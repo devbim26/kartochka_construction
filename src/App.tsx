@@ -1,26 +1,5 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
+export const  App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+     <div className="flex justify-center items-center bg-gradient-to-r from-orange-500 via-white to-red-500 h-screen"><h1 className="text-center gradient-text text-[60px]">Первая странциа web-приложения TransAcoustic!!!!!</h1> </div>
   );
 }
-
-export default App;
