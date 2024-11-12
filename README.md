@@ -34,4 +34,4 @@ File `Dockerfile.dev` for `dev` branch. App starts on http.
 
 **Command:**
 
-`docker build --build-arg REACT_APP_API_URL=<url>`
+`docker build -f Dockerfile.dev --build-arg REACT_APP_API_URL=<url>`
