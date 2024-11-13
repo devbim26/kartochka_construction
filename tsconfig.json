@@ -2,12 +2,11 @@
 	"compilerOptions": {
 		"target": "es5",
 		"lib": ["dom", "dom.iterable", "esnext"],
-		"baseUrl": "./src",
 		"paths": {
-			"@core": ["./core"],
-			"@features": ["./features"],
-			"@assets": ["./assets"],
-			"@router": ["./router"]
+			"@core": ["./src/core"],
+			"@features": ["./src/features"],
+			"@assets": ["./src/assets"],
+			"@router": ["./src/router"]
 		},
 		"allowJs": true,
 		"skipLibCheck": true,
