@@ -22,6 +22,7 @@ export default [
 						['@pages', path.resolve(__dirname, 'src/pages')],
 						['@assets', path.resolve(__dirname, 'src/assets')],
 						['@router', path.resolve(__dirname, 'src/router')],
+						['@features', path.resolve(__dirname, 'src/features')],
 					],
 					extensions: ['.ts', '.js', '.jsx', 'tsx', '.json'],
 				},
