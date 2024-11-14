@@ -1,4 +1,4 @@
-import { LoginPage, RegistrationPage } from '../../presentation';
+import { CompanyRegistrationPage, LoginPage, RegistrationPage } from '../../presentation';
 
 export const AUTH_ROUTES = {
 	login: {
@@ -8,5 +8,9 @@ export const AUTH_ROUTES = {
 	registration: {
 		route: 'registration',
 		element: <RegistrationPage />,
+	},
+	company_registration: {
+		route: 'company-registration',
+		element: <CompanyRegistrationPage />,
 	},
 };

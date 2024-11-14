@@ -1,3 +1,4 @@
+import { RefCallBack } from 'react-hook-form';
 import { IconType } from 'react-icons';
 import ReactInputMask from 'react-input-mask';
 import { twMerge } from 'tailwind-merge';
@@ -19,7 +20,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 	iconPos?: 'right' | 'left';
 	isLoading?: boolean;
 	errorHighlight?: boolean;
-	ref?: React.RefObject<HTMLInputElement>;
+	ref?: RefCallBack;
 }
 
 export const Input = (props: InputProps) => {
@@ -40,7 +41,7 @@ export const Input = (props: InputProps) => {
 				{props.iconPos === 'left' && IconComponent}
 				<div className="flex flex-row items-center">
 					{props.mask ? (
-						<ReactInputMask mask={props.mask}>
+						<ReactInputMask className="text-value-black" mask={props.mask} {...props}>
 							{() => (
 								<input
 									id={props.id}

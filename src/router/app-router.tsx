@@ -11,6 +11,10 @@ export const AppRouter = () => {
 					path={AUTH_ROUTES.registration.route}
 					element={AUTH_ROUTES.registration.element}
 				/>
+				<Route
+					path={AUTH_ROUTES.company_registration.route}
+					element={AUTH_ROUTES.company_registration.element}
+				/>
 			</Route>
 		</Routes>
 	);
