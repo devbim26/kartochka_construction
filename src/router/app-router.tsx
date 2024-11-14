@@ -7,6 +7,10 @@ export const AppRouter = () => {
 		<Routes>
 			<Route path={APP_ROUTES.auth.route} element={APP_ROUTES.auth.element}>
 				<Route path={AUTH_ROUTES.login.route} element={AUTH_ROUTES.login.element} />
+				<Route
+					path={AUTH_ROUTES.registration.route}
+					element={AUTH_ROUTES.registration.element}
+				/>
 			</Route>
 		</Routes>
 	);

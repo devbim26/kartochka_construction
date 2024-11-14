@@ -13,6 +13,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 	containerClassName?: string;
 	mask?: string;
 	error?: string;
+	Button?: () => JSX.Element;
 	Icon?: (() => JSX.Element) | IconType;
 	onIconClick?: () => void;
 	iconPos?: 'right' | 'left';
@@ -37,42 +38,44 @@ export const Input = (props: InputProps) => {
 		<>
 			<div className={twMerge('relative', props.containerClassName)}>
 				{props.iconPos === 'left' && IconComponent}
-				{props.mask ? (
-					<ReactInputMask mask={props.mask}>
-						{() => (
-							<input
-								id={props.id}
-								disabled={props.disabled}
-								className={twMerge(
-									`text-value-black h-[40px] w-full rounded-[8px] border-none px-[16px] py-[10px] font-raleway text-[14px] font-normal ring-1 ring-inset ring-input-border-primary placeholder:text-input-label-primary focus:ring-2 focus:ring-inset focus:ring-primary focus-visible:outline-none`,
-									props.Icon && props.iconPos === 'right' && 'pr-12',
-									props.Icon && props.iconPos === 'left' && 'pl-12',
-									props.isLoading && `animate-pulse`,
-									props.inputClassName,
-									props.errorHighlight && 'bg-error'
-								)}
-								aria-invalid={props.error ? 'true' : 'false'}
-								{...props}
-							/>
-						)}
-					</ReactInputMask>
-				) : (
-					<input
-						id={props.id}
-						disabled={props.disabled}
-						className={twMerge(
-							`text-value-black h-[40px] w-full rounded-[8px] border-none px-[16px] py-[10px] font-raleway text-[14px] font-normal ring-1 ring-inset ring-input-border-primary placeholder:text-input-label-primary focus:ring-2 focus:ring-inset focus:ring-primary focus-visible:outline-none`,
-							props.Icon && props.iconPos === 'right' && 'pr-12',
-							props.Icon && props.iconPos === 'left' && 'pl-12',
-							props.isLoading && `animate-pulse`,
-							props.inputClassName,
-							props.errorHighlight && 'bg-error'
-						)}
-						aria-invalid={props.error ? 'true' : 'false'}
-						{...props}
-					/>
-				)}
-
+				<div className="flex flex-row items-center">
+					{props.mask ? (
+						<ReactInputMask mask={props.mask}>
+							{() => (
+								<input
+									id={props.id}
+									disabled={props.disabled}
+									className={twMerge(
+										`text-value-black h-[40px] w-full rounded-[8px] border-none px-[16px] py-[10px] font-raleway text-[14px] font-normal ring-1 ring-inset ring-input-border-primary placeholder:text-input-label-primary focus:ring-2 focus:ring-inset focus:ring-primary focus-visible:outline-none`,
+										props.Icon && props.iconPos === 'right' && 'pr-12',
+										props.Icon && props.iconPos === 'left' && 'pl-12',
+										props.isLoading && `animate-pulse`,
+										props.inputClassName,
+										props.errorHighlight && 'bg-error'
+									)}
+									aria-invalid={props.error ? 'true' : 'false'}
+									{...props}
+								/>
+							)}
+						</ReactInputMask>
+					) : (
+						<input
+							id={props.id}
+							disabled={props.disabled}
+							className={twMerge(
+								`text-value-black h-[40px] w-full rounded-[8px] border-none px-[16px] py-[10px] font-raleway text-[14px] font-normal ring-1 ring-inset ring-input-border-primary placeholder:text-input-label-primary focus:ring-2 focus:ring-inset focus:ring-primary focus-visible:outline-none`,
+								props.Icon && props.iconPos === 'right' && 'pr-12',
+								props.Icon && props.iconPos === 'left' && 'pl-12',
+								props.isLoading && `animate-pulse`,
+								props.inputClassName,
+								props.errorHighlight && 'bg-error'
+							)}
+							aria-invalid={props.error ? 'true' : 'false'}
+							{...props}
+						/>
+					)}
+					{props.Button && <props.Button />}
+				</div>
 				{props.iconPos === 'right' && IconComponent}
 			</div>
 			{props.error && (

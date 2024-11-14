@@ -1,12 +1,14 @@
 import { Button, Input, LogoIcon, LogoTextIcon } from '@core';
 import { useState } from 'react';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
+import { useNavigate } from 'react-router-dom';
+import { AUTH_ROUTES } from '../../../constants';
 
 export const LoginPage = () => {
 	const [showPassword, setShowPassword] = useState(false);
-
+	const navigate = useNavigate();
 	return (
-		<div className="flex h-[380px] w-[412px] flex-col gap-[23px] rounded-[12px] border-[1px] border-gray-border bg-white px-[32px] py-[21px]">
+		<div className="flex w-[412px] flex-col gap-[23px] rounded-[12px] border-[1px] border-gray-border bg-white px-[32px] py-[21px]">
 			<div className="flex h-[64px] flex-row items-center justify-center gap-[10px]">
 				<LogoIcon />
 				<LogoTextIcon />
@@ -32,7 +34,10 @@ export const LoginPage = () => {
 			</div>
 			<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
 				<p>Нет аккаунта?</p>
-				<p className="cursor-pointer font-semibold underline-offset-auto hover:underline">
+				<p
+					onClick={() => navigate('/auth/' + AUTH_ROUTES.registration.route)}
+					className="cursor-pointer font-semibold underline-offset-auto hover:underline"
+				>
 					Зарегистрироваться
 				</p>
 			</div>
