@@ -1,1 +1,1 @@
-export * from './auth/presentation';
+export * from './auth';

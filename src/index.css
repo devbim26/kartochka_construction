@@ -2,8 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-.gradient-text {
-	background: linear-gradient(to right, hsl(0, 100%, 50%), black, #00ff00);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
+/* Скрытие стандартной кнопки для ввода пароля в Chrome */
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear {
+	display: none;
+}
+
+input[type='password']::-webkit-inner-spin-button,
+input[type='password']::-webkit-calendar-picker-indicator {
+	display: none;
+}
+
+input[type='password']::-webkit-credentials-auto-fill-button,
+input[type='password']::-webkit-textfield-decoration-container {
+	display: none;
 }

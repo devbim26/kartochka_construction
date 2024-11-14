@@ -1,1 +1,2 @@
-export * from './logos/nav-logo.component';
+export * from './components';
+export * from './logos';
