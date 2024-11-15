@@ -26,7 +26,7 @@ File `Dockerfile` for `master` branch. App starts on https.
 
 **Command:**
 
-`docker build --build-arg REACT_APP_API_URL=<url> --build-arg SERVER_NAME=<domain or ip> --build-arg SSL_CERTIFICATE=<path to crt> --build-arg SSL_CERTIFICATE_KEY=<path to key> -t trans-acoustic-i-name`
+`docker build -t trans-acoustic-i-name:latest --build-arg REACT_APP_API_URL="api_url" --build-arg SERVER_NAME="ip_or_domain" .`
 
 ### 2. Development
 
@@ -34,4 +34,4 @@ File `Dockerfile.dev` for `dev` branch. App starts on http.
 
 **Command:**
 
-`docker build -f Dockerfile.dev --build-arg REACT_APP_API_URL=<url>`
+`docker build -f Dockerfile.dev -t trans-acoustic-i-name:latest --build-arg REACT_APP_API_URL="url" .`
