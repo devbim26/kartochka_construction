@@ -12,9 +12,6 @@ dist/
 .DS_Store 
 Thumbs.db
 
-src/ 
-public/
-
 .vscode/ 
 .idea/ 
 *.swp

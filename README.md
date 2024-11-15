@@ -12,10 +12,10 @@ Create `.env` and write:
 
 ```env
 #https
-REACT_APP_API_URL = https://192.168.10.23:5001/swagger/index.html
+REACT_APP_API_URL = https://192.168.10.23:5001/
 
 #http
-REACT_APP_API_URL = http://192.168.10.23:5000/swagger/index.html
+REACT_APP_API_URL = http://192.168.10.23:5000/
 ```
 
 ## Deploy
