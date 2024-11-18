@@ -1,12 +1,8 @@
 import { Button, Input, LogoIcon, LogoTextIcon } from '@core';
-import { useState } from 'react';
-import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { AUTH_ROUTES } from '../../../constants';
 
 export const RegistrationPage = () => {
-	const [showPassword, setShowPassword] = useState(false);
-
 	const navigate = useNavigate();
 
 	const ApproveButton = () => {
@@ -35,24 +31,6 @@ export const RegistrationPage = () => {
 					Button={ApproveButton}
 				/>
 				<Input label="Код подтверждения" placeholder="000-00000" mask="999-99999" />
-				<Input
-					label="Пароль"
-					type={showPassword ? 'password' : 'text'}
-					placeholder="Введите пароль"
-					Icon={showPassword ? IoMdEyeOff : IoMdEye}
-					iconClassName="text-input-label-primary"
-					iconPos="right"
-					onIconClick={() => setShowPassword(!showPassword)}
-				/>
-				<Input
-					label="Повторите пароль"
-					type={showPassword ? 'password' : 'text'}
-					placeholder="Введите пароль"
-					Icon={showPassword ? IoMdEyeOff : IoMdEye}
-					iconClassName="text-input-label-primary"
-					iconPos="right"
-					onIconClick={() => setShowPassword(!showPassword)}
-				/>
 				<Button variant="primary" onClick={handleRegistration} className="h-[36px]">
 					Зарегистрироваться
 				</Button>
