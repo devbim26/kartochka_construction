@@ -1,0 +1,46 @@
+{
+	"files": ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+	"env": {
+		"browser": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:react/recommended",
+		"plugin:@typescript-eslint/recommended",
+		"prettier"
+	],
+	"plugins": ["react", "@typescript-eslint", "prettier"],
+	"rules": {
+		"prettier/prettier": [
+			"error",
+			{
+				"singleQuote": true,
+				"useTabs": true,
+				"tabWidth": 4,
+				"semi": true,
+				"bracketSpacing": true,
+				"printWidth": 100,
+				"trailingComma": "all",
+				"endOfLine": "lf",
+				"plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"]
+			}
+		]
+	},
+	"settings": {
+		"import/resolver": {
+			"alias": {
+				"map": [
+					["@components", "./src/components"],
+					["@pages", "./src/pages"],
+					["@assets", "./src/assets"],
+					["@router", "./src/router"],
+					["@features", "./src/features"]
+				],
+				"extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
+			}
+		},
+		"react": {
+			"version": "detect"
+		}
+	}
+}
