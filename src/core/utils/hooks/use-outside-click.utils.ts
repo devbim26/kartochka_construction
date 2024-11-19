@@ -1,4 +1,4 @@
-import { RefObject, useEffect } from "react";
+import { RefObject, useEffect } from 'react';
 
 /**
  * @name `useOutsideClick`
@@ -24,21 +24,22 @@ import { RefObject, useEffect } from "react";
  */
 
 export const useOutsideClick = (
-    callback: () => void,
-    refs: Array<RefObject<HTMLElement> | null> = [],
-    containerRef?: RefObject<HTMLElement> | null,
+	callback: () => void,
+	refs: Array<RefObject<HTMLElement> | null> = [],
+	containerRef?: RefObject<HTMLElement> | null,
 ) => {
-    useEffect(() => {
-        const handleClickOutside: EventListener = (event) => {
-            const mouseEvent = event as MouseEvent;
-            if (!refs.some(ref => ref?.current?.contains(mouseEvent.target as Node))) {
-                callback();
-            }
-        };
-        const parentContainer: Document | HTMLElement = containerRef && containerRef.current ? containerRef.current : document;
-        parentContainer.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            parentContainer.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [callback, refs, containerRef])
-}
+	useEffect(() => {
+		const handleClickOutside: EventListener = (event) => {
+			const mouseEvent = event as MouseEvent;
+			if (!refs.some((ref) => ref?.current?.contains(mouseEvent.target as Node))) {
+				callback();
+			}
+		};
+		const parentContainer: Document | HTMLElement =
+			containerRef && containerRef.current ? containerRef.current : document;
+		parentContainer.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			parentContainer.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [callback, refs, containerRef]);
+};

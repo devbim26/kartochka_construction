@@ -2,9 +2,9 @@ import type { RefObject } from 'react';
 import { useEffect } from 'react';
 
 interface IScrollOptions {
-    block?: 'start' | 'center' | 'end' | 'nearest';
-    inline?: 'start' | 'center' | 'end' | 'nearest';
-    behavior?: 'smooth' | 'auto';
+	block?: 'start' | 'center' | 'end' | 'nearest';
+	inline?: 'start' | 'center' | 'end' | 'nearest';
+	behavior?: 'smooth' | 'auto';
 }
 
 /**
@@ -54,20 +54,20 @@ interface IScrollOptions {
  */
 
 export const useAutoScroll = (
-    containerRef: RefObject<HTMLElement> | null,
-    show: boolean,
-    selectedID: string,
-    scrollOptions: IScrollOptions = {
-        block: 'start',
-        inline: 'nearest',
-        behavior: 'smooth',
-    }
+	containerRef: RefObject<HTMLElement> | null,
+	show: boolean,
+	selectedID: string,
+	scrollOptions: IScrollOptions = {
+		block: 'start',
+		inline: 'nearest',
+		behavior: 'smooth',
+	},
 ) => {
-    useEffect(() => {
-        show &&
-            containerRef &&
-            containerRef?.current
-                ?.querySelector(`[id="${selectedID}"]`)
-                ?.scrollIntoView({ ...scrollOptions });
-    }, [show]);
-}
+	useEffect(() => {
+		show &&
+			containerRef &&
+			containerRef?.current
+				?.querySelector(`[id="${selectedID}"]`)
+				?.scrollIntoView({ ...scrollOptions });
+	}, [show]);
+};

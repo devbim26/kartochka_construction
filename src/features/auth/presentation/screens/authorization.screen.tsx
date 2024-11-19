@@ -4,8 +4,8 @@ import { LogoTextIcon } from '../../../../core/presentation/logos/nav-logo-text.
 
 export const AuthorizationScreen = () => {
 	return (
-		<div className="bg-gray-navBg flex w-full flex-col">
-			<div className="bg-gray-navHeader flex h-[64px] w-full flex-row items-center gap-[10px] px-[25px]">
+		<div className="flex w-full flex-col bg-gray-navBg">
+			<div className="flex h-[64px] w-full flex-row items-center gap-[10px] bg-gray-navHeader px-[25px]">
 				<LogoIcon />
 				<LogoTextIcon />
 			</div>
