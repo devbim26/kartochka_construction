@@ -30,7 +30,7 @@ File `Dockerfile` for `master` branch. App starts on https.
 
 ### 2. Development
 
-File `Dockerfile.dev` for `dev` branch. App starts on http. 
+File `Dockerfile.dev` for `dev` branch. App starts on http.
 
 **Command:**
 

@@ -1,0 +1,50 @@
+{
+	"env": {
+		"browser": true,
+		"es2021": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:react/recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:import/errors",
+		"plugin:import/warnings",
+		"plugin:import/typescript",
+		"prettier"
+	],
+	"plugins": ["react", "@typescript-eslint", "prettier", "import"],
+	"rules": {
+		"prettier/prettier": [
+			"error",
+			{
+				"singleQuote": true,
+				"useTabs": true,
+				"tabWidth": 4,
+				"semi": true,
+				"bracketSpacing": true,
+				"printWidth": 100,
+				"trailingComma": "all",
+				"endOfLine": "lf"
+			}
+		],
+		"react/react-in-jsx-scope": "off"
+	},
+	"settings": {
+		"import/resolver": {
+			"alias": {
+				"map": [
+					["@components", "./src/components"],
+					["@pages", "./src/pages"],
+					["@assets", "./src/assets"],
+					["@router", "./src/router"],
+					["@features", "./src/features"],
+					["@core", "./src/core"]
+				],
+				"extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
+			}
+		},
+		"react": {
+			"version": "detect"
+		}
+	}
+}
