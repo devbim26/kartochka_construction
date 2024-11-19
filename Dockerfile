@@ -17,10 +17,8 @@ RUN npm run build
 FROM nginx:alpine
 COPY nginx.conf.template /etc/nginx/templates/nginx.conf.template
 
-ARG SSL_CERTIFICATE 
-ARG SSL_CERTIFICATE_KEY
-RUN cp $SSL_CERTIFICATE /etc/nginx/ssl/certificate.crt 
-RUN cp $SSL_CERTIFICATE_KEY /etc/nginx/ssl/certificate.key
+COPY certificate.crt /etc/nginx/ssl/certificate.crt 
+COPY certificate.key /etc/nginx/ssl/certificate.key
 
 RUN rm -rf /usr/share/nginx/html/* 
 COPY --from=build /app/build /usr/share/nginx/html

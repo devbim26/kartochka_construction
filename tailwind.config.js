@@ -3,10 +3,27 @@ module.exports = {
 	content: ['./src/**/*.{js,jsx,ts,tsx}'],
 	theme: {
 		extend: {
+			fontFamily: {
+				raleway: ['Raleway', 'sans-serif'],
+				sans: ['Source Sans Pro', 'sans-serif'],
+			},
 			colors: {
+				primary: '#2175F3',
 				gray: {
 					navHeader: '#F5F6F7',
 					navBg: '#F9F9F9',
+					border: '#EDEFF2',
+				},
+				input: {
+					border: {
+						primary: '#CFD0D1',
+					},
+					value: {
+						black: '#14181F',
+					},
+					label: {
+						primary: '#6F7671',
+					},
 				},
 			},
 		},

@@ -12,10 +12,10 @@ Create `.env` and write:
 
 ```env
 #https
-REACT_APP_API_URL = https://192.168.10.23:5001/swagger/index.html
+REACT_APP_API_URL = https://192.168.10.23:5001/
 
 #http
-REACT_APP_API_URL = http://192.168.10.23:5000/swagger/index.html
+REACT_APP_API_URL = http://192.168.10.23:5000/
 ```
 
 ## Deploy
@@ -26,7 +26,7 @@ File `Dockerfile` for `master` branch. App starts on https.
 
 **Command:**
 
-`docker build --build-arg REACT_APP_API_URL=<url> --build-arg SERVER_NAME=<domain or ip> --build-arg SSL_CERTIFICATE=<path to crt> --build-arg SSL_CERTIFICATE_KEY=<path to key> -t trans-acoustic-i-name`
+`docker build -t trans-acoustic-i-name:latest --build-arg REACT_APP_API_URL="api_url" --build-arg SERVER_NAME="ip_or_domain" .`
 
 ### 2. Development
 
