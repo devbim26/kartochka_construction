@@ -1,4 +1,4 @@
-import { Button, Input, LogoIcon, LogoTextIcon } from '@core';
+import { Button, Input, LogoIcon, LogoTextIcon, Select } from '@core';
 import { useState } from 'react';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +27,23 @@ export const LoginPage = () => {
 					iconClassName="text-input-label-primary"
 					iconPos="right"
 					onIconClick={() => setShowPassword(!showPassword)}
+				/>
+				<Select
+					label="Label"
+					placeholder="Выберите"
+					id="asddd"
+					options={[
+						{
+							id: 'sad0',
+							label: 'Value1',
+							value: 'val1',
+						},
+						{
+							id: 'sad2',
+							label: 'Value2',
+							value: 'val2',
+						},
+					]}
 				/>
 				<Button variant="primary" className="h-[36px]">
 					Войти
