@@ -30,8 +30,8 @@ File `Dockerfile` for `master` branch. App starts on https.
 
 ### 2. Development
 
-File `Dockerfile.dev` for `dev` branch. App starts on http. 
+File `Dockerfile.dev` for `dev` branch. App starts on http.
 
 **Command:**
 
-`docker build -f Dockerfile.dev -t trans-acoustic-i-name:latest --build-arg REACT_APP_API_URL="url" .`
+`docker build -f Dockerfile.dev --build-arg REACT_APP_API_URL=<url>`
