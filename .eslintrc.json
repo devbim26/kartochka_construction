@@ -1,15 +1,18 @@
 {
-	"files": ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
 	"env": {
-		"browser": true
+		"browser": true,
+		"es2021": true
 	},
 	"extends": [
 		"eslint:recommended",
 		"plugin:react/recommended",
 		"plugin:@typescript-eslint/recommended",
+		"plugin:import/errors",
+		"plugin:import/warnings",
+		"plugin:import/typescript",
 		"prettier"
 	],
-	"plugins": ["react", "@typescript-eslint", "prettier"],
+	"plugins": ["react", "@typescript-eslint", "prettier", "import"],
 	"rules": {
 		"prettier/prettier": [
 			"error",
@@ -21,10 +24,10 @@
 				"bracketSpacing": true,
 				"printWidth": 100,
 				"trailingComma": "all",
-				"endOfLine": "lf",
-				"plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"]
+				"endOfLine": "lf"
 			}
-		]
+		],
+		"react/react-in-jsx-scope": "off"
 	},
 	"settings": {
 		"import/resolver": {
@@ -34,7 +37,8 @@
 					["@pages", "./src/pages"],
 					["@assets", "./src/assets"],
 					["@router", "./src/router"],
-					["@features", "./src/features"]
+					["@features", "./src/features"],
+					["@core", "./src/core"]
 				],
 				"extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
 			}

@@ -46,9 +46,9 @@ export const LogoIcon = ({ className }: LogoProps) => {
 					width="8.97961"
 					height="18.7755"
 					filterUnits="userSpaceOnUse"
-					color-interpolation-filters="sRGB"
+					colorInterpolationFilters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feColorMatrix
 						in="SourceAlpha"
 						type="matrix"
