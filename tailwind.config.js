@@ -25,6 +25,7 @@ module.exports = {
 						primary: '#6F7671',
 					},
 				},
+				error: '#FF0800',
 			},
 		},
 	},

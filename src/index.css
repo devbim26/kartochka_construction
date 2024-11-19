@@ -17,3 +17,13 @@ input[type='password']::-webkit-credentials-auto-fill-button,
 input[type='password']::-webkit-textfield-decoration-container {
 	display: none;
 }
+/* Скрытие стрелочек для всех браузеров */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type='number'] {
+	-moz-appearance: textfield; /* Для Firefox */
+}
