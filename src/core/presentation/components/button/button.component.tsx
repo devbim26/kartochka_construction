@@ -26,7 +26,7 @@ export const Button = ({
 	buttonIcon = false,
 	...rest
 }: ButtonProps) => {
-	let buttonContent = children;
+	const buttonContent = children;
 
 	return (
 		<button
@@ -35,7 +35,7 @@ export const Button = ({
 				`flex-center text-semibold gap-1 whitespace-nowrap rounded-lg font-sans text-[14px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50`,
 				BUTTON_VARIANTS[variant],
 				!buttonIcon ? 'py-1.5' : 'px-0',
-				className
+				className,
 			)}
 			{...rest}
 		>

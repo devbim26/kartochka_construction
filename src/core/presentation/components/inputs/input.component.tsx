@@ -29,7 +29,7 @@ export const Input = (props: InputProps) => {
 			className={twMerge(
 				`text-gray absolute top-1/2 h-5 w-5 -translate-y-1/2 cursor-pointer`,
 				props.iconPos === 'right' ? 'right-3' : 'left-3',
-				props.iconClassName
+				props.iconClassName,
 			)}
 			onClick={props.onIconClick}
 		/>
@@ -52,7 +52,7 @@ export const Input = (props: InputProps) => {
 										props.Icon && props.iconPos === 'left' && 'pl-12',
 										props.isLoading && `animate-pulse`,
 										props.inputClassName,
-										props.errorHighlight && 'bg-error'
+										props.errorHighlight && 'bg-error',
 									)}
 									aria-invalid={props.error ? 'true' : 'false'}
 									{...props}
@@ -69,7 +69,7 @@ export const Input = (props: InputProps) => {
 								props.Icon && props.iconPos === 'left' && 'pl-12',
 								props.isLoading && `animate-pulse`,
 								props.inputClassName,
-								props.errorHighlight && 'bg-error'
+								props.errorHighlight && 'bg-error',
 							)}
 							aria-invalid={props.error ? 'true' : 'false'}
 							{...props}
@@ -97,7 +97,7 @@ export const Input = (props: InputProps) => {
 				forId={props.id}
 				className={twMerge(
 					'font-raleway text-[14px] text-input-label-primary',
-					props.labelClassName
+					props.labelClassName,
 				)}
 			>
 				{props.label}
