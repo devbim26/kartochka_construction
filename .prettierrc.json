@@ -6,6 +6,6 @@
 	"bracketSpacing": true,
 	"printWidth": 100,
 	"trailingComma": "all",
-	"endOfLine": "lf",
+	"endOfLine": "auto",
 	"plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"]
 }
