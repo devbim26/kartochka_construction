@@ -38,7 +38,8 @@
 					["@assets", "./src/assets"],
 					["@router", "./src/router"],
 					["@features", "./src/features"],
-					["@core", "./src/core"]
+					["@core", "./src/core"],
+					["@api-gen", "./api-gen/"]
 				],
 				"extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
 			}

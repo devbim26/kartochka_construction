@@ -59,7 +59,7 @@ export const RegistrationPage = () => {
 							error={formState.errors.code?.message}
 						/>
 						<Button variant="primary" type="submit" className="h-[36px]">
-							Зарегистрироваться
+							Продолжить
 						</Button>
 					</div>
 				</form>
