@@ -1,3 +1,5 @@
+import plugin from 'tailwindcss/plugin';
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: ['./src/**/*.{js,jsx,ts,tsx}'],
@@ -28,5 +30,15 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [],
+	plugins: [
+		plugin(function ({ addUtilities }) {
+			addUtilities({
+				'.scrollbar-none': {
+					'-ms-overflow-style': 'none',
+					/* Internet Explorer 10+ */ 'scrollbar-width': 'none' /* Firefox */,
+				},
+				'.scrollbar-none::-webkit-scrollbar': { display: 'none' /* Safari and Chrome */ },
+			});
+		}),
+	],
 };

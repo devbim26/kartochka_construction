@@ -1,8 +1,9 @@
-import { ChangeEvent, memo, useRef, useState } from 'react';
+import { ChangeEvent, memo, useLayoutEffect, useRef, useState } from 'react';
 import { RefCallBack } from 'react-hook-form';
 import { IconType } from 'react-icons';
+import { FaChevronDown } from 'react-icons/fa';
 import { twMerge } from 'tailwind-merge';
-import { useAutoScroll } from '../../../utils';
+import { useAutoScroll, useOutsideClick } from '../../../utils';
 import { FormElementLabel } from '../forms';
 
 type ListOption = {
@@ -14,6 +15,7 @@ type ListOption = {
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 	label?: string;
 	placeholder?: string;
+	optionsAllPlaceholder?: string;
 	options: ListOption[];
 	searchable?: boolean;
 	wrapperClassName?: string;
@@ -28,52 +30,101 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 	isLoading?: boolean;
 	errorHighlight?: boolean;
 	ref?: RefCallBack;
-	Icon?: (() => JSX.Element) | IconType;
+	icon?: (() => JSX.Element) | IconType;
 }
 
 export const Select = memo((props: SelectProps) => {
 	const optionsListRef = useRef<HTMLDivElement | null>(null);
+	const inputBlockRef = useRef<HTMLDivElement | null>(null);
 	const [show, setShow] = useState<boolean>(false);
+	const [searchValue, setSearchValue] = useState<string>('');
 	const [visibleOptions, setVisibleOptions] = useState<ListOption[]>(props.options);
 	const [selected, setSelected] = useState<ListOption[]>([]);
+	const [selectedAll, setSelectedAll] = useState<boolean>(false);
+	const [searchId] = useState<string>(`search-id-${Math.floor(Math.random() * 1000)}`);
 
 	const optionClickHandle = (opt: ListOption) => {
-		let newValue = selected.map((o) => ({ ...o }));
-		if (props.multiple) {
-			const founded = newValue.findIndex((o) => o.id === opt.id);
-			founded !== -1 ? newValue.push(opt) : newValue.splice(founded, 1);
+		if (selectedAll) {
+			setSelectedAll(false);
 		} else {
-			newValue = newValue[0].id === opt.id ? [] : [opt];
+			let newValue = selected.map((o) => ({ ...o }));
+			if (props.multiple) {
+				const founded = newValue.findIndex((o) => o.id === opt.id);
+				if (founded !== -1) {
+					newValue.splice(founded, 1);
+				} else {
+					newValue.push(opt);
+				}
+			} else {
+				newValue = newValue[0] && newValue[0].id === opt.id ? [] : [opt];
+			}
+			setSelected(newValue);
 		}
-		setSelected(newValue);
 	};
 
+	const close = () => {
+		if (show) {
+			setShow(false);
+			setSearchValue('');
+		}
+	};
+
+	useOutsideClick(close, [inputBlockRef, optionsListRef]);
 	useAutoScroll(optionsListRef, show, selected[0]?.id);
+
+	useLayoutEffect(() => {
+		const cloned = visibleOptions.map((o) => ({ ...o }));
+		setVisibleOptions(
+			searchValue
+				? cloned.filter((o) => o.label.toLowerCase().includes(searchValue.toLowerCase()))
+				: props.options,
+		);
+	}, [searchValue]);
+
+	useLayoutEffect(() => {
+		selectedAll ? setSelected(props.options.map((o) => ({ ...o }))) : setSelected([]);
+	}, [selectedAll]);
 
 	return (
 		<div className={twMerge('relative flex flex-col gap-y-2', props.wrapperClassName)}>
 			{props.label && (
 				<FormElementLabel
-					forId={props.id}
+					forId={searchId}
 					className={twMerge(
-						'font-raleway text-[14px] text-input-label-primary',
+						'font-raleway text-[14px] text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 						props.labelClassName,
 					)}
+					onClick={() => !props.searchable && setShow(true)}
 				>
 					{props.label}
 				</FormElementLabel>
 			)}
 			<div
 				className={twMerge(
-					'color-[#91969E] flex flex-row items-center gap-[8px] truncate rounded-lg border-[1px] border-[#EDEFF2] bg-transparent py-[6px] pl-[12px] pr-[8px]',
+					'flex flex-row items-center gap-[8px] truncate rounded-lg bg-transparent py-[6px] pl-[12px] pr-[8px] text-base font-normal leading-6 text-input-label-primary ring-[1px] ring-input-border-primary',
 					props.containerClassName,
 				)}
-				onClick={() => setShow(true)}
+				onClick={(e: React.MouseEvent<HTMLDivElement>) =>
+					!props.searchable &&
+					(e.target as HTMLDivElement) !== optionsListRef.current &&
+					setShow(true)
+				}
+				ref={inputBlockRef}
+				onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+					if (e.key === 'Escape') {
+						(e.target as HTMLElement).blur();
+						close();
+					} else if (e.key === 'Tab') {
+						close();
+					}
+				}}
 			>
 				<select
 					className="hidden"
-					value={props.multiple ? selected[0].value : selected.map((o) => o.value)}
+					value={props.multiple ? selected[0]?.value : selected.map((o) => o.value)}
+					onChange={props.onChange ? props.onChange : () => {}}
 					{...props}
+					tabIndex={-1}
 				>
 					<option value={''}>{props.placeholder}</option>
 					{props.options.map((option) => (
@@ -84,60 +135,67 @@ export const Select = memo((props: SelectProps) => {
 				</select>
 				{props.searchable ? (
 					<input
-						className="placeholder:color-[#91969E] flex min-w-0 border-none bg-transparent outline-none"
+						id={searchId}
+						className="flex min-w-0 flex-1 border-none bg-transparent outline-none placeholder:text-input-label-primary"
 						type="text"
-						id={props.id}
 						placeholder={props.placeholder}
 						onChange={(e: ChangeEvent<HTMLInputElement>) => {
-							const cloned = visibleOptions.map((o) => ({ ...o }));
-							setVisibleOptions(
-								e.target.value
-									? cloned.filter((o) =>
-											o.label
-												.toLowerCase()
-												.includes(e.target.value.toLowerCase()),
-										)
-									: props.options,
-							);
+							setSearchValue(e.target.value);
 						}}
+						onFocus={() => setShow(true)}
+						onBlur={(e: React.FocusEvent<HTMLInputElement>) => {}}
 					/>
 				) : (
-					<>{props.placeholder}</>
+					<p className="flex flex-1 cursor-pointer">{props.placeholder}</p>
 				)}
-				{props.Icon && (
-					<props.Icon
+				{props.icon ? (
+					<props.icon tabIndex={-1} />
+				) : (
+					<FaChevronDown
 						className={twMerge(
-							`text-gray absolute top-1/2 h-5 w-5 -translate-y-1/2 cursor-pointer`,
+							'h-[20px] w-[20px] cursor-pointer fill-[#6F7276] transition duration-[0.2]',
+							show ? '-rotate-180' : 'rotate-0',
 							props.iconClassName,
 						)}
 					/>
 				)}
-			</div>
-			{show && (
-				<div
-					className={twMerge(
-						'absolute top-[65px] flex max-h-[100px] w-full flex-col overflow-y-auto rounded-lg border-[1px] border-[#EDEFF2] bg-[#FFFFFF] px-[12px] py-[6px]',
-						props.listOptionsClassName,
-					)}
-					ref={optionsListRef}
-				>
-					{visibleOptions.map((option) => (
+				{show && (
+					<div
+						className={twMerge(
+							'absolute left-[0px] top-[67px] z-10 max-h-[50px] w-full overflow-auto bg-white scrollbar-none',
+							props.listOptionsClassName,
+						)}
+						ref={optionsListRef}
+						tabIndex={show ? 0 : -1}
+					>
 						<div
-							key={option.id}
 							className={twMerge(
-								'flex w-full cursor-pointer truncate p-1',
-								selected.find((o) => option.id === o.id)
-									? 'bg-red-500'
-									: 'bg-transparent',
+								'border-input-border flex w-full cursor-pointer truncate rounded-t-lg border-[1px] border-b-0 border-solid px-[12px] py-[6px] text-base font-normal leading-6 hover:bg-primary hover:text-white',
+								selectedAll ? 'bg-primary text-white' : '',
 								props.optionClassName,
 							)}
-							onClick={() => optionClickHandle(option)}
+							onClick={() => setSelectedAll(!selectedAll)}
 						>
-							{option.label}
+							{props.optionsAllPlaceholder ?? 'Все'}
 						</div>
-					))}
-				</div>
-			)}
+						{visibleOptions.map((option) => (
+							<div
+								key={option.id}
+								className={twMerge(
+									'last:rounded-b-lf border-input-border flex w-full cursor-pointer truncate border-[1px] border-solid px-[12px] py-[6px] text-base font-normal leading-6 last:rounded-b-lg last:border-t-0 hover:bg-primary hover:text-white',
+									selected.find((o) => o.id === option.id)
+										? 'bg-primary text-white'
+										: '',
+									props.optionClassName,
+								)}
+								onClick={() => optionClickHandle(option)}
+							>
+								{option.label}
+							</div>
+						))}
+					</div>
+				)}
+			</div>
 		</div>
 	);
 });
