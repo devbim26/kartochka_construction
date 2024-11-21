@@ -7,9 +7,7 @@ export const authLogin = createAsyncThunk(
 	AUTH_FETCH_ROUTES.login.url,
 	async (loginData: LoginFormData, thunkAPI) => {
 		try {
-			const response = await fetchApi.api.authLoginCreate(loginData, {
-				baseURL: process.env.REACT_APP_API_URL,
-			});
+			const response = await fetchApi.api.authLoginCreate(loginData);
 			return {
 				payload: response.data,
 				fetch_data: {

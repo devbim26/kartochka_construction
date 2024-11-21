@@ -36,7 +36,7 @@ export const CompanyRegistrationPage = () => {
 	};
 
 	return (
-		<div className="mb-[100px] flex w-[508px] flex-col gap-[23px] rounded-[12px] border-[1px] border-gray-border bg-white px-[32px] py-[23px]">
+		<div className="mb-[100px] flex w-[508px] flex-col gap-[23px] rounded-[12px] border border-gray-border bg-white px-[32px] py-[23px]">
 			<p className="text-center font-raleway text-[28px] font-semibold text-black">
 				Регистрация компании
 			</p>

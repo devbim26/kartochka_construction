@@ -1,4 +1,4 @@
-import { generateApi } from 'swagger-typescript-api';
+const generateApi = require('swagger-typescript-api').generateApi;
 const apiUrl = 'http://192.168.10.23:5000/swagger/v1/swagger.json';
 
 if (!apiUrl) {
@@ -7,7 +7,12 @@ if (!apiUrl) {
 	process.exit(1);
 }
 
-generateApi({ name: 'api.ts', output: '../../../api-gen', url: apiUrl, httpClientType: 'axios' })
+generateApi({
+	name: 'api.ts',
+	output: '../../../src/api-gen',
+	url: apiUrl,
+	httpClientType: 'axios',
+})
 	.then(() => {
 		console.log('API generation completed successfully.');
 	})
