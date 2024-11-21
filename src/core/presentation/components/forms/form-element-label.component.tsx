@@ -12,3 +12,5 @@ export const FormElementLabel = memo(({ forId, children, className }: FormElemen
 		</label>
 	);
 });
+
+FormElementLabel.displayName = 'FormElementLabel';
