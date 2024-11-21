@@ -7,7 +7,7 @@
 			"@features": ["./src/features"],
 			"@assets": ["./src/assets"],
 			"@router": ["./src/router"],
-			"@api-gen": ["./api-gen/"]
+			"@api-gen": ["./src/api-gen"]
 		},
 		"allowJs": true,
 		"skipLibCheck": true,

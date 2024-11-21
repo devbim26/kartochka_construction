@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { SliceInitialState } from '../../../core/utils/fetch/create-cases.util';
+import { createAsyncCases, SliceInitialState } from '../../../core/utils/fetch/create-cases.util';
+import { authLogin } from '../services';
 import { authReducer } from './auth.reducer';
 
 export interface AuthSliceDataState {
@@ -43,5 +44,9 @@ export const authSlice = createSlice({
 	reducers: {
 		authReducer,
 	},
-	extraReducers: (builder) => {},
+	extraReducers: (builder) => {
+		createAsyncCases(builder, authLogin, (state: AuthSliceState, action) =>
+			console.log(action.payload),
+		);
+	},
 });

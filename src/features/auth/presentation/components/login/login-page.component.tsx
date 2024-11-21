@@ -1,16 +1,27 @@
-import { Button, Input, LogoIcon, LogoTextIcon } from '@core';
+import { Button, Input, LogoIcon, LogoTextIcon, useAppDispatch, useAppSelector } from '@core';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { AUTH_ROUTES } from '../../../constants';
+import { authLogin } from '../../../services';
 import { LoginFormData } from '../../../types';
 import { LoginFormDataConfig } from '../../../utils';
 
 export const LoginPage = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
+	const authData = useAppSelector((store) => store.authData);
+
+	useEffect(() => {
+		console.log(authData);
+	}, [authData]);
+
+	useEffect(() => {
+		dispatch(authLogin({ password: 'asdasdasd', phoneNumber: '+375232131' }));
+	}, []);
 
 	const form = useForm<LoginFormData>({
 		resolver: zodResolver(LoginFormDataConfig.schema),
