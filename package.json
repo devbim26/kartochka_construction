@@ -29,7 +29,7 @@
 		"build": "craco build",
 		"test": "craco test",
 		"eject": "craco eject",
-		"format": "prettier --write ."
+		"format": "prettier --write ./src && eslint --fix ./src"
 	},
 	"eslintConfig": {
 		"extends": [
@@ -61,6 +61,7 @@
 		"eslint-plugin-import": "^2.31.0",
 		"eslint-plugin-prettier": "^5.2.1",
 		"eslint-plugin-react": "^7.37.2",
+		"eslint-plugin-tailwindcss": "^3.17.5",
 		"globals": "^15.12.0",
 		"postcss": "^8.4.48",
 		"prettier": "^3.3.3",

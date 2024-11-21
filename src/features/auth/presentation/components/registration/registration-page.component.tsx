@@ -18,7 +18,7 @@ export const RegistrationPage = () => {
 	};
 
 	return (
-		<div className="flex w-[508px] flex-col gap-[23px] rounded-[12px] border-[1px] border-gray-border bg-white px-[32px] py-[23px]">
+		<div className="flex w-[508px] flex-col gap-[23px] rounded-[12px] border border-gray-border bg-white px-[32px] py-[23px]">
 			<div className="flex h-[64px] flex-row items-center justify-center gap-[10px]">
 				<LogoIcon />
 				<LogoTextIcon />
