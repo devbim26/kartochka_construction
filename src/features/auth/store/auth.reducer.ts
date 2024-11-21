@@ -2,13 +2,15 @@ import { AUTH_ACTIONS } from '../constants';
 import { AuthSliceDataState, AuthSliceState } from './auth.slice';
 
 type ActionType = (typeof AUTH_ACTIONS)[keyof typeof AUTH_ACTIONS];
+type PayloadType = boolean | string;
 
 interface Action {
 	type: ActionType;
-	payload: boolean | string;
+	payload: PayloadType;
 }
+type MapFnc = (data: AuthSliceDataState, payload: any) => AuthSliceDataState;
 
-const actions = new Map<any, any>([
+const actions = new Map<ActionType, MapFnc>([
 	[
 		AUTH_ACTIONS.SET_INVALID_DATA,
 		(data: AuthSliceDataState, payload: boolean) => {
@@ -55,7 +57,7 @@ const actions = new Map<any, any>([
 
 export const authReducer = (state: AuthSliceState, action: Action): AuthSliceState => {
 	if (actions.has(action.type)) {
-		return { ...state, data: actions.get(action.type)(state.data, action.payload) };
+		return { ...state, data: actions.get(action.type)!(state.data, action.payload) };
 	} else {
 		return state;
 	}
