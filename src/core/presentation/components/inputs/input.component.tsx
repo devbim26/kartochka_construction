@@ -41,7 +41,11 @@ export const Input = (props: InputProps) => {
 				{props.iconPos === 'left' && IconComponent}
 				<div className="flex flex-row items-center">
 					{props.mask ? (
-						<ReactInputMask className="text-value-black" mask={props.mask} {...props}>
+						<ReactInputMask
+							className="text-input-value-black"
+							mask={props.mask}
+							{...props}
+						>
 							{() => (
 								<input
 									id={props.id}

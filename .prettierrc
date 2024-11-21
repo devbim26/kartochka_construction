@@ -7,6 +7,5 @@
 	"printWidth": 100,
 	"trailingComma": "all",
 	"endOfLine": "auto",
-	"classNamesOrder": "ignore",
 	"plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"]
 }

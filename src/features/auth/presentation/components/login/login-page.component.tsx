@@ -1,4 +1,4 @@
-import { Button, Input, LogoIcon, LogoTextIcon, Select } from '@core';
+import { Button, Input, LogoIcon, LogoTextIcon } from '@core';
 import { useState } from 'react';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ export const LoginPage = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const navigate = useNavigate();
 	return (
-		<div className="flex w-[412px] flex-col gap-[23px] rounded-[12px] border-[1px] border-gray-border bg-white px-[32px] py-[21px]">
+		<div className="flex w-[412px] flex-col gap-[23px] rounded-[12px] border border-gray-border bg-white px-[32px] py-[21px]">
 			<div className="flex h-[64px] flex-row items-center justify-center gap-[10px]">
 				<LogoIcon />
 				<LogoTextIcon />
@@ -27,40 +27,6 @@ export const LoginPage = () => {
 					iconClassName="text-input-label-primary"
 					iconPos="right"
 					onIconClick={() => setShowPassword(!showPassword)}
-				/>
-				<Select
-					id="id1"
-					placeholder="select somthing"
-					multiple
-					searchable
-					label="Select"
-					options={[
-						{
-							id: 'id1',
-							value: 'value',
-							label: 'label',
-						},
-						{
-							id: 'id2',
-							value: 'value2',
-							label: 'label2',
-						},
-						{
-							id: 'id3',
-							value: 'value3',
-							label: 'label2',
-						},
-						{
-							id: 'id35',
-							value: 'value3',
-							label: 'label2',
-						},
-						{
-							id: 'id354',
-							value: 'value3',
-							label: 'label2',
-						},
-					]}
 				/>
 				<Button variant="primary" className="h-[36px]">
 					Войти

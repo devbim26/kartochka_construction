@@ -28,7 +28,7 @@ export const CompanyRegistrationPage = () => {
 	};
 
 	return (
-		<div className="flex max-h-[700px] min-w-[800px] flex-col gap-[23px] overflow-auto rounded-[12px] border-[1px] border-gray-border bg-white px-[32px] py-[23px]">
+		<div className="flex max-h-[700px] min-w-[800px] flex-col gap-[23px] overflow-auto rounded-[12px] border border-gray-border bg-white px-[32px] py-[23px]">
 			<div className="flex flex-col">
 				<div className="flex flex-col gap-[20px]">
 					<p className="text-center font-raleway text-[28px] font-semibold text-black">

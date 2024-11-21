@@ -10,9 +10,10 @@
 		"plugin:import/errors",
 		"plugin:import/warnings",
 		"plugin:import/typescript",
-		"prettier"
+		"plugin:prettier/recommended",
+		"plugin:tailwindcss/recommended"
 	],
-	"plugins": ["react", "@typescript-eslint", "prettier", "import"],
+	"plugins": ["react", "@typescript-eslint", "prettier", "import", "tailwindcss"],
 	"rules": {
 		"prettier/prettier": [
 			"error",

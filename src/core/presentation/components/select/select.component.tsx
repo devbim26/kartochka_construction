@@ -143,7 +143,7 @@ export const Select = memo((props: SelectProps) => {
 							setSearchValue(e.target.value);
 						}}
 						onFocus={() => setShow(true)}
-						onBlur={(e: React.FocusEvent<HTMLInputElement>) => {}}
+						onBlur={() => {}}
 					/>
 				) : (
 					<p className="flex flex-1 cursor-pointer">{props.placeholder}</p>
@@ -162,7 +162,7 @@ export const Select = memo((props: SelectProps) => {
 				{show && (
 					<div
 						className={twMerge(
-							'absolute left-[0px] top-[67px] z-10 max-h-[50px] w-full overflow-auto bg-white scrollbar-none',
+							'absolute left-[0px] top-[67px] z-10 max-h-[185px] w-full overflow-auto bg-white scrollbar-none',
 							props.listOptionsClassName,
 						)}
 						ref={optionsListRef}
