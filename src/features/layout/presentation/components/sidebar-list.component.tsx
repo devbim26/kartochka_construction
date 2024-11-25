@@ -1,3 +1,4 @@
+import { SessionStorageKeys } from '@core';
 import { memo, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { twMerge } from 'tailwind-merge';
@@ -5,17 +6,26 @@ import { SidebarItemCommonProps } from '../../types';
 
 interface SidebarListProps extends SidebarItemCommonProps {
 	children: JSX.Element;
-	defaultShowState?: boolean;
 }
 
 export const SidebarList = memo((props: SidebarListProps) => {
-	const [showSubItems, setShowSubItems] = useState<boolean>(props.defaultShowState || false);
+	const [showSubItems, setShowSubItems] = useState<boolean>(() => {
+		const idFromStorage = sessionStorage.getItem(SessionStorageKeys.NavbarSelectId);
+		return (idFromStorage && idFromStorage === props.id) || false;
+	});
+
+	const onClickHandle = () => {
+		!showSubItems
+			? sessionStorage.setItem(SessionStorageKeys.NavbarSelectId, props.id)
+			: sessionStorage.setItem(SessionStorageKeys.NavbarSelectId, '');
+		setShowSubItems(!showSubItems);
+	};
 
 	return (
 		<div className="flex h-fit flex-col">
 			<div
 				className="flex w-full cursor-pointer flex-row items-center justify-between py-[14px] pl-[24px]"
-				onClick={() => setShowSubItems(!showSubItems)}
+				onClick={onClickHandle}
 			>
 				<div className="flex flex-row items-center gap-[16px] font-sans text-base font-normal leading-5 text-[#383838]">
 					{props.icon && <props.icon size={'20px'} />}
