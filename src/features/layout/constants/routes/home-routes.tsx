@@ -1,3 +1,5 @@
+import { Outlet } from 'react-router-dom';
+
 export const HOME_ROUTES = {
 	main: {
 		id: 'main-page-id',
@@ -25,37 +27,61 @@ export const HOME_ROUTES = {
 		element: <div>Счета</div>,
 	},
 	users_list: {
-		manager: {
-			id: 'manager-page-id',
-			route: 'manager',
-			element: <div>Менеджер</div>,
+		layout: {
+			id: 'users-list-layout-id',
+			route: 'users-list',
+			element: (
+				<div>
+					Users list item
+					<Outlet />
+				</div>
+			),
 		},
-		client: {
-			id: 'client-page-id',
-			route: 'client',
-			element: <div>Клиент</div>,
+		childrens: {
+			manager: {
+				id: 'manager-page-id',
+				route: 'manager',
+				element: <div>Менеджер</div>,
+			},
+			client: {
+				id: 'client-page-id',
+				route: 'client',
+				element: <div>Клиент</div>,
+			},
 		},
 	},
 	guidbooks: {
-		materials: {
-			id: 'materials-page-id',
-			route: 'materials',
-			element: <div>Материалы</div>,
+		layout: {
+			id: 'guidbooks-layout-id',
+			route: 'guidbooks',
+			element: (
+				<div>
+					Guidbooks Layout
+					<Outlet />
+				</div>
+			),
 		},
-		constructions: {
-			id: 'constructions-page-id',
-			route: 'constructions',
-			element: <div>Конструктор подписок</div>,
-		},
-		requirements: {
-			id: 'requirements-page-id',
-			route: 'requirements',
-			element: <div>Требования</div>,
-		},
-		issuers: {
-			id: 'issuers-page-id',
-			route: 'issuers',
-			element: <div>Производители</div>,
+		childrens: {
+			materials: {
+				id: 'materials-page-id',
+				route: 'materials',
+				element: <div>Материалы</div>,
+			},
+			constructions: {
+				id: 'constructions-page-id',
+				route: 'constructions',
+				element: <div>Конструктор подписок</div>,
+			},
+			requirements: {
+				id: 'requirements-page-id',
+				route: 'requirements',
+				element: <div>Требования</div>,
+			},
+			issuers: {
+				id: 'issuers-page-id',
+				route: 'issuers',
+				element: <div>Производители</div>,
+			},
 		},
 	},
 	news: {

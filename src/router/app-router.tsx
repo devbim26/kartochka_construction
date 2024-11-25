@@ -19,21 +19,51 @@ export const AppRouter = () => {
 			<Route path={APP_ROUTES.home.route} element={APP_ROUTES.home.element}>
 				<Route path={HOME_ROUTES.main.route} element={HOME_ROUTES.main.element} />
 				<Route
-					path={HOME_ROUTES.guidbooks.constructions.route}
-					element={HOME_ROUTES.guidbooks.constructions.element}
+					path={HOME_ROUTES.constructor.route}
+					element={HOME_ROUTES.constructor.element}
 				/>
+				<Route path={HOME_ROUTES.account.route} element={HOME_ROUTES.account.element} />
 				<Route
-					path={HOME_ROUTES.guidbooks.issuers.route}
-					element={HOME_ROUTES.guidbooks.issuers.element}
+					path={HOME_ROUTES.subscribes_constructor.route}
+					element={HOME_ROUTES.subscribes_constructor.element}
 				/>
+				<Route path={HOME_ROUTES.accounts.route} element={HOME_ROUTES.accounts.element} />
 				<Route
-					path={HOME_ROUTES.guidbooks.materials.route}
-					element={HOME_ROUTES.guidbooks.materials.element}
-				/>
+					path={HOME_ROUTES.users_list.layout.route}
+					element={HOME_ROUTES.users_list.layout.element}
+				>
+					<Route
+						path={HOME_ROUTES.users_list.childrens.manager.route}
+						element={HOME_ROUTES.users_list.childrens.manager.element}
+					/>
+					<Route
+						path={HOME_ROUTES.users_list.childrens.client.route}
+						element={HOME_ROUTES.users_list.childrens.client.element}
+					/>
+				</Route>
 				<Route
-					path={HOME_ROUTES.guidbooks.requirements.route}
-					element={HOME_ROUTES.guidbooks.requirements.element}
-				/>
+					path={HOME_ROUTES.guidbooks.layout.route}
+					element={HOME_ROUTES.guidbooks.layout.element}
+				>
+					<Route
+						path={HOME_ROUTES.guidbooks.childrens.constructions.route}
+						element={HOME_ROUTES.guidbooks.childrens.constructions.element}
+					/>
+					<Route
+						path={HOME_ROUTES.guidbooks.childrens.issuers.route}
+						element={HOME_ROUTES.guidbooks.childrens.issuers.element}
+					/>
+					<Route
+						path={HOME_ROUTES.guidbooks.childrens.materials.route}
+						element={HOME_ROUTES.guidbooks.childrens.materials.element}
+					/>
+					<Route
+						path={HOME_ROUTES.guidbooks.childrens.requirements.route}
+						element={HOME_ROUTES.guidbooks.childrens.requirements.element}
+					/>
+				</Route>
+				<Route path={HOME_ROUTES.news.route} element={HOME_ROUTES.news.element} />
+				<Route path={HOME_ROUTES.reports.route} element={HOME_ROUTES.reports.element} />
 			</Route>
 		</Routes>
 	);
