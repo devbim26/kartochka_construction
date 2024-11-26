@@ -7,7 +7,7 @@ export const HomeScreen = () => {
 			<HomeHeader />
 			<div className="flex flex-1 flex-row">
 				<Sidebar />
-				<div className="flex flex-1 bg-background-secondary px-[24px] pt-[29px]">
+				<div className="bg-background-secondary flex flex-1 px-[24px] pt-[29px]">
 					<Outlet />
 				</div>
 			</div>
