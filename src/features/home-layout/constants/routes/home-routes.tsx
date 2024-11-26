@@ -1,38 +1,38 @@
 import { Outlet } from 'react-router-dom';
+import { DevScreen } from '../../../dev';
 
 export const HOME_ROUTES = {
 	main: {
 		id: 'main-page-id',
 		route: 'main',
-		element: <div>Главная</div>,
+		element: <DevScreen title="Главная" />,
 	},
 	constructor: {
 		id: 'constructor-page-id',
 		route: 'constructor',
-		element: <div>Конструктор</div>,
+		element: <DevScreen title="Конструктор" />,
 	},
 	account: {
 		id: 'account-page-id',
 		route: 'account',
-		element: <div>Личный кабинет</div>,
+		element: <DevScreen title="Личный кабинет" />,
 	},
 	subscribes_constructor: {
 		id: 'subscribes-constructor-page-id',
 		route: 'subscribes-constructor',
-		element: <div>Конструктор подписок</div>,
+		element: <DevScreen title="Конструктор подписок" />,
 	},
 	accounts: {
 		id: 'accounts-page-id',
 		route: 'accounts',
-		element: <div>Счета</div>,
+		element: <DevScreen title="Счета" />,
 	},
 	users_list: {
 		layout: {
 			id: 'users-list-layout-id',
 			route: 'users-list',
 			element: (
-				<div>
-					Users list item
+				<div className="flex flex-1">
 					<Outlet />
 				</div>
 			),
@@ -41,12 +41,12 @@ export const HOME_ROUTES = {
 			manager: {
 				id: 'manager-page-id',
 				route: 'manager',
-				element: <div>Менеджер</div>,
+				element: <DevScreen title="Список пользователей. Менеджер" />,
 			},
 			client: {
 				id: 'client-page-id',
 				route: 'client',
-				element: <div>Клиент</div>,
+				element: <DevScreen title="Список пользователей. Клиент" />,
 			},
 		},
 	},
@@ -55,8 +55,7 @@ export const HOME_ROUTES = {
 			id: 'guidbooks-layout-id',
 			route: 'guidbooks',
 			element: (
-				<div>
-					Guidbooks Layout
+				<div className="flex flex-1">
 					<Outlet />
 				</div>
 			),
@@ -65,33 +64,33 @@ export const HOME_ROUTES = {
 			materials: {
 				id: 'materials-page-id',
 				route: 'materials',
-				element: <div>Материалы</div>,
+				element: <DevScreen title="Справочники. Материалы" />,
 			},
 			constructions: {
 				id: 'constructions-page-id',
 				route: 'constructions',
-				element: <div>Конструктор подписок</div>,
+				element: <DevScreen title="Справочники. Конструкции" />,
 			},
 			requirements: {
 				id: 'requirements-page-id',
 				route: 'requirements',
-				element: <div>Требования</div>,
+				element: <DevScreen title="Справочники. Требования" />,
 			},
 			issuers: {
 				id: 'issuers-page-id',
 				route: 'issuers',
-				element: <div>Производители</div>,
+				element: <DevScreen title="Справочники. Производители" />,
 			},
 		},
 	},
 	news: {
 		id: 'news-page-id',
 		route: 'news',
-		element: <div>Новости</div>,
+		element: <DevScreen title="Новости" />,
 	},
 	reports: {
 		id: 'reports-page-id',
 		route: 'reports',
-		element: <div>Отчеты</div>,
+		element: <DevScreen title="Отчеты" />,
 	},
 };
