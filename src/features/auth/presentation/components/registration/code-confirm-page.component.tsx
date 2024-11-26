@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
-import { smsCodeRequest } from '../../../services';
+import { smsCodeApprove, smsCodeRequest } from '../../../services';
 import { ApproveFormData } from '../../../types';
 import { ApproveFormDataConfig } from '../../../utils';
 
@@ -52,15 +52,15 @@ export const CodeConfirmPage = () => {
 	const onSubmit = (type: string) => {
 		type === 'code'
 			? dispatch(smsCodeRequest(form.getValues('phoneNumber').replaceAll(' ', '')))
-			: // : dispatch(
-				// 		smsCodeApprove({
-				// 			phoneNumber: form.getValues('phoneNumber').replaceAll(' ', ''),
-				// 			code: form.getValues('code').replaceAll('-', ''),
-				// 		}),
-				// 	);
-				navigate(`/auth/${AUTH_ROUTES.company_registration.route}`, {
-					phoneNumber: form.getValues('phoneNumber'),
-				});
+			: dispatch(
+					smsCodeApprove({
+						phoneNumber: form.getValues('phoneNumber').replaceAll(' ', ''),
+						code: form.getValues('code').replaceAll('-', ''),
+					}),
+				);
+		// navigate(`/auth/${AUTH_ROUTES.company_registration.route}`, {
+		// 	phoneNumber: form.getValues('phoneNumber'),
+		// });
 	};
 	const { formState } = form;
 
