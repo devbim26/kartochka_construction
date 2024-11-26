@@ -23,7 +23,7 @@ export const LoginPage = () => {
 	const authData = useAppSelector((store) => store.authData);
 
 	useEffect(() => {
-		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name && navigate(`/`, {});
+		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name && navigate('/');
 	}, [authData.fetch_data?.fetch_name]);
 
 	useEffect(() => {

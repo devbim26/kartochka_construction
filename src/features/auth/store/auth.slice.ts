@@ -4,6 +4,7 @@ import {
 	authLogin,
 	authRegistration,
 	fileUpload,
+	logout,
 	smsCodeApprove,
 	smsCodeRequest,
 } from '../services';
@@ -64,6 +65,9 @@ export const authSlice = createSlice({
 			console.log(action.payload);
 		});
 		createAsyncCases(builder, fileUpload, (state: AuthSliceState, action) => {
+			console.log(action.payload);
+		});
+		createAsyncCases(builder, logout, (state: AuthSliceState, action) => {
 			console.log(action.payload);
 		});
 	},

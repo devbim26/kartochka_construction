@@ -120,3 +120,24 @@ export const fileUpload = createAsyncThunk(
 		}
 	},
 );
+
+export const logout = createAsyncThunk(
+	AUTH_FETCH_ROUTES.logout.async_thunk_route,
+	async (_, thunkAPI) => {
+		try {
+			const response = await fetchApi.api.authLogoutCreate();
+			return {
+				payload: response.data,
+				fetch_data: {
+					group: AUTH_FETCH_ROUTES.group,
+					fetch_name: AUTH_FETCH_ROUTES.fileUpload.fetch_name,
+				},
+			};
+		} catch (error) {
+			if (error instanceof Error) {
+				return thunkAPI.rejectWithValue({ error: error.message });
+			}
+			return thunkAPI.rejectWithValue({ error: 'Unknown error' });
+		}
+	},
+);
