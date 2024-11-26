@@ -1,34 +1,46 @@
-import { Button, Input, LogoIcon, LogoTextIcon, useAppDispatch, useAppSelector } from '@core';
+import {
+	Button,
+	Input,
+	LogoIcon,
+	LogoTextIcon,
+	useAppDispatch,
+	useAppNavigate,
+	useAppSelector,
+} from '@core';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
-import { useNavigate } from 'react-router-dom';
-import { AUTH_ROUTES } from '../../../constants';
+import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
 import { authLogin } from '../../../services';
 import { LoginFormData } from '../../../types';
 import { LoginFormDataConfig } from '../../../utils';
 
 export const LoginPage = () => {
 	const [showPassword, setShowPassword] = useState(false);
-	const navigate = useNavigate();
+	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
 	const authData = useAppSelector((store) => store.authData);
+
+	useEffect(() => {
+		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name && navigate(`/`, {});
+	}, [authData.fetch_data?.fetch_name]);
 
 	useEffect(() => {
 		console.log(authData);
 	}, [authData]);
 
-	useEffect(() => {
-		dispatch(authLogin({ password: 'asdasdasd', phoneNumber: '+375232131' }));
-	}, []);
-
 	const form = useForm<LoginFormData>({
 		resolver: zodResolver(LoginFormDataConfig.schema),
 		defaultValues: LoginFormDataConfig.defaultValues,
 	});
-	const onSubmit = (data: LoginFormData) => {
-		console.log(form);
+	const onSubmit = () => {
+		dispatch(
+			authLogin({
+				phoneNumber: form.getValues('phoneNumber').replaceAll(' ', ''),
+				password: form.getValues('password'),
+			}),
+		);
 	};
 	const { formState } = form;
 
@@ -71,7 +83,7 @@ export const LoginPage = () => {
 				<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
 					<p>Нет аккаунта?</p>
 					<p
-						onClick={() => navigate('/auth/' + AUTH_ROUTES.registration.route)}
+						onClick={() => navigate('/auth/' + AUTH_ROUTES.code_approve.route)}
 						className="cursor-pointer font-semibold underline-offset-auto hover:underline"
 					>
 						Зарегистрироваться

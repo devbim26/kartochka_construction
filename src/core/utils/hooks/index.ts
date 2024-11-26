@@ -1,4 +1,5 @@
 export * from './use-app-dispatch.utils';
+export * from './use-app-navigate.utils';
 export * from './use-app-selector.utils';
 export * from './use-auto-scroll.utils';
 export * from './use-outside-click.utils';

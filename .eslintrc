@@ -1,7 +1,7 @@
 {
 	"env": {
 		"browser": true,
-		"es2021": true
+		"es2021": true,
 	},
 	"extends": [
 		"eslint:recommended",
@@ -11,7 +11,7 @@
 		"plugin:import/warnings",
 		"plugin:import/typescript",
 		"plugin:prettier/recommended",
-		"plugin:tailwindcss/recommended"
+		"plugin:tailwindcss/recommended",
 	],
 	"plugins": ["react", "@typescript-eslint", "prettier", "import", "tailwindcss"],
 	"rules": {
@@ -25,13 +25,13 @@
 				"bracketSpacing": true,
 				"printWidth": 100,
 				"trailingComma": "all",
-				"endOfLine": "auto"
-			}
+				"endOfLine": "auto",
+			},
 		],
 		"react/react-in-jsx-scope": "off",
 		"@typescript-eslint/no-empty-function": "off",
 		"@typescript-eslint/no-non-null-assertion": "off",
-		"@typescript-eslint/no-explicit-any": "off"
+		"@typescript-eslint/no-explicit-any": "off",
 	},
 	"settings": {
 		"import/resolver": {
@@ -43,13 +43,13 @@
 					["@router", "./src/router"],
 					["@features", "./src/features"],
 					["@core", "./src/core"],
-					["@api-gen", "./api-gen/"]
+					["@api-gen", "./src/api-gen/"],
 				],
-				"extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
-			}
+				"extensions": [".ts", ".js", ".jsx", ".tsx", ".json"],
+			},
 		},
 		"react": {
-			"version": "detect"
-		}
-	}
+			"version": "detect",
+		},
+	},
 }

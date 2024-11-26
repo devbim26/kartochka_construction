@@ -15,9 +15,19 @@ export const AUTH_FETCH_ROUTES = {
 		fetch_name: 'refresh',
 		async_thunk_route: 'auth/refresh',
 	},
-	emailcode: {
-		url: `${process.env.REACT_APP_API_URL}/auth/registration`,
-		fetch_name: 'emailcode',
-		async_thunk_route: 'auth/email-verification',
+	sms: {
+		url: `${process.env.REACT_APP_API_URL}/sms`,
+		fetch_name: 'smscode',
+		async_thunk_route: 'smsRequest',
+	},
+	smsApprove: {
+		url: `${process.env.REACT_APP_API_URL}/sms/approve`,
+		fetch_name: 'codeapprove',
+		async_thunk_route: 'code/approve',
+	},
+	fileUpload: {
+		url: `${process.env.REACT_APP_API_URL}/File`,
+		fetch_name: 'fileupload',
+		async_thunk_route: 'fileupload',
 	},
 };

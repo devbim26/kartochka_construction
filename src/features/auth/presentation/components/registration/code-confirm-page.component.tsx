@@ -1,32 +1,66 @@
-import { Button, Input, LogoIcon, LogoTextIcon } from '@core';
+import {
+	Button,
+	Input,
+	LogoIcon,
+	LogoTextIcon,
+	useAppDispatch,
+	useAppNavigate,
+	useAppSelector,
+} from '@core';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { AUTH_ROUTES } from '../../../constants';
+import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
+import { smsCodeRequest } from '../../../services';
 import { ApproveFormData } from '../../../types';
 import { ApproveFormDataConfig } from '../../../utils';
 
-export const RegistrationPage = () => {
-	const navigate = useNavigate();
-
+export const CodeConfirmPage = () => {
+	const navigate = useAppNavigate();
+	const dispatch = useAppDispatch();
+	const authData = useAppSelector((store) => store.authData);
 	const ApproveButton = () => {
 		return (
 			<Button
-				disabled={!!formState.errors.phoneNumber?.message}
+				disabled={
+					!!formState.errors.phoneNumber?.message ||
+					form.watch('phoneNumber').length < 10 ||
+					form.watch('phoneNumber').includes('_')
+				}
 				variant="primary"
 				className="absolute right-[2px] h-[36px]"
+				type="button"
+				onClick={() => onSubmit('code')}
 			>
 				Подтвердить номер телефона
 			</Button>
 		);
 	};
+
 	const form = useForm<ApproveFormData>({
 		resolver: zodResolver(ApproveFormDataConfig.schema),
 		defaultValues: ApproveFormDataConfig.defaultValues,
 	});
-	const onSubmit = (data: ApproveFormData) => {
-		console.log(form);
-		navigate('/auth/' + AUTH_ROUTES.company_registration.route);
+
+	useEffect(() => {
+		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.smsApprove.fetch_name &&
+			navigate(`/auth/${AUTH_ROUTES.company_registration.route}`, {
+				phoneNumber: form.getValues('phoneNumber'),
+			});
+	}, [authData.fetch_data?.fetch_name]);
+
+	const onSubmit = (type: string) => {
+		type === 'code'
+			? dispatch(smsCodeRequest(form.getValues('phoneNumber').replaceAll(' ', '')))
+			: // : dispatch(
+				// 		smsCodeApprove({
+				// 			phoneNumber: form.getValues('phoneNumber').replaceAll(' ', ''),
+				// 			code: form.getValues('code').replaceAll('-', ''),
+				// 		}),
+				// 	);
+				navigate(`/auth/${AUTH_ROUTES.company_registration.route}`, {
+					phoneNumber: form.getValues('phoneNumber'),
+				});
 	};
 	const { formState } = form;
 
@@ -37,7 +71,7 @@ export const RegistrationPage = () => {
 					<LogoIcon />
 					<LogoTextIcon />
 				</div>
-				<form onSubmit={form.handleSubmit(onSubmit)}>
+				<form onSubmit={form.handleSubmit(() => onSubmit('submit'))}>
 					<div className="flex flex-col gap-[20px]">
 						<Input
 							label={formState.errors.phoneNumber?.message || 'Номер телефона'}

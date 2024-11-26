@@ -1,37 +1,81 @@
-import { Button, convertToBase64, FormElementLabel, Input } from '@core';
+import {
+	Button,
+	convertToBase64,
+	FormElementLabel,
+	Input,
+	useAppDispatch,
+	useAppNavigate,
+	useAppSelector,
+} from '@core';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { TiDeleteOutline } from 'react-icons/ti';
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+import { AUTH_FETCH_ROUTES } from '../../../constants';
+import { authRegistration, fileUpload } from '../../../services';
 import { RegistrationFormData } from '../../../types';
 import { RegistrationFormDataConfig } from '../../../utils';
 
 export const CompanyRegistrationPage = () => {
-	const navigate = useNavigate();
+	const navigate = useAppNavigate();
+
+	const dispatch = useAppDispatch();
+
+	const authData = useAppSelector((store) => store.authData);
+
+	const [search] = useSearchParams();
+
+	useEffect(() => {
+		console.log(search.get('phoneNumber'));
+		form.setValue('mainPhoneNumber', search.get('phoneNumber')!);
+	}, [search]);
 
 	const form = useForm<RegistrationFormData>({
 		resolver: zodResolver(RegistrationFormDataConfig.schema),
 		defaultValues: RegistrationFormDataConfig.defaultValues,
 	});
+
 	const { formState } = form;
 	const phoneNumbers = form.watch('phoneNumbers');
 	const logo = form.watch('companyLogo');
 
 	const [showPassword, setShowPassword] = useState(false);
 
-	const onSubmit = (data: RegistrationFormData) => {
-		console.log(form);
+	const onSubmit = () => {
+		dispatch(
+			authRegistration({
+				...form.getValues(),
+			}),
+		);
 	};
+
+	console.log(formState.errors);
+
+	useEffect(() => {
+		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.registration.fetch_name &&
+			navigate(`/`, {});
+	}, [authData.fetch_data?.fetch_name]);
+
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
 		if (file) {
 			form.setValue('companyLogo.name', file.name);
 			const base64 = await convertToBase64(file);
-			if (base64) form.setValue('companyLogo.data', base64);
+			const fileData = await file.arrayBuffer();
+			if (base64) {
+				form.setValue('companyLogo.data', base64);
+				dispatch(
+					fileUpload({
+						data: { mimeType: file.type, isPublic: true },
+						file: fileData,
+					}),
+				);
+				form.setValue('companyLogo.url', '123');
+			}
 		}
 	};
 
@@ -49,12 +93,14 @@ export const CompanyRegistrationPage = () => {
 								formState.errors.mainPhoneNumber?.message ? 'text-error' : ''
 							}
 							error={formState.errors.mainPhoneNumber?.message}
+							disabled
 							{...form.register(`mainPhoneNumber`)}
 							placeholder="+375 (29) 21-21-211"
 							mask="+375 (99) 999-99-99"
 							iconPos="right"
 							iconClassName="w-[40px] h-[40px] text-primary right-[2px]"
 							Icon={phoneNumbers.length < 3 ? AiOutlinePlusCircle : undefined}
+							defaultValue={search.get('phoneNumber')!}
 							onIconClick={() =>
 								form.setValue('phoneNumbers', [
 									...phoneNumbers,
@@ -138,10 +184,12 @@ export const CompanyRegistrationPage = () => {
 						placeholder="Введите ФИО"
 					/>
 					<Input
-						label={formState.errors.companyAdress?.message || 'Адрес компании'}
-						labelClassName={formState.errors.companyAdress?.message ? 'text-error' : ''}
-						error={formState.errors.companyAdress?.message}
-						{...form.register('companyAdress')}
+						label={formState.errors.companyAddress?.message || 'Адрес компании'}
+						labelClassName={
+							formState.errors.companyAddress?.message ? 'text-error' : ''
+						}
+						error={formState.errors.companyAddress?.message}
+						{...form.register('companyAddress')}
 						maxLength={50}
 						type={'text'}
 						placeholder="Введите адрес компании"
@@ -176,10 +224,10 @@ export const CompanyRegistrationPage = () => {
 					/>
 
 					<Input
-						label={formState.errors.bankAdress?.message || 'Адрес банка'}
-						labelClassName={formState.errors.bankAdress?.message ? 'text-error' : ''}
-						error={formState.errors.bankAdress?.message}
-						{...form.register('bankAdress')}
+						label={formState.errors.bankAddress?.message || 'Адрес банка'}
+						labelClassName={formState.errors.bankAddress?.message ? 'text-error' : ''}
+						error={formState.errors.bankAddress?.message}
+						{...form.register('bankAddress')}
 						maxLength={100}
 						type={'text'}
 						placeholder="Введите адрес"
@@ -188,10 +236,10 @@ export const CompanyRegistrationPage = () => {
 						<FormElementLabel
 							className={twMerge(
 								'font-raleway text-[14px] text-input-label-primary',
-								formState.errors.companyLogo?.name ? 'text-error' : '',
+								formState.errors.companyLogo?.url ? 'text-error' : '',
 							)}
 						>
-							{formState.errors.companyLogo?.name?.message || 'Логотип компании'}
+							{formState.errors.companyLogo?.url?.message || 'Логотип компании'}
 						</FormElementLabel>
 						<div className="flex items-center gap-[10px]">
 							<Button
