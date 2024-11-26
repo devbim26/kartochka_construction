@@ -28,6 +28,11 @@ module.exports = {
 					},
 				},
 				error: '#FF0800',
+				background: {
+					container: '#FFFFFF',
+					primary: '#F9F9F9',
+					secondary: '#F5F6F7',
+				},
 			},
 		},
 	},
