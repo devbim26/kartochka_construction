@@ -27,6 +27,11 @@ module.exports = {
 						primary: '#6F7671',
 					},
 				},
+				background: {
+					container: '#FFFFFF',
+					primary: '#F9F9F9',
+					secondary: '#F5F6F7',
+				},
 			},
 		},
 	},
