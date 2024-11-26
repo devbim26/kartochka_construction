@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
+		"@hookform/resolvers": "^3.9.1",
 		"@reduxjs/toolkit": "^2.3.0",
 		"@testing-library/jest-dom": "^5.17.0",
 		"@testing-library/react": "^13.4.0",
@@ -12,6 +13,7 @@
 		"@types/react": "^18.3.12",
 		"@types/react-dom": "^18.3.1",
 		"@types/react-router-dom": "^5.3.3",
+		"axios": "^1.7.7",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-hook-form": "^7.53.2",
@@ -22,14 +24,16 @@
 		"react-scripts": "^5.0.1",
 		"tailwind-merge": "^2.5.4",
 		"typescript": "^4.9.5",
-		"web-vitals": "^2.1.4"
+		"web-vitals": "^2.1.4",
+		"zod": "^3.23.8"
 	},
 	"scripts": {
 		"start": "craco start",
 		"build": "craco build",
 		"test": "craco test",
 		"eject": "craco eject",
-		"format": "prettier --write ./src && eslint --fix ./src"
+		"format": "prettier --write ./src && eslint --fix ./src",
+		"generate-api": "node ./tools/generate-api.js"
 	},
 	"eslintConfig": {
 		"extends": [
@@ -52,9 +56,11 @@
 	"devDependencies": {
 		"@craco/craco": "^7.1.0",
 		"@eslint/js": "^9.14.0",
+		"@openapitools/openapi-generator-cli": "^2.15.3",
 		"@types/react-input-mask": "^3.0.6",
 		"autoprefixer": "^10.4.20",
 		"craco-alias": "^3.0.1",
+		"dotenv": "^16.4.5",
 		"eslint": "^8.57.1",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-import-resolver-alias": "^1.1.2",
@@ -67,6 +73,7 @@
 		"prettier": "^3.3.3",
 		"prettier-plugin-organize-imports": "^4.1.0",
 		"prettier-plugin-tailwindcss": "^0.6.8",
+		"swagger-typescript-api": "^13.0.23",
 		"tailwindcss": "^3.4.14",
 		"typescript-eslint": "^8.14.0"
 	}
