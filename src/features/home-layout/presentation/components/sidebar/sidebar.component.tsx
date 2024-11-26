@@ -6,8 +6,8 @@ import { HiOutlineUsers } from 'react-icons/hi2';
 import { RiFileList3Line, RiPencilRulerLine, RiWallet3Fill } from 'react-icons/ri';
 import { TiDocumentText } from 'react-icons/ti';
 import { useNavigate } from 'react-router-dom';
-import { HOME_ROUTES } from '../../constants';
-import { useSidebarNavigate } from '../../utils';
+import { HOME_ROUTES } from '../../../constants';
+import { useSidebarNavigate } from '../../../utils';
 import { SidebarItem } from './sidebar-item.component';
 import { SidebarListItem } from './sidebar-list-item.component';
 import { SidebarList } from './sidebar-list.component';
@@ -29,7 +29,7 @@ export const Sidebar = () => {
 	);
 
 	return (
-		<div className="flex h-full w-[247px] flex-col pt-[20px]">
+		<div className="flex h-full w-[248px] flex-col">
 			<SidebarItem
 				id={HOME_ROUTES.main.id}
 				icon={BiSolidHome}

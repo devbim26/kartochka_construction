@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { SidebarItemProps } from '../../types';
+import { SidebarItemProps } from '../../../types';
 
 export const SidebarListItem = memo((props: SidebarItemProps) => {
 	return (
