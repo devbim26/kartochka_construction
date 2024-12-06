@@ -32,6 +32,9 @@ module.exports = {
 					container: '#FFFFFF',
 					primary: '#F9F9F9',
 					secondary: '#F5F6F7',
+					button: {
+						secondary: '#EDF2FA',
+					},
 				},
 			},
 		},

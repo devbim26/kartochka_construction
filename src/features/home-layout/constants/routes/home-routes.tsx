@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { DevScreen } from '../../../dev';
+import { GuidbooksLauout, MaterialsPage } from '../../../guidbooks';
 
 export const HOME_ROUTES = {
 	main: {
@@ -54,17 +55,13 @@ export const HOME_ROUTES = {
 		layout: {
 			id: 'guidbooks-layout-id',
 			route: 'guidbooks',
-			element: (
-				<div className="flex flex-1">
-					<Outlet />
-				</div>
-			),
+			element: <GuidbooksLauout />,
 		},
 		childrens: {
 			materials: {
 				id: 'materials-page-id',
 				route: 'materials',
-				element: <DevScreen title="Справочники. Материалы" />,
+				element: <MaterialsPage />,
 			},
 			constructions: {
 				id: 'constructions-page-id',
