@@ -6,7 +6,7 @@ import { twMerge } from 'tailwind-merge';
 import { useAutoScroll, useOutsideClick } from '../../../utils';
 import { FormElementLabel } from '../forms';
 
-type ListOption = {
+export type ListOption = {
 	id: string;
 	value: string;
 	label: string;
@@ -31,6 +31,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 	errorHighlight?: boolean;
 	ref?: RefCallBack;
 	icon?: (() => JSX.Element) | IconType;
+	onChangePageSize: (value: ListOption['value']) => void;
 }
 
 export const Select = memo((props: SelectProps) => {

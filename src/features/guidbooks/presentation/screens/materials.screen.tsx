@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 
+import { SimpleTable } from '@core';
 import {
 	MaterialsAddFormDefaultValues,
 	MaterialsEditFormDefaultValues,
@@ -14,6 +15,26 @@ import {
 	MaterialsEdit,
 	MaterialsFilter,
 } from '../components';
+
+import type { ColumnDef } from '@tanstack/react-table';
+
+const testData = [
+	{
+		id: 123,
+	},
+	{
+		id: 123,
+	},
+];
+
+const createColumns = (): ColumnDef<any>[] => {
+	return [
+		{
+			accessorKey: 'id',
+			cell: (info) => info.getValue(),
+		},
+	];
+};
 
 export const MaterialsPage = () => {
 	const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
@@ -30,7 +51,7 @@ export const MaterialsPage = () => {
 	);
 
 	const onSaveHandle = useCallback(() => {}, []);
-
+	const columns = createColumns();
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper
@@ -50,6 +71,7 @@ export const MaterialsPage = () => {
 				}}
 			/>
 			<GuidbookPageTableWrapper />
+			<SimpleTable columns={columns} data={testData}></SimpleTable>
 		</div>
 	);
 };
