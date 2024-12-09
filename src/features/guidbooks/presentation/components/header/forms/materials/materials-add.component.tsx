@@ -10,7 +10,12 @@ export const MaterialsAdd = withMemo(({ control }: HeaderFormsProps<IMaterialsAd
 				control={control}
 				name={MaterialsAddFormKeys.name}
 				render={({ field }) => (
-					<Input {...field} label="Название" placeholder="Введите название" />
+					<Input
+						{...field}
+						value={field.value}
+						label="Название"
+						placeholder="Введите название"
+					/>
 				)}
 			/>
 		</>

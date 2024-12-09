@@ -1,9 +1,9 @@
 import type { ColumnDef, SortingState } from '@tanstack/react-table';
-import type { FetchDataFilters, ListOption, PaginatedData } from '..';
+import type { FetchDataFilters, PaginatedData, SelectOption } from '..';
 
 interface TableProps<T, K = unknown> {
 	columns: ColumnDef<T, K>[];
-	pageSizeOptions?: ListOption[];
+	pageSizeOptions?: SelectOption[];
 	fetchData: (params: FetchDataFilters<T>) => void;
 	data: PaginatedData<T>;
 	disablePagination?: boolean;
@@ -33,6 +33,12 @@ interface ScrollData {
 
 interface TableRef {
 	scrollTo: ({ top, left }: ScrollData) => void;
+}
+
+export const enum TableSorcTypes {
+	Desc = 'DESC',
+	Asc = 'ASC',
+	None = 'None',
 }
 
 export type { ScrollData, TableData, TableProps, TableRef };

@@ -1,7 +1,7 @@
 import { IMaterialsAddForm, IMaterialsEditForm, IMaterialsFilterForm } from '../../types';
 
 export const MaterialsFilterFormDefaultValues: IMaterialsFilterForm = {
-	name: 'фильтр',
+	name: '',
 	materialType: '',
 };
 

@@ -45,11 +45,11 @@ export const GuidbookPageHeaderWrapper = withMemo(
 						'flex',
 						formType === HeaderFormTypes.filter
 							? 'flex-row justify-between'
-							: 'justify-center',
+							: 'justify-start',
 					)}
 				>
 					<p className="font-sans text-base font-semibold leading-4">
-						{guidbookHeaderTitlesMap.get(formType)!(titles)}
+						{titles.pageTitle}
 					</p>
 					{formType === HeaderFormTypes.filter && (
 						<Button
@@ -64,6 +64,9 @@ export const GuidbookPageHeaderWrapper = withMemo(
 					)}
 				</div>
 				<div className="flex flex-col rounded-xl border border-solid border-gray-border bg-white">
+					<p className="flex justify-center pt-[16px] font-sans text-base font-semibold leading-4">
+						{guidbookHeaderTitlesMap.get(formType)!(titles)}
+					</p>
 					<div className="flex flex-wrap gap-[16px] border-b border-solid border-gray-border px-[16px] pb-[24px] pt-[16px]">
 						<FormProvider {...form}>
 							{formType == HeaderFormTypes.filter ? (

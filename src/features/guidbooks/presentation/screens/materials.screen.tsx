@@ -1,6 +1,7 @@
 import { SimpleTable } from '@core';
 import { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useState } from 'react';
+import { TableHeaderCell } from '../../../../core/presentation/components/table/table-header-cell.component';
 import {
 	MaterialsAddFormDefaultValues,
 	MaterialsEditFormDefaultValues,
@@ -19,9 +20,15 @@ import {
 const testData = [
 	{
 		id: 123,
+		name: 'name',
+		plice: 'police',
+		addv: 'sad',
 	},
 	{
-		id: 123,
+		id: 124,
+		name: 'name',
+		plice: 'police',
+		addv: 'sad',
 	},
 ];
 
@@ -29,6 +36,19 @@ const createColumns = (): ColumnDef<any>[] => {
 	return [
 		{
 			accessorKey: 'id',
+			header: () => <TableHeaderCell text={'id'} showSortIcon />,
+			cell: (info) => info.getValue(),
+		},
+		{
+			accessorKey: 'name',
+			cell: (info) => info.getValue(),
+		},
+		{
+			accessorKey: 'plice',
+			cell: (info) => info.getValue(),
+		},
+		{
+			accessorKey: 'addv',
 			cell: (info) => info.getValue(),
 		},
 	];
@@ -55,7 +75,7 @@ export const MaterialsPage = () => {
 			<GuidbookPageHeaderWrapper
 				onSave={onSaveHandle}
 				titles={{
-					filterTitle: 'Материалы',
+					pageTitle: 'Материалы',
 					editTitle: 'Редактировать материал',
 					addTitle: 'Добавить материал',
 				}}

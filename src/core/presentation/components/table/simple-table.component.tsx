@@ -16,15 +16,7 @@ export const SimpleTable = withMemo(function TableComponent<T>({
 	const headerRows = getHeaderGroups().map((headerGroup) => (
 		<tr key={headerGroup.id} className="bg-blue-alice sticky top-0 z-10 h-12 border-b">
 			{headerGroup.headers.map(
-				({
-					column: { getIsSorted, getCanSort, getToggleSortingHandler, columnDef },
-					id,
-					colSpan,
-					getContext,
-				}) => {
-					const isSorted = getIsSorted();
-					const isDescOrder = isSorted && isSorted === 'desc';
-
+				({ column: { getToggleSortingHandler, columnDef }, id, colSpan, getContext }) => {
 					return (
 						<th key={id} colSpan={colSpan} className="group px-4 py-2">
 							<div

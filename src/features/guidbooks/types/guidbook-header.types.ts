@@ -7,7 +7,7 @@ export const enum HeaderFormTypes {
 }
 
 export interface HeaderFormTitles {
-	filterTitle: string;
+	pageTitle: string;
 	editTitle: string;
 	addTitle: string;
 }
