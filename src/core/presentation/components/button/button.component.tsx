@@ -1,5 +1,6 @@
-import { memo, type ComponentPropsWithoutRef } from 'react';
+import { type ComponentPropsWithoutRef } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { withMemo } from '../../../../non-alias';
 
 export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
 	variant?: keyof typeof BUTTON_VARIANTS;
@@ -19,7 +20,7 @@ const BUTTON_VARIANTS = {
 	// empty: 'text-primary bg-none',
 };
 
-export const Button = memo(
+export const Button = withMemo(
 	({ children, className, variant = 'primary', buttonIcon = false, ...rest }: ButtonProps) => {
 		const buttonContent = children;
 
@@ -39,5 +40,3 @@ export const Button = memo(
 		);
 	},
 );
-
-Button.displayName = 'Button';

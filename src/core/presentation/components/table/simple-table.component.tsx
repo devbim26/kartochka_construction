@@ -1,6 +1,7 @@
 import type { SimpleTableProps } from '@core';
-import { useSimpleTable, withMemo } from '@core';
+import { useSimpleTable } from '@core';
 import { twJoin, twMerge } from 'tailwind-merge';
+import { withMemo } from '../../../../non-alias';
 
 export const SimpleTable = withMemo(function TableComponent<T>({
 	columns,

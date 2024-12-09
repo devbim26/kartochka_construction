@@ -1,12 +1,13 @@
 import { BsCaretUpFill } from 'react-icons/bs';
 import { twMerge } from 'tailwind-merge';
+import { withMemo } from '../../../../non-alias';
 
 interface Props {
 	isSorted: boolean;
 	isDescOrder: boolean;
 }
 
-export const SortableColumnIcon = ({ isSorted, isDescOrder }: Props) => {
+export const SortableColumnIcon = withMemo(({ isSorted, isDescOrder }: Props) => {
 	return (
 		<div className="text-gray flex flex-col p-[2px]">
 			<BsCaretUpFill
@@ -23,4 +24,4 @@ export const SortableColumnIcon = ({ isSorted, isDescOrder }: Props) => {
 			/>
 		</div>
 	);
-};
+});

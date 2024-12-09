@@ -1,7 +1,3 @@
-import { memo } from 'react';
-
-export const GuidbookPageTableWrapper = memo(() => {
+export const GuidbookPageTableWrapper = () => {
 	return <div>table</div>;
-});
-
-GuidbookPageTableWrapper.displayName = 'GuidbookPageTableWrapper';
+};

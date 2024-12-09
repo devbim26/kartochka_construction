@@ -54,7 +54,7 @@ interface IScrollOptions {
  */
 
 export const useAutoScroll = (
-	containerRef: RefObject<HTMLElement> | null,
+	containerRef: RefObject<HTMLElement | null>,
 	show: boolean,
 	selectedID: string,
 	scrollOptions: IScrollOptions = {

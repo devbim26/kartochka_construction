@@ -1,9 +1,9 @@
 import { Input } from '@core';
-import { memo } from 'react';
 import { Controller } from 'react-hook-form';
+import { withMemo } from '../../../../../../../non-alias/with-memo.utils';
 import { HeaderFormsProps, IMaterialsAddForm, MaterialsAddFormKeys } from '../../../../../types';
 
-export const MaterialsAdd = memo(({ control }: HeaderFormsProps<IMaterialsAddForm>) => {
+export const MaterialsAdd = withMemo(({ control }: HeaderFormsProps<IMaterialsAddForm>) => {
 	return (
 		<>
 			<Controller
@@ -16,5 +16,3 @@ export const MaterialsAdd = memo(({ control }: HeaderFormsProps<IMaterialsAddFor
 		</>
 	);
 });
-
-MaterialsAdd.displayName = 'MaterialsAdd';

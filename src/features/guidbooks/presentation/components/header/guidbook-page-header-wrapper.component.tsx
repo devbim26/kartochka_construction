@@ -1,8 +1,9 @@
 import { Button, CleanUpIcon } from '@core';
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { twMerge } from 'tailwind-merge';
+import { withMemo } from '../../../../../non-alias';
 import { guidbookHeaderTitlesMap } from '../../../constants';
 import { HeaderFormElements, HeaderFormTitles, HeaderFormTypes } from '../../../types';
 
@@ -15,7 +16,7 @@ interface GuidbookPageHeaderWrapperProps {
 	formElements: HeaderFormElements<any>;
 }
 
-export const GuidbookPageHeaderWrapper = memo(
+export const GuidbookPageHeaderWrapper = withMemo(
 	({
 		titles,
 		formType,
@@ -77,7 +78,7 @@ export const GuidbookPageHeaderWrapper = memo(
 					<div className="flex flex-row justify-end gap-[30px] pb-[25px] pr-[16px] pt-[12px]">
 						{formType !== HeaderFormTypes.filter && (
 							<Button
-								className="bg-background-button-secondaryflex group w-fit flex-row items-center gap-[4px] border border-solid border-primary px-[16px] py-[6px] group-hover:bg-primary"
+								className="group flex w-fit flex-row items-center gap-[4px] border border-solid border-primary bg-background-button-secondary px-[16px] py-[6px] group-hover:bg-primary"
 								onClick={onSave}
 							>
 								<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
@@ -104,5 +105,3 @@ export const GuidbookPageHeaderWrapper = memo(
 		);
 	},
 );
-
-GuidbookPageHeaderWrapper.displayName = 'GuidbookPageHeaderWrapper';

@@ -1,13 +1,13 @@
 import { Input } from '@core';
-import { memo } from 'react';
 import { Controller } from 'react-hook-form';
+import { withMemo } from '../../../../../../../non-alias';
 import {
 	HeaderFormsProps,
 	IMaterialsFilterForm,
 	MaterialsFilterFormKeys,
 } from '../../../../../types';
 
-export const MaterialsFilter = memo(({ control }: HeaderFormsProps<IMaterialsFilterForm>) => {
+export const MaterialsFilter = withMemo(({ control }: HeaderFormsProps<IMaterialsFilterForm>) => {
 	return (
 		<Controller
 			control={control}
@@ -18,5 +18,3 @@ export const MaterialsFilter = memo(({ control }: HeaderFormsProps<IMaterialsFil
 		/>
 	);
 });
-
-MaterialsFilter.displayName = 'MaterialsFilter';

@@ -1,9 +1,9 @@
 import { Input } from '@core';
-import { memo } from 'react';
 import { Controller } from 'react-hook-form';
+import { withMemo } from '../../../../../../../non-alias';
 import { HeaderFormsProps, IMaterialsEditForm, MaterialsEditFormKeys } from '../../../../../types';
 
-export const MaterialsEdit = memo(({ control }: HeaderFormsProps<IMaterialsEditForm>) => {
+export const MaterialsEdit = withMemo(({ control }: HeaderFormsProps<IMaterialsEditForm>) => {
 	return (
 		<>
 			<Controller
@@ -16,5 +16,3 @@ export const MaterialsEdit = memo(({ control }: HeaderFormsProps<IMaterialsEditF
 		</>
 	);
 });
-
-MaterialsEdit.displayName = 'MaterialsEdit';

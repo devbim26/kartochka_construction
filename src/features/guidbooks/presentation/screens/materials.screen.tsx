@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
-
 import { SimpleTable } from '@core';
+import { ColumnDef } from '@tanstack/react-table';
+import { useCallback, useState } from 'react';
 import {
 	MaterialsAddFormDefaultValues,
 	MaterialsEditFormDefaultValues,
@@ -15,8 +15,6 @@ import {
 	MaterialsEdit,
 	MaterialsFilter,
 } from '../components';
-
-import type { ColumnDef } from '@tanstack/react-table';
 
 const testData = [
 	{
@@ -71,7 +69,7 @@ export const MaterialsPage = () => {
 				}}
 			/>
 			<GuidbookPageTableWrapper />
-			<SimpleTable columns={columns} data={testData}></SimpleTable>
+			<SimpleTable columns={columns} data={testData} />
 		</div>
 	);
 };

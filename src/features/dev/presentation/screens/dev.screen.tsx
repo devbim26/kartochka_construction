@@ -1,10 +1,10 @@
-import { memo } from 'react';
+import { withMemo } from '../../../../non-alias';
 
 interface DevScreenProps {
 	title: string;
 }
 
-export const DevScreen = memo(({ title }: DevScreenProps) => {
+export const DevScreen = withMemo(({ title }: DevScreenProps) => {
 	return (
 		<div className="flex flex-1 items-center justify-center">
 			<div className="flex size-[400px] flex-col items-center justify-center gap-[20px] rounded-lg border-0 border-r-8 bg-background-secondary">
@@ -18,5 +18,3 @@ export const DevScreen = memo(({ title }: DevScreenProps) => {
 		</div>
 	);
 });
-
-DevScreen.displayName = 'DevScreen';

@@ -1,8 +1,9 @@
-import { ChangeEvent, memo, useLayoutEffect, useRef, useState } from 'react';
+import { ChangeEvent, useLayoutEffect, useRef, useState } from 'react';
 import { RefCallBack } from 'react-hook-form';
 import { IconType } from 'react-icons';
 import { FaChevronDown } from 'react-icons/fa';
 import { twMerge } from 'tailwind-merge';
+import { withMemo } from '../../../../non-alias';
 import { useAutoScroll, useOutsideClick } from '../../../utils';
 import { FormElementLabel } from '../forms';
 
@@ -34,7 +35,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 	onChangePageSize: (value: ListOption['value']) => void;
 }
 
-export const Select = memo((props: SelectProps) => {
+export const Select = withMemo((props: SelectProps) => {
 	const optionsListRef = useRef<HTMLDivElement | null>(null);
 	const inputBlockRef = useRef<HTMLDivElement | null>(null);
 	const [show, setShow] = useState<boolean>(false);
@@ -200,5 +201,3 @@ export const Select = memo((props: SelectProps) => {
 		</div>
 	);
 });
-
-Select.displayName = 'Select';

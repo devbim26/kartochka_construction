@@ -1,1 +1,1 @@
-export * from './routes/routes.constants';
+export * from './routes.constants';

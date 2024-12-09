@@ -16,9 +16,9 @@ export interface HeaderFormsProps<T extends FieldValues> {
 	control: Control<T>;
 }
 
-export type HeaderElementType<T extends FieldValues> = React.MemoExoticComponent<
-	({ control }: HeaderFormsProps<T>) => JSX.Element
->;
+export type HeaderElementType<T extends FieldValues> = ({
+	control,
+}: HeaderFormsProps<T>) => JSX.Element;
 
 export interface HeaderFormElements<T extends FieldValues> {
 	filter: HeaderElementType<T>;

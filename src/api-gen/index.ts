@@ -1,6 +1,7 @@
+import { apiUrl } from '../non-alias';
 import { Api } from './api';
 
 export const fetchApi = new Api({
-	baseURL: process.env.REACT_APP_API_URL,
+	baseURL: apiUrl,
 });
 export * from './api';

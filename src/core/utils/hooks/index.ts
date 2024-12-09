@@ -6,4 +6,3 @@ export * from './use-outside-click.utils';
 export * from './use-simple-table.utils';
 export * from './use-table.utils';
 export * from './use-update.utils';
-export * from './with-memo.utils';

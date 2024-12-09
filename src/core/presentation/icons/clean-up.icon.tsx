@@ -1,7 +1,6 @@
-import { memo } from 'react';
 import { IconBaseProps } from 'react-icons';
 
-export const CleanUpIcon = memo((props: IconBaseProps) => {
+export const CleanUpIcon = (props: IconBaseProps) => {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -19,6 +18,4 @@ export const CleanUpIcon = memo((props: IconBaseProps) => {
 			/>
 		</svg>
 	);
-});
-
-CleanUpIcon.displayName = 'CleanUpIcon';
+};

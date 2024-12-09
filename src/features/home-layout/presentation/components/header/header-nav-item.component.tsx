@@ -1,5 +1,5 @@
-import { memo } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { withMemo } from '../../../../../non-alias';
 
 interface HeaderNavItemProps {
 	clickCallback: (id: string) => void;
@@ -8,18 +8,18 @@ interface HeaderNavItemProps {
 	id: string;
 }
 
-export const HeaderNavItem = memo(({ clickCallback, isSelected, text, id }: HeaderNavItemProps) => {
-	return (
-		<p
-			className={twMerge(
-				'cursor-pointer text-xl font-medium',
-				isSelected ? 'text-primary' : 'text-input-value-black',
-			)}
-			onClick={() => clickCallback(id)}
-		>
-			{text}
-		</p>
-	);
-});
-
-HeaderNavItem.displayName = 'HeaderNavItem';
+export const HeaderNavItem = withMemo(
+	({ clickCallback, isSelected, text, id }: HeaderNavItemProps) => {
+		return (
+			<p
+				className={twMerge(
+					'cursor-pointer text-xl font-medium',
+					isSelected ? 'text-primary' : 'text-input-value-black',
+				)}
+				onClick={() => clickCallback(id)}
+			>
+				{text}
+			</p>
+		);
+	},
+);
