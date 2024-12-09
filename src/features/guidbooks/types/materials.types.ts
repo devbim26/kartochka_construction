@@ -1,3 +1,4 @@
+import { SelectOption } from '@core';
 import { FieldValues } from 'react-hook-form';
 
 export interface IMaterialsFilterForm extends FieldValues {
@@ -12,6 +13,7 @@ export interface IMaterialsEditForm extends FieldValues {
 //TODO
 export interface IMaterialsAddForm extends FieldValues {
 	name: string;
+	sel: SelectOption;
 }
 
 export type MaterialFormTypes = IMaterialsFilterForm | IMaterialsEditForm | IMaterialsAddForm;
@@ -22,6 +24,7 @@ export const enum MaterialsFilterFormKeys {
 
 export const enum MaterialsAddFormKeys {
 	name = 'name',
+	sel = 'sel',
 }
 
 export const enum MaterialsEditFormKeys {

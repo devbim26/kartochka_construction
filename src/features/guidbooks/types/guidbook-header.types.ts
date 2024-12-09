@@ -1,4 +1,4 @@
-import type { Control, FieldValues } from 'react-hook-form';
+import type { Control, FieldValues, UseFormSetValue } from 'react-hook-form';
 
 export const enum HeaderFormTypes {
 	filter = 'FilterType',
@@ -14,6 +14,7 @@ export interface HeaderFormTitles {
 
 export interface HeaderFormsProps<T extends FieldValues> {
 	control: Control<T>;
+	setValue: UseFormSetValue<T>;
 }
 
 export type HeaderElementType<T extends FieldValues> = ({

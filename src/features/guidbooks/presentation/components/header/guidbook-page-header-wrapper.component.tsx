@@ -70,11 +70,17 @@ export const GuidbookPageHeaderWrapper = withMemo(
 					<div className="flex flex-wrap gap-[16px] border-b border-solid border-gray-border px-[16px] pb-[24px] pt-[16px]">
 						<FormProvider {...form}>
 							{formType == HeaderFormTypes.filter ? (
-								<formElements.filter control={form.control} />
+								<formElements.filter
+									control={form.control}
+									setValue={form.setValue}
+								/>
 							) : formType == HeaderFormTypes.edit ? (
-								<formElements.edit control={form.control} />
+								<formElements.edit
+									control={form.control}
+									setValue={form.setValue}
+								/>
 							) : (
-								<formElements.add control={form.control} />
+								<formElements.add control={form.control} setValue={form.setValue} />
 							)}
 						</FormProvider>
 					</div>
