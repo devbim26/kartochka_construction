@@ -3,6 +3,9 @@ import { FieldValues } from 'react-hook-form';
 
 export interface IMaterialsFilterForm extends FieldValues {
 	name: string;
+	materialType: SelectOption;
+	density: number | null;
+	thickness: number | null;
 }
 
 //TODO
@@ -13,13 +16,15 @@ export interface IMaterialsEditForm extends FieldValues {
 //TODO
 export interface IMaterialsAddForm extends FieldValues {
 	name: string;
-	sel: SelectOption;
 }
 
 export type MaterialFormTypes = IMaterialsFilterForm | IMaterialsEditForm | IMaterialsAddForm;
 
 export const enum MaterialsFilterFormKeys {
-	name = 'name',
+	Name = 'name',
+	MaterialType = 'materialType',
+	Density = 'density',
+	Thickness = 'thickness',
 }
 
 export const enum MaterialsAddFormKeys {

@@ -26,6 +26,9 @@ module.exports = {
 					label: {
 						primary: '#6F7671',
 					},
+					placeholder: {
+						primary: '#91969E',
+					},
 				},
 				error: '#FF0800',
 				background: {

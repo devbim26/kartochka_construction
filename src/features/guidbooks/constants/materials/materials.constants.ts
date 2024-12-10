@@ -2,7 +2,13 @@ import { IMaterialsAddForm, IMaterialsEditForm, IMaterialsFilterForm } from '../
 
 export const MaterialsFilterFormDefaultValues: IMaterialsFilterForm = {
 	name: '',
-	materialType: '',
+	materialType: {
+		id: '',
+		label: '',
+		value: '',
+	},
+	density: null,
+	thickness: null,
 };
 
 export const MaterialsAddFormDefaultValues: IMaterialsAddForm = {
