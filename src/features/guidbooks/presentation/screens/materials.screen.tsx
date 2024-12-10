@@ -1,16 +1,10 @@
-import { SimpleTable } from '@core';
 import { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useState } from 'react';
 import { TableHeaderCell } from '../../../../core/presentation/components/table/table-header-cell.component';
 import { MaterialsAddFormDefaultValues, MaterialsFilterFormDefaultValues } from '../../constants';
 import { HeaderFormTypes, MaterialFormTypes } from '../../types';
 import { useHeaderForm } from '../../utils';
-import {
-	GuidbookPageHeaderWrapper,
-	GuidbookPageTableWrapper,
-	MaterialsAddAndEdit,
-	MaterialsFilter,
-} from '../components';
+import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
 
 const testData = [
 	{
@@ -83,8 +77,8 @@ export const MaterialsPage = () => {
 					edit: MaterialsAddAndEdit,
 				}}
 			/>
-			<GuidbookPageTableWrapper />
-			<SimpleTable columns={columns} data={testData} />
+			{/* <GuidbookPageTableWrapper />
+			<SimpleTable columns={columns} data={testData} /> */}
 		</div>
 	);
 };

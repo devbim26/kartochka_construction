@@ -31,7 +31,7 @@ export const MaterialsFilter = withMemo(
 					render={({ field }) => (
 						<Select
 							{...field}
-							placeholder="Выбрать материал"
+							placeholder="Выбрать тип материала"
 							cancelable={true}
 							label="Тип материала"
 							classNames={{
@@ -39,7 +39,7 @@ export const MaterialsFilter = withMemo(
 									bodyClassName: 'w-[226px]',
 								},
 							}}
-							options={[{ id: '1', label: 'label1', value: '1' }]}
+							options={[]}
 							onChange={(value) => {
 								setValue(MaterialsFilterFormKeys.MaterialType, value);
 							}}
