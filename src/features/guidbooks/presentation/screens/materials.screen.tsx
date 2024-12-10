@@ -2,18 +2,13 @@ import { SimpleTable } from '@core';
 import { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useState } from 'react';
 import { TableHeaderCell } from '../../../../core/presentation/components/table/table-header-cell.component';
-import {
-	MaterialsAddFormDefaultValues,
-	MaterialsEditFormDefaultValues,
-	MaterialsFilterFormDefaultValues,
-} from '../../constants';
+import { MaterialsAddFormDefaultValues, MaterialsFilterFormDefaultValues } from '../../constants';
 import { HeaderFormTypes, MaterialFormTypes } from '../../types';
 import { useHeaderForm } from '../../utils';
 import {
 	GuidbookPageHeaderWrapper,
 	GuidbookPageTableWrapper,
-	MaterialsAdd,
-	MaterialsEdit,
+	MaterialsAddAndEdit,
 	MaterialsFilter,
 } from '../components';
 
@@ -62,7 +57,7 @@ export const MaterialsPage = () => {
 	const form = useHeaderForm<MaterialFormTypes>(
 		{
 			filter: MaterialsFilterFormDefaultValues,
-			edit: MaterialsEditFormDefaultValues,
+			edit: MaterialsAddFormDefaultValues,
 			add: MaterialsAddFormDefaultValues,
 		},
 		currentHeaderFormType,
@@ -84,8 +79,8 @@ export const MaterialsPage = () => {
 				form={form}
 				formElements={{
 					filter: MaterialsFilter,
-					add: MaterialsAdd,
-					edit: MaterialsEdit,
+					add: MaterialsAddAndEdit,
+					edit: MaterialsAddAndEdit,
 				}}
 			/>
 			<GuidbookPageTableWrapper />

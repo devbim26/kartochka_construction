@@ -1,15 +1,19 @@
 import { Input } from '@core';
 import { Controller } from 'react-hook-form';
 import { withMemo } from '../../../../../../../non-alias/with-memo.utils';
-import { HeaderFormsProps, IMaterialsAddForm, MaterialsAddFormKeys } from '../../../../../types';
+import {
+	HeaderFormsProps,
+	IMaterialsAddAndEditForm,
+	MaterialsAddAndEditFormKeys,
+} from '../../../../../types';
 
-export const MaterialsAdd = withMemo(
-	({ control, setValue }: HeaderFormsProps<IMaterialsAddForm>) => {
+export const MaterialsAddAndEdit = withMemo(
+	({ control, setValue }: HeaderFormsProps<IMaterialsAddAndEditForm>) => {
 		return (
 			<>
 				<Controller
 					control={control}
-					name={MaterialsAddFormKeys.name}
+					name={MaterialsAddAndEditFormKeys.Name}
 					render={({ field }) => (
 						<Input
 							{...field}

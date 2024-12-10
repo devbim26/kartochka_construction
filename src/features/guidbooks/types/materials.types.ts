@@ -1,24 +1,32 @@
-import { SelectOption } from '@core';
+import { InputNumberType, SelectOption } from '@core';
 import { FieldValues } from 'react-hook-form';
 
 export interface IMaterialsFilterForm extends FieldValues {
 	name: string;
 	materialType: SelectOption;
-	density: number | null;
-	thickness: number | null;
+	density: InputNumberType;
+	thickness: InputNumberType;
 }
 
-//TODO
-export interface IMaterialsEditForm extends FieldValues {
+export interface IMaterialsAddAndEditForm extends FieldValues {
 	name: string;
+	description: string;
+	density: InputNumberType;
+	thickness: InputNumberType;
+	materialType: SelectOption;
+	region: SelectOption;
+	type: SelectOption;
+	issuer: string;
+	//image
+	materialCoefficient: InputNumberType;
+	velocity: InputNumberType;
+	lossFactor: InputNumberType;
+	youngModulus: InputNumberType;
+	damping: InputNumberType;
+	solid: InputNumberType;
 }
 
-//TODO
-export interface IMaterialsAddForm extends FieldValues {
-	name: string;
-}
-
-export type MaterialFormTypes = IMaterialsFilterForm | IMaterialsEditForm | IMaterialsAddForm;
+export type MaterialFormTypes = IMaterialsFilterForm | IMaterialsAddAndEditForm;
 
 export const enum MaterialsFilterFormKeys {
 	Name = 'name',
@@ -27,11 +35,19 @@ export const enum MaterialsFilterFormKeys {
 	Thickness = 'thickness',
 }
 
-export const enum MaterialsAddFormKeys {
-	name = 'name',
-	sel = 'sel',
-}
-
-export const enum MaterialsEditFormKeys {
-	name = 'name',
+export const enum MaterialsAddAndEditFormKeys {
+	Name = 'name',
+	Description = 'description',
+	Density = 'density',
+	Thickness = 'thickness',
+	MaterialType = 'materialType',
+	Region = 'region',
+	Type = 'type',
+	Issuer = 'issuer',
+	MaterialCoefficient = 'materialCoefficient',
+	Velocity = 'velocity',
+	LossFactor = 'lossFactor',
+	YoungModulus = 'youngModulus',
+	Damping = 'damping',
+	Solid = 'solid',
 }
