@@ -41,9 +41,12 @@ interface SelectProps {
 	classNames?: SelectClassNames;
 	cancelable?: boolean;
 	onChange: (value: SelectOption) => void;
+	error?: string;
+	errorHighlight?: boolean;
+	isLoading?: boolean;
 }
 
-export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
+export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 	(
 		{
 			options,
@@ -54,6 +57,10 @@ export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
 			onChange,
 			label,
 			placeholder,
+			error,
+			errorHighlight,
+			isLoading,
+			...props
 		}: SelectProps,
 		ref,
 	) => {
@@ -67,7 +74,15 @@ export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
 		}, [options, searchValue]);
 
 		return (
-			<div ref={ref} className="flex flex-col gap-[8px]">
+			<div className="flex flex-col gap-[8px]">
+				<select className="hidden" value={value.value} ref={ref} {...props}>
+					<option value={''}></option>
+					{options.map((option) => (
+						<option key={option.id} value={option.value}>
+							{option.label}
+						</option>
+					))}
+				</select>
 				<label
 					className={twMerge(
 						'text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
@@ -87,7 +102,11 @@ export const Select = React.forwardRef<HTMLDivElement, SelectProps>(
 							className={twMerge(
 								'flex h-fit w-[226px] flex-row gap-[8px] rounded-lg border-[1px] border-solid border-input-border-primary py-[6px] pl-[12px] pr-[8px]',
 								classNames?.popover?.buttonClassName,
+								isLoading && `animate-pulse`,
+								errorHighlight && 'border-error',
+								error ? 'ring-error focus:ring-error' : '',
 							)}
+							aria-invalid={error ? 'true' : 'false'}
 							textClassName={twMerge(
 								'truncate text-sm font-normal leading-5 tracking-[0.1px] text-input-placeholder-primary',
 								classNames?.popover?.buttonTextClassName,
