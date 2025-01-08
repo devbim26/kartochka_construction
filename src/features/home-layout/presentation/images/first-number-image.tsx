@@ -1,4 +1,4 @@
-export const FirstImage = () => {
+export const FirstNumberImage = () => {
 	return (
 		<svg
 			width="42"

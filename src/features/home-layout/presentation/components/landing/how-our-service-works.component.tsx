@@ -1,5 +1,12 @@
 import { Chevron } from '@core';
 import { useState } from 'react';
+import {
+	FifthNumberImage,
+	FirstNumberImage,
+	FourthNumberImage,
+	SecondNumberImage,
+} from '../../images';
+import { ThirdNumberImage } from '../../images/third-number-image';
 
 export const HowOurServiceWorks = () => {
 	const [selectedStep, setSelectedStep] = useState(0);
@@ -18,6 +25,14 @@ export const HowOurServiceWorks = () => {
 		'После выбора конструкций получите подробные расчёты, подтверждающие соответствие проектных решений всем строительным нормам, а также стоимость каждого решения.',
 		'Детальные расчеты для выбранной конструкции: все необходимые параметры и данные.\n\nСпецификации материалов, полная информация о материалах.',
 		'Отправьте расчеты на проверку нашим сертифицированным инженерам.\n\nПолучите заключение для успешного прохождения государственной экспертизы.',
+	];
+
+	const numberImages = [
+		<FirstNumberImage key="first" />,
+		<SecondNumberImage key="second" />,
+		<ThirdNumberImage key="third" />,
+		<FourthNumberImage key="fourth" />,
+		<FifthNumberImage key="fifth" />,
 	];
 
 	const handleStepClick = (index: number) => {
@@ -61,13 +76,16 @@ export const HowOurServiceWorks = () => {
 					</div>
 					<div className="shadow-blue flex h-full w-[50%] rounded-[20px] bg-white">
 						{selectedStep !== null && (
-							<div className="flex flex-col py-[45px]">
-								<span className="flex mb-[90px] justify-between px-[20px] flex-row font-montserrat text-[20px] font-semibold leading-[24px]">
-									{steps[selectedStep]}
-								</span>
-								<span className="font-montserrat px-[27px] text-[20px] font-normal leading-[24px] whitespace-pre-wrap">
+							<div className="flex flex-col py-[45px] px-[20px] gap-[30px]">
+								<div className="flex justify-between flex-row gap-[30px]">
+									<div className="flex flex-row font-montserrat text-[20px] font-semibold leading-[24px]">
+										{steps[selectedStep]}
+									</div>
+									<div className="flex">{numberImages[selectedStep]}</div>
+								</div>
+								<div className="font-montserrat px-[7px] text-[20px] font-normal leading-[24px] whitespace-pre-wrap">
 									{descriptions[selectedStep]}
-								</span>
+								</div>
 							</div>
 						)}
 					</div>
