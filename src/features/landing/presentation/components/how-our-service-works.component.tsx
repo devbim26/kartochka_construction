@@ -5,8 +5,8 @@ import {
 	FirstNumberImage,
 	FourthNumberImage,
 	SecondNumberImage,
-} from '../../images';
-import { ThirdNumberImage } from '../../images/third-number-image';
+	ThirdNumberImage,
+} from '../images';
 
 export const HowOurServiceWorks = () => {
 	const [selectedStep, setSelectedStep] = useState(0);
