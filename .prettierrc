@@ -7,5 +7,5 @@
 	"printWidth": 100,
 	"trailingComma": "all",
 	"endOfLine": "auto",
-	"plugins": ["prettier-plugin-organize-imports"]
+	"plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"]
 }

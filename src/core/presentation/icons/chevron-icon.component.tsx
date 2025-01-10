@@ -1,6 +1,6 @@
 interface ChevronIconProps {
 	color?: string;
-	direction?: string;
+	direction?: 'up' | 'down' | 'left' | 'right';
 }
 
 export const ChevronIcon = ({ color = '#2175F3', direction = 'down' }: ChevronIconProps) => {
@@ -11,6 +11,9 @@ export const ChevronIcon = ({ color = '#2175F3', direction = 'down' }: ChevronIc
 			break;
 		case 'up':
 			transform = 'rotate(180deg)';
+			break;
+		case 'left':
+			transform = 'rotate(-90deg)';
 			break;
 		case 'down':
 		default:
@@ -24,7 +27,7 @@ export const ChevronIcon = ({ color = '#2175F3', direction = 'down' }: ChevronIc
 			viewBox="0 0 11 17"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
-			style={{ transform }}
+			style={{ transition: 'transform 0.1s ease-in-out', transform }}
 		>
 			<path
 				fillRule="evenodd"

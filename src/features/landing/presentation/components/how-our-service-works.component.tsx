@@ -42,12 +42,12 @@ export const HowOurServiceWorks = () => {
 	return (
 		<div className="flex w-full justify-center bg-background-primary">
 			<div className="flex w-[73.18%] flex-col py-[50px]">
-				<div className="mb-[49px] flex font-raleway text-[20px] font-normal leading-[24px]">
+				<div className="mb-[49px] flex font-montserrat text-[20px] font-normal leading-[24px]">
 					Как работает наш сервис
 				</div>
 				<div className="flex flex-row gap-[30px]">
-					<div className="flex w-[50%] flex-col">
-						<div className="font-raleway text-[25px] font-medium leading-[30px]">
+					<div className="flex w-1/2 flex-col">
+						<div className="font-montserrat text-[25px] font-medium leading-[30px]">
 							Этапы проектирования
 						</div>
 						<div className="mt-[50px] flex flex-col gap-[30px]">
@@ -58,7 +58,7 @@ export const HowOurServiceWorks = () => {
 									onClick={() => handleStepClick(index)}
 								>
 									<div
-										className={`font-montserrat flex cursor-pointer text-[20px] font-medium leading-[24px] ${
+										className={`flex cursor-pointer font-montserrat text-[20px] font-normal leading-[24px] ${
 											selectedStep === index ? 'text-primary' : ''
 										}`}
 									>
@@ -66,7 +66,7 @@ export const HowOurServiceWorks = () => {
 									</div>
 									<div className="flex">
 										<Chevron
-											color={selectedStep === index ? 'primary' : 'gray'}
+											color={selectedStep === index ? 'primary' : 'grey'}
 											direction={selectedStep === index ? 'right' : 'down'}
 										/>
 									</div>
@@ -74,16 +74,16 @@ export const HowOurServiceWorks = () => {
 							))}
 						</div>
 					</div>
-					<div className="shadow-blue flex h-full w-[50%] rounded-[20px] bg-white">
+					<div className="flex h-full w-1/2 rounded-[20px] bg-white shadow-blue">
 						{selectedStep !== null && (
-							<div className="flex flex-col py-[45px] px-[20px] gap-[30px]">
-								<div className="flex justify-between flex-row gap-[30px]">
+							<div className="flex flex-col gap-[24px] px-[20px] pb-[24px] pt-[45px]">
+								<div className="flex flex-row justify-between gap-[30px]">
 									<div className="flex flex-row font-montserrat text-[20px] font-semibold leading-[24px]">
 										{steps[selectedStep]}
 									</div>
 									<div className="flex">{numberImages[selectedStep]}</div>
 								</div>
-								<div className="font-montserrat px-[7px] text-[20px] font-normal leading-[24px] whitespace-pre-wrap">
+								<div className="whitespace-pre-wrap px-[7px] font-montserrat text-[20px] font-normal leading-[24px]">
 									{descriptions[selectedStep]}
 								</div>
 							</div>

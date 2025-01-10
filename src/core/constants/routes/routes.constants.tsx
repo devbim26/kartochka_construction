@@ -2,7 +2,7 @@ import { AuthorizationScreen, HomeScreen, LandingScreen } from '@features';
 
 export const APP_ROUTES = {
 	landing: {
-		route: '/',
+		route: '/landing',
 		element: <LandingScreen />,
 	},
 	auth: {
@@ -10,7 +10,7 @@ export const APP_ROUTES = {
 		element: <AuthorizationScreen />,
 	},
 	home: {
-		route: '/home',
+		route: '/',
 		element: <HomeScreen />,
 	},
 };

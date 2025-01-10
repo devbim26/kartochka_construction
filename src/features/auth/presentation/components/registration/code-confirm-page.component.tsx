@@ -66,7 +66,7 @@ export const CodeConfirmPage = () => {
 
 	return (
 		<FormProvider {...form}>
-			<div className="flex w-[508px] flex-col gap-[23px] rounded-[12px] border border-gray-border bg-white px-[32px] py-[23px]">
+			<div className="border-gray-border flex w-[508px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[23px]">
 				<div className="flex h-[64px] flex-row items-center justify-center gap-[10px]">
 					<LogoIcon />
 					<LogoTextIcon />
