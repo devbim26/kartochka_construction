@@ -1,5 +1,6 @@
 import { Chevron } from '@core';
 import { useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 export const FAQ = () => {
 	const [selectedQuestions, setSelectedQuestions] = useState<number[]>([0]);
@@ -8,7 +9,7 @@ export const FAQ = () => {
 		'Насколько точны ваши расчеты?',
 		'Можно ли использовать ваши расчеты для официальной экспертизы?',
 		'Какие нормы вы используете для расчетов?',
-		'Поддерживает ли ваш ервис расчеты для нестандартных конструкций',
+		'Поддерживает ли ваш cервис расчеты для нестандартных конструкций',
 		'Можно ли интегрировать ваши расчеты с программами CAD/BIM?',
 		'Каковы ограничения бесплатной версии?',
 		'Как часто обновляется база данных материалов и нормативов?',
@@ -46,7 +47,10 @@ export const FAQ = () => {
 					{questions.map((question, index) => (
 						<div
 							key={index}
-							className={`flex cursor-pointer flex-row justify-between gap-[10px] overflow-hidden rounded-[20px] bg-white py-[23px] pl-[20px] pr-[45px] transition-all duration-300 ease-in-out ${selectedQuestions.includes(index) ? 'max-h-[100%]' : 'max-h-[64px]'}`}
+							className={twMerge(
+								'flex cursor-pointer flex-row justify-between gap-[10px] overflow-hidden rounded-[20px] bg-white py-[23px] pl-[20px] pr-[45px] transition-all duration-300 ease-in-out',
+								selectedQuestions.includes(index) ? 'max-h-[100%]' : 'max-h-[64px]',
+							)}
 							onClick={() => handleQuestionClick(index)}
 						>
 							<div className="flex flex-col gap-[40px]">
