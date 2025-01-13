@@ -1,5 +1,6 @@
 import { Chevron } from '@core';
 import { useState } from 'react';
+import { stepDescriptions, steps } from '../../constants';
 import {
 	FifthNumberImage,
 	FirstNumberImage,
@@ -10,22 +11,6 @@ import {
 
 export const HowOurServiceWorks = () => {
 	const [selectedStep, setSelectedStep] = useState(0);
-
-	const steps = [
-		'Укажите характеристики вашего проекта',
-		'Выберите оптимальные конструкции на основе расчётов',
-		'Получите точные расчёты конструкций',
-		'Создайте отчет',
-		'Пройдите экспертизу',
-	];
-
-	const descriptions = [
-		'Укажите основные характеристики вашего проекта, такие как тип здания, назначение помещений и другие параметры.\n\nЭто позволит системе точно учитывать все необходимые нормы и требования.',
-		'Ознакомьтесь с предложенными конструкциями, сравните их по стоимости и параметрам. Это поможет вам выбрать наилучшее решение для вашего проекта.',
-		'После выбора конструкций получите подробные расчёты, подтверждающие соответствие проектных решений всем строительным нормам, а также стоимость каждого решения.',
-		'Детальные расчеты для выбранной конструкции: все необходимые параметры и данные.\n\nСпецификации материалов, полная информация о материалах.',
-		'Отправьте расчеты на проверку нашим сертифицированным инженерам.\n\nПолучите заключение для успешного прохождения государственной экспертизы.',
-	];
 
 	const numberImages = [
 		<FirstNumberImage key="first" />,
@@ -84,7 +69,7 @@ export const HowOurServiceWorks = () => {
 									<div className="flex">{numberImages[selectedStep]}</div>
 								</div>
 								<div className="whitespace-pre-wrap px-[7px] font-montserrat text-[20px] font-normal leading-[24px]">
-									{descriptions[selectedStep]}
+									{stepDescriptions[selectedStep]}
 								</div>
 							</div>
 						)}
