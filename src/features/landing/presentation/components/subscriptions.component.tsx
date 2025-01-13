@@ -73,7 +73,7 @@ export const Subscriptions = () => {
 					{titles.map((title, index) => (
 						<div
 							key={index}
-							className="flex flex-col rounded-[20px] border border-grey-border px-[16px] pb-[16px] pt-[41px]"
+							className="flex flex-1 flex-col rounded-[20px] border border-grey-border px-[16px] pb-[16px] pt-[41px]"
 						>
 							<div className="mx-[17px] border-b-2 border-b-grey-border pb-[9px] font-montserrat text-[25px] font-bold leading-[30px] text-primary">
 								{title}

@@ -2,7 +2,7 @@ import { Chevron } from '@core';
 import { useState } from 'react';
 
 export const FAQ = () => {
-	const [selectedQuestion, setSelectedQuestion] = useState<number | null>(0);
+	const [selectedQuestions, setSelectedQuestions] = useState<number[]>([0]);
 
 	const questions = [
 		'Насколько точны ваши расчеты?',
@@ -29,7 +29,11 @@ export const FAQ = () => {
 	];
 
 	const handleQuestionClick = (index: number) => {
-		setSelectedQuestion(selectedQuestion === index ? null : index);
+		setSelectedQuestions((prevSelected) =>
+			prevSelected.includes(index)
+				? prevSelected.filter((i) => i !== index)
+				: [...prevSelected, index],
+		);
 	};
 
 	return (
@@ -42,26 +46,24 @@ export const FAQ = () => {
 					{questions.map((question, index) => (
 						<div
 							key={index}
-							className="flex cursor-pointer flex-row justify-between gap-[10px] rounded-[20px] bg-white py-[23px] pl-[20px] pr-[45px]"
+							className={`flex cursor-pointer flex-row justify-between gap-[10px] overflow-hidden rounded-[20px] bg-white py-[23px] pl-[20px] pr-[45px] transition-all duration-300 ease-in-out ${selectedQuestions.includes(index) ? 'max-h-[100%]' : 'max-h-[64px]'}`}
 							onClick={() => handleQuestionClick(index)}
 						>
 							<div className="flex flex-col gap-[40px]">
 								<div className="font-montserrat text-[20px] font-semibold leading-[24px]">
 									{question}
 								</div>
-								{selectedQuestion === index && (
-									<div
-										key={index}
-										className="font-montserrat text-[20px] font-normal leading-[24px]"
-									>
-										{descriptions[index]}
-									</div>
-								)}
+								<div
+									key={index}
+									className="font-montserrat text-[20px] font-normal leading-[24px]"
+								>
+									{descriptions[index]}
+								</div>
 							</div>
 							<div className="flex flex-col justify-start">
 								<Chevron
-									color={selectedQuestion === index ? 'grey' : 'primary'}
-									direction={selectedQuestion === index ? 'down' : 'right'}
+									color={selectedQuestions.includes(index) ? 'grey' : 'primary'}
+									direction={selectedQuestions.includes(index) ? 'down' : 'right'}
 								/>
 							</div>
 						</div>
