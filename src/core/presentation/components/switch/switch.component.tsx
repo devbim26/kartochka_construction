@@ -1,4 +1,5 @@
 import { memo, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 interface SwitchProps {
 	className?: string;
@@ -47,12 +48,18 @@ export const Switch = memo(
 
 		return (
 			<div
-				className={`relative flex cursor-pointer items-center rounded-full transition duration-300 ease-in-out ${className}`}
+				className={twMerge(
+					'relative flex cursor-pointer items-center rounded-full transition duration-300 ease-in-out',
+					className,
+				)}
 				onClick={handleToggle}
 				style={{ backgroundColor: isEnabled ? currentOnColor : currentOffColor }}
 			>
 				<span
-					className={`${onTextClassName} absolute z-50 transition duration-300 ease-in-out`}
+					className={twMerge(
+						'absolute z-50 transition duration-300 ease-in-out',
+						onTextClassName,
+					)}
 					style={{
 						color: isEnabled ? currentOffColor : currentOffHandleColor,
 					}}
@@ -60,7 +67,10 @@ export const Switch = memo(
 					{onText}
 				</span>
 				<span
-					className={`${offTextClassName} absolute z-50 transition duration-300 ease-in-out`}
+					className={twMerge(
+						'absolute z-50 transition duration-300 ease-in-out',
+						offTextClassName,
+					)}
 					style={{
 						color: isEnabled ? currentOnHandleColor : currentOnColor,
 					}}
@@ -68,7 +78,11 @@ export const Switch = memo(
 					{offText}
 				</span>
 				<div
-					className={`flex h-full w-1/2 items-center justify-center rounded-full transition-transform duration-300 ease-in-out ${isEnabled ? 'translate-x-full' : 'translate-x-0'} ${handleClassName}`}
+					className={twMerge(
+						'flex h-full w-1/2 items-center justify-center rounded-full transition-transform duration-300 ease-in-out',
+						isEnabled ? 'translate-x-full' : 'translate-x-0',
+						handleClassName,
+					)}
 					style={{
 						backgroundColor: isEnabled ? currentOnHandleColor : currentOffHandleColor,
 					}}
