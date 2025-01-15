@@ -4,7 +4,9 @@ export const subscriptionDescriptions = [
 	'Максимальные возможности для крупных компаний',
 ];
 
-export const prices = ['бесплатно', '350$/месяц', '550$/месяц'];
+export const monthPrices = ['бесплатно', '350$/месяц', '550$/месяц'];
+
+export const yearPrices = ['бесплатно', '300$/месяц', '500$/месяц'];
 
 export const points = [
 	[
@@ -41,3 +43,7 @@ export const points = [
 		'Интеграция AutoCAD, Revit',
 	],
 ];
+
+export const titles = ['Trial', 'Standart', 'Pro'];
+
+export const crossedPoints = [['Проверка отчета', 'Подпись отчета'], [], []];

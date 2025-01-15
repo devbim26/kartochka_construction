@@ -1,12 +1,22 @@
 import { Button } from '@core';
+import { useState } from 'react';
 import { Switch } from '../../../../core/presentation/components/switch';
-import { points, prices, subscriptionDescriptions } from '../../constants';
+import {
+	crossedPoints,
+	monthPrices,
+	points,
+	subscriptionDescriptions,
+	titles,
+	yearPrices,
+} from '../../constants';
 import { CheckMarkImage } from '../images';
 
 export const Subscriptions = () => {
-	const titles = ['Trial', 'Standart', 'Pro'];
+	const [isPerMonth, setIsPerMonth] = useState(true);
 
-	const crossedPoints = [['Проверка отчета', 'Подпись отчета'], [], []];
+	const handleToggle = () => {
+		isPerMonth ? setIsPerMonth(false) : setIsPerMonth(true);
+	};
 
 	return (
 		<div className="flex w-[73.18%] flex-col py-[50px]">
@@ -22,6 +32,7 @@ export const Subscriptions = () => {
 					className="mb-[12px] h-[30px] w-[180px] p-[3px]"
 					onTextClassName="font-semibold font-montserrat text-[16px] leading-[20px] right-[29px]"
 					offTextClassName="font-semibold font-montserrat text-[16px] leading-[20px] left-[17px]"
+					onChange={handleToggle}
 				/>
 				<div className="mb-[12px] font-montserrat text-[12px] font-normal">
 					При покупке на год первые 3 месяца бесплатно
@@ -39,7 +50,7 @@ export const Subscriptions = () => {
 								{subscriptionDescriptions[index]}
 							</div>
 							<div className="mb-[18px] font-montserrat text-[20px] font-medium leading-[24px] text-primary">
-								{prices[index]}
+								{isPerMonth ? monthPrices[index] : yearPrices[index]}
 							</div>
 							<Button className="mb-[14px] w-full text-[16px]">
 								Оформить подписку

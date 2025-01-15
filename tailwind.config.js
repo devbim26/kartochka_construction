@@ -42,6 +42,7 @@ module.exports = {
 		},
 	},
 	plugins: [
+		require('@xpd/tailwind-3dtransforms'),
 		plugin(function ({ addUtilities }) {
 			addUtilities({
 				'.scrollbar-none': {

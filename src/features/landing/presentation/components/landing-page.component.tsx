@@ -29,7 +29,7 @@ export const LandingPage = () => {
 				<Button className="mb-[44px] text-[22px] leading-[27px]" onClick={handleStartCalc}>
 					начать расчет
 				</Button>
-				<img src={LandingGif} alt="GIF" />
+				<img src={LandingGif} alt="GIF" className="flex w-full" />
 			</div>
 			<AboutUsComponent />
 			<HowOurServiceWorks />

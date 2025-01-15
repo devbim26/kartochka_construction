@@ -12,6 +12,7 @@ interface SwitchProps {
 	offColor?: keyof typeof SWITCH_COLORS | string;
 	onHandleColor?: keyof typeof SWITCH_COLORS | string;
 	offHandleColor?: keyof typeof SWITCH_COLORS | string;
+	onChange?: (isEnabled: boolean) => void;
 }
 
 const SWITCH_COLORS = {
@@ -31,11 +32,16 @@ export const Switch = memo(
 		offColor = 'grey',
 		onHandleColor = 'white',
 		offHandleColor = 'white',
+		onChange,
 	}: SwitchProps) => {
 		const [isEnabled, setIsEnabled] = useState(false);
 
 		const handleToggle = () => {
-			setIsEnabled(!isEnabled);
+			const newEnabledState = !isEnabled;
+			setIsEnabled(newEnabledState);
+			if (onChange) {
+				onChange(newEnabledState);
+			}
 		};
 
 		const getCurrentColor = (color: keyof typeof SWITCH_COLORS | string) =>

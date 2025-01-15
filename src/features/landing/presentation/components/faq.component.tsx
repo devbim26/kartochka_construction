@@ -36,9 +36,11 @@ export const FAQ = () => {
 								</div>
 								<div
 									key={index}
-									className="font-montserrat text-[20px] font-normal leading-[24px]"
+									className="whitespace-pre-wrap font-montserrat text-[20px] font-normal leading-[24px]"
 								>
-									{descriptions[index]}
+									<span
+										dangerouslySetInnerHTML={{ __html: descriptions[index] }}
+									/>
 								</div>
 							</div>
 							<div className="flex flex-col justify-start">
