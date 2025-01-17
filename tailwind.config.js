@@ -5,16 +5,21 @@ module.exports = {
 	content: ['./src/**/*.{js,jsx,ts,tsx}'],
 	theme: {
 		extend: {
+			boxShadow: {
+				blue: '0px 0px 22.2px -5px rgba(33, 117, 243, 0.56)',
+			},
 			fontFamily: {
 				raleway: ['Raleway', 'sans-serif'],
 				sans: ['Source Sans Pro', 'sans-serif'],
+				montserrat: ['Montserrat', 'sans-serif'],
 			},
 			colors: {
 				primary: '#2175F3',
-				gray: {
+				grey: {
 					navHeader: '#F5F6F7',
 					navBg: '#F9F9F9',
 					border: '#EDEFF2',
+					text: '#BFBFBF',
 				},
 				input: {
 					border: {
@@ -43,6 +48,7 @@ module.exports = {
 		},
 	},
 	plugins: [
+		require('@xpd/tailwind-3dtransforms'),
 		plugin(function ({ addUtilities }) {
 			addUtilities({
 				'.scrollbar-none': {

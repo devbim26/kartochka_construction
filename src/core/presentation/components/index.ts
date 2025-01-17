@@ -1,6 +1,7 @@
 export * from './button';
 export * from './checkbox';
 export * from './checkbox-select';
+export * from './chevron';
 export * from './forms';
 export * from './inputs';
 export * from './popover';
