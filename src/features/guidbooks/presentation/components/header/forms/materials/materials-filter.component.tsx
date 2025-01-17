@@ -1,13 +1,12 @@
-import { Input, Select } from '@core';
+import { Input, memoize } from '@core';
 import { Controller } from 'react-hook-form';
-import { withMemo } from '../../../../../../../non-alias';
 import {
 	HeaderFormsProps,
 	IMaterialsFilterForm,
 	MaterialsFilterFormKeys,
 } from '../../../../../types';
 
-export const MaterialsFilter = withMemo(
+export const MaterialsFilter = memoize(
 	({ control, setValue }: HeaderFormsProps<IMaterialsFilterForm>) => {
 		return (
 			<>
@@ -22,27 +21,6 @@ export const MaterialsFilter = withMemo(
 							containerClassName="w-[226px]"
 							label="Название"
 							placeholder="Введите название"
-						/>
-					)}
-				/>
-				<Controller
-					control={control}
-					name={MaterialsFilterFormKeys.MaterialType}
-					render={({ field }) => (
-						<Select
-							{...field}
-							placeholder="Выбрать тип материала"
-							cancelable={true}
-							label="Тип материала"
-							classNames={{
-								popover: {
-									bodyClassName: 'w-[226px]',
-								},
-							}}
-							options={[]}
-							onChange={(value) => {
-								setValue(MaterialsFilterFormKeys.MaterialType, value);
-							}}
 						/>
 					)}
 				/>
@@ -83,4 +61,5 @@ export const MaterialsFilter = withMemo(
 			</>
 		);
 	},
+	'MaterialsFilter',
 );

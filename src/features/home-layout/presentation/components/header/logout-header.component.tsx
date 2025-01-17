@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppNavigate, useAppSelector } from '@core';
 import { useEffect } from 'react';
 import { ImExit } from 'react-icons/im';
-import { AUTH_FETCH_ROUTES, AUTH_ROUTES, logout } from '../../../../auth';
+import { AUTH_FETCH_ROUTES, logout } from '../../../../auth';
 
 export const LogoutHeader = () => {
 	const dispatch = useAppDispatch();
@@ -10,7 +10,7 @@ export const LogoutHeader = () => {
 
 	useEffect(() => {
 		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.logout.fetch_name &&
-			navigate('/auth' + AUTH_ROUTES.login.route);
+			navigate('/auth' + '/');
 	}, [authData.fetch_data?.fetch_name]);
 
 	const logoutHandler = () => {

@@ -76,10 +76,10 @@ const RegistrationFormDataSchema = z
 type RegistrationFormDataSchemaType = z.infer<typeof RegistrationFormDataSchema>;
 
 export {
+	ApproveFormDataSchema,
 	LoginFormDataSchema,
 	RegistrationFormDataSchema,
-	ApproveFormDataSchema,
-	type RegistrationFormDataSchemaType,
-	type LoginFormDataSchemaType,
 	type ApproveFormDataSchemaType,
+	type LoginFormDataSchemaType,
+	type RegistrationFormDataSchemaType,
 };

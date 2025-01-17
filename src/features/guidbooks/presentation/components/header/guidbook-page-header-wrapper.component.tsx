@@ -1,9 +1,8 @@
-import { Button, CleanUpIcon } from '@core';
+import { Button, CleanUpIcon, memoize } from '@core';
 import { useCallback } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { twMerge } from 'tailwind-merge';
-import { withMemo } from '../../../../../non-alias';
 import { guidbookHeaderTitlesMap } from '../../../constants';
 import { HeaderFormElements, HeaderFormTitles, HeaderFormTypes } from '../../../types';
 
@@ -16,7 +15,7 @@ interface GuidbookPageHeaderWrapperProps {
 	formElements: HeaderFormElements<any>;
 }
 
-export const GuidbookPageHeaderWrapper = withMemo(
+export const GuidbookPageHeaderWrapper = memoize(
 	({
 		titles,
 		formType,
@@ -63,11 +62,11 @@ export const GuidbookPageHeaderWrapper = withMemo(
 						</Button>
 					)}
 				</div>
-				<div className="flex flex-col rounded-xl border border-solid border-gray-border bg-white">
+				<div className="border-gray-border flex flex-col rounded-xl border border-solid bg-white">
 					<p className="flex justify-center pt-[16px] font-sans text-base font-semibold leading-4">
 						{guidbookHeaderTitlesMap.get(formType)!(titles)}
 					</p>
-					<div className="flex flex-wrap gap-[16px] border-b border-solid border-gray-border px-[16px] pb-[24px] pt-[16px]">
+					<div className="border-gray-border flex flex-wrap gap-[16px] border-b border-solid px-[16px] pb-[24px] pt-[16px]">
 						<FormProvider {...form}>
 							{formType == HeaderFormTypes.filter ? (
 								<formElements.filter
@@ -113,4 +112,5 @@ export const GuidbookPageHeaderWrapper = withMemo(
 			</div>
 		);
 	},
+	'GuidbookPageHeaderWrapper',
 );

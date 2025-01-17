@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { RefCallBack } from 'react-hook-form';
 import { IconType } from 'react-icons';
-import ReactInputMask from 'react-input-mask';
+import { ReactInputMask } from 'react-input-mask';
 import { twMerge } from 'tailwind-merge';
 import { FormElementLabel } from '../forms/form-element-label.component';
 
@@ -15,9 +15,9 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 	containerClassName?: string;
 	mask?: string;
 	error?: string;
-	Button?: () => JSX.Element;
+	Button?: () => React.JSX.Element;
 	disabledButton?: boolean;
-	Icon?: (() => JSX.Element) | IconType;
+	Icon?: (() => React.JSX.Element) | IconType;
 	onIconClick?: () => void;
 	iconPos?: 'right' | 'left';
 	isLoading?: boolean;

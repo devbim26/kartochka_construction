@@ -1,6 +1,7 @@
-import { APP_ROUTES, LogoIcon, LogoTextIcon } from '@core';
+import { LogoIcon, LogoTextIcon } from '@core';
 import { useLocation } from 'react-router-dom';
-import { HOME_ROUTES } from '../../../constants';
+import { APP_ROUTES } from '../../../../../non-alias';
+import { HOME_ROUTES } from '../../../constants/routes/home-routes';
 import { HeaderNav } from './header-nav.component';
 
 export const HomeHeader = () => {
@@ -13,7 +14,7 @@ export const HomeHeader = () => {
 				<LogoTextIcon className="h-[64px] w-[170px]" />
 			</div>
 			{(location.pathname.startsWith(`/${HOME_ROUTES.main.route}`) ||
-				location.pathname.startsWith(`${APP_ROUTES.landing.route}`)) && <HeaderNav />}
+				location.pathname.startsWith(`/${APP_ROUTES.landing.route}`)) && <HeaderNav />}
 		</header>
 	);
 };

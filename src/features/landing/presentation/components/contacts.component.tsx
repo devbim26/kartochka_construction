@@ -3,7 +3,7 @@ import { EmailImage, PhoneImage } from '../images';
 export const Contacts = () => {
 	return (
 		<div className="flex w-[73.18%] flex-col py-[50px]">
-			<div className="font-montserrat mb-[36px] flex text-[20px] font-normal leading-[24px]">
+			<div className="mb-[36px] flex font-montserrat text-[20px] font-normal leading-[24px]">
 				Контакты
 			</div>
 			<div className="flex flex-row justify-between">

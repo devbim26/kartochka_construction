@@ -1,11 +1,7 @@
-import { SimpleTable } from '@core';
-import { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useState } from 'react';
-import { TableHeaderCell } from '../../../../core/presentation/components/table/table-header-cell.component';
 import { MaterialsAddFormDefaultValues, MaterialsFilterFormDefaultValues } from '../../constants';
 import { HeaderFormTypes, MaterialFormTypes } from '../../types';
 import { useHeaderForm } from '../../utils';
-import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
 
 const testData = [
 	{
@@ -22,33 +18,10 @@ const testData = [
 	},
 ];
 
-const createColumns = (): ColumnDef<any>[] => {
-	return [
-		{
-			accessorKey: 'id',
-			header: () => <TableHeaderCell text={'id'} showSortIcon />,
-			cell: (info) => info.getValue(),
-		},
-		{
-			accessorKey: 'name',
-			cell: (info) => info.getValue(),
-		},
-		{
-			accessorKey: 'plice',
-			cell: (info) => info.getValue(),
-		},
-		{
-			accessorKey: 'addv',
-			cell: (info) => info.getValue(),
-		},
-	];
-};
-
 export const MaterialsPage = () => {
 	const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 		HeaderFormTypes.filter,
 	);
-
 	const form = useHeaderForm<MaterialFormTypes>(
 		{
 			filter: MaterialsFilterFormDefaultValues,
@@ -59,10 +32,9 @@ export const MaterialsPage = () => {
 	);
 
 	const onSaveHandle = useCallback(() => {}, []);
-	const columns = createColumns();
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
-			<GuidbookPageHeaderWrapper
+			{/* <GuidbookPageHeaderWrapper
 				onSave={onSaveHandle}
 				titles={{
 					pageTitle: 'Материалы',
@@ -77,9 +49,8 @@ export const MaterialsPage = () => {
 					add: MaterialsAddAndEdit,
 					edit: MaterialsAddAndEdit,
 				}}
-			/>
+			/> */}
 			{/* <GuidbookPageTableWrapper /> */}
-			<SimpleTable columns={columns} data={testData} />
 		</div>
 	);
 };

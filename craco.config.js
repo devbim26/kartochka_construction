@@ -8,7 +8,6 @@ module.exports = {
 			'@core': path.resolve(__dirname, './src/core'),
 			'@features': path.resolve(__dirname, './src/features'),
 			'@api-gen': path.resolve(__dirname, './src/api-gen'),
-			'@router': path.resolve(__dirname, './src/router'),
 		},
 	},
 	plugins: [

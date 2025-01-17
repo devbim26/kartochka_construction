@@ -9,4 +9,4 @@ type LoginFormData = LoginFormDataSchemaType;
 type ApproveFormData = ApproveFormDataSchemaType;
 type RegistrationFormData = RegistrationFormDataSchemaType;
 
-export type { LoginFormData, ApproveFormData, RegistrationFormData };
+export type { ApproveFormData, LoginFormData, RegistrationFormData };

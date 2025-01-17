@@ -1,7 +1,6 @@
-import { ChevronIcon } from '@core';
+import { ChevronIcon, memoize } from '@core';
 import { IconType } from 'react-icons';
 import { twMerge } from 'tailwind-merge';
-import { withMemo } from '../../../../non-alias';
 
 interface DropdownSelectButtonProps {
 	displayText: string;
@@ -11,7 +10,7 @@ interface DropdownSelectButtonProps {
 	Icon?: IconType;
 }
 
-export const DropdownSelectButton = withMemo(
+export const DropdownSelectButton = memoize(
 	({ displayText, className, textClassName, Icon, iconClassName }: DropdownSelectButtonProps) => {
 		return (
 			<div
@@ -31,4 +30,5 @@ export const DropdownSelectButton = withMemo(
 			</div>
 		);
 	},
+	'DropdownSelectButton',
 );

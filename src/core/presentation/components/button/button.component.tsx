@@ -1,6 +1,6 @@
 import { type ComponentPropsWithoutRef } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { withMemo } from '../../../../non-alias';
+import { memoize } from '../../../utils';
 
 export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
 	variant?: keyof typeof BUTTON_VARIANTS;
@@ -20,7 +20,7 @@ const BUTTON_VARIANTS = {
 	// empty: 'text-primary bg-none',
 };
 
-export const Button = withMemo(
+export const Button = memoize(
 	({ children, className, variant = 'primary', buttonIcon = false, ...rest }: ButtonProps) => {
 		const buttonContent = children;
 
@@ -39,4 +39,5 @@ export const Button = withMemo(
 			</button>
 		);
 	},
+	'Button',
 );

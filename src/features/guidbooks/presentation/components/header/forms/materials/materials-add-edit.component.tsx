@@ -1,6 +1,5 @@
-import { Input, Select } from '@core';
+import { Input, memoize } from '@core';
 import { Controller } from 'react-hook-form';
-import { withMemo } from '../../../../../../../non-alias/with-memo.utils';
 import {
 	HeaderFormsProps,
 	IMaterialsAddAndEditForm,
@@ -8,7 +7,7 @@ import {
 } from '../../../../../types';
 import { FormSubTitle } from '../form-sub-title.components';
 
-export const MaterialsAddAndEdit = withMemo(
+export const MaterialsAddAndEdit = memoize(
 	({ control, setValue }: HeaderFormsProps<IMaterialsAddAndEditForm>) => {
 		return (
 			<div className="flex flex-col gap-[23px]">
@@ -78,69 +77,6 @@ export const MaterialsAddAndEdit = withMemo(
 					/>
 					<Controller
 						control={control}
-						name={MaterialsAddAndEditFormKeys.MaterialType}
-						render={({ field }) => (
-							<Select
-								{...field}
-								placeholder="Выбрать тип материала"
-								cancelable={true}
-								label="Тип материала"
-								classNames={{
-									popover: {
-										bodyClassName: 'w-[226px]',
-									},
-								}}
-								options={[]}
-								onChange={(value) => {
-									setValue(MaterialsAddAndEditFormKeys.MaterialType, value);
-								}}
-							/>
-						)}
-					/>
-					<Controller
-						control={control}
-						name={MaterialsAddAndEditFormKeys.MaterialType}
-						render={({ field }) => (
-							<Select
-								{...field}
-								placeholder="Выбрать регион"
-								cancelable={true}
-								label="Регион"
-								classNames={{
-									popover: {
-										bodyClassName: 'w-[226px]',
-									},
-								}}
-								options={[]}
-								onChange={(value) => {
-									setValue(MaterialsAddAndEditFormKeys.MaterialType, value);
-								}}
-							/>
-						)}
-					/>
-					<Controller
-						control={control}
-						name={MaterialsAddAndEditFormKeys.MaterialType}
-						render={({ field }) => (
-							<Select
-								{...field}
-								placeholder="Выбрать тип"
-								cancelable={true}
-								label="Тип"
-								classNames={{
-									popover: {
-										bodyClassName: 'w-[226px]',
-									},
-								}}
-								options={[]}
-								onChange={(value) => {
-									setValue(MaterialsAddAndEditFormKeys.MaterialType, value);
-								}}
-							/>
-						)}
-					/>
-					<Controller
-						control={control}
 						name={MaterialsAddAndEditFormKeys.Name}
 						render={({ field }) => (
 							<Input
@@ -159,4 +95,5 @@ export const MaterialsAddAndEdit = withMemo(
 			</div>
 		);
 	},
+	'MaterialsAddAndEdit',
 );

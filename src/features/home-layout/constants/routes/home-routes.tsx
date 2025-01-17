@@ -1,6 +1,20 @@
 import { Outlet } from 'react-router-dom';
 import { DevScreen } from '../../../dev';
-import { GuidbooksLauout, MaterialsPage } from '../../../guidbooks';
+import { GuidbooksLauout, GUIDBOOKS_ROUTES } from '../../../guidbooks';
+
+//TODO
+export const USERS_LIST_ROUTES = {
+	manager: {
+		id: 'manager-page-id',
+		route: 'manager',
+		element: <DevScreen title="Список пользователей. Менеджер" />,
+	},
+	client: {
+		id: 'client-page-id',
+		route: 'client',
+		element: <DevScreen title="Список пользователей. Клиент" />,
+	},
+};
 
 export const HOME_ROUTES = {
 	main: {
@@ -28,58 +42,6 @@ export const HOME_ROUTES = {
 		route: 'accounts',
 		element: <DevScreen title="Счета" />,
 	},
-	users_list: {
-		layout: {
-			id: 'users-list-layout-id',
-			route: 'users-list',
-			element: (
-				<div className="flex flex-1">
-					<Outlet />
-				</div>
-			),
-		},
-		childrens: {
-			manager: {
-				id: 'manager-page-id',
-				route: 'manager',
-				element: <DevScreen title="Список пользователей. Менеджер" />,
-			},
-			client: {
-				id: 'client-page-id',
-				route: 'client',
-				element: <DevScreen title="Список пользователей. Клиент" />,
-			},
-		},
-	},
-	guidbooks: {
-		layout: {
-			id: 'guidbooks-layout-id',
-			route: 'guidbooks',
-			element: <GuidbooksLauout />,
-		},
-		childrens: {
-			materials: {
-				id: 'materials-page-id',
-				route: 'materials',
-				element: <MaterialsPage />,
-			},
-			constructions: {
-				id: 'constructions-page-id',
-				route: 'constructions',
-				element: <DevScreen title="Справочники. Конструкции" />,
-			},
-			requirements: {
-				id: 'requirements-page-id',
-				route: 'requirements',
-				element: <DevScreen title="Справочники. Требования" />,
-			},
-			issuers: {
-				id: 'issuers-page-id',
-				route: 'issuers',
-				element: <DevScreen title="Справочники. Производители" />,
-			},
-		},
-	},
 	news: {
 		id: 'news-page-id',
 		route: 'news',
@@ -89,5 +51,26 @@ export const HOME_ROUTES = {
 		id: 'reports-page-id',
 		route: 'reports',
 		element: <DevScreen title="Отчеты" />,
+	},
+	guidbooks: {
+		id: 'guidbooks-layout-id',
+		route: 'guidbooks',
+		element: <GuidbooksLauout />,
+		childrens: [
+			GUIDBOOKS_ROUTES.constructions,
+			GUIDBOOKS_ROUTES.issuers,
+			GUIDBOOKS_ROUTES.materials,
+			GUIDBOOKS_ROUTES.requirements,
+		],
+	},
+	users_list: {
+		id: 'users-list-layout-id',
+		route: 'users-list',
+		element: (
+			<div className="flex flex-1">
+				<Outlet />
+			</div>
+		),
+		childrens: [USERS_LIST_ROUTES.client, USERS_LIST_ROUTES.manager],
 	},
 };

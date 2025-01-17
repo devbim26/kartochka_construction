@@ -1,10 +1,10 @@
-import { withMemo } from '../../../../non-alias';
+import { memoize } from '@core';
 
 interface DevScreenProps {
 	title: string;
 }
 
-export const DevScreen = withMemo(({ title }: DevScreenProps) => {
+export const DevScreen = memoize(({ title }: DevScreenProps) => {
 	return (
 		<div className="flex flex-1 items-center justify-center">
 			<div className="flex size-[400px] flex-col items-center justify-center gap-[20px] rounded-lg border-0 border-r-8 bg-background-secondary">
@@ -17,4 +17,4 @@ export const DevScreen = withMemo(({ title }: DevScreenProps) => {
 			</div>
 		</div>
 	);
-});
+}, 'memoize');

@@ -3,15 +3,15 @@ import { LogoBelniis, LogoIcon, LogoTextIcon } from '@core';
 export const AboutUsComponent = () => {
 	return (
 		<div className="flex w-[73.18%] flex-col bg-white py-[50px]">
-			<div className="font-montserrat mb-[20px] flex text-[20px] font-normal leading-[24px]">
+			<div className="mb-[20px] flex font-montserrat text-[20px] font-normal leading-[24px]">
 				О нас
 			</div>
 			<div className="flex flex-row gap-[82px]">
 				<div className="flex flex-col">
-					<div className="font-montserrat mb-[13px] flex text-[40px] font-semibold leading-[49px]">
+					<div className="mb-[13px] flex font-montserrat text-[40px] font-semibold leading-[49px]">
 						«ТрансАкустик» объединяет экспертов
 					</div>
-					<div className="font-montserrat flex text-[20px] leading-[24px]">
+					<div className="flex font-montserrat text-[20px] leading-[24px]">
 						с многолетним опытом и глубокой экспертизой в области теоретических
 						исследований и практического применения строительных решений на реальных
 						объектах. Все наши решения подтверждены аккредитованными лабораториями, что
@@ -24,7 +24,7 @@ export const AboutUsComponent = () => {
 						<LogoTextIcon className="h-[88px] w-[232px]" />
 					</div>
 					<LogoBelniis className="mb-[11px]" />
-					<div className="font-montserrat flex text-center text-[14px] leading-[12px]">
+					<div className="flex text-center font-montserrat text-[14px] leading-[12px]">
 						&quot;Республиканский научно-исследовательский институт в отрасли
 						строительства. Беларусь&quot;
 					</div>

@@ -1,5 +1,5 @@
+import { memoize } from '@core';
 import { twMerge } from 'tailwind-merge';
-import { withMemo } from '../../../../../non-alias';
 
 interface HeaderNavItemProps {
 	clickCallback: (id: string) => void;
@@ -8,7 +8,7 @@ interface HeaderNavItemProps {
 	id: string;
 }
 
-export const HeaderNavItem = withMemo(
+export const HeaderNavItem = memoize(
 	({ clickCallback, isSelected, text, id }: HeaderNavItemProps) => {
 		return (
 			<p
@@ -22,4 +22,5 @@ export const HeaderNavItem = withMemo(
 			</p>
 		);
 	},
+	'memoize',
 );

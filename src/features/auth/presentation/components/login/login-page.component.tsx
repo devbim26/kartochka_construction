@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
-import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
+import { AUTH_FETCH_ROUTES } from '../../../constants';
 import { authLogin } from '../../../services';
 import { LoginFormData } from '../../../types';
 import { LoginFormDataConfig } from '../../../utils';
@@ -46,7 +46,7 @@ export const LoginPage = () => {
 
 	return (
 		<FormProvider {...form}>
-			<div className="flex w-[412px] flex-col gap-[23px] rounded-[12px] border border-gray-border bg-white px-[32px] py-[21px]">
+			<div className="border-gray-border flex w-[412px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[21px]">
 				<div className="flex h-[64px] flex-row items-center justify-center gap-[10px]">
 					<LogoIcon />
 					<LogoTextIcon />
@@ -83,7 +83,7 @@ export const LoginPage = () => {
 				<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
 					<p>Нет аккаунта?</p>
 					<p
-						onClick={() => navigate('/auth/' + AUTH_ROUTES.code_approve.route)}
+						onClick={() => navigate('/auth/' + '/')}
 						className="cursor-pointer font-semibold underline-offset-auto hover:underline"
 					>
 						Зарегистрироваться

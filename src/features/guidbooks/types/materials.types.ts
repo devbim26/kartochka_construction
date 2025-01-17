@@ -1,9 +1,9 @@
-import { InputNumberType, SelectOption } from '@core';
+import { InputNumberType } from '@core';
 import { FieldValues } from 'react-hook-form';
 
 export interface IMaterialsFilterForm extends FieldValues {
 	name: string;
-	materialType: SelectOption;
+	materialType: any;
 	density: InputNumberType;
 	thickness: InputNumberType;
 }
@@ -13,9 +13,9 @@ export interface IMaterialsAddAndEditForm extends FieldValues {
 	description: string;
 	density: InputNumberType;
 	thickness: InputNumberType;
-	materialType: SelectOption;
-	region: SelectOption;
-	type: SelectOption;
+	materialType: any;
+	region: any;
+	type: any;
 	issuer: string;
 	//image
 	materialCoefficient: InputNumberType;

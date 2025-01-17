@@ -6,7 +6,8 @@ import { HiOutlineUsers } from 'react-icons/hi2';
 import { RiFileList3Line, RiPencilRulerLine, RiWallet3Fill } from 'react-icons/ri';
 import { TiDocumentText } from 'react-icons/ti';
 import { useNavigate } from 'react-router-dom';
-import { HOME_ROUTES } from '../../../constants';
+import { GUIDBOOKS_ROUTES } from '../../../../guidbooks';
+import { HOME_ROUTES, USERS_LIST_ROUTES } from '../../../constants/routes/home-routes';
 import { useSidebarNavigate } from '../../../utils';
 import { SidebarItem } from './sidebar-item.component';
 import { SidebarListItem } from './sidebar-list-item.component';
@@ -67,59 +68,47 @@ export const Sidebar = () => {
 			/>
 			<SidebarList
 				icon={HiOutlineUsers}
-				id={HOME_ROUTES.users_list.layout.id}
+				id={HOME_ROUTES.users_list.id}
 				label="Список пользователей"
 			>
-				<>
-					<SidebarListItem
-						id={HOME_ROUTES.users_list.childrens.manager.id}
-						label="Менеджер"
-						isSelected={currentItemId === HOME_ROUTES.users_list.childrens.manager.id}
-						setId={sidebarItemClick}
-					/>
-					<SidebarListItem
-						id={HOME_ROUTES.users_list.childrens.client.id}
-						label="Клиент"
-						isSelected={currentItemId === HOME_ROUTES.users_list.childrens.client.id}
-						setId={sidebarItemClick}
-					/>
-				</>
+				<SidebarListItem
+					id={USERS_LIST_ROUTES.manager.id}
+					label="Менеджер"
+					isSelected={currentItemId === USERS_LIST_ROUTES.manager.id}
+					setId={sidebarItemClick}
+				/>
+				<SidebarListItem
+					id={USERS_LIST_ROUTES.client.id}
+					label="Клиент"
+					isSelected={currentItemId === USERS_LIST_ROUTES.client.id}
+					setId={sidebarItemClick}
+				/>
 			</SidebarList>
-			<SidebarList
-				label="Справочники"
-				icon={RiFileList3Line}
-				id={HOME_ROUTES.guidbooks.layout.id}
-			>
-				<>
-					<SidebarListItem
-						id={HOME_ROUTES.guidbooks.childrens.materials.id}
-						label="Материалы"
-						isSelected={currentItemId === HOME_ROUTES.guidbooks.childrens.materials.id}
-						setId={sidebarItemClick}
-					/>
-					<SidebarListItem
-						id={HOME_ROUTES.guidbooks.childrens.constructions.id}
-						label="Конструкции"
-						isSelected={
-							currentItemId === HOME_ROUTES.guidbooks.childrens.constructions.id
-						}
-						setId={sidebarItemClick}
-					/>
-					<SidebarListItem
-						id={HOME_ROUTES.guidbooks.childrens.requirements.id}
-						label="Требования"
-						isSelected={
-							currentItemId === HOME_ROUTES.guidbooks.childrens.requirements.id
-						}
-						setId={sidebarItemClick}
-					/>
-					<SidebarListItem
-						id={HOME_ROUTES.guidbooks.childrens.issuers.id}
-						label="Производители"
-						isSelected={currentItemId === HOME_ROUTES.guidbooks.childrens.issuers.id}
-						setId={sidebarItemClick}
-					/>
-				</>
+			<SidebarList label="Справочники" icon={RiFileList3Line} id={HOME_ROUTES.guidbooks.id}>
+				<SidebarListItem
+					id={GUIDBOOKS_ROUTES.materials.id}
+					label="Материалы"
+					isSelected={currentItemId === GUIDBOOKS_ROUTES.materials.id}
+					setId={sidebarItemClick}
+				/>
+				<SidebarListItem
+					id={GUIDBOOKS_ROUTES.constructions.id}
+					label="Конструкции"
+					isSelected={currentItemId === GUIDBOOKS_ROUTES.constructions.id}
+					setId={sidebarItemClick}
+				/>
+				<SidebarListItem
+					id={GUIDBOOKS_ROUTES.requirements.id}
+					label="Требования"
+					isSelected={currentItemId === GUIDBOOKS_ROUTES.requirements.id}
+					setId={sidebarItemClick}
+				/>
+				<SidebarListItem
+					id={GUIDBOOKS_ROUTES.issuers.id}
+					label="Производители"
+					isSelected={currentItemId === GUIDBOOKS_ROUTES.issuers.id}
+					setId={sidebarItemClick}
+				/>
 			</SidebarList>
 			<SidebarItem
 				id={HOME_ROUTES.news.id}

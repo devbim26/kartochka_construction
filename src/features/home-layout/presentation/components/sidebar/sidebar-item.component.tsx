@@ -1,8 +1,8 @@
+import { memoize } from '@core';
 import { twMerge } from 'tailwind-merge';
-import { withMemo } from '../../../../../non-alias';
 import { SidebarItemProps } from '../../../types';
 
-export const SidebarItem = withMemo((props: SidebarItemProps) => {
+export const SidebarItem = memoize((props: SidebarItemProps) => {
 	return (
 		<div
 			className={twMerge(
@@ -20,4 +20,4 @@ export const SidebarItem = withMemo((props: SidebarItemProps) => {
 			{props.label}
 		</div>
 	);
-});
+}, 'SidebarItem');

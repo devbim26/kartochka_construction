@@ -1,9 +1,8 @@
-import { SelectEmptyValue } from '@core';
 import { IMaterialsAddAndEditForm, IMaterialsFilterForm } from '../../types';
 
 export const MaterialsFilterFormDefaultValues: IMaterialsFilterForm = {
 	name: '',
-	materialType: SelectEmptyValue,
+	materialType: null,
 	density: null,
 	thickness: null,
 };
@@ -14,9 +13,9 @@ export const MaterialsAddFormDefaultValues: IMaterialsAddAndEditForm = {
 	description: '',
 	density: null,
 	thickness: null,
-	materialType: SelectEmptyValue,
-	region: SelectEmptyValue,
-	type: SelectEmptyValue,
+	materialType: null,
+	region: null,
+	type: null,
 	issuer: '',
 	materialCoefficient: null,
 	velocity: null,

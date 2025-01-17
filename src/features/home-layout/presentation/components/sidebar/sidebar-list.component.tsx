@@ -1,15 +1,14 @@
-import { SessionStorageKeys } from '@core';
+import { memoize, SessionStorageKeys } from '@core';
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { twMerge } from 'tailwind-merge';
-import { withMemo } from '../../../../../non-alias';
 import { SidebarItemCommonProps } from '../../../types';
 
 interface SidebarListProps extends SidebarItemCommonProps {
-	children: JSX.Element;
+	children: React.ReactNode;
 }
 
-export const SidebarList = withMemo((props: SidebarListProps) => {
+export const SidebarList = memoize((props: SidebarListProps) => {
 	const [showSubItems, setShowSubItems] = useState<boolean>(() => {
 		const idFromStorage = sessionStorage.getItem(SessionStorageKeys.NavbarSelectId);
 		return (idFromStorage && idFromStorage === props.id) || false;
@@ -42,4 +41,4 @@ export const SidebarList = withMemo((props: SidebarListProps) => {
 			<div className="flex flex-col">{showSubItems && props.children}</div>
 		</div>
 	);
-});
+}, 'SidebarList');

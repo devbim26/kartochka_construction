@@ -1,7 +1,7 @@
 import { Popover as UiPopover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import { useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { withMemo } from '../../../../non-alias';
+import { memoize } from '../../../utils';
 
 type Anchor =
 	| `${'top' | 'bottom' | 'left' | 'right'} ${'start' | 'end'}`
@@ -11,8 +11,8 @@ type Anchor =
 	| 'right';
 
 interface PopoverProps {
-	buttonContent: JSX.Element;
-	children: JSX.Element;
+	buttonContent: React.JSX.Element;
+	children: React.JSX.Element;
 	bodyClassName?: string;
 	hidePadding?: boolean;
 	buttonClassName?: string;
@@ -24,7 +24,7 @@ export interface PopoverRef {
 	getButtonBoundings(): DOMRect;
 }
 
-export const Popover = withMemo(
+export const Popover = memoize(
 	({
 		buttonContent,
 		children,
@@ -77,4 +77,5 @@ export const Popover = withMemo(
 			</UiPopover>
 		);
 	},
+	'Popover',
 );

@@ -1,14 +1,12 @@
 import { LogoIcon, LogoTextIcon } from '@core';
-import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { AUTH_ROUTES } from '../../constants';
 
 export const AuthorizationScreen = () => {
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		navigate(AUTH_ROUTES.login.route);
-	}, []);
+	// useEffect(() => {
+	// 	navigate('/');
+	// }, []);
 
 	return (
 		<div className="bg-gray-navBg flex min-h-screen w-full flex-col">

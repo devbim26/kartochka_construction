@@ -6,7 +6,6 @@
 			"@core": ["./src/core"],
 			"@features": ["./src/features"],
 			"@assets": ["./src/assets"],
-			"@router": ["./src/router"],
 			"@api-gen": ["./src/api-gen"]
 		},
 		"allowJs": true,

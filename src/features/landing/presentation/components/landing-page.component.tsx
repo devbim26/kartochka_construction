@@ -1,5 +1,5 @@
 import { LandingGif } from '@assets';
-import { APP_ROUTES, Button } from '@core';
+import { Button } from '@core';
 import { useNavigate } from 'react-router-dom';
 import { AboutUsComponent } from './about-us.component';
 import { Contacts } from './contacts.component';
@@ -11,18 +11,18 @@ import { Subscriptions } from './subscriptions.component';
 export const LandingPage = () => {
 	const navigate = useNavigate();
 	const handleStartCalc = () => {
-		navigate(APP_ROUTES.auth.route);
+		navigate('/');
 	};
 	return (
 		<div className="mt-[23px] flex w-full flex-col items-center">
 			<div className="flex w-full flex-col items-center bg-white">
 				<div className="mb-[15px] flex w-[35.73%]">
-					<span className="font-montserrat text-center text-[35px] font-bold leading-[43px]">
+					<span className="text-center font-montserrat text-[35px] font-bold leading-[43px]">
 						Комплексные решения в строительстве
 					</span>
 				</div>
 				<div className="mb-[40px] flex w-[35.73%]">
-					<span className="font-montserrat text-center text-[20px] leading-[24px]">
+					<span className="text-center font-montserrat text-[20px] leading-[24px]">
 						Автоматизация подбора конструкций и выполнение рутинных расчетов
 					</span>
 				</div>

@@ -33,18 +33,16 @@
 		"@typescript-eslint/no-non-null-assertion": "off",
 		"@typescript-eslint/no-explicit-any": "off",
 		"tailwindcss/no-unnecessary-arbitrary-value": "warn",
+        "@typescript-eslint/no-unused-expressions": "warn"
 	},
 	"settings": {
 		"import/resolver": {
 			"alias": {
 				"map": [
-					["@components", "./src/components"],
-					["@pages", "./src/pages"],
 					["@assets", "./src/assets"],
-					["@router", "./src/router"],
 					["@features", "./src/features"],
 					["@core", "./src/core"],
-					["@api-gen", "./src/api-gen/"],
+					["@api-gen", "./src/api-gen"],
 				],
 				"extensions": [".ts", ".js", ".jsx", ".tsx", ".json"],
 			},

@@ -1,7 +1,7 @@
 import { Checkbox as UiCheckbox } from '@headlessui/react';
-import type { ComponentPropsWithoutRef } from 'react';
+import { type ComponentPropsWithoutRef } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { withMemo } from '../../../../non-alias';
+import { memoize } from '../../../utils';
 import { FormElementLabel } from '../forms';
 
 type Variants = 'primary' | 'secondary' | 'disabled';
@@ -35,7 +35,7 @@ const VARIANTS: Record<Variants, Record<string, string>> = {
 	},
 };
 
-export const Checkbox = withMemo(
+export const Checkbox = memoize(
 	({
 		label,
 		checked,
@@ -106,4 +106,5 @@ export const Checkbox = withMemo(
 			</div>
 		);
 	},
+	'Checkbox',
 );

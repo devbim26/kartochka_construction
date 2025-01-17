@@ -19,7 +19,7 @@ export interface HeaderFormsProps<T extends FieldValues> {
 
 export type HeaderElementType<T extends FieldValues> = ({
 	control,
-}: HeaderFormsProps<T>) => JSX.Element;
+}: HeaderFormsProps<T>) => React.JSX.Element;
 
 export interface HeaderFormElements<T extends FieldValues> {
 	filter: HeaderElementType<T>;
