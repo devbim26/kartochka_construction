@@ -8,6 +8,7 @@ export const AppRouter = () => {
 	return (
 		<Provider store={store}>
 			<Routes>
+				<Route path={APP_ROUTES.landing.route} element={APP_ROUTES.landing.element} />
 				<Route path={APP_ROUTES.auth.route} element={APP_ROUTES.auth.element}>
 					<Route path={AUTH_ROUTES.login.route} element={AUTH_ROUTES.login.element} />
 					<Route

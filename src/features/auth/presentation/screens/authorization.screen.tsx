@@ -11,8 +11,8 @@ export const AuthorizationScreen = () => {
 	}, []);
 
 	return (
-		<div className="flex min-h-screen w-full flex-col bg-gray-navBg">
-			<div className="flex h-[64px] w-full flex-row items-center gap-[10px] bg-gray-navHeader px-[25px]">
+		<div className="bg-gray-navBg flex min-h-screen w-full flex-col">
+			<div className="bg-gray-navHeader flex h-[64px] w-full flex-row items-center gap-[10px] px-[25px]">
 				<LogoIcon />
 				<LogoTextIcon />
 			</div>
