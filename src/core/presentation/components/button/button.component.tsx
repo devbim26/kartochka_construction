@@ -4,7 +4,6 @@ import { twMerge } from 'tailwind-merge';
 export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
 	variant?: keyof typeof BUTTON_VARIANTS;
 	buttonIcon?: boolean;
-	className?: string;
 }
 
 const BUTTON_VARIANTS = {
