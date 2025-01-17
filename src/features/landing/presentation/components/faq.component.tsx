@@ -17,7 +17,7 @@ export const FAQ = () => {
 	return (
 		<div className="flex w-full justify-center bg-background-primary">
 			<div className="flex w-[73.18%] flex-col py-[50px]">
-				<div className="mb-[30px] flex font-montserrat text-[20px] font-normal leading-[24px]">
+				<div className="font-montserrat mb-[30px] flex text-[20px] font-normal leading-[24px]">
 					Часто задаваемые вопросы
 				</div>
 				<div className="flex flex-col gap-[15px]">
@@ -36,7 +36,7 @@ export const FAQ = () => {
 								</div>
 								<div
 									key={index}
-									className="whitespace-pre-wrap font-montserrat text-[20px] font-normal leading-[24px]"
+									className="font-montserrat whitespace-pre-wrap text-[20px] font-normal leading-[24px]"
 								>
 									<span
 										dangerouslySetInnerHTML={{ __html: descriptions[index] }}

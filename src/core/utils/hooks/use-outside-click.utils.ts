@@ -25,8 +25,8 @@ import { RefObject, useEffect } from 'react';
 
 export const useOutsideClick = (
 	callback: () => void,
-	refs: Array<RefObject<HTMLElement> | null> = [],
-	containerRef?: RefObject<HTMLElement> | null,
+	refs: Array<RefObject<HTMLElement | null>> = [],
+	containerRef?: RefObject<HTMLElement | null>,
 ) => {
 	useEffect(() => {
 		const handleClickOutside: EventListener = (event) => {

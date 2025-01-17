@@ -31,12 +31,18 @@ module.exports = {
 					label: {
 						primary: '#6F7671',
 					},
+					placeholder: {
+						primary: '#91969E',
+					},
 				},
 				error: '#FF0800',
 				background: {
 					container: '#FFFFFF',
 					primary: '#F9F9F9',
 					secondary: '#F5F6F7',
+					button: {
+						secondary: '#EDF2FA',
+					},
 				},
 			},
 		},

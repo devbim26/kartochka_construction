@@ -96,6 +96,49 @@ export enum Country {
 	Ukrain = 'Ukrain',
 }
 
+export interface CraeteSubConstructionTemplateDto {
+	name?: string | null;
+	materials?: UserMaterialTemplateDto[] | null;
+	subPosition?: SubConstructionPosition;
+}
+
+export interface CreateConstructionHeaderCommand {
+	name?: string | null;
+	description?: string | null;
+	priority?: Priority;
+	region?: Region;
+	descriptionSource?: string | null;
+	/** @format uuid */
+	issuerId?: string;
+	propertySource?: string | null;
+	/** @format double */
+	maxHeight?: number;
+	fireResistance?: string | null;
+	rTotal?: number[] | null;
+	laboratoryTestSource?: string | null;
+	index?: IndexType;
+	/** @format float */
+	indexValue?: number;
+	constructionType?: CreateConstructionTypeTemplateDto;
+}
+
+export interface CreateConstructionRootTemplateDto {
+	constructions?: CreateConstructionTemplateDto[] | null;
+}
+
+export interface CreateConstructionTemplateDto {
+	position?: SubConstructionPosition;
+	subConstructions?: CraeteSubConstructionTemplateDto[] | null;
+}
+
+export interface CreateConstructionTypeTemplateDto {
+	/** @format uuid */
+	constructionTypeTemplateId?: string;
+	name?: string | null;
+	shortName?: string | null;
+	constructionRoot?: CreateConstructionRootTemplateDto;
+}
+
 export interface CreateIssuerCommand {
 	name: string | null;
 	country?: Country;
@@ -106,13 +149,14 @@ export interface CreateIssuerCommand {
 export interface CreateMaterialCommand {
 	name?: string | null;
 	description?: string | null;
+	shortName?: string | null;
 	/** @format float */
 	density?: number;
 	/** @format float */
 	thickness?: number;
 	region?: Region;
 	/** @format uuid */
-	issuerId?: string;
+	issuerId?: string | null;
 	imageUrl?: string | null;
 	/** @format float */
 	materialCoefficient?: number;
@@ -165,6 +209,11 @@ export interface CreateUserCommand {
 	password: string | null;
 }
 
+export interface DeleteConstructionHeaderCommand {
+	/** @format uuid */
+	id?: string;
+}
+
 export interface DeleteIssuerCommand {
 	/** @format uuid */
 	id: string;
@@ -178,6 +227,20 @@ export interface DeleteMaterialCommand {
 export interface DeleteRequirementCommand {
 	/** @format uuid */
 	id?: string;
+}
+
+export interface GetConstructionHeaderWithPaginationQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	name?: string | null;
+	description?: string | null;
+	/** @format uuid */
+	constructionTypeId?: string | null;
+	region?: Region;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -219,9 +282,129 @@ export interface GetRequirementsWithPaginationParamsQuery {
 	placementRoom?: string | null;
 }
 
+export enum IndexType {
+	Rw = 'Rw',
+	Lnw = 'Lnw',
+	ValueΔRw = 'ΔRw',
+}
+
+export interface IssuerDto {
+	/** @format uuid */
+	id: string;
+	name: string | null;
+	country?: Country;
+	logoUrl?: string | null;
+	webSite?: string | null;
+}
+
+export interface IssuerDtoPaginatedList {
+	items?: IssuerDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
+}
+
+export interface MaterialDto {
+	/** @format uuid */
+	id?: string;
+	publicId?: string | null;
+	name?: string | null;
+	shortName?: string | null;
+	description?: string | null;
+	/** @format float */
+	density?: number;
+	/** @format float */
+	thickness?: number;
+	materialType?: NamedEntity;
+	type?: MaterialOriginType;
+	region?: Region;
+	issuer?: IssuerDto;
+	imageUrl?: string | null;
+	/** @format float */
+	materialCoefficient?: number;
+	/** @format float */
+	velocity?: number;
+	/** @format float */
+	lossFactor?: number;
+	/** @format float */
+	youngModulus?: number;
+	/** @format float */
+	damping?: number;
+	/** @format float */
+	solid?: number;
+}
+
+export enum MaterialOriginType {
+	Generic = 'Generic',
+	Manufacturer = 'Manufacturer',
+	UserDefinedProduct = 'UserDefinedProduct',
+}
+
+export interface NamedEntity {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+}
+
+export interface PaginatedMaterialDto {
+	/** @format uuid */
+	id?: string;
+	publicId?: string | null;
+	name?: string | null;
+	shortName?: string | null;
+	description?: string | null;
+	/** @format float */
+	density?: number;
+	/** @format float */
+	thickness?: number;
+	materialType?: NamedEntity;
+	type?: MaterialOriginType;
+	region?: Region;
+	imageUrl?: string | null;
+	/** @format float */
+	materialCoefficient?: number;
+	/** @format float */
+	velocity?: number;
+	/** @format float */
+	lossFactor?: number;
+	/** @format float */
+	youngModulus?: number;
+	/** @format float */
+	damping?: number;
+	/** @format float */
+	solid?: number;
+}
+
+export interface PaginatedMaterialDtoPaginatedList {
+	items?: PaginatedMaterialDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
+}
+
 export interface PasswordGrantFlow {
 	phoneNumber: string | null;
 	password: string | null;
+}
+
+export enum Priority {
+	Low = 'Low',
+	Medium = 'Medium',
+	High = 'High',
 }
 
 export enum Region {
@@ -270,6 +453,39 @@ export enum Region {
 	Ukrain = 'Ukrain',
 }
 
+export interface RequirementDto {
+	/** @format uuid */
+	id?: string;
+	secondPlacementRoom?: string | null;
+	firstPlacementRoom?: string | null;
+	buildingType?: BuildingType;
+	standartShortName?: string | null;
+	standartFullName?: string | null;
+	region?: Region;
+	/** @format date */
+	standartValidityPeriod?: string;
+	class?: CategoryClass;
+	/** @format float */
+	noizeIsolationIndex?: number;
+	/** @format float */
+	noizeImpactIndex?: number;
+	notice?: string | null;
+}
+
+export interface RequirementDtoPaginatedList {
+	items?: RequirementDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
+}
+
 export interface SendSmsCommand {
 	phoneNumber: string | null;
 }
@@ -277,6 +493,34 @@ export interface SendSmsCommand {
 export enum SortOrder {
 	Asc = 'Asc',
 	Desc = 'Desc',
+}
+
+export enum SubConstructionPosition {
+	Left = 'Left',
+	Center = 'Center',
+	Right = 'Right',
+}
+
+export interface UpdateConstructionHeaderCommand {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	description?: string | null;
+	priority?: Priority;
+	region?: Region;
+	descriptionSource?: string | null;
+	/** @format uuid */
+	issuerId?: string;
+	propertySource?: string | null;
+	/** @format double */
+	maxHeight?: number;
+	fireResistance?: string | null;
+	rTotal?: number[] | null;
+	laboratoryTestSource?: string | null;
+	index?: IndexType;
+	/** @format float */
+	indexValue?: number;
+	constructionType?: CreateConstructionTypeTemplateDto;
 }
 
 export interface UpdateIssuerCommand {
@@ -299,7 +543,7 @@ export interface UpdateMaterialCommand {
 	thickness?: number;
 	region?: Region;
 	/** @format uuid */
-	issuerId?: string;
+	issuerId?: string | null;
 	imageUrl?: string | null;
 	/** @format float */
 	materialCoefficient?: number;
@@ -332,6 +576,15 @@ export interface UpdateRequirementCommand {
 	/** @format float */
 	noizeImpactIndex?: number;
 	notice?: string | null;
+}
+
+export interface UserMaterialTemplateDto {
+	/** @format uuid */
+	materialId?: string;
+	/** @format float */
+	thickness?: number;
+	/** @format float */
+	density?: number;
 }
 
 import type {
@@ -518,9 +771,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/Account/current
 		 */
 		accountCurrentList: (params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<AccountDto, any>({
 				path: `/api/Account/current`,
 				method: 'GET',
+				format: 'json',
 				...params,
 			}),
 
@@ -587,16 +841,113 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags Construction
+		 * @name ConstructionDetail
+		 * @request GET:/api/Construction/{ConstructionHeaderId}
+		 */
+		constructionDetail: (constructionHeaderId: string, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Construction/${constructionHeaderId}`,
+				method: 'GET',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionConstructionTypesList
+		 * @request GET:/api/Construction/ConstructionTypes
+		 */
+		constructionConstructionTypesList: (params: RequestParams = {}) =>
+			this.request<CreateConstructionTypeTemplateDto, any>({
+				path: `/api/Construction/ConstructionTypes`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionGetPaginatedCreate
+		 * @request POST:/api/Construction/get-paginated
+		 */
+		constructionGetPaginatedCreate: (
+			data: GetConstructionHeaderWithPaginationQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/Construction/get-paginated`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionCreate
+		 * @request POST:/api/Construction
+		 */
+		constructionCreate: (data: CreateConstructionHeaderCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Construction`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionDelete
+		 * @request DELETE:/api/Construction
+		 */
+		constructionDelete: (data: DeleteConstructionHeaderCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Construction`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionUpdate
+		 * @request PUT:/api/Construction
+		 */
+		constructionUpdate: (data: UpdateConstructionHeaderCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Construction`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags File
 		 * @name FileCreate
 		 * @request POST:/api/File
 		 */
 		fileCreate: (data: CreateUploadingUrlCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<string, any>({
 				path: `/api/File`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -608,9 +959,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/Issuer/{id}
 		 */
 		issuerDetail: (id: string, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<IssuerDto, any>({
 				path: `/api/Issuer/${id}`,
 				method: 'GET',
+				format: 'json',
 				...params,
 			}),
 
@@ -625,11 +977,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: GetIssuerWithPaginationParamsQuery,
 			params: RequestParams = {},
 		) =>
-			this.request<void, any>({
+			this.request<IssuerDtoPaginatedList, any>({
 				path: `/api/Issuer/get-paginated`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -641,11 +994,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/api/Issuer
 		 */
 		issuerCreate: (data: CreateIssuerCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<IssuerDto, any>({
 				path: `/api/Issuer`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -673,11 +1027,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request PUT:/api/Issuer
 		 */
 		issuerUpdate: (data: UpdateIssuerCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<IssuerDto, any>({
 				path: `/api/Issuer`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -689,9 +1044,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/Material/{id}
 		 */
 		materialDetail: (id: string, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<MaterialDto, any>({
 				path: `/api/Material/${id}`,
 				method: 'GET',
+				format: 'json',
 				...params,
 			}),
 
@@ -706,11 +1062,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: GetMaterialsWithPaginationParamsQuery,
 			params: RequestParams = {},
 		) =>
-			this.request<void, any>({
+			this.request<PaginatedMaterialDtoPaginatedList, any>({
 				path: `/api/Material/get-paginated`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -722,11 +1079,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/api/Material
 		 */
 		materialCreate: (data: CreateMaterialCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<MaterialDto, any>({
 				path: `/api/Material`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -754,11 +1112,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request PUT:/api/Material
 		 */
 		materialUpdate: (data: UpdateMaterialCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<MaterialDto, any>({
 				path: `/api/Material`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -770,9 +1129,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/Requirement/{id}
 		 */
 		requirementDetail: (id: string, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<RequirementDto, any>({
 				path: `/api/Requirement/${id}`,
 				method: 'GET',
+				format: 'json',
 				...params,
 			}),
 
@@ -787,11 +1147,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: GetRequirementsWithPaginationParamsQuery,
 			params: RequestParams = {},
 		) =>
-			this.request<void, any>({
+			this.request<RequirementDtoPaginatedList, any>({
 				path: `/api/Requirement/get-paginated`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -803,11 +1164,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/api/Requirement
 		 */
 		requirementCreate: (data: CreateRequirementCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<RequirementDto, any>({
 				path: `/api/Requirement`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -835,11 +1197,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request PUT:/api/Requirement
 		 */
 		requirementUpdate: (data: UpdateRequirementCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<RequirementDto, any>({
 				path: `/api/Requirement`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 

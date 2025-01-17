@@ -17,12 +17,12 @@ export const LandingPage = () => {
 		<div className="mt-[23px] flex w-full flex-col items-center">
 			<div className="flex w-full flex-col items-center bg-white">
 				<div className="mb-[15px] flex w-[35.73%]">
-					<span className="text-center font-montserrat text-[35px] font-bold leading-[43px]">
+					<span className="font-montserrat text-center text-[35px] font-bold leading-[43px]">
 						Комплексные решения в строительстве
 					</span>
 				</div>
 				<div className="mb-[40px] flex w-[35.73%]">
-					<span className="text-center font-montserrat text-[20px] leading-[24px]">
+					<span className="font-montserrat text-center text-[20px] leading-[24px]">
 						Автоматизация подбора конструкций и выполнение рутинных расчетов
 					</span>
 				</div>

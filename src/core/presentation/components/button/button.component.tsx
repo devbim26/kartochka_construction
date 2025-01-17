@@ -1,5 +1,6 @@
-import { memo, type ComponentPropsWithoutRef } from 'react';
+import { type ComponentPropsWithoutRef } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { withMemo } from '../../../../non-alias';
 
 export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
 	variant?: keyof typeof BUTTON_VARIANTS;
@@ -13,13 +14,13 @@ const BUTTON_VARIANTS = {
 	// 'esm:px-4 px-2 shadow-sm text-primary bg-white-flash enabled:hover:bg-white-flash/70 border border-primary',
 	// delete: 'esm:px-4 px-2 shadow-sm text-error bg-linen enabled:hover:bg-linen/70 border border-error',
 	// neutral: 'text-primary bg-none enabled:hover:text-primary',
-	// inactive:
-	// 'text-button-text-dark bg-none enabled:hover:text-blue-pantone border border-gray-spanish',
-	// active: 'text-primary bg-none enabled:hover:text-blue-pantone border border-primary',
+	inactive:
+		'text-button-text-dark bg-none enabled:hover:text-blue-pantone border border-gray-spanish',
+	active: 'text-primary bg-none enabled:hover:text-blue-pantone border border-primary',
 	// empty: 'text-primary bg-none',
 };
 
-export const Button = memo(
+export const Button = withMemo(
 	({ children, className, variant = 'primary', buttonIcon = false, ...rest }: ButtonProps) => {
 		const buttonContent = children;
 
@@ -39,5 +40,3 @@ export const Button = memo(
 		);
 	},
 );
-
-Button.displayName = 'Button';

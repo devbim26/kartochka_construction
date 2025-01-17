@@ -46,7 +46,7 @@ export const LoginPage = () => {
 
 	return (
 		<FormProvider {...form}>
-			<div className="border-gray-border flex w-[412px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[21px]">
+			<div className="flex w-[412px] flex-col gap-[23px] rounded-[12px] border border-gray-border bg-white px-[32px] py-[21px]">
 				<div className="flex h-[64px] flex-row items-center justify-center gap-[10px]">
 					<LogoIcon />
 					<LogoTextIcon />
