@@ -62,7 +62,7 @@ export const HowOurServiceWorks = () => {
 						</div>
 					</div>
 					<div
-						className="hover:rotate-y-180 relative flex h-full w-1/2 transition-transform duration-1000 ease-in-out"
+						className="hover:rotate-y-180 relative flex h-full w-1/2 transform transition-transform duration-1000 ease-in-out"
 						onMouseEnter={() => setIsHover(true)}
 						onMouseLeave={() => setIsHover(false)}
 					>
