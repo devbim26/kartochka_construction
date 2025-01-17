@@ -1,3 +1,4 @@
+import { SimpleTable } from '@core';
 import { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useState } from 'react';
 import { TableHeaderCell } from '../../../../core/presentation/components/table/table-header-cell.component';
@@ -9,15 +10,15 @@ import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from 
 const testData = [
 	{
 		id: 123,
-		name: 'name',
-		plice: 'police',
-		addv: 'sad',
+		name: 'name1',
+		plice: 'police1',
+		addv: 'sad1',
 	},
 	{
 		id: 124,
-		name: 'name',
-		plice: 'police',
-		addv: 'sad',
+		name: 'name2',
+		plice: 'police2',
+		addv: 'sad2S',
 	},
 ];
 
@@ -77,8 +78,8 @@ export const MaterialsPage = () => {
 					edit: MaterialsAddAndEdit,
 				}}
 			/>
-			{/* <GuidbookPageTableWrapper />
-			<SimpleTable columns={columns} data={testData} /> */}
+			{/* <GuidbookPageTableWrapper /> */}
+			<SimpleTable columns={columns} data={testData} />
 		</div>
 	);
 };

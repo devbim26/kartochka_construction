@@ -14,7 +14,7 @@ export const SimpleTable = withMemo(function TableComponent<T>({
 	);
 
 	const headerRows = getHeaderGroups().map((headerGroup) => (
-		<tr key={headerGroup.id} className="bg-blue-alice sticky top-0 z-10 h-12 border-b">
+		<tr key={headerGroup.id} className="sticky top-0 z-10 h-12 border-b bg-[#F5F6F7]">
 			{headerGroup.headers.map(
 				({ column: { getToggleSortingHandler, columnDef }, id, colSpan, getContext }) => {
 					return (
