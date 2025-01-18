@@ -1,4 +1,4 @@
-import { HomeHeader } from "@features/home-layout";
+import { HomeHeader } from "@features";
 import { LandingPage } from "../components";
 
 export const LandingScreen = () => {

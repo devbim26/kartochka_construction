@@ -5,7 +5,7 @@ import {
 	IMaterialsFilterForm,
 	MaterialsFilterFormKeys,
 } from '../../../../../types';
-import { memoize } from '@core/utils/hoc/memo.utils';
+import { memoize } from 'core/utils/hoc/memo.utils';
 
 export const MaterialsFilter = memoize(
 	({ control, setValue }: HeaderFormsProps<IMaterialsFilterForm>) => {

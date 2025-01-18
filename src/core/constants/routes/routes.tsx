@@ -1,5 +1,5 @@
 import { Routes } from '@core';
-import { AuthorizationScreen, LandingScreen, LoginPage } from '@features';
+import { TestScreen } from '@features';
 import { Route } from 'react-router-dom';
 
 // export const APP_ROUTES = {
@@ -36,17 +36,17 @@ export const routes: Routes = [
 	{
 		id: 'langind-page-id',
 		route: '/landing',
-		element: <LandingScreen />,
+		element: <TestScreen />,
 	},
 	{
 		id: 'auth-layout-id',
 		route: '/auth',
-		element: <AuthorizationScreen />,
+		element: <TestScreen />,
 		childrens: [
 			{
 				id: 'login-page-id',
 				route: 'login',
-				element: <LoginPage />,
+				element: <TestScreen />,
 			},
 		],
 	},

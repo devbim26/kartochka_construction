@@ -1,9 +1,9 @@
 import { SessionStorageKeys } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { twMerge } from 'tailwind-merge';
 import { SidebarItemCommonProps } from '../../../types';
+import { memoize } from 'core/utils/hoc/memo.utils';
 
 interface SidebarListProps extends SidebarItemCommonProps {
 	children: React.ReactNode;
