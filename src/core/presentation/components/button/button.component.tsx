@@ -1,6 +1,6 @@
+import { memoize } from '@core/utils/hoc/memo.utils';
 import { type ComponentPropsWithoutRef } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { memoize } from '../../../utils';
 
 export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
 	variant?: keyof typeof BUTTON_VARIANTS;

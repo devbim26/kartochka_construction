@@ -4,9 +4,15 @@ const CracoAlias = require('craco-alias');
 module.exports = {
 	webpack: {
 		alias: {
-			'@assets': path.resolve(__dirname, './src/assets'),
+			'@*': path.resolve(__dirname, './src/*'),
+			'@router': path.resolve(__dirname, './src/router'),
+			'@router/*': path.resolve(__dirname, './src/router/*'),
 			'@core': path.resolve(__dirname, './src/core'),
+			'@core/*': path.resolve(__dirname, './src/core/*'),
 			'@features': path.resolve(__dirname, './src/features'),
+			'@features/*': path.resolve(__dirname, './src/features/*'),
+			'@assets': path.resolve(__dirname, './src/assets'),
+			'@assets/*': path.resolve(__dirname, './src/assets/*'),
 			'@api-gen': path.resolve(__dirname, './src/api-gen'),
 		},
 	},

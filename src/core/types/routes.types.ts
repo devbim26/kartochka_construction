@@ -1,7 +1,7 @@
 export interface RouteItem {
 	id: string;
 	route: string;
-	element: () => React.JSX.Element;
+	element: React.JSX.Element;
 	childrens?: Routes;
 }
 

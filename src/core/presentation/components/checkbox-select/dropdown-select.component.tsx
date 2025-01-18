@@ -1,4 +1,5 @@
-import { ChevronIcon, memoize } from '@core';
+import { ChevronIcon } from '@core';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import { IconType } from 'react-icons';
 import { twMerge } from 'tailwind-merge';
 

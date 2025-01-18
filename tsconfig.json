@@ -3,9 +3,15 @@
 		"target": "es5",
 		"lib": ["dom", "dom.iterable", "esnext"],
 		"paths": {
+			"@*": ["./src/*"],
+			"@router": ["./src/router"],
+			"@router*": ["./src/router/*"],
 			"@core": ["./src/core"],
+			"@core/*": ["./src/core/*"],
 			"@features": ["./src/features"],
+			"@features/*": ["./src/features/*"],
 			"@assets": ["./src/assets"],
+			"@assets/*": ["./src/assets/*"],
 			"@api-gen": ["./src/api-gen"]
 		},
 		"allowJs": true,

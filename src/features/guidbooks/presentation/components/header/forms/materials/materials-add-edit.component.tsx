@@ -1,4 +1,4 @@
-import { Input, memoize } from '@core';
+import { Input } from '@core';
 import { Controller } from 'react-hook-form';
 import {
 	HeaderFormsProps,
@@ -6,6 +6,7 @@ import {
 	MaterialsAddAndEditFormKeys,
 } from '../../../../../types';
 import { FormSubTitle } from '../form-sub-title.components';
+import { memoize } from '@core/utils/hoc/memo.utils';
 
 export const MaterialsAddAndEdit = memoize(
 	({ control, setValue }: HeaderFormsProps<IMaterialsAddAndEditForm>) => {

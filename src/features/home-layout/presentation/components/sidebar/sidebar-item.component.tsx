@@ -1,6 +1,6 @@
-import { memoize } from '@core';
 import { twMerge } from 'tailwind-merge';
 import { SidebarItemProps } from '../../../types';
+import { memoize } from '@core/utils/hoc/memo.utils';
 
 export const SidebarItem = memoize((props: SidebarItemProps) => {
 	return (

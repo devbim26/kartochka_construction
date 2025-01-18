@@ -1,5 +1,5 @@
-import { HomeHeader } from '../../../home-layout/presentation/components';
-import { LandingPage } from '../components';
+import { HomeHeader } from "@features/home-layout";
+import { LandingPage } from "../components";
 
 export const LandingScreen = () => {
 	return (

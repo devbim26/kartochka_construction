@@ -1,4 +1,4 @@
-import { memoize } from '@core';
+import { memoize } from '@core/utils/hoc/memo.utils';
 
 interface DevScreenProps {
 	title: string;

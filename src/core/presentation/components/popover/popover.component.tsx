@@ -1,7 +1,7 @@
+import { memoize } from '@core/utils/hoc/memo.utils';
 import { Popover as UiPopover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import { useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { memoize } from '../../../utils';
 
 type Anchor =
 	| `${'top' | 'bottom' | 'left' | 'right'} ${'start' | 'end'}`

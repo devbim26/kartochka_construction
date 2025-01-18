@@ -1,2 +1,3 @@
+export * from './components';
 export * from './images';
-export * from './screens/landing.screen';
+export * from './screens';

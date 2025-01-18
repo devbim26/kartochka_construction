@@ -1,5 +1,5 @@
+import { fetchApi } from '@api-gen';
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchApi } from '../../../api-gen';
 import { AUTH_FETCH_ROUTES } from '../constants';
 import { convertToServerRegistrationData } from '../converters';
 import { ApproveFormData, LoginFormData, RegistrationFormData } from '../types';

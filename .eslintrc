@@ -40,9 +40,15 @@
 			"alias": {
 				"map": [
 					["@assets", "./src/assets"],
+					["@assets", "./src/assets/"],
 					["@features", "./src/features"],
+					["@features", "./src/features/"],
 					["@core", "./src/core"],
+					["@core", "./src/core/"],
+					["@router", "./src/router"],
+					["@router", "./src/router/"],
 					["@api-gen", "./src/api-gen"],
+					["@", "./src/"]
 				],
 				"extensions": [".ts", ".js", ".jsx", ".tsx", ".json"],
 			},
