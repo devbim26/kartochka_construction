@@ -1,8 +1,8 @@
 import { Checkbox as UiCheckbox } from '@headlessui/react';
+import { memoize } from 'core/utils/hoc/memo.utils';
 import { type ComponentPropsWithoutRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { FormElementLabel } from '../forms';
-import { memoize } from 'core/utils/hoc/memo.utils';
 
 type Variants = 'primary' | 'secondary' | 'disabled';
 

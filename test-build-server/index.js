@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === 'development') {
 /* App Config */
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, '../dist')));
+app.use(express.static(path.join(__dirname, '../build')));
 
 
 /* Server Initialization */

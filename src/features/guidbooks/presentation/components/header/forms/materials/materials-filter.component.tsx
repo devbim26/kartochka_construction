@@ -1,11 +1,11 @@
 import { Input } from '@core';
+import { memoize } from 'core/utils/hoc/memo.utils';
 import { Controller } from 'react-hook-form';
 import {
 	HeaderFormsProps,
 	IMaterialsFilterForm,
 	MaterialsFilterFormKeys,
 } from '../../../../../types';
-import { memoize } from 'core/utils/hoc/memo.utils';
 
 export const MaterialsFilter = memoize(
 	({ control, setValue }: HeaderFormsProps<IMaterialsFilterForm>) => {

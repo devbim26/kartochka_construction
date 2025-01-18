@@ -1,11 +1,11 @@
 import { Button, CleanUpIcon } from '@core';
+import { memoize } from 'core/utils/hoc/memo.utils';
 import { useCallback } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { twMerge } from 'tailwind-merge';
 import { guidbookHeaderTitlesMap } from '../../../constants';
 import { HeaderFormElements, HeaderFormTitles, HeaderFormTypes } from '../../../types';
-import { memoize } from 'core/utils/hoc/memo.utils';
 
 interface GuidbookPageHeaderWrapperProps {
 	titles: HeaderFormTitles;

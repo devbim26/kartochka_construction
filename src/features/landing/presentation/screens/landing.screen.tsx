@@ -1,5 +1,5 @@
-import { HomeHeader } from "@features";
-import { LandingPage } from "../components";
+import { HomeHeader } from '@features';
+import { LandingPage } from '../components';
 
 export const LandingScreen = () => {
 	return (

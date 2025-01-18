@@ -1,2 +1,2 @@
-const apiUrl = ''
+const apiUrl = '';
 export { apiUrl };

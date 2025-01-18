@@ -1,5 +1,5 @@
 import { Routes } from '@core';
-import { AuthorizationScreen, GUIDBOOKS_ROUTES, HOME_ROUTES, HomeScreen, LandingScreen, LoginPage } from '@features';
+import { AuthorizationScreen, HomeScreen, HOME_ROUTES, LandingScreen, LoginPage } from '@features';
 import { Route } from 'react-router-dom';
 
 // export const APP_ROUTES = {
@@ -54,10 +54,7 @@ export const routes: Routes = [
 		id: 'home-layout-id',
 		route: '/',
 		element: <HomeScreen />,
-		childrens: [
-			HOME_ROUTES.main,
-			HOME_ROUTES.guidbooks
-		],
+		childrens: [HOME_ROUTES.main, HOME_ROUTES.guidbooks],
 	},
 ];
 
