@@ -3,7 +3,7 @@ import { RefCallBack } from 'react-hook-form';
 import { IconType } from 'react-icons';
 import { ReactInputMask } from 'react-input-mask';
 import { twMerge } from 'tailwind-merge';
-import { FormElementLabel } from '../forms/form-element-label.component';
+import { FormElementLabel } from '../forms';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 	label?: string;
@@ -58,8 +58,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 		/>
 	);
 
-	const InputComponent = (
-		<>
+	return (
+		<div className={twMerge('flex flex-col gap-y-2', wrapperClassName)}>
+			{label && (
+				<FormElementLabel
+					forId={props.id}
+					className={twMerge(
+						'font-raleway text-[14px] text-input-label-primary',
+						labelClassName,
+					)}
+				>
+					{label}
+				</FormElementLabel>
+			)}
 			<div className={twMerge('relative', containerClassName)}>
 				{iconPos === 'left' && IconComponent}
 				<div className="flex flex-row items-center">
@@ -107,25 +118,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 				{iconPos === 'right' && IconComponent}
 			</div>
 			{/* {error && <p className={twMerge('p-regular-14 text-error', errorClassName)}>{error}</p>} */}
-		</>
-	);
-
-	if (!label) {
-		return InputComponent;
-	}
-
-	return (
-		<div className={twMerge('flex flex-col gap-y-2', wrapperClassName)}>
-			<FormElementLabel
-				forId={props.id}
-				className={twMerge(
-					'font-raleway text-[14px] text-input-label-primary',
-					labelClassName,
-				)}
-			>
-				{label}
-			</FormElementLabel>
-			{InputComponent}
 		</div>
 	);
 });
