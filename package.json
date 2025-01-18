@@ -25,8 +25,9 @@
 		"zod": "^3.24.1"
 	},
 	"scripts": {
-		"dev": "webpack serve --mode development --config webpack.config.js",
-		"build": "webpack --mode production --config webpack.config.js",
+		"start": "npm run build && node test-build-server/index.js",
+		"dev": "NODE_ENV=development webpack serve --config webpack.config.js",
+		"build": "NODE_ENV=production webpack --config webpack.config.js",
 		"format": "prettier --write ./src && eslint --fix ./src",
 		"generate-api": "node ./tools/generate-api.js",
 		"test-eslint": "eslint ./src --debug"
@@ -50,12 +51,19 @@
 		]
 	},
 	"devDependencies": {
+		"@babel/core": "^7.26.0",
+		"@babel/preset-env": "^7.26.0",
+		"@babel/preset-react": "^7.26.3",
 		"@openapitools/openapi-generator-cli": "^2.15.3",
 		"@types/react": "^19.0.7",
 		"@types/react-dom": "^19.0.3",
 		"@types/react-input-mask": "^3.0.6",
 		"@xpd/tailwind-3dtransforms": "^1.0.3",
 		"autoprefixer": "^10.4.20",
+		"babel-loader": "^9.2.1",
+		"body-parser": "^1.20.3",
+		"clean-webpack-plugin": "^4.0.0",
+		"css-loader": "^7.1.2",
 		"dotenv": "^16.4.7",
 		"eslint": "^8.57.1",
 		"eslint-config-prettier": "^10.0.1",
@@ -64,16 +72,24 @@
 		"eslint-plugin-prettier": "^5.2.2",
 		"eslint-plugin-react": "^7.37.4",
 		"eslint-plugin-tailwindcss": "^3.18.0",
+		"express": "^4.21.2",
 		"file-loader": "^6.2.0",
 		"html-webpack-plugin": "^5.6.3",
+		"mini-css-extract-plugin": "^2.9.2",
 		"postcss": "^8.5.1",
+		"postcss-loader": "^8.1.1",
 		"prettier-plugin-organize-imports": "^4.1.0",
 		"prettier-plugin-tailwindcss": "^0.6.10",
 		"react-app-rewired": "^2.2.1",
+		"sass": "^1.83.4",
+		"sass-loader": "^16.0.4",
+		"style-loader": "^4.0.0",
 		"swagger-typescript-api": "^13.0.23",
 		"tailwindcss": "^3.4.17",
 		"ts-loader": "^9.5.2",
 		"tsconfig-paths-webpack-plugin": "^4.2.0",
-		"webpack-cli": "^6.0.1"
+		"webpack": "^5.97.1",
+		"webpack-cli": "^6.0.1",
+		"webpack-dev-server": "^5.2.0"
 	}
 }

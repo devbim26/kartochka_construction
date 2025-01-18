@@ -1,8 +1,6 @@
-import { Component } from '@features';
-import { Route, Routes } from 'react-router-dom';
+import { RouteItems } from '@core';
+import { Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
-	return <Routes>
-		<Route path='/' element={<Component/>}></Route>
-	</Routes>;
+	return <Routes>{RouteItems}</Routes>;
 };
