@@ -93,9 +93,6 @@ module.exports = {
 				use: [
 					{
 						loader: 'file-loader',
-						options: {
-							name: '[name].[hash].[ext]',
-						},
 					},
 				],
 			},
@@ -103,7 +100,7 @@ module.exports = {
 	},
 	devtool: 'source-map',
 	devServer: {
-		watchFiles: path.join(__dirname, 'src'),
+		watchFiles: path.resolve(__dirname, './src'),
 		compress: true,
 		open: true,
 		hot: true,
