@@ -1,4 +1,4 @@
-import { IconBaseProps } from 'react-icons';
+import type { IconBaseProps } from 'react-icons';
 
 export const CleanUpIcon = (props: IconBaseProps) => {
 	return (

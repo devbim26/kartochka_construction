@@ -2,7 +2,7 @@ import { fetchApi } from '@api-gen';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AUTH_FETCH_ROUTES } from '../constants';
 import { convertToServerRegistrationData } from '../converters';
-import { ApproveFormData, LoginFormData, RegistrationFormData } from '../types';
+import type { ApproveFormData, LoginFormData, RegistrationFormData } from '../types';
 
 export const authLogin = createAsyncThunk(
 	AUTH_FETCH_ROUTES.login.async_thunk_route,

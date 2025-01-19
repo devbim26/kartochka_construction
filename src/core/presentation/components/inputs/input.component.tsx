@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
-import { RefCallBack } from 'react-hook-form';
-import { IconType } from 'react-icons';
+import { type RefCallBack } from 'react-hook-form';
+import { type IconType } from 'react-icons';
 import { twMerge } from 'tailwind-merge';
 import { FormElementLabel } from '../forms';
 
@@ -15,7 +15,6 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 	mask?: string;
 	error?: string;
 	Button?: () => React.JSX.Element;
-	disabledButton?: boolean;
 	Icon?: (() => React.JSX.Element) | IconType;
 	onIconClick?: () => void;
 	iconPos?: 'right' | 'left';
@@ -36,7 +35,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 		mask,
 		error,
 		Button,
-		disabledButton,
 		Icon,
 		onIconClick,
 		iconPos,
@@ -112,7 +110,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 				</div>
 				{iconPos === 'right' && IconComponent}
 			</div>
-			{/* {error && <p className={twMerge('p-regular-14 text-error', errorClassName)}>{error}</p>} */}
+			{error && <p className={twMerge('p-regular-14 text-error', errorClassName)}>{error}</p>}
 		</div>
 	);
 });

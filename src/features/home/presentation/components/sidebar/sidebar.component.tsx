@@ -1,5 +1,3 @@
-import { HomeRoutesMap } from 'features/home/constants';
-import { SidebarSessionStorageKeys } from 'features/home/types';
 import { useCallback, useEffect, useState } from 'react';
 import { BiNews, BiSolidCalendarEdit, BiSolidHome } from 'react-icons/bi';
 import { FaUser } from 'react-icons/fa6';
@@ -8,7 +6,8 @@ import { RiFileList3Line, RiPencilRulerLine, RiWallet3Fill } from 'react-icons/r
 import { TiDocumentText } from 'react-icons/ti';
 import { useNavigate } from 'react-router-dom';
 import { GUIDBOOKS_ROUTES } from '../../../../guidbooks';
-import { HOME_ROUTES, USERS_LIST_ROUTES } from '../../../constants/routes/home-routes';
+import { HomeRoutesMap, HOME_ROUTES, USERS_LIST_ROUTES } from '../../../constants';
+import { SidebarSessionStorageKeys } from '../../../types';
 import { SidebarItem } from './sidebar-item.component';
 import { SidebarListItem } from './sidebar-list-item.component';
 import { SidebarList } from './sidebar-list.component';

@@ -63,7 +63,7 @@ export const AppRouter = () => {
 				</Route>
 				<Route
 					path={HOME_ROUTES.users_list.route}
-					element={<div className="flex flex-grow"></div>}
+					element={<div className="flex grow"></div>}
 				>
 					<Route
 						path={USERS_LIST_ROUTES.client.route}

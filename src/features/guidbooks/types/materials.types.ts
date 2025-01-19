@@ -1,5 +1,5 @@
-import { InputNumberType } from '@core';
-import { FieldValues } from 'react-hook-form';
+import type { InputNumberType } from '@core';
+import type { FieldValues } from 'react-hook-form';
 
 export interface IMaterialsFilterForm extends FieldValues {
 	name: string;

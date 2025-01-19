@@ -1,11 +1,11 @@
 import { Button, CleanUpIcon } from '@core';
-import { memoize } from 'core/utils/hoc/memo.utils';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import { useCallback } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { twMerge } from 'tailwind-merge';
 import { guidbookHeaderTitlesMap } from '../../../constants';
-import { HeaderFormElements, HeaderFormTitles, HeaderFormTypes } from '../../../types';
+import { HeaderFormTypes, type HeaderFormElements, type HeaderFormTitles } from '../../../types';
 
 interface GuidbookPageHeaderWrapperProps {
 	titles: HeaderFormTitles;
@@ -63,11 +63,11 @@ export const GuidbookPageHeaderWrapper = memoize(
 						</Button>
 					)}
 				</div>
-				<div className="border-gray-border flex flex-col rounded-xl border border-solid bg-white">
+				<div className="flex flex-col rounded-xl border border-solid bg-white">
 					<p className="flex justify-center pt-[16px] font-sans text-base font-semibold leading-4">
 						{guidbookHeaderTitlesMap.get(formType)!(titles)}
 					</p>
-					<div className="border-gray-border flex flex-wrap gap-[16px] border-b border-solid px-[16px] pb-[24px] pt-[16px]">
+					<div className="flex flex-wrap gap-[16px] border-b border-solid px-[16px] pb-[24px] pt-[16px]">
 						<FormProvider {...form}>
 							{formType == HeaderFormTypes.filter ? (
 								<formElements.filter

@@ -2,14 +2,14 @@ import { SortOrder } from './sort-order.types';
 
 type FetchDataOrdering<TData> = Partial<TData>;
 
-interface FetchDataFilters<TData = unknown> {
+interface FetchDataFilters {
 	pageNumber?: number;
 	pageSize?: number;
 	sortOrder?: SortOrder;
 	ordering: string;
 }
 
-type FetchDataParams<T> = FetchDataFilters<T> & FetchDataOrdering<T>;
+type FetchDataParams<T> = FetchDataFilters & FetchDataOrdering<T>;
 
 interface PaginatedData<T> {
 	items: T[];

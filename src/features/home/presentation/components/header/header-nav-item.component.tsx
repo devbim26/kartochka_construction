@@ -1,4 +1,4 @@
-import { memoize } from 'core/utils/hoc/memo.utils';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import { twMerge } from 'tailwind-merge';
 
 interface HeaderNavItemProps {

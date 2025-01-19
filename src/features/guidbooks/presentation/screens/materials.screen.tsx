@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { MaterialsAddFormDefaultValues, MaterialsFilterFormDefaultValues } from '../../constants';
-import { HeaderFormTypes, MaterialFormTypes } from '../../types';
+import { HeaderFormTypes, type MaterialFormTypes } from '../../types';
 import { useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
 

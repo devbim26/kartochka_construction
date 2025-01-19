@@ -1,5 +1,5 @@
-import { CreateUserCommand } from '@api-gen';
-import { RegistrationFormData } from '../types';
+import type { CreateUserCommand } from '@api-gen';
+import type { RegistrationFormData } from '../types';
 
 export const convertToServerRegistrationData = (data: RegistrationFormData): CreateUserCommand => ({
 	...data,

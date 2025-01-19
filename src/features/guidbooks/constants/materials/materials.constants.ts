@@ -1,4 +1,4 @@
-import { IMaterialsAddAndEditForm, IMaterialsFilterForm } from '../../types';
+import type { IMaterialsAddAndEditForm, IMaterialsFilterForm } from '../../types';
 
 export const MaterialsFilterFormDefaultValues: IMaterialsFilterForm = {
 	name: '',

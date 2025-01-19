@@ -1,5 +1,5 @@
-import { ActionReducerMapBuilder, AsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { Draft } from 'immer';
+import type { ActionReducerMapBuilder, AsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import type { Draft } from 'immer';
 
 export interface SliceInitialState {
 	fetch_data: {

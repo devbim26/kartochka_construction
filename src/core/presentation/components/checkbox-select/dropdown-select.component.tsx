@@ -1,6 +1,6 @@
 import { ChevronIcon } from '@core';
-import { memoize } from 'core/utils/hoc/memo.utils';
-import { IconType } from 'react-icons';
+import { memoize } from '@core/utils/hoc/memo.utils';
+import type { IconType } from 'react-icons';
 import { twMerge } from 'tailwind-merge';
 
 interface DropdownSelectButtonProps {

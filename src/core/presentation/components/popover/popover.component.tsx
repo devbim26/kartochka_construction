@@ -1,5 +1,5 @@
+import { memoize } from '@core/utils/hoc/memo.utils';
 import { Popover as UiPopover, PopoverButton, PopoverPanel } from '@headlessui/react';
-import { memoize } from 'core/utils/hoc/memo.utils';
 import { useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 

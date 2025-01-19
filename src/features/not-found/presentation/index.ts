@@ -1,1 +1,1 @@
-export * from './screens/not-found-screen.screen'
+export * from './screens/not-found-screen.screen';

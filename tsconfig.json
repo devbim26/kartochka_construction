@@ -1,14 +1,19 @@
 {
 	"compilerOptions": {
-	  "baseUrl": "./src",
 	  "target": "es5",
 	  "lib": ["dom", "dom.iterable", "esnext"],
 	  "paths": {
-		"@router": ["router"],
-		"@core": ["core"],
-		"@features": ["features"],
-		"@assets": ["assets"],
-		"@api-gen": ["api-gen"]
+		"@*": ["./src/*"],
+		"@api-gen": ["./src/api-gen"],
+		"@app": ["./src/app"],
+		"@core": ["./src/core"],
+		"@features": ["./src/features"],
+		"@app/*": ["./src/app/*"],
+		"@core/*": ["./src/core/*"],
+		"@features/*": ["./src/features/*"],
+		"@assets/*": ["./src/assets/*"],
+		"router": ["./src/router"],
+		"router/*": ["./src/router/"],
 	  },
 	  "allowJs": true,
 	  "skipLibCheck": true,
@@ -23,6 +28,7 @@
 	  "isolatedModules": true,
 	  "jsx": "react-jsx"
 	},
-	"include": ["src"]
+	"include": ["**/*.ts", "**/*.tsx"],
+	"exclude": ["node_modules"]
   }
   

@@ -9,13 +9,13 @@ import {
 	useAppSelector,
 } from '@core';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { HOME_ROUTES } from 'features/home';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
+import { HOME_ROUTES } from '../../../../home';
 import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
 import { authLogin } from '../../../services';
-import { LoginFormData } from '../../../types';
+import type { LoginFormData } from '../../../types';
 import { LoginFormDataConfig } from '../../../utils';
 
 const LoginPage = () => {
@@ -49,7 +49,7 @@ const LoginPage = () => {
 
 	return (
 		<FormProvider {...form}>
-			<div className="border-gray-border flex w-[412px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[21px]">
+			<div className="flex w-[412px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[21px]">
 				<div className="flex h-[64px] flex-row items-center justify-center gap-[10px]">
 					<LogoIcon />
 					<LogoTextIcon />

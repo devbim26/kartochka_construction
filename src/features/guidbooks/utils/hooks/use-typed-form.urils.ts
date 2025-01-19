@@ -1,4 +1,10 @@
-import { DefaultValues, FieldValues, useForm, UseFormProps, UseFormReturn } from 'react-hook-form';
+import {
+	useForm,
+	type DefaultValues,
+	type FieldValues,
+	type UseFormProps,
+	type UseFormReturn,
+} from 'react-hook-form';
 import { HeaderFormTypes } from '../../types';
 
 export const useHeaderForm = <T extends FieldValues>(

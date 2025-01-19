@@ -1,15 +1,15 @@
 import { Input } from '@core';
-import { memoize } from 'core/utils/hoc/memo.utils';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import { Controller } from 'react-hook-form';
 import {
-	HeaderFormsProps,
-	IMaterialsAddAndEditForm,
 	MaterialsAddAndEditFormKeys,
+	type HeaderFormsProps,
+	type IMaterialsAddAndEditForm,
 } from '../../../../../types';
 import { FormSubTitle } from '../form-sub-title.components';
 
 export const MaterialsAddAndEdit = memoize(
-	({ control, setValue }: HeaderFormsProps<IMaterialsAddAndEditForm>) => {
+	({ control }: HeaderFormsProps<IMaterialsAddAndEditForm>) => {
 		return (
 			<div className="flex flex-col gap-[23px]">
 				<FormSubTitle text="Описание" />

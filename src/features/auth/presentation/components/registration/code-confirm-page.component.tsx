@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
 import { smsCodeApprove, smsCodeRequest } from '../../../services';
-import { ApproveFormData } from '../../../types';
+import type { ApproveFormData } from '../../../types';
 import { ApproveFormDataConfig } from '../../../utils';
 
 const CodeConfirmPage = () => {
@@ -67,7 +67,7 @@ const CodeConfirmPage = () => {
 
 	return (
 		<FormProvider {...form}>
-			<div className="border-gray-border flex w-[508px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[23px]">
+			<div className="flex w-[508px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[23px]">
 				<div className="flex h-[64px] flex-row items-center justify-center gap-[10px]">
 					<LogoIcon />
 					<LogoTextIcon />

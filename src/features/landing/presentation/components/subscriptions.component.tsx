@@ -41,9 +41,9 @@ export const Subscriptions = () => {
 					{titles.map((title, index) => (
 						<div
 							key={index}
-							className="flex flex-1 flex-col rounded-[20px] border border-grey-border px-[16px] pb-[16px] pt-[41px]"
+							className="flex flex-1 flex-col rounded-[20px] border border-gray-border px-[16px] pb-[16px] pt-[41px]"
 						>
-							<div className="mx-[17px] border-b-2 border-b-grey-border pb-[9px] font-montserrat text-[25px] font-bold leading-[30px] text-primary">
+							<div className="mx-[17px] border-b-2 border-b-gray-border pb-[9px] font-montserrat text-[25px] font-bold leading-[30px] text-primary">
 								{title}
 							</div>
 							<div className="mb-[25px] font-montserrat text-[16px] font-medium leading-[145%]">
@@ -69,7 +69,7 @@ export const Subscriptions = () => {
 								{crossedPoints[index].map((point, index) => (
 									<div
 										key={index}
-										className="mb-[10px] ml-[26px] flex flex-row gap-[10px] text-start font-montserrat text-[18px] font-semibold leading-[145%] text-grey-text line-through"
+										className="mb-[10px] ml-[26px] flex flex-row gap-[10px] text-start font-montserrat text-[18px] font-semibold leading-[145%] text-gray-text line-through"
 									>
 										{point}
 									</div>

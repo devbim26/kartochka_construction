@@ -1,4 +1,4 @@
-import { createAsyncCases, SliceInitialState } from '@core';
+import { createAsyncCases, type SliceInitialState } from '@core/utils/fetch/create-cases.util';
 import { createSlice } from '@reduxjs/toolkit';
 import {
 	authLogin,

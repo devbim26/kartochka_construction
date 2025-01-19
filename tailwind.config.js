@@ -14,7 +14,7 @@ module.exports = {
 			},
 			colors: {
 				primary: '#2175F3',
-				grey: {
+				gray: {
 					navHeader: '#F5F6F7',
 					navBg: '#F9F9F9',
 					border: '#EDEFF2',

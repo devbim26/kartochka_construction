@@ -1,4 +1,4 @@
-import { EntityConfig } from '@core';
+import type { EntityConfig } from '@core';
 import {
 	ApproveFormDataSchema,
 	LoginFormDataSchema,

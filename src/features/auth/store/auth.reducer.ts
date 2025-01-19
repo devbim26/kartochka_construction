@@ -1,5 +1,5 @@
 import { AUTH_ACTIONS } from '../constants';
-import { AuthSliceDataState, AuthSliceState } from './auth.slice';
+import type { AuthSliceDataState, AuthSliceState } from './auth.slice';
 
 type ActionType = (typeof AUTH_ACTIONS)[keyof typeof AUTH_ACTIONS];
 type PayloadType = boolean | string;
@@ -49,7 +49,7 @@ const actions = new Map<ActionType, MapFnc>([
 	],
 	[
 		AUTH_ACTIONS.LOGOUT,
-		(data: AuthSliceDataState, payload: boolean) => {
+		(data: AuthSliceDataState) => {
 			return { ...data, user_id: '', user_role: '' };
 		},
 	],
