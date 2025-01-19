@@ -4,7 +4,13 @@
 
 1. Run `npm i`
 2. Set `ENV` args (see below)
-3. Run `npm start`
+3. Run `npm run dev`
+
+## Build
+1. Run `npm run format`
+2. Fix warns and errors
+3. Run `npm run build`
+4. Run `npm run start`
 
 ## Development
 
@@ -20,18 +26,18 @@ REACT_APP_API_URL = http://192.168.10.23:5000/
 
 ## Deploy
 
-### 1. Production
+### 1. HTTPS (Not working now)
 
 File `Dockerfile` for `master` branch. App starts on https.
 
 **Command:**
 
-`docker build -t trans-acoustic-i-name:latest --build-arg REACT_APP_API_URL="api_url" --build-arg SERVER_NAME="ip_or_domain" .`
+`docker build -t trans-acoustic-i-name:latest --build-arg REACT_APP_API_URL="api_url" --build-arg SERVER_NAME="ip_or_domain"`
 
-### 2. Development
+### 2. HTTP
 
 File `Dockerfile.dev` for `dev` branch. App starts on http.
 
 **Command:**
 
-`docker build -f Dockerfile.dev --build-arg REACT_APP_API_URL=<url>`
+`docker build -f Dockerfile.dev -t trans-acoustic-i-name:latest --build-arg REACT_APP_API_URL=<url>`
