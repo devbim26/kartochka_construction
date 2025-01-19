@@ -12,6 +12,7 @@ import {
 	LandingScreen,
 	LoginPage,
 	MaterialsPage,
+	NotFoundScreen,
 	USERS_LIST_ROUTES,
 } from '@features';
 import { Route, Routes } from 'react-router-dom';
@@ -74,6 +75,7 @@ export const AppRouter = () => {
 					/>
 				</Route>
 			</Route>
+			<Route path="*" element={<NotFoundScreen />} />
 		</Routes>
 	);
 };

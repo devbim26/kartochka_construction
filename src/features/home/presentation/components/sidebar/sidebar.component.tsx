@@ -1,5 +1,6 @@
+import { HomeRoutesMap } from 'features/home/constants';
 import { SidebarSessionStorageKeys } from 'features/home/types';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BiNews, BiSolidCalendarEdit, BiSolidHome } from 'react-icons/bi';
 import { FaUser } from 'react-icons/fa6';
 import { HiOutlineUsers } from 'react-icons/hi2';
@@ -8,7 +9,6 @@ import { TiDocumentText } from 'react-icons/ti';
 import { useNavigate } from 'react-router-dom';
 import { GUIDBOOKS_ROUTES } from '../../../../guidbooks';
 import { HOME_ROUTES, USERS_LIST_ROUTES } from '../../../constants/routes/home-routes';
-import { useSidebarNavigate } from '../../../utils';
 import { SidebarItem } from './sidebar-item.component';
 import { SidebarListItem } from './sidebar-list-item.component';
 import { SidebarList } from './sidebar-list.component';
@@ -18,7 +18,11 @@ export const Sidebar = () => {
 	const [currentItemId, setCurrentItemId] = useState<string>(
 		sessionStorage.getItem(SidebarSessionStorageKeys.HomeRoutesId) || HOME_ROUTES.main.id,
 	);
-	useSidebarNavigate(currentItemId, navigate);
+
+	useEffect(() => {
+		navigate(`${HomeRoutesMap.get(currentItemId)}`);
+		sessionStorage.setItem(SidebarSessionStorageKeys.HomeRoutesId, currentItemId);
+	}, [currentItemId]);
 
 	const sidebarItemClick = useCallback(
 		(id: string) => {

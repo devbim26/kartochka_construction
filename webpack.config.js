@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const webpack = require('webpack');
 
 const runStatus = process.env.NODE_ENV;
 
@@ -31,7 +32,7 @@ module.exports = {
 				use: {
 					loader: 'ts-loader',
 					options: {
-						transpileOnly: true, 
+						transpileOnly: true,
 						compilerOptions: {
 							sourceMap: runStatus === 'development',
 						},
@@ -123,6 +124,14 @@ module.exports = {
 		}),
 		new MiniCssExtractPlugin({
 			filename: runStatus === 'production' ? '[name].[contenthash].css' : '[name].css',
+		}),
+		new webpack.DefinePlugin({
+			'process.env': Object.keys(process.env)
+				.filter((key) => key.startsWith('REACT_APP_'))
+				.reduce((acc, key) => {
+					acc[key] = JSON.stringify(process.env[key]);
+					return acc;
+				}, {}),
 		}),
 	],
 	optimization: {
