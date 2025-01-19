@@ -1,2 +1,0 @@
-const apiUrl = '';
-export { apiUrl };
