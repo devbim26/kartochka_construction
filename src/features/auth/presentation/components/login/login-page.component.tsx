@@ -1,4 +1,5 @@
 import {
+	APP_ROUTES,
 	Button,
 	Input,
 	LogoIcon,
@@ -8,22 +9,24 @@ import {
 	useAppSelector,
 } from '@core';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { HOME_ROUTES } from 'features/home';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
-import { AUTH_FETCH_ROUTES } from '../../../constants';
+import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
 import { authLogin } from '../../../services';
 import { LoginFormData } from '../../../types';
 import { LoginFormDataConfig } from '../../../utils';
 
-export const LoginPage = () => {
+const LoginPage = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
 	const authData = useAppSelector((store) => store.authData);
 
 	useEffect(() => {
-		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name && navigate('/');
+		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name &&
+			navigate(HOME_ROUTES.main.route);
 	}, [authData.fetch_data?.fetch_name]);
 
 	useEffect(() => {
@@ -83,7 +86,9 @@ export const LoginPage = () => {
 				<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
 					<p>Нет аккаунта?</p>
 					<p
-						onClick={() => navigate('/auth/' + '/')}
+						onClick={() =>
+							navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.code_approve.route)
+						}
 						className="cursor-pointer font-semibold underline-offset-auto hover:underline"
 					>
 						Зарегистрироваться
@@ -93,3 +98,5 @@ export const LoginPage = () => {
 		</FormProvider>
 	);
 };
+
+export default LoginPage;

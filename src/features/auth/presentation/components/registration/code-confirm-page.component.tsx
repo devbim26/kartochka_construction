@@ -1,4 +1,5 @@
 import {
+	APP_ROUTES,
 	Button,
 	Input,
 	LogoIcon,
@@ -10,12 +11,12 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { AUTH_FETCH_ROUTES } from '../../../constants';
+import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
 import { smsCodeApprove, smsCodeRequest } from '../../../services';
 import { ApproveFormData } from '../../../types';
 import { ApproveFormDataConfig } from '../../../utils';
 
-export const CodeConfirmPage = () => {
+const CodeConfirmPage = () => {
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
 	const authData = useAppSelector((store) => store.authData);
@@ -44,7 +45,7 @@ export const CodeConfirmPage = () => {
 
 	useEffect(() => {
 		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.smsApprove.fetch_name &&
-			navigate(`/auth/`, {
+			navigate(APP_ROUTES.auth.route + AUTH_ROUTES.company_registration.route, {
 				phoneNumber: form.getValues('phoneNumber'),
 			});
 	}, [authData.fetch_data?.fetch_name]);
@@ -100,7 +101,9 @@ export const CodeConfirmPage = () => {
 				<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
 					<p>Есть аккаунт?</p>
 					<p
-						onClick={() => navigate('/auth/' + '/')}
+						onClick={() =>
+							navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.login.route)
+						}
 						className="cursor-pointer font-semibold underline-offset-auto hover:underline"
 					>
 						Авторизироваться
@@ -110,3 +113,5 @@ export const CodeConfirmPage = () => {
 		</FormProvider>
 	);
 };
+
+export default CodeConfirmPage;

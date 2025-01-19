@@ -1,3 +1,5 @@
+import { PageLoader } from '@core';
+import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { HomeHeader, Sidebar } from '../components';
 
@@ -8,7 +10,9 @@ export const HomeScreen = () => {
 			<div className="flex flex-1 flex-row">
 				<Sidebar />
 				<div className="flex flex-1 bg-background-primary px-[24px] pt-[29px]">
-					<Outlet />
+					<Suspense fallback={<PageLoader />}>
+						<Outlet />
+					</Suspense>
 				</div>
 			</div>
 		</div>

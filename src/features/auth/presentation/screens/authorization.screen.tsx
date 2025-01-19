@@ -1,6 +1,6 @@
-import { APP_ROUTES, LogoIcon, LogoTextIcon } from '@core';
+import { APP_ROUTES, LogoIcon, LogoTextIcon, PageLoader } from '@core';
 import { AUTH_ROUTES } from 'features/auth/constants';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 export const AuthorizationScreen = () => {
@@ -17,7 +17,9 @@ export const AuthorizationScreen = () => {
 				<LogoTextIcon />
 			</div>
 			<div className="flex justify-center pt-[40px]">
-				<Outlet />
+				<Suspense fallback={<PageLoader />}>
+					<Outlet />
+				</Suspense>
 			</div>
 		</div>
 	);

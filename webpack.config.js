@@ -4,15 +4,15 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
-const production = process.env.NODE_ENV === 'production';
+const runStatus = process.env.NODE_ENV;
 
 module.exports = {
-	mode: production ? 'production' : 'development',
+	mode: runStatus,
 	entry: path.resolve(__dirname, './src/index.tsx'),
 	output: {
-		filename: production ? '[name].[contenthash].js' : '[name].js',
+		filename: runStatus === 'production' ? '[name].[contenthash].js' : '[name].js',
 		path: path.resolve(__dirname, './build'),
-    publicPath: '/',
+		publicPath: '/',
 		clean: true,
 	},
 	resolve: {
@@ -28,57 +28,65 @@ module.exports = {
 			},
 			{
 				test: /\.(tsx|ts)$/,
-				use: 'ts-loader',
+				use: {
+					loader: 'ts-loader',
+					options: {
+						transpileOnly: true, 
+						compilerOptions: {
+							sourceMap: runStatus === 'development',
+						},
+					},
+				},
 			},
 			{
 				test: /\.s[ac]ss$/i,
 				exclude: /node_modules/,
 				use: [
-					production ? MiniCssExtractPlugin.loader : 'style-loader',
+					runStatus === 'production' ? MiniCssExtractPlugin.loader : 'style-loader',
 					{
 						loader: 'css-loader',
 						options: {
-							sourceMap: !production,
+							sourceMap: runStatus === 'development',
 						},
 					},
-          {
+					{
 						loader: 'postcss-loader',
 						options: {
-							sourceMap: !production,
+							sourceMap: runStatus === 'development',
 						},
 					},
-          {
+					{
 						loader: 'sass-loader',
 						options: {
-							sourceMap: !production,
+							sourceMap: runStatus === 'development',
 						},
 					},
 				],
 			},
-      {
-        test: /\.css$/i,
-        use: [
-          production ? MiniCssExtractPlugin.loader : 'style-loader',
-          {
+			{
+				test: /\.css$/i,
+				use: [
+					runStatus === 'production' ? MiniCssExtractPlugin.loader : 'style-loader',
+					{
 						loader: 'css-loader',
 						options: {
-							sourceMap: !production,
+							sourceMap: runStatus === 'development',
 						},
 					},
-          {
+					{
 						loader: 'postcss-loader',
 						options: {
-							sourceMap: !production,
+							sourceMap: runStatus === 'development',
 						},
 					},
-          {
+					{
 						loader: 'sass-loader',
 						options: {
-							sourceMap: !production,
+							sourceMap: runStatus === 'development',
 						},
 					},
-        ],
-      },
+				],
+			},
 			{
 				test: /\.(png|jpg|gif|svg)$/,
 				use: [
@@ -114,7 +122,7 @@ module.exports = {
 			filename: 'index.html',
 		}),
 		new MiniCssExtractPlugin({
-			filename: production ? '[name].[contenthash].css' : '[name].css',
+			filename: runStatus === 'production' ? '[name].[contenthash].css' : '[name].css',
 		}),
 	],
 	optimization: {

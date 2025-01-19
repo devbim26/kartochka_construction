@@ -1,7 +1,6 @@
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import { RefCallBack } from 'react-hook-form';
 import { IconType } from 'react-icons';
-import { ReactInputMask } from 'react-input-mask';
 import { twMerge } from 'tailwind-merge';
 import { FormElementLabel } from '../forms';
 
@@ -75,26 +74,22 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 				{iconPos === 'left' && IconComponent}
 				<div className="flex flex-row items-center">
 					{mask ? (
-						<ReactInputMask mask={mask} {...props}>
-							{(inputProps) => (
-								<input
-									id={props.id}
-									ref={ref}
-									disabled={props.disabled}
-									className={twMerge(
-										`text-value-black h-[40px] w-full rounded-[8px] border-none px-[16px] py-[10px] font-raleway text-[14px] font-normal ring-1 ring-inset ring-input-border-primary placeholder:text-input-label-primary focus:ring-2 focus:ring-inset focus:ring-primary focus-visible:outline-none`,
-										Icon && iconPos === 'right' && 'pr-12',
-										Icon && iconPos === 'left' && 'pl-12',
-										isLoading && `animate-pulse`,
-										inputClassName,
-										errorHighlight && 'bg-error',
-										error ? 'ring-error focus:ring-error' : '',
-									)}
-									aria-invalid={error ? 'true' : 'false'}
-									{...inputProps}
-								/>
+						<input
+							id={props.id}
+							ref={ref}
+							{...props}
+							disabled={props.disabled}
+							className={twMerge(
+								`text-value-black h-[40px] w-full rounded-[8px] border-none px-[16px] py-[10px] font-raleway text-[14px] font-normal ring-1 ring-inset ring-input-border-primary placeholder:text-input-label-primary focus:ring-2 focus:ring-inset focus:ring-primary focus-visible:outline-none`,
+								Icon && iconPos === 'right' && 'pr-12',
+								Icon && iconPos === 'left' && 'pl-12',
+								isLoading && `animate-pulse`,
+								inputClassName,
+								errorHighlight && 'bg-error',
+								error ? 'ring-error focus:ring-error' : '',
 							)}
-						</ReactInputMask>
+							aria-invalid={error ? 'true' : 'false'}
+						/>
 					) : (
 						<input
 							id={props.id}

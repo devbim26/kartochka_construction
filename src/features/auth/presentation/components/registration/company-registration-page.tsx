@@ -1,4 +1,5 @@
 import {
+	APP_ROUTES,
 	Button,
 	convertToBase64,
 	FormElementLabel,
@@ -15,18 +16,15 @@ import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { TiDeleteOutline } from 'react-icons/ti';
 import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
-import { AUTH_FETCH_ROUTES } from '../../../constants';
+import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
 import { authRegistration, fileUpload } from '../../../services';
 import { RegistrationFormData } from '../../../types';
 import { RegistrationFormDataConfig } from '../../../utils';
 
-export const CompanyRegistrationPage = () => {
+const CompanyRegistrationPage = () => {
 	const navigate = useAppNavigate();
-
 	const dispatch = useAppDispatch();
-
 	const authData = useAppSelector((store) => store.authData);
-
 	const [search] = useSearchParams();
 
 	useEffect(() => {
@@ -57,7 +55,7 @@ export const CompanyRegistrationPage = () => {
 
 	useEffect(() => {
 		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.registration.fetch_name &&
-			navigate('/');
+			navigate(APP_ROUTES.auth + '/' + AUTH_ROUTES.login);
 	}, [authData.fetch_data?.fetch_name]);
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
@@ -274,3 +272,5 @@ export const CompanyRegistrationPage = () => {
 		</div>
 	);
 };
+
+export default CompanyRegistrationPage;

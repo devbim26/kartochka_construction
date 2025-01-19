@@ -4,5 +4,6 @@ export * from './checkbox-select';
 export * from './chevron';
 export * from './forms';
 export * from './inputs';
+export * from './loaders';
 export * from './popover';
 export * from './separator';

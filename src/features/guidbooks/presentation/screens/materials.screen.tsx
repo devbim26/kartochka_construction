@@ -2,23 +2,9 @@ import { useCallback, useState } from 'react';
 import { MaterialsAddFormDefaultValues, MaterialsFilterFormDefaultValues } from '../../constants';
 import { HeaderFormTypes, MaterialFormTypes } from '../../types';
 import { useHeaderForm } from '../../utils';
+import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
 
-const testData = [
-	{
-		id: 123,
-		name: 'name1',
-		plice: 'police1',
-		addv: 'sad1',
-	},
-	{
-		id: 124,
-		name: 'name2',
-		plice: 'police2',
-		addv: 'sad2S',
-	},
-];
-
-export const MaterialsPage = () => {
+const MaterialsPage = () => {
 	const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 		HeaderFormTypes.filter,
 	);
@@ -34,7 +20,7 @@ export const MaterialsPage = () => {
 	const onSaveHandle = useCallback(() => {}, []);
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
-			{/* <GuidbookPageHeaderWrapper
+			<GuidbookPageHeaderWrapper
 				onSave={onSaveHandle}
 				titles={{
 					pageTitle: 'Материалы',
@@ -49,8 +35,10 @@ export const MaterialsPage = () => {
 					add: MaterialsAddAndEdit,
 					edit: MaterialsAddAndEdit,
 				}}
-			/> */}
+			/>
 			{/* <GuidbookPageTableWrapper /> */}
 		</div>
 	);
 };
+
+export default MaterialsPage;

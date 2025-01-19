@@ -1,4 +1,4 @@
-import { SessionStorageKeys } from '@core';
+import { SidebarSessionStorageKeys } from 'features/home/types';
 import { useCallback, useState } from 'react';
 import { BiNews, BiSolidCalendarEdit, BiSolidHome } from 'react-icons/bi';
 import { FaUser } from 'react-icons/fa6';
@@ -16,7 +16,7 @@ import { SidebarList } from './sidebar-list.component';
 export const Sidebar = () => {
 	const navigate = useNavigate();
 	const [currentItemId, setCurrentItemId] = useState<string>(
-		sessionStorage.getItem(SessionStorageKeys.HomeRoutesId) || HOME_ROUTES.main.id,
+		sessionStorage.getItem(SidebarSessionStorageKeys.HomeRoutesId) || HOME_ROUTES.main.id,
 	);
 	useSidebarNavigate(currentItemId, navigate);
 
