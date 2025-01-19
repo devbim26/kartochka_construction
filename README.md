@@ -22,6 +22,9 @@ REACT_APP_API_URL = https://192.168.10.23:5001/
 
 #http
 REACT_APP_API_URL = http://192.168.10.23:5000/
+
+#for test host server
+TEST_SERVER_PORT = 3000
 ```
 
 ## Deploy
