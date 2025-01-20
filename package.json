@@ -24,8 +24,8 @@
 	},
 	"scripts": {
 		"start": "npm run build && node test-build-server/index.js",
-		"dev": "NODE_ENV=development webpack serve --config webpack.config.js",
-		"build": "NODE_ENV=production webpack --config webpack.config.js",
+		"dev": "cross-env NODE_ENV=development webpack serve --config webpack.config.js",
+		"build": " cross-env NODE_ENV=production webpack --config webpack.config.js",
 		"format": "prettier --write ./src && eslint . --ext ts,tsx ./src",
 		"generate-api": "node ./tools/generate-api.js",
 		"eslint:debug": "eslint ./src --debug"
@@ -61,6 +61,7 @@
 		"babel-loader": "^9.2.1",
 		"body-parser": "^1.20.3",
 		"clean-webpack-plugin": "^4.0.0",
+		"cross-env": "^7.0.3",
 		"css-loader": "^7.1.2",
 		"dotenv": "^16.4.7",
 		"eslint": "^8.57.1",
