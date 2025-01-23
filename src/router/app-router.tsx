@@ -15,6 +15,7 @@ import {
 	NotFoundScreen,
 	USERS_LIST_ROUTES,
 } from '@features';
+import { MainScreen } from '@features/main/presentation/screens/main.screen';
 import { Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
@@ -30,7 +31,7 @@ export const AppRouter = () => {
 				/>
 			</Route>
 			<Route path={APP_ROUTES.home.route} element={<HomeScreen />}>
-				<Route path={HOME_ROUTES.main.route} element={<DevScreen title="Главная" />} />
+				<Route path={HOME_ROUTES.main.route} element={<MainScreen />} />
 				<Route
 					path={HOME_ROUTES.constructor.route}
 					element={<DevScreen title="Конструктор" />}

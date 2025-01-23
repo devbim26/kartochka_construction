@@ -6,7 +6,7 @@ export const subscriptionDescriptions = [
 
 export const monthPrices = ['бесплатно', '350$/месяц', '550$/месяц'];
 
-export const yearPrices = ['бесплатно', '300$/месяц', '500$/месяц'];
+export const yearPrices = ['бесплатно', '300$/месяц', '450$/месяц'];
 
 export const points = [
 	[

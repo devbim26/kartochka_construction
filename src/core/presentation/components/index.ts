@@ -7,3 +7,5 @@ export * from './inputs';
 export * from './loaders';
 export * from './popover';
 export * from './separator';
+export * from './sub-select';
+export * from './switch';

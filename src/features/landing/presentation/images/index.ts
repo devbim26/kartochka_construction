@@ -1,4 +1,3 @@
-export * from './check-mark-image';
 export * from './email-image';
 export * from './fifth-number-image';
 export * from './first-number-image';
