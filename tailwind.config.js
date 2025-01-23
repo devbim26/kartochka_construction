@@ -4,6 +4,20 @@ module.exports = {
 	content: ['./src/**/*.{js,jsx,ts,tsx}', './public/**/*.{html,js}'],
 	theme: {
 		extend: {
+			keyframes: {
+				turnOverTo: {
+					'0%': { transform: 'rotateY(0deg)' },
+					'100%': { transform: 'rotateY(180deg)' },
+				},
+				turnOverFrom: {
+					'0%': { transform: 'rotateY(180deg)' },
+					'100%': { transform: 'rotateY(0deg)' },
+				},
+			},
+			animation: {
+				turnOverTo: 'turnOverTo 0.7s ease-in-out',
+				turnOverFrom: 'turnOverFrom 0.7s ease-in-out',
+			},
 			boxShadow: {
 				blue: '0px 0px 22.2px -5px rgba(33, 117, 243, 0.56)',
 			},
@@ -49,7 +63,6 @@ module.exports = {
 	plugins: [
 		require('tailwindcss'),
 		require('autoprefixer'),
-		require('@xpd/tailwind-3dtransforms'),
 		plugin(function ({ addUtilities }) {
 			addUtilities({
 				'.scrollbar-none': {
