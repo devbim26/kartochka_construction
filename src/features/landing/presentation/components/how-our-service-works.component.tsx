@@ -20,7 +20,7 @@ const numberImages = [
 
 export const HowOurServiceWorks = () => {
 	const [selectedStep, setSelectedStep] = useState(0);
-	const [isHover, setIsHover] = useState(false);
+	const [isHover, setIsHover] = useState<boolean | null>(null);
 
 	const handleStepClick = (index: number) => {
 		setSelectedStep(index);
@@ -62,33 +62,52 @@ export const HowOurServiceWorks = () => {
 						</div>
 					</div>
 					<div
-						className="relative flex h-full w-1/2 transition-transform duration-1000 ease-in-out hover:rotate-y-180"
+						className={twMerge(
+							'relative flex h-full w-1/2',
+							isHover !== null
+								? isHover
+									? 'animate-turnOverTo'
+									: 'animate-turnOverFrom'
+								: '',
+						)}
 						onMouseEnter={() => setIsHover(true)}
 						onMouseLeave={() => setIsHover(false)}
 					>
 						<div
 							className={twMerge(
-								'absolute inset-0 flex w-full flex-col gap-[24px] rounded-[20px] bg-white px-[20px] py-[30px] shadow-blue transition-opacity duration-1000 ease-in-out',
-								isHover ? 'opacity-0' : 'opacity-100',
+								'absolute inset-0 flex w-full flex-col gap-[24px] rounded-[20px] bg-white px-[20px] py-[30px] shadow-blue transition-opacity duration-700 ease-in-out',
+								isHover ? 'opacity-0' : 'opacity-1',
 							)}
 						>
-							<div className="flex flex-row justify-between gap-[30px]">
-								<div className="flex flex-row font-montserrat text-[20px] font-semibold leading-[24px]">
-									{steps[selectedStep]}
+							<div
+								className={twMerge(
+									'transition-opacity delay-700 duration-300 ease-in-out',
+									isHover ? 'opacity-0' : 'opacity-1',
+								)}
+							>
+								<div className="flex flex-row justify-between gap-[30px]">
+									<div className="flex flex-row font-montserrat text-[20px] font-semibold leading-[24px]">
+										{steps[selectedStep]}
+									</div>
+									<div className="flex">{numberImages[selectedStep]}</div>
 								</div>
-								<div className="flex">{numberImages[selectedStep]}</div>
-							</div>
-							<div className="whitespace-pre-wrap px-[7px] font-montserrat text-[20px] font-normal leading-[24px]">
-								{stepDescriptions[selectedStep]}
+								<div className="whitespace-pre-wrap px-[7px] font-montserrat text-[20px] font-normal leading-[24px]">
+									{stepDescriptions[selectedStep]}
+								</div>
 							</div>
 						</div>
 						<div
 							className={twMerge(
-								'absolute inset-0 flex w-full transform flex-col gap-[24px] rounded-[20px] bg-white px-[20px] py-[30px] shadow-blue transition-opacity duration-1000 ease-in-out rotate-y-180',
-								isHover ? 'opacity-100' : 'opacity-0',
+								'absolute inset-0 flex w-full flex-col gap-[24px] rounded-[20px] bg-white px-[20px] py-[30px] shadow-blue transition-opacity duration-700 ease-in-out',
+								isHover ? 'opacity-1' : 'opacity-0',
 							)}
 						>
-							<div className="whitespace-pre-wrap px-[7px] font-montserrat text-[20px] font-normal leading-[24px]">
+							<div
+								className={twMerge(
+									'whitespace-pre-wrap px-[7px] font-montserrat text-[20px] font-normal leading-[24px] transition-opacity delay-700 duration-300 ease-in-out',
+									isHover ? 'opacity-1' : 'invisible opacity-0',
+								)}
+							>
 								{stepDetailDescriptions[selectedStep]}
 							</div>
 						</div>

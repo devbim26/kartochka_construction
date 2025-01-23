@@ -1,12 +1,13 @@
 import { LandingGif } from '@assets';
-import { Button } from '@core';
+import { APP_ROUTES, Button } from '@core';
+import { AUTH_ROUTES } from '@features/auth';
 import { useNavigate } from 'react-router-dom';
 
 export const LandingPageTop = () => {
 	const navigate = useNavigate();
 
 	const handleStartCalc = () => {
-		navigate('/');
+		navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.login.route);
 	};
 	return (
 		<div className="flex w-full flex-col items-center bg-white">
