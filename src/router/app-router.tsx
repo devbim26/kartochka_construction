@@ -1,5 +1,6 @@
 import { APP_ROUTES } from '@core';
 import {
+	AccountScreen,
 	AuthorizationScreen,
 	AUTH_ROUTES,
 	CodeConfirmPage,
@@ -35,10 +36,7 @@ export const AppRouter = () => {
 					path={HOME_ROUTES.constructor.route}
 					element={<DevScreen title="Конструктор" />}
 				/>
-				<Route
-					path={HOME_ROUTES.account.route}
-					element={<DevScreen title="Личный кабинет" />}
-				/>
+				<Route path={HOME_ROUTES.account.route} element={<AccountScreen />} />
 				<Route path={HOME_ROUTES.accounts.route} element={<DevScreen title="Счета" />} />
 				<Route
 					path={HOME_ROUTES.subscribes_constructor.route}
