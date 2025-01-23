@@ -3,7 +3,7 @@ interface ChevronIconProps {
 	direction?: 'up' | 'down' | 'left' | 'right';
 }
 
-export const LandingChevronIcon = ({ color = '#2175F3', direction = 'down' }: ChevronIconProps) => {
+export const ChevronLandingIcon = ({ color = '#2175F3', direction = 'down' }: ChevronIconProps) => {
 	let transform;
 	switch (direction) {
 		case 'right':

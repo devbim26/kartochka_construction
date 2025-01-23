@@ -12,11 +12,11 @@ import {
 	HOME_ROUTES,
 	LandingScreen,
 	LoginPage,
+	MainScreen,
 	MaterialsPage,
 	NotFoundScreen,
 	USERS_LIST_ROUTES,
 } from '@features';
-import { MainScreen } from '@features/main/presentation/screens/main.screen';
 import { Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {

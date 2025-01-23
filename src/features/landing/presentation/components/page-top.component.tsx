@@ -3,7 +3,7 @@ import { APP_ROUTES, Button } from '@core';
 import { AUTH_ROUTES } from '@features/auth';
 import { useNavigate } from 'react-router-dom';
 
-export const LandingPageTop = () => {
+export const PageTop = () => {
 	const navigate = useNavigate();
 
 	const handleStartCalc = () => {

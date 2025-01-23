@@ -1,16 +1,12 @@
-import { AccountForm, Subscription } from '../components';
+import { CurrentSub } from '@core';
+import { AccountForm, AccountHeader } from '../components';
 
 const AccountScreen = () => {
-	const subscription = {
-		status: 'Standart',
-		endDate: '11.11.2011',
-	};
-
 	return (
-		<div className="flex w-full flex-col gap-[30px]">
-			<p className="font-sans text-lg font-semibold leading-4">Личный кабинет</p>
+		<div className="flex w-full flex-col gap-[30px] pb-[29px]">
+			<AccountHeader />
 			<AccountForm />
-			<Subscription subscription={subscription} />
+			<CurrentSub />
 		</div>
 	);
 };
