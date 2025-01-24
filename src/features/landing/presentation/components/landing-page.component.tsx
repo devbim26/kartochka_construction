@@ -1,18 +1,18 @@
+import { SubSelect } from '@core';
 import { AboutUsComponent } from './about-us.component';
 import { Contacts } from './contacts.component';
 import { FAQ } from './faq.component';
 import { Footer } from './footer.component';
 import { HowOurServiceWorks } from './how-our-service-works.component';
-import { LandingPageTop } from './landing-page-top.component';
-import { Subscriptions } from './subscriptions.component';
+import { PageTop } from './page-top.component';
 
 const LandingPage = () => {
 	return (
 		<div className="flex w-full flex-col items-center overflow-x-hidden pt-[23px]">
-			<LandingPageTop />
+			<PageTop />
 			<AboutUsComponent />
 			<HowOurServiceWorks />
-			<Subscriptions />
+			<SubSelect />
 			<FAQ />
 			<Contacts />
 			<Footer />

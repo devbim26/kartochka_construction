@@ -5,7 +5,7 @@ import { HomeHeader, Sidebar } from '../components';
 
 export const HomeScreen = () => {
 	return (
-		<div className="flex h-screen w-screen flex-col">
+		<div className="flex h-screen w-screen flex-col overflow-x-hidden">
 			<HomeHeader />
 			<div className="flex flex-1 flex-row">
 				<Sidebar />

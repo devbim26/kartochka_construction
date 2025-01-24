@@ -1,6 +1,6 @@
+import { ChevronLandingIcon } from '@core/presentation/icons';
 import { memo, type ComponentPropsWithoutRef } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { LandingChevronIcon } from '../../icons';
 
 export interface ChevronProps extends ComponentPropsWithoutRef<'button'> {
 	color?: keyof typeof CHEVRON_COLORS | string;
@@ -18,7 +18,7 @@ export const Chevron = memo(
 		const chevronColor = CHEVRON_COLORS[color as keyof typeof CHEVRON_COLORS] || color;
 		return (
 			<button disabled={rest.disabled} className={twMerge(className)} {...rest}>
-				<LandingChevronIcon color={chevronColor} direction={direction} />
+				<ChevronLandingIcon color={chevronColor} direction={direction} />
 			</button>
 		);
 	},

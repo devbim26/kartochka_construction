@@ -1,23 +1,23 @@
 interface ChevronIconProps {
 	color?: string;
 	direction?: 'up' | 'down' | 'left' | 'right';
+	className?: string;
 }
 
-export const LandingChevronIcon = ({ color = '#2175F3', direction = 'down' }: ChevronIconProps) => {
+export const ChevronLandingIcon = ({ color, direction, className }: ChevronIconProps) => {
 	let transform;
 	switch (direction) {
 		case 'right':
 			transform = 'rotate(0deg)';
 			break;
 		case 'up':
-			transform = 'rotate(180deg)';
+			transform = 'rotate(-90deg)';
 			break;
 		case 'left':
-			transform = 'rotate(-90deg)';
+			transform = 'rotate(180deg)';
 			break;
 		case 'down':
 		default:
-			transform = 'rotate(90deg)';
 			break;
 	}
 	return (
@@ -28,6 +28,7 @@ export const LandingChevronIcon = ({ color = '#2175F3', direction = 'down' }: Ch
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
 			style={{ transition: 'transform 0.1s ease-in-out', transform }}
+			className={className}
 		>
 			<path
 				fillRule="evenodd"

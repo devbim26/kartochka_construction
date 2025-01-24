@@ -1,28 +1,37 @@
-import { Button } from '@core';
-import { useState } from 'react';
-import { Switch } from '../../../../core/presentation/components/switch';
 import {
+	APP_ROUTES,
+	Button,
+	CheckMarkImage,
 	crossedPoints,
 	monthPrices,
 	points,
 	subscriptionDescriptions,
+	Switch,
 	titles,
 	yearPrices,
-} from '../../constants';
-import { CheckMarkImage } from '../images';
+} from '@core';
+import { useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 
-export const Subscriptions = () => {
+interface SubSelectProps {
+	wrapperClassName?: string;
+	subContainerClassName?: string;
+}
+
+export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelectProps) => {
 	const [isPerMonth, setIsPerMonth] = useState(true);
 
 	const handleToggle = () => {
-		isPerMonth ? setIsPerMonth(false) : setIsPerMonth(true);
+		setIsPerMonth(!isPerMonth);
 	};
 
 	return (
-		<div className="flex w-[73.18%] flex-col py-[50px]">
-			<div className="mb-[34px] flex font-montserrat text-[20px] font-normal leading-[24px]">
-				Подписки
-			</div>
+		<div className={twMerge('flex w-[73.18%] flex-col py-[50px]', wrapperClassName)}>
+			{location.pathname.startsWith(`/${APP_ROUTES.landing.route}`) && (
+				<div className="mb-[34px] flex font-montserrat text-[20px] font-normal leading-[24px]">
+					Подписки
+				</div>
+			)}
 			<div className="flex flex-col items-center text-center">
 				<Switch
 					onText="год"
@@ -37,11 +46,14 @@ export const Subscriptions = () => {
 				<div className="mb-[12px] font-montserrat text-[12px] font-normal">
 					При покупке на год первые 3 месяца бесплатно
 				</div>
-				<div className="flex w-full gap-[10px]">
+				<div className="flex w-fit gap-[10px]">
 					{titles.map((title, index) => (
 						<div
 							key={index}
-							className="flex flex-1 flex-col rounded-[20px] border border-gray-border px-[16px] pb-[16px] pt-[41px]"
+							className={twMerge(
+								subContainerClassName,
+								'flex flex-1 flex-col rounded-[20px] border border-gray-border px-[16px] pb-[16px] pt-[41px]',
+							)}
 						>
 							<div className="mx-[17px] border-b-2 border-b-gray-border pb-[9px] font-montserrat text-[25px] font-bold leading-[30px] text-primary">
 								{title}
@@ -52,7 +64,7 @@ export const Subscriptions = () => {
 							<div className="mb-[18px] font-montserrat text-[20px] font-medium leading-[24px] text-primary">
 								{isPerMonth ? monthPrices[index] : yearPrices[index]}
 							</div>
-							<Button className="mb-[14px] w-full text-[16px]">
+							<Button className="mb-[14px] w-full text-[16px] font-semibold">
 								Оформить подписку
 							</Button>
 							<div className="flex flex-col">

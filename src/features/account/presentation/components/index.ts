@@ -1,2 +1,2 @@
-export * from './account-form.components';
-export * from './subscriptions.components';
+export * from './account-form.component';
+export * from './account-header.component';

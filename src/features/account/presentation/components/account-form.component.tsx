@@ -43,6 +43,7 @@ export const AccountForm = () => {
 										containerClassName="w-[220px]"
 										label={formField.label}
 										wrapperClassName="flex-row items-center mb-[20px]"
+										value={formField.value}
 									/>
 								)}
 							/>
@@ -50,7 +51,13 @@ export const AccountForm = () => {
 							<Controller
 								name={formField.fieldName}
 								key={crypto.randomUUID()}
-								render={({}) => <></>}
+								render={({}) => (
+									<div className="flex flex-row">
+										<p className="w-[175px] font-sans text-sm font-semibold leading-5 tracking-[0.1px] text-input-label-primary">
+											Логотип
+										</p>
+									</div>
+								)}
 							/>
 						),
 					)}

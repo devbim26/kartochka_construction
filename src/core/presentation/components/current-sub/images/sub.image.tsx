@@ -1,4 +1,4 @@
-export const SubscriptionImage = () => {
+export const SubImage = () => {
 	return (
 		<svg
 			width="152"

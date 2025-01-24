@@ -3,4 +3,6 @@ export * from './contacts.component';
 export * from './faq.component';
 export * from './footer.component';
 export * from './how-our-service-works.component';
+export * from './landing-page.component';
 export * from './landing-page.lazy.component';
+export * from './page-top.component';
