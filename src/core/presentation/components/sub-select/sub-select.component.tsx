@@ -64,8 +64,10 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 							<div className="mb-[18px] font-montserrat text-[20px] font-medium leading-[24px] text-primary">
 								{isPerMonth ? monthPrices[index] : yearPrices[index]}
 							</div>
-							<Button className="mb-[14px] w-full text-[16px] font-semibold">
-								Оформить подписку
+							<Button className="mb-[14px] h-[40px] w-full">
+								<p className="font-sans text-base font-semibold leading-5 text-white">
+									Оформить подписку
+								</p>
 							</Button>
 							<div className="flex flex-col">
 								{points[index].map((point, index) => (
