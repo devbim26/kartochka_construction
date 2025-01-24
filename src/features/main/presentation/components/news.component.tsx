@@ -14,7 +14,9 @@ export const News = () => {
 						<FaAngleRight />
 					</Button>
 				</div>
-				<p className="cursor-pointer text-primary">читать полностью...</p>
+				<p className="cursor-pointer font-sans text-base leading-5 text-primary">
+					читать полностью...
+				</p>
 			</div>
 		</div>
 	);
