@@ -11,8 +11,8 @@ export const CurrentSub = ({
 		<div className="flex w-1/2 flex-col gap-[26px] rounded-xl border-[1px] border-gray-border bg-white px-[18px] py-[15px]">
 			<div className="flex flex-row items-center justify-between">
 				<p className="font-sans text-2xl font-semibold leading-4">Подписка</p>
-				<Button className="border-2 border-primary bg-white px-[16px] py-[4px] font-semibold text-primary enabled:hover:bg-inherit">
-					Улучшить до PRO
+				<Button className="border-2 border-primary bg-white px-[16px] py-[4px] font-semibold text-primary enabled:hover:bg-primary enabled:hover:text-white">
+					<p className="font-sans text-sm font-semibold leading-4">Улучшить до PRO</p>
 				</Button>
 			</div>
 			<div className="flex flex-row justify-between">
@@ -32,7 +32,11 @@ export const CurrentSub = ({
 							</p>
 						</div>
 					</div>
-					<Button className="w-min px-[16px] font-semibold">Продлить подписку</Button>
+					<Button className="w-min px-[16px]">
+						<p className="font-sans text-sm font-semibold leading-4">
+							Продлить подписку
+						</p>
+					</Button>
 				</div>
 				<SubImage />
 			</div>
