@@ -35,7 +35,7 @@ File `Dockerfile` for `master` branch. App starts on https.
 
 **Command:**
 
-`docker build -t trans-acoustic-i-name:latest --build-arg REACT_APP_API_URL="api_url" --build-arg SERVER_NAME="ip_or_domain"`
+`docker build -t trans-acoustic-i-name:latest --build-arg REACT_APP_API_URL="api_url"`
 
 ### 2. HTTP
 
