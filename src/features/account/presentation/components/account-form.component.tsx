@@ -64,8 +64,10 @@ export const AccountForm = () => {
 				</FormProvider>
 			</div>
 			<div className="flex justify-end px-[16px] py-[13px]">
-				<Button onClick={handleClick} className="px-[16px] font-semibold">
-					{isViewMode ? ButtonTitles.default : ButtonTitles.edit}
+				<Button onClick={handleClick} className="px-[16px]">
+					<p className="font-sans text-sm font-semibold leading-4">
+						{isViewMode ? ButtonTitles.default : ButtonTitles.edit}
+					</p>
 				</Button>
 			</div>
 		</div>
