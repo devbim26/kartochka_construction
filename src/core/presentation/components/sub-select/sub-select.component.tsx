@@ -64,7 +64,7 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 							<div className="mb-[18px] font-montserrat text-[20px] font-medium leading-[24px] text-primary">
 								{isPerMonth ? monthPrices[index] : yearPrices[index]}
 							</div>
-							<Button className="mb-[14px] w-fit text-[16px] font-semibold">
+							<Button className="mb-[14px] w-full text-[16px] font-semibold">
 								Оформить подписку
 							</Button>
 							<div className="flex flex-col">
