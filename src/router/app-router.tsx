@@ -5,11 +5,11 @@ import {
 	AUTH_ROUTES,
 	CodeConfirmPage,
 	CompanyRegistrationPage,
+	DESIGNING_ROUTES,
 	DevScreen,
 	GuidbooksLauout,
 	GUIDBOOKS_ROUTES,
 	HomeScreen,
-	HOME_ROUTES,
 	LandingScreen,
 	LoginPage,
 	MainScreen,
@@ -31,21 +31,27 @@ export const AppRouter = () => {
 					element={<CompanyRegistrationPage />}
 				/>
 			</Route>
-			<Route path={APP_ROUTES.home.route} element={<HomeScreen />}>
-				<Route path={HOME_ROUTES.main.route} element={<MainScreen />} />
+			<Route path={APP_ROUTES.designing.route} element={<HomeScreen />}>
+				<Route path={DESIGNING_ROUTES.main.route} element={<MainScreen />} />
 				<Route
-					path={HOME_ROUTES.constructor.route}
+					path={DESIGNING_ROUTES.constructor.route}
 					element={<DevScreen title="Конструктор" />}
 				/>
-				<Route path={HOME_ROUTES.account.route} element={<AccountScreen />} />
-				<Route path={HOME_ROUTES.accounts.route} element={<DevScreen title="Счета" />} />
+				<Route path={DESIGNING_ROUTES.account.route} element={<AccountScreen />} />
 				<Route
-					path={HOME_ROUTES.subscribes_constructor.route}
+					path={DESIGNING_ROUTES.accounts.route}
+					element={<DevScreen title="Счета" />}
+				/>
+				<Route
+					path={DESIGNING_ROUTES.subscribes_constructor.route}
 					element={<DevScreen title="Конструктор подписок" />}
 				/>
-				<Route path={HOME_ROUTES.news.route} element={<DevScreen title="Новости" />} />
-				<Route path={HOME_ROUTES.reports.route} element={<DevScreen title="Отчеты" />} />
-				<Route path={HOME_ROUTES.guidbooks.route} element={<GuidbooksLauout />}>
+				<Route path={DESIGNING_ROUTES.news.route} element={<DevScreen title="Новости" />} />
+				<Route
+					path={DESIGNING_ROUTES.reports.route}
+					element={<DevScreen title="Отчеты" />}
+				/>
+				<Route path={DESIGNING_ROUTES.guidbooks.route} element={<GuidbooksLauout />}>
 					<Route path={GUIDBOOKS_ROUTES.materials.route} element={<MaterialsPage />} />
 					<Route
 						path={GUIDBOOKS_ROUTES.constructions.route}
@@ -61,7 +67,7 @@ export const AppRouter = () => {
 					/>
 				</Route>
 				<Route
-					path={HOME_ROUTES.users_list.route}
+					path={DESIGNING_ROUTES.users_list.route}
 					element={<div className="flex grow"></div>}
 				>
 					<Route

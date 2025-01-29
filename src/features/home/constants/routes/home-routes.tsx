@@ -10,7 +10,7 @@ export const USERS_LIST_ROUTES = {
 	},
 };
 
-export const HOME_ROUTES = {
+export const DESIGNING_ROUTES = {
 	main: {
 		id: 'main-page-id',
 		route: 'main',

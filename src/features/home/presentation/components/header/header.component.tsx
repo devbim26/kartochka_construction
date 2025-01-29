@@ -1,7 +1,8 @@
 import { LogoIcon, LogoTextIcon } from '@core';
 import { useLocation } from 'react-router-dom';
-import { HOME_ROUTES } from '../../../constants/routes/home-routes';
+import { DESIGNING_ROUTES } from '../../../constants/routes/home-routes';
 import { HeaderNav } from './header-nav.component';
+import { LogoutHeader } from './logout-header.component';
 
 export const HomeHeader = () => {
 	const location = useLocation();
@@ -12,8 +13,9 @@ export const HomeHeader = () => {
 				<LogoIcon className="h-[40px] w-[39px]" />
 				<LogoTextIcon className="h-[64px] w-[170px]" />
 			</div>
-			{(location.pathname.startsWith(`/${HOME_ROUTES.main.route}`) ||
+			{(location.pathname.startsWith(`/${DESIGNING_ROUTES.main.route}`) ||
 				location.pathname.startsWith(`/`)) && <HeaderNav />}
+			{location.pathname.startsWith('/') && <LogoutHeader />}
 		</header>
 	);
 };

@@ -26,7 +26,10 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 	};
 
 	return (
-		<div className={twMerge('flex w-[73.18%] flex-col py-[50px]', wrapperClassName)}>
+		<div
+			className={twMerge('flex w-[73.18%] flex-col py-[50px]', wrapperClassName)}
+			id="subscription"
+		>
 			{location.pathname.startsWith(`/${APP_ROUTES.landing.route}`) && (
 				<div className="mb-[34px] flex font-montserrat text-[20px] font-normal leading-[24px]">
 					Подписки

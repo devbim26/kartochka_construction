@@ -6,7 +6,7 @@ import { RiFileList3Line, RiPencilRulerLine, RiWallet3Fill } from 'react-icons/r
 import { TiDocumentText } from 'react-icons/ti';
 import { useNavigate } from 'react-router-dom';
 import { GUIDBOOKS_ROUTES } from '../../../../guidbooks';
-import { HomeRoutesMap, HOME_ROUTES, USERS_LIST_ROUTES } from '../../../constants';
+import { DESIGNING_ROUTES, HomeRoutesMap, USERS_LIST_ROUTES } from '../../../constants';
 import { SidebarSessionStorageKeys } from '../../../types';
 import { SidebarItem } from './sidebar-item.component';
 import { SidebarListItem } from './sidebar-list-item.component';
@@ -15,7 +15,7 @@ import { SidebarList } from './sidebar-list.component';
 export const Sidebar = () => {
 	const navigate = useNavigate();
 	const [currentItemId, setCurrentItemId] = useState<string>(
-		sessionStorage.getItem(SidebarSessionStorageKeys.HomeRoutesId) || HOME_ROUTES.main.id,
+		sessionStorage.getItem(SidebarSessionStorageKeys.HomeRoutesId) || DESIGNING_ROUTES.main.id,
 	);
 
 	useEffect(() => {
@@ -35,43 +35,43 @@ export const Sidebar = () => {
 	return (
 		<div className="flex h-full w-[248px] flex-col">
 			<SidebarItem
-				id={HOME_ROUTES.main.id}
+				id={DESIGNING_ROUTES.main.id}
 				icon={BiSolidHome}
-				isSelected={currentItemId === HOME_ROUTES.main.id}
+				isSelected={currentItemId === DESIGNING_ROUTES.main.id}
 				label="Главная"
 				setId={sidebarItemClick}
 			/>
 			<SidebarItem
-				id={HOME_ROUTES.constructor.id}
+				id={DESIGNING_ROUTES.constructor.id}
 				icon={RiPencilRulerLine}
-				isSelected={currentItemId === HOME_ROUTES.constructor.id}
+				isSelected={currentItemId === DESIGNING_ROUTES.constructor.id}
 				label="Конструктор"
 				setId={sidebarItemClick}
 			/>
 			<SidebarItem
-				id={HOME_ROUTES.account.id}
+				id={DESIGNING_ROUTES.account.id}
 				icon={FaUser}
-				isSelected={currentItemId === HOME_ROUTES.account.id}
+				isSelected={currentItemId === DESIGNING_ROUTES.account.id}
 				label="Личный кабинет"
 				setId={sidebarItemClick}
 			/>
 			<SidebarItem
-				id={HOME_ROUTES.subscribes_constructor.id}
+				id={DESIGNING_ROUTES.subscribes_constructor.id}
 				icon={BiSolidCalendarEdit}
-				isSelected={currentItemId === HOME_ROUTES.subscribes_constructor.id}
+				isSelected={currentItemId === DESIGNING_ROUTES.subscribes_constructor.id}
 				label="Конструктор подписок"
 				setId={sidebarItemClick}
 			/>
 			<SidebarItem
-				id={HOME_ROUTES.accounts.id}
+				id={DESIGNING_ROUTES.accounts.id}
 				icon={RiWallet3Fill}
-				isSelected={currentItemId === HOME_ROUTES.accounts.id}
+				isSelected={currentItemId === DESIGNING_ROUTES.accounts.id}
 				label="Счета"
 				setId={sidebarItemClick}
 			/>
 			<SidebarList
 				icon={HiOutlineUsers}
-				id={HOME_ROUTES.users_list.id}
+				id={DESIGNING_ROUTES.users_list.id}
 				label="Список пользователей"
 			>
 				<SidebarListItem
@@ -87,7 +87,11 @@ export const Sidebar = () => {
 					setId={sidebarItemClick}
 				/>
 			</SidebarList>
-			<SidebarList label="Справочники" icon={RiFileList3Line} id={HOME_ROUTES.guidbooks.id}>
+			<SidebarList
+				label="Справочники"
+				icon={RiFileList3Line}
+				id={DESIGNING_ROUTES.guidbooks.id}
+			>
 				<SidebarListItem
 					id={GUIDBOOKS_ROUTES.materials.id}
 					label="Материалы"
@@ -114,16 +118,16 @@ export const Sidebar = () => {
 				/>
 			</SidebarList>
 			<SidebarItem
-				id={HOME_ROUTES.news.id}
+				id={DESIGNING_ROUTES.news.id}
 				icon={BiNews}
-				isSelected={currentItemId === HOME_ROUTES.news.id}
+				isSelected={currentItemId === DESIGNING_ROUTES.news.id}
 				label="Новости"
 				setId={sidebarItemClick}
 			/>
 			<SidebarItem
-				id={HOME_ROUTES.reports.id}
+				id={DESIGNING_ROUTES.reports.id}
 				icon={TiDocumentText}
-				isSelected={currentItemId === HOME_ROUTES.reports.id}
+				isSelected={currentItemId === DESIGNING_ROUTES.reports.id}
 				label="Отчеты"
 				setId={sidebarItemClick}
 			/>
