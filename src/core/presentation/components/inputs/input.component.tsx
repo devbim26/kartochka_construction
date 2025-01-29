@@ -9,10 +9,10 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 	inputClassName?: string;
 	wrapperClassName?: string;
 	iconClassName?: string;
-	errorClassName?: string;
 	labelClassName?: string;
 	containerClassName?: string;
 	mask?: string;
+	replacement?: { [key: string]: RegExp };
 	error?: string;
 	Button?: () => React.JSX.Element;
 	Icon?: (() => React.JSX.Element) | IconType;
@@ -29,10 +29,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 		inputClassName,
 		wrapperClassName,
 		iconClassName,
-		errorClassName,
 		labelClassName,
 		containerClassName,
-		mask,
 		error,
 		Button,
 		Icon,
@@ -71,46 +69,26 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 			<div className={twMerge('relative', containerClassName)}>
 				{iconPos === 'left' && IconComponent}
 				<div className="flex flex-row items-center">
-					{mask ? (
-						<input
-							id={props.id}
-							ref={ref}
-							{...props}
-							disabled={props.disabled}
-							className={twMerge(
-								`text-value-black h-[40px] w-full rounded-[8px] border-none px-[16px] py-[10px] font-raleway text-[14px] font-normal ring-1 ring-inset ring-input-border-primary placeholder:text-input-label-primary focus:ring-2 focus:ring-inset focus:ring-primary focus-visible:outline-none`,
-								Icon && iconPos === 'right' && 'pr-12',
-								Icon && iconPos === 'left' && 'pl-12',
-								isLoading && `animate-pulse`,
-								inputClassName,
-								errorHighlight && 'bg-error',
-								error ? 'ring-error focus:ring-error' : '',
-							)}
-							aria-invalid={error ? 'true' : 'false'}
-						/>
-					) : (
-						<input
-							id={props.id}
-							ref={ref}
-							disabled={props.disabled}
-							className={twMerge(
-								`text-value-black h-[40px] w-full rounded-[8px] border-none px-[16px] py-[10px] font-raleway text-[14px] font-normal ring-1 ring-inset ring-input-border-primary placeholder:text-input-label-primary focus:ring-2 focus:ring-inset focus:ring-primary focus-visible:outline-none`,
-								Icon && iconPos === 'right' && 'pr-12',
-								Icon && iconPos === 'left' && 'pl-12',
-								isLoading && `animate-pulse`,
-								inputClassName,
-								errorHighlight && 'bg-error',
-								error ? 'ring-error focus:ring-error' : '',
-							)}
-							aria-invalid={error ? 'true' : 'false'}
-							{...props}
-						/>
-					)}
+					<input
+						id={props.id}
+						ref={ref}
+						{...props}
+						disabled={props.disabled}
+						className={twMerge(
+							`text-value-black h-[40px] w-full rounded-[8px] border-none px-[16px] py-[10px] font-raleway text-[14px] font-normal ring-1 ring-inset ring-input-border-primary placeholder:text-input-label-primary focus:ring-2 focus:ring-inset focus:ring-primary focus-visible:outline-none`,
+							Icon && iconPos === 'right' && 'pr-12',
+							Icon && iconPos === 'left' && 'pl-12',
+							isLoading && `animate-pulse`,
+							inputClassName,
+							errorHighlight && 'bg-error',
+							error ? 'ring-error focus:ring-error' : '',
+						)}
+						aria-invalid={error ? 'true' : 'false'}
+					/>
 					{Button && <Button />}
 				</div>
 				{iconPos === 'right' && IconComponent}
 			</div>
-			{error && <p className={twMerge('p-regular-14 text-error', errorClassName)}>{error}</p>}
 		</div>
 	);
 });

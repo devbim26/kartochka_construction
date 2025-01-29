@@ -1,14 +1,17 @@
 import {
+	approvalCodeMask,
 	APP_ROUTES,
 	Button,
 	Input,
 	LogoIcon,
 	LogoTextIcon,
+	phoneNumberMask,
 	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMask } from '@react-input/mask';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
@@ -25,7 +28,7 @@ const CodeConfirmPage = () => {
 			<Button
 				disabled={
 					!!formState.errors.phoneNumber?.message ||
-					form.watch('phoneNumber').length < 10 ||
+					form.watch('phoneNumber').length < 19 ||
 					form.watch('phoneNumber').includes('_')
 				}
 				variant="primary"
@@ -45,7 +48,7 @@ const CodeConfirmPage = () => {
 
 	useEffect(() => {
 		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.smsApprove.fetch_name &&
-			navigate(APP_ROUTES.auth.route + AUTH_ROUTES.company_registration.route, {
+			navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.company_registration.route, {
 				phoneNumber: form.getValues('phoneNumber'),
 			});
 	}, [authData.fetch_data?.fetch_name]);
@@ -59,11 +62,11 @@ const CodeConfirmPage = () => {
 						code: form.getValues('code').replaceAll('-', ''),
 					}),
 				);
-		// navigate(`/auth/${AUTH_ROUTES.company_registration.route}`, {
-		// 	phoneNumber: form.getValues('phoneNumber'),
-		// });
 	};
+
 	const { formState } = form;
+	const approvalCodeMaskRef = useMask(approvalCodeMask);
+	const phoneNumberMaskRef = useMask(phoneNumberMask);
 
 	return (
 		<FormProvider {...form}>
@@ -79,17 +82,17 @@ const CodeConfirmPage = () => {
 							labelClassName={
 								formState.errors.phoneNumber?.message ? 'text-error' : ''
 							}
-							{...form.register('phoneNumber')}
-							placeholder="+375 (29) 21-21-21"
-							mask="+375 (99) 999-99-99"
+							onChange={(e) => form.setValue('phoneNumber', e.target.value)}
+							ref={phoneNumberMaskRef}
+							placeholder="+375 (__) ___-__-__"
 							Button={ApproveButton}
 							error={formState.errors.phoneNumber?.message}
 						/>
 						<Input
 							label={formState.errors.code?.message || 'Код подтверждения'}
-							placeholder="0-0-0-0"
-							mask="9-9-9-9"
-							{...form.register('code')}
+							placeholder="_-_-_-_"
+							onChange={(e) => form.setValue('code', e.target.value)}
+							ref={approvalCodeMaskRef}
 							labelClassName={formState.errors.code?.message ? 'text-error' : ''}
 							error={formState.errors.code?.message}
 						/>

@@ -1,6 +1,6 @@
 import { Api } from './api';
 
 export const fetchApi = new Api({
-	baseURL: process.env.REACT_APP_API_URL,
+	baseURL: 'https://192.168.10.23:5001',
 });
 export * from './api';

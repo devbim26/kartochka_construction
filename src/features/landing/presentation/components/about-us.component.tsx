@@ -2,7 +2,7 @@ import { LogoBelniis, LogoIcon, LogoTextIcon } from '@core';
 
 export const AboutUsComponent = () => {
 	return (
-		<div className="flex w-[73.18%] flex-col bg-white py-[50px]">
+		<div className="flex w-[73.18%] flex-col bg-white py-[50px]" id="aboutUs">
 			<div className="mb-[20px] flex font-montserrat text-[20px] font-normal leading-[24px]">
 				О нас
 			</div>
