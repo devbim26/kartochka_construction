@@ -102,7 +102,7 @@ module.exports = {
 	devServer: {
 		watchFiles: path.resolve(__dirname, './src'),
 		compress: true,
-		open: true,
+		open: ['/landing'],
 		hot: true,
 		port: 3000,
 		historyApiFallback: true,
