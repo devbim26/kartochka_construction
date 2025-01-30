@@ -45,7 +45,7 @@ const LoginPage = () => {
 	const { formState } = form;
 
 	const phoneMaskRef = useMask(phoneNumberMask);
-	const [state, setState] = useState<string>('');
+
 	return (
 		<FormProvider {...form}>
 			<div className="flex w-[412px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[21px]">
