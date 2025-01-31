@@ -6,8 +6,6 @@ export const AccountDataConfig: EntityConfig = {
 	defaultValues: {
 		mainPhoneNumber: '',
 		phoneNumbers: [] as string[],
-		password: '',
-		secondPassword: '',
 		companyName: '',
 		directorFullName: '',
 		companyAdress: '',
@@ -15,7 +13,7 @@ export const AccountDataConfig: EntityConfig = {
 		paymentAccount: '',
 		bankIdNumber: '',
 		bankAdress: '',
-		companyLogo: {},
+		companyLogo: undefined,
 		compannyInfo: '',
 	},
 };

@@ -16,7 +16,7 @@ const MaterialsPage = () => {
 		},
 		currentHeaderFormType,
 	);
-
+	console.log(currentHeaderFormType);
 	const onSaveHandle = useCallback(() => {}, []);
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
