@@ -116,8 +116,6 @@ export const Select = memoize(
 					newValue: SingleValue<SelectOption> | MultiValue<SelectOption>,
 					actionMeta: ActionMeta<SelectOption>,
 				) => {
-					console.log({ newValue, actionMeta });
-
 					onChange?.(
 						multiple
 							? (newValue as MultiValue<SelectOption>).map((v) => v.value)
@@ -153,7 +151,7 @@ export const Select = memoize(
 				return {
 					container: (state) => {
 						return twMerge(
-							'flex-between items-center p-regular-14 lg:p-regular-16 relative flex h-8 w-full gap-3 rounded-md bg-white text-left text-gray shadow-sm ring-1 ring-inset ring-gray-border focus:outline-none focus:ring-2 focus:ring-primary',
+							'flex-between items-center p-regular-14 lg:p-regular-16 relative flex h-8 w-full gap-3 rounded-md bg-white text-left text-gray ring-1 ring-inset ring-gray-border focus:outline-none focus:ring-2 focus:ring-primary',
 							state.isDisabled && 'bg-gray-100',
 							buttonClassName,
 							wrapperClassname,
@@ -223,7 +221,13 @@ export const Select = memoize(
 						<div className={twMerge('flex items-center gap-3')}>
 							{props.data.icon}
 							<p
-								className={twMerge('block truncate', buttonLabelClassName)}
+								className={twMerge(
+									'block truncate',
+									props.data.label === placeholder
+										? 'text-input-label-primary'
+										: 'text-black',
+									buttonLabelClassName,
+								)}
 								title={props.data.label}
 							>
 								{props.data.label}
@@ -293,7 +297,12 @@ export const Select = memoize(
 					)}
 				>
 					{label && (
-						<label className={twMerge('p-regular-14 text-gray block', labelClassName)}>
+						<label
+							className={twMerge(
+								'p-regular-14 block text-input-label-primary',
+								labelClassName,
+							)}
+						>
 							{label}
 						</label>
 					)}

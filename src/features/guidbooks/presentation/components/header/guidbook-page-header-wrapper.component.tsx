@@ -60,7 +60,6 @@ export const GuidbookPageHeaderWrapper = memoize(
 		}, [currentHeaderFormType]);
 
 		const submitHandle = useCallback(() => {
-			console.log(123);
 			currentForm.current.handleSubmit(() => currentForm.current.getValues())();
 		}, []);
 
@@ -88,9 +87,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 					)}
 				</FormProvider>
 			);
-		}, [currentForm.current]);
-
-		console.log(currentForm.current.getValues());
+		}, [currentForm.current, forms]);
 
 		return (
 			<div className="flex w-full flex-col gap-[14px]">

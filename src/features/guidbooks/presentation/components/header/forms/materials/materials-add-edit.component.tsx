@@ -7,35 +7,19 @@ import {
 	Select,
 	useAppDispatch,
 } from '@core';
-import {
-	fileUpload,
-	FormSubTitle,
-	MaterialsData,
-	RuRegionNamesSelectValues,
-	type HeaderFormsProps,
-	type IMaterialsAddAndEditForm,
-} from '@features';
-import { useEffect } from 'react';
+import type { HeaderFormsProps, IMaterialsAddAndEditForm, MaterialsData } from '@features';
+import { fileUpload, FormSubTitle, RuRegionNamesSelectValues } from '@features';
+
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const MaterialsAddAndEdit = memoize(
 	({ control }: HeaderFormsProps<IMaterialsAddAndEditForm>) => {
 		const form = useFormContext<MaterialsData>();
-		const onSubmit = () => {};
 
-		const { formState, watch, setValue } = form;
+		const { formState } = form;
 
 		const dispatch = useAppDispatch();
-
-		useEffect(() => {
-			form.trigger();
-			form.handleSubmit(() => console.log(123))();
-		}, []);
-
-		console.log(watch('name'));
-
-		form.watch();
 
 		const handleFileChange = async (
 			event: React.ChangeEvent<HTMLInputElement>,
@@ -57,8 +41,6 @@ export const MaterialsAddAndEdit = memoize(
 				}
 			}
 		};
-
-		console.log(formState.errors);
 
 		return (
 			<div className="flex flex-col gap-[23px]">
