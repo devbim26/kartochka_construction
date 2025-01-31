@@ -19,8 +19,12 @@ const MaterialsPage = () => {
 			edit: MaterialsAddAndEditDataConfig.defaultValues,
 			add: MaterialsAddAndEditDataConfig.defaultValues,
 		},
+		{
+			filter: zodResolver(MaterialsAddAndEditDataConfig.schema),
+			edit: zodResolver(MaterialsAddAndEditDataConfig.schema),
+			add: zodResolver(MaterialsAddAndEditDataConfig.schema),
+		},
 		currentHeaderFormType,
-		{ resolver: zodResolver(MaterialsAddAndEditDataConfig.schema) },
 	);
 
 	const onSaveHandle = useCallback(() => {
@@ -29,6 +33,7 @@ const MaterialsPage = () => {
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper
+				pageRoute=""
 				onSave={onSaveHandle}
 				titles={{
 					pageTitle: 'Материалы',

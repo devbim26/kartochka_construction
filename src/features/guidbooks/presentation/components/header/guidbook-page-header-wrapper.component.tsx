@@ -52,6 +52,10 @@ export const GuidbookPageHeaderWrapper = memoize(
 					: setFormType(HeaderFormTypes.filter);
 		}, [search]);
 
+		const submitHandle = useCallback(() => {
+			form.handleSubmit(() => console.log(123))();
+		}, []);
+
 		return (
 			<div className="flex w-full flex-col gap-[14px]">
 				<div

@@ -99,6 +99,7 @@ export const MaterialsAddAndEdit = memoize(
 								{...field}
 								value={field.value || ''}
 								options={[{ label: '1', value: '1' }]}
+								error={formState.errors.materialType?.message}
 								labelClassName={twMerge(
 									'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 									formState.errors.materialType?.message ? 'text-error' : '',
