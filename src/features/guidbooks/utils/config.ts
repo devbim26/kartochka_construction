@@ -4,8 +4,8 @@ import { MaterialsAddAndEditDataSchema } from './validation';
 export const MaterialsAddAndEditDataConfig: EntityConfig = {
 	schema: MaterialsAddAndEditDataSchema,
 	defaultValues: {
-		name: '',
-		description: '',
+		name: '123',
+		description: '35',
 		shortName: '',
 		density: '',
 		thickness: '',
@@ -26,9 +26,9 @@ export const MaterialsAddAndEditDataConfig: EntityConfig = {
 export const MaterialsFilterDataConfig: EntityConfig = {
 	schema: MaterialsAddAndEditDataSchema,
 	defaultValues: {
-		name: '',
-		density: '',
-		thickness: '',
+		name: 'ыав',
+		density: 'ыав',
+		thickness: 'ываы',
 		materialType: '',
 	},
 };

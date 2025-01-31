@@ -20,7 +20,7 @@ const MaterialsPage = () => {
 			add: MaterialsAddAndEditDataConfig.defaultValues,
 		},
 		{
-			filter: zodResolver(MaterialsAddAndEditDataConfig.schema),
+			filter: zodResolver(MaterialsFilterDataConfig.schema),
 			edit: zodResolver(MaterialsAddAndEditDataConfig.schema),
 			add: zodResolver(MaterialsAddAndEditDataConfig.schema),
 		},
