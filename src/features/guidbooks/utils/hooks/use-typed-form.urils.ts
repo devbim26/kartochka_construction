@@ -18,6 +18,7 @@ export const useHeaderForm = <T extends FieldValues>(
 ): UseFormReturn<T> => {
 	return useForm<T>({
 		...props,
+		resolver: props?.resolver,
 		defaultValues:
 			currentHeaderFormType === HeaderFormTypes.filter
 				? defObjects.filter

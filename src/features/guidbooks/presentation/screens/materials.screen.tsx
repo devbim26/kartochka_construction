@@ -1,23 +1,27 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useState } from 'react';
-import { MaterialsAddFormDefaultValues, MaterialsFilterFormDefaultValues } from '../../constants';
 import { HeaderFormTypes, type MaterialFormTypes } from '../../types';
-import { useHeaderForm } from '../../utils';
+import { MaterialsAddAndEditDataConfig, MaterialsFilterDataConfig, useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
 
 const MaterialsPage = () => {
 	const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 		HeaderFormTypes.filter,
 	);
+
 	const form = useHeaderForm<MaterialFormTypes>(
 		{
-			filter: MaterialsFilterFormDefaultValues,
-			edit: MaterialsAddFormDefaultValues,
-			add: MaterialsAddFormDefaultValues,
+			filter: MaterialsFilterDataConfig.defaultValues,
+			edit: MaterialsAddAndEditDataConfig.defaultValues,
+			add: MaterialsAddAndEditDataConfig.defaultValues,
 		},
 		currentHeaderFormType,
+		{ resolver: zodResolver(MaterialsAddAndEditDataConfig.schema) },
 	);
 
-	const onSaveHandle = useCallback(() => {}, []);
+	const onSaveHandle = useCallback(() => {
+		console.log(123);
+	}, []);
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper

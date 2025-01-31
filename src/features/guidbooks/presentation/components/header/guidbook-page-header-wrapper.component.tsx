@@ -38,6 +38,10 @@ export const GuidbookPageHeaderWrapper = memoize(
 			setFormType(HeaderFormTypes.add);
 		}, []);
 
+		const submitHandle = useCallback(() => {
+			form.handleSubmit(() => onSave)();
+		}, []);
+
 		return (
 			<div className="flex w-full flex-col gap-[14px]">
 				<div
@@ -88,7 +92,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 						{formType !== HeaderFormTypes.filter && (
 							<Button
 								className="group flex w-fit flex-row items-center gap-[4px] border border-solid border-primary bg-background-button-secondary px-[16px] py-[6px] group-hover:bg-primary"
-								onClick={onSave}
+								onClick={submitHandle}
 							>
 								<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
 									{formType === HeaderFormTypes.add
