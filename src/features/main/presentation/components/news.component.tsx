@@ -1,4 +1,5 @@
-import { Button, ChevronLandingIcon } from '@core';
+import { Button } from '@core';
+import { FaAngleLeft, FaAngleRight } from 'react-icons/fa6';
 
 export const News = () => {
 	return (
@@ -6,14 +7,16 @@ export const News = () => {
 			<p className="font-sans text-2xl font-semibold leading-4">Новости</p>
 			<div className="flex flex-row items-center justify-between">
 				<div className="flex gap-[12px]">
-					<Button className="flex size-[24px] items-center justify-center p-0">
-						<ChevronLandingIcon color="white" className="w-[5px]" direction="left" />
+					<Button className="flex h-[28px] w-[28px] items-center justify-center p-0">
+						<FaAngleLeft />
 					</Button>
-					<Button className="flex size-[24px] items-center justify-center p-0">
-						<ChevronLandingIcon color="white" className="w-[5px]" direction="right" />
+					<Button className="flex h-[28px] w-[28px] items-center justify-center p-0">
+						<FaAngleRight />
 					</Button>
 				</div>
-				<p className="cursor-pointer text-primary">читать полностью...</p>
+				<p className="cursor-pointer font-sans text-base leading-5 text-primary">
+					читать полностью...
+				</p>
 			</div>
 		</div>
 	);
