@@ -313,12 +313,13 @@ export const Select = memoize(
 						isMulti={multiple}
 						options={_options}
 						onChange={_onChange}
-						isSearchable={false}
+						isSearchable={isSearchable}
 						classNames={classNames}
 						styles={styles}
 						isDisabled={props.disabled}
 						unstyled
 						menuPosition={menuPosition}
+						noOptionsMessage={() => 'Нет вариантов'}
 						components={{
 							Option,
 							SingleValue,
