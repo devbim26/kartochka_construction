@@ -9,9 +9,9 @@ export const MaterialsAddAndEditDataConfig: EntityConfig = {
 		shortName: '',
 		density: '',
 		thickness: '',
-		//тип материала
-		//регион
-		//тип
+		materialType: '',
+		region: '',
+		type: '',
 		manufacturer: '',
 		image: {},
 		materialCoefficient: '',
@@ -26,21 +26,9 @@ export const MaterialsAddAndEditDataConfig: EntityConfig = {
 export const MaterialsFilterDataConfig: EntityConfig = {
 	schema: MaterialsDataSchema,
 	defaultValues: {
-		name: '21212',
-		description: '',
-		shortName: '',
+		name: '',
 		density: '',
 		thickness: '',
-		//тип материала
-		//регион
-		//тип
-		manufacturer: '',
-		image: {},
-		materialCoefficient: '',
-		speedOfSound: '',
-		lossFactor: '',
-		youngModulus: '',
-		damping: '',
-		solid: '',
+		materialType: '',
 	},
 };

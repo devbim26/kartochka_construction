@@ -12,6 +12,10 @@ const MaterialsDataSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value >= 0, 'Значение должно быть не меньше нуля'),
+	materialType: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => +value >= 0, 'Значение должно быть не меньше нуля'),
 	//тип материала
 	//регион
 	//тип
