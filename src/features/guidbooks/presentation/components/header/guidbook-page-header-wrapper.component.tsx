@@ -1,8 +1,9 @@
-import { Button, CleanUpIcon } from '@core';
+import { Button, CleanUpIcon, useAppNavigate } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
+import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { guidbookHeaderTitlesMap } from '../../../constants';
 import { HeaderFormTypes, type HeaderFormElements, type HeaderFormTitles } from '../../../types';
@@ -14,6 +15,7 @@ interface GuidbookPageHeaderWrapperProps {
 	setFormType: (type: HeaderFormTypes) => void;
 	form: UseFormReturn<any, any, any>;
 	formElements: HeaderFormElements<any>;
+	pageRoute: string;
 }
 
 export const GuidbookPageHeaderWrapper = memoize(
@@ -24,10 +26,13 @@ export const GuidbookPageHeaderWrapper = memoize(
 		setFormType,
 		formElements,
 		onSave,
+		pageRoute,
 	}: GuidbookPageHeaderWrapperProps) => {
+		const navigate = useAppNavigate();
+		const [search] = useSearchParams();
 		const onCancelHandle = useCallback(() => {
 			form.reset();
-			setFormType(HeaderFormTypes.filter);
+			window.history.back(), setFormType(HeaderFormTypes.filter);
 		}, []);
 
 		const onClearHandle = useCallback(() => {
@@ -35,8 +40,17 @@ export const GuidbookPageHeaderWrapper = memoize(
 		}, []);
 
 		const onAddHandle = useCallback(() => {
+			navigate('', { add: 'true' });
 			setFormType(HeaderFormTypes.add);
 		}, []);
+
+		useEffect(() => {
+			search.get('add')
+				? setFormType(HeaderFormTypes.add)
+				: search.get('edit')
+					? setFormType(HeaderFormTypes.edit)
+					: setFormType(HeaderFormTypes.filter);
+		}, [search]);
 
 		return (
 			<div className="flex w-full flex-col gap-[14px]">
