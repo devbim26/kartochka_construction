@@ -1,11 +1,21 @@
-import { Input, memoize, Select } from '@core';
 import {
+	Button,
+	convertToBase64,
+	FormElementLabel,
+	Input,
+	memoize,
+	Select,
+	useAppDispatch,
+} from '@core';
+import {
+	fileUpload,
 	FormSubTitle,
 	MaterialsData,
 	RuRegionNamesSelectValues,
 	type HeaderFormsProps,
 	type IMaterialsAddAndEditForm,
 } from '@features';
+import { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -15,11 +25,40 @@ export const MaterialsAddAndEdit = memoize(
 		const onSubmit = () => {};
 
 		const { formState, watch, setValue } = form;
-		console.log({ ...form.getValues() });
 
-		// useEffect(() => {
-		// 	setValue('density', '');
-		// }, []);
+		const dispatch = useAppDispatch();
+
+		useEffect(() => {
+			form.trigger();
+			form.handleSubmit(() => console.log(123))();
+		}, []);
+
+		console.log(watch('name'));
+
+		form.watch();
+
+		const handleFileChange = async (
+			event: React.ChangeEvent<HTMLInputElement>,
+		): Promise<void> => {
+			const file = event.target.files?.[0];
+			if (file) {
+				form.setValue('image.name', file.name);
+				const base64 = await convertToBase64(file);
+				const fileData = await file.arrayBuffer();
+				if (base64) {
+					form.setValue('image.data', base64);
+					dispatch(
+						fileUpload({
+							data: { mimeType: file.type, isPublic: true },
+							file: fileData,
+						}),
+					);
+					form.setValue('image.url', '123');
+				}
+			}
+		};
+
+		console.log(formState.errors);
 
 		return (
 			<div className="flex flex-col gap-[23px]">
@@ -172,22 +211,23 @@ export const MaterialsAddAndEdit = memoize(
 						type={'text'}
 					/>
 
-					{/* <div className="flex flex-col gap-[8px]">
+					<div className="flex flex-col gap-[8px]">
 						<FormElementLabel
 							className={twMerge(
-								'font-raleway text-[14px] text-input-label-primary',
-								formState.errors.companyLogo?.url ? 'text-error' : '',
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+								formState.errors.image?.url ? 'text-error' : '',
 							)}
 						>
-							{formState.errors.companyLogo?.url?.message || 'Логотип компании'}
+							{formState.errors.image?.url?.message || 'Логотип компании'}
 						</FormElementLabel>
-						<div className="flex items-center gap-[10px]">
+						<div className="flex">
 							<Button
-								variant="primary"
-								className="h-[36px] w-[168px]"
+								className="group flex w-fit flex-row items-center gap-[4px] border border-solid border-primary bg-background-button-secondary px-[16px] py-[6px] group-hover:bg-primary"
 								onClick={() => document.getElementById('file-upload')!.click()}
 							>
-								Загрузить
+								<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
+									Загрузить
+								</p>
 							</Button>
 							<input
 								type="file"
@@ -197,7 +237,7 @@ export const MaterialsAddAndEdit = memoize(
 								className="hidden"
 							/>
 						</div>
-					</div> */}
+					</div>
 				</div>
 				<FormSubTitle text="Физические свойства" />
 				<div className="flex flex-wrap gap-[23px]"></div>

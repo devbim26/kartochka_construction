@@ -1,6 +1,6 @@
 import { Button, CleanUpIcon, useAppNavigate } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
@@ -21,7 +21,7 @@ interface GuidbookPageHeaderWrapperProps {
 
 export const GuidbookPageHeaderWrapper = memoize(
 	({ titles, forms, formElements, onSave }: GuidbookPageHeaderWrapperProps) => {
-		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
+		const currentForm = useRef<UseFormReturn>(forms.filterForm);
 		const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
 		);
@@ -29,12 +29,12 @@ export const GuidbookPageHeaderWrapper = memoize(
 		const navigate = useAppNavigate();
 		const [search] = useSearchParams();
 		const onCancelHandle = useCallback(() => {
-			currentForm.reset();
+			currentForm.current.reset();
 			window.history.back(), setCurrentHeaderFormType(HeaderFormTypes.filter);
 		}, []);
 
 		const onClearHandle = useCallback(() => {
-			currentForm.reset();
+			currentForm.current.reset();
 		}, []);
 
 		const onAddHandle = useCallback(() => {
@@ -48,17 +48,49 @@ export const GuidbookPageHeaderWrapper = memoize(
 				: search.get('edit')
 					? setCurrentHeaderFormType(HeaderFormTypes.edit)
 					: setCurrentHeaderFormType(HeaderFormTypes.filter);
-		}, [search]);
+		}, [search.get('add'), search.get('edit')]);
 
 		useEffect(() => {
-			setCurrentForm(() =>
+			currentForm.current =
 				currentHeaderFormType === HeaderFormTypes.add
 					? forms.addForm
 					: currentHeaderFormType === HeaderFormTypes.filter
 						? forms.filterForm
-						: forms.editForm,
-			);
+						: forms.editForm;
 		}, [currentHeaderFormType]);
+
+		const submitHandle = useCallback(() => {
+			console.log(123);
+			currentForm.current.handleSubmit(() => currentForm.current.getValues())();
+		}, []);
+
+		const formComponent = useMemo(() => {
+			return (
+				<FormProvider {...currentForm.current}>
+					{currentHeaderFormType == HeaderFormTypes.filter ? (
+						<formElements.filter
+							control={currentForm.current.control}
+							setValue={currentForm.current.setValue}
+							formState={currentForm.current.formState}
+						/>
+					) : currentHeaderFormType == HeaderFormTypes.edit ? (
+						<formElements.edit
+							control={currentForm.current.control}
+							setValue={currentForm.current.setValue}
+							formState={currentForm.current.formState}
+						/>
+					) : (
+						<formElements.add
+							control={currentForm.current.control}
+							setValue={currentForm.current.setValue}
+							formState={currentForm.current.formState}
+						/>
+					)}
+				</FormProvider>
+			);
+		}, [currentForm.current]);
+
+		console.log(currentForm.current.getValues());
 
 		return (
 			<div className="flex w-full flex-col gap-[14px]">
@@ -90,24 +122,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 						{guidbookHeaderTitlesMap.get(currentHeaderFormType)!(titles)}
 					</p>
 					<div className="flex flex-wrap gap-[16px] border-b border-solid px-[16px] pb-[24px] pt-[16px]">
-						<FormProvider {...currentForm}>
-							{currentHeaderFormType == HeaderFormTypes.filter ? (
-								<formElements.filter
-									control={currentForm.control}
-									setValue={currentForm.setValue}
-								/>
-							) : currentHeaderFormType == HeaderFormTypes.edit ? (
-								<formElements.edit
-									control={currentForm.control}
-									setValue={currentForm.setValue}
-								/>
-							) : (
-								<formElements.add
-									control={currentForm.control}
-									setValue={currentForm.setValue}
-								/>
-							)}
-						</FormProvider>
+						{formComponent}
 					</div>
 					<div className="flex flex-row justify-end gap-[30px] pb-[25px] pr-[16px] pt-[12px]">
 						{currentHeaderFormType !== HeaderFormTypes.filter && (

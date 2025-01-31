@@ -1,5 +1,7 @@
-import type { DefaultValues, FieldValues, Resolver, UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { DefaultValues, FieldValues, UseFormProps, UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
+import { ZodType } from 'zod';
 
 export const useHeaderForm = <T extends FieldValues>(
 	defObjects: {
@@ -8,22 +10,26 @@ export const useHeaderForm = <T extends FieldValues>(
 		edit: DefaultValues<T>;
 	},
 	resolvers: {
-		filter: Resolver<T>;
-		add: Resolver<T>;
-		edit: Resolver<T>;
+		filter: ZodType<any>;
+		add: ZodType<any>;
+		edit: ZodType<any>;
 	},
+	props?: UseFormProps<T>,
 ): { editForm: UseFormReturn<T>; addForm: UseFormReturn<T>; filterForm: UseFormReturn<T> } => {
 	return {
 		editForm: useForm<T>({
-			resolver: resolvers.edit,
+			...props,
+			resolver: zodResolver(resolvers.edit),
 			defaultValues: defObjects.edit,
 		}),
 		addForm: useForm<T>({
-			resolver: resolvers.add,
+			...props,
+			resolver: zodResolver(resolvers.add),
 			defaultValues: defObjects.add,
 		}),
 		filterForm: useForm<T>({
-			resolver: resolvers.filter,
+			...props,
+			resolver: zodResolver(resolvers.filter),
 			defaultValues: defObjects.filter,
 		}),
 	};

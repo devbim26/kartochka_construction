@@ -23,12 +23,12 @@ export const MaterialsAddAndEditDataConfig: EntityConfig = {
 	},
 };
 
-export const MaterialsFilterDataConfig: EntityConfig = {
-	schema: MaterialsAddAndEditDataSchema,
-	defaultValues: {
-		name: 'ыав',
-		density: 'ыав',
-		thickness: 'ываы',
-		materialType: '',
-	},
-};
+// export const MaterialsFilterDataConfig: EntityConfig = {
+// 	schema: MaterialsAddAndEditDataSchema,
+// 	defaultValues: {
+// 		name: 'ыав',
+// 		density: 'ыав',
+// 		thickness: 'ываы',
+// 		materialType: '',
+// 	},
+// };

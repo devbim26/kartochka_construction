@@ -1,20 +1,26 @@
 import { useCallback } from 'react';
-import { MaterialsAddFormDefaultValues, MaterialsFilterFormDefaultValues } from '../../constants';
 import { type MaterialFormTypes } from '../../types';
-import { useHeaderForm } from '../../utils';
+import { MaterialsAddAndEditDataConfig, useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
 
 const MaterialsPage = () => {
-	const forms = useHeaderForm<MaterialFormTypes>({
-		filter: MaterialsFilterFormDefaultValues,
-		edit: MaterialsAddFormDefaultValues,
-		add: MaterialsAddFormDefaultValues,
-	});
+	const forms = useHeaderForm<MaterialFormTypes>(
+		{
+			filter: MaterialsAddAndEditDataConfig.defaultValues,
+			edit: MaterialsAddAndEditDataConfig.defaultValues,
+			add: MaterialsAddAndEditDataConfig.defaultValues,
+		},
+		{
+			filter: MaterialsAddAndEditDataConfig.schema,
+			edit: MaterialsAddAndEditDataConfig.schema,
+			add: MaterialsAddAndEditDataConfig.schema,
+		},
+	);
+
 	const onSaveHandle = useCallback(() => {}, []);
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper
-				pageRoute=""
 				onSave={onSaveHandle}
 				titles={{
 					pageTitle: 'Материалы',
