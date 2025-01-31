@@ -194,7 +194,7 @@ export const Select = memoize(
 						return twMerge('py-2 pl-3 pr-9');
 					},
 				};
-			}, [buttonClassName, className, optionsClassName, wrapperClassname]);
+			}, [buttonClassName, className, optionsClassName, wrapperClassname, error]);
 
 			const Option = memoize((props) => {
 				const currentValue = props.getValue()?.[0];
@@ -319,11 +319,6 @@ export const Select = memoize(
 							Control,
 						}}
 					/>
-					{error && (
-						<p className={twMerge('p-regular-14 text-error', errorClassName)}>
-							{error}
-						</p>
-					)}
 				</div>
 			);
 		},
