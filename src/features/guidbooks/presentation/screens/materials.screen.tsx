@@ -1,7 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useState } from 'react';
 import { HeaderFormTypes, type MaterialFormTypes } from '../../types';
-import { MaterialsAddAndEditDataConfig, MaterialsFilterDataConfig, useHeaderForm } from '../../utils';
+import {
+	MaterialsAddAndEditDataConfig,
+	MaterialsFilterDataConfig,
+	useHeaderForm,
+} from '../../utils';
 import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
 
 const MaterialsPage = () => {

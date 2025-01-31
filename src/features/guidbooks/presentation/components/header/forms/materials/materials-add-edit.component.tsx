@@ -1,7 +1,7 @@
-import { Input } from '@core';
+import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { MaterialsData, type HeaderFormsProps, type IMaterialsAddAndEditForm } from '@features';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 import { FormSubTitle } from '../form-sub-title.components';
 
@@ -74,21 +74,61 @@ export const MaterialsAddAndEdit = memoize(
 						error={formState.errors.density?.message}
 						placeholder="Введите плотность материала"
 						{...form.register('density')}
-						type={'text'}
+						type={'number'}
 					/>
 
 					<Input
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-							formState.errors.density?.message ? 'text-error' : '',
+							formState.errors.thickness?.message ? 'text-error' : '',
 						)}
 						inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 						containerClassName="w-[226px]"
-						label={formState.errors.density?.message || 'Толщина материала, кг/м³'}
-						error={formState.errors.density?.message}
+						label={formState.errors.thickness?.message || 'Толщина материала, кг/м³'}
+						error={formState.errors.thickness?.message}
 						placeholder="Введите толщину материала"
-						{...form.register('density')}
+						{...form.register('thickness')}
 						type={'number'}
+					/>
+
+					<Controller
+						name="materialType"
+						control={control}
+						render={({ field }) => (
+							<Select
+								{...field}
+								value={field.value || ''}
+								options={[{ label: '1', value: '1' }]}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+									formState.errors.materialType?.message ? 'text-error' : '',
+								)}
+								buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+								wrapperClassname="w-[226px] shadow-none"
+								label={formState.errors.materialType?.message || 'Тип материала'}
+								placeholder="Выберите тип материала"
+							/>
+						)}
+					/>
+
+					<Controller
+						name="region"
+						control={control}
+						render={({ field }) => (
+							<Select
+								{...field}
+								value={field.value || ''}
+								options={[{ label: '1', value: '1' }]}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+									formState.errors.region?.message ? 'text-error' : '',
+								)}
+								buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+								wrapperClassname="w-[226px]"
+								label={formState.errors.region?.message || 'Регион'}
+								placeholder="Выберите регион"
+							/>
+						)}
 					/>
 				</div>
 				<FormSubTitle text="Физические свойства" />
