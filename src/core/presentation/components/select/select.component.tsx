@@ -157,6 +157,7 @@ export const Select = memoize(
 							state.isDisabled && 'bg-gray-100',
 							buttonClassName,
 							wrapperClassname,
+							error ? 'ring-error focus:ring-error' : '',
 						);
 					},
 					singleValue: (state) => {
