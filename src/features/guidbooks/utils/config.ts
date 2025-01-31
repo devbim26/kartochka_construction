@@ -1,8 +1,8 @@
 import type { EntityConfig } from '@core';
-import { MaterialsDataSchema } from './validation';
+import { MaterialsAddAndEditDataSchema } from './validation';
 
 export const MaterialsAddAndEditDataConfig: EntityConfig = {
-	schema: MaterialsDataSchema,
+	schema: MaterialsAddAndEditDataSchema,
 	defaultValues: {
 		name: '',
 		description: '',
@@ -24,7 +24,7 @@ export const MaterialsAddAndEditDataConfig: EntityConfig = {
 };
 
 export const MaterialsFilterDataConfig: EntityConfig = {
-	schema: MaterialsDataSchema,
+	schema: MaterialsAddAndEditDataSchema,
 	defaultValues: {
 		name: '',
 		density: '',

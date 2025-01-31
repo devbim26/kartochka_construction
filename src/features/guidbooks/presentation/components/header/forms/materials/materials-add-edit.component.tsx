@@ -77,19 +77,19 @@ export const MaterialsAddAndEdit = memoize(
 						type={'text'}
 					/>
 
-					{/* <Input
+					<Input
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
 							formState.errors.density?.message ? 'text-error' : '',
 						)}
 						inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 						containerClassName="w-[226px]"
-						label={formState.errors.density?.message || 'Плотность материала, кг/м³'}
+						label={formState.errors.density?.message || 'Толщина материала, кг/м³'}
 						error={formState.errors.density?.message}
-						placeholder="Введите плотность материала"
+						placeholder="Введите толщину материала"
 						{...form.register('density')}
 						type={'number'}
-					/> */}
+					/>
 				</div>
 				<FormSubTitle text="Физические свойства" />
 				<div className="flex flex-wrap gap-[23px]"></div>

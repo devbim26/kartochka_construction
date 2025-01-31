@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const MaterialsDataSchema = z.object({
+const MaterialsAddAndEditDataSchema = z.object({
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	shortName: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -12,19 +12,15 @@ const MaterialsDataSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value >= 0, 'Значение должно быть не меньше нуля'),
-	materialType: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value >= 0, 'Значение должно быть не меньше нуля'),
-	//тип материала
-	//регион
-	//тип
+	materialType: z.string().min(1, 'Поле обязательно для заполнения'),
+	region: z.string().min(1, 'Поле обязательно для заполнения'),
+	type: z.string().min(1, 'Поле обязательно для заполнения'),
 	manufacturer: z.string().min(1, 'Поле обязательно для заполнения'),
-	// image: z.object({
-	// 	name: z.string().min(1, 'Логотип не выбран'),
-	// 	data: z.union([z.string(), z.instanceof(ArrayBuffer)]).optional(),
-	// 	url: z.string().optional(),
-	// }),
+	image: z.object({
+		name: z.string().min(1, 'Логотип не выбран'),
+		data: z.union([z.string(), z.instanceof(ArrayBuffer)]).optional(),
+		url: z.string().optional(),
+	}),
 	materialCoefficient: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
@@ -52,6 +48,6 @@ const MaterialsDataSchema = z.object({
 		.refine((value) => +value <= 100, 'Значение должно быть не больше ста'),
 });
 
-type MaterialsDataSchemaType = z.infer<typeof MaterialsDataSchema>;
+type MaterialsDataSchemaType = z.infer<typeof MaterialsAddAndEditDataSchema>;
 
-export { MaterialsDataSchema, type MaterialsDataSchemaType };
+export { MaterialsAddAndEditDataSchema, type MaterialsDataSchemaType };
