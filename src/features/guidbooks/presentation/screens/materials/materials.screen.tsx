@@ -1,14 +1,15 @@
-import { useCallback } from 'react';
-import { type MaterialFormTypes } from '../../types';
 import {
+	GuidbookPageHeaderWrapper,
+	MaterialsAddAndEdit,
 	MaterialsAddAndEditDataConfig,
+	MaterialsFilter,
 	MaterialsFilterDataConfig,
 	useHeaderForm,
-} from '../../utils';
-import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
+} from '@features';
+import { useCallback } from 'react';
 
 const MaterialsPage = () => {
-	const forms = useHeaderForm<MaterialFormTypes>(
+	const forms = useHeaderForm(
 		{
 			filter: MaterialsFilterDataConfig.defaultValues,
 			edit: MaterialsAddAndEditDataConfig.defaultValues,
