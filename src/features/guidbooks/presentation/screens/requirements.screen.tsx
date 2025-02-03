@@ -2,12 +2,15 @@ import { useCallback, useState } from 'react';
 import { RequirementsAddFormDefaultValues, RequirementsFilterFormDefaultValues } from '../../constants/requirements/requirements.constants';
 import { HeaderFormTypes } from '../../types';
 import { useHeaderForm } from '../../utils';
+import { RequirementFormTypes } from '@features/guidbooks/types/requirements.types';
+import { GuidbookPageHeaderWrapper } from '../components';
+import { RequirementsAddAndEdit, RequirementsFilter } from '../components/header/forms/requirements';
 
 export const RequirementsPage = () => {
 	const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
 	);
-	const form = useHeaderForm<MaterialFormTypes>(
+	const form = useHeaderForm<RequirementFormTypes>(
 		{
 			filter: RequirementsFilterFormDefaultValues,
 			edit: RequirementsAddFormDefaultValues,
@@ -30,9 +33,9 @@ export const RequirementsPage = () => {
 				setFormType={setCurrentHeaderFormType}
 				form={form}
 				formElements={{
-					filter: MaterialsFilter,
-					add: MaterialsAddAndEdit,
-					edit: MaterialsAddAndEdit,
+					filter: RequirementsFilter,
+					add: RequirementsAddAndEdit,
+					edit: RequirementsAddAndEdit,
 				}}
 			/>
 			{/* <GuidbookPageTableWrapper /> */}
