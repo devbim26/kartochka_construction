@@ -1,11 +1,7 @@
-import {
-	useForm,
-	type DefaultValues,
-	type FieldValues,
-	type UseFormProps,
-	type UseFormReturn,
-} from 'react-hook-form';
-import { HeaderFormTypes } from '../../types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { DefaultValues, FieldValues, UseFormProps, UseFormReturn } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import type { ZodType } from 'zod';
 
 export const useHeaderForm = <T extends FieldValues>(
 	defObjects: {
@@ -13,16 +9,31 @@ export const useHeaderForm = <T extends FieldValues>(
 		add: DefaultValues<T>;
 		edit: DefaultValues<T>;
 	},
-	currentHeaderFormType: HeaderFormTypes,
+	resolvers: {
+		filter: ZodType<any>;
+		add: ZodType<any>;
+		edit: ZodType<any>;
+	},
 	props?: UseFormProps<T>,
-): UseFormReturn<T> => {
-	return useForm<T>({
-		...props,
-		defaultValues:
-			currentHeaderFormType === HeaderFormTypes.filter
-				? defObjects.filter
-				: currentHeaderFormType === HeaderFormTypes.edit
-					? defObjects.edit
-					: defObjects.add,
-	});
+): { editForm: UseFormReturn<T>; addForm: UseFormReturn<T>; filterForm: UseFormReturn<T> } => {
+	return {
+		editForm: useForm<T>({
+			...props,
+			resolver: zodResolver(resolvers.edit),
+			defaultValues: defObjects.edit,
+			mode: 'onSubmit',
+		}),
+		addForm: useForm<T>({
+			...props,
+			resolver: zodResolver(resolvers.add),
+			defaultValues: defObjects.add,
+			mode: 'onSubmit',
+		}),
+		filterForm: useForm<T>({
+			...props,
+			resolver: zodResolver(resolvers.filter),
+			defaultValues: defObjects.filter,
+			mode: 'onSubmit',
+		}),
+	};
 };

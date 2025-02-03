@@ -7,7 +7,7 @@ import {
 	useAppDispatch,
 } from '@core';
 import { AccountDataConfig, ButtonTitles, fileUpload, FormTitles, updateUser } from '@features';
-import { AccountData } from '@features/account/types/account-data.types';
+import type { AccountData } from '@features/account/types/account-data.types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import { useEffect, useState } from 'react';
@@ -101,12 +101,12 @@ export const AccountForm = () => {
 
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
-			<div className="flex border-b-[1px] px-[24px] py-[18px]">
+			<div className="flex border-b px-[24px] py-[18px]">
 				<p className="font-sans text-lg font-semibold leading-4">
 					{isViewMode ? FormTitles.default : FormTitles.edit}
 				</p>
 			</div>
-			<div className="flex flex-col border-b-[1px] px-[24px] py-[11px]">
+			<div className="flex flex-col border-b px-[24px] py-[11px]">
 				<FormProvider {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)}>
 						<div className="flex flex-col gap-[20px]">
@@ -252,7 +252,6 @@ export const AccountForm = () => {
 										onChange={handleFileChange}
 										className="hidden"
 									/>
-									<p>{logo.name}</p>
 								</div>
 							</div>
 							<Input

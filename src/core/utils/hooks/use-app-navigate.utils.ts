@@ -18,7 +18,7 @@ export const useAppNavigate = () => {
 	const navigate = useNavigate();
 
 	const appNavigate = useCallback(
-		(path: string, searchParams?: SearchParams) => {
+		(path?: string, searchParams?: SearchParams) => {
 			const search = new URLSearchParams(searchParams).toString();
 			navigate(`${path}?${search}`);
 		},
