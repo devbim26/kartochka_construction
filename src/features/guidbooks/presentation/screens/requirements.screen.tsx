@@ -1,22 +1,24 @@
-import { useCallback, useState } from 'react';
-import { RequirementsAddFormDefaultValues, RequirementsFilterFormDefaultValues } from '../../constants/requirements/requirements.constants';
-import { HeaderFormTypes } from '../../types';
-import { useHeaderForm } from '../../utils';
-import { RequirementFormTypes } from '@features/guidbooks/types/requirements.types';
+import { Requirement } from '@features/guidbooks/types/requirements';
+import { useCallback } from 'react';
+import { RequirementsDataConfig, useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper } from '../components';
-import { RequirementsAddAndEdit, RequirementsFilter } from '../components/header/forms/requirements';
+import {
+	RequirementsAddAndEdit,
+	RequirementsFilter,
+} from '../components/header/forms/requirements';
 
 export const RequirementsPage = () => {
-	const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
-			HeaderFormTypes.filter,
-	);
-	const form = useHeaderForm<RequirementFormTypes>(
+	const form = useHeaderForm<Requirement>(
 		{
-			filter: RequirementsFilterFormDefaultValues,
-			edit: RequirementsAddFormDefaultValues,
-			add: RequirementsAddFormDefaultValues
+			filter: RequirementsDataConfig.defaultValues,
+			edit: RequirementsDataConfig.defaultValues,
+			add: RequirementsDataConfig.defaultValues,
 		},
-		currentHeaderFormType,
+		{
+			filter: RequirementsDataConfig.schema,
+			edit: RequirementsDataConfig.schema,
+			add: RequirementsDataConfig.schema,
+		},
 	);
 
 	const onSaveHandle = useCallback(() => {}, []);
@@ -29,9 +31,7 @@ export const RequirementsPage = () => {
 					editTitle: 'Редактировать требования',
 					addTitle: 'Добавить требования',
 				}}
-				formType={currentHeaderFormType}
-				setFormType={setCurrentHeaderFormType}
-				form={form}
+				forms={form}
 				formElements={{
 					filter: RequirementsFilter,
 					add: RequirementsAddAndEdit,

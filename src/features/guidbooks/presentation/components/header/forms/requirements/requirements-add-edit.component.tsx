@@ -1,179 +1,191 @@
-import { Input } from '@core';
+import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { Controller } from 'react-hook-form';
-import { type HeaderFormsProps } from '../../../../../types';
-import { FormSubTitle } from '../form-sub-title.components';
-import { RequirementsAddAndEditFormKeys, type IRequirementsAddAndEditForm } from '@features/guidbooks/types/requirements.types';
+import { RuBuildingTypeSelectValues } from '@features/guidbooks/types/building.types';
+import { RuCategoryClassSelectValues } from '@features/guidbooks/types/class.types';
+import { Requirement } from '@features/guidbooks/types/requirements';
+import { Controller, useFormContext } from 'react-hook-form';
+import { twMerge } from 'tailwind-merge';
+import { RuConstructionTypeSelectValues, RuRegionNamesSelectValues } from '../../../../../types';
 
-//потом где-то будут селекты
-export const RequirementsAddAndEdit = memoize(
-	({ control }: HeaderFormsProps<IRequirementsAddAndEditForm>) => {
-		return (
-			<div className="flex flex-col gap-[23px]">
-				<div className="flex flex-wrap gap-[23px]">
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.Region}
-						render={({ field }) => (
-							<Input
-								{...field}
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label="Регион"
-								placeholder="Введите регион"
-							/>
+export const RequirementsAddAndEdit = memoize(() => {
+	const form = useFormContext<Requirement>();
+	const { setValue, register, control, formState } = form;
+
+	return (
+		<>
+			<Controller
+				control={control}
+				name={'region'}
+				render={({ field }) => (
+					<Select
+						options={RuRegionNamesSelectValues}
+						{...field}
+						value={field.value || ''}
+						label={formState.errors?.region?.message || 'Регион'}
+						isSearchable
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+							formState.errors.region?.message ? 'text-error' : '',
 						)}
+						placeholder="Выберите регион"
+						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
 					/>
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.FirstPlacementRoom}
-						render={({ field }) => (
-							<Input
-								{...field}
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label="Помещение 1"
-								placeholder="Введите помещение 1"
-							/>
+				)}
+			/>
+			<Controller
+				control={control}
+				name={'construction'}
+				render={({ field }) => (
+					<Select
+						options={RuConstructionTypeSelectValues}
+						{...field}
+						value={field.value || ''}
+						label={formState.errors?.construction?.message || 'Конструкция'}
+						isSearchable
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+							formState.errors.construction?.message ? 'text-error' : '',
 						)}
+						placeholder="Выберите конструкцию"
+						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
 					/>
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.SecondPlacementRoom}
-						render={({ field }) => (
-							<Input
-								{...field}
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label="Помещение 2"
-								placeholder="Введите помещение 2"
-							/>
+				)}
+			/>
+			<Input
+				{...register('firstPlacementRoom')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.firstPlacementRoom?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors?.firstPlacementRoom?.message || 'Первое помещение'}
+				placeholder="Введите первое помещение"
+			/>
+			<Input
+				{...register('secondPlacementRoom')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.secondPlacementRoom?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors?.secondPlacementRoom?.message || 'Второе помещение'}
+				placeholder="Введите второе помещение"
+			/>
+			<Controller
+				control={control}
+				name={'buildingType'}
+				render={({ field }) => (
+					<Select
+						options={RuBuildingTypeSelectValues}
+						{...field}
+						value={field.value || ''}
+						label={formState.errors?.buildingType?.message || 'Тип здания'}
+						isSearchable
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+							formState.errors.buildingType?.message ? 'text-error' : '',
 						)}
+						placeholder="Выберите тип здания"
+						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
 					/>
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.BuildingType}
-						render={({ field }) => (
-							<Input
-								{...field}
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label="Тип здания"
-								placeholder="Введите тип"
-							/>
+				)}
+			/>
+			<Input
+				{...register('standartValidityPeriod')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.standartValidityPeriod?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={
+					formState.errors?.standartValidityPeriod?.message || 'Срок действия стандарта'
+				}
+				placeholder="Введите срок действия"
+			/>
+			<Input
+				{...register('standartShortName')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.standartShortName?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors?.standartShortName?.message || 'Название стандарта краткое'}
+				placeholder="Введите название стандарта"
+			/>
+			<Input
+				{...register('standartFullName')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.standartFullName?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors?.standartFullName?.message || 'Название стандарта полное'}
+				placeholder="Введите название стандарта"
+			/>
+			<Controller
+				control={control}
+				name={'class'}
+				render={({ field }) => (
+					<Select
+						options={RuCategoryClassSelectValues}
+						{...field}
+						value={field.value || ''}
+						label={formState.errors?.class?.message || 'Класс'}
+						isSearchable
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+							formState.errors.class?.message ? 'text-error' : '',
 						)}
+						placeholder="Выберите класс"
+						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
 					/>
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.StandardValidityPeriod}
-						render={({ field }) => (
-							<Input
-								{...field}
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label="Срок действия стандарта"
-								placeholder="Введите срок действия"
-							/>
-						)}
-					/>
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.StandardShortName}
-						render={({ field }) => (
-							<Input 
-								{...field} 
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label="Название стандарта краткое" 
-								placeholder="Введите название стандарта" 
-							/>
-						)}
-					/>
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.StandardFullName}
-						render={({ field }) => (
-							<Input 
-								{...field} 
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label="Название стандарта полное" 
-								placeholder="Введите название стандарта" 
-							/>
-						)}
-					/>
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.NoizeIsolationIndex}
-						render={({ field }) => (
-							<Input 
-								{...field} 
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								type="number" 
-								min={0}
-								value={field.value || ''}
-								label="Индекс изоляции воздушного шума" 
-								placeholder="Введите индекс" 
-							/>
-						)}
-					/>
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.NoizeImpactIndex}
-						render={({ field }) => (
-							<Input 
-								{...field} 
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								type="number"
-								min={0} 
-								value={field.value || ''}
-								label="Индекс приведённого уровня ударного шума" 
-								placeholder="Введите индекс" 
-							/>
-						)}
-					/>
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.Class}
-						render={({ field }) => (
-							<Input 
-								{...field} 
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label="Класс" 
-								placeholder="Введите класс" 
-							/>
-						)}
-					/>
-					<Controller
-						control={control}
-						name={RequirementsAddAndEditFormKeys.Notice}
-						render={({ field }) => (
-							<Input 
-								{...field} 
-								labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label="Примечание" 
-								placeholder="Введите примечание" 
-							/>
-						)}
-					/>
-				</div>
-			</div>
-		);
-	},
-	'RequirementsAddAndEdit',
-);
+				)}
+			/>
+			<Input
+				{...register('noizeIsolationIndex')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.noizeIsolationIndex?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={
+					formState.errors?.noizeIsolationIndex?.message ||
+					'Звукоизоляция воздушного шума'
+				}
+				placeholder="Введите значение"
+			/>
+			<Input
+				{...register('noizeImpactIndex')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.noizeImpactIndex?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors?.noizeImpactIndex?.message || 'Звукоизоляция ударного шума'}
+				placeholder="Введите значение"
+			/>
+			<Input
+				{...register('notice')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.notice ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors?.notice?.message || 'Примечание'}
+				placeholder="Введите примечание"
+			/>
+		</>
+	);
+}, 'RequirementsAddAndEdit');

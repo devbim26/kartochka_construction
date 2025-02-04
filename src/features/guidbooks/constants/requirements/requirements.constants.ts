@@ -1,4 +1,4 @@
-import type { IRequirementsAddAndEditForm, IRequirementsFilterForm } from '../../types/requirements.types';
+import type { IRequirementsAddAndEditForm, IRequirementsFilterForm } from '../../types/requirements/requirements.types';
 
 export const RequirementsFilterFormDefaultValues: IRequirementsFilterForm = {
 	region: '',

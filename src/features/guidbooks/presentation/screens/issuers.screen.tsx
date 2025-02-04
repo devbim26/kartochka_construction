@@ -1,22 +1,23 @@
 import { useCallback, useState } from 'react';
-import { IssuersAddFormDefaultValues, IssuersFilterFormDefaultValues } from '../../constants/issuers/issuers.constants';
-import { HeaderFormTypes } from '../../types';
-import { useHeaderForm } from '../../utils';
-import { IssuerFormTypes } from '@features/guidbooks/types/issuers.types';
+import { IssuersDataConfig, useHeaderForm } from '../../utils';
+import { Issuer } from '@features/guidbooks/types/issuer/issuers.types';
 import { GuidbookPageHeaderWrapper } from '../components';
-import { IssuersAddAndEdit, IssuersFilter } from '../components/header/forms/issuers';
+import { IssuersAddEdit } from '../components/header/forms/issuers';
+import { IssuersFilter } from '../components/header/forms/issuers/issuers-filter.component';
 
 const IssuersPage = () => {
-	const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
-		HeaderFormTypes.filter,
-	);
-	const form = useHeaderForm<IssuerFormTypes>(
+
+	const form = useHeaderForm<Issuer>(
 		{
-			filter: IssuersFilterFormDefaultValues,
-			edit: IssuersAddFormDefaultValues,
-			add: IssuersAddFormDefaultValues,
+			filter: IssuersDataConfig.defaultValues,
+			edit: IssuersDataConfig.defaultValues,
+			add: IssuersDataConfig.defaultValues,
 		},
-		currentHeaderFormType,
+		{
+			filter: IssuersDataConfig.schema,
+			edit: IssuersDataConfig.schema,
+			add: IssuersDataConfig.schema,
+		},
 	);
 
 	const onSaveHandle = useCallback(() => {}, []);
@@ -29,13 +30,11 @@ const IssuersPage = () => {
 					editTitle: 'Редактировать производителя',
 					addTitle: 'Добавить производителя',
 				}}
-				formType={currentHeaderFormType}
-				setFormType={setCurrentHeaderFormType}
-				form={form}
+				forms={form}
 				formElements={{
 					filter: IssuersFilter,
-					add: IssuersAddAndEdit,
-					edit: IssuersAddAndEdit,
+					add: IssuersAddEdit,
+					edit: IssuersAddEdit,
 				}}
 			/>
 			{/* <GuidbookPageTableWrapper /> */}

@@ -1,39 +1,55 @@
-import { Input } from '@core';
+import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { Controller } from 'react-hook-form';
-import { IssuersFilterFormKeys, type IIssuersFilterForm } from '../../../../../types/issuers.types';
-import { type HeaderFormsProps } from '../../../../../types';
+import { Controller, useFormContext } from 'react-hook-form';
+import { twMerge } from 'tailwind-merge';
+import { RuCountryNamesSelectValues } from '../../../../../types';
+import { Issuer } from '../../../../../types/issuer/issuers.types';
 
-export const IssuersFilter = memoize(({ control }: HeaderFormsProps<IIssuersFilterForm>) => {
+export const IssuersFilter = memoize(() => {
+	const form = useFormContext<Issuer>();
+	const { setValue, register, control, formState } = form;
+
 	return (
 		<>
-			<Controller
-				control={control}
-				name={IssuersFilterFormKeys.Name}
-				render={({ field }) => (
-					<Input
-						{...field}
-						labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-						inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-						containerClassName="w-[226px]"
-						label="Производитель"
-						placeholder="Введите производителя"
-					/>
+			<Input
+				{...register('name')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.name?.message ? 'text-error' : '',
 				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors?.name?.message || 'Производитель'}
+				placeholder="Введите производителя"
+			/>
+			<Input
+				{...register('webSite')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.webSite?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors?.webSite?.message || 'Сайт'}
+				placeholder="Введите ссылку"
 			/>
 			<Controller
 				control={control}
-				name={IssuersFilterFormKeys.Country}
+				name={'country'}
 				render={({ field }) => (
-					<Input
-						//ПОЗЖЕ ПЕРЕДЕЛАТЬ НА СЕЛЕКТ
+					<Select
+						options={RuCountryNamesSelectValues}
 						{...field}
 						value={field.value || ''}
-						containerClassName="w-[226px]"
-						labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-						inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-						label="Страна"
+						label={formState.errors?.country?.message || 'Страна'}
+						isSearchable
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+							formState.errors.country?.message ? 'text-error' : '',
+						)}
 						placeholder="Выберите страну"
+						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
 					/>
 				)}
 			/>

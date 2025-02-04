@@ -1,5 +1,6 @@
 import type { EntityConfig } from '@core';
-import { MaterialsAddAndEditDataSchema } from './validation';
+import { IssuersSchema, MaterialsAddAndEditDataSchema } from './validation';
+import { RequirementsSchema } from './validation/requirements.validation';
 
 export const MaterialsAddAndEditDataConfig: EntityConfig = {
 	schema: MaterialsAddAndEditDataSchema,
@@ -30,5 +31,31 @@ export const MaterialsFilterDataConfig: EntityConfig = {
 		density: '',
 		thickness: '',
 		materialType: '',
+	},
+};
+
+export const IssuersDataConfig: EntityConfig = {
+	schema: IssuersSchema,
+	defaultValues: {
+		name: '',
+		country: '',
+		logoUrl: '',
+		webSite: '',
+	},
+};
+
+export const RequirementsDataConfig: EntityConfig = {
+	schema: RequirementsSchema,
+	defaultValues: {
+		region: '',
+		secondPlacementRoom: '',
+		firstPlacementRoom: '',
+		buildingType: '',
+		standartShortName: '',
+		standartFullName: '',
+		class: '',
+		noizeIsolationIndex: '',
+		noizeImpactIndex: '',
+		notice: '',
 	},
 };
