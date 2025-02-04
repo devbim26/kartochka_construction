@@ -6,7 +6,7 @@ export const AUTH_FETCH_ROUTES = {
 		async_thunk_route: 'auth/login',
 	},
 	registration: {
-		url: `${process.env.REACT_APP_API_URL}/auth/registration`,
+		url: `${process.env.REACT_APP_API_URL}/account/registration`,
 		fetch_name: 'registration',
 		async_thunk_route: 'auth/registration',
 	},

@@ -4,12 +4,15 @@ import {
 	convertToBase64,
 	FormElementLabel,
 	Input,
+	phoneNumberMask,
 	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMask } from '@react-input/mask';
 import { useEffect, useState } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
@@ -21,6 +24,40 @@ import { authRegistration, fileUpload } from '../../../services';
 import type { RegistrationFormData } from '../../../types';
 import { RegistrationFormDataConfig } from '../../../utils';
 
+const PhoneInput = ({
+	form,
+	index,
+	phoneNumber,
+}: {
+	form: UseFormReturn<RegistrationFormData>;
+	index: number;
+	phoneNumber: { id: string; number: string };
+}) => {
+	const phoneRef = useMask(phoneNumberMask);
+	return (
+		<Input
+			key={phoneNumber.id}
+			label={form.formState.errors.phoneNumbers?.[index]?.number?.message || 'Номер телефона'}
+			labelClassName={
+				form.formState.errors.phoneNumbers?.[index]?.number?.message ? 'text-error' : ''
+			}
+			ref={phoneRef}
+			placeholder="+375 (__) ___-__-__"
+			onChange={(e) => form.setValue(`phoneNumbers.${index}.number`, e.target.value)}
+			error={form.formState.errors.phoneNumbers?.[index]?.message}
+			iconPos="right"
+			iconClassName="w-[40px] h-[40px] text-error right-[2px]"
+			Icon={TiDeleteOutline}
+			onIconClick={() => {
+				const updatedPhoneNumbers = form
+					.watch('phoneNumbers')
+					.filter((ph) => ph.id !== phoneNumber.id);
+				form.setValue('phoneNumbers', updatedPhoneNumbers);
+			}}
+		/>
+	);
+};
+
 const CompanyRegistrationPage = () => {
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
@@ -28,7 +65,6 @@ const CompanyRegistrationPage = () => {
 	const [search] = useSearchParams();
 
 	useEffect(() => {
-		console.log(search.get('phoneNumber'));
 		form.setValue('mainPhoneNumber', search.get('phoneNumber')!);
 	}, [search]);
 
@@ -50,8 +86,6 @@ const CompanyRegistrationPage = () => {
 			}),
 		);
 	};
-
-	console.log(formState.errors);
 
 	useEffect(() => {
 		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.registration.fetch_name &&
@@ -92,9 +126,6 @@ const CompanyRegistrationPage = () => {
 							}
 							error={formState.errors.mainPhoneNumber?.message}
 							disabled
-							{...form.register(`mainPhoneNumber`)}
-							placeholder="+375 (29) 21-21-211"
-							mask="+375 (99) 999-99-99"
 							iconPos="right"
 							iconClassName="w-[40px] h-[40px] text-primary right-[2px]"
 							Icon={phoneNumbers.length < 3 ? AiOutlinePlusCircle : undefined}
@@ -108,30 +139,11 @@ const CompanyRegistrationPage = () => {
 						/>
 						{phoneNumbers &&
 							phoneNumbers.map((phoneNumber, index) => (
-								<Input
-									key={phoneNumber.id}
-									label={
-										formState.errors.phoneNumbers?.[index]?.number?.message ||
-										'Номер телефона'
-									}
-									labelClassName={
-										formState.errors.phoneNumbers?.[index]?.number?.message
-											? 'text-error'
-											: ''
-									}
-									error={formState.errors.phoneNumbers?.[index]?.message}
-									placeholder="+375 (29) 21-21-211"
-									mask="+375 (99) 999-99-99"
-									{...form.register(`phoneNumbers.${index}.number`)}
-									iconPos="right"
-									iconClassName="w-[40px] h-[40px] text-error right-[2px]"
-									Icon={TiDeleteOutline}
-									onIconClick={() => {
-										const updatedPhoneNumbers = phoneNumbers.filter(
-											(ph) => ph.id !== phoneNumber.id,
-										);
-										form.setValue('phoneNumbers', updatedPhoneNumbers);
-									}}
+								<PhoneInput
+									key={crypto.randomUUID()}
+									form={form}
+									index={index}
+									phoneNumber={phoneNumber}
 								/>
 							))}
 					</div>

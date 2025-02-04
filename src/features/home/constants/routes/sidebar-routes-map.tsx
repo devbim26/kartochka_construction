@@ -1,36 +1,36 @@
 import { GUIDBOOKS_ROUTES } from '../../../guidbooks';
-import { HOME_ROUTES, USERS_LIST_ROUTES } from './home-routes';
+import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from './home-routes';
 
 export const HomeRoutesMap = new Map<string, string>([
-	[HOME_ROUTES.account.id, HOME_ROUTES.account.route],
-	[HOME_ROUTES.accounts.id, HOME_ROUTES.accounts.route],
-	[HOME_ROUTES.constructor.id, HOME_ROUTES.constructor.route],
+	[DESIGNING_ROUTES.account.id, DESIGNING_ROUTES.account.route],
+	[DESIGNING_ROUTES.accounts.id, DESIGNING_ROUTES.accounts.route],
+	[DESIGNING_ROUTES.constructor.id, DESIGNING_ROUTES.constructor.route],
 	[
 		GUIDBOOKS_ROUTES.constructions.id,
-		HOME_ROUTES.guidbooks.route + '/' + GUIDBOOKS_ROUTES.constructions.route,
+		DESIGNING_ROUTES.guidbooks.route + '/' + GUIDBOOKS_ROUTES.constructions.route,
 	],
 	[
 		GUIDBOOKS_ROUTES.issuers.id,
-		HOME_ROUTES.guidbooks.route + '/' + GUIDBOOKS_ROUTES.issuers.route,
+		DESIGNING_ROUTES.guidbooks.route + '/' + GUIDBOOKS_ROUTES.issuers.route,
 	],
 	[
 		GUIDBOOKS_ROUTES.materials.id,
-		HOME_ROUTES.guidbooks.route + '/' + GUIDBOOKS_ROUTES.materials.route,
+		DESIGNING_ROUTES.guidbooks.route + '/' + GUIDBOOKS_ROUTES.materials.route,
 	],
 	[
 		GUIDBOOKS_ROUTES.requirements.id,
-		HOME_ROUTES.guidbooks.route + '/' + GUIDBOOKS_ROUTES.requirements.route,
+		DESIGNING_ROUTES.guidbooks.route + '/' + GUIDBOOKS_ROUTES.requirements.route,
 	],
-	[HOME_ROUTES.main.id, HOME_ROUTES.main.route],
-	[HOME_ROUTES.news.id, HOME_ROUTES.news.route],
-	[HOME_ROUTES.reports.id, HOME_ROUTES.reports.route],
-	[HOME_ROUTES.subscribes_constructor.id, HOME_ROUTES.subscribes_constructor.route],
+	[DESIGNING_ROUTES.main.id, DESIGNING_ROUTES.main.route],
+	[DESIGNING_ROUTES.news.id, DESIGNING_ROUTES.news.route],
+	[DESIGNING_ROUTES.reports.id, DESIGNING_ROUTES.reports.route],
+	[DESIGNING_ROUTES.subscribes_constructor.id, DESIGNING_ROUTES.subscribes_constructor.route],
 	[
 		USERS_LIST_ROUTES.client.id,
-		HOME_ROUTES.users_list.route + '/' + USERS_LIST_ROUTES.client.route,
+		DESIGNING_ROUTES.users_list.route + '/' + USERS_LIST_ROUTES.client.route,
 	],
 	[
 		USERS_LIST_ROUTES.manager.id,
-		HOME_ROUTES.users_list.route + '/' + USERS_LIST_ROUTES.manager.route,
+		DESIGNING_ROUTES.users_list.route + '/' + USERS_LIST_ROUTES.manager.route,
 	],
 ]);

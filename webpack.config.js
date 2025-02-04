@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -102,7 +103,7 @@ module.exports = {
 	devServer: {
 		watchFiles: path.resolve(__dirname, './src'),
 		compress: true,
-		open: true,
+		open: ['/landing'],
 		hot: true,
 		port: 3000,
 		historyApiFallback: true,
@@ -111,6 +112,15 @@ module.exports = {
 		},
 		devMiddleware: {
 			stats: 'minimal',
+		},
+		server: {
+			type: 'https',
+			options: {
+				pfx: fs.readFileSync(
+					path.resolve(__dirname, './credentials', 'astra-local.ds.pfx'),
+				),
+				passphrase: 'DSPass2024',
+			},
 		},
 	},
 	plugins: [
