@@ -1,5 +1,6 @@
-import { TableColumn } from '@core/types';
+import { PaginationState, TableColumn } from '@core/types';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import { useState } from 'react';
 import { AutoSizer, Column, Table } from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import { twMerge } from 'tailwind-merge';
@@ -16,22 +17,30 @@ interface SimpleTableProps<T extends object> {
 	classNames?: SimpleTableClassNames;
 	data: Array<T>;
 	columns: TableColumn<T>[];
+	pageSize: number;
 }
 
 export const VTable = memoize(
-	<T extends object>({ classNames, data, columns }: SimpleTableProps<T>) => {
+	<T extends object>({ classNames, data, columns, pageSize }: SimpleTableProps<T>) => {
+		const [paginationState, setPaginationState] = useState<PaginationState>({
+			pageNumber: 1,
+			pageSize: pageSize,
+			totalPages: 21,
+			totalCount: 21,
+		});
+
 		const rowGetter = ({ index }: { index: number }) => data[index];
 
 		return (
-			<div className="flex flex-1 flex-col">
+			<div className="flex h-fit flex-col gap-[30px] rounded-xl bg-white pb-[30px]">
 				<AutoSizer disableHeight>
 					{({ width }) => (
 						<Table
-							height={350}
+							height={490}
 							rowHeight={48}
 							width={width}
 							headerHeight={48}
-							rowCount={data.length}
+							rowCount={paginationState.pageSize}
 							headerRowRenderer={(props) => (
 								<TableHeader
 									{...props}
@@ -44,8 +53,9 @@ export const VTable = memoize(
 							rowRenderer={(props) => (
 								<TableRow
 									{...props}
+									key={props.key}
 									rowClassName={twMerge(
-										'bg-white border-b-[1px] border-b-[#EDEFF2] overflow-x-auto',
+										'bg-none border-b-[1px] border-b-[#EDEFF2] overflow-x-auto',
 										classNames?.rowClassName,
 									)}
 								/>
@@ -53,19 +63,16 @@ export const VTable = memoize(
 							rowGetter={rowGetter}
 						>
 							{columns.map((column) => (
-								<Column key={String(column.id)} {...column} />
+								<Column key={String(column.dataKey)} {...column} />
 							))}
 						</Table>
 					)}
 				</AutoSizer>
 				<Pagination
-					onChange={() => {}}
-					state={{
-						pageNumber: 1,
-						pageSize: 10,
-						totalPages: 99,
-						totalCount: 10,
+					onChange={(page) => {
+						setPaginationState((curr) => ({ ...curr, pageNumber: page }));
 					}}
+					state={paginationState}
 				/>
 			</div>
 		);

@@ -17,7 +17,7 @@ export const PaginationButton = memoize(
 				disabled={disabled}
 				onClick={clickHandle}
 				className={twMerge(
-					'flex h-[32px] w-[32px] items-center justify-center rounded-lg border-[1px] border-[#EDEFF2]',
+					'flex h-[32px] w-[32px] cursor-pointer items-center justify-center rounded-lg border-[1px] border-[#EDEFF2] disabled:cursor-default',
 					selected && 'border-primary text-primary',
 				)}
 			>

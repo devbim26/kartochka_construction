@@ -5,26 +5,176 @@ import { HeaderFormTypes, type MaterialFormTypes } from '../../types';
 import { useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
 
-const tData = [
-	{ id: '1', name: 'lol1', age: 12 },
-	{ id: '1', name: 'lol1', age: 12 },
-	{ id: '1', name: 'lol1', age: 12 },
-	{ id: '3', name: 'lol3', age: 12 },
-	{ id: '3', name: 'lol3', age: 12 },
-	{ id: '3', name: 'lol3', age: 12 },
-	{ id: '3', name: 'lol3', age: 12 },
-	{ id: '3', name: 'lol3', age: 12 },
-	{ id: '3', name: 'lol3', age: 12 },
-	{ id: '3', name: 'lol3', age: 12 },
-	{ id: '3', name: 'lol3', age: 12 },
-	{ id: '3', name: 'lol3', age: 12 },
-	{ id: '3', name: 'lol3', age: 12 },
+const tData: TData[] = [
+	{
+		id: '1',
+		name: 'lol1',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '1',
+		name: 'lol1',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '1',
+		name: 'lol1',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '3',
+		name: 'lol3',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '3',
+		name: 'lol3',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '3',
+		name: 'lol3',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '3',
+		name: 'lol3',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '3',
+		name: 'lol3',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '3',
+		name: 'lol3',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '3',
+		name: 'lol3',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '3',
+		name: 'lol3',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '3',
+		name: 'lol3',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
+	{
+		id: '3',
+		name: 'lol3',
+		age: 12,
+		surname: 'aaa1',
+		exp: 'aaaa23',
+		some: 'ssdfsd',
+		andr: 'sadasd',
+		vanchez: 'sadsad',
+		ni: 'asdsad',
+		vlad: 'asd',
+	},
 ];
 
 interface TData {
 	id: string;
 	name: string;
 	age: number;
+	surname: string;
+	exp: string;
+	some: string;
+	andr: string;
+	vanchez: string;
+	ni: string;
+	vlad: string;
 }
 
 const createColumns = (data: TData[]): TableColumn<TData>[] => {
@@ -34,22 +184,71 @@ const createColumns = (data: TData[]): TableColumn<TData>[] => {
 			dataKey: 'id',
 			label: 'ID',
 			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[100px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[100px]' }),
+			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
 		},
 		{
 			dataKey: 'name',
 			label: 'Имя',
 			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[100px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[100px]' }),
+			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
 		},
 		{
 			dataKey: 'age',
 			label: 'Возраст',
 			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[100px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[100px]' }),
+			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
+		},
+		{
+			dataKey: 'surname',
+			label: 'surname',
+			width: 0,
+			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
+		},
+		{
+			dataKey: 'vanchez',
+			label: 'vanchez',
+			width: 0,
+			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
+		},
+		{
+			dataKey: 'andr',
+			label: 'andr',
+			width: 0,
+			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
+		},
+		{
+			dataKey: 'exp',
+			label: 'exp',
+			width: 0,
+			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
+		},
+		{
+			dataKey: 'ni',
+			label: 'ni',
+			width: 0,
+			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
+		},
+		{
+			dataKey: 'vlad',
+			label: 'vlad',
+			width: 0,
+			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
+		},
+		{
+			dataKey: 'some',
+			label: 'some',
+			width: 0,
+			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
 		},
 	];
 	return mapColumns(columns);
@@ -88,7 +287,7 @@ const MaterialsPage = () => {
 					edit: MaterialsAddAndEdit,
 				}}
 			/>
-			<VTable data={tData} columns={columns} />
+			<VTable data={tData} columns={columns} pageSize={10} />
 		</div>
 	);
 };
