@@ -1,4 +1,4 @@
-import { ColumnCell, ColumnHeader, mapColumns, TableColumn, VTable } from '@core';
+import { ColumnCell, ColumnHeader, mapColumns, VTable, type TableColumn } from '@core';
 import { useCallback, useMemo } from 'react';
 import { type MaterialFormTypes } from '../../types';
 import {

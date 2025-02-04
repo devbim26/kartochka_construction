@@ -1,4 +1,4 @@
-import { TableHeaderRowProps } from 'react-virtualized';
+import type { TableHeaderRowProps } from 'react-virtualized';
 import { twMerge } from 'tailwind-merge';
 
 interface TableHeaderProps extends TableHeaderRowProps {

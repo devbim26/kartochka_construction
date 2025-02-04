@@ -1,4 +1,4 @@
-import { TableCellProps } from 'react-virtualized';
+import type { TableCellProps } from 'react-virtualized';
 import { twMerge } from 'tailwind-merge';
 
 interface ColumnCellProps extends TableCellProps {

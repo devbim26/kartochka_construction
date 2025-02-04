@@ -1,4 +1,4 @@
-import { PaginationState, TableColumn } from '@core/types';
+import type { PaginationState, TableColumn } from '@core/types';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { useState } from 'react';
 import { AutoSizer, Column, Table } from 'react-virtualized';
