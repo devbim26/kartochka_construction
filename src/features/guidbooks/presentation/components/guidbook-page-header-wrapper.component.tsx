@@ -1,5 +1,4 @@
-import { Button, CleanUpIcon, useAppNavigate } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
+import { Button, CleanUpIcon, memoize, useAppNavigate } from '@core';
 import {
 	guidbookHeaderTitlesMap,
 	HeaderFormElements,

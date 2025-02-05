@@ -1,2 +1,2 @@
-export * from './forms';
-export * from './guidbook-page-header-wrapper.component';
+export * from './materials-add-edit.component';
+export * from './materials-filter.component';

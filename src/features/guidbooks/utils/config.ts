@@ -1,8 +1,8 @@
 import type { EntityConfig } from '@core';
-import { MaterialsAddAndEditDataSchema } from './validation';
+import { ConstructionsDataSchema, MaterialsDataSchema } from '@features/guidbooks/utils/validation';
 
 export const MaterialsAddAndEditDataConfig: EntityConfig = {
-	schema: MaterialsAddAndEditDataSchema,
+	schema: MaterialsDataSchema,
 	defaultValues: {
 		name: '',
 		description: '',
@@ -24,11 +24,40 @@ export const MaterialsAddAndEditDataConfig: EntityConfig = {
 };
 
 export const MaterialsFilterDataConfig: EntityConfig = {
-	schema: MaterialsAddAndEditDataSchema,
+	schema: MaterialsDataSchema,
 	defaultValues: {
 		name: '',
 		density: '',
 		thickness: '',
 		materialType: '',
+	},
+};
+
+export const ConstructionsAddAndEditDataConfig: EntityConfig = {
+	schema: ConstructionsDataSchema,
+	defaultValues: {
+		name: '',
+		description: '',
+		priority: '',
+		constructionSource: '',
+		region: '',
+		constructionType: '',
+		manufacturer: '',
+		maxHeight: '',
+		resistanceClass: '',
+		specificationsSource: '',
+		rTotal: [] as string[],
+		index: '',
+		indexValue: '',
+	},
+};
+
+export const ConstructionsFilterDataConfig: EntityConfig = {
+	schema: ConstructionsDataSchema,
+	defaultValues: {
+		name: '',
+		constructionType: '',
+		description: '',
+		region: '',
 	},
 };

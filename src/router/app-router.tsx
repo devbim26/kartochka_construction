@@ -5,6 +5,7 @@ import {
 	AUTH_ROUTES,
 	CodeConfirmPage,
 	CompanyRegistrationPage,
+	ConstructionsScreen,
 	DESIGNING_ROUTES,
 	DevScreen,
 	GuidbooksLauout,
@@ -13,7 +14,7 @@ import {
 	LandingScreen,
 	LoginPage,
 	MainScreen,
-	MaterialsPage,
+	MaterialsScreen,
 	NotFoundScreen,
 	USERS_LIST_ROUTES,
 } from '@features';
@@ -52,10 +53,10 @@ export const AppRouter = () => {
 					element={<DevScreen title="Отчеты" />}
 				/>
 				<Route path={DESIGNING_ROUTES.guidbooks.route} element={<GuidbooksLauout />}>
-					<Route path={GUIDBOOKS_ROUTES.materials.route} element={<MaterialsPage />} />
+					<Route path={GUIDBOOKS_ROUTES.materials.route} element={<MaterialsScreen />} />
 					<Route
 						path={GUIDBOOKS_ROUTES.constructions.route}
-						element={<DevScreen title="Конструкции" />}
+						element={<ConstructionsScreen />}
 					/>
 					<Route
 						path={GUIDBOOKS_ROUTES.requirements.route}

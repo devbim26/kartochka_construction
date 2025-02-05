@@ -1,22 +1,12 @@
-import {
-	Button,
-	convertToBase64,
-	FormElementLabel,
-	Input,
-	memoize,
-	Select,
-	useAppDispatch,
-} from '@core';
-import type { HeaderFormsProps, MaterialsData } from '@features';
-import { fileUpload, FormSubTitle, RuRegionNamesSelectValues } from '@features';
-
+import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
+import { fileUpload, FormSubTitle, MaterialsData, RuRegionNamesSelectValues } from '@features';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
-export const MaterialsAddAndEdit = memoize(({ control }: HeaderFormsProps<MaterialsData>) => {
+export const MaterialsAddAndEdit = () => {
 	const form = useFormContext<MaterialsData>();
 
-	const { formState } = form;
+	const { formState, control } = form;
 
 	const dispatch = useAppDispatch();
 
@@ -40,9 +30,9 @@ export const MaterialsAddAndEdit = memoize(({ control }: HeaderFormsProps<Materi
 	};
 
 	return (
-		<div className="flex flex-col gap-[23px]">
+		<div className="flex flex-col gap-[16px]">
 			<FormSubTitle text="Описание" />
-			<div className="flex flex-wrap gap-[23px]">
+			<div className="flex flex-wrap gap-[16px]">
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
@@ -134,6 +124,7 @@ export const MaterialsAddAndEdit = memoize(({ control }: HeaderFormsProps<Materi
 					render={({ field }) => (
 						<Select
 							{...field}
+							isSearchable
 							value={field.value || ''}
 							options={RuRegionNamesSelectValues}
 							error={formState.errors.region?.message}
@@ -210,7 +201,7 @@ export const MaterialsAddAndEdit = memoize(({ control }: HeaderFormsProps<Materi
 				</div>
 			</div>
 			<FormSubTitle text="Физические свойства" />
-			<div className="flex flex-wrap gap-[23px]">
+			<div className="flex flex-wrap gap-[16px]">
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
@@ -292,4 +283,4 @@ export const MaterialsAddAndEdit = memoize(({ control }: HeaderFormsProps<Materi
 			</div>
 		</div>
 	);
-}, 'MaterialsAddAndEdit');
+};

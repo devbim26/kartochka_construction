@@ -8,7 +8,7 @@ import {
 } from '@features';
 import { useCallback } from 'react';
 
-const MaterialsPage = () => {
+const MaterialsScreen = () => {
 	const forms = useHeaderForm(
 		{
 			filter: MaterialsFilterDataConfig.defaultValues,
@@ -29,8 +29,8 @@ const MaterialsPage = () => {
 				onSave={onSaveHandle}
 				titles={{
 					pageTitle: 'Материалы',
-					editTitle: 'Редактировать материал',
-					addTitle: 'Добавить материал',
+					editTitle: 'Редактирование материала',
+					addTitle: 'Добавление материала',
 				}}
 				forms={forms}
 				formElements={{
@@ -44,4 +44,4 @@ const MaterialsPage = () => {
 	);
 };
 
-export default MaterialsPage;
+export default MaterialsScreen;

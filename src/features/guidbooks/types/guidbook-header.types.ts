@@ -27,3 +27,7 @@ export interface HeaderFormElements<T extends FieldValues> {
 	edit: HeaderElementType<T>;
 	add: HeaderElementType<T>;
 }
+export interface HeaderFormExtraElements<T extends FieldValues> {
+	select: HeaderElementType<T>;
+	specifications: HeaderElementType<T>;
+}

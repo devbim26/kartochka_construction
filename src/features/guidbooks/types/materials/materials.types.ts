@@ -1,4 +1,4 @@
-import { MaterialsDataSchemaType } from '../utils';
+import { MaterialsDataSchemaType } from '@features';
 
 type MaterialsData = MaterialsDataSchemaType;
 

@@ -1,3 +1,3 @@
 import { lazy } from 'react';
 
-export const MaterialsPage = lazy(() => import('./materials.screen'));
+export const MaterialsScreen = lazy(() => import('./materials.screen'));

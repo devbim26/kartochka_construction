@@ -1,15 +1,14 @@
 import { Input, Select } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
-import { HeaderFormsProps, MaterialsData } from '@features';
+import { MaterialsData } from '@features';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
-export const MaterialsFilter = memoize(({ control }: HeaderFormsProps<MaterialsData>) => {
+export const MaterialsFilter = () => {
 	const form = useFormContext<MaterialsData>();
 
-	const { formState } = form;
+	const { formState, control } = form;
 	return (
-		<div className="flex flex-wrap gap-[23px]">
+		<div className="flex flex-wrap gap-[16px]">
 			<Input
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
@@ -71,4 +70,4 @@ export const MaterialsFilter = memoize(({ control }: HeaderFormsProps<MaterialsD
 			/>
 		</div>
 	);
-}, 'MaterialsFilter');
+};
