@@ -1,27 +1,21 @@
-import { useCallback } from 'react';
-import { type MaterialFormTypes } from '../../types';
-import {
-	MaterialsAddAndEditDataConfig,
-	MaterialsFilterDataConfig,
-	useHeaderForm,
-} from '../../utils';
+import { useCallback, useState } from 'react';
+import { MaterialsAddFormDefaultValues, MaterialsFilterFormDefaultValues } from '../../constants';
+import { HeaderFormTypes, type MaterialFormTypes } from '../../types';
+import { useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
 
 const MaterialsPage = () => {
-	const forms = useHeaderForm<MaterialFormTypes>(
-		{
-			filter: MaterialsFilterDataConfig.defaultValues,
-			edit: MaterialsAddAndEditDataConfig.defaultValues,
-			add: MaterialsAddAndEditDataConfig.defaultValues,
-		},
-		{
-			filter: MaterialsFilterDataConfig.schema,
-			edit: MaterialsAddAndEditDataConfig.schema,
-			add: MaterialsAddAndEditDataConfig.schema,
-		},
+	const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
+		HeaderFormTypes.filter,
 	);
+	const form = useHeaderForm<MaterialFormTypes>({
+		filter: MaterialsFilterFormDefaultValues,
+		edit: MaterialsAddFormDefaultValues,
+		add: MaterialsAddFormDefaultValues,
+	});
 
 	const onSaveHandle = useCallback(() => {}, []);
+
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper
@@ -31,14 +25,13 @@ const MaterialsPage = () => {
 					editTitle: 'Редактировать материал',
 					addTitle: 'Добавить материал',
 				}}
-				forms={forms}
+				forms={form}
 				formElements={{
 					filter: MaterialsFilter,
 					add: MaterialsAddAndEdit,
 					edit: MaterialsAddAndEdit,
 				}}
 			/>
-			{/* <GuidbookPageTableWrapper /> */}
 		</div>
 	);
 };
