@@ -18,7 +18,7 @@ const RequirementsSchema = z.object({
 		.min(1, 'Поле обязательно для заполнения')
 		.max(50, 'Название не должно превышать 50 символов'),
 	noizeIsolationIndex: z
-		.string()
+		.number()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value >= 0, 'Значение должно быть больше нуля'),
 	notice: z.string().optional(),

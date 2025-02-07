@@ -1,7 +1,8 @@
 import type { CreateIssuerCommand } from '@api-gen';
 import { Country as ServerCountry } from '@api-gen/api';
 import { createDataRecordConverter } from '@core';
-import { Country as ClientCountry, type FormIssuer } from '@features/guidbooks/types';
+import type { FormIssuer, Issuer } from '@features/guidbooks/types';
+import { Country as ClientCountry } from '@features/guidbooks/types';
 
 const countryMap = createDataRecordConverter({
 	[ClientCountry.None]: ServerCountry.None,
@@ -49,9 +50,12 @@ const countryMap = createDataRecordConverter({
 	[ClientCountry.Ukrain]: ServerCountry.Ukrain,
 });
 
-export const convertToServerIssuerData = (data: FormIssuer): CreateIssuerCommand => ({
+export const convertToServerIssuerData = (data: Issuer): CreateIssuerCommand => ({
 	...data,
-	country: countryMap.toServer[data.country as ClientCountry],
+	name: data.name || null,
+	country: data.country ? countryMap.toServer[data.country as ClientCountry] : undefined,
+	logoUrl: data.logoUrl || null,
+	webSite: data.webSite || null,
 });
 
 export const convertToClientIssuerData = (data: CreateIssuerCommand): FormIssuer => ({
