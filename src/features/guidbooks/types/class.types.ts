@@ -6,8 +6,8 @@ export enum CategoryClass {
 }
 
 export const RuCategoryClassSelectValues = [
-  { label: 'Общий', value: CategoryClass.General },
-  { label: 'А', value: CategoryClass.A },
-  { label: 'Б', value: CategoryClass.B },
-  { label: 'В', value: CategoryClass.C },
+	{ label: 'Общий', value: CategoryClass.General },
+	{ label: 'А', value: CategoryClass.A },
+	{ label: 'Б', value: CategoryClass.B },
+	{ label: 'В', value: CategoryClass.C },
 ];

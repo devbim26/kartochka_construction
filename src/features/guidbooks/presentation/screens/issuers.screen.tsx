@@ -1,22 +1,21 @@
-import { useCallback, useState } from 'react';
-import { IssuersDataConfig, useHeaderForm } from '../../utils';
 import { Issuer } from '@features/guidbooks/types/issuer/issuers.types';
+import { useCallback } from 'react';
+import { IssuersDataConfig, IssuersFormCofig, useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper } from '../components';
 import { IssuersAddEdit } from '../components/header/forms/issuers';
 import { IssuersFilter } from '../components/header/forms/issuers/issuers-filter.component';
 
 const IssuersPage = () => {
-
 	const form = useHeaderForm<Issuer>(
 		{
 			filter: IssuersDataConfig.defaultValues,
-			edit: IssuersDataConfig.defaultValues,
-			add: IssuersDataConfig.defaultValues,
+			edit: IssuersFormCofig.defaultValues,
+			add: IssuersFormCofig.defaultValues,
 		},
 		{
 			filter: IssuersDataConfig.schema,
-			edit: IssuersDataConfig.schema,
-			add: IssuersDataConfig.schema,
+			edit: IssuersFormCofig.schema,
+			add: IssuersFormCofig.schema,
 		},
 	);
 

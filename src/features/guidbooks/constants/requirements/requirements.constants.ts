@@ -1,21 +1,23 @@
-import type { IRequirementsAddAndEditForm, IRequirementsFilterForm } from '../../types/requirements/requirements.types';
+import type { Requirement, RequirementFilter } from '../../types/requirements/requirements.types';
 
-export const RequirementsFilterFormDefaultValues: IRequirementsFilterForm = {
+export const RequirementsFilterFormDefaultValues: RequirementFilter = {
 	region: '',
-	requirement: '',
+	construction: '',
+	firstPlacementRoom: '',
+	secondPlacementRoom: '',
 	buildingType: '',
 };
 
-export const RequirementsAddFormDefaultValues: IRequirementsAddAndEditForm = {
+export const RequirementsAddFormDefaultValues: Requirement = {
 	region: '',
 	construction: '',
-	room1: '',
-	room2: '',
+	class: '',
+	firstPlacementRoom: '',
+	secondPlacementRoom: '',
 	buildingType: '',
-	standardValidity: '',
-	standardShortName: '',
-	standardFullName: '',
-	airNoiseInsulationIndex: null,
-	impactNoiseLevelIndex: null,
-	classification: '',
+	standartValidityPeriod: '',
+	standartShortName: '',
+	standartFullName: '',
+	noizeIsolationIndex: '',
+	notice: '',
 };

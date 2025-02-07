@@ -1,1 +1,1 @@
-export * from './requirements.types'
+export * from './requirements.types';

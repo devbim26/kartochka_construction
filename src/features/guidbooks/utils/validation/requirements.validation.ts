@@ -8,20 +8,36 @@ const RequirementsSchema = z.object({
 	secondPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
 	firstPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
 	buildingType: z.string().min(1, 'Поле обязательно для заполнения'),
-	standartShortName: z.string().min(1, 'Поле обязательно для заполнения'),
-	standartFullName: z.string().min(1, 'Поле обязательно для заполнения'),
+	standartValidityPeriod: z.string().min(1, 'Поле обязательно для заполнения'),
+	standartShortName: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.max(50, 'Название не должно превышать 50 символов'),
+	standartFullName: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.max(50, 'Название не должно превышать 50 символов'),
 	noizeIsolationIndex: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value >= 0, 'Значение должно быть больше нуля'),
-	noizeImpactIndex: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value >= 0, 'Значение должно быть больше нуля'),
 	notice: z.string().optional(),
-	standartValidityPeriod: z.string().min(1, 'Поле обязательно для заполнения'),
+});
+
+const RequirementsFilterSchema = z.object({
+	region: z.string().min(1, 'Поле обязательно для заполнения'),
+	construction: z.string().min(1, 'Поле обязательно для заполнения'),
+	firstPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
+	secondPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
+	buildingType: z.string().min(1, 'Поле обязательно для заполнения'),
 });
 
 type RequirementsDataSchemaType = z.infer<typeof RequirementsSchema>;
+type RequirementsFilterDataSchemaType = z.infer<typeof RequirementsFilterSchema>;
 
-export { RequirementsSchema, type RequirementsDataSchemaType };
+export {
+	RequirementsSchema,
+	RequirementsFilterSchema,
+	type RequirementsDataSchemaType,
+	type RequirementsFilterDataSchemaType,
+};

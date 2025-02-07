@@ -16,6 +16,8 @@ export const IssuersAddEdit = memoize(() => {
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
+		debugger;
+		console.log(file);
 		if (file) {
 			try {
 				const base64 = await convertToBase64(file);
@@ -97,7 +99,7 @@ export const IssuersAddEdit = memoize(() => {
 							variant="primary"
 							className={twMerge(
 								'group flex w-fit flex-row items-center gap-[4px] border-2 border-solid border-primary bg-white',
-								uploadError ? 'border-error bg-red-500' : '',
+								formState.errors.logoUrl?.message ? 'border-error' : '',
 							)}
 							onClick={() => document.getElementById('file-upload')!.click()}
 						>

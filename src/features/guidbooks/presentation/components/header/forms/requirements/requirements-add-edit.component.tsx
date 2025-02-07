@@ -1,8 +1,10 @@
-import { Input, Select } from '@core';
+import { dateMask, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { RuBuildingTypeSelectValues } from '@features/guidbooks/types/building.types';
 import { RuCategoryClassSelectValues } from '@features/guidbooks/types/class.types';
 import { Requirement } from '@features/guidbooks/types/requirements';
+import { RuRoomTypeSelectValues } from '@features/guidbooks/types/room.types';
+import { useMask } from '@react-input/mask';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 import { RuConstructionTypeSelectValues, RuRegionNamesSelectValues } from '../../../../../types';
@@ -10,6 +12,8 @@ import { RuConstructionTypeSelectValues, RuRegionNamesSelectValues } from '../..
 export const RequirementsAddAndEdit = memoize(() => {
 	const form = useFormContext<Requirement>();
 	const { setValue, register, control, formState } = form;
+
+	const dateRef = useMask(dateMask);
 
 	return (
 		<>
@@ -53,27 +57,50 @@ export const RequirementsAddAndEdit = memoize(() => {
 					/>
 				)}
 			/>
-			<Input
-				{...register('firstPlacementRoom')}
-				labelClassName={twMerge(
-					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-					formState.errors.firstPlacementRoom?.message ? 'text-error' : '',
+			<Controller
+				control={control}
+				name={'firstPlacementRoom'}
+				render={({ field }) => (
+					<Select
+						options={RuRoomTypeSelectValues}
+						{...field}
+						value={field.value || ''}
+						label={
+							formState.errors?.firstPlacementRoom?.message || 'Конструкция разделяет'
+						}
+						isSearchable
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+							formState.errors.firstPlacementRoom?.message ? 'text-error' : '',
+						)}
+						placeholder="Выберите первое помещение"
+						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
+					/>
 				)}
-				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-				containerClassName="w-[226px]"
-				label={formState.errors?.firstPlacementRoom?.message || 'Первое помещение'}
-				placeholder="Введите первое помещение"
 			/>
-			<Input
-				{...register('secondPlacementRoom')}
-				labelClassName={twMerge(
-					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-					formState.errors.secondPlacementRoom?.message ? 'text-error' : '',
+			<Controller
+				control={control}
+				name={'secondPlacementRoom'}
+				render={({ field }) => (
+					<Select
+						options={RuRoomTypeSelectValues}
+						{...field}
+						value={field.value || ''}
+						label={
+							formState.errors?.secondPlacementRoom?.message ||
+							'Конструкция разделяет'
+						}
+						isSearchable
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+							formState.errors.secondPlacementRoom?.message ? 'text-error' : '',
+						)}
+						placeholder="Выберите второе помещение"
+						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
+					/>
 				)}
-				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-				containerClassName="w-[226px]"
-				label={formState.errors?.secondPlacementRoom?.message || 'Второе помещение'}
-				placeholder="Введите второе помещение"
 			/>
 			<Controller
 				control={control}
@@ -106,7 +133,8 @@ export const RequirementsAddAndEdit = memoize(() => {
 				label={
 					formState.errors?.standartValidityPeriod?.message || 'Срок действия стандарта'
 				}
-				placeholder="Введите срок действия"
+				ref={dateRef}
+				placeholder="гггг-мм-дд"
 			/>
 			<Input
 				{...register('standartShortName')}
@@ -158,21 +186,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				)}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
-				label={
-					formState.errors?.noizeIsolationIndex?.message ||
-					'Звукоизоляция воздушного шума'
-				}
-				placeholder="Введите значение"
-			/>
-			<Input
-				{...register('noizeImpactIndex')}
-				labelClassName={twMerge(
-					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-					formState.errors.noizeImpactIndex?.message ? 'text-error' : '',
-				)}
-				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-				containerClassName="w-[226px]"
-				label={formState.errors?.noizeImpactIndex?.message || 'Звукоизоляция ударного шума'}
+				label={formState.errors?.noizeIsolationIndex?.message || 'Значение'}
 				placeholder="Введите значение"
 			/>
 			<Input

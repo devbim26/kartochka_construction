@@ -1,5 +1,5 @@
 import type { EntityConfig } from '@core';
-import { IssuersSchema, MaterialsAddAndEditDataSchema } from './validation';
+import { FormIssuerSchema, IssuersSchema, MaterialsAddAndEditDataSchema } from './validation';
 import { RequirementsSchema } from './validation/requirements.validation';
 
 export const MaterialsAddAndEditDataConfig: EntityConfig = {
@@ -44,6 +44,16 @@ export const IssuersDataConfig: EntityConfig = {
 	},
 };
 
+export const IssuersFormCofig: EntityConfig = {
+	schema: FormIssuerSchema,
+	defaultValues: {
+		name: '',
+		country: '',
+		logoUrl: '',
+		webSite: '',
+	},
+};
+
 export const RequirementsDataConfig: EntityConfig = {
 	schema: RequirementsSchema,
 	defaultValues: {
@@ -57,5 +67,7 @@ export const RequirementsDataConfig: EntityConfig = {
 		noizeIsolationIndex: '',
 		noizeImpactIndex: '',
 		notice: '',
+		construction: '',
+		standartValidityPeriod: '',
 	},
 };
