@@ -1,5 +1,6 @@
 import type { InputNumberType } from '@core';
 import type { FieldValues } from 'react-hook-form';
+import type { MaterialsDataSchemaType } from '../utils/validation';
 
 export interface IMaterialsFilterForm extends FieldValues {
 	name: string;
@@ -51,3 +52,7 @@ export const enum MaterialsAddAndEditFormKeys {
 	Damping = 'damping',
 	Solid = 'solid',
 }
+
+type MaterialsData = MaterialsDataSchemaType;
+
+export { type MaterialsData };

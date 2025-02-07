@@ -1,4 +1,4 @@
-import { TableColumn } from '@core/types';
+import type { TableColumn } from '@core/types';
 
 export const mapColumns = <T extends object>(columns: TableColumn<T>[]) =>
 	columns.map((column) => ({

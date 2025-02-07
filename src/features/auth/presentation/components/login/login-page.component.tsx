@@ -4,15 +4,16 @@ import {
 	Input,
 	LogoIcon,
 	LogoTextIcon,
+	phoneNumberMask,
 	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMask } from '@react-input/mask';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
-import { HOME_ROUTES } from '../../../../home';
 import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
 import { authLogin } from '../../../services';
 import type { LoginFormData } from '../../../types';
@@ -26,12 +27,8 @@ const LoginPage = () => {
 
 	useEffect(() => {
 		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name &&
-			navigate(HOME_ROUTES.main.route);
+			navigate(APP_ROUTES.designing.route);
 	}, [authData.fetch_data?.fetch_name]);
-
-	useEffect(() => {
-		console.log(authData);
-	}, [authData]);
 
 	const form = useForm<LoginFormData>({
 		resolver: zodResolver(LoginFormDataConfig.schema),
@@ -47,6 +44,8 @@ const LoginPage = () => {
 	};
 	const { formState } = form;
 
+	const phoneMaskRef = useMask(phoneNumberMask);
+
 	return (
 		<FormProvider {...form}>
 			<div className="flex w-[412px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[21px]">
@@ -61,9 +60,9 @@ const LoginPage = () => {
 							labelClassName={
 								formState.errors.phoneNumber?.message ? 'text-error' : ''
 							}
-							placeholder="+375 (29) 21-21-21"
-							mask="+375 (99) 999-99-99"
-							{...form.register('phoneNumber')}
+							placeholder="+375 (__) ___-__-__"
+							ref={phoneMaskRef}
+							onChange={(e) => form.setValue('phoneNumber', e.target.value)}
 							error={formState.errors.phoneNumber?.message}
 						/>
 						<Input

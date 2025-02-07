@@ -7,8 +7,8 @@ export const APP_ROUTES = {
 		id: 'auth-layout-id',
 		route: '/auth',
 	},
-	home: {
+	designing: {
 		id: 'home-layout-id',
-		route: '/',
+		route: '/designing',
 	},
 };

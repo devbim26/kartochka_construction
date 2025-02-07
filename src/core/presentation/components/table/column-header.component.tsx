@@ -1,5 +1,5 @@
 import { BiSort } from 'react-icons/bi';
-import { TableHeaderProps } from 'react-virtualized';
+import type { TableHeaderProps } from 'react-virtualized';
 import { twMerge } from 'tailwind-merge';
 
 interface ColumnHeaderProps extends TableHeaderProps {

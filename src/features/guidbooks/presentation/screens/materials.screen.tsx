@@ -8,14 +8,11 @@ const MaterialsPage = () => {
 	const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 		HeaderFormTypes.filter,
 	);
-	const form = useHeaderForm<MaterialFormTypes>(
-		{
-			filter: MaterialsFilterFormDefaultValues,
-			edit: MaterialsAddFormDefaultValues,
-			add: MaterialsAddFormDefaultValues,
-		},
-		currentHeaderFormType,
-	);
+	const form = useHeaderForm<MaterialFormTypes>({
+		filter: MaterialsFilterFormDefaultValues,
+		edit: MaterialsAddFormDefaultValues,
+		add: MaterialsAddFormDefaultValues,
+	});
 
 	const onSaveHandle = useCallback(() => {}, []);
 
@@ -28,9 +25,7 @@ const MaterialsPage = () => {
 					editTitle: 'Редактировать материал',
 					addTitle: 'Добавить материал',
 				}}
-				formType={currentHeaderFormType}
-				setFormType={setCurrentHeaderFormType}
-				form={form}
+				forms={form}
 				formElements={{
 					filter: MaterialsFilter,
 					add: MaterialsAddAndEdit,

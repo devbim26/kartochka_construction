@@ -1,13 +1,13 @@
-import { TableHeaderRowProps } from 'react-virtualized';
+import type { TableHeaderRowProps } from 'react-virtualized';
 import { twMerge } from 'tailwind-merge';
 
 interface TableHeaderProps extends TableHeaderRowProps {
 	headerClassName?: string;
 }
 
-export const TableHeader = (props: TableHeaderProps) => {
+export const TableHeader = ({ headerClassName, ...props }: TableHeaderProps) => {
 	return (
-		<div {...props} className={twMerge(props.className, props.headerClassName)}>
+		<div {...props} className={twMerge(props.className, headerClassName)}>
 			{props.columns}
 		</div>
 	);
