@@ -1,5 +1,5 @@
-import { AccountDto } from '@api-gen';
-import { AccountData } from '../types';
+import type { AccountDto } from '@api-gen';
+import type { AccountData } from '../types';
 
 export const convertToServerAccountData = (data: AccountData): AccountDto => ({
 	...data,
@@ -9,5 +9,5 @@ export const convertToServerAccountData = (data: AccountData): AccountDto => ({
 	})),
 	phoneNumber: data.mainPhoneNumber.replaceAll(' ', ''),
 	companyDescription: data.compannyInfo,
-	logoUrl: data.companyLogo.url,
+	logoUrl: data.companyLogo?.url,
 });

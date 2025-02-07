@@ -1,0 +1,79 @@
+import { fetchApi } from '@api-gen';
+import type { GuideBooksCreateDataTypes, GuidebooksFiltersDataTypes } from '../types';
+import { Guidebooks } from '../types';
+
+type BaseProps = {
+	guidebookType: Guidebooks;
+	// converter: (result: GuidebooksType) => GuidebooksType; Идея есть как сделать нет
+};
+
+type PaginatedProps = BaseProps & {
+	data: GuidebooksFiltersDataTypes;
+};
+
+type CreateAndEditProps = BaseProps & {
+	data: GuideBooksCreateDataTypes;
+};
+
+type DeleteProps = BaseProps & {
+	data: { id: string };
+};
+
+type DetailProps = BaseProps & {
+	id: string;
+};
+
+const getGuidebooksPaginatedApiMap = {
+	[Guidebooks.ISSUER]: fetchApi.api.issuerGetPaginatedCreate,
+	[Guidebooks.CONSTRUCTION]: fetchApi.api.constructionGetPaginatedCreate,
+	[Guidebooks.MATERIAL]: fetchApi.api.materialGetPaginatedCreate,
+	[Guidebooks.REQUIREMENT]: fetchApi.api.requirementGetPaginatedCreate,
+};
+
+const getGuidebooksDetailApiMap = {
+	[Guidebooks.ISSUER]: fetchApi.api.issuerDetail,
+	[Guidebooks.CONSTRUCTION]: fetchApi.api.constructionDetail,
+	[Guidebooks.MATERIAL]: fetchApi.api.materialDetail,
+	[Guidebooks.REQUIREMENT]: fetchApi.api.requirementDetail,
+};
+
+const getGuidebooksCreateApiMap = {
+	[Guidebooks.ISSUER]: fetchApi.api.issuerCreate,
+	[Guidebooks.CONSTRUCTION]: fetchApi.api.constructionCreate,
+	[Guidebooks.MATERIAL]: fetchApi.api.materialCreate,
+	[Guidebooks.REQUIREMENT]: fetchApi.api.requirementCreate,
+};
+
+const getGuidebooksEditApiMap = {
+	[Guidebooks.ISSUER]: fetchApi.api.issuerUpdate,
+	[Guidebooks.CONSTRUCTION]: fetchApi.api.constructionUpdate,
+	[Guidebooks.MATERIAL]: fetchApi.api.materialUpdate,
+	[Guidebooks.REQUIREMENT]: fetchApi.api.requirementUpdate,
+};
+
+const getGuidebooksDeleteApiMap = {
+	[Guidebooks.ISSUER]: fetchApi.api.issuerDelete,
+	[Guidebooks.CONSTRUCTION]: fetchApi.api.constructionDelete,
+	[Guidebooks.MATERIAL]: fetchApi.api.materialDelete,
+	[Guidebooks.REQUIREMENT]: fetchApi.api.requirementDelete,
+};
+
+export const getGuidebooksPaginated = async ({ data, guidebookType }: PaginatedProps) => {
+	return await getGuidebooksPaginatedApiMap[guidebookType](data);
+};
+
+export const getGuidebooksDetail = async ({ id, guidebookType }: DetailProps) => {
+	return await getGuidebooksDetailApiMap[guidebookType](id);
+};
+
+export const getGuidebooksCreate = async ({ data, guidebookType }: CreateAndEditProps) => {
+	return await getGuidebooksCreateApiMap[guidebookType](data);
+};
+
+export const getGuidebooksEdit = async ({ data, guidebookType }: CreateAndEditProps) => {
+	return await getGuidebooksEditApiMap[guidebookType](data);
+};
+
+export const getGuidebooksDelete = async ({ data, guidebookType }: DeleteProps) => {
+	return await getGuidebooksDeleteApiMap[guidebookType](data);
+};

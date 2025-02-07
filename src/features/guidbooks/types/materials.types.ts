@@ -1,6 +1,6 @@
 import type { InputNumberType } from '@core';
 import type { FieldValues } from 'react-hook-form';
-import { MaterialsDataSchemaType } from '../utils/validation';
+import type { MaterialsDataSchemaType } from '../utils/validation';
 
 export interface IMaterialsFilterForm extends FieldValues {
 	name: string;

@@ -1,46 +1,31 @@
-import { useCallback } from 'react';
-import { type MaterialFormTypes } from '../../types';
-import {
-	MaterialsAddAndEditDataConfig,
-	MaterialsFilterDataConfig,
-	useHeaderForm,
-} from '../../utils';
-import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '../components';
-
 const MaterialsPage = () => {
-	const forms = useHeaderForm<MaterialFormTypes>(
-		{
-			filter: MaterialsFilterDataConfig.defaultValues,
-			edit: MaterialsAddAndEditDataConfig.defaultValues,
-			add: MaterialsAddAndEditDataConfig.defaultValues,
-		},
-		{
-			filter: MaterialsFilterDataConfig.schema,
-			edit: MaterialsAddAndEditDataConfig.schema,
-			add: MaterialsAddAndEditDataConfig.schema,
-		},
-	);
-
-	const onSaveHandle = useCallback(() => {}, []);
-	return (
-		<div className="flex w-full flex-col gap-[40px]">
-			<GuidbookPageHeaderWrapper
-				onSave={onSaveHandle}
-				titles={{
-					pageTitle: 'Материалы',
-					editTitle: 'Редактировать материал',
-					addTitle: 'Добавить материал',
-				}}
-				forms={forms}
-				formElements={{
-					filter: MaterialsFilter,
-					add: MaterialsAddAndEdit,
-					edit: MaterialsAddAndEdit,
-				}}
-			/>
-			{/* <GuidbookPageTableWrapper /> */}
-		</div>
-	);
+	// const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
+	// 	HeaderFormTypes.filter,
+	// );
+	// const form = useHeaderForm<MaterialFormTypes>({
+	// 	filter: MaterialsFilterFormDefaultValues,
+	// 	edit: MaterialsAddFormDefaultValues,
+	// 	add: MaterialsAddFormDefaultValues,
+	// });
+	// const onSaveHandle = useCallback(() => {}, []);
+	// return (
+	// 	<div className="flex w-full flex-col gap-[40px]">
+	// 		<GuidbookPageHeaderWrapper
+	// 			onSave={onSaveHandle}
+	// 			titles={{
+	// 				pageTitle: 'Материалы',
+	// 				editTitle: 'Редактировать материал',
+	// 				addTitle: 'Добавить материал',
+	// 			}}
+	// 			forms={form}
+	// 			formElements={{
+	// 				filter: MaterialsFilter,
+	// 				add: MaterialsAddAndEdit,
+	// 				edit: MaterialsAddAndEdit,
+	// 			}}
+	// 		/>
+	// 	</div>
+	// );
 };
 
 export default MaterialsPage;
