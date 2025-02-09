@@ -3,7 +3,7 @@ import { z } from 'zod';
 const RequirementsSchema = z.object({
 	id: z.string().optional(),
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
-	construction: z.string().min(1, 'Поле обязательно для заполнения'),
+	construction: z.string().min(1, 'Поле обязательно для заполнения'), //пока нет в свагере
 	class: z.string().min(1, 'Поле обязательно для заполнения'),
 	secondPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
 	firstPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -17,7 +17,7 @@ const RequirementsSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.max(50, 'Название не должно превышать 50 символов'),
-	noizeIsolationIndex: z
+	noizeIsolationIndex: z //будет ещё одно значение
 		.number()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value >= 0, 'Значение должно быть больше нуля'),

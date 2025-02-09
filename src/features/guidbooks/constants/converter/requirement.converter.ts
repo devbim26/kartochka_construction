@@ -11,7 +11,7 @@ import {
 	ConstructionType,
 	Region as ClientRegion,
 } from '@features/guidbooks/types';
-import { type RequirementsDataSchemaType } from '@features/guidbooks/utils/validation/requirements.validation';
+import type { RequirementsDataSchemaType } from '@features/guidbooks/utils/validation/requirements.validation';
 
 const regionMap = createDataRecordConverter({
 	[ClientRegion.None]: ServerRegion.None,
@@ -105,4 +105,20 @@ export const convertToClientRequirementData = (
 	class: convertToServerCategoryClassData(data.class!),
 	noizeIsolationIndex: data.noizeIsolationIndex ?? 0,
 	notice: data.notice ?? '',
+});
+
+export const convertToServerIssuerData = (
+	data: RequirementsDataSchemaType,
+): CreateRequirementCommand => ({
+	...data,
+	secondPlacementRoom: data.secondPlacementRoom || null,
+	firstPlacementRoom: data.firstPlacementRoom || null,
+	buildingType: buildingTypeMap.toServer[data.buildingType as ClientBuildingType] || null,
+	standartShortName: data.standartShortName || null,
+	standartFullName: data.standartFullName || null,
+	region: data.region ? regionMap.toServer[data.region as ClientRegion] : undefined,
+	standartValidityPeriod: data.standartValidityPeriod,
+	class: categoryClassMap.toServer[data.class as ClientCategoryClass],
+	noizeIsolationIndex: data.noizeIsolationIndex,
+	notice: data.notice || null,
 });

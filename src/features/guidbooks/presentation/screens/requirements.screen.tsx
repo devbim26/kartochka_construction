@@ -1,4 +1,4 @@
-import { Requirement } from '@features/guidbooks/types/requirements';
+import type { Requirement } from '@features/guidbooks/types/requirements';
 import { useCallback } from 'react';
 import { RequirementsDataConfig, useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper } from '../components';

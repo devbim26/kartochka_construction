@@ -1,9 +1,8 @@
 import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import { Issuer, RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
-import { RuCountryNamesSelectValues } from '../../../../../types';
-import { Issuer } from '../../../../../types/issuer/issuers.types';
 
 export const IssuersFilter = memoize(() => {
 	const form = useFormContext<Issuer>();

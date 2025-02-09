@@ -5,13 +5,13 @@ import {
 	convertToServerIssuerData,
 } from '@features/guidbooks/constants/converter/issuer.converter';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
-import { Guidebooks } from '@features/guidbooks/types';
+import type { Country } from '@features/guidbooks/types';
+import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
 import type { Issuer } from '@features/guidbooks/types/issuer/issuers.types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { IssuersDataConfig, IssuersFormCofig, useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper } from '../components';
-import { IssuersAddEdit } from '../components/header/forms/issuers';
-import { IssuersFilter } from '../components/header/forms/issuers/issuers-filter.component';
+import { IssuersAddEdit, IssuersFilter } from '../components/header/forms/issuers';
 
 const createColumns = (data: Issuer[]): TableColumn<Issuer>[] => {
 	if (!data) return [];
@@ -28,7 +28,12 @@ const createColumns = (data: Issuer[]): TableColumn<Issuer>[] => {
 			label: 'Страна',
 			width: 0,
 			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			cellRenderer: (props) =>
+				ColumnCell({
+					...props,
+					containerClassName: 'w-[300px]',
+					cellData: RuCountryNamesMap[`${props.cellData as Country}`],
+				}),
 		},
 		{
 			dataKey: 'webSite',

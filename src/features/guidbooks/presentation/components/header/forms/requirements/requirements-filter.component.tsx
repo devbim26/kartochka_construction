@@ -1,11 +1,14 @@
 import { Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import type { RequirementFilter } from '@features/guidbooks/types';
+import {
+	RuConstructionTypeSelectValues,
+	RuRegionNamesSelectValues,
+} from '@features/guidbooks/types';
 import { RuBuildingTypeSelectValues } from '@features/guidbooks/types/building.types';
-import { RequirementFilter } from '@features/guidbooks/types/requirements';
 import { RuRoomTypeSelectValues } from '@features/guidbooks/types/room.types';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
-import { RuConstructionTypeSelectValues, RuRegionNamesSelectValues } from '../../../../../types';
 
 export const RequirementsFilter = memoize(() => {
 	const form = useFormContext<RequirementFilter>();
