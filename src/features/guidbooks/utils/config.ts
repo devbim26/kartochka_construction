@@ -1,8 +1,14 @@
 import type { EntityConfig } from '@core';
-import { ConstructionsDataSchema, MaterialsDataSchema } from '@features/guidbooks/utils/validation';
+import {
+	ConstructionsAddDataSchema,
+	ConstructionsEditDataSchema,
+	ConstructionsFilterDataSchema,
+	MaterialsAddAndEditDataSchema,
+	MaterialsFilterDataSchema,
+} from '@features/guidbooks/utils/validation';
 
 export const MaterialsAddAndEditDataConfig: EntityConfig = {
-	schema: MaterialsDataSchema,
+	schema: MaterialsAddAndEditDataSchema,
 	defaultValues: {
 		name: '',
 		description: '',
@@ -24,7 +30,7 @@ export const MaterialsAddAndEditDataConfig: EntityConfig = {
 };
 
 export const MaterialsFilterDataConfig: EntityConfig = {
-	schema: MaterialsDataSchema,
+	schema: MaterialsFilterDataSchema,
 	defaultValues: {
 		name: '',
 		density: '',
@@ -33,8 +39,8 @@ export const MaterialsFilterDataConfig: EntityConfig = {
 	},
 };
 
-export const ConstructionsAddAndEditDataConfig: EntityConfig = {
-	schema: ConstructionsDataSchema,
+export const ConstructionsAddDataConfig: EntityConfig = {
+	schema: ConstructionsAddDataSchema,
 	defaultValues: {
 		name: '',
 		description: '',
@@ -47,13 +53,56 @@ export const ConstructionsAddAndEditDataConfig: EntityConfig = {
 		resistanceClass: '',
 		specificationsSource: '',
 		rTotal: [] as string[],
-		index: '',
-		indexValue: '',
+		rLab: [] as string[],
+		labIndex: '',
+		labIndexValue: '',
+		heavySingleWall: [
+			{
+				'': {
+					type: '',
+					material: '',
+					thickness: '',
+					density: '',
+				},
+			},
+		],
+	},
+};
+
+export const ConstructionsEditDataConfig: EntityConfig = {
+	schema: ConstructionsEditDataSchema,
+	defaultValues: {
+		name: '',
+		description: '',
+		priority: '',
+		constructionSource: '',
+		region: '',
+		constructionType: '',
+		manufacturer: '',
+		maxHeight: '',
+		resistanceClass: '',
+		specificationsSource: '',
+		rTotal: [] as string[],
+		rLab: [] as string[],
+		rCals: '',
+		labIndex: '',
+		labIndexValue: '',
+		estimatedIndex: '',
+		estimatedIndexValue: '',
+		heavySingleWall: [
+			'',
+			{
+				type: '',
+				material: '',
+				thickness: '',
+				density: '',
+			},
+		],
 	},
 };
 
 export const ConstructionsFilterDataConfig: EntityConfig = {
-	schema: ConstructionsDataSchema,
+	schema: ConstructionsFilterDataSchema,
 	defaultValues: {
 		name: '',
 		constructionType: '',

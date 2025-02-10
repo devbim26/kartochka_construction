@@ -1,6 +1,7 @@
 import {
 	ConstructionsAddAndEdit,
-	ConstructionsAddAndEditDataConfig,
+	ConstructionsAddDataConfig,
+	ConstructionsEditDataConfig,
 	ConstructionsFilter,
 	ConstructionsFilterDataConfig,
 	GuidbookPageHeaderWrapper,
@@ -12,13 +13,13 @@ const ConstructionsScreen = () => {
 	const forms = useHeaderForm(
 		{
 			filter: ConstructionsFilterDataConfig.defaultValues,
-			edit: ConstructionsAddAndEditDataConfig.defaultValues,
-			add: ConstructionsAddAndEditDataConfig.defaultValues,
+			edit: ConstructionsEditDataConfig.defaultValues,
+			add: ConstructionsAddDataConfig.defaultValues,
 		},
 		{
 			filter: ConstructionsFilterDataConfig.schema,
-			edit: ConstructionsAddAndEditDataConfig.schema,
-			add: ConstructionsAddAndEditDataConfig.schema,
+			edit: ConstructionsEditDataConfig.schema,
+			add: ConstructionsAddDataConfig.schema,
 		},
 	);
 

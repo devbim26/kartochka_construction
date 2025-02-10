@@ -1,101 +1,85 @@
-import { memo, useState } from 'react';
+import { memoize } from '@core/utils';
+import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface SwitchProps {
-	className?: string;
+	wrapperClassName?: string;
+	onWrapperClassName?: string;
+	offWrapperClassName?: string;
 	handleClassName?: string;
-	onTextClassName?: string;
-	offTextClassName?: string;
+	activeTextClassName?: string;
+	unactiveTextClassName?: string;
+	onIcon?: React.ReactNode;
+	offIcon?: React.ReactNode;
+	textClassName?: string;
 	onText?: string;
 	offText?: string;
-	onColor?: keyof typeof SWITCH_COLORS | string;
-	offColor?: keyof typeof SWITCH_COLORS | string;
-	onHandleColor?: keyof typeof SWITCH_COLORS | string;
-	offHandleColor?: keyof typeof SWITCH_COLORS | string;
-	onChange?: (isEnabled: boolean) => void;
+	onChange: (isEnabled: boolean) => void;
 }
 
-const SWITCH_COLORS = {
-	primary: '#2175F3',
-	grey: '#6F7276',
-};
-
-export const Switch = memo(
+export const Switch = memoize(
 	({
-		className = '',
-		handleClassName = '',
-		onTextClassName = '',
-		offTextClassName = '',
-		onText = 'On',
-		offText = 'Off',
-		onColor = 'primary',
-		offColor = 'grey',
-		onHandleColor = 'white',
-		offHandleColor = 'white',
+		wrapperClassName,
+		handleClassName,
+		textClassName,
+		activeTextClassName = 'text-primary',
+		unactiveTextClassName = 'text-white',
+		onWrapperClassName = 'bg-primary',
+		offWrapperClassName = 'bg-gray-text',
+		onText,
+		offText,
+		onIcon,
+		offIcon,
 		onChange,
 	}: SwitchProps) => {
 		const [isEnabled, setIsEnabled] = useState(false);
 
 		const handleToggle = () => {
-			const newEnabledState = !isEnabled;
-			setIsEnabled(newEnabledState);
-			if (onChange) {
-				onChange(newEnabledState);
-			}
+			const newState = !isEnabled;
+			setIsEnabled(newState);
+			onChange(newState);
 		};
-
-		const getCurrentColor = (color: keyof typeof SWITCH_COLORS | string) =>
-			SWITCH_COLORS[color as keyof typeof SWITCH_COLORS] || color;
-
-		const currentOnColor = getCurrentColor(onColor);
-		const currentOffColor = getCurrentColor(offColor);
-		const currentOnHandleColor = getCurrentColor(onHandleColor);
-		const currentOffHandleColor = getCurrentColor(offHandleColor);
 
 		return (
 			<div
 				className={twMerge(
-					'relative flex cursor-pointer items-center rounded-full transition duration-300 ease-in-out',
-					className,
+					'relative flex h-[20px] w-[36px] cursor-pointer items-center rounded-full p-[2px] transition duration-300 ease-in-out',
+					isEnabled ? onWrapperClassName : offWrapperClassName,
+					wrapperClassName,
 				)}
 				onClick={handleToggle}
-				style={{ backgroundColor: isEnabled ? currentOnColor : currentOffColor }}
 			>
 				<span
 					className={twMerge(
-						'absolute z-50 transition duration-300 ease-in-out',
-						onTextClassName,
+						'absolute right-0 z-50 flex w-1/2 items-center justify-center transition duration-300 ease-in-out',
+						textClassName,
+						onIcon && 'gap-[5px]',
+						isEnabled ? activeTextClassName : unactiveTextClassName,
 					)}
-					style={{
-						color: isEnabled ? currentOffColor : currentOffHandleColor,
-					}}
 				>
+					{onIcon}
 					{onText}
 				</span>
 				<span
 					className={twMerge(
-						'absolute z-50 transition duration-300 ease-in-out',
-						offTextClassName,
+						'absolute z-50 flex w-1/2 items-center justify-center transition duration-300 ease-in-out',
+						textClassName,
+						offIcon && 'gap-[5px]',
+						!isEnabled ? activeTextClassName : unactiveTextClassName,
 					)}
-					style={{
-						color: isEnabled ? currentOnHandleColor : currentOnColor,
-					}}
 				>
+					{offIcon}
 					{offText}
 				</span>
 				<div
 					className={twMerge(
-						'flex h-full w-1/2 items-center justify-center rounded-full transition-transform duration-300 ease-in-out',
+						'flex h-full w-1/2 items-center justify-center rounded-full bg-white transition-transform duration-300 ease-in-out',
 						isEnabled ? 'translate-x-full' : 'translate-x-0',
 						handleClassName,
 					)}
-					style={{
-						backgroundColor: isEnabled ? currentOnHandleColor : currentOffHandleColor,
-					}}
 				></div>
 			</div>
 		);
 	},
+	'Switch',
 );
-
-Switch.displayName = 'Switch';

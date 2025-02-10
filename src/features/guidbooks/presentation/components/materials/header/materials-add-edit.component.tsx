@@ -1,10 +1,15 @@
 import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
-import { fileUpload, FormSubTitle, MaterialsData, RuRegionNamesSelectValues } from '@features';
+import {
+	fileUpload,
+	FormSubTitle,
+	MaterialsAddAndEditData,
+	RuRegionNamesSelectValues,
+} from '@features';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const MaterialsAddAndEdit = () => {
-	const form = useFormContext<MaterialsData>();
+	const form = useFormContext<MaterialsAddAndEditData>();
 
 	const { formState, control } = form;
 
@@ -179,7 +184,7 @@ export const MaterialsAddAndEdit = () => {
 							formState.errors.image?.url ? 'text-error' : '',
 						)}
 					>
-						{formState.errors.image?.url?.message || 'Логотип компании'}
+						{formState.errors.image?.url?.message || 'Изображение'}
 					</FormElementLabel>
 					<div className="flex">
 						<Button

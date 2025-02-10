@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const MaterialsDataSchema = z.object({
+export const MaterialsAddAndEditDataSchema = z.object({
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	shortName: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -48,6 +48,18 @@ const MaterialsDataSchema = z.object({
 		.refine((value) => +value < 100, 'Значение должно быть меньше ста'),
 });
 
-type MaterialsDataSchemaType = z.infer<typeof MaterialsDataSchema>;
+export const MaterialsFilterDataSchema = z.object({
+	name: z.string().min(1, 'Поле обязательно для заполнения'),
+	density: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	thickness: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	materialType: z.string().min(1, 'Поле обязательно для заполнения'),
+});
 
-export { MaterialsDataSchema, type MaterialsDataSchemaType };
+export type MaterialsAddAndEditData = z.infer<typeof MaterialsAddAndEditDataSchema>;
+export type MaterialsFilterData = z.infer<typeof MaterialsFilterDataSchema>;

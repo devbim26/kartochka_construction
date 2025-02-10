@@ -1,10 +1,10 @@
 import { Input, Select } from '@core';
-import { ConstructionsData, RuRegionNamesSelectValues } from '@features';
+import { ConstructionsFilterData, RuRegionNamesSelectValues } from '@features';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const ConstructionsFilter = () => {
-	const form = useFormContext<ConstructionsData>();
+	const form = useFormContext<ConstructionsFilterData>();
 
 	const { formState, control } = form;
 	return (
