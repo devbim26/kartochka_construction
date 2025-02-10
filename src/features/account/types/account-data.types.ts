@@ -1,4 +1,4 @@
-import { AccountDataSchemaType } from '../utils';
+import type { AccountDataSchemaType } from '../utils';
 
 type AccountData = AccountDataSchemaType;
 

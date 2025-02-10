@@ -1,7 +1,7 @@
 import { fetchApi } from '@api-gen';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ACCOUNT_FETCH_ROUTES } from '../constants';
-import { AccountData } from '../types';
+import type { AccountData } from '../types';
 
 export const getCurrentUser = createAsyncThunk(
 	ACCOUNT_FETCH_ROUTES.getCurrent.async_thunk_route,

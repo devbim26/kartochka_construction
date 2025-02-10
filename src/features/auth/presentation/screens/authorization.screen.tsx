@@ -1,13 +1,14 @@
 import { APP_ROUTES, LogoIcon, LogoTextIcon, PageLoader } from '@core';
+import { AUTH_ROUTES } from '@features/auth/constants';
 import { Suspense, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { AUTH_ROUTES } from '../../constants';
 
 export const AuthorizationScreen = () => {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		navigate(`${APP_ROUTES.auth.route}/${AUTH_ROUTES.login.route}`);
+		if (!location.pathname.startsWith(`/auth/login`))
+			navigate(`${APP_ROUTES.auth.route}/${AUTH_ROUTES.login.route}`);
 	}, []);
 
 	return (
