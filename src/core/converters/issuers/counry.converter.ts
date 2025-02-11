@@ -1,10 +1,8 @@
-import type { CreateIssuerCommand } from '@api-gen';
 import { Country as ServerCountry } from '@api-gen/api';
-import { createDataRecordConverter } from '@core';
-import type { FormIssuer, Issuer } from '@features/guidbooks/types';
+import { createDataRecordConverter } from '@core/utils';
 import { Country as ClientCountry } from '@features/guidbooks/types';
 
-const countryMap = createDataRecordConverter({
+export const countryMap = createDataRecordConverter({
 	[ClientCountry.None]: ServerCountry.None,
 	[ClientCountry.Albania]: ServerCountry.Albania,
 	[ClientCountry.Andorra]: ServerCountry.Andorra,
@@ -48,20 +46,4 @@ const countryMap = createDataRecordConverter({
 	[ClientCountry.Sweden]: ServerCountry.Sweden,
 	[ClientCountry.Switzerland]: ServerCountry.Switzerland,
 	[ClientCountry.Ukrain]: ServerCountry.Ukrain,
-});
-
-export const convertToServerIssuerData = (data: Issuer): CreateIssuerCommand => ({
-	...data,
-	name: data.name || null,
-	country: data.country ? countryMap.toServer[data.country as ClientCountry] : undefined,
-	logoUrl: data.logoUrl || null,
-	webSite: data.webSite || null,
-});
-
-export const convertToClientIssuerData = (data: CreateIssuerCommand): FormIssuer => ({
-	...data,
-	name: data.name ?? '', // Если name null, заменяем на пустую строку
-	country: data.country ? countryMap.toClient[data.country] : ClientCountry.None,
-	logoUrl: data.logoUrl ?? '',
-	webSite: data.webSite ?? '',
 });

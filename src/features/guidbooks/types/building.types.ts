@@ -7,6 +7,15 @@ export enum BuildingType {
 	PreschoolEducationalInstitutions = 'PreschoolEducationalInstitutions',
 }
 
+export const RuBuildingTypeNamesMap = {
+	ResidentialBuildings: 'Жилые здания',
+	Hotel: 'Отель',
+	AdministrativeBuildings: 'Административные здания',
+	Hospital: 'Больница',
+	EducationalInstitutions: 'Образовательные учреждения',
+	PreschoolEducationalInstitutions: 'Дошкольные образовательные учреждения',
+};
+
 export const RuBuildingTypeSelectValues = [
 	{ label: 'Жилые здания', value: BuildingType.ResidentialBuildings },
 	{ label: 'Отель', value: BuildingType.Hotel },

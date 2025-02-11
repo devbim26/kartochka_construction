@@ -1,7 +1,8 @@
 import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { fileUpload } from '@features/auth';
-import { FormIssuer, RuCountryNamesSelectValues } from '@features/guidbooks/types';
+import type { FormIssuer } from '@features/guidbooks/types';
+import { RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
@@ -121,7 +122,7 @@ export const IssuersAddEdit = memoize(() => {
 						<img
 							src={preview}
 							alt="Превью изображения"
-							className="h-[60px] w-[60px] rounded-md object-cover"
+							className="size-[60px] rounded-md object-cover"
 						/>
 					</div>
 				)}

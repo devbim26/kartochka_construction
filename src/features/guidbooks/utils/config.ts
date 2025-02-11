@@ -65,7 +65,7 @@ export const RequirementsDataConfig: EntityConfig = {
 		standartFullName: '',
 		class: '',
 		noizeIsolationIndex: '',
-		noizeImpactIndex: '',
+		noizeImpactIndex: '1',
 		notice: '',
 		construction: '',
 		standartValidityPeriod: '',

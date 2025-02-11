@@ -1,7 +1,9 @@
 import { dateMask, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import {
+	ConstructionType,
 	RuConstructionTypeSelectValues,
+	RuRegionNamesMap,
 	RuRegionNamesSelectValues,
 } from '@features/guidbooks/types';
 import { RuBuildingTypeSelectValues } from '@features/guidbooks/types/building.types';
@@ -14,9 +16,10 @@ import { twMerge } from 'tailwind-merge';
 
 export const RequirementsAddAndEdit = memoize(() => {
 	const form = useFormContext<Requirement>();
-	const { setValue, register, control, formState } = form;
-
+	const { setValue, register, control, formState, watch } = form;
 	const dateRef = useMask(dateMask);
+
+	const construction = watch('construction');
 
 	return (
 		<>
@@ -25,7 +28,12 @@ export const RequirementsAddAndEdit = memoize(() => {
 				name={'region'}
 				render={({ field }) => (
 					<Select
-						options={RuRegionNamesSelectValues}
+						options={[
+							{ label: RuRegionNamesMap.None, value: RuRegionNamesMap.None },
+							...RuRegionNamesSelectValues.filter(
+								(reg) => reg.label !== RuRegionNamesMap.None,
+							).sort((a, b) => a.label.localeCompare(b.label)),
+						]}
 						{...field}
 						value={field.value || ''}
 						label={formState.errors?.region?.message || 'Регион'}
@@ -65,8 +73,11 @@ export const RequirementsAddAndEdit = memoize(() => {
 				name={'construction'}
 				render={({ field }) => (
 					<Select
+						onChange={(value) => {
+							setValue('noizeImpactIndex', '');
+							setValue('construction', value as string);
+						}}
 						options={RuConstructionTypeSelectValues}
-						{...field}
 						value={field.value || ''}
 						label={formState.errors?.construction?.message || 'Конструкция'}
 						isSearchable
@@ -127,6 +138,9 @@ export const RequirementsAddAndEdit = memoize(() => {
 			/>
 			<Input
 				{...register('standartValidityPeriod')}
+				// onChange={(event) => {
+				// 	setValue('standartValidityPeriod', event.target.value);
+				// }}
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.standartValidityPeriod?.message ? 'text-error' : '',
@@ -136,8 +150,8 @@ export const RequirementsAddAndEdit = memoize(() => {
 				label={
 					formState.errors?.standartValidityPeriod?.message || 'Срок действия стандарта'
 				}
-				ref={dateRef}
-				placeholder="гггг-мм-дд"
+				placeholder="Введите дату"
+				// ref={dateRef}
 			/>
 			<Input
 				{...register('standartShortName')}
@@ -189,9 +203,22 @@ export const RequirementsAddAndEdit = memoize(() => {
 				)}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
-				label={formState.errors?.noizeIsolationIndex?.message || 'Значение'}
+				label={formState.errors?.noizeIsolationIndex?.message || 'Индекс воздушного шума'}
 				placeholder="Введите значение"
 			/>
+			{construction === ConstructionType.WallsAndPartitions && (
+				<Input
+					{...register('noizeImpactIndex')}
+					labelClassName={twMerge(
+						'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+						formState.errors.noizeImpactIndex?.message ? 'text-error' : '',
+					)}
+					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+					containerClassName="w-[226px]"
+					label={formState.errors?.noizeImpactIndex?.message || 'Индекс ударного шума'}
+					placeholder="Введите значение"
+				/>
+			)}
 			<Input
 				{...register('notice')}
 				labelClassName={twMerge(

@@ -1,17 +1,18 @@
-import type { CreateRequirementCommand } from '@api-gen';
+import type { CreateRequirementCommand, RequirementDto } from '@api-gen';
 import {
 	BuildingType as ServerBuildingType,
 	CategoryClass as ServerCategoryClass,
 	Region as ServerRegion,
 } from '@api-gen/api';
 import { createDataRecordConverter } from '@core';
+import type { RequirementFilter } from '@features/guidbooks/types';
 import {
 	BuildingType as ClientBuildingType,
 	CategoryClass as ClientCategoryClass,
 	ConstructionType,
 	Region as ClientRegion,
 } from '@features/guidbooks/types';
-import type { RequirementsDataSchemaType } from '@features/guidbooks/utils/validation/requirements.validation';
+import type { RequirementsDataSchemaType } from '@features/guidbooks/utils';
 
 const regionMap = createDataRecordConverter({
 	[ClientRegion.None]: ServerRegion.None,
@@ -90,24 +91,39 @@ export const convertToServerCategoryClassData = (
 	return categoryClassMap.toServer[type];
 };
 
+export const convertToClientBuildingTypeData = (type: ServerBuildingType): ClientBuildingType => {
+	return buildingTypeMap.toClient[type];
+};
+
+export const convertToClientRegionData = (type: ServerRegion): ClientRegion => {
+	return regionMap.toClient[type];
+};
+
+export const convertToClientCategoryClassData = (
+	type: ServerCategoryClass,
+): ClientCategoryClass => {
+	return categoryClassMap.toClient[type];
+};
+
 export const convertToClientRequirementData = (
-	data: CreateRequirementCommand,
+	data: RequirementDto,
 ): RequirementsDataSchemaType => ({
 	...data,
 	construction: ConstructionType.WallsAndPartitions,
 	secondPlacementRoom: data.secondPlacementRoom ?? '',
 	firstPlacementRoom: data.firstPlacementRoom ?? '',
-	buildingType: convertToServerBuildingTypeData(data.buildingType!),
+	buildingType: convertToClientBuildingTypeData(data.buildingType!)! as string,
 	standartShortName: data.standartShortName ?? '',
 	standartFullName: data.standartFullName ?? '',
-	region: convertToServerRegionData(data.region!),
+	region: convertToClientRegionData(data.region!)! as string,
 	standartValidityPeriod: data.standartValidityPeriod ?? '',
-	class: convertToServerCategoryClassData(data.class!),
-	noizeIsolationIndex: data.noizeIsolationIndex ?? 0,
+	class: convertToClientCategoryClassData(data.class!)! as string,
+	noizeIsolationIndex: String(data.noizeIsolationIndex),
+	noizeImpactIndex: String(data.noizeImpactIndex),
 	notice: data.notice ?? '',
 });
 
-export const convertToServerIssuerData = (
+export const convertToServerRequirementData = (
 	data: RequirementsDataSchemaType,
 ): CreateRequirementCommand => ({
 	...data,
@@ -121,4 +137,14 @@ export const convertToServerIssuerData = (
 	class: categoryClassMap.toServer[data.class as ClientCategoryClass],
 	noizeIsolationIndex: data.noizeIsolationIndex,
 	notice: data.notice || null,
+});
+
+export const convertToServerFilterRequirementData = (
+	data: RequirementFilter,
+): CreateRequirementCommand => ({
+	...data,
+	secondPlacementRoom: data.secondPlacementRoom || null,
+	firstPlacementRoom: data.firstPlacementRoom || null,
+	buildingType: buildingTypeMap.toServer[data.buildingType as ClientBuildingType] || null,
+	region: data.region ? regionMap.toServer[data.region as ClientRegion] : undefined,
 });

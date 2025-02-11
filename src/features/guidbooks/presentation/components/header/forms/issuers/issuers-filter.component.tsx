@@ -1,6 +1,7 @@
 import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { Issuer, RuCountryNamesSelectValues } from '@features/guidbooks/types';
+import type { Issuer } from '@features/guidbooks/types';
+import { RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
