@@ -17,8 +17,6 @@ export const IssuersAddEdit = memoize(() => {
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
-		debugger;
-		console.log(file);
 		if (file) {
 			try {
 				const base64 = await convertToBase64(file);

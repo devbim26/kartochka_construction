@@ -23,7 +23,7 @@ const FormIssuerSchema = z.object({
 		.min(1, 'Поле обязательно для заполнения')
 		.max(50, 'Название не должно превышать 50 символов'),
 	country: z.string().min(1, 'Поле обязательно для заполнения'),
-	logoUrl: z.string(),
+	logoUrl: z.string().min(1, 'Поле обязательно для заполнения'),
 	webSite: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')

@@ -11,11 +11,11 @@ export const DeleteIcon = ({ className, onClick }: Props) => {
 		<div
 			onClick={onClick}
 			className={twMerge(
-				'flex size-[32px] cursor-pointer items-center justify-center rounded-[8px] border border-error bg-[#F86F6F]/60',
+				'flex size-[32px] cursor-pointer items-center justify-center rounded-[8px] border border-error bg-[#F86F6F]/20',
 				className,
 			)}
 		>
-			<RiDeleteBin6Line className="text-error" />
+			<RiDeleteBin6Line className="size-[20px] text-error" />
 		</div>
 	);
 };

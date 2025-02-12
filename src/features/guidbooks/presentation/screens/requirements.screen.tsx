@@ -131,7 +131,6 @@ export const RequirementsPage = () => {
 	const onEditHandle = useCallback(() => {
 		handleEditTableData(form.editForm.getValues());
 	}, []);
-	console.log(!!search.get('add'));
 
 	const handleDeleteTableData = async (id: string) => {
 		try {
@@ -255,13 +254,13 @@ export const RequirementsPage = () => {
 						containerClassName: 'w-[300px]',
 						cellData: (
 							<div className="flex gap-2">
-								<DeleteIcon
-									onClick={() => handleDeleteTableData(props.cellData as string)}
-								/>
 								<EditIcon
 									onClick={() =>
 										navigate('', { edit: 'true', entityId: props.cellData })
 									}
+								/>
+								<DeleteIcon
+									onClick={() => handleDeleteTableData(props.cellData as string)}
 								/>
 							</div>
 						),

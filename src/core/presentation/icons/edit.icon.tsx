@@ -11,11 +11,11 @@ export const EditIcon = ({ className, onClick }: Props) => {
 		<div
 			onClick={onClick}
 			className={twMerge(
-				'flex size-[32px] cursor-pointer items-center justify-center rounded-[8px] border border-primary bg-primary/30',
+				'flex size-[32px] cursor-pointer items-center justify-center rounded-[8px] border border-primary bg-primary/20',
 				className,
 			)}
 		>
-			<CiEdit className="text-primary" />
+			<CiEdit className="size-[20px] text-primary" />
 		</div>
 	);
 };
