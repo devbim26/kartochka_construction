@@ -3,6 +3,7 @@ import { memoize } from '@core/utils/hoc/memo.utils';
 import type { RequirementFilter } from '@features/guidbooks/types';
 import {
 	RuConstructionTypeSelectValues,
+	RuRegionNamesMap,
 	RuRegionNamesSelectValues,
 } from '@features/guidbooks/types';
 import { RuBuildingTypeSelectValues } from '@features/guidbooks/types/building.types';
@@ -21,7 +22,12 @@ export const RequirementsFilter = memoize(() => {
 				name={'region'}
 				render={({ field }) => (
 					<Select
-						options={RuRegionNamesSelectValues}
+						options={[
+							{ label: RuRegionNamesMap.None, value: RuRegionNamesMap.None },
+							...RuRegionNamesSelectValues.filter(
+								(reg) => reg.label !== RuRegionNamesMap.None,
+							).sort((a, b) => a.label.localeCompare(b.label)),
+						]}
 						{...field}
 						value={field.value || ''}
 						label={formState.errors?.region?.message || 'Регион'}

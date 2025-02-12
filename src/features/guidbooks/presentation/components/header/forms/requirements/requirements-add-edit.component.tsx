@@ -151,6 +151,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 					formState.errors?.standartValidityPeriod?.message || 'Срок действия стандарта'
 				}
 				placeholder="Введите дату"
+				max={10}
 				// ref={dateRef}
 			/>
 			<Input
@@ -163,6 +164,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				containerClassName="w-[226px]"
 				label={formState.errors?.standartShortName?.message || 'Название стандарта краткое'}
 				placeholder="Введите название стандарта"
+				max={50}
 			/>
 			<Input
 				{...register('standartFullName')}
@@ -174,6 +176,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				containerClassName="w-[226px]"
 				label={formState.errors?.standartFullName?.message || 'Название стандарта полное'}
 				placeholder="Введите название стандарта"
+				max={10}
 			/>
 			<Controller
 				control={control}
@@ -205,6 +208,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				containerClassName="w-[226px]"
 				label={formState.errors?.noizeIsolationIndex?.message || 'Индекс воздушного шума'}
 				placeholder="Введите значение"
+				type="number"
 			/>
 			{construction === ConstructionType.WallsAndPartitions && (
 				<Input
@@ -217,6 +221,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 					containerClassName="w-[226px]"
 					label={formState.errors?.noizeImpactIndex?.message || 'Индекс ударного шума'}
 					placeholder="Введите значение"
+					type="number"
 				/>
 			)}
 			<Input
@@ -229,6 +234,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				containerClassName="w-[226px]"
 				label={formState.errors?.notice?.message || 'Примечание'}
 				placeholder="Введите примечание"
+				max={200}
 			/>
 		</>
 	);

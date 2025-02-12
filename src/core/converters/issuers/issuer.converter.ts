@@ -1,7 +1,7 @@
 import type { CreateIssuerCommand, IssuerDto } from '@api-gen';
 import type { FormIssuer, Issuer } from '@features/guidbooks/types';
 import { Country as ClientCountry } from '@features/guidbooks/types';
-import { countryMap } from './counry.converter';
+import { countryMap } from '../counry.converter';
 
 export const convertToServerIssuerData = (data: Issuer): CreateIssuerCommand => ({
 	...data,

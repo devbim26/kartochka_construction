@@ -1,7 +1,10 @@
 import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import type { Issuer } from '@features/guidbooks/types';
-import { RuCountryNamesSelectValues } from '@features/guidbooks/types';
+import {
+	RuCountryNamesMap,
+	RuCountryNamesSelectValues,
+	type Issuer,
+} from '@features/guidbooks/types';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -21,6 +24,7 @@ export const IssuersFilter = memoize(() => {
 				containerClassName="w-[226px]"
 				label={formState.errors?.name?.message || 'Производитель'}
 				placeholder="Введите производителя"
+				max={50}
 			/>
 			<Input
 				{...register('webSite')}
@@ -38,7 +42,12 @@ export const IssuersFilter = memoize(() => {
 				name={'country'}
 				render={({ field }) => (
 					<Select
-						options={RuCountryNamesSelectValues}
+						options={[
+							{ label: RuCountryNamesMap.None, value: RuCountryNamesMap.None },
+							...RuCountryNamesSelectValues.filter(
+								(reg) => reg.label !== RuCountryNamesMap.None,
+							).sort((a, b) => a.label.localeCompare(b.label)),
+						]}
 						{...field}
 						value={field.value || ''}
 						label={formState.errors?.country?.message || 'Страна'}
