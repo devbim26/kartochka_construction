@@ -30,16 +30,14 @@ const PhoneInput = ({
 	return (
 		<Input
 			key={phoneNumber.id}
-			label={form.formState.errors.phoneNumbers?.[index]?.number?.message || 'Номер телефона'}
-			labelClassName={
-				form.formState.errors.phoneNumbers?.[index]?.number?.message ? 'text-error' : ''
-			}
 			ref={phoneRef}
 			placeholder="+375 (__) ___-__-__"
 			onChange={(e) => form.setValue(`phoneNumbers.${index}.number`, e.target.value)}
+			wrapperClassName="flex-row items-center gap-[10px]"
+			inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 			error={form.formState.errors.phoneNumbers?.[index]?.message}
 			iconPos="right"
-			iconClassName="w-[40px] h-[40px] text-error right-[2px]"
+			iconClassName="size-[25px] text-error right-[2px]"
 			Icon={TiDeleteOutline}
 			onIconClick={() => {
 				const updatedPhoneNumbers = form
@@ -53,6 +51,7 @@ const PhoneInput = ({
 
 export const AccountForm = () => {
 	const [isViewMode, setIsViewMode] = useState(true);
+	const [preview, setPreview] = useState<string | null>(null);
 
 	const form = useForm<AccountData>({
 		resolver: zodResolver(AccountDataConfig.schema),
@@ -63,7 +62,6 @@ export const AccountForm = () => {
 	const { register, setValue, watch, formState } = form;
 
 	const onSubmit = () => {
-		console.log(123);
 		dispatch(
 			updateUser({
 				...form.getValues(),
@@ -74,18 +72,17 @@ export const AccountForm = () => {
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
 		if (file) {
-			form.setValue('companyLogo.name', file.name);
 			const base64 = await convertToBase64(file);
 			const fileData = await file.arrayBuffer();
 			if (base64) {
-				form.setValue('companyLogo.data', base64);
+				setPreview(String(base64));
 				dispatch(
 					fileUpload({
 						data: { mimeType: file.type, isPublic: true },
 						file: fileData,
 					}),
 				);
-				form.setValue('companyLogo.url', '123');
+				form.setValue('companyLogo', '123');
 			}
 		}
 	};
@@ -111,22 +108,40 @@ export const AccountForm = () => {
 				<FormProvider {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)}>
 						<div className="flex flex-col gap-[20px]">
-							<div className="flex flex-col gap-[8px] text-[14px] placeholder:text-input-label-primary">
+							<Input
+								label={formState.errors.companyName?.message || 'Название'}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+									formState.errors.companyName?.message ? 'text-error' : '',
+								)}
+								wrapperClassName="flex-row items-center gap-[10px]"
+								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+								error={formState.errors.companyName?.message}
+								{...form.register('companyName')}
+								maxLength={50}
+								type={'text'}
+								placeholder="Введите название компании"
+								max={50}
+							/>
+							<div className="flex flex-wrap gap-[8px] text-[14px] placeholder:text-input-label-primary">
 								<Input
 									label={
 										formState.errors.mainPhoneNumber?.message ||
 										'Номера телефонов'
 									}
-									labelClassName={
+									labelClassName={twMerge(
+										'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 										formState.errors.mainPhoneNumber?.message
 											? 'text-error'
-											: ''
-									}
+											: '',
+									)}
+									wrapperClassName="flex-row items-center gap-[10px]"
+									inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 									error={formState.errors.mainPhoneNumber?.message}
 									disabled
 									defaultValue={watch('mainPhoneNumber') || '+375(33)-606-13-82'}
 									iconPos="right"
-									iconClassName="w-[40px] h-[40px] text-primary right-[2px]"
+									iconClassName="size-[25px] text-primary right-[2px]"
 									Icon={phoneNumbers.length < 3 ? AiOutlinePlusCircle : undefined}
 									onIconClick={() =>
 										form.setValue('phoneNumbers', [
@@ -148,98 +163,132 @@ export const AccountForm = () => {
 								</div>
 							</div>
 							<Input
-								label={formState.errors.companyName?.message || 'Название компании'}
-								labelClassName={
-									formState.errors.companyName?.message ? 'text-error' : ''
-								}
-								error={formState.errors.companyName?.message}
-								{...form.register('companyName')}
-								maxLength={50}
+								label={formState.errors.payersRegistrationNumber?.message || 'УНП'}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+									formState.errors.payersRegistrationNumber?.message
+										? 'text-error'
+										: '',
+								)}
+								wrapperClassName="flex-row items-center gap-[10px]"
+								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+								error={formState.errors.payersRegistrationNumber?.message}
+								{...form.register('payersRegistrationNumber')}
+								type={'number'}
+								max={9}
+								placeholder="Введите УНП"
+							/>
+							<Input
+								label={formState.errors.paymentAccount?.message || 'Расчетный счет'}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+									formState.errors.paymentAccount?.message ? 'text-error' : '',
+								)}
+								wrapperClassName="flex-row items-center gap-[10px]"
+								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+								error={formState.errors.paymentAccount?.message}
+								{...form.register('paymentAccount')}
 								type={'text'}
-								placeholder="Введите название компании"
+								placeholder="Введите расчетный счет"
+								max={20}
+							/>
+							<Input
+								label={formState.errors.bankIdNumber?.message || 'БИК'}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+									formState.errors.bankIdNumber?.message ? 'text-error' : '',
+								)}
+								wrapperClassName="flex-row items-center gap-[10px]"
+								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+								error={formState.errors.bankIdNumber?.message}
+								{...form.register('bankIdNumber')}
+								type={'number'}
+								placeholder="Введите  БИК"
+								max={9}
 							/>
 							<Input
 								label={
 									formState.errors.directorFullName?.message || 'ФИО директора'
 								}
-								labelClassName={
-									formState.errors.directorFullName?.message ? 'text-error' : ''
-								}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+									formState.errors.directorFullName?.message ? 'text-error' : '',
+								)}
+								wrapperClassName="flex-row items-center gap-[10px]"
+								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 								error={formState.errors.directorFullName?.message}
 								{...form.register('directorFullName')}
 								maxLength={50}
 								type={'text'}
 								placeholder="Введите ФИО"
+								max={50}
 							/>
-							<Input
-								label={formState.errors.companyAddress?.message || 'Адрес компании'}
-								labelClassName={
-									formState.errors.companyAddress?.message ? 'text-error' : ''
-								}
-								error={formState.errors.companyAddress?.message}
-								{...form.register('companyAddress')}
-								maxLength={50}
-								type={'text'}
-								placeholder="Введите адрес компании"
-							/>
-							<Input
-								label={formState.errors.payersRegistrationNumber?.message || 'УНП'}
-								labelClassName={
-									formState.errors.payersRegistrationNumber?.message
-										? 'text-error'
-										: ''
-								}
-								error={formState.errors.payersRegistrationNumber?.message}
-								{...form.register('payersRegistrationNumber')}
-								type={'number'}
-								placeholder="Введите УНП"
-							/>
-							<Input
-								label={formState.errors.paymentAccount?.message || 'Расчетный счет'}
-								labelClassName={
-									formState.errors.paymentAccount?.message ? 'text-error' : ''
-								}
-								error={formState.errors.paymentAccount?.message}
-								{...form.register('paymentAccount')}
-								type={'text'}
-								placeholder="Введите расчетный счет"
-							/>
-							<Input
-								label={formState.errors.bankIdNumber?.message || 'БИК'}
-								labelClassName={
-									formState.errors.bankIdNumber?.message ? 'text-error' : ''
-								}
-								error={formState.errors.bankIdNumber?.message}
-								{...form.register('bankIdNumber')}
-								type={'number'}
-								placeholder="Введите  БИК"
-							/>
-
 							<Input
 								label={formState.errors.bankAddress?.message || 'Адрес банка'}
-								labelClassName={
-									formState.errors.bankAddress?.message ? 'text-error' : ''
-								}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+									formState.errors.bankAddress?.message ? 'text-error' : '',
+								)}
+								wrapperClassName="flex-row items-center gap-[10px]"
+								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 								error={formState.errors.bankAddress?.message}
 								{...form.register('bankAddress')}
 								maxLength={100}
 								type={'text'}
 								placeholder="Введите адрес"
+								max={50}
 							/>
-							<div className="flex flex-col gap-[8px]">
+							<Input
+								label={formState.errors.companyAddress?.message || 'Адрес компании'}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+									formState.errors.companyAddress?.message ? 'text-error' : '',
+								)}
+								wrapperClassName="flex-row items-center gap-[10px]"
+								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+								error={formState.errors.companyAddress?.message}
+								{...form.register('companyAddress')}
+								maxLength={50}
+								type={'text'}
+								max={50}
+								placeholder="Введите адрес компании"
+							/>
+							<Input
+								{...form.register('compannyInfo')}
+								label="Информация о компании"
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+								)}
+								wrapperClassName="flex-row items-center gap-[10px]"
+								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+								maxLength={100}
+								type={'text'}
+								max={200}
+								placeholder="Введите информацию"
+							/>
+							<div className="flex flex-row items-center gap-[8px]">
 								<FormElementLabel
 									className={twMerge(
-										'font-raleway text-[14px] text-input-label-primary',
-										formState.errors.companyLogo?.url ? 'text-error' : '',
+										'w-[145px] font-sans text-sm font-normal leading-5 text-input-label-primary',
+										formState.errors.companyLogo ? 'text-error' : '',
 									)}
 								>
-									{formState.errors.companyLogo?.url?.message ||
-										'Логотип компании'}
+									{formState.errors.companyLogo?.message || 'Логотип компании'}
 								</FormElementLabel>
-								<div className="flex items-center gap-[10px]">
+								<div className="flex flex-col items-center gap-[10px]">
+									{preview && (
+										<div className="flex justify-center self-center">
+											<img
+												src={preview}
+												alt="Превью изображения"
+												className="h-[80px] w-[220px] rounded-md object-cover"
+											/>
+										</div>
+									)}
 									<Button
 										variant="primary"
-										className="h-[36px] w-[168px]"
+										type="button"
+										className="h-[30px] w-[220px]"
 										onClick={() =>
 											document.getElementById('file-upload')!.click()
 										}
@@ -255,13 +304,6 @@ export const AccountForm = () => {
 									/>
 								</div>
 							</div>
-							<Input
-								{...form.register('compannyInfo')}
-								label="Информация о компании"
-								maxLength={100}
-								type={'text'}
-								placeholder="Введите информацию"
-							/>
 						</div>
 						<div className="flex justify-end px-[16px] py-[13px]">
 							<Button

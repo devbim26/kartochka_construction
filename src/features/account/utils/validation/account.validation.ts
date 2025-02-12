@@ -21,13 +21,7 @@ const AccountDataSchema = z.object({
 	paymentAccount: z.string().min(1, 'Поле обязательно для заполнения'),
 	bankIdNumber: z.string().min(1, 'Поле обязательно для заполнения'),
 	bankAddress: z.string().min(1, 'Поле обязательно для заполнения'),
-	companyLogo: z
-		.object({
-			name: z.string().min(1, 'Логотип не выбран'),
-			data: z.union([z.string(), z.instanceof(ArrayBuffer)]).optional(),
-			url: z.string().optional(),
-		})
-		.optional(),
+	companyLogo: z.string().min(1, 'Логотип не выбран'),
 	compannyInfo: z.string().optional(),
 });
 
