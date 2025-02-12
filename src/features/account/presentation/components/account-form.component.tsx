@@ -121,6 +121,7 @@ export const AccountForm = () => {
 								maxLength={50}
 								type={'text'}
 								placeholder="Введите название компании"
+								max={50}
 							/>
 							<div className="flex flex-wrap gap-[8px] text-[14px] placeholder:text-input-label-primary">
 								<Input
@@ -174,6 +175,7 @@ export const AccountForm = () => {
 								error={formState.errors.payersRegistrationNumber?.message}
 								{...form.register('payersRegistrationNumber')}
 								type={'number'}
+								max={9}
 								placeholder="Введите УНП"
 							/>
 							<Input
@@ -188,6 +190,7 @@ export const AccountForm = () => {
 								{...form.register('paymentAccount')}
 								type={'text'}
 								placeholder="Введите расчетный счет"
+								max={20}
 							/>
 							<Input
 								label={formState.errors.bankIdNumber?.message || 'БИК'}
@@ -201,6 +204,7 @@ export const AccountForm = () => {
 								{...form.register('bankIdNumber')}
 								type={'number'}
 								placeholder="Введите  БИК"
+								max={9}
 							/>
 							<Input
 								label={
@@ -217,6 +221,7 @@ export const AccountForm = () => {
 								maxLength={50}
 								type={'text'}
 								placeholder="Введите ФИО"
+								max={50}
 							/>
 							<Input
 								label={formState.errors.bankAddress?.message || 'Адрес банка'}
@@ -231,6 +236,7 @@ export const AccountForm = () => {
 								maxLength={100}
 								type={'text'}
 								placeholder="Введите адрес"
+								max={50}
 							/>
 							<Input
 								label={formState.errors.companyAddress?.message || 'Адрес компании'}
@@ -244,6 +250,7 @@ export const AccountForm = () => {
 								{...form.register('companyAddress')}
 								maxLength={50}
 								type={'text'}
+								max={50}
 								placeholder="Введите адрес компании"
 							/>
 							<Input
@@ -256,6 +263,7 @@ export const AccountForm = () => {
 								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 								maxLength={100}
 								type={'text'}
+								max={200}
 								placeholder="Введите информацию"
 							/>
 							<div className="flex flex-row items-center gap-[8px]">
