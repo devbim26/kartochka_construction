@@ -1,9 +1,10 @@
 import {
-	ConstructionsAddAndEdit,
-	ConstructionsAddDataConfig,
-	ConstructionsEditDataConfig,
+	ConstructionsAdd,
+	ConstructionsAddConfig,
+	ConstructionsEdit,
+	ConstructionsEditConfig,
 	ConstructionsFilter,
-	ConstructionsFilterDataConfig,
+	ConstructionsFilterConfig,
 	GuidbookPageHeaderWrapper,
 	useHeaderForm,
 } from '@features';
@@ -12,14 +13,14 @@ import { useCallback } from 'react';
 const ConstructionsScreen = () => {
 	const forms = useHeaderForm(
 		{
-			filter: ConstructionsFilterDataConfig.defaultValues,
-			edit: ConstructionsEditDataConfig.defaultValues,
-			add: ConstructionsAddDataConfig.defaultValues,
+			filter: ConstructionsFilterConfig.defaultValues,
+			edit: ConstructionsEditConfig.defaultValues,
+			add: ConstructionsAddConfig.defaultValues,
 		},
 		{
-			filter: ConstructionsFilterDataConfig.schema,
-			edit: ConstructionsEditDataConfig.schema,
-			add: ConstructionsAddDataConfig.schema,
+			filter: ConstructionsFilterConfig.schema,
+			edit: ConstructionsEditConfig.schema,
+			add: ConstructionsAddConfig.schema,
 		},
 	);
 
@@ -36,8 +37,8 @@ const ConstructionsScreen = () => {
 				forms={forms}
 				formElements={{
 					filter: ConstructionsFilter,
-					add: ConstructionsAddAndEdit,
-					edit: ConstructionsAddAndEdit,
+					add: ConstructionsAdd,
+					edit: ConstructionsEdit,
 				}}
 			/>
 			{/* <GuidbookPageTableWrapper /> */}

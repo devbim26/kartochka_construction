@@ -1,14 +1,14 @@
 import type { EntityConfig } from '@core';
 import {
-	ConstructionsAddDataSchema,
-	ConstructionsEditDataSchema,
-	ConstructionsFilterDataSchema,
-	MaterialsAddAndEditDataSchema,
-	MaterialsFilterDataSchema,
-} from '@features/guidbooks/utils/validation';
+	ConstructionsAddSchema,
+	ConstructionsEditSchema,
+	ConstructionsFilterSchema,
+	MaterialsAddAndEditSchema,
+	MaterialsFilterSchema,
+} from './validation';
 
-export const MaterialsAddAndEditDataConfig: EntityConfig = {
-	schema: MaterialsAddAndEditDataSchema,
+export const MaterialsAddAndEditConfig: EntityConfig = {
+	schema: MaterialsAddAndEditSchema,
 	defaultValues: {
 		name: '',
 		description: '',
@@ -29,8 +29,8 @@ export const MaterialsAddAndEditDataConfig: EntityConfig = {
 	},
 };
 
-export const MaterialsFilterDataConfig: EntityConfig = {
-	schema: MaterialsFilterDataSchema,
+export const MaterialsFilterConfig: EntityConfig = {
+	schema: MaterialsFilterSchema,
 	defaultValues: {
 		name: '',
 		density: '',
@@ -39,8 +39,8 @@ export const MaterialsFilterDataConfig: EntityConfig = {
 	},
 };
 
-export const ConstructionsAddDataConfig: EntityConfig = {
-	schema: ConstructionsAddDataSchema,
+export const ConstructionsAddConfig: EntityConfig = {
+	schema: ConstructionsAddSchema,
 	defaultValues: {
 		name: '',
 		description: '',
@@ -56,21 +56,30 @@ export const ConstructionsAddDataConfig: EntityConfig = {
 		rLab: [] as string[],
 		labIndex: '',
 		labIndexValue: '',
-		heavySingleWall: [
-			{
-				'': {
-					type: '',
-					material: '',
-					thickness: '',
-					density: '',
-				},
+		baseConstruction: {
+			'0': {
+				type: '',
+				material: '',
+				thickness: '',
+				density: '',
 			},
-		],
+		},
+		cladding: {
+			'0': {
+				type: '',
+				material: '',
+				thickness: '',
+				density: '',
+				racksStep: '',
+				width: '',
+				numberOfConnections: '',
+			},
+		},
 	},
 };
 
-export const ConstructionsEditDataConfig: EntityConfig = {
-	schema: ConstructionsEditDataSchema,
+export const ConstructionsEditConfig: EntityConfig = {
+	schema: ConstructionsEditSchema,
 	defaultValues: {
 		name: '',
 		description: '',
@@ -90,7 +99,6 @@ export const ConstructionsEditDataConfig: EntityConfig = {
 		estimatedIndex: '',
 		estimatedIndexValue: '',
 		heavySingleWall: [
-			'',
 			{
 				type: '',
 				material: '',
@@ -101,8 +109,8 @@ export const ConstructionsEditDataConfig: EntityConfig = {
 	},
 };
 
-export const ConstructionsFilterDataConfig: EntityConfig = {
-	schema: ConstructionsFilterDataSchema,
+export const ConstructionsFilterConfig: EntityConfig = {
+	schema: ConstructionsFilterSchema,
 	defaultValues: {
 		name: '',
 		constructionType: '',

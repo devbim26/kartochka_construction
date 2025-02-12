@@ -1,7 +1,6 @@
 import { Input, Select, Switch } from '@core';
 import {
 	ConstructionComponentsMap,
-	ConstructionsAddData,
 	ConstructionsEditData,
 	DescriptionFieldNames,
 	FormSubTitle,
@@ -15,11 +14,9 @@ import { IoWarningOutline } from 'react-icons/io5';
 import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
-export const ConstructionsAddAndEdit = () => {
+export const ConstructionsEdit = () => {
 	const [search] = useSearchParams();
-	const isEditMode = search.get('edit');
-	const form = useFormContext<ConstructionsAddData>();
-	const formEdit = useFormContext<ConstructionsEditData>();
+	const form = useFormContext<ConstructionsEditData>();
 
 	const [isSpecsDisplay, setSpecsDisplay] = useState(false);
 
@@ -255,47 +252,41 @@ export const ConstructionsAddAndEdit = () => {
 							{...form.register('labIndexValue')}
 							type={'number'}
 						/>
+						<FormSubTitle text="Расчетное значение" />
+						<div className="flex flex-wrap gap-[16px]">
+							<Input
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+									formState.errors.estimatedIndex?.message ? 'text-error' : '',
+								)}
+								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+								containerClassName="w-[226px]"
+								label={formState.errors.estimatedIndex?.message || 'Индекс'}
+								error={formState.errors.estimatedIndex?.message}
+								placeholder="Введите индекс"
+								{...form.register('estimatedIndex')}
+								type={'number'}
+							/>
+							<Input
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+									formState.errors.estimatedIndexValue?.message
+										? 'text-error'
+										: '',
+								)}
+								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+								containerClassName="w-[226px]"
+								label={
+									formState.errors.estimatedIndexValue?.message ||
+									'Index value, dBA'
+								}
+								error={formState.errors.estimatedIndexValue?.message}
+								placeholder="Введите индекс"
+								{...form.register('estimatedIndexValue')}
+								type={'number'}
+							/>
+						</div>
 					</div>
-					{/* {isEditMode && (
-						<>
-							<FormSubTitle text="Расчетное значение" />
-							<div className="flex flex-wrap gap-[16px]">
-								<Input
-									labelClassName={twMerge(
-										'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-										formState.errors.estimatedIndex?.message
-											? 'text-error'
-											: '',
-									)}
-									inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-									containerClassName="w-[226px]"
-									label={formState.errors.estimatedIndex?.message || 'Индекс'}
-									error={formState.errors.estimatedIndex?.message}
-									placeholder="Введите индекс"
-									{...form.register('estimatedIndex')}
-									type={'number'}
-								/>
-								<Input
-									labelClassName={twMerge(
-										'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-										formState.errors.estimatedIndexValue?.message
-											? 'text-error'
-											: '',
-									)}
-									inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-									containerClassName="w-[226px]"
-									label={
-										formState.errors.estimatedIndexValue?.message ||
-										'Index value, dBA'
-									}
-									error={formState.errors.estimatedIndexValue?.message}
-									placeholder="Введите индекс"
-									{...form.register('estimatedIndexValue')}
-									type={'number'}
-								/>
-							</div>
-						</>
-					)} */}
 				</>
 			)}
 		</div>

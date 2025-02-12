@@ -1,1 +1,1 @@
-export const SpecificationsFieldNames = ['constructionType', 'heavySingleWall', 'thickness'];
+export const SpecificationsFieldNames = ['constructionType', 'baseConstruction', 'thickness'];

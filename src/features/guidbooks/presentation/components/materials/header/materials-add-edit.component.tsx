@@ -5,6 +5,7 @@ import {
 	MaterialsAddAndEditData,
 	RuRegionNamesSelectValues,
 } from '@features';
+
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -103,7 +104,7 @@ export const MaterialsAddAndEdit = () => {
 					{...form.register('thickness')}
 					type={'number'}
 				/>
-				<Controller
+				{/* <Controller
 					name="materialType"
 					control={control}
 					render={({ field }) => (
@@ -122,7 +123,7 @@ export const MaterialsAddAndEdit = () => {
 							placeholder="Выберите тип материала"
 						/>
 					)}
-				/>
+				/> */}
 				<Controller
 					name="region"
 					control={control}
@@ -167,14 +168,14 @@ export const MaterialsAddAndEdit = () => {
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-						formState.errors.manufacturer?.message ? 'text-error' : '',
+						formState.errors.issuer?.message ? 'text-error' : '',
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 					containerClassName="w-[226px]"
-					label={formState.errors.manufacturer?.message || 'Производитель'}
-					error={formState.errors.manufacturer?.message}
+					label={formState.errors.issuer?.message || 'Производитель'}
+					error={formState.errors.issuer?.message}
 					placeholder="Введите производителя"
-					{...form.register('manufacturer')}
+					{...form.register('issuer')}
 					type={'text'}
 				/>
 				<div className="flex flex-col gap-[8px]">

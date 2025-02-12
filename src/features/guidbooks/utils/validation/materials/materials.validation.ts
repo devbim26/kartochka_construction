@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const MaterialsAddAndEditDataSchema = z.object({
+export const MaterialsAddAndEditSchema = z.object({
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	shortName: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -12,14 +12,14 @@ export const MaterialsAddAndEditDataSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	materialType: z.string().min(1, 'Поле обязательно для заполнения'),
+	//materialType: z.string().min(1, 'Поле обязательно для заполнения'),
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
 	type: z.string().min(1, 'Поле обязательно для заполнения'),
-	manufacturer: z.string().min(1, 'Поле обязательно для заполнения'),
+	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
 	image: z.object({
-		name: z.string().min(1, 'Логотип не выбран'),
+		name: z.string().min(1, 'Логотип не выбран').optional(),
 		data: z.union([z.string(), z.instanceof(ArrayBuffer)]).optional(),
-		url: z.string().optional(),
+		url: z.string(),
 	}),
 	materialCoefficient: z
 		.string()
@@ -48,7 +48,7 @@ export const MaterialsAddAndEditDataSchema = z.object({
 		.refine((value) => +value < 100, 'Значение должно быть меньше ста'),
 });
 
-export const MaterialsFilterDataSchema = z.object({
+export const MaterialsFilterSchema = z.object({
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	density: z
 		.string()
@@ -58,8 +58,11 @@ export const MaterialsFilterDataSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	materialType: z.string().min(1, 'Поле обязательно для заполнения'),
+	materialType: z.object({
+		id: z.string(),
+		name: z.string().min(1, 'Поле обязательно для заполнения'),
+	}),
 });
 
-export type MaterialsAddAndEditData = z.infer<typeof MaterialsAddAndEditDataSchema>;
-export type MaterialsFilterData = z.infer<typeof MaterialsFilterDataSchema>;
+export type MaterialsAddAndEditSchemaType = z.infer<typeof MaterialsAddAndEditSchema>;
+export type MaterialsFilterSchemaType = z.infer<typeof MaterialsFilterSchema>;

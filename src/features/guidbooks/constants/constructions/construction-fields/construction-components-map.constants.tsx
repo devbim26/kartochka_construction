@@ -1,5 +1,11 @@
-import { HeavySingleWall } from '@features/guidbooks/presentation';
+import { Cladding, HeavySingleWall } from '@features/guidbooks/presentation';
 
 export const ConstructionComponentsMap: Record<string, React.ReactNode> = {
-	heavy: <HeavySingleWall />,
+	heavySingleWall: <HeavySingleWall />,
+	heavySingleWallAndCladding: (
+		<>
+			<HeavySingleWall />
+			<Cladding />
+		</>
+	),
 };

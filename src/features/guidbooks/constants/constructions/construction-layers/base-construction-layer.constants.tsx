@@ -1,5 +1,6 @@
 import { Input, Select } from '@core';
-import { ConstructionsAddData } from '@features/guidbooks/utils';
+import { ConstructionsAddData } from '@features/guidbooks/types';
+
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -7,52 +8,52 @@ interface BaseConstructionLayerProps {
 	id: string;
 }
 
-export const BaseConstrustionLayer = ({ id }: BaseConstructionLayerProps) => {
+export const BaseConstructionLayer = ({ id }: BaseConstructionLayerProps) => {
 	const form = useFormContext<ConstructionsAddData>();
-	const { formState, control, setValue } = form;
+	const { formState, control, setValue, watch } = form;
 
 	return (
 		<div className="flex flex-wrap gap-[16px]">
 			<Controller
-				name={`heavySingleWall.${id}.type`}
+				name={`baseConstruction.${id}.type`}
 				control={control}
 				render={({ field }) => (
 					<Select
 						{...field}
 						value={field.value || ''}
 						options={[{ label: 'Тяжелая однослойная стена', value: '1' }]}
-						error={formState.errors.heavySingleWall?.[id]?.type?.message}
+						error={formState.errors.baseConstruction?.[id]?.type?.message}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px]',
-							formState.errors.heavySingleWall?.[id]?.type?.message
+							formState.errors.baseConstruction?.[id]?.type?.message
 								? 'text-error'
 								: '',
 						)}
 						wrapperClassname="ring-input-border-primary flex-row items-center gap-[16px]"
 						buttonClassName="text-sm rounded-[8px] w-[226px]"
-						label={formState.errors.heavySingleWall?.[id]?.type?.message || ''}
-						placeholder="Выберите материал"
+						label={formState.errors.baseConstruction?.[id]?.type?.message || ''}
+						placeholder="Выберите тип"
 					/>
 				)}
 			/>
 			<Controller
-				name={`heavySingleWall.${id}.material`}
+				name={`baseConstruction.${id}.material`}
 				control={control}
 				render={({ field }) => (
 					<Select
 						{...field}
 						value={field.value || ''}
 						options={[{ label: 'Полнотелый красный кирпич', value: '1' }]}
-						error={formState.errors.heavySingleWall?.[id]?.material?.message}
+						error={formState.errors.baseConstruction?.[id]?.material?.message}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px]',
-							formState.errors.heavySingleWall?.[id]?.material?.message
+							formState.errors.baseConstruction?.[id]?.material?.message
 								? 'text-error'
 								: '',
 						)}
 						wrapperClassname="ring-input-border-primary flex-row items-center gap-[16px]"
 						buttonClassName="text-sm rounded-[8px] w-[226px]"
-						label={formState.errors.heavySingleWall?.[id]?.material?.message || ''}
+						label={formState.errors.baseConstruction?.[id]?.material?.message || ''}
 						placeholder="Выберите материал"
 					/>
 				)}
@@ -60,29 +61,29 @@ export const BaseConstrustionLayer = ({ id }: BaseConstructionLayerProps) => {
 			<Input
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
-					formState.errors.heavySingleWall?.[id]?.thickness?.message ? 'text-error' : '',
+					formState.errors.baseConstruction?.[id]?.thickness?.message ? 'text-error' : '',
 				)}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] w-[78px]"
 				wrapperClassName="flex-row items-center gap-[16px]"
-				label={formState.errors.heavySingleWall?.[id]?.thickness?.message || 'Толщина, мм'}
-				error={formState.errors.heavySingleWall?.[id]?.thickness?.message}
+				label={formState.errors.baseConstruction?.[id]?.thickness?.message || 'Толщина, мм'}
+				error={formState.errors.baseConstruction?.[id]?.thickness?.message}
 				placeholder="Введите толщину"
-				{...form.register(`heavySingleWall.${id}.thickness`)}
+				{...form.register(`baseConstruction.${id}.thickness`)}
 				type={'number'}
 			/>
 			<Input
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
-					formState.errors.heavySingleWall?.[id]?.density?.message ? 'text-error' : '',
+					formState.errors.baseConstruction?.[id]?.density?.message ? 'text-error' : '',
 				)}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] w-[78px]"
 				wrapperClassName="flex-row items-center gap-[16px]"
 				label={
-					formState.errors.heavySingleWall?.[id]?.density?.message || 'Плотность, кг/м³'
+					formState.errors.baseConstruction?.[id]?.density?.message || 'Плотность, кг/м³'
 				}
-				error={formState.errors.heavySingleWall?.[id]?.density?.message}
+				error={formState.errors.baseConstruction?.[id]?.density?.message}
 				placeholder="Введите плотность"
-				{...form.register(`heavySingleWall.${id}.density`)}
+				{...form.register(`baseConstruction.${id}.density`)}
 				type={'number'}
 			/>
 		</div>
