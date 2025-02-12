@@ -62,7 +62,6 @@ export const AccountForm = () => {
 	const { register, setValue, watch, formState } = form;
 
 	const onSubmit = () => {
-		console.log(123);
 		dispatch(
 			updateUser({
 				...form.getValues(),
