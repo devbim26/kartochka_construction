@@ -89,7 +89,7 @@ const CompanyRegistrationPage = () => {
 
 	useEffect(() => {
 		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.registration.fetch_name &&
-			navigate(APP_ROUTES.auth + '/' + AUTH_ROUTES.login);
+			navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.login.route);
 	}, [authData.fetch_data?.fetch_name]);
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
