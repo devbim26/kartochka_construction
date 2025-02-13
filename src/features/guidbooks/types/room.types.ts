@@ -10,5 +10,5 @@ export const RuRoomTypeSelectValues = [
 
 export const RuRoomTypeNamesMap = {
 	[RoomType.Room]: 'Комната',
-	[RoomType.Kitchen]: 'Ключи',
+	[RoomType.Kitchen]: 'Кухня',
 };
