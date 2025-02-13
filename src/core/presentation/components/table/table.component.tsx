@@ -29,7 +29,7 @@ export const VTable = memoize(
 			totalCount: 21,
 		});
 
-		const rowGetter = ({ index }: { index: number }) => data[index];
+		const rowGetter = ({ index }: { index: number }) => data[index] || {};
 
 		return (
 			<div className="flex h-fit flex-col gap-[30px] rounded-xl bg-white pb-[30px]">

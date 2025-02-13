@@ -40,10 +40,10 @@ const claddingSchema = z.object({
 });
 
 export const ConstructionsFilterSchema = z.object({
-	name: z.string().min(1, 'Поле обязательно для заполнения'),
-	description: z.string().min(1, 'Поле обязательно для заполнения'),
-	region: z.string().min(1, 'Поле обязательно для заполнения'),
-	constructionType: z.string().min(1, 'Поле обязательно для заполнения'),
+	name: z.string(),
+	description: z.string(),
+	region: z.string(),
+	constructionType: z.string(),
 });
 
 export const ConstructionsAddSchema = z.object({

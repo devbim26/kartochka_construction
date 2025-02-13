@@ -2,9 +2,11 @@ import { ColumnCell, ColumnHeader, mapColumns, TableColumn, VTable } from '@core
 import { convertToPaginatedType } from '@core/converters';
 import {
 	convertToClientMaterialsAddAndEditData,
+	convertToServerMaterialsAddAndEditData,
 	convertToServerMaterialsFilterData,
 } from '@core/converters/materials/materials.converter';
 import {
+	getGuidebooksCreate,
 	getGuidebooksPaginated,
 	GuidbookPageHeaderWrapper,
 	Guidebooks,
@@ -18,110 +20,149 @@ import {
 } from '@features';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-const createColumns = (data: MaterialsAddAndEditData[]): TableColumn<MaterialsAddAndEditData>[] => {
-	if (!data) return [];
-	const columns: TableColumn<MaterialsAddAndEditData>[] = [
-		{
-			dataKey: 'image',
-			label: 'Изображение',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		{
-			dataKey: 'name',
-			label: 'Название',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		{
-			dataKey: 'shortName',
-			label: 'Краткое название',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		{
-			dataKey: 'description',
-			label: 'Описание',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		{
-			dataKey: 'description',
-			label: 'Описание',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		//цвет
-		//штриховка
-		// {
-		// 	dataKey: 'materialType',
-		// 	label: 'Тип материала',
-		// 	width: 0,
-		// 	headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-		// 	cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		// },
-		{
-			dataKey: 'region',
-			label: 'Регион',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		{
-			dataKey: 'density',
-			label: 'Плотность материала',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		{
-			dataKey: 'thickness',
-			label: 'Толщина материала',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		{
-			dataKey: 'speedOfSound',
-			label: 'Скорость звука',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		{
-			dataKey: 'materialCoefficient',
-			label: 'Коэффициент материала',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		{
-			dataKey: 'lossFactor',
-			label: 'Коэффициент потерь',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		//коэффициент для расчетов
-		{
-			dataKey: 'youngModulus',
-			label: 'Модуль Юнга материала, ГПа',
-			width: 0,
-			headerRenderer: (props) => ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-		},
-		//коэффициент затухания
-		//процентная доля твердой массы
-	];
-	return mapColumns(columns);
-};
-
 const MaterialsScreen = () => {
+	const createColumns = (
+		data: MaterialsAddAndEditData[],
+	): TableColumn<MaterialsAddAndEditData>[] => {
+		if (!data) return [];
+		const columns: TableColumn<MaterialsAddAndEditData>[] = [
+			// {
+			// 	dataKey: 'imageUrl',
+			// 	label: 'Изображение',
+			// 	width: 0,
+			// 	headerRenderer: (props) =>
+			// 		ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+			// 	cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			// },
+			{
+				dataKey: 'name',
+				label: 'Название',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			{
+				dataKey: 'shortName',
+				label: 'Краткое название',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			{
+				dataKey: 'description',
+				label: 'Описание',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			{
+				dataKey: 'description',
+				label: 'Описание',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			//цвет
+			//штриховка
+			{
+				dataKey: 'materialType',
+				label: 'Тип материала',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			{
+				dataKey: 'region',
+				label: 'Регион',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			{
+				dataKey: 'density',
+				label: 'Плотность материала',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			{
+				dataKey: 'thickness',
+				label: 'Толщина материала',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			{
+				dataKey: 'speedOfSound',
+				label: 'Скорость звука',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			{
+				dataKey: 'materialCoefficient',
+				label: 'Коэффициент материала',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			{
+				dataKey: 'lossFactor',
+				label: 'Коэффициент потерь',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			//коэффициент для расчетов
+			{
+				dataKey: 'youngModulus',
+				label: 'Модуль Юнга материала, ГПа',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
+			//коэффициент затухания
+			//процентная доля твердой массы
+			{
+				dataKey: 'id',
+				label: 'Действия',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) =>
+					ColumnCell({
+						...props,
+						containerClassName: 'w-[300px]',
+						cellData: (
+							<div className="flex gap-2">
+								{/* <EditIcon
+									onClick={() =>
+										navigate('', { edit: 'true', entityId: props.cellData })
+									}
+								/>
+								<DeleteIcon
+									onClick={() => handleDeleteTableData(props.cellData as string)}
+								/> */}
+							</div>
+						),
+					}),
+			},
+		];
+		return mapColumns(columns);
+	};
+
 	const forms = useHeaderForm(
 		{
 			filter: MaterialsFilterConfig.defaultValues,
@@ -139,11 +180,13 @@ const MaterialsScreen = () => {
 
 	const columns = useMemo(() => createColumns(tableData), [tableData]);
 
-	const [filterName, filterDensity, filterThickness] = forms.filterForm.watch([
-		'name',
-		'thickness',
-		'density',
-	]);
+	const [filterName, filterMaterialType, filterDensity, filterThickness] = forms.filterForm.watch(
+		['name', 'materialType', 'thickness', 'density'],
+	);
+
+	const onSaveHandle = useCallback(() => {
+		handleAddTableData(forms.addForm.getValues());
+	}, []);
 
 	const handleGetTableData = async (data: MaterialsFilterData) => {
 		try {
@@ -160,17 +203,52 @@ const MaterialsScreen = () => {
 		}
 	};
 
-	useEffect(() => {
-		const values = forms.filterForm.getValues() as {
-			name: string;
-			density: string;
-			thickness: string;
-			materialType: { id: string; name: string };
-		};
-		handleGetTableData(values);
-	}, [filterDensity, filterName, filterThickness]);
+	const handleAddTableData = async (data: MaterialsAddAndEditData) => {
+		try {
+			const response = await getGuidebooksCreate({
+				data: convertToServerMaterialsAddAndEditData(data),
+				guidebookType: Guidebooks.MATERIAL,
+			});
+			if (response.status === 200) {
+				handleGetTableData(forms.addForm.getValues());
+			}
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	};
 
-	const onSaveHandle = useCallback(() => {}, []);
+	// const handleEditTableData = async (data: MaterialsAddAndEditData) => {
+	// 	try {
+	// 		const response = await getGuidebooksEdit({
+	// 			data: convertToServerMaterialsAddAndEditData(data),
+	// 			guidebookType: Guidebooks.MATERIAL,
+	// 		});
+	// 		if (response.status === 200) {
+	// 			handleGetTableData(forms.filterForm.getValues());
+	// 		}
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 	}
+	// };
+
+	// const handleDeleteTableData = async (id: string) => {
+	// 	try {
+	// 		const response = await getGuidebooksDelete({
+	// 			data: { id: id },
+	// 			guidebookType: Guidebooks.MATERIAL,
+	// 		});
+	// 		if (response.status === 200) {
+	// 			handleGetTableData(forms.filterForm.getValues());
+	// 		}
+	// 	} catch (error) {
+	// 		console.log('Error:', error);
+	// 	}
+	// };
+
+	useEffect(() => {
+		const values = forms.filterForm.getValues();
+		handleGetTableData(values);
+	}, [filterDensity, filterName, filterThickness, filterMaterialType]);
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">

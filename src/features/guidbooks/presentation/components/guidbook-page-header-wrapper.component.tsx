@@ -118,7 +118,10 @@ export const GuidbookPageHeaderWrapper = memoize(
 						{currentHeaderFormType !== HeaderFormTypes.filter && (
 							<Button
 								className="group flex w-fit flex-row items-center gap-[6px] border border-solid border-primary bg-background-button-secondary px-[16px] py-[5px] group-hover:bg-primary"
-								onClick={submitHandle}
+								onClick={() => {
+									onSave();
+									submitHandle();
+								}}
 							>
 								<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
 									{currentHeaderFormType === HeaderFormTypes.add

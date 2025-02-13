@@ -1,6 +1,6 @@
 import { Region as ServerRegion } from '@api-gen/api';
 import { createDataRecordConverter } from '@core/utils';
-import { Region as ClientRegion } from '@features';
+import { RuRegionNames as ClientRegion } from '@features';
 
 export const RegionConverter = createDataRecordConverter({
 	[ClientRegion.None]: ServerRegion.None,

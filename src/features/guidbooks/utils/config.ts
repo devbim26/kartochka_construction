@@ -19,7 +19,7 @@ export const MaterialsAddAndEditConfig: EntityConfig = {
 		region: '',
 		type: '',
 		manufacturer: '',
-		image: {},
+		imageUrl: '',
 		materialCoefficient: '',
 		speedOfSound: '',
 		lossFactor: '',
@@ -56,25 +56,8 @@ export const ConstructionsAddConfig: EntityConfig = {
 		rLab: [] as string[],
 		labIndex: '',
 		labIndexValue: '',
-		baseConstruction: {
-			'0': {
-				type: '',
-				material: '',
-				thickness: '',
-				density: '',
-			},
-		},
-		cladding: {
-			'0': {
-				type: '',
-				material: '',
-				thickness: '',
-				density: '',
-				racksStep: '',
-				width: '',
-				numberOfConnections: '',
-			},
-		},
+		baseConstruction: {},
+		cladding: {},
 	},
 };
 
@@ -98,14 +81,7 @@ export const ConstructionsEditConfig: EntityConfig = {
 		labIndexValue: '',
 		estimatedIndex: '',
 		estimatedIndexValue: '',
-		heavySingleWall: [
-			{
-				type: '',
-				material: '',
-				thickness: '',
-				density: '',
-			},
-		],
+		heavySingleWall: [],
 	},
 };
 

@@ -1,39 +1,40 @@
-import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
-import {
-	fileUpload,
-	FormSubTitle,
-	MaterialsAddAndEditData,
-	RuRegionNamesSelectValues,
-} from '@features';
-
+import { Input, Select, useAppDispatch } from '@core';
+import { FormSubTitle, MaterialsAddAndEditData, RuRegionNamesSelectValues } from '@features';
+import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const MaterialsAddAndEdit = () => {
 	const form = useFormContext<MaterialsAddAndEditData>();
 
-	const { formState, control } = form;
+	const { formState, control, setValue } = form;
 
 	const dispatch = useAppDispatch();
+	const [preview, setPreview] = useState<string | null>(null);
+	const [uploadError, setUploadError] = useState<boolean>(false);
 
-	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-		const file = event.target.files?.[0];
-		if (file) {
-			form.setValue('image.name', file.name);
-			const base64 = await convertToBase64(file);
-			const fileData = await file.arrayBuffer();
-			if (base64) {
-				form.setValue('image.data', base64);
-				dispatch(
-					fileUpload({
-						data: { mimeType: file.type, isPublic: true },
-						file: fileData,
-					}),
-				);
-				form.setValue('image.url', '123');
-			}
-		}
-	};
+	// const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+	// 	const file = event.target.files?.[0];
+	// 	if (file) {
+	// 		try {
+	// 			const base64 = await convertToBase64(file);
+	// 			const fileData = await file.arrayBuffer();
+	// 			if (base64 && typeof base64 === 'string') {
+	// 				setValue('imageUrl', file.name);
+	// 				setPreview(base64);
+	// 				dispatch(
+	// 					fileUpload({
+	// 						data: { mimeType: file.type, isPublic: true },
+	// 						file: fileData,
+	// 					}),
+	// 				);
+	// 				setUploadError(false);
+	// 			}
+	// 		} catch (error) {
+	// 			setUploadError(true);
+	// 		}
+	// 	}
+	// };
 
 	return (
 		<div className="flex flex-col gap-[16px]">
@@ -104,7 +105,7 @@ export const MaterialsAddAndEdit = () => {
 					{...form.register('thickness')}
 					type={'number'}
 				/>
-				{/* <Controller
+				<Controller
 					name="materialType"
 					control={control}
 					render={({ field }) => (
@@ -123,7 +124,7 @@ export const MaterialsAddAndEdit = () => {
 							placeholder="Выберите тип материала"
 						/>
 					)}
-				/> */}
+				/>
 				<Controller
 					name="region"
 					control={control}
@@ -178,33 +179,49 @@ export const MaterialsAddAndEdit = () => {
 					{...form.register('issuer')}
 					type={'text'}
 				/>
-				<div className="flex flex-col gap-[8px]">
-					<FormElementLabel
-						className={twMerge(
-							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.image?.url ? 'text-error' : '',
-						)}
-					>
-						{formState.errors.image?.url?.message || 'Изображение'}
-					</FormElementLabel>
-					<div className="flex">
-						<Button
-							className="group flex h-[32px] w-fit flex-row items-center gap-[4px] border border-solid border-primary bg-background-button-secondary px-[13px] group-hover:bg-primary"
-							onClick={() => document.getElementById('file-upload')!.click()}
+				{/* <div className="relative flex items-start gap-4">
+					<div className="flex flex-col gap-y-2">
+						<FormElementLabel
+							className={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+								formState.errors.imageUrl?.message ? 'text-error' : '',
+							)}
+							errorMessage={formState.errors.imageUrl?.message}
 						>
-							<p className="border-primary font-sans text-sm font-semibold leading-4 text-primary group-hover:text-white">
-								Выбрать изображение
-							</p>
-						</Button>
-						<input
-							type="file"
-							id="file-upload"
-							accept="image/*"
-							onChange={handleFileChange}
-							className="hidden"
-						/>
+							Логотип
+						</FormElementLabel>
+						<div className="flex items-center gap-[8px]">
+							<Button
+								variant="primary"
+								className={twMerge(
+									'group flex w-fit flex-row items-center gap-[4px] border-2 border-solid border-primary bg-white',
+									formState.errors.imageUrl?.message ? 'border-error' : '',
+								)}
+								onClick={() => document.getElementById('file-upload')!.click()}
+							>
+								<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
+									Выбрать изображение
+								</p>
+							</Button>
+							<input
+								type="file"
+								id="file-upload"
+								accept="image/*"
+								onChange={handleFileChange}
+								className="hidden"
+							/>
+						</div>
 					</div>
-				</div>
+					{preview && (
+						<div className="flex justify-center self-center">
+							<img
+								src={preview}
+								alt="Превью изображения"
+								className="size-[60px] rounded-md object-cover"
+							/>
+						</div>
+					)}
+				</div> */}
 			</div>
 			<FormSubTitle text="Физические свойства" />
 			<div className="flex flex-wrap gap-[16px]">

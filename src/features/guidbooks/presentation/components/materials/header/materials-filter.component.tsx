@@ -1,6 +1,6 @@
-import { Input } from '@core';
+import { Input, Select } from '@core';
 import { MaterialsFilterData } from '@features';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const MaterialsFilter = () => {
@@ -22,14 +22,14 @@ export const MaterialsFilter = () => {
 				{...form.register('name')}
 				type={'text'}
 			/>
-			{/* <Controller
+			<Controller
 				name="materialType"
 				control={control}
 				render={({ field }) => (
 					<Select
 						{...field}
 						value={field.value || ''}
-						options={[{ label: '1', value: '1' }]}
+						options={[{ label: 'Membrane(ge)', value: 'Membrane(ge)' }]}
 						error={formState.errors.materialType?.message}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px]',
@@ -41,7 +41,7 @@ export const MaterialsFilter = () => {
 						placeholder="Выберите тип материала"
 					/>
 				)}
-			/> */}
+			/>
 			<Input
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
