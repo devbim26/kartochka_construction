@@ -75,13 +75,13 @@ export const HowOurServiceWorks = () => {
 					>
 						<div
 							className={twMerge(
-								'absolute inset-0 flex w-full flex-col gap-[24px] rounded-[20px] bg-white px-[20px] py-[30px] shadow-blue transition-opacity duration-700 ease-in-out',
+								'ease absolute inset-0 flex w-full flex-col gap-[24px] rounded-[20px] bg-white px-[20px] py-[30px] shadow-blue transition-opacity duration-200',
 								isHover ? 'opacity-0' : 'opacity-1',
 							)}
 						>
 							<div
 								className={twMerge(
-									'transition-opacity delay-700 duration-300 ease-in-out',
+									'transition-opacity delay-100 duration-100 ease-in-out',
 									isHover ? 'opacity-0' : 'opacity-1',
 								)}
 							>
