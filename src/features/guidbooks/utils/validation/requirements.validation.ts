@@ -3,7 +3,7 @@ import { z } from 'zod';
 const RequirementsSchema = z.object({
 	id: z.string().optional(),
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
-	construction: z.string().min(1, 'Поле обязательно для заполнения'),
+	constructionType: z.string().min(1, 'Поле обязательно для заполнения'),
 	class: z.string().min(1, 'Поле обязательно для заполнения'),
 	secondPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
 	firstPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -30,7 +30,7 @@ const RequirementsSchema = z.object({
 
 const RequirementsFilterSchema = z.object({
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
-	construction: z.string().min(1, 'Поле обязательно для заполнения'),
+	constructionType: z.string().min(1, 'Поле обязательно для заполнения'),
 	firstPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
 	secondPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
 	buildingType: z.string().min(1, 'Поле обязательно для заполнения'),

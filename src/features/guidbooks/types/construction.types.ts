@@ -1,14 +1,14 @@
 export enum ConstructionType {
-	WallsAndPartitions = 'WallsAndPartitions',
-	Floors = 'Floors',
+	Wall = 'Wall',
+	Floor = 'Floor',
 }
 
 export const RuConstructionTypeNamesMap = {
-	WallsAndPartitions: 'Стены и перегородки',
-	Floors: 'Перекрытия',
+	Wall: 'Стены и перегородки',
+	Floor: 'Перекрытия',
 };
 
 export const RuConstructionTypeSelectValues = [
-	{ label: 'Стены и перегородки', value: ConstructionType.WallsAndPartitions },
-	{ label: 'Перекрытия', value: ConstructionType.Floors },
+	{ label: 'Стены и перегородки', value: ConstructionType.Wall },
+	{ label: 'Перекрытия', value: ConstructionType.Floor },
 ];

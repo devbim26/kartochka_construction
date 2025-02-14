@@ -50,6 +50,11 @@ export enum CategoryClass {
 	C = 'C',
 }
 
+export enum ConstructionType {
+	Wall = 'Wall',
+	Floor = 'Floor',
+}
+
 export enum Country {
 	None = 'None',
 	Albania = 'Albania',
@@ -98,7 +103,7 @@ export enum Country {
 
 export interface CraeteSubConstructionTemplateDto {
 	name?: string | null;
-	materials?: UserMaterialTemplateDto[] | null;
+	userMaterials?: UserMaterialTemplateDto[] | null;
 	subPosition?: SubConstructionPosition;
 }
 
@@ -172,6 +177,18 @@ export interface CreateMaterialCommand {
 	solid?: number;
 }
 
+export interface CreateReportDto {
+	reportNumber?: string | null;
+	client?: string | null;
+	description?: string | null;
+	projectName?: string | null;
+	engenierFullName?: string | null;
+	city?: string | null;
+	code?: string | null;
+	/** @format uuid */
+	constructionHeaderId?: string;
+}
+
 export interface CreateRequirementCommand {
 	secondPlacementRoom?: string | null;
 	firstPlacementRoom?: string | null;
@@ -185,8 +202,9 @@ export interface CreateRequirementCommand {
 	/** @format float */
 	noizeIsolationIndex?: number;
 	/** @format float */
-	noizeImpactIndex?: number;
+	noizeImpactIndex?: number | null;
 	notice?: string | null;
+	constructionType?: ConstructionType;
 }
 
 export interface CreateUploadingUrlCommand {
@@ -268,6 +286,17 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	density?: number | null;
 	/** @format float */
 	thickness?: number | null;
+}
+
+export interface GetReportWithPaginationQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	name?: string | null;
+	client?: string | null;
 }
 
 export interface GetRequirementsWithPaginationParamsQuery {
@@ -453,6 +482,37 @@ export enum Region {
 	Ukrain = 'Ukrain',
 }
 
+export interface ReportDto {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	client?: string | null;
+	/** @format date */
+	lastUpdated?: string;
+	status?: ReportStatus;
+	fileUrl?: string | null;
+}
+
+export interface ReportDtoPaginatedList {
+	items?: ReportDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
+}
+
+export enum ReportStatus {
+	None = 'None',
+	ValueСonsideration = 'Сonsideration',
+	Confirmed = 'Confirmed',
+}
+
 export interface RequirementDto {
 	/** @format uuid */
 	id?: string;
@@ -468,8 +528,9 @@ export interface RequirementDto {
 	/** @format float */
 	noizeIsolationIndex?: number;
 	/** @format float */
-	noizeImpactIndex?: number;
+	noizeImpactIndex?: number | null;
 	notice?: string | null;
+	constructionType?: ConstructionType;
 }
 
 export interface RequirementDtoPaginatedList {
@@ -574,8 +635,9 @@ export interface UpdateRequirementCommand {
 	/** @format float */
 	noizeIsolationIndex?: number;
 	/** @format float */
-	noizeImpactIndex?: number;
+	noizeImpactIndex?: number | null;
 	notice?: string | null;
+	constructionType?: ConstructionType;
 }
 
 export interface UserMaterialTemplateDto {
@@ -1115,6 +1177,43 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<MaterialDto, any>({
 				path: `/api/Material`,
 				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Report
+		 * @name ReportGetPaginatedCreate
+		 * @request POST:/api/Report/get-paginated
+		 */
+		reportGetPaginatedCreate: (
+			data: GetReportWithPaginationQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<ReportDtoPaginatedList, any>({
+				path: `/api/Report/get-paginated`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Report
+		 * @name ReportCreate
+		 * @request POST:/api/Report
+		 */
+		reportCreate: (data: CreateReportDto, params: RequestParams = {}) =>
+			this.request<ReportDto, any>({
+				path: `/api/Report`,
+				method: 'POST',
 				body: data,
 				type: ContentType.Json,
 				format: 'json',

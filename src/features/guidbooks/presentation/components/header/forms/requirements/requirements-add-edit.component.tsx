@@ -2,12 +2,12 @@ import { dateMask, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import {
 	ConstructionType,
+	RuBuildingTypeSelectValues,
+	RuCategoryClassSelectValues,
 	RuConstructionTypeSelectValues,
 	RuRegionNamesMap,
 	RuRegionNamesSelectValues,
 } from '@features/guidbooks/types';
-import { RuBuildingTypeSelectValues } from '@features/guidbooks/types/building.types';
-import { RuCategoryClassSelectValues } from '@features/guidbooks/types/class.types';
 import type { Requirement } from '@features/guidbooks/types/requirements';
 import { RuRoomTypeSelectValues } from '@features/guidbooks/types/room.types';
 import { useMask } from '@react-input/mask';
@@ -19,7 +19,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 	const { setValue, register, control, formState, watch } = form;
 	const dateRef = useMask(dateMask);
 
-	const construction = watch('construction');
+	const construction = watch('constructionType');
 
 	return (
 		<>
@@ -70,20 +70,20 @@ export const RequirementsAddAndEdit = memoize(() => {
 			/>
 			<Controller
 				control={control}
-				name={'construction'}
+				name={'constructionType'}
 				render={({ field }) => (
 					<Select
 						onChange={(value) => {
 							setValue('noizeImpactIndex', '');
-							setValue('construction', value as string);
+							setValue('constructionType', value as string);
 						}}
 						options={RuConstructionTypeSelectValues}
 						value={field.value || ''}
-						label={formState.errors?.construction?.message || 'Конструкция'}
+						label={formState.errors?.constructionType?.message || 'Конструкция'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.construction?.message ? 'text-error' : '',
+							formState.errors.constructionType?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите конструкцию"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
@@ -210,7 +210,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				placeholder="Введите значение"
 				type="number"
 			/>
-			{construction === ConstructionType.WallsAndPartitions && (
+			{construction === ConstructionType.Wall && (
 				<Input
 					{...register('noizeImpactIndex')}
 					labelClassName={twMerge(

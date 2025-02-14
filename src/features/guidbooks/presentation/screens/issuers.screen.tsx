@@ -68,7 +68,7 @@ const IssuersPage = () => {
 		handleGetTableData(form.filterForm.getValues());
 	}, [filterCountry, filterName, filterWebSite]);
 
-	const handleGetTableData = async (data: Issuer) => {
+	const handleGetTableData = useCallback(async (data: Issuer) => {
 		try {
 			const response = await getGuidebooksPaginated({
 				data: convertToServerIssuerData(data),
@@ -79,31 +79,26 @@ const IssuersPage = () => {
 		} catch (error) {
 			console.log('Error:', error);
 		}
-	};
+	}, []);
 
-	const handleAddTableData = async (data: Issuer) => {
-		try {
-			const response = await getGuidebooksCreate({
-				data: convertToServerIssuerData(data),
-				guidebookType: Guidebooks.ISSUER,
-			});
-			if (response.status === 200) {
-				handleGetTableData(form.filterForm.getValues());
+	const handleAddTableData = useCallback(
+		async (data: Issuer) => {
+			try {
+				const response = await getGuidebooksCreate({
+					data: convertToServerIssuerData(data),
+					guidebookType: Guidebooks.ISSUER,
+				});
+				if (response.status === 200) {
+					handleGetTableData(form.filterForm.getValues());
+				}
+			} catch (error) {
+				console.log('Error:', error);
 			}
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	};
+		},
+		[handleGetTableData, form.filterForm.getValues()],
+	);
 
-	const onSaveHandle = useCallback(() => {
-		handleAddTableData(form.addForm.getValues());
-	}, []);
-
-	const onEditHandle = useCallback(() => {
-		handleEditTableData(form.editForm.getValues());
-	}, []);
-
-	const handleGetOneTableData = async (id: string) => {
+	const handleGetOneTableData = useCallback(async (id: string) => {
 		try {
 			const response = await getGuidebooksDetail({
 				id: id,
@@ -116,35 +111,49 @@ const IssuersPage = () => {
 		} catch (error) {
 			console.log('Error:', error);
 		}
-	};
+	}, []);
 
-	const handleEditTableData = async (data: Issuer) => {
-		try {
-			const response = await getGuidebooksEdit({
-				data: convertToServerIssuerData(data),
-				guidebookType: Guidebooks.ISSUER,
-			});
-			if (response.status === 200) {
-				handleGetTableData(form.filterForm.getValues());
+	const handleEditTableData = useCallback(
+		async (data: Issuer) => {
+			try {
+				const response = await getGuidebooksEdit({
+					data: convertToServerIssuerData(data),
+					guidebookType: Guidebooks.ISSUER,
+				});
+				if (response.status === 200) {
+					handleGetTableData(form.filterForm.getValues());
+				}
+			} catch (error) {
+				console.log(error);
 			}
-		} catch (error) {
-			console.log(error);
-		}
-	};
+		},
+		[handleGetTableData, form.filterForm.getValues()],
+	);
 
-	const handleDeleteTableData = async (id: string) => {
-		try {
-			const response = await getGuidebooksDelete({
-				data: { id: id },
-				guidebookType: Guidebooks.ISSUER,
-			});
-			if (response.status === 200) {
-				handleGetTableData(form.filterForm.getValues());
+	const handleDeleteTableData = useCallback(
+		async (id: string) => {
+			try {
+				const response = await getGuidebooksDelete({
+					data: { id: id },
+					guidebookType: Guidebooks.ISSUER,
+				});
+				if (response.status === 200) {
+					handleGetTableData(form.filterForm.getValues());
+				}
+			} catch (error) {
+				console.log('Error:', error);
 			}
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	};
+		},
+		[handleGetTableData, form.filterForm.getValues()],
+	);
+
+	const onSaveHandle = useCallback(() => {
+		handleAddTableData(form.addForm.getValues());
+	}, [handleAddTableData, form.editForm.getValues()]);
+
+	const onEditHandle = useCallback(() => {
+		handleEditTableData(form.editForm.getValues());
+	}, [handleEditTableData, form.editForm.getValues()]);
 
 	const createColumns = (data: Issuer[]): TableColumn<Issuer>[] => {
 		if (!data) return [];

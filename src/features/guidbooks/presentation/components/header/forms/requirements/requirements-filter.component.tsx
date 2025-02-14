@@ -44,17 +44,17 @@ export const RequirementsFilter = memoize(() => {
 			/>
 			<Controller
 				control={control}
-				name={'construction'}
+				name={'constructionType'}
 				render={({ field }) => (
 					<Select
 						options={RuConstructionTypeSelectValues}
 						{...field}
 						value={field.value || ''}
-						label={formState.errors?.construction?.message || 'Конструкция'}
+						label={formState.errors?.constructionType?.message || 'Конструкция'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.construction?.message ? 'text-error' : '',
+							formState.errors.constructionType?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите конструкцию"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"

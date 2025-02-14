@@ -21,10 +21,17 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import type { BuildingType, Region, Requirement, RoomType } from '@features/guidbooks/types';
+import type {
+	BuildingType,
+	ConstructionType,
+	Region,
+	Requirement,
+	RoomType,
+} from '@features/guidbooks/types';
 import {
 	Guidebooks,
 	RuBuildingTypeNamesMap,
+	RuConstructionTypeNamesMap,
 	RuCountryNamesMap,
 	RuRoomTypeNamesMap,
 } from '@features/guidbooks/types';
@@ -58,16 +65,16 @@ export const RequirementsPage = () => {
 
 	const [
 		filterRegion,
+		filterConstructionType,
+		filterFirstPlacementRoom,
+		filterSecondPlacementRoom,
 		filterBuildingType,
-		filterStandartFullName,
-		filterStandartShortName,
-		filterStandartValidityPeriod,
 	] = form.filterForm.watch([
 		'region',
+		'constructionType',
+		'firstPlacementRoom',
+		'secondPlacementRoom',
 		'buildingType',
-		'standartFullName',
-		'standartShortName',
-		'standartValidityPeriod',
 	]);
 
 	useEffect(() => {
@@ -84,13 +91,13 @@ export const RequirementsPage = () => {
 		handleGetTableData(form.filterForm.getValues());
 	}, [
 		filterRegion,
+		filterConstructionType,
+		filterFirstPlacementRoom,
+		filterSecondPlacementRoom,
 		filterBuildingType,
-		filterStandartFullName,
-		filterStandartShortName,
-		filterStandartValidityPeriod,
 	]);
 
-	const handleGetTableData = async (data: Requirement) => {
+	const handleGetTableData = useCallback(async (data: Requirement) => {
 		try {
 			const response = await getGuidebooksPaginated({
 				data: convertToServerRequirementData(data),
@@ -103,45 +110,68 @@ export const RequirementsPage = () => {
 		} catch (error) {
 			console.log('Error:', error);
 		}
-	};
+	}, []);
 
-	const handleAddTableData = async (data: Requirement) => {
-		try {
-			const response = await getGuidebooksCreate({
-				data: convertToServerRequirementData(data),
-				guidebookType: Guidebooks.REQUIREMENT,
-			});
-			if (response.status === 200) {
-				handleGetTableData(form.filterForm.getValues());
+	const handleAddTableData = useCallback(
+		async (data: Requirement) => {
+			try {
+				const response = await getGuidebooksCreate({
+					data: convertToServerRequirementData(data),
+					guidebookType: Guidebooks.REQUIREMENT,
+				});
+				if (response.status === 200) {
+					handleGetTableData(form.filterForm.getValues());
+				}
+			} catch (error) {
+				console.log('Error:', error);
 			}
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	};
+		},
+		[handleGetTableData, form.filterForm.getValues()],
+	);
+
+	const handleEditTableData = useCallback(
+		async (data: Requirement) => {
+			try {
+				const response = await getGuidebooksEdit({
+					data: convertToServerRequirementData(data),
+					guidebookType: Guidebooks.REQUIREMENT,
+				});
+				if (response.status === 200) {
+					handleGetTableData(form.filterForm.getValues());
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		},
+		[handleGetTableData, form.filterForm.getValues()],
+	);
 
 	const onSaveHandle = useCallback(() => {
 		handleAddTableData(form.editForm.getValues());
-	}, []);
+	}, [handleAddTableData, form.editForm.getValues()]);
 
 	const onEditHandle = useCallback(() => {
 		handleEditTableData(form.editForm.getValues());
-	}, []);
+	}, [handleEditTableData, form.editForm.getValues()]);
 
-	const handleDeleteTableData = async (id: string) => {
-		try {
-			const response = await getGuidebooksDelete({
-				data: { id: id },
-				guidebookType: Guidebooks.REQUIREMENT,
-			});
-			if (response.status === 200) {
-				handleGetTableData(form.filterForm.getValues());
+	const handleDeleteTableData = useCallback(
+		async (id: string) => {
+			try {
+				const response = await getGuidebooksDelete({
+					data: { id: id },
+					guidebookType: Guidebooks.REQUIREMENT,
+				});
+				if (response.status === 200) {
+					handleGetTableData(form.filterForm.getValues());
+				}
+			} catch (error) {
+				console.log('Error:', error);
 			}
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	};
+		},
+		[handleGetTableData, form.filterForm.getValues()],
+	);
 
-	const handleGetOneTableData = async (id: string) => {
+	const handleGetOneTableData = useCallback(async (id: string) => {
 		try {
 			const response = await getGuidebooksDetail({
 				id: id,
@@ -154,21 +184,7 @@ export const RequirementsPage = () => {
 		} catch (error) {
 			console.log('Error:', error);
 		}
-	};
-
-	const handleEditTableData = async (data: Requirement) => {
-		try {
-			const response = await getGuidebooksEdit({
-				data: convertToServerRequirementData(data),
-				guidebookType: Guidebooks.REQUIREMENT,
-			});
-			if (response.status === 200) {
-				handleGetTableData(form.filterForm.getValues());
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	};
+	}, []);
 
 	const createColumns = (data: Requirement[]): TableColumn<Requirement>[] => {
 		if (!data) return [];
@@ -178,11 +194,11 @@ export const RequirementsPage = () => {
 				label: 'Регион',
 				width: 0,
 				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+					ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
 				cellRenderer: (props) =>
 					ColumnCell({
 						...props,
-						containerClassName: 'w-[300px]',
+						containerClassName: 'w-[200px]',
 						cellData: RuCountryNamesMap[`${props.cellData as Region}`],
 					}),
 			},
@@ -190,6 +206,7 @@ export const RequirementsPage = () => {
 				dataKey: 'buildingType',
 				label: 'Тип здания',
 				width: 0,
+
 				headerRenderer: (props) =>
 					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
 				cellRenderer: (props) =>
@@ -197,6 +214,20 @@ export const RequirementsPage = () => {
 						...props,
 						containerClassName: 'w-[300px]',
 						cellData: RuBuildingTypeNamesMap[`${props.cellData as BuildingType}`],
+					}),
+			},
+			{
+				dataKey: 'constructionType',
+				label: 'Тип конструкции',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) =>
+					ColumnCell({
+						...props,
+						containerClassName: 'w-[300px]',
+						cellData:
+							RuConstructionTypeNamesMap[`${props.cellData as ConstructionType}`],
 					}),
 			},
 			{
@@ -220,19 +251,19 @@ export const RequirementsPage = () => {
 				label: 'Срок действия стандарта',
 				width: 0,
 				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[200px]' }),
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
 			},
 			{
 				dataKey: 'firstPlacementRoom',
 				label: 'Конструкция разделяет',
 				width: 0,
 				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
 				cellRenderer: (props) =>
 					ColumnCell({
 						...props,
-						containerClassName: 'w-[200px]',
+						containerClassName: 'w-[300px]',
 						cellData: RuRoomTypeNamesMap[`${props.cellData as RoomType}`],
 					}),
 			},
@@ -241,11 +272,11 @@ export const RequirementsPage = () => {
 				label: 'Конструкция разделяет',
 				width: 0,
 				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
 				cellRenderer: (props) =>
 					ColumnCell({
 						...props,
-						containerClassName: 'w-[200px]',
+						containerClassName: 'w-[300px]',
 						cellData: RuRoomTypeNamesMap[`${props.cellData as RoomType}`],
 					}),
 			},
@@ -254,11 +285,10 @@ export const RequirementsPage = () => {
 				label: 'Действия',
 				width: 0,
 				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
 				cellRenderer: (props) =>
 					ColumnCell({
 						...props,
-						containerClassName: 'w-[200px]',
 						cellData: (
 							<div className="flex gap-2">
 								<EditIcon
