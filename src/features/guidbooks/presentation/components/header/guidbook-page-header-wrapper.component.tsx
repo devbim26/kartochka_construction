@@ -1,6 +1,6 @@
 import { Button, CleanUpIcon, useAppNavigate } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
@@ -21,7 +21,7 @@ interface GuidbookPageHeaderWrapperProps {
 
 export const GuidbookPageHeaderWrapper = memoize(
 	({ titles, forms, formElements, onSave }: GuidbookPageHeaderWrapperProps) => {
-		const currentForm = useRef<UseFormReturn>(forms.filterForm);
+		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
 		const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
 		);
@@ -29,12 +29,12 @@ export const GuidbookPageHeaderWrapper = memoize(
 		const navigate = useAppNavigate();
 		const [search] = useSearchParams();
 		const onCancelHandle = useCallback(() => {
-			currentForm.current.reset();
+			currentForm.reset();
 			window.history.back(), setCurrentHeaderFormType(HeaderFormTypes.filter);
 		}, []);
 
 		const onClearHandle = useCallback(() => {
-			currentForm.current.reset();
+			currentForm.reset();
 		}, []);
 
 		const onAddHandle = useCallback(() => {
@@ -51,43 +51,41 @@ export const GuidbookPageHeaderWrapper = memoize(
 		}, [search.get('add'), search.get('edit')]);
 
 		useEffect(() => {
-			currentForm.current =
-				currentHeaderFormType === HeaderFormTypes.add
-					? forms.addForm
-					: currentHeaderFormType === HeaderFormTypes.filter
-						? forms.filterForm
-						: forms.editForm;
+			if (currentHeaderFormType === HeaderFormTypes.add) setCurrentForm(forms.addForm);
+			else if (currentHeaderFormType === HeaderFormTypes.filter)
+				setCurrentForm(forms.filterForm);
+			else if (currentHeaderFormType === HeaderFormTypes.edit) setCurrentForm(forms.editForm);
 		}, [currentHeaderFormType]);
 
 		const submitHandle = useCallback(() => {
-			currentForm.current.handleSubmit(() => currentForm.current.getValues())();
-		}, []);
+			currentForm.handleSubmit(() => onSave())();
+		}, [currentForm, onSave]);
 
 		const formComponent = useMemo(() => {
 			return (
-				<FormProvider {...currentForm.current}>
+				<FormProvider {...currentForm}>
 					{currentHeaderFormType == HeaderFormTypes.filter ? (
 						<formElements.filter
-							control={currentForm.current.control}
-							setValue={currentForm.current.setValue}
-							formState={currentForm.current.formState}
+							control={currentForm.control}
+							setValue={currentForm.setValue}
+							formState={currentForm.formState}
 						/>
 					) : currentHeaderFormType == HeaderFormTypes.edit ? (
 						<formElements.edit
-							control={currentForm.current.control}
-							setValue={currentForm.current.setValue}
-							formState={currentForm.current.formState}
+							control={currentForm.control}
+							setValue={currentForm.setValue}
+							formState={currentForm.formState}
 						/>
 					) : (
 						<formElements.add
-							control={currentForm.current.control}
-							setValue={currentForm.current.setValue}
-							formState={currentForm.current.formState}
+							control={currentForm.control}
+							setValue={currentForm.setValue}
+							formState={currentForm.formState}
 						/>
 					)}
 				</FormProvider>
 			);
-		}, [currentForm.current, forms]);
+		}, [currentForm, forms]);
 
 		return (
 			<div className="flex w-full flex-col gap-[14px]">

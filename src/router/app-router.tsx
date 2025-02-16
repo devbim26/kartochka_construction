@@ -15,8 +15,10 @@ import {
 	MainScreen,
 	MaterialsPage,
 	NotFoundScreen,
+	RequirementsPage,
 	USERS_LIST_ROUTES,
 } from '@features';
+import IssuersPage from '@features/guidbooks/presentation/screens/issuers.screen';
 import { Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
@@ -59,12 +61,9 @@ export const AppRouter = () => {
 					/>
 					<Route
 						path={GUIDBOOKS_ROUTES.requirements.route}
-						element={<DevScreen title="Требования" />}
+						element={<RequirementsPage />}
 					/>
-					<Route
-						path={GUIDBOOKS_ROUTES.issuers.route}
-						element={<DevScreen title="Производители" />}
-					/>
+					<Route path={GUIDBOOKS_ROUTES.issuers.route} element={<IssuersPage />} />
 				</Route>
 				<Route
 					path={DESIGNING_ROUTES.users_list.route}

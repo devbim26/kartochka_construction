@@ -4,12 +4,16 @@ import { twMerge } from 'tailwind-merge';
 
 interface FormElementLabelProps extends ComponentPropsWithoutRef<'label'> {
 	forId?: string;
+	errorMessage?: string;
 }
 
-export const FormElementLabel = memoize(({ forId, children, className }: FormElementLabelProps) => {
-	return (
-		<label className={twMerge('p-regular-14 text-gray', className)} htmlFor={forId}>
-			{children}
-		</label>
-	);
-}, 'FormElementLabel');
+export const FormElementLabel = memoize(
+	({ forId, children, className, errorMessage }: FormElementLabelProps) => {
+		return (
+			<label className={twMerge('p-regular-14 text-gray', className)} htmlFor={forId}>
+				{errorMessage || children}
+			</label>
+		);
+	},
+	'FormElementLabel',
+);
