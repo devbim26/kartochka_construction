@@ -1,6 +1,16 @@
 import { Input, Select, useAppDispatch } from '@core';
-import { FormSubTitle, MaterialsAddAndEditData, RuRegionNamesSelectValues } from '@features';
-import { useState } from 'react';
+import { convertToPaginatedType, convertToSelectValues } from '@core/converters';
+import { convertToClientIssuerData } from '@core/converters/issuers/issuer.converter';
+import {
+	FormSubTitle,
+	getGuidebooksPaginated,
+	Guidebooks,
+	Issuer,
+	MaterialsAddAndEditData,
+	RuMaterialTypeNamesSelectValues,
+	RuRegionNamesSelectValues,
+} from '@features';
+import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -12,6 +22,30 @@ export const MaterialsAddAndEdit = () => {
 	const dispatch = useAppDispatch();
 	const [preview, setPreview] = useState<string | null>(null);
 	const [uploadError, setUploadError] = useState<boolean>(false);
+	const [issuerData, setIssuerData] = useState<Array<Issuer>>([]);
+
+	const handleGetIssuerData = useCallback(async () => {
+		try {
+			const response = await getGuidebooksPaginated({
+				data: {
+					name: null,
+					country: null,
+					logoUrl: null,
+					webSite: null,
+				},
+				guidebookType: Guidebooks.ISSUER,
+			});
+
+			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
+			setIssuerData(items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
+	useEffect(() => {
+		handleGetIssuerData();
+	}, []);
 
 	// const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 	// 	const file = event.target.files?.[0];
@@ -112,7 +146,9 @@ export const MaterialsAddAndEdit = () => {
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={[{ label: '1', value: '1' }]}
+							options={[
+								{ label: 'test', value: '2b2616d2-e2c0-4338-a717-c6c06d24e090' },
+							]}
 							error={formState.errors.materialType?.message}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px]',
@@ -153,7 +189,7 @@ export const MaterialsAddAndEdit = () => {
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={[{ label: '1', value: '1' }]}
+							options={RuMaterialTypeNamesSelectValues}
 							error={formState.errors.type?.message}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px]',
@@ -166,18 +202,25 @@ export const MaterialsAddAndEdit = () => {
 						/>
 					)}
 				/>
-				<Input
-					labelClassName={twMerge(
-						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-						formState.errors.issuer?.message ? 'text-error' : '',
+				<Controller
+					name="issuer"
+					control={control}
+					render={({ field }) => (
+						<Select
+							{...field}
+							value={field.value || ''}
+							options={convertToSelectValues(issuerData) ?? []}
+							error={formState.errors.issuer?.message}
+							labelClassName={twMerge(
+								'text-sm leading-5 tracking-[0.1px]',
+								formState.errors.issuer?.message ? 'text-error' : '',
+							)}
+							wrapperClassname="w-[226px] ring-input-border-primary"
+							buttonClassName="text-sm rounded-[8px]"
+							label={formState.errors.issuer?.message || 'Производитель'}
+							placeholder="Выберите производителя"
+						/>
 					)}
-					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-					containerClassName="w-[226px]"
-					label={formState.errors.issuer?.message || 'Производитель'}
-					error={formState.errors.issuer?.message}
-					placeholder="Введите производителя"
-					{...form.register('issuer')}
-					type={'text'}
 				/>
 				{/* <div className="relative flex items-start gap-4">
 					<div className="flex flex-col gap-y-2">
@@ -241,14 +284,14 @@ export const MaterialsAddAndEdit = () => {
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-						formState.errors.speedOfSound?.message ? 'text-error' : '',
+						formState.errors.velocity?.message ? 'text-error' : '',
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 					containerClassName="w-[226px]"
-					label={formState.errors.speedOfSound?.message || 'Скорость звука'}
-					error={formState.errors.speedOfSound?.message}
+					label={formState.errors.velocity?.message || 'Скорость звука'}
+					error={formState.errors.velocity?.message}
 					placeholder="Введите скорость"
-					{...form.register('speedOfSound')}
+					{...form.register('velocity')}
 					type={'number'}
 				/>
 				<Input

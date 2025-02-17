@@ -1,44 +1,5 @@
 import { z } from 'zod';
 
-const baseConstructionSchema = z.object({
-	type: z.string().min(1, 'Поле обязательно для заполнения'),
-	material: z.string().min(1, 'Поле обязательно для заполнения'),
-	thickness: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	density: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-});
-
-const claddingSchema = z.object({
-	type: z.string().min(1, 'Поле обязательно для заполнения'),
-	material: z.string().min(1, 'Поле обязательно для заполнения'),
-	thickness: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	density: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	racksStep: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	width: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	numberOfConnections: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => Number.isInteger(+value), 'Значение должно быть целым числом')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-});
-
 export const ConstructionsFilterSchema = z.object({
 	name: z.string(),
 	description: z.string(),
@@ -82,8 +43,6 @@ export const ConstructionsAddSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	baseConstruction: z.record(baseConstructionSchema.optional()),
-	cladding: z.record(claddingSchema.optional()),
 });
 
 export const ConstructionsEditSchema = z.object({

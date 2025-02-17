@@ -4,7 +4,6 @@ import {
 	ConstructionsEditData,
 	DescriptionFieldNames,
 	FormSubTitle,
-	RuPriorityNamesSelectValues,
 	RuRegionNamesSelectValues,
 	SpecificationsFieldNames,
 } from '@features';

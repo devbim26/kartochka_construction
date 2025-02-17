@@ -1,12 +1,24 @@
-import { ColumnCell, ColumnHeader, mapColumns, TableColumn, VTable } from '@core';
-import { convertToPaginatedType } from '@core/converters';
+import {
+	ColumnCell,
+	ColumnHeader,
+	DeleteIcon,
+	EditIcon,
+	mapColumns,
+	TableColumn,
+	useAppNavigate,
+	VTable,
+} from '@core';
 import {
 	convertToClientMaterialsAddAndEditData,
+	convertToPaginatedType,
 	convertToServerMaterialsAddAndEditData,
 	convertToServerMaterialsFilterData,
-} from '@core/converters/materials/materials.converter';
+} from '@core/converters';
 import {
 	getGuidebooksCreate,
+	getGuidebooksDelete,
+	getGuidebooksDetail,
+	getGuidebooksEdit,
 	getGuidebooksPaginated,
 	GuidbookPageHeaderWrapper,
 	Guidebooks,
@@ -16,24 +28,32 @@ import {
 	MaterialsFilter,
 	MaterialsFilterConfig,
 	MaterialsFilterData,
+	Region,
+	RuRegionNamesMap,
 	useHeaderForm,
 } from '@features';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const MaterialsScreen = () => {
+	const navigate = useAppNavigate();
+	const [search] = useSearchParams();
+	const [singleMaterial, setSingleMaterial] = useState<MaterialsAddAndEditData>();
+	const [tableData, setTableData] = useState<Array<MaterialsAddAndEditData>>([]);
+
 	const createColumns = (
 		data: MaterialsAddAndEditData[],
 	): TableColumn<MaterialsAddAndEditData>[] => {
 		if (!data) return [];
 		const columns: TableColumn<MaterialsAddAndEditData>[] = [
-			// {
-			// 	dataKey: 'imageUrl',
-			// 	label: 'Изображение',
-			// 	width: 0,
-			// 	headerRenderer: (props) =>
-			// 		ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-			// 	cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			// },
+			{
+				dataKey: 'imageUrl',
+				label: 'Изображение',
+				width: 0,
+				headerRenderer: (props) =>
+					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+			},
 			{
 				dataKey: 'name',
 				label: 'Название',
@@ -74,7 +94,11 @@ const MaterialsScreen = () => {
 				width: 0,
 				headerRenderer: (props) =>
 					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) =>
+					ColumnCell({
+						...props,
+						containerClassName: 'w-[300px]',
+					}),
 			},
 			{
 				dataKey: 'region',
@@ -82,7 +106,12 @@ const MaterialsScreen = () => {
 				width: 0,
 				headerRenderer: (props) =>
 					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+				cellRenderer: (props) =>
+					ColumnCell({
+						...props,
+						containerClassName: 'w-[300px]',
+						cellData: RuRegionNamesMap[`${props.cellData as Region}`],
+					}),
 			},
 			{
 				dataKey: 'density',
@@ -101,7 +130,7 @@ const MaterialsScreen = () => {
 				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
 			},
 			{
-				dataKey: 'speedOfSound',
+				dataKey: 'velocity',
 				label: 'Скорость звука',
 				width: 0,
 				headerRenderer: (props) =>
@@ -147,14 +176,14 @@ const MaterialsScreen = () => {
 						containerClassName: 'w-[300px]',
 						cellData: (
 							<div className="flex gap-2">
-								{/* <EditIcon
+								<EditIcon
 									onClick={() =>
 										navigate('', { edit: 'true', entityId: props.cellData })
 									}
 								/>
 								<DeleteIcon
 									onClick={() => handleDeleteTableData(props.cellData as string)}
-								/> */}
+								/>
 							</div>
 						),
 					}),
@@ -176,17 +205,10 @@ const MaterialsScreen = () => {
 		},
 	);
 
-	const [tableData, setTableData] = useState<Array<MaterialsAddAndEditData>>([]);
-
 	const columns = useMemo(() => createColumns(tableData), [tableData]);
 
-	const [filterName, filterMaterialType, filterDensity, filterThickness] = forms.filterForm.watch(
-		['name', 'materialType', 'thickness', 'density'],
-	);
-
-	const onSaveHandle = useCallback(() => {
-		handleAddTableData(forms.addForm.getValues());
-	}, []);
+	const [filterName, filterMaterialTypeId, filterDensity, filterThickness] =
+		forms.filterForm.watch(['name', 'materialTypeId', 'thickness', 'density']);
 
 	const handleGetTableData = async (data: MaterialsFilterData) => {
 		try {
@@ -203,6 +225,21 @@ const MaterialsScreen = () => {
 		}
 	};
 
+	const handleGetOneTableData = useCallback(async (id: string) => {
+		try {
+			const response = await getGuidebooksDetail({
+				id: id,
+				guidebookType: Guidebooks.MATERIAL,
+			});
+			if (response.status === 200) {
+				const data = convertToClientMaterialsAddAndEditData(response.data as any);
+				setSingleMaterial(data);
+			}
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
 	const handleAddTableData = async (data: MaterialsAddAndEditData) => {
 		try {
 			const response = await getGuidebooksCreate({
@@ -210,50 +247,67 @@ const MaterialsScreen = () => {
 				guidebookType: Guidebooks.MATERIAL,
 			});
 			if (response.status === 200) {
-				handleGetTableData(forms.addForm.getValues());
+				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData);
 			}
 		} catch (error) {
 			console.log('Error:', error);
 		}
 	};
 
-	// const handleEditTableData = async (data: MaterialsAddAndEditData) => {
-	// 	try {
-	// 		const response = await getGuidebooksEdit({
-	// 			data: convertToServerMaterialsAddAndEditData(data),
-	// 			guidebookType: Guidebooks.MATERIAL,
-	// 		});
-	// 		if (response.status === 200) {
-	// 			handleGetTableData(forms.filterForm.getValues());
-	// 		}
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 	}
-	// };
+	const handleEditTableData = async (data: MaterialsAddAndEditData) => {
+		try {
+			const response = await getGuidebooksEdit({
+				data: convertToServerMaterialsAddAndEditData(data),
+				guidebookType: Guidebooks.MATERIAL,
+			});
+			if (response.status === 200) {
+				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
-	// const handleDeleteTableData = async (id: string) => {
-	// 	try {
-	// 		const response = await getGuidebooksDelete({
-	// 			data: { id: id },
-	// 			guidebookType: Guidebooks.MATERIAL,
-	// 		});
-	// 		if (response.status === 200) {
-	// 			handleGetTableData(forms.filterForm.getValues());
-	// 		}
-	// 	} catch (error) {
-	// 		console.log('Error:', error);
-	// 	}
-	// };
+	const handleDeleteTableData = async (id: string) => {
+		try {
+			const response = await getGuidebooksDelete({
+				data: { id: id },
+				guidebookType: Guidebooks.MATERIAL,
+			});
+			if (response.status === 200) {
+				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData);
+			}
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	};
 
 	useEffect(() => {
-		const values = forms.filterForm.getValues();
-		handleGetTableData(values);
-	}, [filterDensity, filterName, filterThickness, filterMaterialType]);
+		handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData);
+	}, [filterDensity, filterName, filterThickness, filterMaterialTypeId]);
+
+	useEffect(() => {
+		if (singleMaterial) forms.editForm.reset(singleMaterial);
+	}, [singleMaterial]);
+
+	useEffect(() => {
+		if (search.get('edit') && search.get('entityId')) {
+			handleGetOneTableData(search.get('entityId')!);
+		}
+	}, [search]);
+
+	const onSaveHandle = useCallback(() => {
+		handleAddTableData(forms.addForm.getValues() as MaterialsAddAndEditData);
+	}, [handleAddTableData, forms.editForm.getValues()]);
+
+	const onEditHandle = useCallback(() => {
+		handleEditTableData(forms.editForm.getValues() as MaterialsAddAndEditData);
+	}, [handleEditTableData, forms.editForm.getValues()]);
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper
-				onSave={onSaveHandle}
+				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
 					pageTitle: 'Материалы',
 					editTitle: 'Редактирование материала',

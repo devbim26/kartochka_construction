@@ -22,7 +22,7 @@ export const MaterialsAddAndEditSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	speedOfSound: z
+	velocity: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
@@ -49,7 +49,7 @@ export const MaterialsFilterSchema = z.object({
 	name: z.string(),
 	density: z.string(),
 	thickness: z.string(),
-	materialType: z.string(),
+	materialTypeId: z.string(),
 });
 
 export type MaterialsAddAndEditSchemaType = z.infer<typeof MaterialsAddAndEditSchema>;

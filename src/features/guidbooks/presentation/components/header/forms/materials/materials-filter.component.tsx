@@ -7,6 +7,7 @@ export const MaterialsFilter = () => {
 	const form = useFormContext<MaterialsFilterData>();
 
 	const { formState, control } = form;
+
 	return (
 		<div className="flex flex-wrap gap-[16px]">
 			<Input
@@ -23,21 +24,18 @@ export const MaterialsFilter = () => {
 				type={'text'}
 			/>
 			<Controller
-				name="materialType"
+				name="materialTypeId"
 				control={control}
 				render={({ field }) => (
 					<Select
 						{...field}
 						value={field.value || ''}
-						options={[{ label: 'Membrane(ge)', value: 'Membrane(ge)' }]}
-						error={formState.errors.materialType?.message}
-						labelClassName={twMerge(
-							'text-sm leading-5 tracking-[0.1px]',
-							formState.errors.materialType?.message ? 'text-error' : '',
-						)}
+						options={[{ label: 'test', value: '2b2616d2-e2c0-4338-a717-c6c06d24e090' }]}
+						error={formState.errors.materialTypeId?.message}
+						labelClassName="text-sm leading-5 tracking-[0.1px]"
 						wrapperClassname="w-[226px] ring-input-border-primary"
 						buttonClassName="text-sm rounded-[8px]"
-						label={formState.errors.materialType?.message || 'Тип материала'}
+						label="Тип материала"
 						placeholder="Выберите тип материала"
 					/>
 				)}

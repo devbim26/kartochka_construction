@@ -5,7 +5,7 @@ import type {
 	Region as ClientRegion,
 	RequirementFilter,
 } from '@features/guidbooks/types';
-import { ConstructionType } from '@features/guidbooks/types';
+import { ConstructionType } from '@features/guidbooks/types/construction.types';
 import type { RequirementsDataSchemaType } from '@features/guidbooks/utils';
 import { buildingTypeMap, convertToClientBuildingTypeData } from '../buildingType.converter';
 import { categoryClassMap, convertToClientCategoryClassData } from '../categoryClass.converter';

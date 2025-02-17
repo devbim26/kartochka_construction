@@ -1,14 +1,7 @@
 import type { RequirementDto } from '@api-gen';
 import type { TableColumn } from '@core';
-import {
-	ColumnCell,
-	ColumnHeader,
-	convertToPaginatedType,
-	DeleteIcon,
-	mapColumns,
-	useAppNavigate,
-	VTable,
-} from '@core';
+import { ColumnCell, ColumnHeader, DeleteIcon, mapColumns, useAppNavigate, VTable } from '@core';
+import { convertToPaginatedType } from '@core/converters';
 import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {
 	convertToClientRequirementData,
@@ -21,28 +14,22 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import type {
-	BuildingType,
-	ConstructionType,
-	Region,
-	Requirement,
-	RoomType,
-} from '@features/guidbooks/types';
+import type { BuildingType, Region, Requirement, RoomType } from '@features/guidbooks/types';
 import {
 	Guidebooks,
 	RuBuildingTypeNamesMap,
-	RuConstructionTypeNamesMap,
 	RuCountryNamesMap,
 	RuRoomTypeNamesMap,
 } from '@features/guidbooks/types';
+import {
+	ConstructionType,
+	RuConstructionTypeNamesMap,
+} from '@features/guidbooks/types/construction.types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { RequirementsDataConfig, useHeaderForm } from '../../utils';
-import {
-	GuidbookPageHeaderWrapper,
-	RequirementsAddAndEdit,
-	RequirementsFilter,
-} from '../components';
+import { GuidbookPageHeaderWrapper } from '../components';
+import { RequirementsAddAndEdit, RequirementsFilter } from '../components/header/forms';
 
 export const RequirementsPage = () => {
 	const navigate = useAppNavigate();

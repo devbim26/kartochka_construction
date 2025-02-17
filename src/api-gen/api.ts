@@ -144,39 +144,6 @@ export interface CreateConstructionTypeTemplateDto {
 	constructionRoot?: CreateConstructionRootTemplateDto;
 }
 
-export interface CreateIssuerCommand {
-	name: string | null;
-	country?: Country;
-	logoUrl?: string | null;
-	webSite?: string | null;
-}
-
-export interface CreateMaterialCommand {
-	name?: string | null;
-	description?: string | null;
-	shortName?: string | null;
-	/** @format float */
-	density?: number;
-	/** @format float */
-	thickness?: number;
-	region?: Region;
-	/** @format uuid */
-	issuerId?: string | null;
-	imageUrl?: string | null;
-	/** @format float */
-	materialCoefficient?: number;
-	/** @format float */
-	velocity?: number;
-	/** @format float */
-	lossFactor?: number;
-	/** @format float */
-	youngModulus?: number;
-	/** @format float */
-	damping?: number;
-	/** @format float */
-	solid?: number;
-}
-
 export interface CreateReportDto {
 	reportNumber?: string | null;
 	client?: string | null;
@@ -210,21 +177,6 @@ export interface CreateRequirementCommand {
 export interface CreateUploadingUrlCommand {
 	mimeType: string | null;
 	isPublic: boolean;
-}
-
-export interface CreateUserCommand {
-	phoneNumber?: string | null;
-	companyName?: string | null;
-	bankIdNumber?: string | null;
-	payersRegistrationNumber?: string | null;
-	paymentAccount?: string | null;
-	bankAddress?: string | null;
-	companyAddress?: string | null;
-	directorFullName?: string | null;
-	companyDescription?: string | null;
-	additionalPhoneNumbers?: string[] | null;
-	logoUrl?: string | null;
-	password: string | null;
 }
 
 export interface DeleteConstructionHeaderCommand {
@@ -286,6 +238,8 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	density?: number | null;
 	/** @format float */
 	thickness?: number | null;
+	/** @format uuid */
+	materialTypeId?: string | null;
 }
 
 export interface GetReportWithPaginationQuery {
@@ -584,42 +538,6 @@ export interface UpdateConstructionHeaderCommand {
 	constructionType?: CreateConstructionTypeTemplateDto;
 }
 
-export interface UpdateIssuerCommand {
-	/** @format uuid */
-	id: string;
-	name: string | null;
-	country?: Country;
-	logoUrl?: string | null;
-	webSite?: string | null;
-}
-
-export interface UpdateMaterialCommand {
-	/** @format uuid */
-	id?: string;
-	name?: string | null;
-	description?: string | null;
-	/** @format float */
-	density?: number;
-	/** @format float */
-	thickness?: number;
-	region?: Region;
-	/** @format uuid */
-	issuerId?: string | null;
-	imageUrl?: string | null;
-	/** @format float */
-	materialCoefficient?: number;
-	/** @format float */
-	velocity?: number;
-	/** @format float */
-	lossFactor?: number;
-	/** @format float */
-	youngModulus?: number;
-	/** @format float */
-	damping?: number;
-	/** @format float */
-	solid?: number;
-}
-
 export interface UpdateRequirementCommand {
 	/** @format uuid */
 	id?: string;
@@ -816,12 +734,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name AccountRegisterCreate
 		 * @request POST:/api/Account/register
 		 */
-		accountRegisterCreate: (data: CreateUserCommand, params: RequestParams = {}) =>
+		accountRegisterCreate: (
+			data: {
+				PhoneNumber?: string;
+				CompanyName?: string;
+				BankIdNumber?: string;
+				PayersRegistrationNumber?: string;
+				PaymentAccount?: string;
+				BankAddress?: string;
+				CompanyAddress?: string;
+				DirectorFullName?: string;
+				CompanyDescription?: string;
+				AdditionalPhoneNumbers?: string[];
+				/** @format binary */
+				FormFile?: File;
+				Password: string;
+			},
+			params: RequestParams = {},
+		) =>
 			this.request<void, any>({
 				path: `/api/Account/register`,
 				method: 'POST',
 				body: data,
-				type: ContentType.Json,
+				type: ContentType.FormData,
 				...params,
 			}),
 
@@ -847,12 +782,28 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name AccountUpdateUpdate
 		 * @request PUT:/api/Account/update
 		 */
-		accountUpdateUpdate: (data: AccountDto, params: RequestParams = {}) =>
+		accountUpdateUpdate: (
+			data: {
+				CompanyName?: string;
+				PhoneNumber?: string;
+				PayersRegistrationNumber?: string;
+				PaymentAccount?: string;
+				BankIdNumber?: string;
+				DirectorFullName?: string;
+				BankAddress?: string;
+				CompanyAddress?: string;
+				CompanyDescription?: string;
+				AdditionalPhoneNumbers?: AdditionalPhoneNumber[];
+				/** @format binary */
+				FormFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
 			this.request<void, any>({
 				path: `/api/Account/update`,
 				method: 'PUT',
 				body: data,
-				type: ContentType.Json,
+				type: ContentType.FormData,
 				...params,
 			}),
 
@@ -1055,12 +1006,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name IssuerCreate
 		 * @request POST:/api/Issuer
 		 */
-		issuerCreate: (data: CreateIssuerCommand, params: RequestParams = {}) =>
+		issuerCreate: (
+			data: {
+				Name: string;
+				Country?: Country;
+				WebSite?: string;
+				/** @format binary */
+				FormFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
 			this.request<IssuerDto, any>({
 				path: `/api/Issuer`,
 				method: 'POST',
 				body: data,
-				type: ContentType.Json,
+				type: ContentType.FormData,
 				format: 'json',
 				...params,
 			}),
@@ -1088,12 +1048,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name IssuerUpdate
 		 * @request PUT:/api/Issuer
 		 */
-		issuerUpdate: (data: UpdateIssuerCommand, params: RequestParams = {}) =>
+		issuerUpdate: (
+			data: {
+				/** @format uuid */
+				Id: string;
+				Name: string;
+				Country?: Country;
+				WebSite?: string;
+				/** @format binary */
+				FormFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
 			this.request<IssuerDto, any>({
 				path: `/api/Issuer`,
 				method: 'PUT',
 				body: data,
-				type: ContentType.Json,
+				type: ContentType.FormData,
 				format: 'json',
 				...params,
 			}),
@@ -1140,12 +1111,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name MaterialCreate
 		 * @request POST:/api/Material
 		 */
-		materialCreate: (data: CreateMaterialCommand, params: RequestParams = {}) =>
+		materialCreate: (
+			data: {
+				Name?: string;
+				Description?: string;
+				ShortName?: string;
+				/** @format float */
+				Density?: number;
+				/** @format float */
+				Thickness?: number;
+				Region?: Region;
+				/** @format uuid */
+				IssuerId?: string;
+				/** @format binary */
+				FormFile?: File;
+				/** @format float */
+				MaterialCoefficient?: number;
+				/** @format float */
+				Velocity?: number;
+				/** @format float */
+				LossFactor?: number;
+				/** @format float */
+				YoungModulus?: number;
+				/** @format float */
+				Damping?: number;
+				/** @format float */
+				Solid?: number;
+			},
+			params: RequestParams = {},
+		) =>
 			this.request<MaterialDto, any>({
 				path: `/api/Material`,
 				method: 'POST',
 				body: data,
-				type: ContentType.Json,
+				type: ContentType.FormData,
 				format: 'json',
 				...params,
 			}),
@@ -1173,12 +1172,41 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name MaterialUpdate
 		 * @request PUT:/api/Material
 		 */
-		materialUpdate: (data: UpdateMaterialCommand, params: RequestParams = {}) =>
+		materialUpdate: (
+			data: {
+				/** @format uuid */
+				Id?: string;
+				Name?: string;
+				Description?: string;
+				/** @format float */
+				Density?: number;
+				/** @format float */
+				Thickness?: number;
+				Region?: Region;
+				/** @format uuid */
+				IssuerId?: string;
+				/** @format float */
+				MaterialCoefficient?: number;
+				/** @format float */
+				Velocity?: number;
+				/** @format float */
+				LossFactor?: number;
+				/** @format float */
+				YoungModulus?: number;
+				/** @format float */
+				Damping?: number;
+				/** @format float */
+				Solid?: number;
+				/** @format binary */
+				FormFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
 			this.request<MaterialDto, any>({
 				path: `/api/Material`,
 				method: 'PUT',
 				body: data,
-				type: ContentType.Json,
+				type: ContentType.FormData,
 				format: 'json',
 				...params,
 			}),

@@ -1,13 +1,13 @@
 import { Input, Select, Switch } from '@core';
 import {
 	ConstructionComponentsMap,
-	ConstructionsAddData,
 	DescriptionFieldNames,
 	FormSubTitle,
-	RuPriorityNamesSelectValues,
 	RuRegionNamesSelectValues,
 	SpecificationsFieldNames,
 } from '@features';
+import { ConstructionsAddData } from '@features/guidbooks/types/constructions';
+import { RuPriorityNamesSelectValues } from '@features/guidbooks/types/priority.types';
 import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoWarningOutline } from 'react-icons/io5';

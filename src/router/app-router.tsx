@@ -16,10 +16,10 @@ import {
 	MainScreen,
 	MaterialsScreen,
 	NotFoundScreen,
-	RequirementsPage,
 	USERS_LIST_ROUTES,
 } from '@features';
 import IssuersPage from '@features/guidbooks/presentation/screens/issuers.screen';
+import { RequirementsPage } from '@features/guidbooks/presentation/screens/requirements.screen';
 import { Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {

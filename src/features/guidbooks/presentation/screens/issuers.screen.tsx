@@ -1,14 +1,7 @@
 import type { IssuerDto } from '@api-gen';
 import type { TableColumn } from '@core';
-import {
-	ColumnCell,
-	ColumnHeader,
-	convertToPaginatedType,
-	DeleteIcon,
-	mapColumns,
-	useAppNavigate,
-	VTable,
-} from '@core';
+import { ColumnCell, ColumnHeader, DeleteIcon, mapColumns, useAppNavigate, VTable } from '@core';
+import { convertToPaginatedType } from '@core/converters';
 import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {
 	convertToClientIssuerData,
