@@ -1,15 +1,5 @@
 import type { RequirementDto } from '@api-gen';
-import type { TableColumn } from '@core';
-import {
-	ColumnCell,
-	ColumnHeader,
-	convertToPaginatedType,
-	DeleteIcon,
-	mapColumns,
-	useAppNavigate,
-	VTable,
-} from '@core';
-import { EditIcon } from '@core/presentation/icons/edit.icon';
+import { convertToPaginatedType, mapColumns, useAppNavigate } from '@core';
 import {
 	convertToClientRequirementData,
 	convertToServerRequirementData,
@@ -21,20 +11,9 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import type {
-	BuildingType,
-	ConstructionType,
-	Region,
-	Requirement,
-	RoomType,
-} from '@features/guidbooks/types';
-import {
-	Guidebooks,
-	RuBuildingTypeNamesMap,
-	RuConstructionTypeNamesMap,
-	RuCountryNamesMap,
-	RuRoomTypeNamesMap,
-} from '@features/guidbooks/types';
+import type { Requirement } from '@features/guidbooks/types';
+import { Guidebooks } from '@features/guidbooks/types';
+import { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { RequirementsDataConfig, useHeaderForm } from '../../utils';
@@ -186,124 +165,9 @@ export const RequirementsPage = () => {
 		}
 	}, []);
 
-	const createColumns = (data: Requirement[]): TableColumn<Requirement>[] => {
+	const createColumns = (data: Requirement[]): ColumnDef<Requirement>[] => {
 		if (!data) return [];
-		const columns: TableColumn<Requirement>[] = [
-			{
-				dataKey: 'region',
-				label: 'Регион',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[200px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						containerClassName: 'w-[200px]',
-						cellData: RuCountryNamesMap[`${props.cellData as Region}`],
-					}),
-			},
-			{
-				dataKey: 'buildingType',
-				label: 'Тип здания',
-				width: 0,
-
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						containerClassName: 'w-[300px]',
-						cellData: RuBuildingTypeNamesMap[`${props.cellData as BuildingType}`],
-					}),
-			},
-			{
-				dataKey: 'constructionType',
-				label: 'Тип конструкции',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						containerClassName: 'w-[300px]',
-						cellData:
-							RuConstructionTypeNamesMap[`${props.cellData as ConstructionType}`],
-					}),
-			},
-			{
-				dataKey: 'standartFullName',
-				label: 'Стандарт полное',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			},
-			{
-				dataKey: 'standartShortName',
-				label: 'Стандарт краткое',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			},
-			{
-				dataKey: 'standartValidityPeriod',
-				label: 'Срок действия стандарта',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			},
-			{
-				dataKey: 'firstPlacementRoom',
-				label: 'Конструкция разделяет',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						containerClassName: 'w-[300px]',
-						cellData: RuRoomTypeNamesMap[`${props.cellData as RoomType}`],
-					}),
-			},
-			{
-				dataKey: 'secondPlacementRoom',
-				label: 'Конструкция разделяет',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						containerClassName: 'w-[300px]',
-						cellData: RuRoomTypeNamesMap[`${props.cellData as RoomType}`],
-					}),
-			},
-			{
-				dataKey: 'id',
-				label: 'Действия',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						cellData: (
-							<div className="flex gap-2">
-								<EditIcon
-									onClick={() =>
-										navigate('', { edit: 'true', entityId: props.cellData })
-									}
-								/>
-								<DeleteIcon
-									onClick={() => handleDeleteTableData(props.cellData as string)}
-								/>
-							</div>
-						),
-					}),
-			},
-		];
+		const columns: ColumnDef<Requirement>[] = [];
 		return mapColumns(columns);
 	};
 
@@ -324,8 +188,7 @@ export const RequirementsPage = () => {
 					add: RequirementsAddAndEdit,
 					edit: RequirementsAddAndEdit,
 				}}
-			/>{' '}
-			{!!tableData.length && <VTable pageSize={10} data={tableData} columns={columns} />}
+			/>
 		</div>
 	);
 };

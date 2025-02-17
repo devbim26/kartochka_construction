@@ -4,4 +4,4 @@ export * from './entity.types';
 export * from './form.types';
 export * from './network.types';
 export * from './pagination.types';
-export * from './table.types';
+export * from './simple-table.types';
