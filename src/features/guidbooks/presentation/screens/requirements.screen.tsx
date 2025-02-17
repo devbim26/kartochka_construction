@@ -13,7 +13,7 @@ import {
 } from '@features/guidbooks/services';
 import type { Requirement } from '@features/guidbooks/types';
 import { Guidebooks } from '@features/guidbooks/types';
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { RequirementsDataConfig, useHeaderForm } from '../../utils';
