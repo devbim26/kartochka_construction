@@ -1,8 +1,8 @@
-import { Region as ServerRegion } from '@api-gen/api';
+import { Region as ServerRegion } from '@api-gen';
 import { createDataRecordConverter } from '@core/utils';
-import { RuRegionNames as ClientRegion } from '@features';
+import { Region as ClientRegion } from '@features/guidbooks/types';
 
-export const RegionConverter = createDataRecordConverter({
+export const regionMap = createDataRecordConverter({
 	[ClientRegion.None]: ServerRegion.None,
 	[ClientRegion.Albania]: ServerRegion.Albania,
 	[ClientRegion.Andorra]: ServerRegion.Andorra,
@@ -47,3 +47,11 @@ export const RegionConverter = createDataRecordConverter({
 	[ClientRegion.Switzerland]: ServerRegion.Switzerland,
 	[ClientRegion.Ukrain]: ServerRegion.Ukrain,
 });
+
+export const convertToServerRegionData = (type: ClientRegion): ServerRegion => {
+	return regionMap.toServer[type];
+};
+
+export const convertToClientRegionData = (type: ServerRegion): ClientRegion => {
+	return regionMap.toClient[type];
+};

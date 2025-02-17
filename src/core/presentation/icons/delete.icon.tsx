@@ -1,22 +1,21 @@
-import type { IconBaseProps } from 'react-icons';
+import { RiDeleteBin6Line } from 'react-icons/ri';
+import { twMerge } from 'tailwind-merge';
 
-export const DeleteIcon = (props: IconBaseProps) => {
+type Props = {
+	className?: string;
+	onClick: () => void;
+};
+
+export const DeleteIcon = ({ className, onClick }: Props) => {
 	return (
-		<svg
-			width="18"
-			height="18"
-			viewBox="0 0 18 18"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			{...props}
+		<div
+			onClick={onClick}
+			className={twMerge(
+				'flex size-[32px] cursor-pointer items-center justify-center rounded-[8px] border border-error bg-[#F86F6F]/20',
+				className,
+			)}
 		>
-			<path
-				d="M3 4.49316H15M12 4.49316L11.797 3.88422C11.6003 3.2941 11.502 2.99904 11.3195 2.7809C11.1584 2.58826 10.9516 2.43916 10.7179 2.34725C10.4532 2.24316 10.1422 2.24316 9.52018 2.24316H8.47982C7.85779 2.24316 7.54677 2.24316 7.28213 2.34725C7.04844 2.43916 6.84156 2.58826 6.68047 2.7809C6.49804 2.99904 6.39969 3.2941 6.20298 3.88422L6 4.49316M13.5 4.49316V12.1432C13.5 13.4033 13.5 14.0333 13.2548 14.5146C13.039 14.938 12.6948 15.2822 12.2715 15.4979C11.7902 15.7432 11.1601 15.7432 9.9 15.7432H8.1C6.83988 15.7432 6.20982 15.7432 5.72852 15.4979C5.30516 15.2822 4.96095 14.938 4.74524 14.5146C4.5 14.0333 4.5 13.4033 4.5 12.1432V4.49316M10.5 7.49316V12.7432M7.5 7.49316V12.7432"
-				stroke="#F86F6F"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			/>
-		</svg>
+			<RiDeleteBin6Line className="size-[20px] text-error" />
+		</div>
 	);
 };

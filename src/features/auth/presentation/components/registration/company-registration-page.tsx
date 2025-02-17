@@ -89,7 +89,7 @@ const CompanyRegistrationPage = () => {
 
 	useEffect(() => {
 		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.registration.fetch_name &&
-			navigate(APP_ROUTES.auth + '/' + AUTH_ROUTES.login);
+			navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.login.route);
 	}, [authData.fetch_data?.fetch_name]);
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
@@ -279,6 +279,14 @@ const CompanyRegistrationPage = () => {
 					<Button variant="primary" className="h-[36px]">
 						Зарегистрироваться
 					</Button>
+					<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
+						<p
+							onClick={() => navigate(APP_ROUTES.landing.route)}
+							className="cursor-pointer font-semibold underline-offset-auto hover:underline"
+						>
+							На главную
+						</p>
+					</div>
 				</div>
 			</form>
 		</div>
