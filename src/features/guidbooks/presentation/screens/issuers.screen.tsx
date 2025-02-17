@@ -1,15 +1,12 @@
 import type { IssuerDto } from '@api-gen';
-import type { TableColumn } from '@core';
 import {
-	ColumnCell,
-	ColumnHeader,
 	convertToPaginatedType,
-	DeleteIcon,
 	mapColumns,
+	SimpleTable,
+	SimpleTableCell,
+	SimpleTableHeaderCell,
 	useAppNavigate,
-	VTable,
 } from '@core';
-import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {
 	convertToClientIssuerData,
 	convertToServerIssuerData,
@@ -21,8 +18,9 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import type { Country, Issuer } from '@features/guidbooks/types';
-import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
+import type { Issuer } from '@features/guidbooks/types';
+import { Guidebooks } from '@features/guidbooks/types';
+import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { IssuersDataConfig, IssuersFormCofig, useHeaderForm } from '../../utils';
@@ -155,69 +153,42 @@ const IssuersPage = () => {
 		handleEditTableData(form.editForm.getValues());
 	}, [handleEditTableData, form.editForm.getValues()]);
 
-	const createColumns = (data: Issuer[]): TableColumn<Issuer>[] => {
+	const createColumns = (data: Issuer[]): ColumnDef<Issuer>[] => {
 		if (!data) return [];
-		const columns: TableColumn<Issuer>[] = [
+		const columns: ColumnDef<Issuer>[] = [
 			{
-				dataKey: 'name',
-				label: 'Имя',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+				accessorKey: 'name',
+				header: () => <SimpleTableHeaderCell text={'Производитель'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				dataKey: 'country',
-				label: 'Страна',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						containerClassName: 'w-[300px]',
-						cellData: RuCountryNamesMap[`${props.cellData as Country}`],
-					}),
+				accessorKey: 'country',
+				header: () => <SimpleTableHeaderCell text={'Страна'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				dataKey: 'webSite',
-				label: 'Сайт',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+				accessorKey: 'logoUrl',
+				header: () => <SimpleTableHeaderCell text={'Логотип'} />,
+				cell: (info) => {
+					const value = info.getValue() as string | null;
+					return (
+						<SimpleTableCell
+							contentClassName="h-[39px] w-[39px]"
+							content={
+								value ? (
+									<img src={info.getValue() as string} className="size-[39px]" />
+								) : (
+									''
+								)
+							}
+						/>
+					);
+				},
 			},
 			{
-				dataKey: 'logoUrl',
-				label: 'Логотип',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			},
-			{
-				dataKey: 'id',
-				label: 'Действия',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						containerClassName: 'w-[300px]',
-						cellData: (
-							<div className="flex gap-2">
-								<EditIcon
-									onClick={() =>
-										navigate('', { edit: 'true', entityId: props.cellData })
-									}
-								/>
-								<DeleteIcon
-									onClick={() => handleDeleteTableData(props.cellData as string)}
-								/>
-							</div>
-						),
-					}),
+				accessorKey: 'webSite',
+				header: () => <SimpleTableHeaderCell text={'Сайт'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 		];
 		return mapColumns(columns);
@@ -240,8 +211,8 @@ const IssuersPage = () => {
 					add: IssuersAddEdit,
 					edit: IssuersAddEdit,
 				}}
-			/>{' '}
-			{!!tableData.length && <VTable pageSize={10} data={tableData} columns={columns} />}
+			/>
+			{!!tableData.length && <SimpleTable pageSize={10} data={tableData} columns={columns} />}
 		</div>
 	);
 };
