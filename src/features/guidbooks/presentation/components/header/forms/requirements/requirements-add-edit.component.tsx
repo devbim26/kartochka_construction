@@ -70,6 +70,26 @@ export const RequirementsAddAndEdit = memoize(() => {
 			/>
 			<Controller
 				control={control}
+				name={'class'}
+				render={({ field }) => (
+					<Select
+						options={RuCategoryClassSelectValues}
+						{...field}
+						value={field.value || ''}
+						label={formState.errors?.class?.message || 'Класс'}
+						isSearchable
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+							formState.errors.class?.message ? 'text-error' : '',
+						)}
+						placeholder="Выберите класс"
+						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
+					/>
+				)}
+			/>
+			<Controller
+				control={control}
 				name={'constructionType'}
 				render={({ field }) => (
 					<Select
@@ -177,26 +197,6 @@ export const RequirementsAddAndEdit = memoize(() => {
 				label={formState.errors?.standartFullName?.message || 'Название стандарта полное'}
 				placeholder="Введите название стандарта"
 				max={10}
-			/>
-			<Controller
-				control={control}
-				name={'class'}
-				render={({ field }) => (
-					<Select
-						options={RuCategoryClassSelectValues}
-						{...field}
-						value={field.value || ''}
-						label={formState.errors?.class?.message || 'Класс'}
-						isSearchable
-						labelClassName={twMerge(
-							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.class?.message ? 'text-error' : '',
-						)}
-						placeholder="Выберите класс"
-						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
-					/>
-				)}
 			/>
 			<Input
 				{...register('noizeIsolationIndex')}

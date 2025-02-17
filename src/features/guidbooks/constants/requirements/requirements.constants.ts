@@ -2,7 +2,7 @@ import type { Requirement, RequirementFilter } from '../../types/requirements/re
 
 export const RequirementsFilterFormDefaultValues: RequirementFilter = {
 	region: '',
-	construction: '',
+	constructionType: '',
 	firstPlacementRoom: '',
 	secondPlacementRoom: '',
 	buildingType: '',
@@ -10,7 +10,7 @@ export const RequirementsFilterFormDefaultValues: RequirementFilter = {
 
 export const RequirementsAddFormDefaultValues: Requirement = {
 	region: '',
-	construction: '',
+	constructionType: '',
 	class: '',
 	firstPlacementRoom: '',
 	secondPlacementRoom: '',
@@ -19,5 +19,6 @@ export const RequirementsAddFormDefaultValues: Requirement = {
 	standartShortName: '',
 	standartFullName: '',
 	noizeIsolationIndex: '',
+	noizeImpactIndex: '',
 	notice: '',
 };
