@@ -20,11 +20,13 @@ const RequirementsSchema = z.object({
 	noizeIsolationIndex: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value >= 0, 'Значение должно быть больше нуля'),
+		.refine((value) => /^\d+$/.test(value), 'Значение должно быть целым числом')
+		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
 	noizeImpactIndex: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value >= 0, 'Значение должно быть больше нуля'),
+		.refine((value) => /^\d+$/.test(value), 'Значение должно быть целым числом')
+		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
 	notice: z.string().optional(),
 });
 
