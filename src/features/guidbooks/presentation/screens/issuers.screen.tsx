@@ -12,7 +12,7 @@ import {
 import {
 	convertToClientIssuerData,
 	convertToServerIssuerData,
-} from '@features/guidbooks/constants/converter';
+} from '@features/guidbooks/converters';
 import {
 	getGuidebooksCreate,
 	getGuidebooksDelete,
@@ -29,7 +29,7 @@ import { IssuersDataConfig, IssuersFormCofig, useHeaderForm } from '../../utils'
 import { GuidbookPageHeaderWrapper } from '../components';
 import { IssuersAddEdit, IssuersFilter } from '../components/header/forms/issuers';
 
-const IssuersPage = () => {
+const IssuersScreen = () => {
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const [singleIssuer, setSingleIssuer] = useState<Issuer>();
@@ -240,4 +240,4 @@ const IssuersPage = () => {
 	);
 };
 
-export default IssuersPage;
+export default IssuersScreen;

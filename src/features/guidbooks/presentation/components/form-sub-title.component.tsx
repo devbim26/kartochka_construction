@@ -10,7 +10,7 @@ export const FormSubTitle = memoize(({ text, className }: FormSubTitleProps) => 
 	return (
 		<p
 			className={twMerge(
-				'font-sans text-[17px] font-normal leading-5 tracking-[0.1px]',
+				'font-sans text-[17px] font-normal leading-5 tracking-[0.1px] text-primary',
 				className,
 			)}
 		>

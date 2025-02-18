@@ -1,34 +1,33 @@
 {
 	"compilerOptions": {
-	  "target": "es5",
-	  "lib": ["dom", "dom.iterable", "esnext"],
-	  "paths": {
-		"@*": ["./src/*"],
-		"@api-gen": ["./src/api-gen"],
-		"@app": ["./src/app"],
-		"@core": ["./src/core"],
-		"@features": ["./src/features"],
-		"@app/*": ["./src/app/*"],
-		"@core/*": ["./src/core/*"],
-		"@features/*": ["./src/features/*"],
-		"@assets/*": ["./src/assets/*"],
-		"router": ["./src/router"],
-		"router/*": ["./src/router/"],
-	  },
-	  "allowJs": true,
-	  "skipLibCheck": true,
-	  "esModuleInterop": true,
-	  "allowSyntheticDefaultImports": true,
-	  "strict": true,
-	  "forceConsistentCasingInFileNames": true,
-	  "noFallthroughCasesInSwitch": true,
-	  "module": "esnext",
-	  "moduleResolution": "node",
-	  "resolveJsonModule": true,
-	  "isolatedModules": true,
-	  "jsx": "react-jsx"
+		"target": "es5",
+		"lib": ["dom", "dom.iterable", "esnext"],
+		"paths": {
+			"@*": ["./src/*"],
+			"@api-gen": ["./src/api-gen"],
+			"@app": ["./src/app"],
+			"@core": ["./src/core"],
+			"@features": ["./src/features"],
+			"@app/*": ["./src/app/*"],
+			"@core/*": ["./src/core/*"],
+			"@features/*": ["./src/features/*"],
+			"@assets/*": ["./src/assets/*"],
+			"router": ["./src/router"],
+			"router/*": ["./src/router/"]
+		},
+		"allowJs": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"noFallthroughCasesInSwitch": true,
+		"module": "esnext",
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"jsx": "react-jsx"
 	},
 	"include": ["**/*.ts", "**/*.tsx"],
 	"exclude": ["node_modules"]
-  }
-  
+}

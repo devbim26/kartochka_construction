@@ -1,12 +1,15 @@
 import { Button, CleanUpIcon, useAppNavigate } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import { guidbookHeaderTitlesMap } from '@features/guidbooks/constants';
+import {
+	HeaderFormTypes,
+	type HeaderFormElements,
+	type HeaderFormTitles,
+} from '@features/guidbooks/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
-import { twMerge } from 'tailwind-merge';
-import { guidbookHeaderTitlesMap } from '../../../constants';
-import { HeaderFormTypes, type HeaderFormElements, type HeaderFormTitles } from '../../../types';
 
 interface GuidbookPageHeaderWrapperProps {
 	titles: HeaderFormTitles;
@@ -90,24 +93,15 @@ export const GuidbookPageHeaderWrapper = memoize(
 
 		return (
 			<div className="flex w-full flex-col gap-[14px]">
-				<div
-					className={twMerge(
-						'flex',
-						currentHeaderFormType === HeaderFormTypes.filter
-							? 'flex-row justify-between'
-							: 'justify-start',
-					)}
-				>
-					<p className="font-sans text-base font-semibold leading-4">
-						{titles.pageTitle}
-					</p>
+				<div className="flex items-center justify-between">
+					<p className="font-sans text-lg font-semibold leading-6">{titles.pageTitle}</p>
 					{currentHeaderFormType === HeaderFormTypes.filter && (
 						<Button
 							className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
 							onClick={onAddHandle}
 						>
 							<FaPlus fill="white" width={'16px'} height={'16px'} />
-							<p className="font-sans text-base font-semibold leading-4 text-white">
+							<p className="font-sans text-sm font-semibold leading-[18px]">
 								Добавить
 							</p>
 						</Button>
@@ -120,13 +114,16 @@ export const GuidbookPageHeaderWrapper = memoize(
 					<div className="flex flex-wrap gap-[16px] border-b border-solid px-[16px] pb-[24px] pt-[16px]">
 						{formComponent}
 					</div>
-					<div className="flex flex-row justify-end gap-[30px] pb-[25px] pr-[16px] pt-[12px]">
+					<div className="flex flex-row justify-end gap-[30px] px-[16px] py-[13px]">
 						{currentHeaderFormType !== HeaderFormTypes.filter && (
 							<Button
-								className="group flex w-fit flex-row items-center gap-[4px] border border-solid border-primary bg-background-button-secondary px-[16px] py-[6px] group-hover:bg-primary"
-								onClick={submitHandle}
+								className="group flex w-fit flex-row items-center gap-[6px] border border-solid border-primary bg-background-button-secondary px-[16px] py-[5px] group-hover:bg-primary"
+								onClick={() => {
+									onSave();
+									submitHandle();
+								}}
 							>
-								<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
+								<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
 									{currentHeaderFormType === HeaderFormTypes.add
 										? 'Сохранить'
 										: 'Сохранить изменения'}
@@ -134,15 +131,19 @@ export const GuidbookPageHeaderWrapper = memoize(
 							</Button>
 						)}
 						<Button
-							className="group flex w-fit flex-row items-center gap-[4px] border border-solid border-primary bg-background-button-secondary px-[16px] py-[6px] group-hover:bg-primary"
+							className="group flex w-fit flex-row items-center gap-[4px] border border-solid border-primary bg-background-button-secondary px-[16px] py-[5px] group-hover:bg-primary"
 							onClick={
 								currentHeaderFormType === HeaderFormTypes.filter
 									? onClearHandle
 									: onCancelHandle
 							}
 						>
-							<CleanUpIcon width={'16px'} height={'16px'} />
-							<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
+							<CleanUpIcon
+								width={'16px'}
+								height={'16px'}
+								className="fill-primary group-hover:fill-white"
+							/>
+							<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
 								{currentHeaderFormType === HeaderFormTypes.filter
 									? 'Очистить'
 									: 'Отмена'}

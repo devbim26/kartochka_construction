@@ -11,7 +11,7 @@ import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {
 	convertToClientRequirementData,
 	convertToServerRequirementData,
-} from '@features/guidbooks/constants/converter';
+} from '@features/guidbooks/converters';
 import {
 	getGuidebooksCreate,
 	getGuidebooksDelete,
@@ -25,13 +25,10 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { RequirementsDataConfig, useHeaderForm } from '../../utils';
-import {
-	GuidbookPageHeaderWrapper,
-	RequirementsAddAndEdit,
-	RequirementsFilter,
-} from '../components';
+import { GuidbookPageHeaderWrapper } from '../components';
+import { RequirementsAddAndEdit, RequirementsFilter } from '../components/header/forms';
 
-export const RequirementsPage = () => {
+const RequirementsScreen = () => {
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const [singleRequirement, setSingleRequirement] = useState<Requirement>();
@@ -262,3 +259,5 @@ export const RequirementsPage = () => {
 		</div>
 	);
 };
+
+export default RequirementsScreen;
