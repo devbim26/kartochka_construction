@@ -1,11 +1,13 @@
 import type { RequirementDto } from '@api-gen';
 import {
 	convertToPaginatedType,
+	DeleteIcon,
 	mapColumns,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
 } from '@core';
+import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {
 	convertToClientRequirementData,
 	convertToServerRequirementData,
@@ -213,6 +215,27 @@ export const RequirementsPage = () => {
 				accessorKey: 'secondPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'id',
+				header: () => <SimpleTableHeaderCell text={'Действия'} />,
+				cell: (info) => {
+					const value = info.getValue() as string;
+					return (
+						<SimpleTableCell
+							content={
+								<div className="flex gap-2">
+									<DeleteIcon onClick={() => handleDeleteTableData(value)} />
+									<EditIcon
+										onClick={() =>
+											navigate('', { edit: 'true', entityId: value })
+										}
+									/>
+								</div>
+							}
+						/>
+					);
+				},
 			},
 		];
 		return mapColumns(columns);
