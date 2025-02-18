@@ -1,9 +1,9 @@
-import type { CreateIssuerCommand, IssuerDto } from '@api-gen';
+import { IssuerDto } from '@api-gen';
+import { countryMap } from '@core';
 import type { FormIssuer, Issuer } from '@features/guidbooks/types';
 import { Country as ClientCountry } from '@features/guidbooks/types';
-import { countryMap } from '../counry.converter';
 
-export const convertToServerIssuerData = (data: Issuer): CreateIssuerCommand => ({
+export const convertToServerIssuerData = (data: Issuer) => ({
 	...data,
 	name: data.name || null,
 	country: data.country ? countryMap.toServer[data.country as ClientCountry] : undefined,

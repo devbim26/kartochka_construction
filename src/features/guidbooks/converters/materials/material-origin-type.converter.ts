@@ -1,5 +1,5 @@
 import { MaterialOriginType as ServerMaterialOriginType } from '@api-gen';
-import { createDataRecordConverter } from '@core/utils';
+import { createDataRecordConverter } from '@core/utils/helpers';
 import { MaterialType as ClientMaterialOriginType } from '@features/guidbooks/types';
 
 export const materialOriginTypeMap = createDataRecordConverter({

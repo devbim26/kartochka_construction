@@ -11,15 +11,15 @@ import {
 	GuidbooksLauout,
 	GUIDBOOKS_ROUTES,
 	HomeScreen,
+	IssuersScreen,
 	LandingScreen,
 	LoginPage,
 	MainScreen,
 	MaterialsScreen,
 	NotFoundScreen,
+	RequirementsScreen,
 	USERS_LIST_ROUTES,
 } from '@features';
-import IssuersPage from '@features/guidbooks/presentation/screens/issuers.screen';
-import { RequirementsPage } from '@features/guidbooks/presentation/screens/requirements.screen';
 import { Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
@@ -62,9 +62,9 @@ export const AppRouter = () => {
 					/>
 					<Route
 						path={GUIDBOOKS_ROUTES.requirements.route}
-						element={<RequirementsPage />}
+						element={<RequirementsScreen />}
 					/>
-					<Route path={GUIDBOOKS_ROUTES.issuers.route} element={<IssuersPage />} />
+					<Route path={GUIDBOOKS_ROUTES.issuers.route} element={<IssuersScreen />} />
 				</Route>
 				<Route
 					path={DESIGNING_ROUTES.users_list.route}

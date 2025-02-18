@@ -1,10 +1,13 @@
 import { MaterialDto } from '@api-gen';
 import { MaterialsAddAndEditData, MaterialsFilterData, MaterialType, Region } from '@features';
 import {
+	convertToClientRegionData,
+	convertToServerRegionData,
+} from '../../../../core/converters/region.converter';
+import {
 	convertToClientMaterialOriginTypeData,
 	convertToServerMaterialOriginTypeData,
-} from '../material-origin-type.converter';
-import { convertToClientRegionData, convertToServerRegionData } from '../region.converter';
+} from './material-origin-type.converter';
 
 export const convertToServerMaterialsFilterData = (data: MaterialsFilterData) => ({
 	name: data.name || undefined,
@@ -25,7 +28,7 @@ export const convertToClientMaterialsAddAndEditData = (
 	type: convertToClientMaterialOriginTypeData(data.type!) ?? '',
 	region: convertToClientRegionData(data.region!) ?? '',
 	issuer: data.issuer?.id ?? '',
-	imageUrl: data.imageUrl ?? '',
+	image: data.imageUrl ?? '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',
 	materialType: data.materialType?.name ?? '',
 	velocity: String(data.velocity) ?? '',
@@ -45,7 +48,7 @@ export const convertToServerMaterialsAddAndEditData = (data: MaterialsAddAndEdit
 	type: convertToServerMaterialOriginTypeData(data.type as MaterialType) || undefined,
 	region: convertToServerRegionData(data.region as Region) || undefined,
 	issuerId: data.issuer || undefined,
-	imageUrl: undefined,
+	image: data.image || undefined,
 	materialCoefficient: +data.materialCoefficient || undefined,
 	materialTypeId: data.materialType || undefined,
 	velocity: +data.velocity || undefined,

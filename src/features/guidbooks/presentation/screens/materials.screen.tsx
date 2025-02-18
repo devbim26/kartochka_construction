@@ -1,20 +1,17 @@
 import {
-	ColumnCell,
-	ColumnHeader,
+	convertToPaginatedType,
 	DeleteIcon,
 	EditIcon,
 	mapColumns,
-	TableColumn,
+	SimpleTable,
+	SimpleTableCell,
+	SimpleTableHeaderCell,
 	useAppNavigate,
-	VTable,
 } from '@core';
 import {
 	convertToClientMaterialsAddAndEditData,
-	convertToPaginatedType,
 	convertToServerMaterialsAddAndEditData,
 	convertToServerMaterialsFilterData,
-} from '@core/converters';
-import {
 	getGuidebooksCreate,
 	getGuidebooksDelete,
 	getGuidebooksDetail,
@@ -32,6 +29,7 @@ import {
 	RuRegionNamesMap,
 	useHeaderForm,
 } from '@features';
+import { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -43,151 +41,115 @@ const MaterialsScreen = () => {
 
 	const createColumns = (
 		data: MaterialsAddAndEditData[],
-	): TableColumn<MaterialsAddAndEditData>[] => {
+	): ColumnDef<MaterialsAddAndEditData>[] => {
 		if (!data) return [];
-		const columns: TableColumn<MaterialsAddAndEditData>[] = [
+		const columns: ColumnDef<MaterialsAddAndEditData>[] = [
 			{
-				dataKey: 'imageUrl',
-				label: 'Изображение',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+				accessorKey: 'imageUrl',
+				header: () => <SimpleTableHeaderCell text="Изображение" />,
+				cell: (info) => {
+					const value = info.getValue() as string | null;
+					return (
+						<SimpleTableCell
+							contentClassName="h-[39px] w-[39px]"
+							content={
+								value ? (
+									<img src={info.getValue() as string} className="size-[39px]" />
+								) : (
+									''
+								)
+							}
+						/>
+					);
+				},
 			},
 			{
-				dataKey: 'name',
-				label: 'Название',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+				accessorKey: 'name',
+				header: () => <SimpleTableHeaderCell text="Название" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				dataKey: 'shortName',
-				label: 'Краткое название',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+				accessorKey: 'shortName',
+				header: () => <SimpleTableHeaderCell text="Краткое название" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				dataKey: 'description',
-				label: 'Описание',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+				accessorKey: 'description',
+				header: () => <SimpleTableHeaderCell text="Описание" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				dataKey: 'description',
-				label: 'Описание',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
+				accessorKey: 'materialType',
+				header: () => <SimpleTableHeaderCell text="Тип материала" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'region',
+				header: () => <SimpleTableHeaderCell text="Регион" />,
+				cell: (info) => (
+					<SimpleTableCell content={RuRegionNamesMap[`${info.getValue() as Region}`]} />
+				),
+			},
+			{
+				accessorKey: 'density',
+				header: () => <SimpleTableHeaderCell text="Плотность" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'thickness',
+				header: () => <SimpleTableHeaderCell text="Толщина" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'velocity',
+				header: () => <SimpleTableHeaderCell text="Скорость звука" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'materialCoefficient',
+				header: () => <SimpleTableHeaderCell text="Коэффициент материала" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'lossFactor',
+				header: () => <SimpleTableHeaderCell text="Коэффициент потерь" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'youngModulus',
+				header: () => <SimpleTableHeaderCell text="Модуль Юнга материала, ГПа" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'actions',
+				header: () => <SimpleTableHeaderCell text="Действия" />,
+				cell: (info) => {
+					const entityId = info.row.original.id;
+					return (
+						<SimpleTableCell
+							content={
+								<div className="flex gap-2">
+									<EditIcon
+										onClick={() =>
+											navigate('', { edit: 'true', entityId: entityId })
+										}
+									/>
+									<DeleteIcon
+										onClick={() =>
+											handleDeleteTableData(info.getValue() as string)
+										}
+									/>
+								</div>
+							}
+						/>
+					);
+				},
 			},
 			//цвет
 			//штриховка
-			{
-				dataKey: 'materialType',
-				label: 'Тип материала',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						containerClassName: 'w-[300px]',
-					}),
-			},
-			{
-				dataKey: 'region',
-				label: 'Регион',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						containerClassName: 'w-[300px]',
-						cellData: RuRegionNamesMap[`${props.cellData as Region}`],
-					}),
-			},
-			{
-				dataKey: 'density',
-				label: 'Плотность материала',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			},
-			{
-				dataKey: 'thickness',
-				label: 'Толщина материала',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			},
-			{
-				dataKey: 'velocity',
-				label: 'Скорость звука',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			},
-			{
-				dataKey: 'materialCoefficient',
-				label: 'Коэффициент материала',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			},
-			{
-				dataKey: 'lossFactor',
-				label: 'Коэффициент потерь',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			},
 			//коэффициент для расчетов
-			{
-				dataKey: 'youngModulus',
-				label: 'Модуль Юнга материала, ГПа',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-			},
 			//коэффициент затухания
 			//процентная доля твердой массы
-			{
-				dataKey: 'id',
-				label: 'Действия',
-				width: 0,
-				headerRenderer: (props) =>
-					ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-				cellRenderer: (props) =>
-					ColumnCell({
-						...props,
-						containerClassName: 'w-[300px]',
-						cellData: (
-							<div className="flex gap-2">
-								<EditIcon
-									onClick={() =>
-										navigate('', { edit: 'true', entityId: props.cellData })
-									}
-								/>
-								<DeleteIcon
-									onClick={() => handleDeleteTableData(props.cellData as string)}
-								/>
-							</div>
-						),
-					}),
-			},
 		];
 		return mapColumns(columns);
 	};
@@ -320,7 +282,7 @@ const MaterialsScreen = () => {
 					edit: MaterialsAddAndEdit,
 				}}
 			/>
-			{!!tableData.length && <VTable pageSize={10} data={tableData} columns={columns} />}
+			{!!tableData.length && <SimpleTable pageSize={10} data={tableData} columns={columns} />}
 		</div>
 	);
 };

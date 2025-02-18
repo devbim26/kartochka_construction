@@ -1,7 +1,7 @@
-import { Input, Select, useAppDispatch } from '@core';
+import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
 import { convertToPaginatedType, convertToSelectValues } from '@core/converters';
-import { convertToClientIssuerData } from '@core/converters/issuers/issuer.converter';
 import {
+	fileUpload,
 	FormSubTitle,
 	getGuidebooksPaginated,
 	Guidebooks,
@@ -10,15 +10,14 @@ import {
 	RuMaterialTypeNamesSelectValues,
 	RuRegionNamesSelectValues,
 } from '@features';
+import { convertToClientIssuerData } from '@features/guidbooks/converters';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const MaterialsAddAndEdit = () => {
 	const form = useFormContext<MaterialsAddAndEditData>();
-
 	const { formState, control, setValue } = form;
-
 	const dispatch = useAppDispatch();
 	const [preview, setPreview] = useState<string | null>(null);
 	const [uploadError, setUploadError] = useState<boolean>(false);
@@ -47,28 +46,28 @@ export const MaterialsAddAndEdit = () => {
 		handleGetIssuerData();
 	}, []);
 
-	// const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-	// 	const file = event.target.files?.[0];
-	// 	if (file) {
-	// 		try {
-	// 			const base64 = await convertToBase64(file);
-	// 			const fileData = await file.arrayBuffer();
-	// 			if (base64 && typeof base64 === 'string') {
-	// 				setValue('imageUrl', file.name);
-	// 				setPreview(base64);
-	// 				dispatch(
-	// 					fileUpload({
-	// 						data: { mimeType: file.type, isPublic: true },
-	// 						file: fileData,
-	// 					}),
-	// 				);
-	// 				setUploadError(false);
-	// 			}
-	// 		} catch (error) {
-	// 			setUploadError(true);
-	// 		}
-	// 	}
-	// };
+	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+		const file = event.target.files?.[0];
+		if (file) {
+			try {
+				const base64 = await convertToBase64(file);
+				const fileData = await file.arrayBuffer();
+				if (base64 && typeof base64 === 'string') {
+					setValue('image', file.name);
+					setPreview(base64);
+					dispatch(
+						fileUpload({
+							data: { mimeType: file.type, isPublic: true },
+							file: fileData,
+						}),
+					);
+					setUploadError(false);
+				}
+			} catch (error) {
+				setUploadError(true);
+			}
+		}
+	};
 
 	return (
 		<div className="flex flex-col gap-[16px]">
@@ -222,14 +221,14 @@ export const MaterialsAddAndEdit = () => {
 						/>
 					)}
 				/>
-				{/* <div className="relative flex items-start gap-4">
+				<div className="relative flex items-start gap-4">
 					<div className="flex flex-col gap-y-2">
 						<FormElementLabel
 							className={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-								formState.errors.imageUrl?.message ? 'text-error' : '',
+								formState.errors.image?.message ? 'text-error' : '',
 							)}
-							errorMessage={formState.errors.imageUrl?.message}
+							errorMessage={formState.errors.image?.message}
 						>
 							Логотип
 						</FormElementLabel>
@@ -238,7 +237,7 @@ export const MaterialsAddAndEdit = () => {
 								variant="primary"
 								className={twMerge(
 									'group flex w-fit flex-row items-center gap-[4px] border-2 border-solid border-primary bg-white',
-									formState.errors.imageUrl?.message ? 'border-error' : '',
+									formState.errors.image?.message ? 'border-error' : '',
 								)}
 								onClick={() => document.getElementById('file-upload')!.click()}
 							>
@@ -264,7 +263,7 @@ export const MaterialsAddAndEdit = () => {
 							/>
 						</div>
 					)}
-				</div> */}
+				</div>
 			</div>
 			<FormSubTitle text="Физические свойства" />
 			<div className="flex flex-wrap gap-[16px]">

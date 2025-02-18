@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 export const MaterialsAddAndEditSchema = z.object({
 	id: z.string(),
-	name: z.string().min(1, 'Поле обязательно для заполнения').nullable(),
-	description: z.string().min(1, 'Поле обязательно для заполнения').nullable(),
-	shortName: z.string().min(1, 'Поле обязательно для заполнения').nullable(),
+	name: z.string().min(1, 'Поле обязательно для заполнения'),
+	description: z.string().min(1, 'Поле обязательно для заполнения'),
+	shortName: z.string().min(1, 'Поле обязательно для заполнения'),
 	density: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
@@ -17,7 +17,7 @@ export const MaterialsAddAndEditSchema = z.object({
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
 	type: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
-	imageUrl: z.string().nullable(),
+	image: z.string().min(1, 'Поле обязательно для заполнения'),
 	materialCoefficient: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
