@@ -126,7 +126,7 @@ export const RequirementsPage = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
-					showToast('Требование успешно отредактировано', 'error');
+					showToast('Требование успешно отредактировано', 'success');
 				}
 			} catch (error) {
 				console.log(error);
