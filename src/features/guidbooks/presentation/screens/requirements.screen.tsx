@@ -1,7 +1,11 @@
 import type { RequirementDto } from '@api-gen';
-import { mapColumns, useAppNavigate } from '@core';
-import { convertToPaginatedType } from '@core/converters';
-
+import {
+	convertToPaginatedType,
+	mapColumns,
+	SimpleTableCell,
+	SimpleTableHeaderCell,
+	useAppNavigate,
+} from '@core';
 import {
 	convertToClientRequirementData,
 	convertToServerRequirementData,
@@ -124,14 +128,6 @@ const RequirementsScreen = () => {
 		[handleGetTableData, form.filterForm.getValues()],
 	);
 
-	const onSaveHandle = useCallback(() => {
-		handleAddTableData(form.editForm.getValues());
-	}, [handleAddTableData, form.editForm.getValues()]);
-
-	const onEditHandle = useCallback(() => {
-		handleEditTableData(form.editForm.getValues());
-	}, [handleEditTableData, form.editForm.getValues()]);
-
 	const handleDeleteTableData = useCallback(
 		async (id: string) => {
 			try {
@@ -164,9 +160,58 @@ const RequirementsScreen = () => {
 		}
 	}, []);
 
+	const onSaveHandle = useCallback(() => {
+		handleAddTableData(form.editForm.getValues());
+	}, [handleAddTableData, form.editForm.getValues()]);
+
+	const onEditHandle = useCallback(() => {
+		handleEditTableData(form.editForm.getValues());
+	}, [handleEditTableData, form.editForm.getValues()]);
+
 	const createColumns = (data: Requirement[]): ColumnDef<Requirement>[] => {
 		if (!data) return [];
-		const columns: ColumnDef<Requirement>[] = [];
+		const columns: ColumnDef<Requirement>[] = [
+			{
+				accessorKey: 'region',
+				header: () => <SimpleTableHeaderCell text={'Регион'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'buildingType',
+				header: () => <SimpleTableHeaderCell text={'Тип здания'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'constructionType',
+				header: () => <SimpleTableHeaderCell text={'Тип конструкции'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'standartFullName',
+				header: () => <SimpleTableHeaderCell text={'Стандарт полное'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'standartShortName',
+				header: () => <SimpleTableHeaderCell text={'Стандарт краткое'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'standartValidityPeriod',
+				header: () => <SimpleTableHeaderCell text={'Срок дейстия стандарта'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'firstPlacementRoom',
+				header: () => <SimpleTableHeaderCell text={'Первое помещение'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'secondPlacementRoom',
+				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+		];
 		return mapColumns(columns);
 	};
 
