@@ -1,5 +1,5 @@
 import { CategoryClass as ServerCategoryClass } from '@api-gen/api';
-import { createDataRecordConverter } from '@core/utils';
+import { createDataRecordConverter } from '@core/utils/helpers';
 import { CategoryClass as ClientCategoryClass } from '@features/guidbooks/types';
 
 export const categoryClassMap = createDataRecordConverter({

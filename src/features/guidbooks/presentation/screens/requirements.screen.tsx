@@ -9,7 +9,7 @@ import {
 import {
 	convertToClientRequirementData,
 	convertToServerRequirementData,
-} from '@features/guidbooks/constants/converter';
+} from '@features/guidbooks/converters';
 import {
 	getGuidebooksCreate,
 	getGuidebooksDelete,
@@ -30,7 +30,7 @@ import {
 } from '../components';
 import { showToast } from '../components/toasts/toastNotification';
 
-export const RequirementsPage = () => {
+const RequirementsScreen = () => {
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const [singleRequirement, setSingleRequirement] = useState<Requirement>();
@@ -246,3 +246,5 @@ export const RequirementsPage = () => {
 		</div>
 	);
 };
+
+export default RequirementsScreen;

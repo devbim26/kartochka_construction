@@ -1,63 +1,95 @@
-import { Input } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
-import { Controller } from 'react-hook-form';
+import { Input, Select } from '@core';
 import {
-	MaterialsFilterFormKeys,
-	type HeaderFormsProps,
-	type IMaterialsFilterForm,
-} from '../../../../../types';
+	convertToClientMaterialTypeList,
+	getGuidebooksMaterialType,
+	type MaterialsFilterData,
+	type MaterialType,
+} from '@features';
+import { useCallback, useEffect, useState } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { twMerge } from 'tailwind-merge';
 
-export const MaterialsFilter = memoize(({ control }: HeaderFormsProps<IMaterialsFilterForm>) => {
+export const MaterialsFilter = () => {
+	const form = useFormContext<MaterialsFilterData>();
+	const { formState, control } = form;
+	const [materialTypes, setMaterialTypes] = useState<Array<MaterialType>>([]);
+
+	const handleGetMaterialTypeData = useCallback(async () => {
+		try {
+			const response = await getGuidebooksMaterialType();
+
+			const items = convertToClientMaterialTypeList(response.data);
+			setMaterialTypes(items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
+	useEffect(() => {
+		handleGetMaterialTypeData();
+	}, []);
+
 	return (
-		<>
-			<Controller
-				control={control}
-				name={MaterialsFilterFormKeys.Name}
-				render={({ field }) => (
-					<Input
-						{...field}
-						labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-						inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-						containerClassName="w-[226px]"
-						label="Название"
-						placeholder="Введите название"
-					/>
+		<div className="flex flex-wrap gap-[16px]">
+			<Input
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+					formState.errors.name?.message ? 'text-error' : '',
 				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors.name?.message || 'Название'}
+				error={formState.errors.name?.message}
+				placeholder="Введите название"
+				{...form.register('name')}
+				type={'text'}
 			/>
 			<Controller
+				name="materialTypeId"
 				control={control}
-				name={MaterialsFilterFormKeys.Density}
 				render={({ field }) => (
-					<Input
+					<Select
 						{...field}
 						value={field.value || ''}
-						containerClassName="w-[226px]"
-						labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-						inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-						label="Плотность материала, кг/м2"
-						type="number"
-						min={1}
-						placeholder="Введите плотность материала"
+						options={materialTypes.map((data) => ({
+							label: data.label,
+							value: data.id,
+						}))}
+						error={formState.errors.materialTypeId?.message}
+						labelClassName="text-sm leading-5 tracking-[0.1px]"
+						wrapperClassname="w-[226px] ring-input-border-primary"
+						buttonClassName="text-sm rounded-[8px]"
+						label="Тип материала"
+						placeholder="Выберите тип материала"
 					/>
 				)}
 			/>
-			<Controller
-				control={control}
-				name={MaterialsFilterFormKeys.Thickness}
-				render={({ field }) => (
-					<Input
-						{...field}
-						containerClassName="w-[226px]"
-						labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-						inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-						value={field.value || ''}
-						label="Толщина материала, мм"
-						type="number"
-						min={1}
-						placeholder="Введите толщину"
-					/>
+			<Input
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+					formState.errors.density?.message ? 'text-error' : '',
 				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors.density?.message || 'Плотность материала, кг/м³'}
+				error={formState.errors.density?.message}
+				placeholder="Введите плотность материала"
+				{...form.register('density')}
+				type={'number'}
 			/>
-		</>
+			<Input
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+					formState.errors.thickness?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors.thickness?.message || 'Толщина материала, мм'}
+				error={formState.errors.thickness?.message}
+				placeholder="Введите толщину материала"
+				{...form.register('thickness')}
+				type={'number'}
+			/>
+		</div>
 	);
-}, 'MaterialsFilter');
+};

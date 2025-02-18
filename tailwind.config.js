@@ -28,6 +28,7 @@ module.exports = {
 			},
 			colors: {
 				primary: '#2175F3',
+				red: '#E24F2F',
 				gray: {
 					navHeader: '#F5F6F7',
 					navBg: '#F9F9F9',
@@ -55,6 +56,7 @@ module.exports = {
 					secondary: '#F5F6F7',
 					button: {
 						secondary: '#EDF2FA',
+						red: '#E24F2F1A',
 					},
 				},
 			},

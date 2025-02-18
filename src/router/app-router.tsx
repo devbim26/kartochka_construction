@@ -5,20 +5,21 @@ import {
 	AUTH_ROUTES,
 	CodeConfirmPage,
 	CompanyRegistrationPage,
+	ConstructionsScreen,
 	DESIGNING_ROUTES,
 	DevScreen,
 	GuidbooksLauout,
 	GUIDBOOKS_ROUTES,
 	HomeScreen,
+	IssuersScreen,
 	LandingScreen,
 	LoginPage,
 	MainScreen,
-	MaterialsPage,
+	MaterialsScreen,
 	NotFoundScreen,
-	RequirementsPage,
+	RequirementsScreen,
 	USERS_LIST_ROUTES,
 } from '@features';
-import IssuersPage from '@features/guidbooks/presentation/screens/issuers.screen';
 import { Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
@@ -54,16 +55,16 @@ export const AppRouter = () => {
 					element={<DevScreen title="Отчеты" />}
 				/>
 				<Route path={DESIGNING_ROUTES.guidbooks.route} element={<GuidbooksLauout />}>
-					<Route path={GUIDBOOKS_ROUTES.materials.route} element={<MaterialsPage />} />
+					<Route path={GUIDBOOKS_ROUTES.materials.route} element={<MaterialsScreen />} />
 					<Route
 						path={GUIDBOOKS_ROUTES.constructions.route}
-						element={<DevScreen title="Конструкции" />}
+						element={<ConstructionsScreen />}
 					/>
 					<Route
 						path={GUIDBOOKS_ROUTES.requirements.route}
-						element={<RequirementsPage />}
+						element={<RequirementsScreen />}
 					/>
-					<Route path={GUIDBOOKS_ROUTES.issuers.route} element={<IssuersPage />} />
+					<Route path={GUIDBOOKS_ROUTES.issuers.route} element={<IssuersScreen />} />
 				</Route>
 				<Route
 					path={DESIGNING_ROUTES.users_list.route}

@@ -1,16 +1,17 @@
 import type { IssuerDto } from '@api-gen';
 import {
-	convertToPaginatedType,
 	mapColumns,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
 } from '@core';
+import { convertToPaginatedType } from '@core/converters';
+
 import {
 	convertToClientIssuerData,
 	convertToServerIssuerData,
-} from '@features/guidbooks/constants/converter';
+} from '@features/guidbooks/converters';
 import {
 	getGuidebooksCreate,
 	getGuidebooksDelete,
@@ -28,7 +29,7 @@ import { GuidbookPageHeaderWrapper } from '../components';
 import { IssuersAddEdit, IssuersFilter } from '../components/header/forms/issuers';
 import { showToast } from '../components/toasts/toastNotification';
 
-const IssuersPage = () => {
+const IssuersScreen = () => {
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const [singleIssuer, setSingleIssuer] = useState<Issuer>();
@@ -224,4 +225,4 @@ const IssuersPage = () => {
 	);
 };
 
-export default IssuersPage;
+export default IssuersScreen;
