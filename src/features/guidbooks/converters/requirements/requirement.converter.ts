@@ -1,15 +1,20 @@
 import type { CreateRequirementCommand, RequirementDto } from '@api-gen';
-import type {
-	BuildingType as ClientBuildingType,
-	CategoryClass as ClientCategoryClass,
-	Region as ClientRegion,
-	RequirementFilter,
+import {
+	buildingTypeMap,
+	categoryClassMap,
+	convertToClientBuildingTypeData,
+	convertToClientCategoryClassData,
+	convertToClientRegionData,
+	regionMap,
+} from '@core';
+import {
+	ConstructionType,
+	type BuildingType as ClientBuildingType,
+	type CategoryClass as ClientCategoryClass,
+	type Region as ClientRegion,
+	type RequirementFilter,
 } from '@features/guidbooks/types';
-import { ConstructionType } from '@features/guidbooks/types';
 import type { RequirementsDataSchemaType } from '@features/guidbooks/utils';
-import { buildingTypeMap, convertToClientBuildingTypeData } from '../buildingType.converter';
-import { categoryClassMap, convertToClientCategoryClassData } from '../categoryClass.converter';
-import { convertToClientRegionData, regionMap } from '../region.converter';
 
 export const convertToClientRequirementData = (
 	data: RequirementDto,

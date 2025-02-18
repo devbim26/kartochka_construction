@@ -1,5 +1,5 @@
 import { Country as ServerCountry } from '@api-gen/api';
-import { createDataRecordConverter } from '@core/utils';
+import { createDataRecordConverter } from '@core/utils/helpers';
 import { Country as ClientCountry } from '@features/guidbooks/types';
 
 export const countryMap = createDataRecordConverter({

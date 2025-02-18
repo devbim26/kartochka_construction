@@ -39,11 +39,10 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 				<Switch
 					onText="год"
 					offText="месяц"
-					onColor="primary"
-					offColor="primary"
-					className="mb-[12px] h-[30px] w-[180px] p-[3px]"
-					onTextClassName="font-semibold font-montserrat text-[16px] leading-[20px] right-[29px]"
-					offTextClassName="font-semibold font-montserrat text-[16px] leading-[20px] left-[17px]"
+					wrapperClassName="mb-[12px] h-[30px] w-[180px] p-[3px] bg-primary"
+					textClassName="font-semibold font-montserrat text-[16px] leading-[20px]"
+					unactiveTextClassName="text-white"
+					activeTextClassName="text-primary"
 					onChange={handleToggle}
 				/>
 				<div className="mb-[12px] font-montserrat text-[12px] font-normal">

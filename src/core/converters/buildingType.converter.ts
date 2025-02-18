@@ -1,5 +1,5 @@
 import { BuildingType as ServerBuildingType } from '@api-gen';
-import { createDataRecordConverter } from '@core/utils';
+import { createDataRecordConverter } from '@core/utils/helpers';
 import { BuildingType as ClientBuildingType } from '@features/guidbooks/types';
 
 export const buildingTypeMap = createDataRecordConverter({

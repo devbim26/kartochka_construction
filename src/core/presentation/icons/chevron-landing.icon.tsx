@@ -17,6 +17,8 @@ export const ChevronLandingIcon = ({ color, direction, className }: ChevronIconP
 			transform = 'rotate(180deg)';
 			break;
 		case 'down':
+			transform = 'rotate(90deg)';
+			break;
 		default:
 			break;
 	}

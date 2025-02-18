@@ -1,6 +1,8 @@
 import { lazy } from 'react';
-export * from './constructions.screen';
+
 export * from './guidbook-layout.screen';
-export * from './issuers.screen';
-export * from './requirements.screen';
-export const MaterialsPage = lazy(() => import('./materials.screen'));
+
+export const RequirementsScreen = lazy(() => import('./requirements.screen'));
+export const MaterialsScreen = lazy(() => import('./materials.screen'));
+export const IssuersScreen = lazy(() => import('./issuers.screen'));
+export const ConstructionsScreen = lazy(() => import('./constructions.screen'));

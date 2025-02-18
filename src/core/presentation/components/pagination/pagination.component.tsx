@@ -12,7 +12,6 @@ export const Pagination = ({ onChange, state }: PaginationProps) => {
 
 	useEffect(() => {
 		const partNum = Math.floor((state.pageNumber - 1) / 10);
-		console.log(partNum);
 		setViewedPages(
 			Array.from({ length: 10 }, (_, index) => ({
 				id: crypto.randomUUID(),
