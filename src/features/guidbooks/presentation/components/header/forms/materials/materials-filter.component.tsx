@@ -1,12 +1,33 @@
 import { Input, Select } from '@core';
-import { MaterialsFilterData } from '@features';
+import {
+	convertToClientMaterialTypeList,
+	getGuidebooksMaterialType,
+	MaterialsFilterData,
+	MaterialType,
+} from '@features';
+import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const MaterialsFilter = () => {
 	const form = useFormContext<MaterialsFilterData>();
-
 	const { formState, control } = form;
+	const [materialTypes, setMaterialTypes] = useState<Array<MaterialType>>([]);
+
+	const handleGetMaterialTypeData = useCallback(async () => {
+		try {
+			const response = await getGuidebooksMaterialType();
+
+			const items = convertToClientMaterialTypeList(response.data);
+			setMaterialTypes(items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
+	useEffect(() => {
+		handleGetMaterialTypeData();
+	}, []);
 
 	return (
 		<div className="flex flex-wrap gap-[16px]">
@@ -30,7 +51,10 @@ export const MaterialsFilter = () => {
 					<Select
 						{...field}
 						value={field.value || ''}
-						options={[{ label: 'test', value: '2b2616d2-e2c0-4338-a717-c6c06d24e090' }]}
+						options={materialTypes.map((data) => ({
+							label: data.label,
+							value: data.id,
+						}))}
 						error={formState.errors.materialTypeId?.message}
 						labelClassName="text-sm leading-5 tracking-[0.1px]"
 						wrapperClassname="w-[226px] ring-input-border-primary"

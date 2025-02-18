@@ -79,7 +79,7 @@ const MaterialsScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				accessorKey: 'materialType',
+				accessorKey: 'materialType.name',
 				header: () => <SimpleTableHeaderCell text="Тип материала" />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},

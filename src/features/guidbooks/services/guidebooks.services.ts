@@ -77,3 +77,7 @@ export const getGuidebooksEdit = async ({ data, guidebookType }: CreateAndEditPr
 export const getGuidebooksDelete = async ({ data, guidebookType }: DeleteProps) => {
 	return await getGuidebooksDeleteApiMap[guidebookType](data);
 };
+
+export const getGuidebooksMaterialType = async () => {
+	return await fetchApi.api.materialTypeList();
+};

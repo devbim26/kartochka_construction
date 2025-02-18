@@ -174,11 +174,6 @@ export interface CreateRequirementCommand {
 	constructionType?: ConstructionType;
 }
 
-export interface CreateUploadingUrlCommand {
-	mimeType: string | null;
-	isPublic: boolean;
-}
-
 export interface DeleteConstructionHeaderCommand {
 	/** @format uuid */
 	id?: string;
@@ -328,6 +323,15 @@ export enum MaterialOriginType {
 	Generic = 'Generic',
 	Manufacturer = 'Manufacturer',
 	UserDefinedProduct = 'UserDefinedProduct',
+}
+
+export interface MaterialTypeDto {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	shortName?: string | null;
+	label?: string | null;
+	fullName?: string | null;
 }
 
 export interface NamedEntity {
@@ -950,23 +954,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
-		 * @tags File
-		 * @name FileCreate
-		 * @request POST:/api/File
-		 */
-		fileCreate: (data: CreateUploadingUrlCommand, params: RequestParams = {}) =>
-			this.request<string, any>({
-				path: `/api/File`,
-				method: 'POST',
-				body: data,
-				type: ContentType.Json,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
 		 * @tags Issuer
 		 * @name IssuerDetail
 		 * @request GET:/api/Issuer/{id}
@@ -1127,6 +1114,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				FormFile?: File;
 				/** @format float */
 				MaterialCoefficient?: number;
+				/** @format uuid */
+				MaterialTypeId?: string;
 				/** @format float */
 				Velocity?: number;
 				/** @format float */
@@ -1185,6 +1174,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				Region?: Region;
 				/** @format uuid */
 				IssuerId?: string;
+				/** @format uuid */
+				MaterialTypeId?: string;
 				/** @format float */
 				MaterialCoefficient?: number;
 				/** @format float */
@@ -1207,6 +1198,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				method: 'PUT',
 				body: data,
 				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags MaterialType
+		 * @name MaterialTypeList
+		 * @request GET:/api/MaterialType
+		 */
+		materialTypeList: (params: RequestParams = {}) =>
+			this.request<MaterialTypeDto[], any>({
+				path: `/api/MaterialType`,
+				method: 'GET',
 				format: 'json',
 				...params,
 			}),

@@ -1,9 +1,13 @@
-import { MaterialDto } from '@api-gen';
-import { MaterialsAddAndEditData, MaterialsFilterData, MaterialType, Region } from '@features';
+import { MaterialDto, MaterialTypeDto } from '@api-gen';
 import {
-	convertToClientRegionData,
-	convertToServerRegionData,
-} from '../../../../core/converters/region.converter';
+	MaterialOriginType,
+	MaterialsAddAndEditData,
+	MaterialsFilterData,
+	MaterialType,
+	Region,
+} from '@features';
+
+import { convertToClientRegionData, convertToServerRegionData } from '@core';
 import {
 	convertToClientMaterialOriginTypeData,
 	convertToServerMaterialOriginTypeData,
@@ -15,6 +19,16 @@ export const convertToServerMaterialsFilterData = (data: MaterialsFilterData) =>
 	density: +data.density || undefined,
 	thickness: +data.thickness || undefined,
 });
+
+export const convertToClientMaterialTypeList = (arr: MaterialTypeDto[]): MaterialType[] => {
+	return arr.map((data) => ({
+		id: data.id ?? '',
+		name: data.name ?? '',
+		shortName: data.shortName ?? '',
+		label: data.label ?? '',
+		fullName: data.fullName ?? '',
+	}));
+};
 
 export const convertToClientMaterialsAddAndEditData = (
 	data: MaterialDto,
@@ -30,7 +44,7 @@ export const convertToClientMaterialsAddAndEditData = (
 	issuer: data.issuer?.id ?? '',
 	image: data.imageUrl ?? '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',
-	materialType: data.materialType?.name ?? '',
+	materialType: { id: data.materialType?.id ?? '', name: data.materialType?.name ?? '' },
 	velocity: String(data.velocity) ?? '',
 	lossFactor: String(data.lossFactor) ?? '',
 	youngModulus: String(data.youngModulus) ?? '',
@@ -45,12 +59,12 @@ export const convertToServerMaterialsAddAndEditData = (data: MaterialsAddAndEdit
 	shortName: data.shortName || undefined,
 	density: +data.density || undefined,
 	thickness: +data.thickness || undefined,
-	type: convertToServerMaterialOriginTypeData(data.type as MaterialType) || undefined,
+	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || undefined,
 	region: convertToServerRegionData(data.region as Region) || undefined,
 	issuerId: data.issuer || undefined,
-	image: data.image || undefined,
+	image: null,
 	materialCoefficient: +data.materialCoefficient || undefined,
-	materialTypeId: data.materialType || undefined,
+	materialTypeId: data.materialType.id || undefined,
 	velocity: +data.velocity || undefined,
 	lossFactor: +data.lossFactor || undefined,
 	youngModulus: +data.youngModulus || undefined,

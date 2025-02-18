@@ -1,11 +1,19 @@
-export enum MaterialType {
+export enum MaterialOriginType {
 	Generic = 'Generic',
 	Manufacturer = 'Manufacturer',
 	UserDefinedProduct = 'UserDefinedProduct',
 }
 
-export const RuMaterialTypeNamesSelectValues = [
-	{ label: 'Общий', value: MaterialType.Generic },
-	{ label: 'Произвлдитель', value: MaterialType.Manufacturer },
-	{ label: 'Пользовательский продукт', value: MaterialType.UserDefinedProduct },
+export const RuMaterialOriginTypesSelectValues = [
+	{ label: 'Общий', value: MaterialOriginType.Generic },
+	{ label: 'Произвлдитель', value: MaterialOriginType.Manufacturer },
+	{ label: 'Пользовательский продукт', value: MaterialOriginType.UserDefinedProduct },
 ];
+
+export interface MaterialType {
+	id: string;
+	name: string;
+	shortName: string;
+	label: string;
+	fullName: string;
+}

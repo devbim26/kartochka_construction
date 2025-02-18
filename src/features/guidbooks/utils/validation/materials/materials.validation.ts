@@ -13,7 +13,10 @@ export const MaterialsAddAndEditSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	materialType: z.string().min(1, 'Поле обязательно для заполнения'),
+	materialType: z.object({
+		name: z.string().min(1, 'Поле обязательно для заполнения'),
+		id: z.string(),
+	}),
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
 	type: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),

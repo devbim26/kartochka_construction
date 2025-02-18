@@ -3,14 +3,19 @@ import { convertToPaginatedType, convertToSelectValues } from '@core/converters'
 import {
 	fileUpload,
 	FormSubTitle,
+	getGuidebooksMaterialType,
 	getGuidebooksPaginated,
 	Guidebooks,
 	Issuer,
 	MaterialsAddAndEditData,
-	RuMaterialTypeNamesSelectValues,
+	MaterialType,
+	RuMaterialOriginTypesSelectValues,
 	RuRegionNamesSelectValues,
 } from '@features';
-import { convertToClientIssuerData } from '@features/guidbooks/converters';
+import {
+	convertToClientIssuerData,
+	convertToClientMaterialTypeList,
+} from '@features/guidbooks/converters';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
@@ -22,6 +27,7 @@ export const MaterialsAddAndEdit = () => {
 	const [preview, setPreview] = useState<string | null>(null);
 	const [uploadError, setUploadError] = useState<boolean>(false);
 	const [issuerData, setIssuerData] = useState<Array<Issuer>>([]);
+	const [materialTypes, setMaterialTypes] = useState<Array<MaterialType>>([]);
 
 	const handleGetIssuerData = useCallback(async () => {
 		try {
@@ -42,8 +48,20 @@ export const MaterialsAddAndEdit = () => {
 		}
 	}, []);
 
+	const handleGetMaterialTypeData = useCallback(async () => {
+		try {
+			const response = await getGuidebooksMaterialType();
+
+			const items = convertToClientMaterialTypeList(response.data);
+			setMaterialTypes(items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
 	useEffect(() => {
 		handleGetIssuerData();
+		handleGetMaterialTypeData();
 	}, []);
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
@@ -139,23 +157,24 @@ export const MaterialsAddAndEdit = () => {
 					type={'number'}
 				/>
 				<Controller
-					name="materialType"
+					name="materialType.id"
 					control={control}
 					render={({ field }) => (
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={[
-								{ label: 'test', value: '2b2616d2-e2c0-4338-a717-c6c06d24e090' },
-							]}
-							error={formState.errors.materialType?.message}
+							options={materialTypes.map((data) => ({
+								label: data.label,
+								value: data.id,
+							}))}
+							error={formState.errors.materialType?.name?.message}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px]',
-								formState.errors.materialType?.message ? 'text-error' : '',
+								formState.errors.materialType?.name?.message ? 'text-error' : '',
 							)}
 							wrapperClassname="w-[226px] ring-input-border-primary"
 							buttonClassName="text-sm rounded-[8px]"
-							label={formState.errors.materialType?.message || 'Тип материала'}
+							label={formState.errors.materialType?.name?.message || 'Тип материала'}
 							placeholder="Выберите тип материала"
 						/>
 					)}
@@ -188,7 +207,7 @@ export const MaterialsAddAndEdit = () => {
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={RuMaterialTypeNamesSelectValues}
+							options={RuMaterialOriginTypesSelectValues}
 							error={formState.errors.type?.message}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px]',

@@ -1,6 +1,7 @@
 export enum Guidebooks {
 	ISSUER = 'Issuer',
 	MATERIAL = 'Material',
+	MATERIALTYPE = 'MaterialType',
 	CONSTRUCTION = 'Construction',
 	REQUIREMENT = 'Requirement',
 }
