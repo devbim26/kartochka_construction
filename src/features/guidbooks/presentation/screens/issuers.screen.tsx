@@ -26,6 +26,7 @@ import { useSearchParams } from 'react-router-dom';
 import { IssuersDataConfig, IssuersFormCofig, useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper } from '../components';
 import { IssuersAddEdit, IssuersFilter } from '../components/header/forms/issuers';
+import { showToast } from '../components/toasts/toastNotification';
 
 const IssuersPage = () => {
 	const navigate = useAppNavigate();
@@ -88,9 +89,11 @@ const IssuersPage = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					showToast('Производитель успешно добавлен', 'success');
 				}
 			} catch (error) {
 				console.log('Error:', error);
+				showToast('Ошибка при добавлении производителя', 'error');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -120,9 +123,11 @@ const IssuersPage = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					showToast('Производитель успешно отредактирован', 'success');
 				}
 			} catch (error) {
 				console.log(error);
+				showToast('Ошибка при редактировании производителя', 'error');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -137,9 +142,11 @@ const IssuersPage = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					showToast('Производитель успешно удалён', 'success');
 				}
 			} catch (error) {
 				console.log('Error:', error);
+				showToast('Ошибка при удалении производителя', 'error');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],

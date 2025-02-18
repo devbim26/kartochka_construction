@@ -28,6 +28,7 @@ import {
 	RequirementsAddAndEdit,
 	RequirementsFilter,
 } from '../components';
+import { showToast } from '../components/toasts/toastNotification';
 
 export const RequirementsPage = () => {
 	const navigate = useAppNavigate();
@@ -106,9 +107,11 @@ export const RequirementsPage = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					showToast('Требование успешно добавлено', 'success');
 				}
 			} catch (error) {
 				console.log('Error:', error);
+				showToast('Ошибка при добавлении требования', 'error');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -123,9 +126,11 @@ export const RequirementsPage = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					showToast('Требование успешно отредактировано', 'error');
 				}
 			} catch (error) {
 				console.log(error);
+				showToast('Ошибка при редактировании требования', 'error');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -140,9 +145,11 @@ export const RequirementsPage = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					showToast('Требование успешно удалено', 'success');
 				}
 			} catch (error) {
 				console.log('Error:', error);
+				showToast('Ошибка при удалении требования', 'error');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
