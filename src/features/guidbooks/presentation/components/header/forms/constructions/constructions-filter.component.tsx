@@ -1,5 +1,5 @@
 import { Input, Select } from '@core';
-import { ConstructionsFilterData, RuRegionNamesSelectValues } from '@features';
+import { RuRegionNamesSelectValues, type ConstructionsFilterData } from '@features';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 

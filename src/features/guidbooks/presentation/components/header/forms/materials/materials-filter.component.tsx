@@ -2,8 +2,8 @@ import { Input, Select } from '@core';
 import {
 	convertToClientMaterialTypeList,
 	getGuidebooksMaterialType,
-	MaterialsFilterData,
-	MaterialType,
+	type MaterialsFilterData,
+	type MaterialType,
 } from '@features';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';

@@ -6,7 +6,7 @@ import {
 	RuRegionNamesSelectValues,
 	SpecificationsFieldNames,
 } from '@features';
-import { ConstructionsAddData } from '@features/guidbooks/types/constructions';
+import type { ConstructionsAddData } from '@features/guidbooks/types/constructions';
 import { RuPriorityNamesSelectValues } from '@features/guidbooks/types/priority.types';
 import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';

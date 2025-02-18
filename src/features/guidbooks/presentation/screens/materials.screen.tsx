@@ -21,15 +21,15 @@ import {
 	Guidebooks,
 	MaterialsAddAndEdit,
 	MaterialsAddAndEditConfig,
-	MaterialsAddAndEditData,
 	MaterialsFilter,
 	MaterialsFilterConfig,
-	MaterialsFilterData,
-	Region,
 	RuRegionNamesMap,
 	useHeaderForm,
+	type MaterialsAddAndEditData,
+	type MaterialsFilterData,
+	type Region,
 } from '@features';
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 

@@ -1,4 +1,4 @@
-import {
+import type {
 	MaterialsAddAndEditSchemaType,
 	MaterialsFilterSchemaType,
 } from '@features/guidbooks/utils';

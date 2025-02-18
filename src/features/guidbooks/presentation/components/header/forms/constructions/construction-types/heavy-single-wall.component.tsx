@@ -1,6 +1,5 @@
 import { Button, DeleteIcon, Input, Select } from '@core';
-import { ConstructionsAddData } from '@features/guidbooks/types';
-
+import type { ConstructionsAddData } from '@features/guidbooks/types';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -36,7 +35,7 @@ export const HeavySingleWall = () => {
 		<div className="flex flex-col gap-[16px]">
 			<div className="flex flex-row items-center justify-between">
 				<p className="font-sans text-sm font-semibold leading-5">1. Базовая конструкция</p>
-				<Button className="border-[1px] border-solid border-red bg-background-button-red p-[7px] enabled:hover:bg-inherit">
+				<Button className="border border-solid border-red bg-background-button-red p-[7px] enabled:hover:bg-inherit">
 					<DeleteIcon />
 				</Button>
 			</div>

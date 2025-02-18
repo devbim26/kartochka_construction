@@ -1,5 +1,5 @@
-import { MaterialDto, MaterialTypeDto } from '@api-gen';
-import {
+import type { MaterialDto, MaterialTypeDto } from '@api-gen';
+import type {
 	MaterialOriginType,
 	MaterialsAddAndEditData,
 	MaterialsFilterData,

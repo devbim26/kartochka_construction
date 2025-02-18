@@ -1,7 +1,11 @@
 import { Button, CleanUpIcon, useAppNavigate } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { guidbookHeaderTitlesMap } from '@features/guidbooks/constants';
-import { HeaderFormElements, HeaderFormTitles, HeaderFormTypes } from '@features/guidbooks/types';
+import {
+	HeaderFormTypes,
+	type HeaderFormElements,
+	type HeaderFormTitles,
+} from '@features/guidbooks/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';

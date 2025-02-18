@@ -1,11 +1,11 @@
 import { Input, Select, Switch } from '@core';
 import {
 	ConstructionComponentsMap,
-	ConstructionsEditData,
 	DescriptionFieldNames,
 	FormSubTitle,
 	RuRegionNamesSelectValues,
 	SpecificationsFieldNames,
+	type ConstructionsEditData,
 } from '@features';
 import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';

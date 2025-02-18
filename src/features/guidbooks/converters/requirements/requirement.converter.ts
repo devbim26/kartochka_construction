@@ -14,7 +14,7 @@ import {
 	type Region as ClientRegion,
 	type RequirementFilter,
 } from '@features/guidbooks/types';
-import { RequirementsDataSchemaType } from '@features/guidbooks/utils';
+import type { RequirementsDataSchemaType } from '@features/guidbooks/utils';
 
 export const convertToClientRequirementData = (
 	data: RequirementDto,

@@ -1,8 +1,5 @@
-import { Input, Select } from '@core';
-import { ConstructionsAddData } from '@features/guidbooks/types';
-
-import { Controller, useFormContext } from 'react-hook-form';
-import { twMerge } from 'tailwind-merge';
+import type { ConstructionsAddData } from '@features/guidbooks/types';
+import { useFormContext } from 'react-hook-form';
 
 interface BaseConstructionLayerProps {
 	id: string;
@@ -14,7 +11,7 @@ export const BaseConstructionLayer = ({ id }: BaseConstructionLayerProps) => {
 
 	return (
 		<div className="flex flex-wrap gap-[16px]">
-			<Controller
+			{/* <Controller
 				name={`baseConstruction.${id}.type`}
 				control={control}
 				render={({ field }) => (
@@ -85,7 +82,7 @@ export const BaseConstructionLayer = ({ id }: BaseConstructionLayerProps) => {
 				placeholder="Введите плотность"
 				{...form.register(`baseConstruction.${id}.density`)}
 				type={'number'}
-			/>
+			/> */}
 		</div>
 	);
 };

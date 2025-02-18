@@ -6,11 +6,11 @@ import {
 	getGuidebooksMaterialType,
 	getGuidebooksPaginated,
 	Guidebooks,
-	Issuer,
-	MaterialsAddAndEditData,
-	MaterialType,
 	RuMaterialOriginTypesSelectValues,
 	RuRegionNamesSelectValues,
+	type Issuer,
+	type MaterialsAddAndEditData,
+	type MaterialType,
 } from '@features';
 import {
 	convertToClientIssuerData,

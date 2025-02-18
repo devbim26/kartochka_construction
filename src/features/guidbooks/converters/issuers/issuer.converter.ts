@@ -1,4 +1,4 @@
-import { IssuerDto } from '@api-gen';
+import type { IssuerDto } from '@api-gen';
 import { countryMap } from '@core';
 import type { FormIssuer, Issuer } from '@features/guidbooks/types';
 import { Country as ClientCountry } from '@features/guidbooks/types';
