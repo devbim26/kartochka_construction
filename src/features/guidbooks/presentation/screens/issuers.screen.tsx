@@ -24,10 +24,10 @@ import { Guidebooks } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { IssuersDataConfig, IssuersFormCofig, useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper } from '../components';
 import { IssuersAddEdit, IssuersFilter } from '../components/header/forms/issuers';
-import { showToast } from '../components/toasts/toastNotification';
 
 const IssuersScreen = () => {
 	const navigate = useAppNavigate();
@@ -90,11 +90,11 @@ const IssuersScreen = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
-					showToast('Производитель успешно добавлен', 'success');
+					toast.success('Производитель успешно добавлен');
 				}
 			} catch (error) {
 				console.log('Error:', error);
-				showToast('Ошибка при добавлении производителя', 'error');
+				toast.error('Ошибка при добавлении производителя');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -124,11 +124,11 @@ const IssuersScreen = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
-					showToast('Производитель успешно отредактирован', 'success');
+					toast.success('Производитель успешно отредактирован');
 				}
 			} catch (error) {
 				console.log(error);
-				showToast('Ошибка при редактировании производителя', 'error');
+				toast.error('Ошибка при редактировании производителя');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -143,11 +143,11 @@ const IssuersScreen = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
-					showToast('Производитель успешно удалён', 'success');
+					toast.success('Производитель успешно удалён');
 				}
 			} catch (error) {
 				console.log('Error:', error);
-				showToast('Ошибка при удалении производителя', 'error');
+				toast.error('Ошибка при удалении производителя');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],

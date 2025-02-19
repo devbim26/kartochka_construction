@@ -22,13 +22,13 @@ import { Guidebooks } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { RequirementsDataConfig, useHeaderForm } from '../../utils';
 import {
 	GuidbookPageHeaderWrapper,
 	RequirementsAddAndEdit,
 	RequirementsFilter,
 } from '../components';
-import { showToast } from '../components/toasts/toastNotification';
 
 const RequirementsScreen = () => {
 	const navigate = useAppNavigate();
@@ -107,11 +107,11 @@ const RequirementsScreen = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
-					showToast('Требование успешно добавлено', 'success');
+					toast.success('Требование успешно добавлено');
 				}
 			} catch (error) {
 				console.log('Error:', error);
-				showToast('Ошибка при добавлении требования', 'error');
+				toast.error('Ошибка при добавлении требования');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -126,11 +126,11 @@ const RequirementsScreen = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
-					showToast('Требование успешно отредактировано', 'success');
+					toast.success('Требование успешно отредактировано');
 				}
 			} catch (error) {
 				console.log(error);
-				showToast('Ошибка при редактировании требования', 'error');
+				toast.error('Ошибка при редактировании требования');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -145,11 +145,11 @@ const RequirementsScreen = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
-					showToast('Требование успешно удалено', 'success');
+					toast.success('Требование успешно удалено');
 				}
 			} catch (error) {
 				console.log('Error:', error);
-				showToast('Ошибка при удалении требования', 'error');
+				toast.error('Ошибка при удалении требования');
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
