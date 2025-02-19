@@ -2,30 +2,18 @@ import { z } from 'zod';
 
 const IssuersSchema = z.object({
 	id: z.string().optional(),
-	name: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.max(50, 'Название не должно превышать 50 символов'),
+	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	country: z.string().min(1, 'Поле обязательно для заполнения'),
 	logoUrl: z.string().min(1, 'Поле обязательно для заполнения'),
-	webSite: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.max(50, 'Ссылка не должна превышать 50 символов'),
+	webSite: z.string().min(1, 'Поле обязательно для заполнения'),
 });
 
 const FormIssuerSchema = z.object({
 	id: z.string().optional(),
-	name: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.max(50, 'Название не должно превышать 50 символов'),
+	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	country: z.string().min(1, 'Поле обязательно для заполнения'),
 	logoUrl: z.string().min(1, 'Поле обязательно для заполнения'),
-	webSite: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.max(50, 'Ссылка не должна превышать 50 символов'),
+	webSite: z.string().min(1, 'Поле обязательно для заполнения'),
 });
 
 type IssuersDataSchemaType = z.infer<typeof IssuersSchema>;

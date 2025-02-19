@@ -209,6 +209,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				label={formState.errors?.noizeIsolationIndex?.message || 'Индекс воздушного шума'}
 				placeholder="Введите значение"
 				type="number"
+				max={10}
 			/>
 			{construction === ConstructionType.Wall && (
 				<Input
@@ -222,6 +223,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 					label={formState.errors?.noizeImpactIndex?.message || 'Индекс ударного шума'}
 					placeholder="Введите значение"
 					type="number"
+					max={10}
 				/>
 			)}
 			<Input
