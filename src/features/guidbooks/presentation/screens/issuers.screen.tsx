@@ -22,6 +22,7 @@ import {
 import type { Issuer } from '@features/guidbooks/types';
 import { Guidebooks } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
+import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -93,8 +94,9 @@ const IssuersScreen = () => {
 					toast.success('Производитель успешно добавлен');
 				}
 			} catch (error) {
-				console.log('Error:', error);
-				toast.error('Ошибка при добавлении производителя');
+				if (error instanceof AxiosError) {
+					toast.error(error.response?.data.message);
+				}
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -127,8 +129,9 @@ const IssuersScreen = () => {
 					toast.success('Производитель успешно отредактирован');
 				}
 			} catch (error) {
-				console.log(error);
-				toast.error('Ошибка при редактировании производителя');
+				if (error instanceof AxiosError) {
+					toast.error(error.response?.data.message);
+				}
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -146,8 +149,9 @@ const IssuersScreen = () => {
 					toast.success('Производитель успешно удалён');
 				}
 			} catch (error) {
-				console.log('Error:', error);
-				toast.error('Ошибка при удалении производителя');
+				if (error instanceof AxiosError) {
+					toast.error(error.response?.data.message);
+				}
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],

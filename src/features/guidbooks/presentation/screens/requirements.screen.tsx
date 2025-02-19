@@ -20,6 +20,7 @@ import {
 import type { Requirement } from '@features/guidbooks/types';
 import { Guidebooks } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
+import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -110,8 +111,9 @@ const RequirementsScreen = () => {
 					toast.success('Требование успешно добавлено');
 				}
 			} catch (error) {
-				console.log('Error:', error);
-				toast.error('Ошибка при добавлении требования');
+				if (error instanceof AxiosError) {
+					toast.error(error.response?.data.message);
+				}
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -129,8 +131,9 @@ const RequirementsScreen = () => {
 					toast.success('Требование успешно отредактировано');
 				}
 			} catch (error) {
-				console.log(error);
-				toast.error('Ошибка при редактировании требования');
+				if (error instanceof AxiosError) {
+					toast.error(error.response?.data.message);
+				}
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -148,8 +151,9 @@ const RequirementsScreen = () => {
 					toast.success('Требование успешно удалено');
 				}
 			} catch (error) {
-				console.log('Error:', error);
-				toast.error('Ошибка при удалении требования');
+				if (error instanceof AxiosError) {
+					toast.error(error.response?.data.message);
+				}
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
