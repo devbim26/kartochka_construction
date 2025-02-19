@@ -22,8 +22,10 @@ import {
 import type { Issuer } from '@features/guidbooks/types';
 import { Guidebooks } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
+import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { IssuersDataConfig, IssuersFormCofig, useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper } from '../components';
 import { IssuersAddEdit, IssuersFilter } from '../components/header/forms/issuers';
@@ -76,7 +78,9 @@ const IssuersScreen = () => {
 			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
 			setTableData(items);
 		} catch (error) {
-			console.log('Error:', error);
+			if (error instanceof AxiosError) {
+				toast.error(error.response?.data.message);
+			}
 		}
 	}, []);
 
@@ -89,9 +93,12 @@ const IssuersScreen = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					toast.success('Производитель успешно добавлен');
 				}
 			} catch (error) {
-				console.log('Error:', error);
+				if (error instanceof AxiosError) {
+					toast.error(error.response?.data.message);
+				}
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -108,7 +115,9 @@ const IssuersScreen = () => {
 				setSingleIssuer(data);
 			}
 		} catch (error) {
-			console.log('Error:', error);
+			if (error instanceof AxiosError) {
+				toast.error(error.response?.data.message);
+			}
 		}
 	}, []);
 
@@ -121,9 +130,12 @@ const IssuersScreen = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					toast.success('Производитель успешно отредактирован');
 				}
 			} catch (error) {
-				console.log(error);
+				if (error instanceof AxiosError) {
+					toast.error(error.response?.data.message);
+				}
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
@@ -138,9 +150,12 @@ const IssuersScreen = () => {
 				});
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					toast.success('Производитель успешно удалён');
 				}
 			} catch (error) {
-				console.log('Error:', error);
+				if (error instanceof AxiosError) {
+					toast.error(error.response?.data.message);
+				}
 			}
 		},
 		[handleGetTableData, form.filterForm.getValues()],
