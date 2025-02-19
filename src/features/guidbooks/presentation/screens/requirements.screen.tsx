@@ -3,6 +3,7 @@ import {
 	convertToPaginatedType,
 	DeleteIcon,
 	mapColumns,
+	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
@@ -19,8 +20,18 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import type { Requirement } from '@features/guidbooks/types';
-import { Guidebooks } from '@features/guidbooks/types';
+import type {
+	BuildingType,
+	ConstructionType,
+	Region,
+	Requirement,
+} from '@features/guidbooks/types';
+import {
+	Guidebooks,
+	RuBuildingTypeNamesMap,
+	RuConstructionTypeNamesMap,
+	RuRegionNamesMap,
+} from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -176,17 +187,26 @@ const RequirementsScreen = () => {
 			{
 				accessorKey: 'region',
 				header: () => <SimpleTableHeaderCell text={'Регион'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					const value = info.getValue() as Region;
+					return <SimpleTableCell content={RuRegionNamesMap[value]} />;
+				},
 			},
 			{
 				accessorKey: 'buildingType',
 				header: () => <SimpleTableHeaderCell text={'Тип здания'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					const value = info.getValue() as BuildingType;
+					return <SimpleTableCell content={RuBuildingTypeNamesMap[value]} />;
+				},
 			},
 			{
 				accessorKey: 'constructionType',
 				header: () => <SimpleTableHeaderCell text={'Тип конструкции'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					const value = info.getValue() as ConstructionType;
+					return <SimpleTableCell content={RuConstructionTypeNamesMap[value]} />;
+				},
 			},
 			{
 				accessorKey: 'standartFullName',
@@ -262,6 +282,7 @@ const RequirementsScreen = () => {
 					edit: RequirementsAddAndEdit,
 				}}
 			/>
+			{!!tableData.length && <SimpleTable pageSize={10} data={tableData} columns={columns} />}
 		</div>
 	);
 };

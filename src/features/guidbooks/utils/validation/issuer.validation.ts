@@ -5,15 +5,13 @@ const IssuersSchema = z.object({
 	name: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
-		.max(50, 'Название не должно превышать 50 символов')
-		.nullable(),
-	country: z.string().min(1, 'Поле обязательно для заполнения').nullable(),
-	logoUrl: z.string().optional().nullable(),
+		.max(50, 'Название не должно превышать 50 символов'),
+	country: z.string().min(1, 'Поле обязательно для заполнения'),
+	logoUrl: z.string().min(1, 'Поле обязательно для заполнения'),
 	webSite: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
-		.max(50, 'Ссылка не должна превышать 50 символов')
-		.nullable(),
+		.max(50, 'Ссылка не должна превышать 50 символов'),
 });
 
 const FormIssuerSchema = z.object({

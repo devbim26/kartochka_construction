@@ -20,8 +20,8 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import type { Issuer } from '@features/guidbooks/types';
-import { Guidebooks } from '@features/guidbooks/types';
+import type { Country, Issuer } from '@features/guidbooks/types';
+import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -166,7 +166,10 @@ const IssuersScreen = () => {
 			{
 				accessorKey: 'country',
 				header: () => <SimpleTableHeaderCell text={'Страна'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					const value = info.getValue() as Country;
+					return <SimpleTableCell content={RuCountryNamesMap[value]} />;
+				},
 			},
 			{
 				accessorKey: 'logoUrl',
