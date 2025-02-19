@@ -18,7 +18,6 @@ export const RequirementsAddAndEdit = memoize(() => {
 	const form = useFormContext<Requirement>();
 	const { setValue, register, control, formState, watch } = form;
 	const dateRef = useMask(dateMask);
-
 	const construction = watch('constructionType');
 
 	return (
@@ -94,7 +93,9 @@ export const RequirementsAddAndEdit = memoize(() => {
 				render={({ field }) => (
 					<Select
 						onChange={(value) => {
-							setValue('noizeImpactIndex', '');
+							construction === ConstructionType.Floor
+								? () => setValue('noizeImpactIndex', '1')
+								: () => setValue('noizeImpactIndex', '');
 							setValue('constructionType', value as string);
 						}}
 						options={RuConstructionTypeSelectValues}
@@ -157,10 +158,11 @@ export const RequirementsAddAndEdit = memoize(() => {
 				)}
 			/>
 			<Input
-				{...register('standartValidityPeriod')}
-				// onChange={(event) => {
-				// 	setValue('standartValidityPeriod', event.target.value);
-				// }}
+				// {...register('standartValidityPeriod')}
+				onChange={(event) => {
+					setValue('standartValidityPeriod', event.target.value);
+				}}
+				value={form.watch('standartValidityPeriod')}
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.standartValidityPeriod?.message ? 'text-error' : '',
@@ -172,7 +174,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				}
 				placeholder="Введите дату"
 				max={10}
-				// ref={dateRef}
+				ref={dateRef}
 			/>
 			<Input
 				{...register('standartShortName')}

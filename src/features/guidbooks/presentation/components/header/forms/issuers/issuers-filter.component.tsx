@@ -11,7 +11,7 @@ import { twMerge } from 'tailwind-merge';
 export const IssuersFilter = memoize(() => {
 	const form = useFormContext<Issuer>();
 	const { setValue, register, control, formState } = form;
-
+	console.log(form.getValues());
 	return (
 		<>
 			<Input

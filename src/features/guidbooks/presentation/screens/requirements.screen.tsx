@@ -174,8 +174,8 @@ const RequirementsScreen = () => {
 	}, []);
 
 	const onSaveHandle = useCallback(() => {
-		handleAddTableData(form.editForm.getValues());
-	}, [handleAddTableData, form.editForm.getValues()]);
+		handleAddTableData(form.addForm.getValues());
+	}, [handleAddTableData, form.addForm.getValues()]);
 
 	const onEditHandle = useCallback(() => {
 		handleEditTableData(form.editForm.getValues());
