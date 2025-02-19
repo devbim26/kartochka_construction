@@ -172,12 +172,11 @@ const IssuersScreen = () => {
 				accessorKey: 'logoUrl',
 				header: () => <SimpleTableHeaderCell text={'Логотип'} />,
 				cell: (info) => {
-					const value = info.getValue() as string | null;
 					return (
 						<SimpleTableCell
 							contentClassName="h-[39px] w-[39px]"
 							content={
-								value ? (
+								info.getValue() ? (
 									<img src={info.getValue() as string} className="size-[39px]" />
 								) : (
 									''
@@ -196,15 +195,21 @@ const IssuersScreen = () => {
 				accessorKey: 'id',
 				header: () => <SimpleTableHeaderCell text={'Действия'} />,
 				cell: (info) => {
-					const value = info.getValue() as string;
 					return (
 						<SimpleTableCell
 							content={
 								<div className="flex gap-2">
-									<DeleteIcon onClick={() => handleDeleteTableData(value)} />
+									<DeleteIcon
+										onClick={() =>
+											handleDeleteTableData(info.getValue() as string)
+										}
+									/>
 									<EditIcon
 										onClick={() =>
-											navigate('', { edit: 'true', entityId: value })
+											navigate('', {
+												edit: 'true',
+												entityId: info.getValue() as string,
+											})
 										}
 									/>
 								</div>

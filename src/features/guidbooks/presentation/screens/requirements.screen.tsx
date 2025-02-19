@@ -217,15 +217,21 @@ const RequirementsScreen = () => {
 				accessorKey: 'id',
 				header: () => <SimpleTableHeaderCell text={'Действия'} />,
 				cell: (info) => {
-					const value = info.getValue() as string;
 					return (
 						<SimpleTableCell
 							content={
 								<div className="flex gap-2">
-									<DeleteIcon onClick={() => handleDeleteTableData(value)} />
+									<DeleteIcon
+										onClick={() =>
+											handleDeleteTableData(info.getValue() as string)
+										}
+									/>
 									<EditIcon
 										onClick={() =>
-											navigate('', { edit: 'true', entityId: value })
+											navigate('', {
+												edit: 'true',
+												entityId: info.getValue() as string,
+											})
 										}
 									/>
 								</div>
