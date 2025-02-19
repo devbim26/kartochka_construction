@@ -13,7 +13,7 @@ export const App = () => {
 					richColors
 					closeButton
 					toastOptions={{
-						duration: 8000,
+						duration: 5000,
 					}}
 				/>
 			</Provider>
