@@ -78,7 +78,9 @@ const IssuersScreen = () => {
 			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
 			setTableData(items);
 		} catch (error) {
-			console.log('Error:', error);
+			if (error instanceof AxiosError) {
+				toast.error(error.response?.data.message);
+			}
 		}
 	}, []);
 
@@ -113,7 +115,9 @@ const IssuersScreen = () => {
 				setSingleIssuer(data);
 			}
 		} catch (error) {
-			console.log('Error:', error);
+			if (error instanceof AxiosError) {
+				toast.error(error.response?.data.message);
+			}
 		}
 	}, []);
 
