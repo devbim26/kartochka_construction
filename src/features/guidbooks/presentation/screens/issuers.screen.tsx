@@ -199,17 +199,17 @@ const IssuersScreen = () => {
 						<SimpleTableCell
 							content={
 								<div className="flex gap-2">
-									<DeleteIcon
-										onClick={() =>
-											handleDeleteTableData(info.getValue() as string)
-										}
-									/>
 									<EditIcon
 										onClick={() =>
 											navigate('', {
 												edit: 'true',
 												entityId: info.getValue() as string,
 											})
+										}
+									/>
+									<DeleteIcon
+										onClick={() =>
+											handleDeleteTableData(info.getValue() as string)
 										}
 									/>
 								</div>
