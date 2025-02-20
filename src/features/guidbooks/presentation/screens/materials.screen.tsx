@@ -169,8 +169,9 @@ const MaterialsScreen = () => {
 
 	const columns = useMemo(() => createColumns(tableData), [tableData]);
 
-	const [filterName, filterMaterialTypeId, filterDensity, filterThickness] =
-		forms.filterForm.watch(['name', 'materialTypeId', 'thickness', 'density']);
+	const [filterName, filterMaterialType, filterDensity, filterThickness] = forms.filterForm.watch(
+		['name', 'materialType', 'thickness', 'density'],
+	);
 
 	const handleGetTableData = async (data: MaterialsFilterData) => {
 		try {
@@ -246,7 +247,7 @@ const MaterialsScreen = () => {
 
 	useEffect(() => {
 		handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData);
-	}, [filterDensity, filterName, filterThickness, filterMaterialTypeId]);
+	}, [filterDensity, filterName, filterThickness, filterMaterialType]);
 
 	useEffect(() => {
 		if (singleMaterial) forms.editForm.reset(singleMaterial);

@@ -1,10 +1,11 @@
-import type { MaterialDto, MaterialTypeDto } from '@api-gen';
-import type {
-	MaterialOriginType,
-	MaterialsAddAndEditData,
-	MaterialsFilterData,
-	MaterialType,
-	Region,
+import type { GetMaterialsWithPaginationParamsQuery, MaterialDto } from '@api-gen';
+import {
+	convertToServerMaterialTypeData,
+	MaterialTypeEnum,
+	type MaterialOriginType,
+	type MaterialsAddAndEditData,
+	type MaterialsFilterData,
+	type Region,
 } from '@features';
 
 import { convertToClientRegionData, convertToServerRegionData } from '@core';
@@ -13,22 +14,15 @@ import {
 	convertToServerMaterialOriginTypeData,
 } from './material-origin-type.converter';
 
-export const convertToServerMaterialsFilterData = (data: MaterialsFilterData) => ({
-	name: data.name || undefined,
-	materialTypeId: data.materialTypeId || undefined,
-	density: +data.density || undefined,
-	thickness: +data.thickness || undefined,
+export const convertToServerMaterialsFilterData = (
+	data: MaterialsFilterData,
+): GetMaterialsWithPaginationParamsQuery => ({
+	name: data.name || null,
+	materialTypeEnum:
+		convertToServerMaterialTypeData(data.materialType as MaterialTypeEnum) || null,
+	density: +data.density || null,
+	thickness: +data.thickness || null,
 });
-
-export const convertToClientMaterialTypeList = (arr: MaterialTypeDto[]): MaterialType[] => {
-	return arr.map((data) => ({
-		id: data.id ?? '',
-		name: data.name ?? '',
-		shortName: data.shortName ?? '',
-		label: data.label ?? '',
-		fullName: data.fullName ?? '',
-	}));
-};
 
 export const convertToClientMaterialsAddAndEditData = (
 	data: MaterialDto,
@@ -44,7 +38,7 @@ export const convertToClientMaterialsAddAndEditData = (
 	issuer: data.issuer?.id ?? '',
 	image: data.imageUrl ?? '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',
-	materialType: { id: data.materialType?.id ?? '', name: data.materialType?.name ?? '' },
+	materialType: data.materialType?.id ?? '',
 	velocity: String(data.velocity) ?? '',
 	lossFactor: String(data.lossFactor) ?? '',
 	youngModulus: String(data.youngModulus) ?? '',
@@ -53,21 +47,21 @@ export const convertToClientMaterialsAddAndEditData = (
 });
 
 export const convertToServerMaterialsAddAndEditData = (data: MaterialsAddAndEditData) => ({
-	id: data.id || undefined,
-	name: data.name || undefined,
-	description: data.description || undefined,
-	shortName: data.shortName || undefined,
-	density: +data.density || undefined,
-	thickness: +data.thickness || undefined,
-	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || undefined,
-	region: convertToServerRegionData(data.region as Region) || undefined,
-	issuerId: data.issuer || undefined,
+	id: data.id || null,
+	name: data.name || null,
+	description: data.description || null,
+	shortName: data.shortName || null,
+	density: +data.density || null,
+	thickness: +data.thickness || null,
+	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || null,
+	region: convertToServerRegionData(data.region as Region) || null,
+	issuerId: data.issuer || null,
 	image: null,
-	materialCoefficient: +data.materialCoefficient || undefined,
-	materialTypeId: data.materialType.id || undefined,
-	velocity: +data.velocity || undefined,
-	lossFactor: +data.lossFactor || undefined,
-	youngModulus: +data.youngModulus || undefined,
-	damping: +data.damping || undefined,
-	solid: +data.solid || undefined,
+	materialCoefficient: +data.materialCoefficient || null,
+	materialTypeEnum: data.materialType || null,
+	velocity: +data.velocity || null,
+	lossFactor: +data.lossFactor || null,
+	youngModulus: +data.youngModulus || null,
+	damping: +data.damping || null,
+	solid: +data.solid || null,
 });

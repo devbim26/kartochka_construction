@@ -1,21 +1,17 @@
-import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
+import { convertToBase64, Input, Select, useAppDispatch } from '@core';
 import { convertToPaginatedType, convertToSelectValues } from '@core/converters';
 import {
 	fileUpload,
 	FormSubTitle,
-	getGuidebooksMaterialType,
 	getGuidebooksPaginated,
 	Guidebooks,
 	RuMaterialOriginTypesSelectValues,
+	RuMaterialTypesSelectValues,
 	RuRegionNamesSelectValues,
 	type Issuer,
 	type MaterialsAddAndEditData,
-	type MaterialType,
 } from '@features';
-import {
-	convertToClientIssuerData,
-	convertToClientMaterialTypeList,
-} from '@features/guidbooks/converters';
+import { convertToClientIssuerData } from '@features/guidbooks/converters';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
@@ -27,7 +23,6 @@ export const MaterialsAddAndEdit = () => {
 	const [preview, setPreview] = useState<string | null>(null);
 	const [uploadError, setUploadError] = useState<boolean>(false);
 	const [issuerData, setIssuerData] = useState<Array<Issuer>>([]);
-	const [materialTypes, setMaterialTypes] = useState<Array<MaterialType>>([]);
 
 	const handleGetIssuerData = useCallback(async () => {
 		try {
@@ -48,20 +43,8 @@ export const MaterialsAddAndEdit = () => {
 		}
 	}, []);
 
-	const handleGetMaterialTypeData = useCallback(async () => {
-		try {
-			const response = await getGuidebooksMaterialType();
-
-			const items = convertToClientMaterialTypeList(response.data);
-			setMaterialTypes(items);
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	}, []);
-
 	useEffect(() => {
 		handleGetIssuerData();
-		handleGetMaterialTypeData();
 	}, []);
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
@@ -157,24 +140,21 @@ export const MaterialsAddAndEdit = () => {
 					type={'number'}
 				/>
 				<Controller
-					name="materialType.id"
+					name="materialType"
 					control={control}
 					render={({ field }) => (
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={materialTypes.map((data) => ({
-								label: data.label,
-								value: data.id,
-							}))}
-							error={formState.errors.materialType?.name?.message}
+							options={RuMaterialTypesSelectValues}
+							error={formState.errors.materialType?.message}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px]',
-								formState.errors.materialType?.name?.message ? 'text-error' : '',
+								formState.errors.materialType?.message ? 'text-error' : '',
 							)}
 							wrapperClassname="w-[226px] ring-input-border-primary"
 							buttonClassName="text-sm rounded-[8px]"
-							label={formState.errors.materialType?.name?.message || 'Тип материала'}
+							label={formState.errors.materialType?.message || 'Тип материала'}
 							placeholder="Выберите тип материала"
 						/>
 					)}
@@ -240,7 +220,7 @@ export const MaterialsAddAndEdit = () => {
 						/>
 					)}
 				/>
-				<div className="relative flex items-start gap-4">
+				{/* <div className="relative flex items-start gap-4">
 					<div className="flex flex-col gap-y-2">
 						<FormElementLabel
 							className={twMerge(
@@ -282,7 +262,7 @@ export const MaterialsAddAndEdit = () => {
 							/>
 						</div>
 					)}
-				</div>
+				</div> */}
 			</div>
 			<FormSubTitle text="Физические свойства" />
 			<div className="flex flex-wrap gap-[16px]">
