@@ -35,9 +35,11 @@ import {
 	RuRoomTypeNamesMap,
 } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
+import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { RequirementsDataConfig, useHeaderForm } from '../../utils';
 import {
@@ -99,99 +101,122 @@ const RequirementsScreen = () => {
 		filterBuildingType,
 	]);
 
-	const handleGetTableData = useCallback(async (data: Requirement) => {
-		try {
-			const response = await getGuidebooksPaginated({
+	const handleGetTableData = (data: Requirement) => {
+		from(
+			getGuidebooksPaginated({
 				data: convertToServerRequirementData(data),
 				guidebookType: Guidebooks.REQUIREMENT,
-			});
-			const items = convertToPaginatedType(convertToClientRequirementData)(
-				response.data as any,
-			);
-			setTableData(items);
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				toast.error(error.response?.data.message);
-			}
-		}
-	}, []);
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const items = convertToPaginatedType(convertToClientRequirementData)(
+						response.data,
+					);
+					return from([items]);
+				}),
+				tap((items) => setTableData(items!)),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
 
-	const handleAddTableData = useCallback(
-		async (data: Requirement) => {
-			try {
-				const response = await getGuidebooksCreate({
-					data: convertToServerRequirementData(data),
-					guidebookType: Guidebooks.REQUIREMENT,
-				});
+	const handleAddTableData = (data: Requirement) => {
+		from(
+			getGuidebooksCreate({
+				data: convertToServerRequirementData(data),
+				guidebookType: Guidebooks.REQUIREMENT,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
 					toast.success('Требование успешно добавлено');
 				}
-			} catch (error) {
-				if (error instanceof AxiosError) {
-					toast.error(error.response?.data.message);
-				}
-			}
-		},
-		[handleGetTableData, form.filterForm.getValues()],
-	);
+			});
+	};
 
-	const handleEditTableData = useCallback(
-		async (data: Requirement) => {
-			try {
-				const response = await getGuidebooksEdit({
-					data: convertToServerRequirementData(data),
-					guidebookType: Guidebooks.REQUIREMENT,
-				});
+	const handleEditTableData = (data: Requirement) => {
+		from(
+			getGuidebooksEdit({
+				data: convertToServerRequirementData(data),
+				guidebookType: Guidebooks.REQUIREMENT,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
 					toast.success('Требование успешно отредактировано');
 				}
-			} catch (error) {
-				if (error instanceof AxiosError) {
-					toast.error(error.response?.data.message);
-				}
-			}
-		},
-		[handleGetTableData, form.filterForm.getValues()],
-	);
+			});
+	};
 
-	const handleDeleteTableData = useCallback(
-		async (id: string) => {
-			try {
-				const response = await getGuidebooksDelete({
-					data: { id: id },
-					guidebookType: Guidebooks.REQUIREMENT,
-				});
+	const handleGetOneTableData = (id: string) => {
+		from(
+			getGuidebooksDelete({
+				data: { id: id },
+				guidebookType: Guidebooks.REQUIREMENT,
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const data = convertToClientRequirementData(response.data as RequirementDto);
+					return from([data]);
+				}),
+				tap((data) => setSingleRequirement(data!)),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
+
+	const handleDeleteTableData = (id: string) => {
+		from(
+			getGuidebooksDetail({
+				id: id,
+				guidebookType: Guidebooks.REQUIREMENT,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
 					toast.success('Требование успешно удалено');
 				}
-			} catch (error) {
-				if (error instanceof AxiosError) {
-					toast.error(error.response?.data.message);
-				}
-			}
-		},
-		[handleGetTableData, form.filterForm.getValues()],
-	);
-
-	const handleGetOneTableData = useCallback(async (id: string) => {
-		try {
-			const response = await getGuidebooksDetail({
-				id: id,
-				guidebookType: Guidebooks.REQUIREMENT,
 			});
-			if (response.status === 200) {
-				const data = convertToClientRequirementData(response.data as RequirementDto);
-				setSingleRequirement(data);
-			}
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				toast.error(error.response?.data.message);
-			}
-		}
-	}, []);
+	};
 
 	const onSaveHandle = useCallback(() => {
 		handleAddTableData(form.addForm.getValues());
