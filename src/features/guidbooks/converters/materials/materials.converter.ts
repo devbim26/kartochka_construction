@@ -1,13 +1,13 @@
-import type { GetMaterialsWithPaginationParamsQuery, MaterialDto, MaterialTypeDto } from '@api-gen';
-import type {
+import type { GetMaterialsWithPaginationParamsQuery } from '@api-gen';
+import {
+	convertToClientMaterialTypeData,
+	convertToServerMaterialTypeData,
 	MaterialTypeEnum,
 	type MaterialOriginType,
 	type MaterialsAddAndEditData,
 	type MaterialsFilterData,
-	type MaterialType,
 	type Region,
 } from '@features';
-import { convertToClientMaterialTypeData } from '@features';
 
 import { convertToClientRegionData, convertToServerRegionData } from '@core';
 import {
@@ -19,25 +19,13 @@ export const convertToServerMaterialsFilterData = (
 	data: MaterialsFilterData,
 ): GetMaterialsWithPaginationParamsQuery => ({
 	name: data.name || null,
-	materialTypeEnum: (data.materialTypeEnum as MaterialTypeEnum) || null,
+	materialTypeEnum:
+		convertToServerMaterialTypeData(data.materialType as MaterialTypeEnum) || null,
 	density: +data.density || null,
 	thickness: +data.thickness || null,
 });
 
-export const convertToClientMaterialTypeList = (data: MaterialTypeDto[]): MaterialType[] => {
-	return data.map((data) => ({
-		id: data.id ?? '',
-		name: data.name ?? '',
-		shortName: data.shortName ?? '',
-		materialTypeEnum: convertToClientMaterialTypeData(data.materialTypeEnum!) ?? '',
-		materialTypeValues: '',
-		fullName: data.fullName ?? '',
-	}));
-};
-
-export const convertToClientMaterialsAddAndEditData = (
-	data: MaterialDto,
-): MaterialsAddAndEditData => ({
+export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddAndEditData => ({
 	id: data.id ?? '',
 	name: data.name ?? '',
 	description: data.description ?? '',
@@ -49,7 +37,7 @@ export const convertToClientMaterialsAddAndEditData = (
 	issuer: data.issuer?.id ?? '',
 	image: data.imageUrl ?? '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',
-	materialType: { id: data.materialType?.id ?? '', name: data.materialType?.name ?? '' },
+	materialType: convertToClientMaterialTypeData(data.materialType) ?? '',
 	velocity: String(data.velocity) ?? '',
 	lossFactor: String(data.lossFactor) ?? '',
 	youngModulus: String(data.youngModulus) ?? '',
@@ -69,7 +57,7 @@ export const convertToServerMaterialsAddAndEditData = (data: MaterialsAddAndEdit
 	issuerId: data.issuer || null,
 	image: null,
 	materialCoefficient: +data.materialCoefficient || null,
-	materialTypeId: data.materialType.id || null,
+	materialTypeEnum: data.materialType || null,
 	velocity: +data.velocity || null,
 	lossFactor: +data.lossFactor || null,
 	youngModulus: +data.youngModulus || null,

@@ -461,7 +461,7 @@ export interface PaginatedMaterialDto {
 	density?: number;
 	/** @format float */
 	thickness?: number;
-	materialType?: NamedEntity;
+	materialType?: MaterialTypeEnum;
 	type?: MaterialOriginType;
 	region?: Region;
 	imageUrl?: string | null;

@@ -73,9 +73,9 @@ export const RequirementsDataConfig: EntityConfig = {
 		standartFullName: '',
 		class: '',
 		noizeIsolationIndex: '',
-		noizeImpactIndex: '1',
+		noizeImpactIndex: '',
 		notice: '',
-		construction: '',
+		constructionType: '',
 		standartValidityPeriod: '',
 	},
 };

@@ -1,11 +1,14 @@
 import type { RequirementDto } from '@api-gen';
 import {
 	convertToPaginatedType,
+	DeleteIcon,
 	mapColumns,
+	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
 } from '@core';
+import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {
 	convertToClientRequirementData,
 	convertToServerRequirementData,
@@ -17,14 +20,33 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import type { Requirement } from '@features/guidbooks/types';
-import { Guidebooks } from '@features/guidbooks/types';
+import type {
+	BuildingType,
+	ConstructionType,
+	Region,
+	Requirement,
+	RoomType,
+} from '@features/guidbooks/types';
+import {
+	Guidebooks,
+	RuBuildingTypeNamesMap,
+	RuConstructionTypeNamesMap,
+	RuRegionNamesMap,
+	RuRoomTypeNamesMap,
+} from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
+import type { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { catchError, from, switchMap, tap } from 'rxjs';
+import { toast } from 'sonner';
 import { RequirementsDataConfig, useHeaderForm } from '../../utils';
-import { GuidbookPageHeaderWrapper } from '../components';
-import { RequirementsAddAndEdit, RequirementsFilter } from '../components/header/forms';
+import {
+	GuidbookPageHeaderWrapper,
+	RequirementsAddAndEdit,
+	RequirementsFilter,
+} from '../components';
 
 const RequirementsScreen = () => {
 	const navigate = useAppNavigate();
@@ -79,90 +101,126 @@ const RequirementsScreen = () => {
 		filterBuildingType,
 	]);
 
-	const handleGetTableData = useCallback(async (data: Requirement) => {
-		try {
-			const response = await getGuidebooksPaginated({
+	const handleGetTableData = (data: Requirement) => {
+		from(
+			getGuidebooksPaginated({
 				data: convertToServerRequirementData(data),
 				guidebookType: Guidebooks.REQUIREMENT,
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const items = convertToPaginatedType(convertToClientRequirementData)(
+						response.data,
+					);
+					return from([items]);
+				}),
+				tap((items) => setTableData(items!)),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
+
+	const handleAddTableData = (data: Requirement) => {
+		from(
+			getGuidebooksCreate({
+				data: convertToServerRequirementData(data),
+				guidebookType: Guidebooks.REQUIREMENT,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response.status === 200) {
+					handleGetTableData(form.filterForm.getValues());
+					toast.success('Требование успешно добавлено');
+				}
 			});
-			const items = convertToPaginatedType(convertToClientRequirementData)(
-				response.data as any,
-			);
-			setTableData(items);
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	}, []);
+	};
 
-	const handleAddTableData = useCallback(
-		async (data: Requirement) => {
-			try {
-				const response = await getGuidebooksCreate({
-					data: convertToServerRequirementData(data),
-					guidebookType: Guidebooks.REQUIREMENT,
-				});
+	const handleEditTableData = (data: Requirement) => {
+		from(
+			getGuidebooksEdit({
+				data: convertToServerRequirementData(data),
+				guidebookType: Guidebooks.REQUIREMENT,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					toast.success('Требование успешно отредактировано');
 				}
-			} catch (error) {
-				console.log('Error:', error);
-			}
-		},
-		[handleGetTableData, form.filterForm.getValues()],
-	);
+			});
+	};
 
-	const handleEditTableData = useCallback(
-		async (data: Requirement) => {
-			try {
-				const response = await getGuidebooksEdit({
-					data: convertToServerRequirementData(data),
-					guidebookType: Guidebooks.REQUIREMENT,
-				});
-				if (response.status === 200) {
-					handleGetTableData(form.filterForm.getValues());
-				}
-			} catch (error) {
-				console.log(error);
-			}
-		},
-		[handleGetTableData, form.filterForm.getValues()],
-	);
+	const handleGetOneTableData = (id: string) => {
+		from(
+			getGuidebooksDelete({
+				data: { id: id },
+				guidebookType: Guidebooks.REQUIREMENT,
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const data = convertToClientRequirementData(response.data as RequirementDto);
+					return from([data]);
+				}),
+				tap((data) => setSingleRequirement(data!)),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
 
-	const handleDeleteTableData = useCallback(
-		async (id: string) => {
-			try {
-				const response = await getGuidebooksDelete({
-					data: { id: id },
-					guidebookType: Guidebooks.REQUIREMENT,
-				});
-				if (response.status === 200) {
-					handleGetTableData(form.filterForm.getValues());
-				}
-			} catch (error) {
-				console.log('Error:', error);
-			}
-		},
-		[handleGetTableData, form.filterForm.getValues()],
-	);
-
-	const handleGetOneTableData = useCallback(async (id: string) => {
-		try {
-			const response = await getGuidebooksDetail({
+	const handleDeleteTableData = (id: string) => {
+		from(
+			getGuidebooksDetail({
 				id: id,
 				guidebookType: Guidebooks.REQUIREMENT,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response.status === 200) {
+					handleGetTableData(form.filterForm.getValues());
+					toast.success('Требование успешно удалено');
+				}
 			});
-			if (response.status === 200) {
-				const data = convertToClientRequirementData(response.data as RequirementDto);
-				setSingleRequirement(data);
-			}
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	}, []);
+	};
 
 	const onSaveHandle = useCallback(() => {
-		handleAddTableData(form.editForm.getValues());
-	}, [handleAddTableData, form.editForm.getValues()]);
+		handleAddTableData(form.addForm.getValues());
+	}, [handleAddTableData, form.addForm.getValues()]);
 
 	const onEditHandle = useCallback(() => {
 		handleEditTableData(form.editForm.getValues());
@@ -174,17 +232,35 @@ const RequirementsScreen = () => {
 			{
 				accessorKey: 'region',
 				header: () => <SimpleTableHeaderCell text={'Регион'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell content={RuRegionNamesMap[info.getValue() as Region]} />
+					);
+				},
 			},
 			{
 				accessorKey: 'buildingType',
 				header: () => <SimpleTableHeaderCell text={'Тип здания'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell
+							content={RuBuildingTypeNamesMap[info.getValue() as BuildingType]}
+						/>
+					);
+				},
 			},
 			{
 				accessorKey: 'constructionType',
 				header: () => <SimpleTableHeaderCell text={'Тип конструкции'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell
+							content={
+								RuConstructionTypeNamesMap[info.getValue() as ConstructionType]
+							}
+						/>
+					);
+				},
 			},
 			{
 				accessorKey: 'standartFullName',
@@ -204,12 +280,51 @@ const RequirementsScreen = () => {
 			{
 				accessorKey: 'firstPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Первое помещение'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell
+							content={RuRoomTypeNamesMap[info.getValue() as RoomType]}
+						/>
+					);
+				},
 			},
 			{
 				accessorKey: 'secondPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell
+							content={RuRoomTypeNamesMap[info.getValue() as RoomType]}
+						/>
+					);
+				},
+			},
+			{
+				accessorKey: 'id',
+				header: () => <SimpleTableHeaderCell text={'Действия'} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell
+							content={
+								<div className="flex gap-2">
+									<EditIcon
+										onClick={() =>
+											navigate('', {
+												edit: 'true',
+												entityId: info.getValue() as string,
+											})
+										}
+									/>
+									<DeleteIcon
+										onClick={() =>
+											handleDeleteTableData(info.getValue() as string)
+										}
+									/>
+								</div>
+							}
+						/>
+					);
+				},
 			},
 		];
 		return mapColumns(columns);
@@ -233,6 +348,7 @@ const RequirementsScreen = () => {
 					edit: RequirementsAddAndEdit,
 				}}
 			/>
+			{!!tableData.length && <SimpleTable pageSize={10} data={tableData} columns={columns} />}
 		</div>
 	);
 };

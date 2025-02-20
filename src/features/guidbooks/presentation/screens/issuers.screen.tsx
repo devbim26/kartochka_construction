@@ -1,13 +1,14 @@
 import type { IssuerDto } from '@api-gen';
 import {
+	convertToPaginatedType,
+	DeleteIcon,
+	EditIcon,
 	mapColumns,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
 } from '@core';
-import { convertToPaginatedType } from '@core/converters';
-
 import {
 	convertToClientIssuerData,
 	convertToServerIssuerData,
@@ -19,11 +20,15 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import type { Issuer } from '@features/guidbooks/types';
-import { Guidebooks } from '@features/guidbooks/types';
+import type { Country, Issuer } from '@features/guidbooks/types';
+import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
+import type { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { catchError, from, switchMap, tap } from 'rxjs';
+import { toast } from 'sonner';
 import { IssuersDataConfig, IssuersFormCofig, useHeaderForm } from '../../utils';
 import { GuidbookPageHeaderWrapper } from '../components';
 import { IssuersAddEdit, IssuersFilter } from '../components/header/forms/issuers';
@@ -67,84 +72,120 @@ const IssuersScreen = () => {
 		handleGetTableData(form.filterForm.getValues());
 	}, [filterCountry, filterName, filterWebSite]);
 
-	const handleGetTableData = useCallback(async (data: Issuer) => {
-		try {
-			const response = await getGuidebooksPaginated({
+	const handleGetTableData = (data: Issuer) => {
+		from(
+			getGuidebooksPaginated({
 				data: convertToServerIssuerData(data),
 				guidebookType: Guidebooks.ISSUER,
-			});
-			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
-			setTableData(items);
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	}, []);
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const items = convertToPaginatedType(convertToClientIssuerData)(response.data);
+					return from([items]);
+				}),
+				tap((items) => setTableData(items!)),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
 
-	const handleAddTableData = useCallback(
-		async (data: Issuer) => {
-			try {
-				const response = await getGuidebooksCreate({
-					data: convertToServerIssuerData(data),
-					guidebookType: Guidebooks.ISSUER,
-				});
+	const handleAddTableData = (data: Issuer) => {
+		from(
+			getGuidebooksCreate({
+				data: convertToServerIssuerData(data),
+				guidebookType: Guidebooks.ISSUER,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					toast.success('Производитель успешно добавлен');
 				}
-			} catch (error) {
-				console.log('Error:', error);
-			}
-		},
-		[handleGetTableData, form.filterForm.getValues()],
-	);
+			});
+	};
 
-	const handleGetOneTableData = useCallback(async (id: string) => {
-		try {
-			const response = await getGuidebooksDetail({
+	const handleDeleteTableData = (id: string) => {
+		from(
+			getGuidebooksDetail({
 				id: id,
 				guidebookType: Guidebooks.ISSUER,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response.status === 200) {
+					handleGetTableData(form.filterForm.getValues());
+					toast.success('Производитель успешно удалён');
+				}
 			});
-			if (response.status === 200) {
-				const data = convertToClientIssuerData(response.data as IssuerDto);
-				setSingleIssuer(data);
-			}
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	}, []);
+	};
 
-	const handleEditTableData = useCallback(
-		async (data: Issuer) => {
-			try {
-				const response = await getGuidebooksEdit({
-					data: convertToServerIssuerData(data),
-					guidebookType: Guidebooks.ISSUER,
-				});
+	const handleEditTableData = (data: Issuer) => {
+		from(
+			getGuidebooksEdit({
+				data: convertToServerIssuerData(data),
+				guidebookType: Guidebooks.ISSUER,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
 				if (response.status === 200) {
 					handleGetTableData(form.filterForm.getValues());
+					toast.success('Производитель успешно отредактирован');
 				}
-			} catch (error) {
-				console.log(error);
-			}
-		},
-		[handleGetTableData, form.filterForm.getValues()],
-	);
+			});
+	};
 
-	const handleDeleteTableData = useCallback(
-		async (id: string) => {
-			try {
-				const response = await getGuidebooksDelete({
-					data: { id: id },
-					guidebookType: Guidebooks.ISSUER,
-				});
-				if (response.status === 200) {
-					handleGetTableData(form.filterForm.getValues());
-				}
-			} catch (error) {
-				console.log('Error:', error);
-			}
-		},
-		[handleGetTableData, form.filterForm.getValues()],
-	);
+	const handleGetOneTableData = (id: string) => {
+		from(
+			getGuidebooksDelete({
+				data: { id: id },
+				guidebookType: Guidebooks.ISSUER,
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const data = convertToClientIssuerData(response.data as IssuerDto);
+					return from([data]);
+				}),
+				tap((data) => setSingleIssuer(data!)),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
 
 	const onSaveHandle = useCallback(() => {
 		handleAddTableData(form.addForm.getValues());
@@ -165,18 +206,21 @@ const IssuersScreen = () => {
 			{
 				accessorKey: 'country',
 				header: () => <SimpleTableHeaderCell text={'Страна'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell content={RuCountryNamesMap[info.getValue() as Country]} />
+					);
+				},
 			},
 			{
 				accessorKey: 'logoUrl',
 				header: () => <SimpleTableHeaderCell text={'Логотип'} />,
 				cell: (info) => {
-					const value = info.getValue() as string | null;
 					return (
 						<SimpleTableCell
 							contentClassName="h-[39px] w-[39px]"
 							content={
-								value ? (
+								info.getValue() ? (
 									<img src={info.getValue() as string} className="size-[39px]" />
 								) : (
 									''
@@ -190,6 +234,33 @@ const IssuersScreen = () => {
 				accessorKey: 'webSite',
 				header: () => <SimpleTableHeaderCell text={'Сайт'} />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'id',
+				header: () => <SimpleTableHeaderCell text={'Действия'} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell
+							content={
+								<div className="flex gap-2">
+									<EditIcon
+										onClick={() =>
+											navigate('', {
+												edit: 'true',
+												entityId: info.getValue() as string,
+											})
+										}
+									/>
+									<DeleteIcon
+										onClick={() =>
+											handleDeleteTableData(info.getValue() as string)
+										}
+									/>
+								</div>
+							}
+						/>
+					);
+				},
 			},
 		];
 		return mapColumns(columns);

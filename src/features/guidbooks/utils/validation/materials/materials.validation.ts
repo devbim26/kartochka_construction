@@ -13,10 +13,7 @@ export const MaterialsAddAndEditSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	materialType: z.object({
-		name: z.string(),
-		id: z.string().min(1, 'Поле обязательно для заполнения'),
-	}),
+	materialType: z.string().min(1, 'Поле обязательно для заполнения'),
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
 	type: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -49,10 +46,10 @@ export const MaterialsAddAndEditSchema = z.object({
 });
 
 export const MaterialsFilterSchema = z.object({
-	name: z.string().optional(),
-	density: z.string().optional(),
-	thickness: z.string().optional(),
-	materialTypeEnum: z.string().optional(),
+	name: z.string(),
+	density: z.string(),
+	thickness: z.string(),
+	materialType: z.string(),
 });
 
 export type MaterialsAddAndEditSchemaType = z.infer<typeof MaterialsAddAndEditSchema>;

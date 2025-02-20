@@ -3,19 +3,15 @@ import { convertToPaginatedType, convertToSelectValues } from '@core/converters'
 import {
 	fileUpload,
 	FormSubTitle,
-	getGuidebooksMaterialTypes,
 	getGuidebooksPaginated,
 	Guidebooks,
 	RuMaterialOriginTypesSelectValues,
+	RuMaterialTypesSelectValues,
 	RuRegionNamesSelectValues,
 	type Issuer,
 	type MaterialsAddAndEditData,
-	type MaterialType,
 } from '@features';
-import {
-	convertToClientIssuerData,
-	convertToClientMaterialTypeList,
-} from '@features/guidbooks/converters';
+import { convertToClientIssuerData } from '@features/guidbooks/converters';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
@@ -26,8 +22,7 @@ export const MaterialsAddAndEdit = () => {
 	const dispatch = useAppDispatch();
 	const [preview, setPreview] = useState<string | null>(null);
 	const [uploadError, setUploadError] = useState<boolean>(false);
-	const [issuers, setIssuers] = useState<Issuer[]>([]);
-	const [materialTypes, setMaterialTypes] = useState<MaterialType[]>([]);
+	const [issuerData, setIssuerData] = useState<Array<Issuer>>([]);
 
 	const handleGetIssuerData = useCallback(async () => {
 		try {
@@ -42,17 +37,7 @@ export const MaterialsAddAndEdit = () => {
 			});
 
 			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
-			setIssuers(items);
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	}, []);
-
-	const handleGetMaterialTypeData = useCallback(async () => {
-		try {
-			const response = await getGuidebooksMaterialTypes();
-			const items = convertToClientMaterialTypeList(response.data);
-			setMaterialTypes(items);
+			setIssuerData(items);
 		} catch (error) {
 			console.log('Error:', error);
 		}
@@ -60,7 +45,6 @@ export const MaterialsAddAndEdit = () => {
 
 	useEffect(() => {
 		handleGetIssuerData();
-		handleGetMaterialTypeData();
 	}, []);
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
@@ -156,24 +140,22 @@ export const MaterialsAddAndEdit = () => {
 					type={'number'}
 				/>
 				<Controller
-					name="materialType.id"
+					name="materialType"
 					control={control}
 					render={({ field }) => (
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={materialTypes.map((data) => ({
-								label: data.name,
-								value: data.id,
-							}))}
-							error={formState.errors.materialType?.id?.message}
+							isSearchable
+							options={RuMaterialTypesSelectValues}
+							error={formState.errors.materialType?.message}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px]',
-								formState.errors.materialType?.id?.message ? 'text-error' : '',
+								formState.errors.materialType?.message ? 'text-error' : '',
 							)}
 							wrapperClassname="w-[226px] ring-input-border-primary"
 							buttonClassName="text-sm rounded-[8px]"
-							label={formState.errors.materialType?.id?.message || 'Тип материала'}
+							label={formState.errors.materialType?.message || 'Тип материала'}
 							placeholder="Выберите тип материала"
 						/>
 					)}
@@ -206,6 +188,7 @@ export const MaterialsAddAndEdit = () => {
 						<Select
 							{...field}
 							value={field.value || ''}
+							isSearchable
 							options={RuMaterialOriginTypesSelectValues}
 							error={formState.errors.type?.message}
 							labelClassName={twMerge(
@@ -226,7 +209,8 @@ export const MaterialsAddAndEdit = () => {
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={convertToSelectValues(issuers) ?? []}
+							isSearchable
+							options={convertToSelectValues(issuerData) ?? []}
 							error={formState.errors.issuer?.message}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px]',

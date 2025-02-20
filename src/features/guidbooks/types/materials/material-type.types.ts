@@ -30,11 +30,51 @@ export enum MaterialTypeEnum {
 	Board = 'Board',
 }
 
+export enum RuMaterialTypeEnum {
+	MasonryAndSolid = 'Кирпичные и монолитные',
+	Frame = 'Каркасные',
+	PorousMaterials = 'Пористые материалы',
+	SandwichPanel = 'Сэндвич-панели',
+	GypsumBondedbBoards = 'Гипсокартонные',
+	WoodBasedBoard = 'Древесно-стружечные плиты',
+	MineralBondedBoards = 'Минеральные плиты',
+	Metal = 'Металлические',
+	Glazing = 'Стеклянные',
+	Membrane = 'Мембраны',
+	FoamMaterials = 'Пеноматериалы',
+	AcousticTreatmentMaterials = 'Акустические материалы',
+	AirGap = 'Воздушные зазоры',
+	Link = 'Связующие',
+	Filler = 'Наполнительные',
+	Heavy = 'Тяжелые',
+	Board = 'Плиты',
+}
+
+export const RuMaterialTypesSelectValues = [
+	{ label: 'Кирпичные и монолитные', value: MaterialTypeEnum.MasonryAndSolid },
+	{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
+	{ label: 'Пористые материалы', value: MaterialTypeEnum.PorousMaterials },
+	{ label: 'Сэндвич-панели', value: MaterialTypeEnum.SandwichPanel },
+	{ label: 'Гипсокартонные', value: MaterialTypeEnum.GypsumBondedbBoards },
+	{ label: 'Древесно-стружечные плиты', value: MaterialTypeEnum.WoodBasedBoard },
+	{ label: 'Минеральные плиты', value: MaterialTypeEnum.MineralBondedBoards },
+	{ label: 'Металлические', value: MaterialTypeEnum.Metal },
+	{ label: 'Стеклянные', value: MaterialTypeEnum.Glazing },
+	{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
+	{ label: 'Пеноматериалы', value: MaterialTypeEnum.FoamMaterials },
+	{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	{ label: 'Воздушные зазоры', value: MaterialTypeEnum.AirGap },
+	{ label: 'Связующие', value: MaterialTypeEnum.Link },
+	{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
+	{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
+	{ label: 'Плиты', value: MaterialTypeEnum.Board },
+];
+
 export interface MaterialType {
 	id: string;
 	name: string;
 	shortName: string;
-	materialTypeEnum: MaterialTypeEnum;
+	materialTypeEnum: string;
 	materialTypeValues: string;
 	fullName: string;
 }
