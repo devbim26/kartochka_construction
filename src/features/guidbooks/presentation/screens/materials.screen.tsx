@@ -23,6 +23,7 @@ import {
 	MaterialsAddAndEditConfig,
 	MaterialsFilter,
 	MaterialsFilterConfig,
+	RuMaterialTypeEnum,
 	RuRegionNamesMap,
 	useHeaderForm,
 	type MaterialsAddAndEditData,
@@ -79,9 +80,17 @@ const MaterialsScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				accessorKey: 'materialType.name',
+				accessorKey: 'materialType',
 				header: () => <SimpleTableHeaderCell text="Тип материала" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => (
+					<SimpleTableCell
+						content={
+							RuMaterialTypeEnum[
+								`${info.getValue() as keyof typeof RuMaterialTypeEnum}`
+							]
+						}
+					/>
+				),
 			},
 			{
 				accessorKey: 'region',
@@ -169,8 +178,9 @@ const MaterialsScreen = () => {
 
 	const columns = useMemo(() => createColumns(tableData), [tableData]);
 
-	const [filterName, filterMaterialTypeId, filterDensity, filterThickness] =
-		forms.filterForm.watch(['name', 'materialTypeId', 'thickness', 'density']);
+	const [filterName, filterMaterialType, filterDensity, filterThickness] = forms.filterForm.watch(
+		['name', 'materialType', 'thickness', 'density'],
+	);
 
 	const handleGetTableData = async (data: MaterialsFilterData) => {
 		try {
@@ -246,7 +256,7 @@ const MaterialsScreen = () => {
 
 	useEffect(() => {
 		handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData);
-	}, [filterDensity, filterName, filterThickness, filterMaterialTypeId]);
+	}, [filterDensity, filterName, filterThickness, filterMaterialType]);
 
 	useEffect(() => {
 		if (singleMaterial) forms.editForm.reset(singleMaterial);

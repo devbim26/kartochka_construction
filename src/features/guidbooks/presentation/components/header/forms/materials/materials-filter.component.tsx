@@ -1,33 +1,11 @@
 import { Input, Select } from '@core';
-import {
-	convertToClientMaterialTypeList,
-	getGuidebooksMaterialType,
-	type MaterialsFilterData,
-	type MaterialType,
-} from '@features';
-import { useCallback, useEffect, useState } from 'react';
+import { RuMaterialTypesSelectValues, type MaterialsFilterData } from '@features';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const MaterialsFilter = () => {
 	const form = useFormContext<MaterialsFilterData>();
 	const { formState, control } = form;
-	const [materialTypes, setMaterialTypes] = useState<Array<MaterialType>>([]);
-
-	const handleGetMaterialTypeData = useCallback(async () => {
-		try {
-			const response = await getGuidebooksMaterialType();
-
-			const items = convertToClientMaterialTypeList(response.data);
-			setMaterialTypes(items);
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	}, []);
-
-	useEffect(() => {
-		handleGetMaterialTypeData();
-	}, []);
 
 	return (
 		<div className="flex flex-wrap gap-[16px]">
@@ -45,17 +23,15 @@ export const MaterialsFilter = () => {
 				type={'text'}
 			/>
 			<Controller
-				name="materialTypeId"
+				name="materialType"
 				control={control}
 				render={({ field }) => (
 					<Select
 						{...field}
+						isSearchable
 						value={field.value || ''}
-						options={materialTypes.map((data) => ({
-							label: data.label,
-							value: data.id,
-						}))}
-						error={formState.errors.materialTypeId?.message}
+						options={RuMaterialTypesSelectValues}
+						error={formState.errors.materialType?.message}
 						labelClassName="text-sm leading-5 tracking-[0.1px]"
 						wrapperClassname="w-[226px] ring-input-border-primary"
 						buttonClassName="text-sm rounded-[8px]"

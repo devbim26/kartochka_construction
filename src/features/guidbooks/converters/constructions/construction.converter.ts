@@ -1,4 +1,4 @@
-import { ConstructionType as ServerConstructionType } from '@api-gen';
+import { ConstructionClass as ServerConstructionType } from '@api-gen';
 import { createDataRecordConverter } from '@core/utils/helpers';
 import { ConstructionType as ClientConstructionType } from '@features/guidbooks/types';
 

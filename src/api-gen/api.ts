@@ -34,6 +34,16 @@ export interface ApproveSmsCommand {
 	code?: string | null;
 }
 
+export interface ArticleDto {
+	/** @format uuid */
+	id?: string;
+	title?: string | null;
+	bodyText?: string | null;
+	/** @format date */
+	publishDate?: string;
+	imageUrl?: string | null;
+}
+
 export enum BuildingType {
 	ResidentialBuildings = 'ResidentialBuildings',
 	Hotel = 'Hotel',
@@ -50,9 +60,15 @@ export enum CategoryClass {
 	C = 'C',
 }
 
-export enum ConstructionType {
+export enum ConstructionClass {
 	Wall = 'Wall',
 	Floor = 'Floor',
+}
+
+export enum ConstructionTypeEnum {
+	HeavySingleLayerWall = 'HeavySingleLayerWall',
+	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
+	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
 }
 
 export enum Country {
@@ -107,6 +123,12 @@ export interface CraeteSubConstructionTemplateDto {
 	subPosition?: SubConstructionPosition;
 }
 
+export interface CreateConstructionDto {
+	/** @format int32 */
+	positionId?: number;
+	userMaterials?: CreateUserMaterialDto[] | null;
+}
+
 export interface CreateConstructionHeaderCommand {
 	name?: string | null;
 	description?: string | null;
@@ -124,7 +146,7 @@ export interface CreateConstructionHeaderCommand {
 	index?: IndexType;
 	/** @format float */
 	indexValue?: number;
-	constructionType?: CreateConstructionTypeTemplateDto;
+	constructionType?: CreateConstructionTypeDto;
 }
 
 export interface CreateConstructionRootTemplateDto {
@@ -134,6 +156,11 @@ export interface CreateConstructionRootTemplateDto {
 export interface CreateConstructionTemplateDto {
 	position?: SubConstructionPosition;
 	subConstructions?: CraeteSubConstructionTemplateDto[] | null;
+}
+
+export interface CreateConstructionTypeDto {
+	constructionTypeEnum?: ConstructionTypeEnum;
+	constructions?: CreateConstructionDto[] | null;
 }
 
 export interface CreateConstructionTypeTemplateDto {
@@ -171,7 +198,18 @@ export interface CreateRequirementCommand {
 	/** @format float */
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
-	constructionType?: ConstructionType;
+	constructionClass?: ConstructionClass;
+}
+
+export interface CreateUserMaterialDto {
+	/** @format uuid */
+	materialId?: string;
+	materialTypeValue?: MaterialTypeValueDto[] | null;
+}
+
+export interface DeleteArticleCommand {
+	/** @format uuid */
+	articleId?: string;
 }
 
 export interface DeleteConstructionHeaderCommand {
@@ -192,6 +230,18 @@ export interface DeleteMaterialCommand {
 export interface DeleteRequirementCommand {
 	/** @format uuid */
 	id?: string;
+}
+
+export interface GetArticlesWithPaginationParamsQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	title?: string | null;
+	/** @format date */
+	publishDate?: string | null;
 }
 
 export interface GetConstructionHeaderWithPaginationQuery {
@@ -217,7 +267,6 @@ export interface GetIssuerWithPaginationParamsQuery {
 	ordering?: string | null;
 	name?: string | null;
 	country?: Country;
-	logo?: string | null;
 	webSite?: string | null;
 }
 
@@ -233,8 +282,7 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	density?: number | null;
 	/** @format float */
 	thickness?: number | null;
-	/** @format uuid */
-	materialTypeId?: string | null;
+	materialTypeEnum?: MaterialTypeEnum;
 }
 
 export interface GetReportWithPaginationQuery {
@@ -258,6 +306,11 @@ export interface GetRequirementsWithPaginationParamsQuery {
 	region?: Region;
 	buildingType?: BuildingType;
 	placementRoom?: string | null;
+	standartShortName?: string | null;
+	standartFullName?: string | null;
+	/** @format date */
+	standartValidityPeriod?: string | null;
+	class?: CategoryClass;
 }
 
 export enum IndexType {
@@ -325,19 +378,76 @@ export enum MaterialOriginType {
 	UserDefinedProduct = 'UserDefinedProduct',
 }
 
+export enum MaterialParametrs {
+	Thickness = 'Thickness',
+	Density = 'Density',
+	ConnectionNumber = 'ConnectionNumber',
+	RackStep = 'RackStep',
+	Width = 'Width',
+}
+
 export interface MaterialTypeDto {
 	/** @format uuid */
 	id?: string;
 	name?: string | null;
 	shortName?: string | null;
-	label?: string | null;
+	materialTypeEnum?: MaterialTypeEnum;
+	materialTypeValues?: MaterialTypeValueDto[] | null;
 	fullName?: string | null;
+}
+
+export enum MaterialTypeEnum {
+	MasonryAndSolid = 'MasonryAndSolid',
+	Frame = 'Frame',
+	PorousMaterials = 'PorousMaterials',
+	SandwichPanel = 'SandwichPanel',
+	GypsumBondedbBoards = 'GypsumBondedbBoards',
+	WoodBasedBoard = 'WoodBasedBoard',
+	MineralBondedBoards = 'MineralBondedBoards',
+	Metal = 'Metal',
+	Glazing = 'Glazing',
+	Membrane = 'Membrane',
+	FoamMaterials = 'FoamMaterials',
+	AcousticTreatmentMaterials = 'AcousticTreatmentMaterials',
+	AirGap = 'AirGap',
+	Link = 'Link',
+	Filler = 'Filler',
+	Heavy = 'Heavy',
+	Board = 'Board',
+}
+
+export interface MaterialTypeValueDto {
+	/** @format double */
+	value?: number;
+	materialParametrs?: MaterialParametrs;
 }
 
 export interface NamedEntity {
 	/** @format uuid */
 	id?: string;
 	name?: string | null;
+}
+
+export interface PaginatedArticleDto {
+	title?: string | null;
+	bodyText?: string | null;
+	/** @format date */
+	publishDate?: string;
+	imageUrl?: string | null;
+}
+
+export interface PaginatedArticleDtoPaginatedList {
+	items?: PaginatedArticleDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
 }
 
 export interface PaginatedMaterialDto {
@@ -351,7 +461,7 @@ export interface PaginatedMaterialDto {
 	density?: number;
 	/** @format float */
 	thickness?: number;
-	materialType?: NamedEntity;
+	materialType?: MaterialTypeEnum;
 	type?: MaterialOriginType;
 	region?: Region;
 	imageUrl?: string | null;
@@ -488,7 +598,7 @@ export interface RequirementDto {
 	/** @format float */
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
-	constructionType?: ConstructionType;
+	constructionClass?: ConstructionClass;
 }
 
 export interface RequirementDtoPaginatedList {
@@ -528,6 +638,7 @@ export interface UpdateConstructionHeaderCommand {
 	priority?: Priority;
 	region?: Region;
 	descriptionSource?: string | null;
+	notation?: string | null;
 	/** @format uuid */
 	issuerId?: string;
 	propertySource?: string | null;
@@ -539,7 +650,7 @@ export interface UpdateConstructionHeaderCommand {
 	index?: IndexType;
 	/** @format float */
 	indexValue?: number;
-	constructionType?: CreateConstructionTypeTemplateDto;
+	constructionType?: CreateConstructionTypeDto;
 }
 
 export interface UpdateRequirementCommand {
@@ -559,7 +670,7 @@ export interface UpdateRequirementCommand {
 	/** @format float */
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
-	constructionType?: ConstructionType;
+	constructionClass?: ConstructionClass;
 }
 
 export interface UserMaterialTemplateDto {
@@ -805,6 +916,112 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		) =>
 			this.request<void, any>({
 				path: `/api/Account/update`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Article
+		 * @name ArticleDetail
+		 * @request GET:/api/Article/{id}
+		 */
+		articleDetail: (id: string, params: RequestParams = {}) =>
+			this.request<ArticleDto, any>({
+				path: `/api/Article/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Article
+		 * @name ArticleDelete
+		 * @request DELETE:/api/Article/{id}
+		 */
+		articleDelete: (id: string, data: DeleteArticleCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Article/${id}`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Article
+		 * @name ArticleGetPaginatedCreate
+		 * @request POST:/api/Article/getPaginated
+		 */
+		articleGetPaginatedCreate: (
+			data: GetArticlesWithPaginationParamsQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<PaginatedArticleDtoPaginatedList, any>({
+				path: `/api/Article/getPaginated`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Article
+		 * @name ArticleCreate
+		 * @request POST:/api/Article
+		 */
+		articleCreate: (
+			data: {
+				Title?: string;
+				BodyText?: string;
+				/** @format date */
+				PublishDate?: string;
+				/** @format binary */
+				FormFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<ArticleDto, any>({
+				path: `/api/Article`,
+				method: 'POST',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Article
+		 * @name ArticleUpdate
+		 * @request PUT:/api/Article
+		 */
+		articleUpdate: (
+			data: {
+				/** @format uuid */
+				Id?: string;
+				Title?: string;
+				BodyText?: string;
+				/** @format date */
+				PublishDate?: string;
+				/** @format binary */
+				FormFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/Article`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.FormData,
@@ -1114,8 +1331,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				FormFile?: File;
 				/** @format float */
 				MaterialCoefficient?: number;
-				/** @format uuid */
-				MaterialTypeId?: string;
+				MaterialTypeEnum?: MaterialTypeEnum;
 				/** @format float */
 				Velocity?: number;
 				/** @format float */
@@ -1174,8 +1390,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				Region?: Region;
 				/** @format uuid */
 				IssuerId?: string;
-				/** @format uuid */
-				MaterialTypeId?: string;
+				MaterialTypeEnum?: MaterialTypeEnum;
 				/** @format float */
 				MaterialCoefficient?: number;
 				/** @format float */
