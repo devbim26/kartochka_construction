@@ -52,7 +52,7 @@ export const HeavyMaterialType = ({ constructionIndex, fieldIndex }: Props) => {
 
 	useEffect(() => {
 		handleGetMaterials({
-			materialTypeEnum: MaterialTypeEnum.Heavy,
+			materialType: MaterialTypeEnum.Heavy,
 		});
 	}, []);
 	return (

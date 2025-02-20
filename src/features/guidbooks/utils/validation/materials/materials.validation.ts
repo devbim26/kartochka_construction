@@ -46,10 +46,10 @@ export const MaterialsAddAndEditSchema = z.object({
 });
 
 export const MaterialsFilterSchema = z.object({
-	name: z.string(),
-	density: z.string(),
-	thickness: z.string(),
-	materialType: z.string(),
+	name: z.string().optional(),
+	density: z.string().optional(),
+	thickness: z.string().optional(),
+	materialType: z.string().optional(),
 });
 
 export type MaterialsAddAndEditSchemaType = z.infer<typeof MaterialsAddAndEditSchema>;

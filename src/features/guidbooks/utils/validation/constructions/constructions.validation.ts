@@ -8,7 +8,7 @@ export const ConstructionsFilterSchema = z.object({
 });
 
 export const MaterialTypeValues = z.object({
-	value: z.string().min(1, 'Поле обязательно для заполнения'),
+	value: z.string().min(1, 'Обязательно'),
 	materialParameters: z.string().min(1, 'Поле обязательно для заполнения'),
 });
 export const UserMaterial = z.object({
@@ -25,8 +25,10 @@ export const ConstructionTypeShema = z.object({
 	constructions: z.array(subConstructionSchema).optional().nullable(),
 });
 
+export type ConstructionTypeSchemaType = z.infer<typeof ConstructionTypeShema>;
+
 export const ConstructionsAddSchema = z.object({
-	id: z.string(),
+	id: z.string().optional(),
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	priority: z.string().min(1, 'Поле обязательно для заполнения'),

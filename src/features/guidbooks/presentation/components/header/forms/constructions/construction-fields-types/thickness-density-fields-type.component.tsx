@@ -1,11 +1,16 @@
 import { Input } from '@core';
-import type { ThicknessDensityFieldsTypeData } from '@features';
+import type { ConstructionsAddData } from '@features';
 
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
-export const ThicknessDensityFieldsType = () => {
-	const form = useFormContext<ThicknessDensityFieldsTypeData>();
+type Props = {
+	fieldIndex: number;
+	constructionIndex: number;
+};
+
+export const ThicknessDensityFieldsType = ({ fieldIndex, constructionIndex }: Props) => {
+	const form = useFormContext<ConstructionsAddData>();
 	const { formState } = form;
 
 	return (
@@ -13,27 +18,51 @@ export const ThicknessDensityFieldsType = () => {
 			<Input
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
-					formState.errors.thickness?.message ? 'text-error' : '',
+					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
+						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
+						? 'text-error'
+						: '',
 				)}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] w-[78px]"
 				wrapperClassName="flex-row items-center gap-[16px]"
-				label={formState.errors.thickness?.message || 'Толщина, мм'}
-				error={formState.errors.thickness?.message}
+				label={
+					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
+						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message ||
+					'Толщина, мм'
+				}
+				error={
+					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
+						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
+				}
 				placeholder="Введите толщину"
-				{...form.register('thickness')}
+				{...form.register(
+					`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`,
+				)}
 				type={'number'}
 			/>
 			<Input
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
-					formState.errors.density?.message ? 'text-error' : '',
+					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
+						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[1]?.value?.message
+						? 'text-error'
+						: '',
 				)}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] w-[78px]"
 				wrapperClassName="flex-row items-center gap-[16px]"
-				label={formState.errors.density?.message || 'Плотность, кг/м³'}
-				error={formState.errors.density?.message}
+				label={
+					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
+						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[1]?.value?.message ||
+					'Плотность, кг/м³'
+				}
+				error={
+					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
+						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[1]?.value?.message
+				}
 				placeholder="Введите плотность"
-				{...form.register('density')}
+				{...form.register(
+					`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${1}.value`,
+				)}
 				type={'number'}
 			/>
 		</div>

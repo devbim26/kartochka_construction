@@ -99,7 +99,7 @@ const ConstructionsScreen = () => {
 								<div className="flex gap-2">
 									<EditIcon
 										onClick={() =>
-											navigate('', { edit: 'true', entityId: entityId })
+											navigate('', { edit: 'true', entityId: entityId! })
 										}
 									/>
 									<DeleteIcon

@@ -4,6 +4,7 @@ import type {
 	ConstructionsAddSchemaType,
 	ConstructionsEditSchemaType,
 	ConstructionsFilterSchemaType,
+	ConstructionTypeSchemaType,
 	FillerMaterialTypeSchemaType,
 	FrameMaterialTypeSchemaType,
 	HeavyMaterialTypeSchemaType,
@@ -29,3 +30,4 @@ export type FrameMaterialTypeData = FrameMaterialTypeSchemaType;
 export type FillerMaterialTypeData = FillerMaterialTypeSchemaType;
 export type BoardMaterialTypeData = BoardMaterialTypeSchemaType;
 export type ZPanelMaterialTypeData = ZPanelMaterialTypeSchemaType;
+export type ConstructionType = ConstructionTypeSchemaType;

@@ -65,6 +65,12 @@ export enum ConstructionClass {
 	Floor = 'Floor',
 }
 
+export enum ConstructionPosition {
+	Left = 'Left',
+	Center = 'Center',
+	Right = 'Right',
+}
+
 export enum ConstructionTypeEnum {
 	HeavySingleLayerWall = 'HeavySingleLayerWall',
 	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
@@ -120,12 +126,11 @@ export enum Country {
 export interface CraeteSubConstructionTemplateDto {
 	name?: string | null;
 	userMaterials?: UserMaterialTemplateDto[] | null;
-	subPosition?: SubConstructionPosition;
+	subPosition?: ConstructionPosition;
 }
 
 export interface CreateConstructionDto {
-	/** @format int32 */
-	positionId?: number;
+	constructionPosition?: ConstructionPosition;
 	userMaterials?: CreateUserMaterialDto[] | null;
 }
 
@@ -154,7 +159,7 @@ export interface CreateConstructionRootTemplateDto {
 }
 
 export interface CreateConstructionTemplateDto {
-	position?: SubConstructionPosition;
+	position?: ConstructionPosition;
 	subConstructions?: CraeteSubConstructionTemplateDto[] | null;
 }
 
@@ -204,6 +209,8 @@ export interface CreateRequirementCommand {
 export interface CreateUserMaterialDto {
 	/** @format uuid */
 	materialId?: string;
+	/** @format int32 */
+	positionId?: number;
 	materialTypeValue?: MaterialTypeValueDto[] | null;
 }
 
@@ -461,7 +468,7 @@ export interface PaginatedMaterialDto {
 	density?: number;
 	/** @format float */
 	thickness?: number;
-	materialType?: MaterialTypeEnum;
+	materialType?: NamedEntity;
 	type?: MaterialOriginType;
 	region?: Region;
 	imageUrl?: string | null;
@@ -622,12 +629,6 @@ export interface SendSmsCommand {
 export enum SortOrder {
 	Asc = 'Asc',
 	Desc = 'Desc',
-}
-
-export enum SubConstructionPosition {
-	Left = 'Left',
-	Center = 'Center',
-	Right = 'Right',
 }
 
 export interface UpdateConstructionHeaderCommand {

@@ -17,8 +17,6 @@ export const ConstructionsEdit = () => {
 
 	const { formState, control, watch } = form;
 
-	const selectedConstruction = watch('constructionType');
-
 	return (
 		<div className="flex w-full flex-col gap-[16px]">
 			<Switch
