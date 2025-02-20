@@ -1,5 +1,6 @@
-import type { GetMaterialsWithPaginationParamsQuery, MaterialDto } from '@api-gen';
+import type { GetMaterialsWithPaginationParamsQuery } from '@api-gen';
 import {
+	convertToClientMaterialTypeData,
 	convertToServerMaterialTypeData,
 	MaterialTypeEnum,
 	type MaterialOriginType,
@@ -24,9 +25,7 @@ export const convertToServerMaterialsFilterData = (
 	thickness: +data.thickness || null,
 });
 
-export const convertToClientMaterialsAddAndEditData = (
-	data: MaterialDto,
-): MaterialsAddAndEditData => ({
+export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddAndEditData => ({
 	id: data.id ?? '',
 	name: data.name ?? '',
 	description: data.description ?? '',
@@ -38,7 +37,7 @@ export const convertToClientMaterialsAddAndEditData = (
 	issuer: data.issuer?.id ?? '',
 	image: data.imageUrl ?? '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',
-	materialType: data.materialType?.id ?? '',
+	materialType: convertToClientMaterialTypeData(data.materialType) ?? '',
 	velocity: String(data.velocity) ?? '',
 	lossFactor: String(data.lossFactor) ?? '',
 	youngModulus: String(data.youngModulus) ?? '',

@@ -23,6 +23,7 @@ import {
 	MaterialsAddAndEditConfig,
 	MaterialsFilter,
 	MaterialsFilterConfig,
+	RuMaterialTypeEnum,
 	RuRegionNamesMap,
 	useHeaderForm,
 	type MaterialsAddAndEditData,
@@ -79,9 +80,17 @@ const MaterialsScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				accessorKey: 'materialType.name',
+				accessorKey: 'materialType',
 				header: () => <SimpleTableHeaderCell text="Тип материала" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => (
+					<SimpleTableCell
+						content={
+							RuMaterialTypeEnum[
+								`${info.getValue() as keyof typeof RuMaterialTypeEnum}`
+							]
+						}
+					/>
+				),
 			},
 			{
 				accessorKey: 'region',

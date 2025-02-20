@@ -146,6 +146,7 @@ export const MaterialsAddAndEdit = () => {
 						<Select
 							{...field}
 							value={field.value || ''}
+							isSearchable
 							options={RuMaterialTypesSelectValues}
 							error={formState.errors.materialType?.message}
 							labelClassName={twMerge(
@@ -187,6 +188,7 @@ export const MaterialsAddAndEdit = () => {
 						<Select
 							{...field}
 							value={field.value || ''}
+							isSearchable
 							options={RuMaterialOriginTypesSelectValues}
 							error={formState.errors.type?.message}
 							labelClassName={twMerge(
@@ -207,6 +209,7 @@ export const MaterialsAddAndEdit = () => {
 						<Select
 							{...field}
 							value={field.value || ''}
+							isSearchable
 							options={convertToSelectValues(issuerData) ?? []}
 							error={formState.errors.issuer?.message}
 							labelClassName={twMerge(

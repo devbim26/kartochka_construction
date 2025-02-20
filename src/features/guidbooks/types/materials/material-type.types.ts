@@ -30,6 +30,26 @@ export enum MaterialTypeEnum {
 	Board = 'Board',
 }
 
+export enum RuMaterialTypeEnum {
+	MasonryAndSolid = 'Кирпичные и монолитные',
+	Frame = 'Каркасные',
+	PorousMaterials = 'Пористые материалы',
+	SandwichPanel = 'Сэндвич-панели',
+	GypsumBondedbBoards = 'Гипсокартонные',
+	WoodBasedBoard = 'Древесно-стружечные плиты',
+	MineralBondedBoards = 'Минеральные плиты',
+	Metal = 'Металлические',
+	Glazing = 'Стеклянные',
+	Membrane = 'Мембраны',
+	FoamMaterials = 'Пеноматериалы',
+	AcousticTreatmentMaterials = 'Акустические материалы',
+	AirGap = 'Воздушные зазоры',
+	Link = 'Связующие',
+	Filler = 'Наполнительные',
+	Heavy = 'Тяжелые',
+	Board = 'Плиты',
+}
+
 export const RuMaterialTypesSelectValues = [
 	{ label: 'Кирпичные и монолитные', value: MaterialTypeEnum.MasonryAndSolid },
 	{ label: 'Каркасные', value: MaterialTypeEnum.Frame },

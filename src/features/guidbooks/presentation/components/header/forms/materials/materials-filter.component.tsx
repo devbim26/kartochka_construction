@@ -28,6 +28,7 @@ export const MaterialsFilter = () => {
 				render={({ field }) => (
 					<Select
 						{...field}
+						isSearchable
 						value={field.value || ''}
 						options={RuMaterialTypesSelectValues}
 						error={formState.errors.materialType?.message}
