@@ -634,6 +634,7 @@ export interface UpdateConstructionHeaderCommand {
 	priority?: Priority;
 	region?: Region;
 	descriptionSource?: string | null;
+	notation?: string | null;
 	/** @format uuid */
 	issuerId?: string;
 	propertySource?: string | null;
@@ -1326,8 +1327,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				FormFile?: File;
 				/** @format float */
 				MaterialCoefficient?: number;
-				/** @format uuid */
-				MaterialTypeId?: string;
+				MaterialTypeEnum?: MaterialTypeEnum;
 				/** @format float */
 				Velocity?: number;
 				/** @format float */
@@ -1386,8 +1386,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				Region?: Region;
 				/** @format uuid */
 				IssuerId?: string;
-				/** @format uuid */
-				MaterialTypeId?: string;
+				MaterialTypeEnum?: MaterialTypeEnum;
 				/** @format float */
 				MaterialCoefficient?: number;
 				/** @format float */
