@@ -32,7 +32,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 		const navigate = useAppNavigate();
 		const [search] = useSearchParams();
 		const onCancelHandle = useCallback(() => {
-			currentForm.reset;
+			currentForm.reset();
 			navigate('');
 			setCurrentHeaderFormType(HeaderFormTypes.filter);
 		}, []);
@@ -117,11 +117,8 @@ export const GuidbookPageHeaderWrapper = memoize(
 					<div className="flex flex-row justify-end gap-[30px] px-[16px] py-[13px]">
 						{currentHeaderFormType !== HeaderFormTypes.filter && (
 							<Button
+								onClick={() => submitHandle()}
 								className="group flex w-fit flex-row items-center gap-[6px] border border-solid border-primary bg-background-button-secondary px-[16px] py-[5px] group-hover:bg-primary"
-								onClick={() => {
-									onSave();
-									submitHandle();
-								}}
 							>
 								<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
 									{currentHeaderFormType === HeaderFormTypes.add

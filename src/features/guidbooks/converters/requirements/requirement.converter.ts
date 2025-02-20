@@ -1,4 +1,8 @@
-import type { CreateRequirementCommand, RequirementDto } from '@api-gen';
+import type {
+	CreateRequirementCommand,
+	GetRequirementsWithPaginationParamsQuery,
+	RequirementDto,
+} from '@api-gen';
 import {
 	buildingTypeMap,
 	categoryClassMap,
@@ -15,12 +19,13 @@ import {
 	type RequirementFilter,
 } from '@features/guidbooks/types';
 import type { RequirementsDataSchemaType } from '@features/guidbooks/utils';
+import { convertToServerConstructionTypeData } from '../constructions';
 
 export const convertToClientRequirementData = (
 	data: RequirementDto,
 ): RequirementsDataSchemaType => ({
 	...data,
-	construction: ConstructionType.WallsAndPartitions,
+	constructionType: ConstructionType.Wall,
 	secondPlacementRoom: data.secondPlacementRoom ?? '',
 	firstPlacementRoom: data.firstPlacementRoom ?? '',
 	buildingType: convertToClientBuildingTypeData(data.buildingType!)! as string,
@@ -46,16 +51,20 @@ export const convertToServerRequirementData = (
 	region: data.region ? regionMap.toServer[data.region as ClientRegion] : undefined,
 	standartValidityPeriod: data.standartValidityPeriod,
 	class: categoryClassMap.toServer[data.class as ClientCategoryClass],
-	noizeIsolationIndex: data.noizeIsolationIndex,
+	noizeIsolationIndex: +data.noizeIsolationIndex,
+	noizeImpactIndex: +data.noizeIsolationIndex,
+	constructionType: convertToServerConstructionTypeData(
+		data.constructionType as ConstructionType,
+	),
 	notice: data.notice || null,
 });
 
 export const convertToServerFilterRequirementData = (
 	data: RequirementFilter,
-): CreateRequirementCommand => ({
+): GetRequirementsWithPaginationParamsQuery => ({
 	...data,
-	secondPlacementRoom: data.secondPlacementRoom || null,
-	firstPlacementRoom: data.firstPlacementRoom || null,
+	// secondPlacementRoom: data.secondPlacementRoom || null,
+	// firstPlacementRoom: data.firstPlacementRoom || null,
 	buildingType: buildingTypeMap.toServer[data.buildingType as ClientBuildingType] || null,
 	region: data.region ? regionMap.toServer[data.region as ClientRegion] : undefined,
 });

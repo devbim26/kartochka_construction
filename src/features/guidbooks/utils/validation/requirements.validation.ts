@@ -9,14 +9,8 @@ const RequirementsSchema = z.object({
 	firstPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
 	buildingType: z.string().min(1, 'Поле обязательно для заполнения'),
 	standartValidityPeriod: z.string().min(1, 'Поле обязательно для заполнения'),
-	standartShortName: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.max(50, 'Название не должно превышать 50 символов'),
-	standartFullName: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.max(50, 'Название не должно превышать 50 символов'),
+	standartShortName: z.string().min(1, 'Поле обязательно для заполнения'),
+	standartFullName: z.string().min(1, 'Поле обязательно для заполнения'),
 	noizeIsolationIndex: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
