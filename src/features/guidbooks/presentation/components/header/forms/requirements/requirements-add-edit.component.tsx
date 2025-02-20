@@ -158,7 +158,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				)}
 			/>
 			<Input
-				// {...register('standartValidityPeriod')}
+				{...register('standartValidityPeriod')}
 				onChange={(event) => {
 					setValue('standartValidityPeriod', event.target.value);
 				}}
@@ -167,8 +167,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.standartValidityPeriod?.message ? 'text-error' : '',
 				)}
-				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-				containerClassName="w-[226px]"
+				inputClassName="py-[6px] px-[12px] h-fit w-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				label={
 					formState.errors?.standartValidityPeriod?.message || 'Срок действия стандарта'
 				}

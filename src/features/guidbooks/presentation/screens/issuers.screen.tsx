@@ -167,8 +167,9 @@ const IssuersScreen = () => {
 				accessorKey: 'country',
 				header: () => <SimpleTableHeaderCell text={'Страна'} />,
 				cell: (info) => {
-					const value = info.getValue() as Country;
-					return <SimpleTableCell content={RuCountryNamesMap[value]} />;
+					return (
+						<SimpleTableCell content={RuCountryNamesMap[info.getValue() as Country]} />
+					);
 				},
 			},
 			{

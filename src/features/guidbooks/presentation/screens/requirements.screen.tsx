@@ -25,12 +25,14 @@ import type {
 	ConstructionType,
 	Region,
 	Requirement,
+	RoomType,
 } from '@features/guidbooks/types';
 import {
 	Guidebooks,
 	RuBuildingTypeNamesMap,
 	RuConstructionTypeNamesMap,
 	RuRegionNamesMap,
+	RuRoomTypeNamesMap,
 } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -188,24 +190,33 @@ const RequirementsScreen = () => {
 				accessorKey: 'region',
 				header: () => <SimpleTableHeaderCell text={'Регион'} />,
 				cell: (info) => {
-					const value = info.getValue() as Region;
-					return <SimpleTableCell content={RuRegionNamesMap[value]} />;
+					return (
+						<SimpleTableCell content={RuRegionNamesMap[info.getValue() as Region]} />
+					);
 				},
 			},
 			{
 				accessorKey: 'buildingType',
 				header: () => <SimpleTableHeaderCell text={'Тип здания'} />,
 				cell: (info) => {
-					const value = info.getValue() as BuildingType;
-					return <SimpleTableCell content={RuBuildingTypeNamesMap[value]} />;
+					return (
+						<SimpleTableCell
+							content={RuBuildingTypeNamesMap[info.getValue() as BuildingType]}
+						/>
+					);
 				},
 			},
 			{
 				accessorKey: 'constructionType',
 				header: () => <SimpleTableHeaderCell text={'Тип конструкции'} />,
 				cell: (info) => {
-					const value = info.getValue() as ConstructionType;
-					return <SimpleTableCell content={RuConstructionTypeNamesMap[value]} />;
+					return (
+						<SimpleTableCell
+							content={
+								RuConstructionTypeNamesMap[info.getValue() as ConstructionType]
+							}
+						/>
+					);
 				},
 			},
 			{
@@ -226,12 +237,24 @@ const RequirementsScreen = () => {
 			{
 				accessorKey: 'firstPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Первое помещение'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell
+							content={RuRoomTypeNamesMap[info.getValue() as RoomType]}
+						/>
+					);
+				},
 			},
 			{
 				accessorKey: 'secondPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell
+							content={RuRoomTypeNamesMap[info.getValue() as RoomType]}
+						/>
+					);
+				},
 			},
 			{
 				accessorKey: 'id',

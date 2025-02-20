@@ -4,4 +4,4 @@ import {
 } from '@features/guidbooks/utils';
 
 export type Issuer = IssuersDataSchemaType;
-export type FormIssuer = FormIssuerDataSchemaType;
+export type FilterIssuer = FormIssuerDataSchemaType;
