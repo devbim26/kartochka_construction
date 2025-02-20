@@ -52,7 +52,7 @@ export const MaterialsFilter = () => {
 						{...field}
 						value={field.value || ''}
 						options={materialTypes.map((data) => ({
-							label: data.label,
+							label: data.name,
 							value: data.id,
 						}))}
 						error={formState.errors.materialTypeId?.message}

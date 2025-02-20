@@ -1,9 +1,15 @@
-import { CreateConstructionTypeTemplateDto } from '@api-gen';
+import {
+	CreateConstructionHeaderCommand,
+	CreateConstructionTypeTemplateDto,
+	GetConstructionHeaderWithPaginationQuery,
+} from '@api-gen';
+import { convertToServerRegionData } from '@core';
 import {
 	ConstructionsAddData,
 	ConstructionsEditData,
 	ConstructionsFilterData,
 	ConstructionTypeTemplate,
+	Region,
 } from '@features';
 
 export const convertToClientConstructionTypesList = (
@@ -14,30 +20,37 @@ export const convertToClientConstructionTypesList = (
 	}));
 };
 
-export const convertToServerConstructionsFilterData = (data: ConstructionsFilterData) => ({
+export const convertToServerConstructionsFilterData = (
+	data: ConstructionsFilterData,
+): GetConstructionHeaderWithPaginationQuery => ({
 	name: data.name || null,
 	constructionTypeId: data.constructionTypeId || null,
 	description: data.description || null,
-	region: data.region || null,
+	region: convertToServerRegionData(data.region as Region) || null,
 });
 
-export const convertToClientConstructionsAddData = (data: any): ConstructionsAddData => ({
+export const convertToClientConstructionsAddData = (
+	data: CreateConstructionHeaderCommand,
+): ConstructionsAddData => ({
+	//id: data.id ?? '',
 	name: data.name ?? '',
 	description: data.description ?? '',
 	priority: data.priority ?? '',
 	descriptionSource: data.descriptionSource ?? '',
 	region: data.region ?? '',
-	constructionType: data.constructionType ?? '',
-	issuer: data.issuer ?? '',
-	maxHeight: data.maxHeight ?? '',
+	//constructionType: data.constructionType ?? '',
+	issuer: data.issuerId ?? '',
+	maxHeight: String(data.maxHeight) ?? '',
 	fireResistance: data.fireResistance ?? '',
 	propertySource: data.propertySource ?? '',
-	labRTotal: data.labRTotal ?? '',
-	labIndex: data.labIndex ?? '',
-	labIndexValue: data.labIndexValue ?? '',
+	//labRTotal: data.rTotal ?? '',
+	// labIndex: data.labIndex ?? '',
+	// labIndexValue: data.labIndexValue ?? '',
 });
 
-export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => ({
+export const convertToClientConstructionsEditData = (
+	data: CreateConstructionHeaderCommand,
+): ConstructionsEditData => ({
 	...convertToClientConstructionsAddData(data),
 	comment: data.comment ?? '',
 	estimatedRTotal: data.estimatedRTotal ?? '',
@@ -45,7 +58,9 @@ export const convertToClientConstructionsEditData = (data: any): ConstructionsEd
 	estimatedIndexValue: data.estimatedIndexValue ?? '',
 });
 
-export const convertToServerConstructionsAddData = (data: ConstructionsAddData): any => ({
+export const convertToServerConstructionsAddData = (
+	data: ConstructionsAddData,
+): CreateConstructionHeaderCommand => ({
 	name: data.name || null,
 	description: data.description || null,
 	priority: data.priority || null,
@@ -61,7 +76,9 @@ export const convertToServerConstructionsAddData = (data: ConstructionsAddData):
 	labIndexValue: data.labIndexValue || null,
 });
 
-export const convertToServerConstructionsEditData = (data: ConstructionsEditData): any => ({
+export const convertToServerConstructionsEditData = (
+	data: ConstructionsEditData,
+): CreateConstructionHeaderCommand => ({
 	...convertToServerConstructionsAddData(data),
 	comment: data.comment || null,
 	estimatedRTotal: data.estimatedRTotal || null,

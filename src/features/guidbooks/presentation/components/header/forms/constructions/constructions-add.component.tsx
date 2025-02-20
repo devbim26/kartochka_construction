@@ -215,7 +215,7 @@ export const ConstructionsAdd = () => {
 						formState.errors.labRTotal?.message ? 'text-error' : '',
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-					containerClassName="w-[226px]"
+					containerClassName="w-[468px]"
 					label={formState.errors.labRTotal?.message || 'R_total'}
 					error={formState.errors.labRTotal?.message}
 					placeholder="Введите через запятую"

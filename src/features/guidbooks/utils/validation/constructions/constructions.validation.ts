@@ -8,6 +8,7 @@ export const ConstructionsFilterSchema = z.object({
 });
 
 export const ConstructionsAddSchema = z.object({
+	id: z.string(),
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	priority: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -24,7 +25,19 @@ export const ConstructionsAddSchema = z.object({
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
 	propertySource: z.string().min(1, 'Поле обязательно для заполнения'),
-	labRTotal: z.string().min(1, 'Поле обязательно для заполнения'),
+	labRTotal: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => {
+			const numbers = value.split(',').map((num) => num.trim());
+			const isValidCount = numbers.length === 16 || numbers.length === 21;
+			return isValidCount;
+		}, 'Необходимо 16 или 21 значение')
+		.refine((value) => {
+			const numbers = value.split(',').map((num) => num.trim());
+			const areNumbers = numbers.every((num) => !isNaN(parseFloat(num)) && isFinite(+num));
+			return areNumbers;
+		}, 'Значение должны быть числами'),
 	labIndex: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')

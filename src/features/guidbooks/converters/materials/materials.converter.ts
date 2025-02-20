@@ -1,10 +1,11 @@
-import type { MaterialDto, MaterialTypeDto } from '@api-gen';
-import type {
-	MaterialOriginType,
-	MaterialsAddAndEditData,
-	MaterialsFilterData,
-	MaterialType,
-	Region,
+import type { GetMaterialsWithPaginationParamsQuery, MaterialDto, MaterialTypeDto } from '@api-gen';
+import {
+	convertToClientMaterialTypeData,
+	type MaterialOriginType,
+	type MaterialsAddAndEditData,
+	type MaterialsFilterData,
+	type MaterialType,
+	type Region,
 } from '@features';
 
 import { convertToClientRegionData, convertToServerRegionData } from '@core';
@@ -13,19 +14,22 @@ import {
 	convertToServerMaterialOriginTypeData,
 } from './material-origin-type.converter';
 
-export const convertToServerMaterialsFilterData = (data: MaterialsFilterData) => ({
+export const convertToServerMaterialsFilterData = (
+	data: MaterialsFilterData,
+): GetMaterialsWithPaginationParamsQuery => ({
 	name: data.name || null,
 	materialTypeId: data.materialTypeId || null,
 	density: +data.density || null,
 	thickness: +data.thickness || null,
 });
 
-export const convertToClientMaterialTypeList = (arr: MaterialTypeDto[]): MaterialType[] => {
-	return arr.map((data) => ({
+export const convertToClientMaterialTypeList = (data: MaterialTypeDto[]): MaterialType[] => {
+	return data.map((data) => ({
 		id: data.id ?? '',
 		name: data.name ?? '',
 		shortName: data.shortName ?? '',
-		label: data.label ?? '',
+		materialTypeEnum: convertToClientMaterialTypeData(data.materialTypeEnum!) ?? '',
+		materialTypeValues: '',
 		fullName: data.fullName ?? '',
 	}));
 };

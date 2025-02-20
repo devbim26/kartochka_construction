@@ -60,9 +60,15 @@ export enum CategoryClass {
 	C = 'C',
 }
 
-export enum ConstructionType {
+export enum ConstructionClass {
 	Wall = 'Wall',
 	Floor = 'Floor',
+}
+
+export enum ConstructionTypeEnum {
+	HeavySingleLayerWall = 'HeavySingleLayerWall',
+	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
+	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
 }
 
 export enum Country {
@@ -117,6 +123,12 @@ export interface CraeteSubConstructionTemplateDto {
 	subPosition?: SubConstructionPosition;
 }
 
+export interface CreateConstructionDto {
+	/** @format int32 */
+	positionId?: number;
+	userMaterials?: CreateUserMaterialDto[] | null;
+}
+
 export interface CreateConstructionHeaderCommand {
 	name?: string | null;
 	description?: string | null;
@@ -134,7 +146,7 @@ export interface CreateConstructionHeaderCommand {
 	index?: IndexType;
 	/** @format float */
 	indexValue?: number;
-	constructionType?: CreateConstructionTypeTemplateDto;
+	constructionType?: CreateConstructionTypeDto;
 }
 
 export interface CreateConstructionRootTemplateDto {
@@ -144,6 +156,11 @@ export interface CreateConstructionRootTemplateDto {
 export interface CreateConstructionTemplateDto {
 	position?: SubConstructionPosition;
 	subConstructions?: CraeteSubConstructionTemplateDto[] | null;
+}
+
+export interface CreateConstructionTypeDto {
+	constructionTypeEnum?: ConstructionTypeEnum;
+	constructions?: CreateConstructionDto[] | null;
 }
 
 export interface CreateConstructionTypeTemplateDto {
@@ -181,7 +198,13 @@ export interface CreateRequirementCommand {
 	/** @format float */
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
-	constructionType?: ConstructionType;
+	constructionClass?: ConstructionClass;
+}
+
+export interface CreateUserMaterialDto {
+	/** @format uuid */
+	materialId?: string;
+	materialTypeValue?: MaterialTypeValueDto[] | null;
 }
 
 export interface DeleteArticleCommand {
@@ -351,13 +374,48 @@ export enum MaterialOriginType {
 	UserDefinedProduct = 'UserDefinedProduct',
 }
 
+export enum MaterialParametrs {
+	Thickness = 'Thickness',
+	Density = 'Density',
+	ConnectionNumber = 'ConnectionNumber',
+	RackStep = 'RackStep',
+	Width = 'Width',
+}
+
 export interface MaterialTypeDto {
 	/** @format uuid */
 	id?: string;
 	name?: string | null;
 	shortName?: string | null;
-	label?: string | null;
+	materialTypeEnum?: MaterialTypeEnum;
+	materialTypeValues?: MaterialTypeValueDto[] | null;
 	fullName?: string | null;
+}
+
+export enum MaterialTypeEnum {
+	MasonryAndSolid = 'MasonryAndSolid',
+	Frame = 'Frame',
+	PorousMaterials = 'PorousMaterials',
+	SandwichPanel = 'SandwichPanel',
+	GypsumBondedbBoards = 'GypsumBondedbBoards',
+	WoodBasedBoard = 'WoodBasedBoard',
+	MineralBondedBoards = 'MineralBondedBoards',
+	Metal = 'Metal',
+	Glazing = 'Glazing',
+	Membrane = 'Membrane',
+	FoamMaterials = 'FoamMaterials',
+	AcousticTreatmentMaterials = 'AcousticTreatmentMaterials',
+	AirGap = 'AirGap',
+	Link = 'Link',
+	Filler = 'Filler',
+	Heavy = 'Heavy',
+	Board = 'Board',
+}
+
+export interface MaterialTypeValueDto {
+	/** @format double */
+	value?: number;
+	materialParametrs?: MaterialParametrs;
 }
 
 export interface NamedEntity {
@@ -536,7 +594,7 @@ export interface RequirementDto {
 	/** @format float */
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
-	constructionType?: ConstructionType;
+	constructionClass?: ConstructionClass;
 }
 
 export interface RequirementDtoPaginatedList {
@@ -587,7 +645,7 @@ export interface UpdateConstructionHeaderCommand {
 	index?: IndexType;
 	/** @format float */
 	indexValue?: number;
-	constructionType?: CreateConstructionTypeTemplateDto;
+	constructionType?: CreateConstructionTypeDto;
 }
 
 export interface UpdateRequirementCommand {
@@ -607,7 +665,7 @@ export interface UpdateRequirementCommand {
 	/** @format float */
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
-	constructionType?: ConstructionType;
+	constructionClass?: ConstructionClass;
 }
 
 export interface UserMaterialTemplateDto {

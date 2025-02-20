@@ -1,5 +1,7 @@
 import {
 	convertToPaginatedType,
+	DeleteIcon,
+	EditIcon,
 	mapColumns,
 	SimpleTable,
 	SimpleTableCell,
@@ -44,35 +46,71 @@ const ConstructionsScreen = () => {
 		if (!data) return [];
 		const columns: ColumnDef<ConstructionsAddData>[] = [
 			{
+				accessorKey: 'id',
+				header: () => <SimpleTableHeaderCell text="ID" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			//изображение
+			{
 				accessorKey: 'name',
 				header: () => <SimpleTableHeaderCell text="Название" />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
-			// {
-			// 	accessorKey: 'actions',
-			// 	header: () => <SimpleTableHeaderCell text="Действия" />,
-			// 	cell: (info) => {
-			// 		const entityId = info.row.original.id;
-			// 		return (
-			// 			<SimpleTableCell
-			// 				content={
-			// 					<div className="flex gap-2">
-			// 						<EditIcon
-			// 							onClick={() =>
-			// 								navigate('', { edit: 'true', entityId: entityId })
-			// 							}
-			// 						/>
-			// 						<DeleteIcon
-			// 							onClick={() =>
-			// 								handleDeleteTableData(info.getValue() as string)
-			// 							}
-			// 						/>
-			// 					</div>
-			// 				}
-			// 			/>
-			// 		);
-			// 	},
-			// },
+			{
+				accessorKey: 'description',
+				header: () => <SimpleTableHeaderCell text="Описание" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'descriptionSource',
+				header: () => <SimpleTableHeaderCell text="Источник" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'maxHeight',
+				header: () => <SimpleTableHeaderCell text="Максимальная высота" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'issuer',
+				header: () => <SimpleTableHeaderCell text="Производитель" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'constructionType',
+				header: () => <SimpleTableHeaderCell text="Тип конструкции" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'region',
+				header: () => <SimpleTableHeaderCell text="Регион" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'actions',
+				header: () => <SimpleTableHeaderCell text="Действия" />,
+				cell: (info) => {
+					const entityId = info.row.original.id;
+					return (
+						<SimpleTableCell
+							content={
+								<div className="flex gap-2">
+									<EditIcon
+										onClick={() =>
+											navigate('', { edit: 'true', entityId: entityId })
+										}
+									/>
+									<DeleteIcon
+										onClick={() =>
+											handleDeleteTableData(info.getValue() as string)
+										}
+									/>
+								</div>
+							}
+						/>
+					);
+				},
+			},
 		];
 		return mapColumns(columns);
 	};
