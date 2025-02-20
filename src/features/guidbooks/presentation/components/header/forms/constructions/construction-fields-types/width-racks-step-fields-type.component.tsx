@@ -1,5 +1,5 @@
 import { Input } from '@core';
-import { WidthRacksStepFieldsTypeData } from '@features';
+import type { WidthRacksStepFieldsTypeData } from '@features';
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 

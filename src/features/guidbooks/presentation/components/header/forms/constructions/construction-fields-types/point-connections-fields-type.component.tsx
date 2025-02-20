@@ -1,5 +1,5 @@
 import { Input } from '@core';
-import { PointConnectionsFieldsTypeData } from '@features';
+import type { PointConnectionsFieldsTypeData } from '@features';
 
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';

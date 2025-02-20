@@ -1,5 +1,5 @@
 import { Select } from '@core';
-import { FillerMaterialTypeData } from '@features';
+import type { FillerMaterialTypeData } from '@features';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 

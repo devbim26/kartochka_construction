@@ -1,5 +1,5 @@
 import { Select } from '@core';
-import { AirGapMaterialTypeData } from '@features';
+import type { AirGapMaterialTypeData } from '@features';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 

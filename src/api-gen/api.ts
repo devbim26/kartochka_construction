@@ -282,8 +282,7 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	density?: number | null;
 	/** @format float */
 	thickness?: number | null;
-	/** @format uuid */
-	materialTypeId?: string | null;
+	materialTypeEnum?: MaterialTypeEnum;
 }
 
 export interface GetReportWithPaginationQuery {
@@ -307,6 +306,11 @@ export interface GetRequirementsWithPaginationParamsQuery {
 	region?: Region;
 	buildingType?: BuildingType;
 	placementRoom?: string | null;
+	standartShortName?: string | null;
+	standartFullName?: string | null;
+	/** @format date */
+	standartValidityPeriod?: string | null;
+	class?: CategoryClass;
 }
 
 export enum IndexType {

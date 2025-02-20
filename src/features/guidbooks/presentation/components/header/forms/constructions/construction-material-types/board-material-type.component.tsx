@@ -1,5 +1,5 @@
 import { Select } from '@core';
-import { BoardMaterialTypeData } from '@features';
+import type { BoardMaterialTypeData } from '@features';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 

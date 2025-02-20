@@ -8,16 +8,18 @@ import {
 	SimpleTableHeaderCell,
 	useAppNavigate,
 } from '@core';
+import type {
+	ConstructionsAddData,
+	ConstructionsEditData,
+	ConstructionsFilterData,
+} from '@features';
 import {
 	ConstructionsAdd,
 	ConstructionsAddConfig,
-	ConstructionsAddData,
 	ConstructionsEdit,
 	ConstructionsEditConfig,
-	ConstructionsEditData,
 	ConstructionsFilter,
 	ConstructionsFilterConfig,
-	ConstructionsFilterData,
 	convertToClientConstructionsAddData,
 	convertToClientConstructionsEditData,
 	convertToServerConstructionsAddData,
@@ -32,7 +34,7 @@ import {
 	Guidebooks,
 	useHeaderForm,
 } from '@features';
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 

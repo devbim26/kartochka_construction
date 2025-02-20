@@ -1,5 +1,5 @@
 import { Input } from '@core';
-import { ThicknessDensityFieldsTypeData } from '@features';
+import type { ThicknessDensityFieldsTypeData } from '@features';
 
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';

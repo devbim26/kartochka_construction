@@ -7,6 +7,24 @@ export const ConstructionsFilterSchema = z.object({
 	region: z.string(),
 });
 
+export const MaterialTypeValues = z.object({
+	value: z.string().min(1, 'Поле обязательно для заполнения'),
+	materialParameters: z.string().min(1, 'Поле обязательно для заполнения'),
+});
+export const UserMaterial = z.object({
+	materialId: z.string().min(1, 'Поле обязательно для заполнения'),
+	positionId: z.string().min(1, 'Поле обязательно для заполнения'),
+	materialTypeValue: z.array(MaterialTypeValues).optional().nullable(),
+});
+export const subConstructionSchema = z.object({
+	contructionPosition: z.string().min(1, 'Поле обязательно для заполнения'),
+	userMaterials: z.array(UserMaterial).optional().nullable(),
+});
+export const ConstructionTypeShema = z.object({
+	constructionTypeEnum: z.string().min(1, 'Поле обязательно для заполнения'),
+	constructions: z.array(subConstructionSchema).optional().nullable(),
+});
+
 export const ConstructionsAddSchema = z.object({
 	id: z.string(),
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -46,6 +64,7 @@ export const ConstructionsAddSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	constructionTypeObject: ConstructionTypeShema,
 });
 
 export const ConstructionsEditSchema = ConstructionsAddSchema.merge(

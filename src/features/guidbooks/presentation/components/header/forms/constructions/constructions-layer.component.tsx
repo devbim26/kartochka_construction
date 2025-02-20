@@ -1,5 +1,5 @@
 import { DeleteIcon } from '@core';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface ConstructionLayerProps {
 	title?: string;
