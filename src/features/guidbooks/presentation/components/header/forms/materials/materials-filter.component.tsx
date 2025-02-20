@@ -1,7 +1,7 @@
 import { Input, Select } from '@core';
 import {
 	convertToClientMaterialTypeList,
-	getGuidebooksMaterialType,
+	getGuidebooksMaterialTypes,
 	type MaterialsFilterData,
 	type MaterialType,
 } from '@features';
@@ -16,7 +16,7 @@ export const MaterialsFilter = () => {
 
 	const handleGetMaterialTypeData = useCallback(async () => {
 		try {
-			const response = await getGuidebooksMaterialType();
+			const response = await getGuidebooksMaterialTypes();
 
 			const items = convertToClientMaterialTypeList(response.data);
 			setMaterialTypes(items);

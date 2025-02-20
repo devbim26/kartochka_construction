@@ -1,15 +1,7 @@
 import { Input, Select, Switch } from '@core';
-import {
-	ConstructionComponentsMap,
-	DescriptionFieldNames,
-	FormSubTitle,
-	RuRegionNamesSelectValues,
-	SpecificationsFieldNames,
-	type ConstructionsEditData,
-} from '@features';
+import { FormSubTitle, RuRegionNamesSelectValues, type ConstructionsEditData } from '@features';
 import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { IoWarningOutline } from 'react-icons/io5';
 import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
@@ -33,16 +25,16 @@ export const ConstructionsEdit = () => {
 				onText="Характеристики"
 				offText="Описание"
 				textClassName="font-sans text-[17px] font-normal leading-5 tracking-[0.1px]"
-				offIcon={
-					Object.keys(formState.errors).some((key) =>
-						DescriptionFieldNames.includes(key),
-					) && <IoWarningOutline />
-				}
-				onIcon={
-					Object.keys(formState.errors).some((key) =>
-						SpecificationsFieldNames.includes(key),
-					) && <IoWarningOutline />
-				}
+				// offIcon={
+				// 	Object.keys(formState.errors).some((key) =>
+				// 		DescriptionFieldNames.includes(key),
+				// 	) && <IoWarningOutline />
+				// }
+				// onIcon={
+				// 	Object.keys(formState.errors).some((key) =>
+				// 		SpecificationsFieldNames.includes(key),
+				// 	) && <IoWarningOutline />
+				// }
 				wrapperClassName="h-[30px] w-[400px] self-center p-[3px] bg-primary"
 				onChange={handleChangeDisplay}
 			/>
@@ -69,7 +61,6 @@ export const ConstructionsEdit = () => {
 							/>
 						)}
 					/>
-					{ConstructionComponentsMap[`${selectedConstruction}`]}
 				</>
 			) : (
 				<>

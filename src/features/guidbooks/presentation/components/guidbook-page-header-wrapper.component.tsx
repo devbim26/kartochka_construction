@@ -32,7 +32,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 		const navigate = useAppNavigate();
 		const [search] = useSearchParams();
 		const onCancelHandle = useCallback(() => {
-			currentForm.reset;
+			currentForm.reset();
 			navigate('');
 			setCurrentHeaderFormType(HeaderFormTypes.filter);
 		}, []);

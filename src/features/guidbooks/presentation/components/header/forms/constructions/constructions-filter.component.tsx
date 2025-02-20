@@ -1,12 +1,34 @@
 import { Input, Select } from '@core';
-import { RuRegionNamesSelectValues, type ConstructionsFilterData } from '@features';
+import {
+	ConstructionTypeTemplate,
+	convertToClientConstructionTypesList,
+	getGuidebooksConstructionTypes,
+	RuRegionNamesSelectValues,
+	type ConstructionsFilterData,
+} from '@features';
+import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const ConstructionsFilter = () => {
 	const form = useFormContext<ConstructionsFilterData>();
-
 	const { formState, control } = form;
+	const [constructionTypes, setConstructionTypes] = useState<ConstructionTypeTemplate[]>([]);
+
+	const handleGetMaterialTypeData = useCallback(async () => {
+		try {
+			const response = await getGuidebooksConstructionTypes();
+			const items = convertToClientConstructionTypesList(response.data as any);
+			setConstructionTypes(items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
+	useEffect(() => {
+		handleGetMaterialTypeData();
+	}, []);
+
 	return (
 		<div className="flex flex-wrap gap-[16px]">
 			<Input
@@ -23,21 +45,24 @@ export const ConstructionsFilter = () => {
 				type={'text'}
 			/>
 			<Controller
-				name="constructionType"
+				name="constructionTypeId"
 				control={control}
 				render={({ field }) => (
 					<Select
 						{...field}
 						value={field.value || ''}
-						options={[{ label: '1', value: '1' }]}
-						error={formState.errors.constructionType?.message}
+						options={constructionTypes.map((data) => ({
+							label: data.name ?? '',
+							value: data.constructionTypeTemplateId ?? '',
+						}))}
+						error={formState.errors.constructionTypeId?.message}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px]',
-							formState.errors.constructionType?.message ? 'text-error' : '',
+							formState.errors.constructionTypeId?.message ? 'text-error' : '',
 						)}
-						wrapperClassname="w-[226px] ring-input-border-primary"
+						wrapperClassname="w-fit min-w-[226px] ring-input-border-primary"
 						buttonClassName="text-sm rounded-[8px]"
-						label={formState.errors.constructionType?.message || 'Тип конструкции'}
+						label={formState.errors.constructionTypeId?.message || 'Тип конструкции'}
 						placeholder="Выберите тип"
 					/>
 				)}

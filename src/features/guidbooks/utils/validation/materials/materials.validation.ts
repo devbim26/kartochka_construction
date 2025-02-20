@@ -14,8 +14,8 @@ export const MaterialsAddAndEditSchema = z.object({
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
 	materialType: z.object({
-		name: z.string().min(1, 'Поле обязательно для заполнения'),
-		id: z.string(),
+		name: z.string(),
+		id: z.string().min(1, 'Поле обязательно для заполнения'),
 	}),
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
 	type: z.string().min(1, 'Поле обязательно для заполнения'),

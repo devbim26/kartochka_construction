@@ -14,10 +14,10 @@ import {
 } from './material-origin-type.converter';
 
 export const convertToServerMaterialsFilterData = (data: MaterialsFilterData) => ({
-	name: data.name || undefined,
-	materialTypeId: data.materialTypeId || undefined,
-	density: +data.density || undefined,
-	thickness: +data.thickness || undefined,
+	name: data.name || null,
+	materialTypeId: data.materialTypeId || null,
+	density: +data.density || null,
+	thickness: +data.thickness || null,
 });
 
 export const convertToClientMaterialTypeList = (arr: MaterialTypeDto[]): MaterialType[] => {
@@ -53,21 +53,21 @@ export const convertToClientMaterialsAddAndEditData = (
 });
 
 export const convertToServerMaterialsAddAndEditData = (data: MaterialsAddAndEditData) => ({
-	id: data.id || undefined,
-	name: data.name || undefined,
-	description: data.description || undefined,
-	shortName: data.shortName || undefined,
-	density: +data.density || undefined,
-	thickness: +data.thickness || undefined,
-	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || undefined,
-	region: convertToServerRegionData(data.region as Region) || undefined,
-	issuerId: data.issuer || undefined,
+	id: data.id || null,
+	name: data.name || null,
+	description: data.description || null,
+	shortName: data.shortName || null,
+	density: +data.density || null,
+	thickness: +data.thickness || null,
+	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || null,
+	region: convertToServerRegionData(data.region as Region) || null,
+	issuerId: data.issuer || null,
 	image: null,
-	materialCoefficient: +data.materialCoefficient || undefined,
-	materialTypeId: data.materialType.id || undefined,
-	velocity: +data.velocity || undefined,
-	lossFactor: +data.lossFactor || undefined,
-	youngModulus: +data.youngModulus || undefined,
-	damping: +data.damping || undefined,
-	solid: +data.solid || undefined,
+	materialCoefficient: +data.materialCoefficient || null,
+	materialTypeId: data.materialType.id || null,
+	velocity: +data.velocity || null,
+	lossFactor: +data.lossFactor || null,
+	youngModulus: +data.youngModulus || null,
+	damping: +data.damping || null,
+	solid: +data.solid || null,
 });

@@ -34,6 +34,16 @@ export interface ApproveSmsCommand {
 	code?: string | null;
 }
 
+export interface ArticleDto {
+	/** @format uuid */
+	id?: string;
+	title?: string | null;
+	bodyText?: string | null;
+	/** @format date */
+	publishDate?: string;
+	imageUrl?: string | null;
+}
+
 export enum BuildingType {
 	ResidentialBuildings = 'ResidentialBuildings',
 	Hotel = 'Hotel',
@@ -174,6 +184,11 @@ export interface CreateRequirementCommand {
 	constructionType?: ConstructionType;
 }
 
+export interface DeleteArticleCommand {
+	/** @format uuid */
+	articleId?: string;
+}
+
 export interface DeleteConstructionHeaderCommand {
 	/** @format uuid */
 	id?: string;
@@ -192,6 +207,18 @@ export interface DeleteMaterialCommand {
 export interface DeleteRequirementCommand {
 	/** @format uuid */
 	id?: string;
+}
+
+export interface GetArticlesWithPaginationParamsQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	title?: string | null;
+	/** @format date */
+	publishDate?: string | null;
 }
 
 export interface GetConstructionHeaderWithPaginationQuery {
@@ -217,7 +244,6 @@ export interface GetIssuerWithPaginationParamsQuery {
 	ordering?: string | null;
 	name?: string | null;
 	country?: Country;
-	logo?: string | null;
 	webSite?: string | null;
 }
 
@@ -338,6 +364,28 @@ export interface NamedEntity {
 	/** @format uuid */
 	id?: string;
 	name?: string | null;
+}
+
+export interface PaginatedArticleDto {
+	title?: string | null;
+	bodyText?: string | null;
+	/** @format date */
+	publishDate?: string;
+	imageUrl?: string | null;
+}
+
+export interface PaginatedArticleDtoPaginatedList {
+	items?: PaginatedArticleDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
 }
 
 export interface PaginatedMaterialDto {
@@ -805,6 +853,112 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		) =>
 			this.request<void, any>({
 				path: `/api/Account/update`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Article
+		 * @name ArticleDetail
+		 * @request GET:/api/Article/{id}
+		 */
+		articleDetail: (id: string, params: RequestParams = {}) =>
+			this.request<ArticleDto, any>({
+				path: `/api/Article/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Article
+		 * @name ArticleDelete
+		 * @request DELETE:/api/Article/{id}
+		 */
+		articleDelete: (id: string, data: DeleteArticleCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Article/${id}`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Article
+		 * @name ArticleGetPaginatedCreate
+		 * @request POST:/api/Article/getPaginated
+		 */
+		articleGetPaginatedCreate: (
+			data: GetArticlesWithPaginationParamsQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<PaginatedArticleDtoPaginatedList, any>({
+				path: `/api/Article/getPaginated`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Article
+		 * @name ArticleCreate
+		 * @request POST:/api/Article
+		 */
+		articleCreate: (
+			data: {
+				Title?: string;
+				BodyText?: string;
+				/** @format date */
+				PublishDate?: string;
+				/** @format binary */
+				FormFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<ArticleDto, any>({
+				path: `/api/Article`,
+				method: 'POST',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Article
+		 * @name ArticleUpdate
+		 * @request PUT:/api/Article
+		 */
+		articleUpdate: (
+			data: {
+				/** @format uuid */
+				Id?: string;
+				Title?: string;
+				BodyText?: string;
+				/** @format date */
+				PublishDate?: string;
+				/** @format binary */
+				FormFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/Article`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.FormData,
