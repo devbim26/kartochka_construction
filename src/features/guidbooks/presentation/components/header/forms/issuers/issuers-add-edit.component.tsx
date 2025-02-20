@@ -1,17 +1,14 @@
 import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { fileUpload } from '@features/auth';
-import {
-	RuCountryNamesMap,
-	RuCountryNamesSelectValues,
-	type FormIssuer,
-} from '@features/guidbooks/types';
+import type { Issuer } from '@features/guidbooks/types';
+import { RuCountryNamesMap, RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const IssuersAddEdit = memoize(() => {
-	const form = useFormContext<FormIssuer>();
+	const form = useFormContext<Issuer>();
 	const { setValue, register, control, formState, trigger } = form;
 
 	const dispatch = useAppDispatch();

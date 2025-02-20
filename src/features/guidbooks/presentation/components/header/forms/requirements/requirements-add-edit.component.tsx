@@ -18,7 +18,6 @@ export const RequirementsAddAndEdit = memoize(() => {
 	const form = useFormContext<Requirement>();
 	const { setValue, register, control, formState, watch } = form;
 	const dateRef = useMask(dateMask);
-
 	const construction = watch('constructionType');
 
 	return (
@@ -94,7 +93,9 @@ export const RequirementsAddAndEdit = memoize(() => {
 				render={({ field }) => (
 					<Select
 						onChange={(value) => {
-							setValue('noizeImpactIndex', '');
+							construction === ConstructionType.Floor
+								? () => setValue('noizeImpactIndex', '1')
+								: () => setValue('noizeImpactIndex', '');
 							setValue('constructionType', value as string);
 						}}
 						options={RuConstructionTypeSelectValues}
@@ -158,21 +159,21 @@ export const RequirementsAddAndEdit = memoize(() => {
 			/>
 			<Input
 				{...register('standartValidityPeriod')}
-				// onChange={(event) => {
-				// 	setValue('standartValidityPeriod', event.target.value);
-				// }}
+				onChange={(event) => {
+					setValue('standartValidityPeriod', event.target.value);
+				}}
+				value={form.watch('standartValidityPeriod')}
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.standartValidityPeriod?.message ? 'text-error' : '',
 				)}
-				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-				containerClassName="w-[226px]"
+				inputClassName="py-[6px] px-[12px] h-fit w-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				label={
 					formState.errors?.standartValidityPeriod?.message || 'Срок действия стандарта'
 				}
 				placeholder="Введите дату"
 				max={10}
-				// ref={dateRef}
+				ref={dateRef}
 			/>
 			<Input
 				{...register('standartShortName')}
@@ -209,6 +210,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				label={formState.errors?.noizeIsolationIndex?.message || 'Индекс воздушного шума'}
 				placeholder="Введите значение"
 				type="number"
+				max={10}
 			/>
 			{construction === ConstructionType.Wall && (
 				<Input
@@ -222,6 +224,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 					label={formState.errors?.noizeImpactIndex?.message || 'Индекс ударного шума'}
 					placeholder="Введите значение"
 					type="number"
+					max={10}
 				/>
 			)}
 			<Input
