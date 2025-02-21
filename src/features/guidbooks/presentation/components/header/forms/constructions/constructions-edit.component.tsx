@@ -1,5 +1,11 @@
 import { Input, Select, Switch } from '@core';
-import { FormSubTitle, RuRegionNamesSelectValues, type ConstructionsEditData } from '@features';
+import {
+	FormSubTitle,
+	RuIndexTypeNamesSelectValues,
+	RuPriorityNamesSelectValues,
+	RuRegionNamesSelectValues,
+	type ConstructionsEditData,
+} from '@features';
 import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
@@ -113,14 +119,14 @@ export const ConstructionsEdit = () => {
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.constructionSource?.message ? 'text-error' : '',
+								formState.errors.descriptionSource?.message ? 'text-error' : '',
 							)}
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 							containerClassName="w-[226px]"
-							label={formState.errors.constructionSource?.message || 'Источник'}
-							error={formState.errors.constructionSource?.message}
+							label={formState.errors.descriptionSource?.message || 'Источник'}
+							error={formState.errors.descriptionSource?.message}
 							placeholder="Введите источник"
-							{...form.register('constructionSource')}
+							{...form.register('descriptionSource')}
 							type={'text'}
 						/>
 						<Controller
@@ -145,23 +151,21 @@ export const ConstructionsEdit = () => {
 							)}
 						/>
 						<Controller
-							name="manufacturer"
+							name="issuer"
 							control={control}
 							render={({ field }) => (
 								<Select
 									{...field}
 									value={field.value || ''}
 									options={[{ label: '1', value: '1' }]}
-									error={formState.errors.manufacturer?.message}
+									error={formState.errors.issuer?.message}
 									labelClassName={twMerge(
 										'text-sm leading-5 tracking-[0.1px]',
-										formState.errors.manufacturer?.message ? 'text-error' : '',
+										formState.errors.issuer?.message ? 'text-error' : '',
 									)}
 									wrapperClassname="w-[226px] ring-input-border-primary"
 									buttonClassName="text-sm rounded-[8px]"
-									label={
-										formState.errors.manufacturer?.message || 'Производитель'
-									}
+									label={formState.errors.issuer?.message || 'Производитель'}
 									placeholder="Выберите производителя"
 								/>
 							)}
@@ -185,30 +189,30 @@ export const ConstructionsEdit = () => {
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.resistanceClass?.message ? 'text-error' : '',
+								formState.errors.fireResistance?.message ? 'text-error' : '',
 							)}
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 							containerClassName="w-[226px]"
 							label={
-								formState.errors.resistanceClass?.message ||
+								formState.errors.fireResistance?.message ||
 								'Класс огнестойкости, EI'
 							}
-							error={formState.errors.resistanceClass?.message}
+							error={formState.errors.fireResistance?.message}
 							placeholder="Введите класс"
-							{...form.register('resistanceClass')}
+							{...form.register('fireResistance')}
 							type={'number'}
 						/>
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.specificationsSource?.message ? 'text-error' : '',
+								formState.errors.propertySource?.message ? 'text-error' : '',
 							)}
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 							containerClassName="w-[226px]"
-							label={formState.errors.specificationsSource?.message || 'Источник'}
-							error={formState.errors.specificationsSource?.message}
+							label={formState.errors.propertySource?.message || 'Источник'}
+							error={formState.errors.propertySource?.message}
 							placeholder="Введите источник"
-							{...form.register('specificationsSource')}
+							{...form.register('propertySource')}
 							type={'text'}
 						/>
 					</div>
@@ -217,15 +221,35 @@ export const ConstructionsEdit = () => {
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.labIndex?.message ? 'text-error' : '',
+								formState.errors.labRTotal?.message ? 'text-error' : '',
 							)}
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={formState.errors.labIndex?.message || 'Индекс'}
-							error={formState.errors.labIndex?.message}
-							placeholder="Введите индекс"
-							{...form.register('labIndex')}
-							type={'number'}
+							containerClassName="w-[468px]"
+							label={formState.errors.labRTotal?.message || 'R_total'}
+							error={formState.errors.labRTotal?.message}
+							placeholder="Введите через запятую"
+							{...form.register('labRTotal')}
+							type={'text'}
+						/>
+						<Controller
+							name="labIndex"
+							control={control}
+							render={({ field }) => (
+								<Select
+									{...field}
+									value={field.value || ''}
+									options={RuIndexTypeNamesSelectValues}
+									error={formState.errors.labIndex?.message}
+									labelClassName={twMerge(
+										'text-sm leading-5 tracking-[0.1px]',
+										formState.errors.labIndex?.message ? 'text-error' : '',
+									)}
+									wrapperClassname="w-[226px] ring-input-border-primary"
+									buttonClassName="text-sm rounded-[8px]"
+									label={formState.errors.labIndex?.message || 'Индекс'}
+									placeholder="Выберите индекс"
+								/>
+							)}
 						/>
 						<Input
 							labelClassName={twMerge(
@@ -272,6 +296,21 @@ export const ConstructionsEdit = () => {
 								placeholder="Введите индекс"
 								{...form.register('estimatedIndexValue')}
 								type={'number'}
+							/>
+							<Input
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+									formState.errors.laboratoryTestSource?.message
+										? 'text-error'
+										: '',
+								)}
+								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+								containerClassName="w-[226px]"
+								label={formState.errors.laboratoryTestSource?.message || 'Источник'}
+								error={formState.errors.laboratoryTestSource?.message}
+								placeholder="Введите источник"
+								{...form.register('laboratoryTestSource')}
+								type={'text'}
 							/>
 						</div>
 					</div>
