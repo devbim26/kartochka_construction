@@ -61,13 +61,12 @@ const MaterialsScreen = () => {
 				accessorKey: 'imageUrl',
 				header: () => <SimpleTableHeaderCell text="Изображение" />,
 				cell: (info) => {
-					const value = info.getValue() as string | null;
 					return (
 						<SimpleTableCell
 							contentClassName="h-[39px] w-[39px]"
 							content={
-								value ? (
-									<img src={info.getValue() as string} className="size-[39px]" />
+								info.row.original.image ? (
+									<img src={info.row.original.image} className="size-[39px]" />
 								) : (
 									''
 								)

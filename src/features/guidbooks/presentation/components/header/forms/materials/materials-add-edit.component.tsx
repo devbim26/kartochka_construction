@@ -1,7 +1,6 @@
 import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
 import { convertToPaginatedType, convertToSelectValues } from '@core/converters';
 import {
-	fileUpload,
 	FormSubTitle,
 	getGuidebooksPaginated,
 	Guidebooks,
@@ -43,25 +42,17 @@ export const MaterialsAddAndEdit = () => {
 		handleGetIssuerData();
 	}, []);
 
-	console.log(formState.errors);
-
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
 		if (file) {
 			try {
 				const base64 = await convertToBase64(file);
-				const fileData = await file.arrayBuffer();
 				if (base64 && typeof base64 === 'string') {
-					setValue('image', base64);
+					setValue('image', file);
 					setPreview(base64);
-					dispatch(
-						fileUpload({
-							data: { mimeType: file.type, isPublic: true },
-							file: fileData,
-						}),
-					);
 					setUploadError(false);
 				}
+				form.trigger('image');
 			} catch (error) {
 				setUploadError(true);
 			}
@@ -228,7 +219,7 @@ export const MaterialsAddAndEdit = () => {
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 								formState.errors.image?.message ? 'text-error' : '',
 							)}
-							errorMessage={formState.errors.image?.message}
+							errorMessage={formState.errors.image?.message?.toString()}
 						>
 							Логотип
 						</FormElementLabel>
