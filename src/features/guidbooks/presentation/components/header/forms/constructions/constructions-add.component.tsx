@@ -9,6 +9,7 @@ import {
 	getGuidebooksPaginated,
 	Guidebooks,
 	RuConstructionConstructionTypeSelectValues,
+	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	RuRegionNamesSelectValues,
 } from '@features';
@@ -36,10 +37,14 @@ export const ConstructionsAdd = () => {
 					logoUrl: null,
 					webSite: null,
 				},
+				pagination: {
+					pageSize: 999999,
+					pageNumber: 1,
+				},
 				guidebookType: Guidebooks.ISSUER,
 			});
 			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
-			setIssuers(items);
+			setIssuers(items.items);
 		} catch (error) {
 			console.log('Error:', error);
 		}
@@ -311,18 +316,25 @@ export const ConstructionsAdd = () => {
 							{...form.register('labRTotal')}
 							type={'text'}
 						/>
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.labIndex?.message ? 'text-error' : '',
+						<Controller
+							name="labIndex"
+							control={control}
+							render={({ field }) => (
+								<Select
+									{...field}
+									value={field.value || ''}
+									options={RuIndexTypeNamesSelectValues}
+									error={formState.errors.labIndex?.message}
+									labelClassName={twMerge(
+										'text-sm leading-5 tracking-[0.1px]',
+										formState.errors.labIndex?.message ? 'text-error' : '',
+									)}
+									wrapperClassname="w-[226px] ring-input-border-primary"
+									buttonClassName="text-sm rounded-[8px]"
+									label={formState.errors.labIndex?.message || 'Индекс'}
+									placeholder="Выберите индекс"
+								/>
 							)}
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={formState.errors.labIndex?.message || 'Индекс'}
-							error={formState.errors.labIndex?.message}
-							placeholder="Введите индекс"
-							{...form.register('labIndex')}
-							type={'number'}
 						/>
 						<Input
 							labelClassName={twMerge(
@@ -336,6 +348,19 @@ export const ConstructionsAdd = () => {
 							placeholder="Введите индекс"
 							{...form.register('labIndexValue')}
 							type={'number'}
+						/>
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.propertySource?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[226px]"
+							label={formState.errors.propertySource?.message || 'Источник'}
+							error={formState.errors.propertySource?.message}
+							placeholder="Введите источник"
+							{...form.register('propertySource')}
+							type={'text'}
 						/>
 					</div>
 				</>

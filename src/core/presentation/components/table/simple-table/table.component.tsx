@@ -1,20 +1,19 @@
-import { useSimpleTable, type PaginationState, type SimpleTableProps } from '@core';
+import { useSimpleTable, type SimpleTableProps } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { flexRender } from '@tanstack/react-table';
-import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { Pagination } from '../../pagination';
 
 export const SimpleTable = memoize(
-	<T extends object>({ data, columns, pageSize, classNames }: SimpleTableProps<T>) => {
-		const [paginationState, setPaginationState] = useState<PaginationState>({
-			pageNumber: 1,
-			pageSize: pageSize,
-			totalPages: 21,
-			totalCount: 21,
-		});
-
+	<T extends object>({
+		data,
+		columns,
+		classNames,
+		onChangePaginationState,
+		paginationState,
+	}: SimpleTableProps<T>) => {
 		const { getHeaderGroups, getRowModel } = useSimpleTable<T>(columns, data);
+
 		const headerRows = getHeaderGroups().map((headerGroup) => (
 			<tr
 				key={headerGroup.id}
@@ -65,8 +64,11 @@ export const SimpleTable = memoize(
 					</table>
 				</div>
 				<Pagination
-					onChange={(page) => {
-						setPaginationState((curr) => ({ ...curr, pageNumber: page }));
+					onPageChange={(page) =>
+						onChangePaginationState({ ...paginationState, pageNumber: page })
+					}
+					onPageSizeChange={(pageSize) => {
+						onChangePaginationState({ ...paginationState, pageSize });
 					}}
 					state={paginationState}
 				/>

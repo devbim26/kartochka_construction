@@ -1053,11 +1053,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/api/Auth/refresh
 		 */
 		authRefreshCreate: (params: RequestParams = {}) =>
-			this.request<void, any>({
-				path: `/api/Auth/refresh`,
-				method: 'POST',
-				...params,
-			}),
+			this.request<void, any>({ path: `/api/Auth/refresh`, method: 'POST', ...params }),
 
 		/**
 		 * No description
@@ -1067,11 +1063,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/api/Auth/logout
 		 */
 		authLogoutCreate: (params: RequestParams = {}) =>
-			this.request<void, any>({
-				path: `/api/Auth/logout`,
-				method: 'POST',
-				...params,
-			}),
+			this.request<void, any>({ path: `/api/Auth/logout`, method: 'POST', ...params }),
 
 		/**
 		 * No description

@@ -1,3 +1,4 @@
+import type { PaginationState } from './pagination.types';
 import { SortOrder } from './sort-order.types';
 
 type FetchDataOrdering<TData> = Partial<TData>;
@@ -11,13 +12,19 @@ interface FetchDataFilters {
 
 type FetchDataParams<T> = FetchDataFilters & FetchDataOrdering<T>;
 
-interface PaginatedData<T> {
+interface ServerPaginationData<T> {
 	items: T[];
 	pageNumber: number;
 	totalPages: number;
 	totalCount: number;
-	hasPreviousPage: boolean;
-	hasNextPage: boolean;
+	pageSize: number;
+	hasPreviousPage: false;
+	hasNextPage: false;
+}
+
+interface PaginatedData<T> {
+	items: T[];
+	pagination: PaginationState;
 }
 
 interface FetchDataResult<T = Record<string, any>> {
@@ -39,4 +46,5 @@ export {
 	type FetchDataParams,
 	type FetchDataResult,
 	type PaginatedData,
+	type ServerPaginationData,
 };

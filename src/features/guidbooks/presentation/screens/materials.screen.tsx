@@ -2,11 +2,12 @@ import {
 	convertToPaginatedType,
 	DeleteIcon,
 	EditIcon,
-	mapColumns,
+	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	type PaginationState,
 } from '@core';
 import {
 	convertToClientMaterialsAddAndEditData,
@@ -39,12 +40,23 @@ const MaterialsScreen = () => {
 	const [search] = useSearchParams();
 	const [singleMaterial, setSingleMaterial] = useState<MaterialsAddAndEditData>();
 	const [tableData, setTableData] = useState<Array<MaterialsAddAndEditData>>([]);
+	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
 
-	const createColumns = (
-		data: MaterialsAddAndEditData[],
-	): ColumnDef<MaterialsAddAndEditData>[] => {
-		if (!data) return [];
-		const columns: ColumnDef<MaterialsAddAndEditData>[] = [
+	const forms = useHeaderForm(
+		{
+			filter: MaterialsFilterConfig.defaultValues,
+			edit: MaterialsAddAndEditConfig.defaultValues,
+			add: MaterialsAddAndEditConfig.defaultValues,
+		},
+		{
+			filter: MaterialsFilterConfig.schema,
+			edit: MaterialsAddAndEditConfig.schema,
+			add: MaterialsAddAndEditConfig.schema,
+		},
+	);
+
+	const columns = useMemo(() => {
+		const cols: ColumnDef<MaterialsAddAndEditData>[] = [
 			{
 				accessorKey: 'imageUrl',
 				header: () => <SimpleTableHeaderCell text="Изображение" />,
@@ -140,7 +152,7 @@ const MaterialsScreen = () => {
 								<div className="flex gap-2">
 									<EditIcon
 										onClick={() =>
-											navigate('', { edit: 'true', entityId: entityId })
+											navigate('', { edit: 'true', entityId: entityId! })
 										}
 									/>
 									<DeleteIcon
@@ -160,38 +172,28 @@ const MaterialsScreen = () => {
 			//коэффициент затухания
 			//процентная доля твердой массы
 		];
-		return mapColumns(columns);
-	};
-
-	const forms = useHeaderForm(
-		{
-			filter: MaterialsFilterConfig.defaultValues,
-			edit: MaterialsAddAndEditConfig.defaultValues,
-			add: MaterialsAddAndEditConfig.defaultValues,
-		},
-		{
-			filter: MaterialsFilterConfig.schema,
-			edit: MaterialsAddAndEditConfig.schema,
-			add: MaterialsAddAndEditConfig.schema,
-		},
-	);
-
-	const columns = useMemo(() => createColumns(tableData), [tableData]);
+		return cols;
+	}, []);
 
 	const [filterName, filterMaterialType, filterDensity, filterThickness] = forms.filterForm.watch(
 		['name', 'materialType', 'thickness', 'density'],
 	);
 
-	const handleGetTableData = async (data: MaterialsFilterData) => {
+	const handleGetTableData = async (
+		data: MaterialsFilterData,
+		pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>,
+	) => {
 		try {
 			const response = await getGuidebooksPaginated({
 				data: convertToServerMaterialsFilterData(data),
 				guidebookType: Guidebooks.MATERIAL,
+				pagination,
 			});
-			const items = convertToPaginatedType(convertToClientMaterialsAddAndEditData)(
+			const resData = convertToPaginatedType(convertToClientMaterialsAddAndEditData)(
 				response.data as any,
 			);
-			setTableData(items);
+			setTableData(resData.items);
+			setPaginationState(resData.pagination);
 		} catch (error) {
 			console.log('Error:', error);
 		}
@@ -219,7 +221,10 @@ const MaterialsScreen = () => {
 				guidebookType: Guidebooks.MATERIAL,
 			});
 			if (response.status === 200) {
-				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData);
+				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData, {
+					...paginationState,
+					pageNumber: 1,
+				});
 			}
 		} catch (error) {
 			console.log('Error:', error);
@@ -233,7 +238,10 @@ const MaterialsScreen = () => {
 				guidebookType: Guidebooks.MATERIAL,
 			});
 			if (response.status === 200) {
-				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData);
+				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData, {
+					...paginationState,
+					pageNumber: 1,
+				});
 			}
 		} catch (error) {
 			console.log(error);
@@ -247,7 +255,10 @@ const MaterialsScreen = () => {
 				guidebookType: Guidebooks.MATERIAL,
 			});
 			if (response.status === 200) {
-				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData);
+				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData, {
+					...paginationState,
+					pageNumber: 1,
+				});
 			}
 		} catch (error) {
 			console.log('Error:', error);
@@ -255,7 +266,7 @@ const MaterialsScreen = () => {
 	};
 
 	useEffect(() => {
-		handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData);
+		handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData, paginationState);
 	}, [filterDensity, filterName, filterThickness, filterMaterialType]);
 
 	useEffect(() => {
@@ -292,7 +303,19 @@ const MaterialsScreen = () => {
 					edit: MaterialsAddAndEdit,
 				}}
 			/>
-			{!!tableData.length && <SimpleTable pageSize={10} data={tableData} columns={columns} />}
+			{!!tableData.length && (
+				<SimpleTable
+					data={tableData}
+					columns={columns}
+					paginationState={paginationState}
+					onChangePaginationState={(newState) => {
+						handleGetTableData(
+							forms.filterForm.getValues() as MaterialsFilterData,
+							newState,
+						);
+					}}
+				/>
+			)}
 		</div>
 	);
 };

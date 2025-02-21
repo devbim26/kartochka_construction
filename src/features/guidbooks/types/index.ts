@@ -5,6 +5,7 @@ export * from './constructions';
 export * from './country.types';
 export * from './guidbook-header.types';
 export * from './guidebook.types';
+export * from './index.types';
 export * from './issuer';
 export * from './materials';
 export * from './priority.types';

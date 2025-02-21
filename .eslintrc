@@ -1,8 +1,5 @@
 {
-	"env": {
-		"browser": true,
-		"es2021": true,
-	},
+	"env": { "browser": true, "es2021": true },
 	"extends": [
 		"prettier",
 		"plugin:@typescript-eslint/recommended",
@@ -10,13 +7,14 @@
 		"plugin:import/warnings",
 		"plugin:import/typescript",
 		"plugin:tailwindcss/recommended",
+		"plugin:react/recommended",
 	],
 	"parserOptions": {
 		"requireConfigFile": false,
 		"sourceType": "module",
 		"project": "./tsconfig.json",
 	},
-	"plugins": ["@typescript-eslint", "prettier", "import", "tailwindcss"],
+	"plugins": ["@typescript-eslint", "prettier", "import", "tailwindcss", "react"],
 	"rules": {
 		"@typescript-eslint/consistent-type-imports": "error",
 		"prettier/prettier": "error",
@@ -27,9 +25,11 @@
 		"@typescript-eslint/no-unused-expressions": "off",
 		"import/no-named-as-default-member": "off",
 		"import/export": "off",
-		"react/react-in-jsx-scope": "off",
 	},
 	"settings": {
+		"react": {
+			"version": "detect",
+		},
 		"import/resolver": {
 			"typescript": {
 				"alwaysTryTypes": true,
