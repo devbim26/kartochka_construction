@@ -1,5 +1,5 @@
 import { Select } from '@core';
-import { ZPanelMaterialTypeData } from '@features';
+import type { ZPanelMaterialTypeData } from '@features';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
