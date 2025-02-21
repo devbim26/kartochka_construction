@@ -1,15 +1,35 @@
-import { Input, Select, Switch } from '@core';
+import { ConstructionPosition, MaterialParametrs } from '@api-gen';
 import {
+	convertToPaginatedType,
+	convertToSelectValues,
+	Input,
+	Select,
+	SelectOption,
+	Switch,
+} from '@core';
+import {
+	ConstructionTypeEnum,
+	convertToClientIssuerData,
+	convertToServerIssuerData,
+	DescriptionFieldNames,
+	FilterIssuer,
 	FormSubTitle,
+	getGuidebooksPaginated,
+	Guidebooks,
+	RuConstructionConstructionTypeSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	RuRegionNamesSelectValues,
 	type ConstructionsEditData,
 } from '@features';
-import { useState } from 'react';
+import { AxiosResponse } from 'axios';
+import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { IoMdWarning } from 'react-icons/io';
 import { useSearchParams } from 'react-router-dom';
+import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
+import { HeavySingleWallComponent } from './contruction-type';
 
 export const ConstructionsEdit = () => {
 	const [search] = useSearchParams();
@@ -21,7 +41,113 @@ export const ConstructionsEdit = () => {
 		setSpecsDisplay(!isSpecsDisplay);
 	};
 
+	useEffect(() => {
+		handleGetIssuers({ name: '', country: '', webSite: '', logoUrl: '' });
+	}, []);
+
+	const [issuers, setIssuers] = useState<Array<SelectOption>>();
+
+	const handleGetIssuers = (data: FilterIssuer) => {
+		from(
+			getGuidebooksPaginated({
+				data: convertToServerIssuerData(data),
+				pagination: { pageSize: 999999, pageNumber: 1 },
+				guidebookType: Guidebooks.ISSUER,
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const items = convertToPaginatedType(convertToClientIssuerData)(response.data);
+					return from([items]);
+				}),
+				tap((items) => setIssuers(convertToSelectValues(items.items)!)),
+				catchError((error) => {
+					console.log('Error:', error);
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
+
 	const { formState, control, watch } = form;
+
+	const currentConstruction = watch('constructionType');
+
+	const ConstructionTypeMap = {
+		[ConstructionTypeEnum.HeavySingleLayerWall]: {
+			component: <HeavySingleWallComponent />,
+			action: () => {
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLayerWall,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
+			component: <HeavySingleWallComponent />,
+			action: () => {
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLayerWall,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
+			component: <HeavySingleWallComponent />,
+			action: () => {
+				console.log(123);
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLayerWall,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+	};
 
 	return (
 		<div className="flex w-full flex-col gap-[16px]">
@@ -29,16 +155,17 @@ export const ConstructionsEdit = () => {
 				onText="Характеристики"
 				offText="Описание"
 				textClassName="font-sans text-[17px] font-normal leading-5 tracking-[0.1px]"
-				// offIcon={
-				// 	Object.keys(formState.errors).some((key) =>
-				// 		DescriptionFieldNames.includes(key),
-				// 	) && <IoWarningOutline />
-				// }
-				// onIcon={
-				// 	Object.keys(formState.errors).some((key) =>
-				// 		SpecificationsFieldNames.includes(key),
-				// 	) && <IoWarningOutline />
-				// }
+				offIcon={
+					Object.keys(formState.errors).some((key) =>
+						DescriptionFieldNames.includes(key),
+					) && <IoMdWarning />
+				}
+				onIcon={
+					!Object.keys(formState.errors).some((key) =>
+						DescriptionFieldNames.includes(key),
+					) &&
+					!!Object.keys(formState.errors).length && <IoMdWarning />
+				}
 				wrapperClassName="h-[30px] w-[400px] self-center p-[3px] bg-primary"
 				onChange={handleChangeDisplay}
 			/>
@@ -52,19 +179,29 @@ export const ConstructionsEdit = () => {
 							<Select
 								{...field}
 								value={field.value || ''}
-								options={[{ label: 'Тяжелая однослойная стена', value: 'heavy' }]}
+								onChange={(value) => {
+									form.setValue('constructionType', value as string);
+									if (value)
+										ConstructionTypeMap[value as ConstructionTypeEnum].action();
+								}}
+								options={RuConstructionConstructionTypeSelectValues}
 								error={formState.errors.constructionType?.message}
 								labelClassName={twMerge(
 									'text-sm leading-5 tracking-[0.1px]',
 									formState.errors.constructionType?.message ? 'text-error' : '',
 								)}
-								wrapperClassname="w-[226px] ring-input-border-primary"
+								wrapperClassname="w-fit min-w-[226px] ring-input-border-primary"
 								buttonClassName="text-sm rounded-[8px]"
 								label={formState.errors.constructionType?.message || ''}
 								placeholder="Выберите тип"
 							/>
 						)}
 					/>
+					{currentConstruction ? (
+						ConstructionTypeMap[currentConstruction as ConstructionTypeEnum].component
+					) : (
+						<></>
+					)}
 				</>
 			) : (
 				<>
@@ -157,7 +294,7 @@ export const ConstructionsEdit = () => {
 								<Select
 									{...field}
 									value={field.value || ''}
-									options={[{ label: '1', value: '1' }]}
+									options={issuers || []}
 									error={formState.errors.issuer?.message}
 									labelClassName={twMerge(
 										'text-sm leading-5 tracking-[0.1px]',
@@ -169,6 +306,22 @@ export const ConstructionsEdit = () => {
 									placeholder="Выберите производителя"
 								/>
 							)}
+						/>
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.maxHeight?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[226px]"
+							label={
+								formState.errors.comment?.message || 'Примечание (не обязательно)'
+							}
+							error={formState.errors.comment?.message}
+							placeholder="Примечание"
+							{...form.register('maxHeight')}
+							type={'text'}
+							maxLength={100}
 						/>
 					</div>
 					<FormSubTitle text="Характеристики" />
@@ -264,60 +417,57 @@ export const ConstructionsEdit = () => {
 							{...form.register('labIndexValue')}
 							type={'number'}
 						/>
-
-						<div className="flex flex-wrap gap-[16px]">
-							<FormSubTitle text="Расчетное значение" />
-							<Input
-								labelClassName={twMerge(
-									'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-									formState.errors.estimatedIndexValue?.message
-										? 'text-error'
-										: '',
-								)}
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label={formState.errors.estimatedIndexValue?.message || 'Индекс'}
-								error={formState.errors.estimatedIndexValue?.message}
-								placeholder="Введите индекс"
-								{...form.register('estimatedIndexValue')}
-								type={'number'}
-							/>
-							<Controller
-								name="labIndex"
-								control={control}
-								render={({ field }) => (
-									<Select
-										{...field}
-										value={field.value || ''}
-										options={RuIndexTypeNamesSelectValues}
-										error={formState.errors.labIndex?.message}
-										labelClassName={twMerge(
-											'text-sm leading-5 tracking-[0.1px]',
-											formState.errors.labIndex?.message ? 'text-error' : '',
-										)}
-										wrapperClassname="w-[226px] ring-input-border-primary"
-										buttonClassName="text-sm rounded-[8px]"
-										label={formState.errors.labIndex?.message || 'Индекс'}
-										placeholder="Выберите индекс"
-									/>
-								)}
-							/>
-							<Input
-								labelClassName={twMerge(
-									'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-									formState.errors.laboratoryTestSource?.message
-										? 'text-error'
-										: '',
-								)}
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label={formState.errors.laboratoryTestSource?.message || 'Источник'}
-								error={formState.errors.laboratoryTestSource?.message}
-								placeholder="Введите источник"
-								{...form.register('laboratoryTestSource')}
-								type={'text'}
-							/>
-						</div>
+					</div>
+					<FormSubTitle text="Расчетное значение" />
+					<div className="flex flex-wrap gap-[16px]">
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.laboratoryTestSource?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[226px]"
+							label={formState.errors.laboratoryTestSource?.message || 'R_calcs'}
+							error={formState.errors.laboratoryTestSource?.message}
+							placeholder="R_calc"
+							{...form.register('estimatedRTotal')}
+							type={'text'}
+						/>
+						<Controller
+							name="labIndex"
+							control={control}
+							render={({ field }) => (
+								<Select
+									{...field}
+									value={field.value || ''}
+									options={RuIndexTypeNamesSelectValues}
+									error={formState.errors.labIndex?.message}
+									labelClassName={twMerge(
+										'text-sm leading-5 tracking-[0.1px]',
+										formState.errors.labIndex?.message ? 'text-error' : '',
+									)}
+									wrapperClassname="w-[226px] ring-input-border-primary"
+									buttonClassName="text-sm rounded-[8px]"
+									label={formState.errors.labIndex?.message || 'Индекс'}
+									placeholder="Выберите индекс"
+								/>
+							)}
+						/>
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.estimatedIndexValue?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[226px]"
+							label={
+								formState.errors.estimatedIndexValue?.message || 'Index value, dBa'
+							}
+							error={formState.errors.estimatedIndexValue?.message}
+							placeholder="Введите индекс"
+							{...form.register('estimatedIndexValue')}
+							type={'number'}
+						/>
 					</div>
 				</>
 			)}

@@ -65,10 +65,50 @@ export enum ConstructionClass {
 	Floor = 'Floor',
 }
 
+export interface ConstructionDto {
+	constructionPosition?: ConstructionPosition;
+	userMaterials?: UserMaterialDto[] | null;
+}
+
+export interface ConstructionHeaderDto {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	description?: string | null;
+	priority?: Priority;
+	region?: Region;
+	descriptionSource?: string | null;
+	notation?: string | null;
+	/** @format uuid */
+	issuerId?: string;
+	issuer?: IssuerDto;
+	/** @format double */
+	maxHeight?: number;
+	fireResistance?: string | null;
+	rTotal?: number[] | null;
+	laboratoryTestSource?: string | null;
+	index?: IndexType;
+	/** @format float */
+	laboratoryIndexValue?: number;
+	/** @format uuid */
+	constructionTypeId?: string;
+	constructionType?: ConstructionTypeDto;
+	/** @format double */
+	rw?: number;
+	/** @format double */
+	computingIndexValue?: number;
+}
+
 export enum ConstructionPosition {
 	Left = 'Left',
 	Center = 'Center',
 	Right = 'Right',
+}
+
+export interface ConstructionTypeDto {
+	name?: string | null;
+	shortName?: string | null;
+	constructions?: ConstructionDto[] | null;
 }
 
 export enum ConstructionTypeEnum {
@@ -429,6 +469,12 @@ export interface MaterialTypeValueDto {
 	materialParametrs?: MaterialParametrs;
 }
 
+export interface NamedEntity {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+}
+
 export interface PaginatedArticleDto {
 	title?: string | null;
 	bodyText?: string | null;
@@ -439,6 +485,35 @@ export interface PaginatedArticleDto {
 
 export interface PaginatedArticleDtoPaginatedList {
 	items?: PaginatedArticleDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
+}
+
+export interface PaginatedConstructionHeaderDto {
+	/** @format uuid */
+	id?: string;
+	constructionId?: string | null;
+	name?: string | null;
+	descriptionSource?: string | null;
+	/** @format double */
+	maxHeight?: number;
+	description?: string | null;
+	region?: Region;
+	constructionType?: ConstructionTypeEnum;
+	issuer?: NamedEntity;
+	issuerLogo?: string | null;
+}
+
+export interface PaginatedConstructionHeaderDtoPaginatedList {
+	items?: PaginatedConstructionHeaderDto[] | null;
 	/** @format int32 */
 	pageNumber?: number;
 	/** @format int32 */
@@ -666,6 +741,13 @@ export interface UpdateRequirementCommand {
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
+}
+
+export interface UserMaterialDto {
+	material?: NamedEntity;
+	/** @format int32 */
+	positionId?: number;
+	materialTypeValue?: MaterialTypeValueDto[] | null;
 }
 
 export interface UserMaterialTemplateDto {
@@ -1075,9 +1157,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/Construction/{ConstructionHeaderId}
 		 */
 		constructionDetail: (constructionHeaderId: string, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<ConstructionHeaderDto, any>({
 				path: `/api/Construction/${constructionHeaderId}`,
 				method: 'GET',
+				format: 'json',
 				...params,
 			}),
 
@@ -1089,7 +1172,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/Construction/ConstructionTypes
 		 */
 		constructionConstructionTypesList: (params: RequestParams = {}) =>
-			this.request<CreateConstructionTypeTemplateDto, any>({
+			this.request<CreateConstructionTypeTemplateDto[], any>({
 				path: `/api/Construction/ConstructionTypes`,
 				method: 'GET',
 				format: 'json',
@@ -1107,11 +1190,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: GetConstructionHeaderWithPaginationQuery,
 			params: RequestParams = {},
 		) =>
-			this.request<void, any>({
+			this.request<PaginatedConstructionHeaderDtoPaginatedList, any>({
 				path: `/api/Construction/get-paginated`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -1123,11 +1207,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/api/Construction
 		 */
 		constructionCreate: (data: CreateConstructionHeaderCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<ConstructionHeaderDto, any>({
 				path: `/api/Construction`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -1155,11 +1240,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request PUT:/api/Construction
 		 */
 		constructionUpdate: (data: UpdateConstructionHeaderCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<ConstructionHeaderDto, any>({
 				path: `/api/Construction`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 

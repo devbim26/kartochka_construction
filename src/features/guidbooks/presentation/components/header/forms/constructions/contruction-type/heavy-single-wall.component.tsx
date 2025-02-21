@@ -19,19 +19,12 @@ export const HeavySingleWallComponent = () => {
 	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
 
 	useEffect(() => {
-		console.log(userMaterials);
-		console.log(userMaterials?.findIndex((c) => c.positionId === '1'));
-
 		setIndices({
 			zeroIndex: userMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
 			oneIndex: userMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
 			twoIndex: userMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 		});
 	}, [userMaterials, form.watch('constructionTypeObject.constructions')]);
-
-	console.log(form.getValues());
-
-	console.log(form.formState.errors);
 
 	return (
 		<div className="flex flex-col">

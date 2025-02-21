@@ -62,12 +62,6 @@ const ConstructionsScreen = () => {
 	const columns = useMemo(() => {
 		const cols: ColumnDef<ConstructionsAddData>[] = [
 			{
-				accessorKey: 'id',
-				header: () => <SimpleTableHeaderCell text="ID" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
-			},
-			//изображение
-			{
 				accessorKey: 'name',
 				header: () => <SimpleTableHeaderCell text="Название" />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
@@ -88,7 +82,7 @@ const ConstructionsScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				accessorKey: 'issuer',
+				accessorKey: 'issuerName',
 				header: () => <SimpleTableHeaderCell text="Производитель" />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},

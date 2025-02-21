@@ -36,6 +36,7 @@ export const ConstructionsAddSchema = z.object({
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
 	constructionType: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
+	issuerName: z.string().optional(),
 	maxHeight: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
