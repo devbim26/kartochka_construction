@@ -14,7 +14,7 @@
 	"parserOptions": {
 		"requireConfigFile": false,
 		"sourceType": "module",
-		"project": "./tsconfig.json"
+		"project": "./tsconfig.json",
 	},
 	"plugins": ["@typescript-eslint", "prettier", "import", "tailwindcss"],
 	"rules": {
@@ -24,9 +24,10 @@
 		"@typescript-eslint/no-non-null-assertion": "off",
 		"@typescript-eslint/no-explicit-any": "off",
 		"tailwindcss/no-unnecessary-arbitrary-value": "error",
-        "@typescript-eslint/no-unused-expressions": "off",
+		"@typescript-eslint/no-unused-expressions": "off",
 		"import/no-named-as-default-member": "off",
-		"import/export": "off"
+		"import/export": "off",
+		"react/react-in-jsx-scope": "off",
 	},
 	"settings": {
 		"import/resolver": {
@@ -34,7 +35,7 @@
 				"alwaysTryTypes": true,
 				"node": {
 					"extensions": [".ts", ".tsx"],
-					"moduleDirectory": ["node_modules", "src/"]
+					"moduleDirectory": ["node_modules", "src/"],
 				},
 				"alias": {
 					"map": [
@@ -49,9 +50,9 @@
 						["router", ".src/router"],
 						["router/*", ".src/router/"],
 					],
-					"extensions": [".ts", ".tsx"]
-				}
-			}
+					"extensions": [".ts", ".tsx"],
+				},
+			},
 		},
 	},
 }

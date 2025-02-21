@@ -1,0 +1,18 @@
+export const DescriptionFieldNames = [
+	'name',
+	'description',
+	'priority',
+	'constructionSource',
+	'region',
+	'manufacturer',
+	'maxHeight',
+	'resistanceClass',
+	'specificationsSource',
+	'rTotal',
+	'rLab',
+	'rCals',
+	'labIndex',
+	'labIndexValue',
+	'estimatedIndex',
+	'estimatedIndexValue',
+];

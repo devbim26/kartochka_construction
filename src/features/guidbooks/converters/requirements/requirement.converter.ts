@@ -19,7 +19,6 @@ import {
 	type RequirementFilter,
 } from '@features/guidbooks/types';
 import type { RequirementsDataSchemaType } from '@features/guidbooks/utils';
-import { convertToServerConstructionTypeData } from '../constructions';
 
 export const convertToClientRequirementData = (
 	data: RequirementDto,
@@ -53,9 +52,9 @@ export const convertToServerRequirementData = (
 	class: categoryClassMap.toServer[data.class as ClientCategoryClass],
 	noizeIsolationIndex: +data.noizeIsolationIndex,
 	noizeImpactIndex: +data.noizeIsolationIndex,
-	constructionType: convertToServerConstructionTypeData(
-		data.constructionType as ConstructionType,
-	),
+	// constructionType: convertToServerConstructionTypeData(
+	// 	data.constructionType as ConstructionType,
+	// ),
 	notice: data.notice || null,
 });
 
