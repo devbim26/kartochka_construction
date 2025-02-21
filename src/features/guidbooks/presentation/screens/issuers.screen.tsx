@@ -128,7 +128,7 @@ const IssuersScreen = () => {
 	};
 
 	const handleDeleteTableData = (id: string) => {
-		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.ISSUER }))
+		from(getGuidebooksDelete({ data: { id: id }, guidebookType: Guidebooks.ISSUER }))
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -169,7 +169,7 @@ const IssuersScreen = () => {
 	};
 
 	const handleGetOneTableData = (id: string) => {
-		from(getGuidebooksDelete({ data: { id: id }, guidebookType: Guidebooks.ISSUER }))
+		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.ISSUER }))
 			.pipe(
 				switchMap((response: AxiosResponse) => {
 					const data = convertToClientIssuerData(response.data as IssuerDto);

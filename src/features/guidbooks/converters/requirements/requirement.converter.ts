@@ -61,7 +61,6 @@ export const convertToServerRequirementData = (
 export const convertToServerFilterRequirementData = (
 	data: RequirementFilter,
 ): GetRequirementsWithPaginationParamsQuery => ({
-	...data,
 	// secondPlacementRoom: data.secondPlacementRoom || null,
 	// firstPlacementRoom: data.firstPlacementRoom || null,
 	buildingType: buildingTypeMap.toServer[data.buildingType as ClientBuildingType] || null,

@@ -1,5 +1,4 @@
 import type {
-	ConstructionHeaderDto,
 	ConstructionPosition,
 	ConstructionTypeEnum,
 	CreateConstructionHeaderCommand,
@@ -9,7 +8,6 @@ import type {
 	IndexType,
 	MaterialParametrs,
 	Priority,
-	UpdateConstructionHeaderCommand,
 } from '@api-gen';
 import { convertToClientRegionData, convertToServerRegionData } from '@core';
 import { convertToClientConstructionTypeDto } from '@core/converters/constructionType.converter';
@@ -44,35 +42,32 @@ export const convertToServerConstructionsFilterData = (
 	region: convertToServerRegionData(data.region as Region) || null,
 });
 
-export const convertToClientConstructionsAddData = (data: ConstructionHeaderDto) => ({
+export const convertToClientConstructionsAddData = (data: any) => ({
 	...data,
 	id: data.id,
 	name: data.name ?? '',
-	issuerName: data.issuer?.name!,
 	description: data.description ?? '',
 	priority: convertToClientPriorityData(data.priority!)! as string,
 	descriptionSource: data.descriptionSource ?? '',
 	region: convertToClientRegionData(data.region!)! as string,
 	maxHeight: String(data.maxHeight),
 	fireResistance: String(data.fireResistance),
-	propertySource: data.laboratoryTestSource ?? '',
+	propertySource: data.propertySource ?? '',
 	labRTotal: data.rTotal ? data.rTotal.join(', ') : '',
 	labIndex: convertToClientIndexTypeData(data.index!)! as string,
 	labIndexValue: String(data.laboratoryIndexValue),
 	constructionType: convertToClientConstructionTypeDto(data.constructionType!)!,
 	constructionTypeObject: convertToClientConstructionType(data.constructionType!)!,
 	laboratoryTestSource: data.laboratoryTestSource ?? '',
-	issuer: data.issuer?.id ?? '',
+	issuer: data.issuerId ?? '',
 });
 
-export const convertToClientConstructionsEditData = (
-	data: ConstructionHeaderDto,
-): ConstructionsEditData => {
+export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => {
 	return {
 		...convertToClientConstructionsAddData(data),
-		comment: data.notation || '',
-		estimatedRTotal: String(data.rw!),
-		estimatedIndexValue: String(data.computingIndexValue),
+		comment: data.notice,
+		estimatedRTotal: data.rw,
+		estimatedIndexValue: data.computingIndexValue,
 	};
 };
 
@@ -137,9 +132,8 @@ export const convertToServerConstructionsAddData = (
 
 export const convertToServerConstructionsEditData = (
 	data: ConstructionsEditData,
-): UpdateConstructionHeaderCommand => ({
+): CreateConstructionHeaderCommand => ({
 	...convertToServerConstructionsAddData(data),
-	id: data.id,
 	// comment: data.comment || null,
 	// estimatedRTotal: data.estimatedRTotal || null,
 	// estimatedIndex: data.estimatedIndex || null,

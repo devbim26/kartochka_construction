@@ -17,7 +17,6 @@ import {
 } from '@features/guidbooks/converters';
 import {
 	getGuidebooksCreate,
-	getGuidebooksDelete,
 	getGuidebooksDetail,
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
@@ -183,7 +182,7 @@ const RequirementsScreen = () => {
 	};
 
 	const handleGetOneTableData = (id: string) => {
-		from(getGuidebooksDelete({ data: { id: id }, guidebookType: Guidebooks.REQUIREMENT }))
+		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.REQUIREMENT }))
 			.pipe(
 				switchMap((response: AxiosResponse) => {
 					const data = convertToClientRequirementData(response.data as RequirementDto);
