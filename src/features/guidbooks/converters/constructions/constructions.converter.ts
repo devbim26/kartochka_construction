@@ -12,7 +12,10 @@ import {
 import { convertToClientRegionData, convertToServerRegionData } from '@core';
 import { convertToClientConstructionTypeDto } from '@core/converters/constructionType.converter';
 import { convertToClientIndexTypeData } from '@core/converters/index.converter';
-import { convertToClientPriorityData } from '@core/converters/priority.converter';
+import {
+	convertToClientPriorityData,
+	convertToServerPriorityData,
+} from '@core/converters/priority.converter';
 import {
 	ConstructionsAddData,
 	ConstructionsEditData,
@@ -56,6 +59,7 @@ export const convertToClientConstructionsAddData = (
 	labIndexValue: String(data.indexValue),
 	constructionType: convertToClientConstructionTypeDto(data.constructionType!)!,
 	constructionTypeObject: convertToClientConstructionType(data.constructionType!)!,
+	laboratoryTestSource: data.laboratoryTestSource ?? '',
 	issuer: data.issuerId ?? '',
 });
 
@@ -114,7 +118,7 @@ export const convertToServerConstructionsAddData = (
 ): CreateConstructionHeaderCommand => ({
 	name: data.name,
 	description: data.description || null,
-	priority: data.priority as Priority,
+	priority: convertToServerPriorityData(data.priority as Priority),
 	descriptionSource: data.descriptionSource || null,
 	region: convertToServerRegionData(data.region as Region),
 	issuerId: data.issuer || undefined,
