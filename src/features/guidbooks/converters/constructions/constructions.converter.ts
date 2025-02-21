@@ -54,7 +54,7 @@ export const convertToClientConstructionsAddData = (
 	labRTotal: data.rTotal ? data.rTotal.join(', ') : '',
 	labIndex: convertToClientIndexTypeData(data.index!)! as string,
 	labIndexValue: String(data.indexValue),
-	constructionType: convertToClientConstructionTypeDto(data.constructionType!)! as string,
+	constructionType: convertToClientConstructionTypeDto(data.constructionType!)!,
 	constructionTypeObject: convertToClientConstructionType(data.constructionType!)!,
 	issuer: data.issuerId ?? '',
 });
