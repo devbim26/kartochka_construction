@@ -1,4 +1,4 @@
-import { convertToBase64, Input, Select, useAppDispatch } from '@core';
+import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
 import { convertToPaginatedType, convertToSelectValues } from '@core/converters';
 import {
 	fileUpload,
@@ -27,17 +27,13 @@ export const MaterialsAddAndEdit = () => {
 	const handleGetIssuerData = useCallback(async () => {
 		try {
 			const response = await getGuidebooksPaginated({
-				data: {
-					name: null,
-					country: null,
-					logoUrl: null,
-					webSite: null,
-				},
+				data: { name: null, country: null, logoUrl: null, webSite: null },
 				guidebookType: Guidebooks.ISSUER,
+				pagination: { pageNumber: 1, pageSize: 99999 },
 			});
 
-			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
-			setIssuerData(items);
+			const resData = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
+			setIssuerData(resData.items);
 		} catch (error) {
 			console.log('Error:', error);
 		}
@@ -47,6 +43,8 @@ export const MaterialsAddAndEdit = () => {
 		handleGetIssuerData();
 	}, []);
 
+	console.log(formState.errors);
+
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
 		if (file) {
@@ -54,7 +52,7 @@ export const MaterialsAddAndEdit = () => {
 				const base64 = await convertToBase64(file);
 				const fileData = await file.arrayBuffer();
 				if (base64 && typeof base64 === 'string') {
-					setValue('image', file.name);
+					setValue('image', base64);
 					setPreview(base64);
 					dispatch(
 						fileUpload({
@@ -223,7 +221,7 @@ export const MaterialsAddAndEdit = () => {
 						/>
 					)}
 				/>
-				{/* <div className="relative flex items-start gap-4">
+				<div className="relative flex items-start gap-4">
 					<div className="flex flex-col gap-y-2">
 						<FormElementLabel
 							className={twMerge(
@@ -265,7 +263,7 @@ export const MaterialsAddAndEdit = () => {
 							/>
 						</div>
 					)}
-				</div> */}
+				</div>
 			</div>
 			<FormSubTitle text="Физические свойства" />
 			<div className="flex flex-wrap gap-[16px]">

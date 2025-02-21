@@ -2,11 +2,12 @@ import type { RequirementDto } from '@api-gen';
 import {
 	convertToPaginatedType,
 	DeleteIcon,
-	mapColumns,
+	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	type PaginationState,
 } from '@core';
 import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {
@@ -54,6 +55,7 @@ const RequirementsScreen = () => {
 	const [search] = useSearchParams();
 	const [singleRequirement, setSingleRequirement] = useState<Requirement>();
 	const [tableData, setTableData] = useState<Array<Requirement>>([]);
+	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
 
 	const form = useHeaderForm<Requirement>(
 		{
@@ -93,7 +95,7 @@ const RequirementsScreen = () => {
 	}, [singleRequirement]);
 
 	useEffect(() => {
-		handleGetTableData(form.filterForm.getValues());
+		handleGetTableData(form.filterForm.getValues(), paginationState);
 	}, [
 		filterRegion,
 		filterConstructionType,
@@ -102,21 +104,28 @@ const RequirementsScreen = () => {
 		filterBuildingType,
 	]);
 
-	const handleGetTableData = (data: Requirement) => {
+	const handleGetTableData = (
+		data: Requirement,
+		pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>,
+	) => {
 		from(
 			getGuidebooksPaginated({
 				data: convertToServerFilterRequirementData(data),
 				guidebookType: Guidebooks.REQUIREMENT,
+				pagination,
 			}),
 		)
 			.pipe(
 				switchMap((response: AxiosResponse) => {
-					const items = convertToPaginatedType(convertToClientRequirementData)(
+					const res = convertToPaginatedType(convertToClientRequirementData)(
 						response.data,
 					);
-					return from([items]);
+					return from([res]);
 				}),
-				tap((items) => setTableData(items!)),
+				tap((res) => {
+					setTableData(res.items);
+					setPaginationState(res.pagination);
+				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data.message);
@@ -143,8 +152,8 @@ const RequirementsScreen = () => {
 				}),
 			)
 			.subscribe((response) => {
-				if (response.status === 200) {
-					handleGetTableData(form.filterForm.getValues());
+				if (response?.status === 200) {
+					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно добавлено');
 				}
 			});
@@ -166,20 +175,15 @@ const RequirementsScreen = () => {
 				}),
 			)
 			.subscribe((response) => {
-				if (response.status === 200) {
-					handleGetTableData(form.filterForm.getValues());
+				if (response?.status === 200) {
+					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно отредактировано');
 				}
 			});
 	};
 
 	const handleGetOneTableData = (id: string) => {
-		from(
-			getGuidebooksDelete({
-				data: { id: id },
-				guidebookType: Guidebooks.REQUIREMENT,
-			}),
-		)
+		from(getGuidebooksDelete({ data: { id: id }, guidebookType: Guidebooks.REQUIREMENT }))
 			.pipe(
 				switchMap((response: AxiosResponse) => {
 					const data = convertToClientRequirementData(response.data as RequirementDto);
@@ -197,12 +201,7 @@ const RequirementsScreen = () => {
 	};
 
 	const handleDeleteTableData = (id: string) => {
-		from(
-			getGuidebooksDetail({
-				id: id,
-				guidebookType: Guidebooks.REQUIREMENT,
-			}),
-		)
+		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.REQUIREMENT }))
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -212,8 +211,8 @@ const RequirementsScreen = () => {
 				}),
 			)
 			.subscribe((response) => {
-				if (response.status === 200) {
-					handleGetTableData(form.filterForm.getValues());
+				if (response?.status === 200) {
+					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно удалено');
 				}
 			});
@@ -227,9 +226,8 @@ const RequirementsScreen = () => {
 		handleEditTableData(form.editForm.getValues());
 	}, [handleEditTableData, form.editForm.getValues()]);
 
-	const createColumns = (data: Requirement[]): ColumnDef<Requirement>[] => {
-		if (!data) return [];
-		const columns: ColumnDef<Requirement>[] = [
+	const columns = useMemo(() => {
+		const cols: ColumnDef<Requirement>[] = [
 			{
 				accessorKey: 'region',
 				header: () => <SimpleTableHeaderCell text={'Регион'} />,
@@ -328,10 +326,8 @@ const RequirementsScreen = () => {
 				},
 			},
 		];
-		return mapColumns(columns);
-	};
-
-	const columns = useMemo(() => createColumns(tableData), [tableData]);
+		return cols;
+	}, []);
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
@@ -349,7 +345,16 @@ const RequirementsScreen = () => {
 					edit: RequirementsAddAndEdit,
 				}}
 			/>
-			{!!tableData.length && <SimpleTable pageSize={10} data={tableData} columns={columns} />}
+			{!!tableData.length && (
+				<SimpleTable
+					data={tableData}
+					columns={columns}
+					paginationState={paginationState}
+					onChangePaginationState={(newState) => {
+						handleGetTableData(form.filterForm.getValues(), newState);
+					}}
+				/>
+			)}
 		</div>
 	);
 };

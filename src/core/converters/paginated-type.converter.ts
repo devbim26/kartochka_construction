@@ -1,4 +1,4 @@
-import type { PaginatedData } from '@core/types';
+import type { PaginatedData, ServerPaginationData } from '@core/types';
 
 export const convertToPaginatedType =
 	<
@@ -8,6 +8,7 @@ export const convertToPaginatedType =
 			pageNumber: number;
 			hasPreviousPage: boolean;
 			hasNextPage: boolean;
+			pageSize: number;
 			items: Array<F>;
 		},
 		F,
@@ -15,6 +16,16 @@ export const convertToPaginatedType =
 	>(
 		nestedConverter: (result: F) => K,
 	) =>
-	(result: PaginatedData<F>): Array<K> => {
-		return result.items.map(nestedConverter);
+	(result: ServerPaginationData<F>): PaginatedData<K> => {
+		return {
+			pagination: {
+				hasNextPage: result.hasNextPage,
+				hasPreviousPage: result.hasPreviousPage,
+				pageNumber: result.pageNumber,
+				pageSize: result.pageSize,
+				totalCount: result.totalCount,
+				totalPages: result.totalPages,
+			},
+			items: result.items.map(nestedConverter),
+		};
 	};
