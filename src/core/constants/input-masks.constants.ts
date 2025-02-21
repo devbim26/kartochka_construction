@@ -11,7 +11,7 @@ export const approvalCodeMask = {
 };
 
 export const dateMask = {
-	mask: '____.__.__',
+	mask: '____-__-__',
 	replacement: { _: /\d/ },
 	showMask: true,
 };
