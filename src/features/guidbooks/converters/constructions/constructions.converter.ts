@@ -1,4 +1,4 @@
-import {
+import type {
 	ConstructionPosition,
 	ConstructionTypeEnum,
 	CreateConstructionHeaderCommand,
@@ -16,14 +16,14 @@ import {
 	convertToClientPriorityData,
 	convertToServerPriorityData,
 } from '@core/converters/priority.converter';
-import {
+import type {
 	ConstructionsAddData,
 	ConstructionsEditData,
 	ConstructionsFilterData,
 	ConstructionTypeTemplate,
 	Region,
 } from '@features';
-import { ConstructionType } from '@features/guidbooks/types/constructions';
+import type { ConstructionType } from '@features/guidbooks/types/constructions';
 
 export const convertToClientConstructionTypesList = (
 	data: CreateConstructionTypeTemplateDto[],

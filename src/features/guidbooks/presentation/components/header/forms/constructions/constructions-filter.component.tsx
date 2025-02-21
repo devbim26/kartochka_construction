@@ -1,10 +1,10 @@
 import { Input, Select } from '@core';
 import {
-	ConstructionTypeTemplate,
 	convertToClientConstructionTypesList,
 	getGuidebooksConstructionTypes,
 	RuRegionNamesSelectValues,
 	type ConstructionsFilterData,
+	type ConstructionTypeTemplate,
 } from '@features';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
