@@ -8,7 +8,7 @@ const RequirementsSchema = z.object({
 	secondPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
 	firstPlacementRoom: z.string().min(1, 'Поле обязательно для заполнения'),
 	buildingType: z.string().min(1, 'Поле обязательно для заполнения'),
-	standartValidityPeriod: z.string().min(1, 'Поле обязательно для заполнения').optional(),
+	standartValidityPeriod: z.string().min(1, 'Поле обязательно для заполнения'),
 	standartShortName: z.string().min(1, 'Поле обязательно для заполнения'),
 	standartFullName: z.string().min(1, 'Поле обязательно для заполнения'),
 	noizeIsolationIndex: z

@@ -49,7 +49,7 @@ export const convertToServerRequirementData = (
 	standartShortName: data.standartShortName || null,
 	standartFullName: data.standartFullName || null,
 	region: data.region ? regionMap.toServer[data.region as ClientRegion] : undefined,
-	standartValidityPeriod: data.standartValidityPeriod || undefined,
+	standartValidityPeriod: data.standartValidityPeriod,
 	class: categoryClassMap.toServer[data.class as ClientCategoryClass],
 	noizeIsolationIndex: +data.noizeIsolationIndex,
 	noizeImpactIndex: +data.noizeIsolationIndex,
