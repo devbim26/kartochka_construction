@@ -359,7 +359,7 @@ export const ConstructionsAdd = () => {
 							label={formState.errors.propertySource?.message || 'Источник'}
 							error={formState.errors.propertySource?.message}
 							placeholder="Введите источник"
-							{...form.register('propertySource')}
+							{...form.register('laboratoryTestSource')}
 							type={'text'}
 						/>
 					</div>

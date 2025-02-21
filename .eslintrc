@@ -25,6 +25,8 @@
 		"@typescript-eslint/no-unused-expressions": "off",
 		"import/no-named-as-default-member": "off",
 		"import/export": "off",
+		"react/display-name": "off",
+		"react/react-in-jsx-scope": "off",
 	},
 	"settings": {
 		"react": {

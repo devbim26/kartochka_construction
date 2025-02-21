@@ -264,21 +264,9 @@ export const ConstructionsEdit = () => {
 							{...form.register('labIndexValue')}
 							type={'number'}
 						/>
-						<FormSubTitle text="Расчетное значение" />
+
 						<div className="flex flex-wrap gap-[16px]">
-							<Input
-								labelClassName={twMerge(
-									'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-									formState.errors.estimatedIndex?.message ? 'text-error' : '',
-								)}
-								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-								containerClassName="w-[226px]"
-								label={formState.errors.estimatedIndex?.message || 'Индекс'}
-								error={formState.errors.estimatedIndex?.message}
-								placeholder="Введите индекс"
-								{...form.register('estimatedIndex')}
-								type={'number'}
-							/>
+							<FormSubTitle text="Расчетное значение" />
 							<Input
 								labelClassName={twMerge(
 									'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
@@ -288,14 +276,31 @@ export const ConstructionsEdit = () => {
 								)}
 								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 								containerClassName="w-[226px]"
-								label={
-									formState.errors.estimatedIndexValue?.message ||
-									'Index value, dBA'
-								}
+								label={formState.errors.estimatedIndexValue?.message || 'Индекс'}
 								error={formState.errors.estimatedIndexValue?.message}
 								placeholder="Введите индекс"
 								{...form.register('estimatedIndexValue')}
 								type={'number'}
+							/>
+							<Controller
+								name="labIndex"
+								control={control}
+								render={({ field }) => (
+									<Select
+										{...field}
+										value={field.value || ''}
+										options={RuIndexTypeNamesSelectValues}
+										error={formState.errors.labIndex?.message}
+										labelClassName={twMerge(
+											'text-sm leading-5 tracking-[0.1px]',
+											formState.errors.labIndex?.message ? 'text-error' : '',
+										)}
+										wrapperClassname="w-[226px] ring-input-border-primary"
+										buttonClassName="text-sm rounded-[8px]"
+										label={formState.errors.labIndex?.message || 'Индекс'}
+										placeholder="Выберите индекс"
+									/>
+								)}
 							/>
 							<Input
 								labelClassName={twMerge(

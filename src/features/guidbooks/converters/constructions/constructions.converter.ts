@@ -1,4 +1,4 @@
-import {
+import type {
 	ConstructionPosition,
 	ConstructionTypeEnum,
 	CreateConstructionHeaderCommand,
@@ -16,14 +16,14 @@ import {
 	convertToClientPriorityData,
 	convertToServerPriorityData,
 } from '@core/converters/priority.converter';
-import {
+import type {
 	ConstructionsAddData,
 	ConstructionsEditData,
 	ConstructionsFilterData,
 	ConstructionTypeTemplate,
 	Region,
 } from '@features';
-import { ConstructionType } from '@features/guidbooks/types/constructions';
+import type { ConstructionType } from '@features/guidbooks/types/constructions';
 
 export const convertToClientConstructionTypesList = (
 	data: CreateConstructionTypeTemplateDto[],
@@ -42,10 +42,9 @@ export const convertToServerConstructionsFilterData = (
 	region: convertToServerRegionData(data.region as Region) || null,
 });
 
-export const convertToClientConstructionsAddData = (
-	data: CreateConstructionHeaderCommand,
-): ConstructionsAddData => ({
+export const convertToClientConstructionsAddData = (data: any) => ({
 	...data,
+	id: data.id,
 	name: data.name ?? '',
 	description: data.description ?? '',
 	priority: convertToClientPriorityData(data.priority!)! as string,
@@ -63,15 +62,14 @@ export const convertToClientConstructionsAddData = (
 	issuer: data.issuerId ?? '',
 });
 
-export const convertToClientConstructionsEditData = (
-	data: CreateConstructionHeaderCommand,
-): ConstructionsEditData => ({
-	...convertToClientConstructionsAddData(data),
-	comment: '1',
-	estimatedRTotal: '1',
-	estimatedIndex: '1',
-	estimatedIndexValue: '1',
-});
+export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => {
+	return {
+		...convertToClientConstructionsAddData(data),
+		comment: data.notice,
+		estimatedRTotal: data.rw,
+		estimatedIndexValue: data.computingIndexValue,
+	};
+};
 
 export const convertToServerConstructionType = (
 	data: ConstructionType,

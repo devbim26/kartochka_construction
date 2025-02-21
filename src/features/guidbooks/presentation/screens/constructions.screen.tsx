@@ -103,7 +103,7 @@ const ConstructionsScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				accessorKey: 'actions',
+				accessorKey: 'id',
 				header: () => <SimpleTableHeaderCell text="Действия" />,
 				cell: (info) => {
 					const entityId = info.row.original.id;
