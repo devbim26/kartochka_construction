@@ -11,6 +11,7 @@ import {
 import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {
 	convertToClientRequirementData,
+	convertToServerFilterRequirementData,
 	convertToServerRequirementData,
 } from '@features/guidbooks/converters';
 import {
@@ -104,7 +105,7 @@ const RequirementsScreen = () => {
 	const handleGetTableData = (data: Requirement) => {
 		from(
 			getGuidebooksPaginated({
-				data: convertToServerRequirementData(data),
+				data: convertToServerFilterRequirementData(data),
 				guidebookType: Guidebooks.REQUIREMENT,
 			}),
 		)
