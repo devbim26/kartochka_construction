@@ -9,3 +9,9 @@ export const RuPriorityNamesSelectValues = [
 	{ label: 'Средний', value: Priority.Medium },
 	{ label: 'Высокий', value: Priority.High },
 ];
+
+export const RuPriorityNamesMap = {
+	Low: 'Низкий',
+	Medium: 'Средний',
+	High: 'Высокий',
+};

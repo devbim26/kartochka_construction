@@ -261,6 +261,19 @@ export const ConstructionsAdd = () => {
 							{...form.register('labIndexValue')}
 							type={'number'}
 						/>
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.propertySource?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[226px]"
+							label={formState.errors.propertySource?.message || 'Источник'}
+							error={formState.errors.propertySource?.message}
+							placeholder="Введите источник"
+							{...form.register('propertySource')}
+							type={'text'}
+						/>
 					</div>
 				</>
 			) : (
