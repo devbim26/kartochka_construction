@@ -1,4 +1,4 @@
-import { ConstructionPosition, ConstructionTypeEnum, MaterialParametrs } from '@api-gen';
+import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
 import { type ConstructionsAddData } from '@features/guidbooks';
 import { useEffect, useState } from 'react';
@@ -15,28 +15,6 @@ export const HeavySingleWallComponent = () => {
 		oneIndex: -1,
 		twoIndex: -1,
 	});
-
-	useEffect(() => {
-		form.setValue(
-			'constructionTypeObject.constructionTypeEnum',
-			ConstructionTypeEnum.HeavySingleLayerWall,
-		);
-		form.setValue('constructionTypeObject.constructions', [
-			{
-				contructionPosition: ConstructionPosition.Left,
-				userMaterials: [
-					{
-						positionId: '1',
-						materialId: '',
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				],
-			},
-		]);
-	}, []);
 
 	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
 
@@ -177,7 +155,6 @@ export const HeavySingleWallComponent = () => {
 					</>
 				)}
 			</div>
-			<div></div>
 		</div>
 	);
 };

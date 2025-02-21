@@ -267,7 +267,7 @@ const IssuersScreen = () => {
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper
-				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
+				onSave={search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
 					pageTitle: 'Производители',
 					editTitle: 'Редактировать производителя',

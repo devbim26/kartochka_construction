@@ -19,7 +19,6 @@ import {
 	type RequirementFilter,
 } from '@features/guidbooks/types';
 import type { RequirementsDataSchemaType } from '@features/guidbooks/utils';
-//import { convertToServerConstructionTypeData } from '../constructions';
 
 export const convertToClientRequirementData = (
 	data: RequirementDto,
