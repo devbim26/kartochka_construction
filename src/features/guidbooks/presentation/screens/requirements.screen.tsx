@@ -2,12 +2,12 @@ import type { RequirementDto } from '@api-gen';
 import {
 	convertToPaginatedType,
 	DeleteIcon,
-	PaginationState,
 	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	type PaginationState,
 } from '@core';
 import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {

@@ -3,12 +3,12 @@ import {
 	convertToPaginatedType,
 	DeleteIcon,
 	EditIcon,
-	PaginationState,
 	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	type PaginationState,
 } from '@core';
 import {
 	convertToClientIssuerData,

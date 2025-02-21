@@ -2,10 +2,10 @@ import type { GetMaterialsWithPaginationParamsQuery } from '@api-gen';
 import {
 	convertToClientMaterialTypeData,
 	convertToServerMaterialTypeData,
-	MaterialTypeEnum,
 	type MaterialOriginType,
 	type MaterialsAddAndEditData,
 	type MaterialsFilterData,
+	type MaterialTypeEnum,
 	type Region,
 } from '@features';
 

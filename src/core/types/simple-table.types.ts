@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { PaginationState } from './pagination.types';
+import type { PaginationState } from './pagination.types';
 
 interface SimpleTableProps<T> {
 	data: Array<T>;

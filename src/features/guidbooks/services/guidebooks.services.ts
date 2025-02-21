@@ -1,5 +1,5 @@
 import { fetchApi } from '@api-gen';
-import { PaginationState } from '@core';
+import type { PaginationState } from '@core';
 import type { GuideBooksCreateDataTypes, GuidebooksFiltersDataTypes } from '../types';
 import { Guidebooks } from '../types';
 

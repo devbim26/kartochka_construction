@@ -1,4 +1,4 @@
-import { PaginationState } from './pagination.types';
+import type { PaginationState } from './pagination.types';
 import { SortOrder } from './sort-order.types';
 
 type FetchDataOrdering<TData> = Partial<TData>;
