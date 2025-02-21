@@ -78,6 +78,10 @@ export const getGuidebooksDelete = async ({ data, guidebookType }: DeleteProps) 
 	return await getGuidebooksDeleteApiMap[guidebookType](data);
 };
 
-export const getGuidebooksMaterialType = async () => {
+export const getGuidebooksMaterialTypes = async () => {
 	return await fetchApi.api.materialTypeList();
+};
+
+export const getGuidebooksConstructionTypes = async () => {
+	return await fetchApi.api.constructionConstructionTypesList();
 };

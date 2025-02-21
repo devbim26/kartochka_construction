@@ -21,8 +21,8 @@ export const convertToServerMaterialsFilterData = (
 	name: data.name || null,
 	materialTypeEnum:
 		convertToServerMaterialTypeData(data.materialType as MaterialTypeEnum) || null,
-	density: +data.density || null,
-	thickness: +data.thickness || null,
+	density: data.density ? +data.density : null,
+	thickness: data.thickness ? +data.thickness : null,
 });
 
 export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddAndEditData => ({

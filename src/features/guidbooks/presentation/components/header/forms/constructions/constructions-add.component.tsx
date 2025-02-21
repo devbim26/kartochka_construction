@@ -1,87 +1,76 @@
-import { Input, Select, Switch } from '@core';
+import { convertToPaginatedType, convertToSelectValues, Input, Select, Switch } from '@core';
+import type { ConstructionsAddData, ConstructionTypeTemplate, Issuer } from '@features';
 import {
-	ConstructionComponentsMap,
-	DescriptionFieldNames,
+	convertToClientConstructionTypesList,
+	convertToClientIssuerData,
 	FormSubTitle,
+	getGuidebooksConstructionTypes,
+	getGuidebooksPaginated,
+	Guidebooks,
+	RuPriorityNamesSelectValues,
 	RuRegionNamesSelectValues,
-	SpecificationsFieldNames,
 } from '@features';
-import type { ConstructionsAddData } from '@features/guidbooks/types/constructions';
-import { RuPriorityNamesSelectValues } from '@features/guidbooks/types/priority.types';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { IoWarningOutline } from 'react-icons/io5';
+import { IoMdWarning } from 'react-icons/io';
 import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+import { HeavySingleWallComponent } from './contruction-type';
 
 export const ConstructionsAdd = () => {
 	const [search] = useSearchParams();
 	const form = useFormContext<ConstructionsAddData>();
-
-	const [isSpecsDisplay, setSpecsDisplay] = useState(false);
-
-	const handleChangeDisplay = () => {
-		setSpecsDisplay(!isSpecsDisplay);
-	};
-
 	const { formState, control, watch } = form;
+	const [displayChars, setDisplayChars] = useState(false);
+	const [constructionTypes, setConstructionTypes] = useState<ConstructionTypeTemplate[]>([]);
+	const [issuers, setIssuers] = useState<Issuer[]>([]);
+	const currentConstruction = watch('constructionType');
 
-	const selectedConstruction = watch('constructionType');
+	const handleGetMaterialTypeData = useCallback(async () => {
+		try {
+			const response = await getGuidebooksConstructionTypes();
+			const items = convertToClientConstructionTypesList(response.data as any);
+			setConstructionTypes(items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
+	const handleGetIssuerData = useCallback(async () => {
+		try {
+			const response = await getGuidebooksPaginated({
+				data: {
+					name: null,
+					country: null,
+					logoUrl: null,
+					webSite: null,
+				},
+				guidebookType: Guidebooks.ISSUER,
+			});
+			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
+			setIssuers(items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
+	useEffect(() => {
+		handleGetIssuerData();
+		handleGetMaterialTypeData();
+	}, []);
 
 	return (
-		<div className="flex w-full flex-col gap-[16px]">
+		<div className="flex w-full flex-col gap-[16px] px-[25px]">
 			<Switch
 				onText="Характеристики"
 				offText="Описание"
 				textClassName="font-sans text-[17px] font-normal leading-5 tracking-[0.1px]"
-				offIcon={
-					Object.keys(formState.errors).some((key) =>
-						DescriptionFieldNames.includes(key),
-					) && <IoWarningOutline />
-				}
-				onIcon={
-					Object.keys(formState.errors).some((key) =>
-						SpecificationsFieldNames.includes(key),
-					) && <IoWarningOutline />
-				}
+				offIcon={<IoMdWarning />}
+				onIcon={<IoMdWarning />}
 				wrapperClassName="h-[30px] w-[400px] self-center p-[3px] bg-primary"
-				onChange={handleChangeDisplay}
+				onChange={() => setDisplayChars(!displayChars)}
 			/>
-			{isSpecsDisplay ? (
-				<>
-					<FormSubTitle text="Тип конструкции" />
-					<Controller
-						name="constructionType"
-						control={control}
-						render={({ field }) => (
-							<Select
-								{...field}
-								value={field.value || ''}
-								options={[
-									{
-										label: 'Тяжелая однослойная стена',
-										value: 'heavySingleWall',
-									},
-									{
-										label: 'Тяжелая однослойная стена + облицовка',
-										value: 'heavySingleWallAndCladding',
-									},
-								]}
-								error={formState.errors.constructionType?.message}
-								labelClassName={twMerge(
-									'text-sm leading-5 tracking-[0.1px] w-[178px]',
-									formState.errors.constructionType?.message ? 'text-error' : '',
-								)}
-								wrapperClassname="w-fit ring-input-border-primary"
-								buttonClassName="text-sm rounded-[8px]"
-								label={formState.errors.constructionType?.message || ''}
-								placeholder="Выберите тип"
-							/>
-						)}
-					/>
-					{ConstructionComponentsMap[`${selectedConstruction}`]}
-				</>
-			) : (
+			{!displayChars ? (
 				<>
 					<FormSubTitle text="Описание" />
 					<div className="flex flex-wrap gap-[16px]">
@@ -134,14 +123,14 @@ export const ConstructionsAdd = () => {
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.constructionSource?.message ? 'text-error' : '',
+								formState.errors.descriptionSource?.message ? 'text-error' : '',
 							)}
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 							containerClassName="w-[226px]"
-							label={formState.errors.constructionSource?.message || 'Источник'}
-							error={formState.errors.constructionSource?.message}
+							label={formState.errors.descriptionSource?.message || 'Источник'}
+							error={formState.errors.descriptionSource?.message}
 							placeholder="Введите источник"
-							{...form.register('constructionSource')}
+							{...form.register('descriptionSource')}
 							type={'text'}
 						/>
 						<Controller
@@ -166,23 +155,21 @@ export const ConstructionsAdd = () => {
 							)}
 						/>
 						<Controller
-							name="manufacturer"
+							name="issuer"
 							control={control}
 							render={({ field }) => (
 								<Select
 									{...field}
 									value={field.value || ''}
-									options={[{ label: '1', value: '1' }]}
-									error={formState.errors.manufacturer?.message}
+									options={convertToSelectValues(issuers) ?? []}
+									error={formState.errors.issuer?.message}
 									labelClassName={twMerge(
 										'text-sm leading-5 tracking-[0.1px]',
-										formState.errors.manufacturer?.message ? 'text-error' : '',
+										formState.errors.issuer?.message ? 'text-error' : '',
 									)}
 									wrapperClassname="w-[226px] ring-input-border-primary"
 									buttonClassName="text-sm rounded-[8px]"
-									label={
-										formState.errors.manufacturer?.message || 'Производитель'
-									}
+									label={formState.errors.issuer?.message || 'Производитель'}
 									placeholder="Выберите производителя"
 								/>
 							)}
@@ -206,35 +193,48 @@ export const ConstructionsAdd = () => {
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.resistanceClass?.message ? 'text-error' : '',
+								formState.errors.fireResistance?.message ? 'text-error' : '',
 							)}
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 							containerClassName="w-[226px]"
 							label={
-								formState.errors.resistanceClass?.message ||
+								formState.errors.fireResistance?.message ||
 								'Класс огнестойкости, EI'
 							}
-							error={formState.errors.resistanceClass?.message}
+							error={formState.errors.fireResistance?.message}
 							placeholder="Введите класс"
-							{...form.register('resistanceClass')}
+							{...form.register('fireResistance')}
 							type={'number'}
 						/>
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.specificationsSource?.message ? 'text-error' : '',
+								formState.errors.propertySource?.message ? 'text-error' : '',
 							)}
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 							containerClassName="w-[226px]"
-							label={formState.errors.specificationsSource?.message || 'Источник'}
-							error={formState.errors.specificationsSource?.message}
+							label={formState.errors.propertySource?.message || 'Источник'}
+							error={formState.errors.propertySource?.message}
 							placeholder="Введите источник"
-							{...form.register('specificationsSource')}
+							{...form.register('propertySource')}
 							type={'text'}
 						/>
 					</div>
 					<FormSubTitle text="Лабораторные тесты" />
 					<div className="flex flex-wrap gap-[16px]">
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.labRTotal?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[468px]"
+							label={formState.errors.labRTotal?.message || 'R_total'}
+							error={formState.errors.labRTotal?.message}
+							placeholder="Введите через запятую"
+							{...form.register('labRTotal')}
+							type={'text'}
+						/>
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
@@ -261,7 +261,48 @@ export const ConstructionsAdd = () => {
 							{...form.register('labIndexValue')}
 							type={'number'}
 						/>
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.propertySource?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[226px]"
+							label={formState.errors.propertySource?.message || 'Источник'}
+							error={formState.errors.propertySource?.message}
+							placeholder="Введите источник"
+							{...form.register('propertySource')}
+							type={'text'}
+						/>
 					</div>
+				</>
+			) : (
+				<>
+					<FormSubTitle text="Тип конструкции" />
+					<Controller
+						name="constructionType"
+						control={control}
+						render={({ field }) => (
+							<Select
+								{...field}
+								value={field.value || ''}
+								options={constructionTypes.map((data) => ({
+									label: data.name ?? '',
+									value: data.constructionTypeTemplateId ?? '',
+								}))}
+								error={formState.errors.constructionType?.message}
+								labelClassName={twMerge(
+									'text-sm leading-5 tracking-[0.1px]',
+									formState.errors.constructionType?.message ? 'text-error' : '',
+								)}
+								wrapperClassname="w-fit min-w-[226px] ring-input-border-primary"
+								buttonClassName="text-sm rounded-[8px]"
+								label={formState.errors.constructionType?.message || ''}
+								placeholder="Выберите тип"
+							/>
+						)}
+					/>
+					<HeavySingleWallComponent />
 				</>
 			)}
 		</div>

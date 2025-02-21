@@ -1,155 +1,121 @@
 import {
+	convertToPaginatedType,
+	DeleteIcon,
+	EditIcon,
+	mapColumns,
+	SimpleTable,
+	SimpleTableCell,
+	SimpleTableHeaderCell,
+	useAppNavigate,
+} from '@core';
+import type {
+	ConstructionsAddData,
+	ConstructionsEditData,
+	ConstructionsFilterData,
+} from '@features';
+import {
 	ConstructionsAdd,
 	ConstructionsAddConfig,
 	ConstructionsEdit,
 	ConstructionsEditConfig,
 	ConstructionsFilter,
 	ConstructionsFilterConfig,
+	convertToClientConstructionsAddData,
+	convertToClientConstructionsEditData,
+	convertToServerConstructionsAddData,
+	convertToServerConstructionsEditData,
+	convertToServerConstructionsFilterData,
+	getGuidebooksCreate,
+	getGuidebooksDelete,
+	getGuidebooksDetail,
+	getGuidebooksEdit,
+	getGuidebooksPaginated,
 	GuidbookPageHeaderWrapper,
+	Guidebooks,
 	useHeaderForm,
 } from '@features';
-import { useCallback } from 'react';
+import type { ColumnDef } from '@tanstack/react-table';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const ConstructionsScreen = () => {
-	// const createColumns = (data: ConstructionsAddData[]): TableColumn<ConstructionsAddData>[] => {
-	// 	if (!data) return [];
-	// 	const columns: TableColumn<ConstructionsAddData>[] = [
-	// 		{
-	// 			dataKey: 'imageUrl',
-	// 			label: 'Изображение',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		{
-	// 			dataKey: 'name',
-	// 			label: 'Название',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		{
-	// 			dataKey: 'shortName',
-	// 			label: 'Краткое название',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		{
-	// 			dataKey: 'description',
-	// 			label: 'Описание',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		{
-	// 			dataKey: 'description',
-	// 			label: 'Описание',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		//цвет
-	// 		//штриховка
-	// 		{
-	// 			dataKey: 'materialType',
-	// 			label: 'Тип материала',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		{
-	// 			dataKey: 'region',
-	// 			label: 'Регион',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		{
-	// 			dataKey: 'density',
-	// 			label: 'Плотность материала',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		{
-	// 			dataKey: 'thickness',
-	// 			label: 'Толщина материала',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		{
-	// 			dataKey: 'speedOfSound',
-	// 			label: 'Скорость звука',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		{
-	// 			dataKey: 'materialCoefficient',
-	// 			label: 'Коэффициент материала',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		{
-	// 			dataKey: 'lossFactor',
-	// 			label: 'Коэффициент потерь',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		//коэффициент для расчетов
-	// 		{
-	// 			dataKey: 'youngModulus',
-	// 			label: 'Модуль Юнга материала, ГПа',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) => ColumnCell({ ...props, containerClassName: 'w-[300px]' }),
-	// 		},
-	// 		//коэффициент затухания
-	// 		//процентная доля твердой массы
-	// 		{
-	// 			dataKey: 'id',
-	// 			label: 'Действия',
-	// 			width: 0,
-	// 			headerRenderer: (props) =>
-	// 				ColumnHeader({ ...props, containerClassName: 'w-[300px]' }),
-	// 			cellRenderer: (props) =>
-	// 				ColumnCell({
-	// 					...props,
-	// 					containerClassName: 'w-[300px]',
-	// 					cellData: (
-	// 						<div className="flex gap-2">
-	// 							{/* <EditIcon
-	// 									onClick={() =>
-	// 										navigate('', { edit: 'true', entityId: props.cellData })
-	// 									}
-	// 								/>
-	// 								<DeleteIcon
-	// 									onClick={() => handleDeleteTableData(props.cellData as string)}
-	// 								/> */}
-	// 						</div>
-	// 					),
-	// 				}),
-	// 		},
-	// 	];
-	// 	return mapColumns(columns);
-	// };
+	const navigate = useAppNavigate();
+	const [search] = useSearchParams();
+	const [singleMaterial, setSingleMaterial] = useState<ConstructionsEditData>();
+	const [tableData, setTableData] = useState<ConstructionsAddData[]>([]);
+
+	const createColumns = (data: ConstructionsAddData[]): ColumnDef<ConstructionsAddData>[] => {
+		if (!data) return [];
+		const columns: ColumnDef<ConstructionsAddData>[] = [
+			{
+				accessorKey: 'id',
+				header: () => <SimpleTableHeaderCell text="ID" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			//изображение
+			{
+				accessorKey: 'name',
+				header: () => <SimpleTableHeaderCell text="Название" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'description',
+				header: () => <SimpleTableHeaderCell text="Описание" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'descriptionSource',
+				header: () => <SimpleTableHeaderCell text="Источник" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'maxHeight',
+				header: () => <SimpleTableHeaderCell text="Максимальная высота" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'issuer',
+				header: () => <SimpleTableHeaderCell text="Производитель" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'constructionType',
+				header: () => <SimpleTableHeaderCell text="Тип конструкции" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'region',
+				header: () => <SimpleTableHeaderCell text="Регион" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'actions',
+				header: () => <SimpleTableHeaderCell text="Действия" />,
+				cell: (info) => {
+					const entityId = info.row.original.id;
+					return (
+						<SimpleTableCell
+							content={
+								<div className="flex gap-2">
+									<EditIcon
+										onClick={() =>
+											navigate('', { edit: 'true', entityId: entityId! })
+										}
+									/>
+									<DeleteIcon
+										onClick={() =>
+											handleDeleteTableData(info.getValue() as string)
+										}
+									/>
+								</div>
+							}
+						/>
+					);
+				},
+			},
+		];
+		return mapColumns(columns);
+	};
 
 	const forms = useHeaderForm(
 		{
@@ -164,11 +130,109 @@ const ConstructionsScreen = () => {
 		},
 	);
 
-	const onSaveHandle = useCallback(() => {}, []);
+	const columns = useMemo(() => createColumns(tableData), [tableData]);
+
+	const [filterName, filterConstructionTypeId, filterDescription, filterRegion] =
+		forms.filterForm.watch(['name', 'constructionTypeId', 'description', 'region']);
+
+	useEffect(() => {
+		handleGetTableData(forms.filterForm.getValues() as ConstructionsFilterData);
+	}, [filterName, filterConstructionTypeId, filterDescription, filterRegion]);
+
+	const handleGetTableData = async (data: ConstructionsFilterData) => {
+		try {
+			const response = await getGuidebooksPaginated({
+				data: convertToServerConstructionsFilterData(data),
+				guidebookType: Guidebooks.CONSTRUCTION,
+			});
+			const items = convertToPaginatedType(convertToClientConstructionsAddData)(
+				response.data as any,
+			);
+			setTableData(items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	};
+
+	const handleGetOneTableData = useCallback(async (id: string) => {
+		try {
+			const response = await getGuidebooksDetail({
+				id: id,
+				guidebookType: Guidebooks.CONSTRUCTION,
+			});
+			if (response.status === 200) {
+				const data = convertToClientConstructionsEditData(response.data as any);
+				setSingleMaterial(data);
+			}
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
+	const handleAddTableData = async (data: ConstructionsAddData) => {
+		try {
+			const response = await getGuidebooksCreate({
+				data: convertToServerConstructionsAddData(data),
+				guidebookType: Guidebooks.CONSTRUCTION,
+			});
+			if (response.status === 200) {
+				handleGetTableData(forms.filterForm.getValues() as ConstructionsFilterData);
+			}
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	};
+
+	const handleEditTableData = async (data: ConstructionsEditData) => {
+		try {
+			const response = await getGuidebooksEdit({
+				data: convertToServerConstructionsEditData(data),
+				guidebookType: Guidebooks.CONSTRUCTION,
+			});
+			if (response.status === 200) {
+				handleGetTableData(forms.filterForm.getValues() as ConstructionsFilterData);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const handleDeleteTableData = async (id: string) => {
+		try {
+			const response = await getGuidebooksDelete({
+				data: { id: id },
+				guidebookType: Guidebooks.CONSTRUCTION,
+			});
+			if (response.status === 200) {
+				handleGetTableData(forms.filterForm.getValues() as ConstructionsFilterData);
+			}
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	};
+
+	useEffect(() => {
+		if (singleMaterial) forms.editForm.reset(singleMaterial);
+	}, [singleMaterial]);
+
+	useEffect(() => {
+		if (search.get('edit') && search.get('entityId')) {
+			handleGetOneTableData(search.get('entityId')!);
+		}
+	}, [search]);
+
+	const onSaveHandle = useCallback(() => {
+		handleAddTableData(forms.addForm.getValues() as ConstructionsAddData);
+	}, [handleAddTableData, forms.editForm.getValues()]);
+
+	const onEditHandle = useCallback(() => {
+		handleEditTableData(forms.editForm.getValues() as ConstructionsEditData);
+	}, [handleEditTableData, forms.editForm.getValues()]);
+
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper
-				onSave={onSaveHandle}
+				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
 					pageTitle: 'Конструкции',
 					editTitle: 'Редактирование конструкции',
@@ -181,7 +245,7 @@ const ConstructionsScreen = () => {
 					edit: ConstructionsEdit,
 				}}
 			/>
-			{/* <GuidbookPageTableWrapper /> */}
+			{!!tableData.length && <SimpleTable pageSize={10} data={tableData} columns={columns} />}
 		</div>
 	);
 };
