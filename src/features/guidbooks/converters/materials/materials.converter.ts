@@ -55,7 +55,7 @@ export const convertToServerMaterialsAddAndEditData = (data: MaterialsAddAndEdit
 	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || null,
 	region: convertToServerRegionData(data.region as Region) || null,
 	issuerId: data.issuer || null,
-	image: null,
+	formFile: data.image,
 	materialCoefficient: +data.materialCoefficient || null,
 	materialTypeEnum: data.materialType || null,
 	velocity: +data.velocity || null,

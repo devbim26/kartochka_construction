@@ -3,7 +3,8 @@ import {
 	convertToPaginatedType,
 	DeleteIcon,
 	EditIcon,
-	mapColumns,
+	PaginationState,
+	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
@@ -38,6 +39,7 @@ const IssuersScreen = () => {
 	const [search] = useSearchParams();
 	const [singleIssuer, setSingleIssuer] = useState<Issuer>();
 	const [tableData, setTableData] = useState<Array<Issuer>>([]);
+	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
 
 	const form = useHeaderForm<Issuer>(
 		{
@@ -69,22 +71,29 @@ const IssuersScreen = () => {
 	}, [singleIssuer]);
 
 	useEffect(() => {
-		handleGetTableData(form.filterForm.getValues());
+		handleGetTableData(form.filterForm.getValues(), paginationState);
 	}, [filterCountry, filterName, filterWebSite]);
 
-	const handleGetTableData = (data: Issuer) => {
+	const handleGetTableData = (
+		data: Issuer,
+		pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>,
+	) => {
 		from(
 			getGuidebooksPaginated({
 				data: convertToServerIssuerData(data),
 				guidebookType: Guidebooks.ISSUER,
+				pagination,
 			}),
 		)
 			.pipe(
 				switchMap((response: AxiosResponse) => {
-					const items = convertToPaginatedType(convertToClientIssuerData)(response.data);
-					return from([items]);
+					const res = convertToPaginatedType(convertToClientIssuerData)(response.data);
+					return from([res]);
 				}),
-				tap((items) => setTableData(items!)),
+				tap((res) => {
+					setTableData(res.items);
+					setPaginationState(res.pagination);
+				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data.message);
@@ -111,20 +120,15 @@ const IssuersScreen = () => {
 				}),
 			)
 			.subscribe((response) => {
-				if (response.status === 200) {
-					handleGetTableData(form.filterForm.getValues());
+				if (response?.status === 200) {
+					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Производитель успешно добавлен');
 				}
 			});
 	};
 
 	const handleDeleteTableData = (id: string) => {
-		from(
-			getGuidebooksDetail({
-				id: id,
-				guidebookType: Guidebooks.ISSUER,
-			}),
-		)
+		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.ISSUER }))
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -134,8 +138,8 @@ const IssuersScreen = () => {
 				}),
 			)
 			.subscribe((response) => {
-				if (response.status === 200) {
-					handleGetTableData(form.filterForm.getValues());
+				if (response?.status === 200) {
+					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Производитель успешно удалён');
 				}
 			});
@@ -157,20 +161,15 @@ const IssuersScreen = () => {
 				}),
 			)
 			.subscribe((response) => {
-				if (response.status === 200) {
-					handleGetTableData(form.filterForm.getValues());
+				if (response?.status === 200) {
+					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Производитель успешно отредактирован');
 				}
 			});
 	};
 
 	const handleGetOneTableData = (id: string) => {
-		from(
-			getGuidebooksDelete({
-				data: { id: id },
-				guidebookType: Guidebooks.ISSUER,
-			}),
-		)
+		from(getGuidebooksDelete({ data: { id: id }, guidebookType: Guidebooks.ISSUER }))
 			.pipe(
 				switchMap((response: AxiosResponse) => {
 					const data = convertToClientIssuerData(response.data as IssuerDto);
@@ -195,9 +194,8 @@ const IssuersScreen = () => {
 		handleEditTableData(form.editForm.getValues());
 	}, [handleEditTableData, form.editForm.getValues()]);
 
-	const createColumns = (data: Issuer[]): ColumnDef<Issuer>[] => {
-		if (!data) return [];
-		const columns: ColumnDef<Issuer>[] = [
+	const columns = useMemo(() => {
+		const cols: ColumnDef<Issuer>[] = [
 			{
 				accessorKey: 'name',
 				header: () => <SimpleTableHeaderCell text={'Производитель'} />,
@@ -263,10 +261,8 @@ const IssuersScreen = () => {
 				},
 			},
 		];
-		return mapColumns(columns);
-	};
-
-	const columns = useMemo(() => createColumns(tableData), [tableData]);
+		return cols;
+	}, []);
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
@@ -278,13 +274,18 @@ const IssuersScreen = () => {
 					addTitle: 'Добавить производителя',
 				}}
 				forms={form}
-				formElements={{
-					filter: IssuersFilter,
-					add: IssuersAddEdit,
-					edit: IssuersAddEdit,
-				}}
+				formElements={{ filter: IssuersFilter, add: IssuersAddEdit, edit: IssuersAddEdit }}
 			/>
-			{!!tableData.length && <SimpleTable pageSize={10} data={tableData} columns={columns} />}
+			{!!tableData.length && (
+				<SimpleTable
+					data={tableData}
+					columns={columns}
+					paginationState={paginationState}
+					onChangePaginationState={(newState) => {
+						handleGetTableData(form.filterForm.getValues(), newState);
+					}}
+				/>
+			)}
 		</div>
 	);
 };

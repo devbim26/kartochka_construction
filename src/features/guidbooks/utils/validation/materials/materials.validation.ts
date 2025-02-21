@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const MaterialsAddAndEditSchema = z.object({
-	id: z.string(),
+	id: z.string().optional(),
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	shortName: z.string().min(1, 'Поле обязательно для заполнения'),

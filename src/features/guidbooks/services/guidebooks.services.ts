@@ -1,4 +1,5 @@
 import { fetchApi } from '@api-gen';
+import { PaginationState } from '@core';
 import type { GuideBooksCreateDataTypes, GuidebooksFiltersDataTypes } from '../types';
 import { Guidebooks } from '../types';
 
@@ -9,19 +10,14 @@ type BaseProps = {
 
 type PaginatedProps = BaseProps & {
 	data: GuidebooksFiltersDataTypes;
+	pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>;
 };
 
-type CreateAndEditProps = BaseProps & {
-	data: GuideBooksCreateDataTypes;
-};
+type CreateAndEditProps = BaseProps & { data: GuideBooksCreateDataTypes };
 
-type DeleteProps = BaseProps & {
-	data: { id: string };
-};
+type DeleteProps = BaseProps & { data: { id: string } };
 
-type DetailProps = BaseProps & {
-	id: string;
-};
+type DetailProps = BaseProps & { id: string };
 
 const getGuidebooksPaginatedApiMap = {
 	[Guidebooks.ISSUER]: fetchApi.api.issuerGetPaginatedCreate,
@@ -58,8 +54,16 @@ const getGuidebooksDeleteApiMap = {
 	[Guidebooks.REQUIREMENT]: fetchApi.api.requirementDelete,
 };
 
-export const getGuidebooksPaginated = async ({ data, guidebookType }: PaginatedProps) => {
-	return await getGuidebooksPaginatedApiMap[guidebookType](data);
+export const getGuidebooksPaginated = async ({
+	data,
+	guidebookType,
+	pagination,
+}: PaginatedProps) => {
+	return await getGuidebooksPaginatedApiMap[guidebookType]({
+		...data,
+		pageNumber: pagination.pageNumber,
+		pageSize: pagination.pageSize,
+	});
 };
 
 export const getGuidebooksDetail = async ({ id, guidebookType }: DetailProps) => {
