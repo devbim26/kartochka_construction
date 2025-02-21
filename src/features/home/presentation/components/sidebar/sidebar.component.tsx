@@ -33,7 +33,7 @@ export const Sidebar = () => {
 	);
 
 	return (
-		<div className="flex h-full w-[248px] flex-col">
+		<div className="flex h-full w-[248px] min-w-[248px] flex-col">
 			<SidebarItem
 				id={DESIGNING_ROUTES.main.id}
 				icon={BiSolidHome}
