@@ -120,9 +120,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 						options={RuRoomTypeSelectValues}
 						{...field}
 						value={field.value || ''}
-						label={
-							formState.errors?.firstPlacementRoom?.message || 'Конструкция разделяет'
-						}
+						label={formState.errors?.firstPlacementRoom?.message || 'Первое помещение'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
@@ -142,10 +140,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 						options={RuRoomTypeSelectValues}
 						{...field}
 						value={field.value || ''}
-						label={
-							formState.errors?.secondPlacementRoom?.message ||
-							'Конструкция разделяет'
-						}
+						label={formState.errors?.secondPlacementRoom?.message || 'Второе помещение'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
@@ -153,7 +148,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 						)}
 						placeholder="Выберите второе помещение"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
+						wrapperClassname="w-[182px] shadow-none ring-input-border-primary"
 					/>
 				)}
 			/>
@@ -212,7 +207,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				type="number"
 				max={10}
 			/>
-			{construction === ConstructionType.Wall && (
+			{construction === ConstructionType.Floor && (
 				<Input
 					{...register('noizeImpactIndex')}
 					labelClassName={twMerge(
