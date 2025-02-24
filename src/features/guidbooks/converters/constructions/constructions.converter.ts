@@ -1,4 +1,4 @@
-import {
+import type {
 	ConstructionPosition,
 	ConstructionTypeEnum,
 	CreateConstructionHeaderCommand,
@@ -9,15 +9,21 @@ import {
 	MaterialParametrs,
 	Priority,
 } from '@api-gen';
-import { convertToServerRegionData } from '@core';
+import { convertToClientRegionData, convertToServerRegionData } from '@core';
+import { convertToClientConstructionTypeDto } from '@core/converters/constructionType.converter';
+import { convertToClientIndexTypeData } from '@core/converters/index.converter';
 import {
+	convertToClientPriorityData,
+	convertToServerPriorityData,
+} from '@core/converters/priority.converter';
+import type {
 	ConstructionsAddData,
 	ConstructionsEditData,
 	ConstructionsFilterData,
 	ConstructionTypeTemplate,
 	Region,
 } from '@features';
-import { ConstructionType } from '@features/guidbooks/types/constructions';
+import type { ConstructionType } from '@features/guidbooks/types/constructions';
 
 export const convertToClientConstructionTypesList = (
 	data: CreateConstructionTypeTemplateDto[],
@@ -36,36 +42,38 @@ export const convertToServerConstructionsFilterData = (
 	region: convertToServerRegionData(data.region as Region) || null,
 });
 
-export const convertToClientConstructionsAddData = (
-	data: CreateConstructionHeaderCommand,
-): ConstructionsAddData => ({
-	//id: data.id ?? '',
+export const convertToClientConstructionsAddData = (data: any) => ({
+	...data,
+	id: data.id,
 	name: data.name ?? '',
 	description: data.description ?? '',
-	priority: data.priority ?? '',
+	priority: convertToClientPriorityData(data.priority!)! as string,
 	descriptionSource: data.descriptionSource ?? '',
-	region: data.region ?? '',
-	//constructionType: data.constructionType ?? '',
-	issuer: data.issuerId ?? '',
-	maxHeight: String(data.maxHeight) ?? '',
-	fireResistance: data.fireResistance ?? '',
+	region: convertToClientRegionData(data.region!)! as string,
+	maxHeight: String(data.maxHeight),
+	fireResistance: String(data.fireResistance),
 	propertySource: data.propertySource ?? '',
-	//labRTotal: data.rTotal ?? '',
-	// labIndex: data.labIndex ?? '',
-	// labIndexValue: data.labIndexValue ?? '',
+	labRTotal: data.rTotal ? data.rTotal.join(', ') : '',
+	labIndex: convertToClientIndexTypeData(data.index!)! as string,
+	labIndexValue: String(data.laboratoryIndexValue),
+	constructionType: convertToClientConstructionTypeDto(data.constructionType!)!,
+	constructionTypeObject: convertToClientConstructionType(data.constructionType!)!,
+	laboratoryTestSource: data.laboratoryTestSource ?? '',
+	issuer: data.issuerId ?? '',
 });
 
-export const convertToClientConstructionsEditData = (
-	data: CreateConstructionHeaderCommand,
-): ConstructionsEditData => ({
-	...convertToClientConstructionsAddData(data),
-	comment: data.comment ?? '',
-	estimatedRTotal: data.estimatedRTotal ?? '',
-	estimatedIndex: data.estimatedIndex ?? '',
-	estimatedIndexValue: data.estimatedIndexValue ?? '',
-});
+export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => {
+	return {
+		...convertToClientConstructionsAddData(data),
+		comment: data.notice,
+		estimatedRTotal: data.rw,
+		estimatedIndexValue: data.computingIndexValue,
+	};
+};
 
-export const convertToConstructionType = (data: ConstructionType): CreateConstructionTypeDto => ({
+export const convertToServerConstructionType = (
+	data: ConstructionType,
+): CreateConstructionTypeDto => ({
 	constructionTypeEnum: data.constructionTypeEnum as ConstructionTypeEnum,
 	constructions:
 		data.constructions?.map((construction) => ({
@@ -83,12 +91,32 @@ export const convertToConstructionType = (data: ConstructionType): CreateConstru
 		})) || [],
 });
 
+export const convertToClientConstructionType = (
+	data: CreateConstructionTypeDto,
+): ConstructionType => ({
+	constructionTypeEnum: data.constructionTypeEnum ?? '',
+	constructions:
+		data.constructions?.map((construction) => ({
+			contructionPosition: construction.constructionPosition ?? '',
+			userMaterials:
+				construction.userMaterials?.map((userMaterial) => ({
+					materialId: userMaterial.materialId ?? '',
+					positionId: String(userMaterial.positionId ?? ''),
+					materialTypeValue:
+						userMaterial.materialTypeValue?.map((mtv) => ({
+							value: String(mtv.value ?? ''),
+							materialParameters: String(mtv.materialParametrs ?? ''),
+						})) || [],
+				})) || [],
+		})) || [],
+});
+
 export const convertToServerConstructionsAddData = (
 	data: ConstructionsAddData,
 ): CreateConstructionHeaderCommand => ({
 	name: data.name,
 	description: data.description || null,
-	priority: data.priority as Priority,
+	priority: convertToServerPriorityData(data.priority as Priority),
 	descriptionSource: data.descriptionSource || null,
 	region: convertToServerRegionData(data.region as Region),
 	issuerId: data.issuer || undefined,
@@ -99,15 +127,15 @@ export const convertToServerConstructionsAddData = (
 	index: data.labIndex as IndexType,
 	indexValue: +data.labIndexValue,
 	laboratoryTestSource: data.propertySource,
-	constructionType: convertToConstructionType(data.constructionTypeObject),
+	constructionType: convertToServerConstructionType(data.constructionTypeObject),
 });
 
 export const convertToServerConstructionsEditData = (
 	data: ConstructionsEditData,
 ): CreateConstructionHeaderCommand => ({
 	...convertToServerConstructionsAddData(data),
-	comment: data.comment || null,
-	estimatedRTotal: data.estimatedRTotal || null,
-	estimatedIndex: data.estimatedIndex || null,
-	estimatedIndexValue: data.estimatedIndexValue || null,
+	// comment: data.comment || null,
+	// estimatedRTotal: data.estimatedRTotal || null,
+	// estimatedIndex: data.estimatedIndex || null,
+	// estimatedIndexValue: data.estimatedIndexValue || null,
 });

@@ -1,18 +1,19 @@
-// import { ConstructionType as ServerConstructionType } from '@api-gen';
+import { createDataRecordConverter } from '@core';
+import { ConstructionType as ClientConstructionType } from '@features/guidbooks/types';
 
-// export const constructionTypeMap = createDataRecordConverter({
-// 	[ClientConstructionType.Wall]: ServerConstructionType.Wall,
-// 	[ClientConstructionType.Floor]: ServerConstructionType.Floor,
-// });
+export const constructionTypeMap = createDataRecordConverter({
+	[ClientConstructionType.Wall]: ClientConstructionType.Wall,
+	[ClientConstructionType.Floor]: ClientConstructionType.Floor,
+});
 
-// export const convertToServerConstructionTypeData = (
-// 	type: ClientConstructionType,
-// ): ServerConstructionType => {
-// 	return constructionTypeMap.toServer[type];
-// };
+export const convertToServerConstructionTypeData = (
+	type: ClientConstructionType,
+): ClientConstructionType => {
+	return constructionTypeMap.toServer[type];
+};
 
-// export const convertToClientConstructionTypeData = (
-// 	type: ServerConstructionType,
-// ): ClientConstructionType => {
-// 	return constructionTypeMap.toClient[type];
-// };
+export const convertToClientConstructionTypeData = (
+	type: ClientConstructionType,
+): ClientConstructionType => {
+	return constructionTypeMap.toClient[type];
+};

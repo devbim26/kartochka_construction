@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 const IssuersSchema = z.object({
 	id: z.string().optional(),
-	name: z.string().min(1, 'Поле обязательно для заполнения'),
-	country: z.string().min(1, 'Поле обязательно для заполнения'),
-	logoUrl: z.string().min(1, 'Поле обязательно для заполнения'),
-	webSite: z.string().min(1, 'Поле обязательно для заполнения'),
+	name: z.string().nullable(),
+	country: z.string().nullable(),
+	logoUrl: z.string().nullable(),
+	webSite: z.string().nullable(),
 });
 
 const FormIssuerSchema = z.object({

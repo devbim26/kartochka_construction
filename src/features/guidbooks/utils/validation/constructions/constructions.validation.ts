@@ -36,6 +36,7 @@ export const ConstructionsAddSchema = z.object({
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
 	constructionType: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
+	issuerName: z.string().optional(),
 	maxHeight: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
@@ -58,14 +59,12 @@ export const ConstructionsAddSchema = z.object({
 			const areNumbers = numbers.every((num) => !isNaN(parseFloat(num)) && isFinite(+num));
 			return areNumbers;
 		}, 'Значение должны быть числами'),
-	labIndex: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	labIndex: z.string().min(1, 'Поле обязательно для заполнения'),
 	labIndexValue: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	laboratoryTestSource: z.string().min(1, 'Поле обязательно для заполнения'),
 	constructionTypeObject: ConstructionTypeShema,
 });
 
@@ -73,10 +72,6 @@ export const ConstructionsEditSchema = ConstructionsAddSchema.merge(
 	z.object({
 		comment: z.string(),
 		estimatedRTotal: z.string().min(1, 'Поле обязательно для заполнения'),
-		estimatedIndex: z
-			.string()
-			.min(1, 'Поле обязательно для заполнения')
-			.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
 		estimatedIndexValue: z
 			.string()
 			.min(1, 'Поле обязательно для заполнения')

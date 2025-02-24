@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const MaterialsAddAndEditSchema = z.object({
-	id: z.string(),
+	id: z.string().optional(),
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	shortName: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -17,7 +17,9 @@ export const MaterialsAddAndEditSchema = z.object({
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
 	type: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
-	image: z.string().min(1, 'Поле обязательно для заполнения'),
+	image: z
+		.any()
+		.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),
 	materialCoefficient: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')

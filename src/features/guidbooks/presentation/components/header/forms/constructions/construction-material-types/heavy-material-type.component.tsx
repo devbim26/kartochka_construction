@@ -31,6 +31,7 @@ export const HeavyMaterialType = ({ constructionIndex, fieldIndex }: Props) => {
 		from(
 			getGuidebooksPaginated({
 				data: data,
+				pagination: { pageSize: 999999, pageNumber: 1 },
 				guidebookType: Guidebooks.MATERIAL,
 			}),
 		)
@@ -41,7 +42,7 @@ export const HeavyMaterialType = ({ constructionIndex, fieldIndex }: Props) => {
 					);
 					return from([items]);
 				}),
-				tap((items) => setMaterials(convertToSelectValues(items!)!)),
+				tap((items) => setMaterials(convertToSelectValues(items.items)!)),
 				catchError((error) => {
 					console.log('Error:', error);
 					return from([null]);
@@ -49,7 +50,7 @@ export const HeavyMaterialType = ({ constructionIndex, fieldIndex }: Props) => {
 			)
 			.subscribe();
 	};
-
+	console.log(form.getValues());
 	useEffect(() => {
 		handleGetMaterials({
 			materialType: MaterialTypeEnum.Heavy,

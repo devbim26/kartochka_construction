@@ -22,7 +22,7 @@ export const MaterialsAddAndEditConfig: EntityConfig = {
 		region: '',
 		type: '',
 		issuer: '',
-		image: '',
+		image: undefined,
 		materialCoefficient: '',
 		velocity: '',
 		lossFactor: '',

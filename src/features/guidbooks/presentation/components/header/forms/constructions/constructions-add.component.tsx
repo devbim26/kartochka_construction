@@ -1,12 +1,15 @@
+import { ConstructionPosition, MaterialParametrs } from '@api-gen';
 import { convertToPaginatedType, convertToSelectValues, Input, Select, Switch } from '@core';
-import type { ConstructionsAddData, ConstructionTypeTemplate, Issuer } from '@features';
+import type { ConstructionsAddData, Issuer } from '@features';
 import {
-	convertToClientConstructionTypesList,
+	ConstructionTypeEnum,
 	convertToClientIssuerData,
+	DescriptionFieldNames,
 	FormSubTitle,
-	getGuidebooksConstructionTypes,
 	getGuidebooksPaginated,
 	Guidebooks,
+	RuConstructionConstructionTypeSelectValues,
+	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	RuRegionNamesSelectValues,
 } from '@features';
@@ -15,26 +18,14 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
-import { HeavySingleWallFacingOneSideComponent } from './contruction-type';
 
 export const ConstructionsAdd = () => {
 	const [search] = useSearchParams();
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control, watch } = form;
 	const [displayChars, setDisplayChars] = useState(false);
-	const [constructionTypes, setConstructionTypes] = useState<ConstructionTypeTemplate[]>([]);
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionType');
-
-	const handleGetMaterialTypeData = useCallback(async () => {
-		try {
-			const response = await getGuidebooksConstructionTypes();
-			const items = convertToClientConstructionTypesList(response.data as any);
-			setConstructionTypes(items);
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	}, []);
 
 	const handleGetIssuerData = useCallback(async () => {
 		try {
@@ -45,10 +36,14 @@ export const ConstructionsAdd = () => {
 					logoUrl: null,
 					webSite: null,
 				},
+				pagination: {
+					pageSize: 999999,
+					pageNumber: 1,
+				},
 				guidebookType: Guidebooks.ISSUER,
 			});
 			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
-			setIssuers(items);
+			setIssuers(items.items);
 		} catch (error) {
 			console.log('Error:', error);
 		}
@@ -56,8 +51,84 @@ export const ConstructionsAdd = () => {
 
 	useEffect(() => {
 		handleGetIssuerData();
-		handleGetMaterialTypeData();
 	}, []);
+
+	const ConstructionTypeMap = {
+		[ConstructionTypeEnum.HeavySingleLayerWall]: {
+			component: <HeavySingleWallComponent />,
+			action: () => {
+				console.log(123);
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLayerWall,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
+			component: <HeavySingleWallComponent />,
+			action: () => {
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLayerWall,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
+			component: <HeavySingleWallComponent />,
+			action: () => {
+				console.log(123);
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLayerWall,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+	};
 
 	return (
 		<div className="flex w-full flex-col gap-[16px] px-[25px]">
@@ -65,8 +136,17 @@ export const ConstructionsAdd = () => {
 				onText="Характеристики"
 				offText="Описание"
 				textClassName="font-sans text-[17px] font-normal leading-5 tracking-[0.1px]"
-				offIcon={<IoMdWarning />}
-				onIcon={<IoMdWarning />}
+				offIcon={
+					Object.keys(formState.errors).some((key) =>
+						DescriptionFieldNames.includes(key),
+					) && <IoMdWarning />
+				}
+				onIcon={
+					!Object.keys(formState.errors).some((key) =>
+						DescriptionFieldNames.includes(key),
+					) &&
+					!!Object.keys(formState.errors).length && <IoMdWarning />
+				}
 				wrapperClassName="h-[30px] w-[400px] self-center p-[3px] bg-primary"
 				onChange={() => setDisplayChars(!displayChars)}
 			/>
@@ -235,18 +315,25 @@ export const ConstructionsAdd = () => {
 							{...form.register('labRTotal')}
 							type={'text'}
 						/>
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.labIndex?.message ? 'text-error' : '',
+						<Controller
+							name="labIndex"
+							control={control}
+							render={({ field }) => (
+								<Select
+									{...field}
+									value={field.value || ''}
+									options={RuIndexTypeNamesSelectValues}
+									error={formState.errors.labIndex?.message}
+									labelClassName={twMerge(
+										'text-sm leading-5 tracking-[0.1px]',
+										formState.errors.labIndex?.message ? 'text-error' : '',
+									)}
+									wrapperClassname="w-[226px] ring-input-border-primary"
+									buttonClassName="text-sm rounded-[8px]"
+									label={formState.errors.labIndex?.message || 'Индекс'}
+									placeholder="Выберите индекс"
+								/>
 							)}
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={formState.errors.labIndex?.message || 'Индекс'}
-							error={formState.errors.labIndex?.message}
-							placeholder="Введите индекс"
-							{...form.register('labIndex')}
-							type={'number'}
 						/>
 						<Input
 							labelClassName={twMerge(
@@ -261,6 +348,19 @@ export const ConstructionsAdd = () => {
 							{...form.register('labIndexValue')}
 							type={'number'}
 						/>
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.propertySource?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[226px]"
+							label={formState.errors.propertySource?.message || 'Источник'}
+							error={formState.errors.propertySource?.message}
+							placeholder="Введите источник"
+							{...form.register('laboratoryTestSource')}
+							type={'text'}
+						/>
 					</div>
 				</>
 			) : (
@@ -273,10 +373,12 @@ export const ConstructionsAdd = () => {
 							<Select
 								{...field}
 								value={field.value || ''}
-								options={constructionTypes.map((data) => ({
-									label: data.name ?? '',
-									value: data.constructionTypeTemplateId ?? '',
-								}))}
+								onChange={(value) => {
+									form.setValue('constructionType', value as string);
+									if (value)
+										ConstructionTypeMap[value as ConstructionTypeEnum].action();
+								}}
+								options={RuConstructionConstructionTypeSelectValues}
 								error={formState.errors.constructionType?.message}
 								labelClassName={twMerge(
 									'text-sm leading-5 tracking-[0.1px]',
@@ -289,7 +391,11 @@ export const ConstructionsAdd = () => {
 							/>
 						)}
 					/>
-					<HeavySingleWallFacingOneSideComponent />
+					{currentConstruction ? (
+						ConstructionTypeMap[currentConstruction as ConstructionTypeEnum].component
+					) : (
+						<></>
+					)}
 				</>
 			)}
 		</div>

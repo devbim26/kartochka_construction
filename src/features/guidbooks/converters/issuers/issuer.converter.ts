@@ -1,7 +1,7 @@
 import type { IssuerDto } from '@api-gen';
 import { countryMap } from '@core';
-import type { FormIssuer, Issuer } from '@features/guidbooks/types';
-import { Country as ClientCountry } from '@features/guidbooks/types';
+
+import { Country as ClientCountry, FilterIssuer, Issuer } from '@features/guidbooks/types';
 
 export const convertToServerIssuerData = (data: Issuer) => ({
 	...data,
@@ -11,7 +11,7 @@ export const convertToServerIssuerData = (data: Issuer) => ({
 	webSite: data.webSite || null,
 });
 
-export const convertToClientIssuerData = (data: IssuerDto): FormIssuer => ({
+export const convertToClientIssuerData = (data: IssuerDto): FilterIssuer => ({
 	...data,
 	name: data.name ?? '',
 	country: data.country ? countryMap.toClient[data.country] : ClientCountry.None,

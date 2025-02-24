@@ -2,11 +2,12 @@ import {
 	convertToPaginatedType,
 	DeleteIcon,
 	EditIcon,
-	mapColumns,
+	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	type PaginationState,
 } from '@core';
 import type {
 	ConstructionsAddData,
@@ -43,16 +44,23 @@ const ConstructionsScreen = () => {
 	const [search] = useSearchParams();
 	const [singleMaterial, setSingleMaterial] = useState<ConstructionsEditData>();
 	const [tableData, setTableData] = useState<ConstructionsAddData[]>([]);
+	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
 
-	const createColumns = (data: ConstructionsAddData[]): ColumnDef<ConstructionsAddData>[] => {
-		if (!data) return [];
-		const columns: ColumnDef<ConstructionsAddData>[] = [
-			{
-				accessorKey: 'id',
-				header: () => <SimpleTableHeaderCell text="ID" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
-			},
-			//изображение
+	const forms = useHeaderForm(
+		{
+			filter: ConstructionsFilterConfig.defaultValues,
+			edit: ConstructionsEditConfig.defaultValues,
+			add: ConstructionsAddConfig.defaultValues,
+		},
+		{
+			filter: ConstructionsFilterConfig.schema,
+			edit: ConstructionsEditConfig.schema,
+			add: ConstructionsAddConfig.schema,
+		},
+	);
+
+	const columns = useMemo(() => {
+		const cols: ColumnDef<ConstructionsAddData>[] = [
 			{
 				accessorKey: 'name',
 				header: () => <SimpleTableHeaderCell text="Название" />,
@@ -74,7 +82,7 @@ const ConstructionsScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				accessorKey: 'issuer',
+				accessorKey: 'issuerName',
 				header: () => <SimpleTableHeaderCell text="Производитель" />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
@@ -89,7 +97,7 @@ const ConstructionsScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				accessorKey: 'actions',
+				accessorKey: 'id',
 				header: () => <SimpleTableHeaderCell text="Действия" />,
 				cell: (info) => {
 					const entityId = info.row.original.id;
@@ -114,41 +122,34 @@ const ConstructionsScreen = () => {
 				},
 			},
 		];
-		return mapColumns(columns);
-	};
-
-	const forms = useHeaderForm(
-		{
-			filter: ConstructionsFilterConfig.defaultValues,
-			edit: ConstructionsEditConfig.defaultValues,
-			add: ConstructionsAddConfig.defaultValues,
-		},
-		{
-			filter: ConstructionsFilterConfig.schema,
-			edit: ConstructionsEditConfig.schema,
-			add: ConstructionsAddConfig.schema,
-		},
-	);
-
-	const columns = useMemo(() => createColumns(tableData), [tableData]);
+		return cols;
+	}, []);
 
 	const [filterName, filterConstructionTypeId, filterDescription, filterRegion] =
 		forms.filterForm.watch(['name', 'constructionTypeId', 'description', 'region']);
 
 	useEffect(() => {
-		handleGetTableData(forms.filterForm.getValues() as ConstructionsFilterData);
+		handleGetTableData(
+			forms.filterForm.getValues() as ConstructionsFilterData,
+			paginationState,
+		);
 	}, [filterName, filterConstructionTypeId, filterDescription, filterRegion]);
 
-	const handleGetTableData = async (data: ConstructionsFilterData) => {
+	const handleGetTableData = async (
+		data: ConstructionsFilterData,
+		pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>,
+	) => {
 		try {
 			const response = await getGuidebooksPaginated({
 				data: convertToServerConstructionsFilterData(data),
 				guidebookType: Guidebooks.CONSTRUCTION,
+				pagination,
 			});
-			const items = convertToPaginatedType(convertToClientConstructionsAddData)(
+			const res = convertToPaginatedType(convertToClientConstructionsAddData)(
 				response.data as any,
 			);
-			setTableData(items);
+			setTableData(res.items);
+			setPaginationState(res.pagination);
 		} catch (error) {
 			console.log('Error:', error);
 		}
@@ -176,7 +177,10 @@ const ConstructionsScreen = () => {
 				guidebookType: Guidebooks.CONSTRUCTION,
 			});
 			if (response.status === 200) {
-				handleGetTableData(forms.filterForm.getValues() as ConstructionsFilterData);
+				handleGetTableData(
+					forms.filterForm.getValues() as ConstructionsFilterData,
+					paginationState,
+				);
 			}
 		} catch (error) {
 			console.log('Error:', error);
@@ -190,7 +194,10 @@ const ConstructionsScreen = () => {
 				guidebookType: Guidebooks.CONSTRUCTION,
 			});
 			if (response.status === 200) {
-				handleGetTableData(forms.filterForm.getValues() as ConstructionsFilterData);
+				handleGetTableData(
+					forms.filterForm.getValues() as ConstructionsFilterData,
+					paginationState,
+				);
 			}
 		} catch (error) {
 			console.log(error);
@@ -204,7 +211,10 @@ const ConstructionsScreen = () => {
 				guidebookType: Guidebooks.CONSTRUCTION,
 			});
 			if (response.status === 200) {
-				handleGetTableData(forms.filterForm.getValues() as ConstructionsFilterData);
+				handleGetTableData(
+					forms.filterForm.getValues() as ConstructionsFilterData,
+					paginationState,
+				);
 			}
 		} catch (error) {
 			console.log('Error:', error);
@@ -245,7 +255,19 @@ const ConstructionsScreen = () => {
 					edit: ConstructionsEdit,
 				}}
 			/>
-			{!!tableData.length && <SimpleTable pageSize={10} data={tableData} columns={columns} />}
+			{!!tableData.length && (
+				<SimpleTable
+					data={tableData}
+					columns={columns}
+					paginationState={paginationState}
+					onChangePaginationState={(newState) => {
+						handleGetTableData(
+							forms.filterForm.getValues() as ConstructionsFilterData,
+							newState,
+						);
+					}}
+				/>
+			)}
 		</div>
 	);
 };

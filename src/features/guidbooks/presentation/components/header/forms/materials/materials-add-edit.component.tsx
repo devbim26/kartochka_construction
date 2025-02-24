@@ -1,7 +1,6 @@
-import { convertToBase64, Input, Select, useAppDispatch } from '@core';
+import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
 import { convertToPaginatedType, convertToSelectValues } from '@core/converters';
 import {
-	fileUpload,
 	FormSubTitle,
 	getGuidebooksPaginated,
 	Guidebooks,
@@ -27,17 +26,13 @@ export const MaterialsAddAndEdit = () => {
 	const handleGetIssuerData = useCallback(async () => {
 		try {
 			const response = await getGuidebooksPaginated({
-				data: {
-					name: null,
-					country: null,
-					logoUrl: null,
-					webSite: null,
-				},
+				data: { name: null, country: null, logoUrl: null, webSite: null },
 				guidebookType: Guidebooks.ISSUER,
+				pagination: { pageNumber: 1, pageSize: 99999 },
 			});
 
-			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
-			setIssuerData(items);
+			const resData = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
+			setIssuerData(resData.items);
 		} catch (error) {
 			console.log('Error:', error);
 		}
@@ -52,18 +47,12 @@ export const MaterialsAddAndEdit = () => {
 		if (file) {
 			try {
 				const base64 = await convertToBase64(file);
-				const fileData = await file.arrayBuffer();
 				if (base64 && typeof base64 === 'string') {
-					setValue('image', file.name);
+					setValue('image', file);
 					setPreview(base64);
-					dispatch(
-						fileUpload({
-							data: { mimeType: file.type, isPublic: true },
-							file: fileData,
-						}),
-					);
 					setUploadError(false);
 				}
+				form.trigger('image');
 			} catch (error) {
 				setUploadError(true);
 			}
@@ -223,14 +212,14 @@ export const MaterialsAddAndEdit = () => {
 						/>
 					)}
 				/>
-				{/* <div className="relative flex items-start gap-4">
+				<div className="relative flex items-start gap-4">
 					<div className="flex flex-col gap-y-2">
 						<FormElementLabel
 							className={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 								formState.errors.image?.message ? 'text-error' : '',
 							)}
-							errorMessage={formState.errors.image?.message}
+							errorMessage={formState.errors.image?.message?.toString()}
 						>
 							Логотип
 						</FormElementLabel>
@@ -265,7 +254,7 @@ export const MaterialsAddAndEdit = () => {
 							/>
 						</div>
 					)}
-				</div> */}
+				</div>
 			</div>
 			<FormSubTitle text="Физические свойства" />
 			<div className="flex flex-wrap gap-[16px]">
