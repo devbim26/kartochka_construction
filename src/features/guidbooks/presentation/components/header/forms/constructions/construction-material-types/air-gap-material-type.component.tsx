@@ -1,13 +1,13 @@
-import { convertToPaginatedType, convertToSelectValues, Select, SelectOption } from '@core';
+import { MaterialTypeEnum } from '@api-gen';
+import type { SelectOption } from '@core';
+import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
+import type { ConstructionsAddData, MaterialsFilterData } from '@features';
 import {
-	ConstructionsAddData,
 	convertToClientMaterialsAddAndEditData,
 	getGuidebooksPaginated,
 	Guidebooks,
-	MaterialsFilterData,
-	MaterialTypeEnum,
 } from '@features';
-import { AxiosResponse } from 'axios';
+import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
@@ -27,6 +27,7 @@ export const AirGapMaterialType = ({ fieldIndex, constructionIndex }: Props) => 
 		from(
 			getGuidebooksPaginated({
 				data: data,
+				pagination: { pageSize: 999999, pageNumber: 1 },
 				guidebookType: Guidebooks.MATERIAL,
 			}),
 		)
@@ -37,7 +38,7 @@ export const AirGapMaterialType = ({ fieldIndex, constructionIndex }: Props) => 
 					);
 					return from([items]);
 				}),
-				tap((items) => setMaterials(convertToSelectValues(items!)!)),
+				tap((items) => setMaterials(convertToSelectValues(items.items!)!)),
 				catchError((error) => {
 					console.log('Error:', error);
 					return from([null]);
@@ -63,25 +64,24 @@ export const AirGapMaterialType = ({ fieldIndex, constructionIndex }: Props) => 
 						value={field.value || ''}
 						options={materials || []}
 						error={
-							formState.errors.constructionTypeObject?.constructions?.[
+							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
+							]?.userMaterials?.[fieldIndex]?.materialId?.message
 						}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
-							formState.errors.constructionTypeObject?.constructions?.[
+							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
+							]?.userMaterials?.[fieldIndex]?.materialId?.message
 								? 'text-error'
 								: '',
 						)}
 						wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
 						buttonClassName="text-sm rounded-[8px] w-[226px]"
 						label={
-							formState.errors.constructionTypeObject?.constructions?.[
+							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value
-								?.message || 'Воздушный зазор'
+							]?.userMaterials?.[fieldIndex]?.materialId?.message || 'Воздушный зазор'
 						}
 						placeholder="Выберите материал"
 					/>

@@ -20,7 +20,7 @@ export const ConstructionLayer = ({
 				<p className="font-sans text-sm font-bold leading-5">{title}</p>
 				{isRemovable && <DeleteIcon onClick={onDeleteClick || (() => void 0)} />}
 			</div>
-			<div className="flex flex-col gap-[16px] py-[16px]">{children}</div>
+			<div className="flex flex-col gap-[16px] pt-[16px]">{children}</div>
 		</div>
 	);
 };

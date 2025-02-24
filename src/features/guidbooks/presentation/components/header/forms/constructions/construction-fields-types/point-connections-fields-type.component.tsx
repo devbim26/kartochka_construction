@@ -1,11 +1,16 @@
 import { Input } from '@core';
-import type { PointConnectionsFieldsTypeData } from '@features';
+import type { ConstructionsAddData } from '@features';
 
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
-export const PointConnectionsFieldsType = () => {
-	const form = useFormContext<PointConnectionsFieldsTypeData>();
+type Props = {
+	fieldIndex: number;
+	constructionIndex: number;
+};
+
+export const PointConnectionsFieldsType = ({ fieldIndex, constructionIndex }: Props) => {
+	const form = useFormContext<ConstructionsAddData>();
 	const { formState } = form;
 
 	return (
@@ -13,17 +18,26 @@ export const PointConnectionsFieldsType = () => {
 			<Input
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
-					formState.errors.pointConnections?.message ? 'text-error' : '',
+					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
+						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
+						? 'text-error'
+						: '',
 				)}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] w-[78px]"
 				wrapperClassName="flex-row items-center gap-[16px]"
 				label={
-					formState.errors.pointConnections?.message ||
+					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
+						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message ||
 					'Количество точечных связей, шт/м²'
 				}
-				error={formState.errors.pointConnections?.message}
+				error={
+					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
+						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
+				}
 				placeholder="Введите количество"
-				{...form.register('pointConnections')}
+				{...form.register(
+					`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`,
+				)}
 				type={'number'}
 			/>
 		</div>

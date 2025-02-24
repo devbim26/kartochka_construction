@@ -1,4 +1,14 @@
-import { Select } from '@core';
+import { MaterialTypeEnum } from '@api-gen';
+import type { SelectOption } from '@core';
+import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
+import type { ConstructionsAddData, MaterialsFilterData } from '@features';
+import {
+	convertToClientMaterialsAddAndEditData,
+	getGuidebooksPaginated,
+	Guidebooks,
+} from '@features';
+import type { AxiosResponse } from 'axios';
+import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
@@ -17,6 +27,7 @@ export const FrameMaterialType = ({ fieldIndex, constructionIndex }: Props) => {
 		from(
 			getGuidebooksPaginated({
 				data: data,
+				pagination: { pageSize: 999999, pageNumber: 1 },
 				guidebookType: Guidebooks.MATERIAL,
 			}),
 		)
@@ -27,7 +38,7 @@ export const FrameMaterialType = ({ fieldIndex, constructionIndex }: Props) => {
 					);
 					return from([items]);
 				}),
-				tap((items) => setMaterials(convertToSelectValues(items!)!)),
+				tap((items) => setMaterials(convertToSelectValues(items.items!)!)),
 				catchError((error) => {
 					console.log('Error:', error);
 					return from([null]);
@@ -51,27 +62,26 @@ export const FrameMaterialType = ({ fieldIndex, constructionIndex }: Props) => {
 					<Select
 						{...field}
 						value={field.value || ''}
-						options={[]}
+						options={materials || []}
 						error={
-							formState.errors.constructionTypeObject?.constructions?.[
+							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
+							]?.userMaterials?.[fieldIndex]?.materialId?.message
 						}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
-							formState.errors.constructionTypeObject?.constructions?.[
+							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
+							]?.userMaterials?.[fieldIndex]?.materialId?.message
 								? 'text-error'
 								: '',
 						)}
 						wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
 						buttonClassName="text-sm rounded-[8px] w-[226px]"
 						label={
-							formState.errors.constructionTypeObject?.constructions?.[
+							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value
-								?.message || 'Каркас'
+							]?.userMaterials?.[fieldIndex]?.materialId?.message || 'Каркас'
 						}
 						placeholder="Выберите материал"
 					/>

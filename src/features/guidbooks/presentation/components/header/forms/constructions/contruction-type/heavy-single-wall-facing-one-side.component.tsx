@@ -1,15 +1,21 @@
-import { ConstructionPosition, ConstructionTypeEnum, MaterialParametrs } from '@api-gen';
+import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
-import { ConstructionLayer, type ConstructionsAddData } from '@features';
+import {
+	AirGapMaterialType,
+	ConstructionLayer,
+	FillerMaterialType,
+	FrameMaterialType,
+	HeavyMaterialType,
+	LinkMaterialType,
+	PointConnectionsFieldsType,
+	SelectableMaterialType,
+	ThicknessDensityFieldsType,
+	WidthRacksStepFieldsType,
+	type ConstructionsAddData,
+} from '@features';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
-import { ThicknessDensityFieldsType } from '../construction-fields-types';
-import {
-	AirGapMaterialType,
-	FrameMaterialType,
-	HeavyMaterialType,
-} from '../construction-material-types';
 
 export const HeavySingleWallFacingOneSideComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
@@ -23,50 +29,10 @@ export const HeavySingleWallFacingOneSideComponent = () => {
 		zeroIndex: -1,
 		oneIndex: -1,
 		twoIndex: -1,
+		threeIndex: -1,
+		fourIndex: -1,
+		fiveIndex: -1,
 	});
-
-	useEffect(() => {
-		form.setValue(
-			'constructionTypeObject.constructionTypeEnum',
-			ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
-		);
-		form.setValue('constructionTypeObject.constructions', [
-			{
-				contructionPosition: ConstructionPosition.Left,
-				userMaterials: [
-					{
-						positionId: '0',
-						materialId: '',
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				],
-			},
-			{
-				contructionPosition: ConstructionPosition.Center,
-				userMaterials: [
-					{
-						positionId: '0',
-						materialId: '',
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '1',
-						materialId: '',
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				],
-			},
-		]);
-	}, []);
 
 	const baseConstructionUserMaterials = form.watch(
 		'constructionTypeObject.constructions.0.userMaterials',
@@ -83,6 +49,9 @@ export const HeavySingleWallFacingOneSideComponent = () => {
 			zeroIndex: facingUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
 			oneIndex: facingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
 			twoIndex: facingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
+			threeIndex: facingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
+			fourIndex: facingUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
+			fiveIndex: facingUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
 		});
 	}, [
 		baseConstructionUserMaterials,
@@ -216,38 +185,67 @@ export const HeavySingleWallFacingOneSideComponent = () => {
 					</>
 				)}
 			</ConstructionLayer>
+
 			<ConstructionLayer title="2. Облицовка">
 				{facingIndices.zeroIndex >= 0 && (
-					<>
-						<div className="flex flex-row gap-[16px]">
-							<AirGapMaterialType
-								fieldIndex={facingIndices.zeroIndex}
-								constructionIndex={1}
-							/>
-							<ThicknessDensityFieldsType
-								fieldIndex={facingIndices.zeroIndex}
-								constructionIndex={1}
-							/>
-						</div>
-						<div className="flex flex-row gap-[16px]">
-							<FrameMaterialType
-								fieldIndex={facingIndices.oneIndex}
-								constructionIndex={1}
-							/>
-							<ThicknessDensityFieldsType
-								fieldIndex={facingIndices.oneIndex}
-								constructionIndex={1}
-							/>
-						</div>
-					</>
+					<div className="flex flex-row gap-[16px]">
+						<AirGapMaterialType
+							fieldIndex={facingIndices.zeroIndex}
+							constructionIndex={1}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={facingIndices.zeroIndex}
+							constructionIndex={1}
+						/>
+					</div>
 				)}
-				{facingIndices.oneIndex < 0 ? (
+
+				{facingIndices.oneIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<FrameMaterialType
+							fieldIndex={facingIndices.oneIndex}
+							constructionIndex={1}
+						/>
+						<WidthRacksStepFieldsType
+							fieldIndex={facingIndices.oneIndex}
+							constructionIndex={1}
+						/>
+					</div>
+				)}
+
+				{facingIndices.twoIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<FillerMaterialType
+							fieldIndex={facingIndices.twoIndex}
+							constructionIndex={1}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={facingIndices.zeroIndex}
+							constructionIndex={1}
+						/>
+					</div>
+				)}
+
+				{facingIndices.threeIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<LinkMaterialType
+							fieldIndex={facingIndices.threeIndex}
+							constructionIndex={1}
+						/>
+						<PointConnectionsFieldsType
+							fieldIndex={facingIndices.threeIndex}
+							constructionIndex={1}
+						/>
+					</div>
+				)}
+
+				{facingIndices.fourIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
 								...(facingUserMaterials || []),
 								{
-									positionId: '1',
+									positionId: '4',
 									materialId: '',
 									materialTypeValue: [
 										{
@@ -266,15 +264,15 @@ export const HeavySingleWallFacingOneSideComponent = () => {
 					/>
 				) : (
 					<>
-						{facingIndices.oneIndex >= 0 && (
+						{facingIndices.fourIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
-									<HeavyMaterialType
-										fieldIndex={facingIndices.oneIndex}
+									<SelectableMaterialType
+										fieldIndex={facingIndices.fourIndex}
 										constructionIndex={1}
 									/>
 									<ThicknessDensityFieldsType
-										fieldIndex={facingIndices.oneIndex}
+										fieldIndex={facingIndices.fourIndex}
 										constructionIndex={1}
 									/>
 								</div>
@@ -285,7 +283,7 @@ export const HeavySingleWallFacingOneSideComponent = () => {
 											'constructionTypeObject.constructions.1.userMaterials',
 											(facingUserMaterials &&
 												facingUserMaterials.filter(
-													(c) => c.positionId !== '1',
+													(c) => c.positionId !== '4',
 												)) ||
 												[],
 										);
@@ -295,13 +293,13 @@ export const HeavySingleWallFacingOneSideComponent = () => {
 						)}
 					</>
 				)}
-				{facingIndices.twoIndex < 0 && facingIndices.oneIndex > 0 ? (
+				{facingIndices.fiveIndex < 0 && facingIndices.fourIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
 								...(facingUserMaterials || []),
 								{
-									positionId: '2',
+									positionId: '5',
 									materialId: '',
 									materialTypeValue: [
 										{
@@ -320,15 +318,15 @@ export const HeavySingleWallFacingOneSideComponent = () => {
 					/>
 				) : (
 					<>
-						{facingIndices.twoIndex >= 0 && (
+						{facingIndices.fiveIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
-									<HeavyMaterialType
-										fieldIndex={facingIndices.twoIndex}
+									<SelectableMaterialType
+										fieldIndex={facingIndices.fiveIndex}
 										constructionIndex={1}
 									/>
 									<ThicknessDensityFieldsType
-										fieldIndex={facingIndices.twoIndex}
+										fieldIndex={facingIndices.fiveIndex}
 										constructionIndex={1}
 									/>
 								</div>
@@ -339,7 +337,7 @@ export const HeavySingleWallFacingOneSideComponent = () => {
 											'constructionTypeObject.constructions.1.userMaterials',
 											(facingUserMaterials &&
 												facingUserMaterials.filter(
-													(c) => c.positionId !== '2',
+													(c) => c.positionId !== '5',
 												)) ||
 												[],
 										);

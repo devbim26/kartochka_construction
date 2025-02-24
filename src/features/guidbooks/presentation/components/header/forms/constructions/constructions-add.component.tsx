@@ -16,11 +16,13 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
-import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+import {
+	HeavySingleWallComponent,
+	HeavySingleWallFacingOneSideComponent,
+} from './contruction-type';
 
 export const ConstructionsAdd = () => {
-	const [search] = useSearchParams();
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control, watch } = form;
 	const [displayChars, setDisplayChars] = useState(false);
@@ -57,7 +59,6 @@ export const ConstructionsAdd = () => {
 		[ConstructionTypeEnum.HeavySingleLayerWall]: {
 			component: <HeavySingleWallComponent />,
 			action: () => {
-				console.log(123);
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWall,
@@ -80,11 +81,11 @@ export const ConstructionsAdd = () => {
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
-			component: <HeavySingleWallComponent />,
+			component: <HeavySingleWallFacingOneSideComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLayerWall,
+					ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
@@ -96,6 +97,45 @@ export const ConstructionsAdd = () => {
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
 								],
 							},
 						],
