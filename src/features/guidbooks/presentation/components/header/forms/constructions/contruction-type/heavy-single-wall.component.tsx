@@ -1,6 +1,6 @@
 import { ConstructionPosition, ConstructionTypeEnum, MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
-import { type ConstructionsAddData } from '@features/guidbooks';
+import { ConstructionLayer, type ConstructionsAddData } from '@features';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
@@ -41,9 +41,6 @@ export const HeavySingleWallComponent = () => {
 	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
 
 	useEffect(() => {
-		console.log(userMaterials);
-		console.log(userMaterials?.findIndex((c) => c.positionId === '1'));
-
 		setIndices({
 			zeroIndex: userMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
 			oneIndex: userMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
@@ -51,133 +48,121 @@ export const HeavySingleWallComponent = () => {
 		});
 	}, [userMaterials, form.watch('constructionTypeObject.constructions')]);
 
-	console.log(form.getValues());
-
-	console.log(form.formState.errors);
-
 	return (
-		<div className="flex flex-col">
-			<div className="flex flex-col gap-[18px]">
-				<div className="font-bold">1. Базовая конструкция</div>
-				{indices.zeroIndex < 0 ? (
-					<AiOutlinePlusCircle
-						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
-								...(userMaterials || []),
-								{
-									positionId: '0',
-									materialId: '',
-									materialTypeValue: [
-										{
-											materialParameters: MaterialParametrs.Thickness,
-											value: '',
-										},
-										{
-											materialParameters: MaterialParametrs.Density,
-											value: '',
-										},
-									],
-								},
-							]);
-						}}
-						className="size-[40px] self-center text-primary"
-					/>
-				) : (
-					<>
-						{indices.zeroIndex >= 0 && (
-							<div className="flex justify-between">
-								<div className="flex gap-[20px]">
-									<HeavyMaterialType
-										fieldIndex={indices.zeroIndex}
-										constructionIndex={0}
-									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={indices.zeroIndex}
-										constructionIndex={0}
-									/>
-								</div>
-								<DeleteIcon
-									className="self-end"
-									onClick={() => {
-										form.setValue(
-											'constructionTypeObject.constructions.0.userMaterials',
-											(userMaterials &&
-												userMaterials.filter(
-													(c) => c.positionId !== '0',
-												)) ||
-												[],
-										);
-									}}
+		<ConstructionLayer title="1. Базовая конструкция">
+			{indices.zeroIndex < 0 ? (
+				<AiOutlinePlusCircle
+					onClick={() => {
+						form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+							...(userMaterials || []),
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.Thickness,
+										value: '',
+									},
+									{
+										materialParameters: MaterialParametrs.Density,
+										value: '',
+									},
+								],
+							},
+						]);
+					}}
+					className="size-[40px] self-center text-primary"
+				/>
+			) : (
+				<>
+					{indices.zeroIndex >= 0 && (
+						<div className="flex justify-between">
+							<div className="flex gap-[20px]">
+								<HeavyMaterialType
+									fieldIndex={indices.zeroIndex}
+									constructionIndex={0}
+								/>
+								<ThicknessDensityFieldsType
+									fieldIndex={indices.zeroIndex}
+									constructionIndex={0}
 								/>
 							</div>
-						)}
-					</>
-				)}
-				{indices.oneIndex >= 0 && (
-					<div className="flex gap-[20px]">
-						<HeavyMaterialType fieldIndex={indices.oneIndex} constructionIndex={0} />
-						<ThicknessDensityFieldsType
-							fieldIndex={indices.oneIndex}
-							constructionIndex={0}
-						/>
-					</div>
-				)}
-				{indices.twoIndex < 0 ? (
-					<AiOutlinePlusCircle
-						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
-								...(userMaterials || []),
-								{
-									positionId: '2',
-									materialId: '',
-									materialTypeValue: [
-										{
-											materialParameters: MaterialParametrs.Thickness,
-											value: '',
-										},
-										{
-											materialParameters: MaterialParametrs.Density,
-											value: '',
-										},
-									],
-								},
-							]);
-						}}
-						className="size-[40px] self-center text-primary"
+							<DeleteIcon
+								className="self-end"
+								onClick={() => {
+									form.setValue(
+										'constructionTypeObject.constructions.0.userMaterials',
+										(userMaterials &&
+											userMaterials.filter((c) => c.positionId !== '0')) ||
+											[],
+									);
+								}}
+							/>
+						</div>
+					)}
+				</>
+			)}
+			{indices.oneIndex >= 0 && (
+				<div className="flex gap-[20px]">
+					<HeavyMaterialType fieldIndex={indices.oneIndex} constructionIndex={0} />
+					<ThicknessDensityFieldsType
+						fieldIndex={indices.oneIndex}
+						constructionIndex={0}
 					/>
-				) : (
-					<>
-						{indices.twoIndex >= 0 && (
-							<div className="flex justify-between">
-								<div className="flex gap-[20px]">
-									<HeavyMaterialType
-										fieldIndex={indices.twoIndex}
-										constructionIndex={0}
-									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={indices.twoIndex}
-										constructionIndex={0}
-									/>
-								</div>
-								<DeleteIcon
-									className="self-end"
-									onClick={() => {
-										form.setValue(
-											'constructionTypeObject.constructions.0.userMaterials',
-											(userMaterials &&
-												userMaterials.filter(
-													(c) => c.positionId !== '2',
-												)) ||
-												[],
-										);
-									}}
+				</div>
+			)}
+			{indices.twoIndex < 0 ? (
+				<AiOutlinePlusCircle
+					onClick={() => {
+						form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+							...(userMaterials || []),
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.Thickness,
+										value: '',
+									},
+									{
+										materialParameters: MaterialParametrs.Density,
+										value: '',
+									},
+								],
+							},
+						]);
+					}}
+					className="size-[40px] self-center text-primary"
+				/>
+			) : (
+				<>
+					{indices.twoIndex >= 0 && (
+						<div className="flex justify-between">
+							<div className="flex gap-[20px]">
+								<HeavyMaterialType
+									fieldIndex={indices.twoIndex}
+									constructionIndex={0}
+								/>
+								<ThicknessDensityFieldsType
+									fieldIndex={indices.twoIndex}
+									constructionIndex={0}
 								/>
 							</div>
-						)}
-					</>
-				)}
-			</div>
-			<div></div>
-		</div>
+							<DeleteIcon
+								className="self-end"
+								onClick={() => {
+									form.setValue(
+										'constructionTypeObject.constructions.0.userMaterials',
+										(userMaterials &&
+											userMaterials.filter((c) => c.positionId !== '2')) ||
+											[],
+									);
+								}}
+							/>
+						</div>
+					)}
+				</>
+			)}
+		</ConstructionLayer>
 	);
 };

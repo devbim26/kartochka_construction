@@ -15,7 +15,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
-import { HeavySingleWallComponent } from './contruction-type';
+import { HeavySingleWallFacingOneSideComponent } from './contruction-type';
 
 export const ConstructionsAdd = () => {
 	const [search] = useSearchParams();
@@ -289,7 +289,7 @@ export const ConstructionsAdd = () => {
 							/>
 						)}
 					/>
-					<HeavySingleWallComponent />
+					<HeavySingleWallFacingOneSideComponent />
 				</>
 			)}
 		</div>
