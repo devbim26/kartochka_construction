@@ -106,7 +106,7 @@ module.exports = {
 		compress: true,
 		open: ['/landing'],
 		hot: true,
-		port: 443,
+		port: 3000,
 		historyApiFallback: true,
 		client: {
 			logging: 'error',
