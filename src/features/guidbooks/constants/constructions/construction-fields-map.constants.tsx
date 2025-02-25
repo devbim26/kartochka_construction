@@ -49,6 +49,17 @@ export const ConstructionFieldsMap = ({ materialType, fieldIndex, constructionIn
 				constructionIndex={constructionIndex}
 			/>
 		),
+		[MaterialTypeEnum.AcousticTreatmentMaterials]: <></>,
+		[MaterialTypeEnum.FoamMaterials]: <></>,
+		[MaterialTypeEnum.Glazing]: <></>,
+		[MaterialTypeEnum.GypsumBondedbBoards]: <></>,
+		[MaterialTypeEnum.WoodBasedBoard]: <></>,
+		[MaterialTypeEnum.Metal]: <></>,
+		[MaterialTypeEnum.MasonryAndSolid]: <></>,
+		[MaterialTypeEnum.PorousMaterials]: <></>,
+		[MaterialTypeEnum.SandwichPanel]: <></>,
+		[MaterialTypeEnum.MineralBondedBoards]: <></>,
+		[MaterialTypeEnum.Membrane]: <></>,
 	};
 
 	return componentsMap[materialType] || <></>;

@@ -1,11 +1,12 @@
-import { MaterialTypeEnum } from '@api-gen';
 import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
 import type { ConstructionsAddData, MaterialsFilterData } from '@features';
 import {
+	ConstructionFieldsMap,
 	convertToClientMaterialsAddAndEditData,
 	getGuidebooksPaginated,
 	Guidebooks,
+	RuMaterialTypesSelectValues,
 } from '@features';
 import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
@@ -20,9 +21,11 @@ interface Props {
 
 export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
-	const { formState, control } = form;
+	const { formState, control, watch } = form;
 	const [materials, setMaterials] = useState<Array<SelectOption>>();
-	//const [materialTypes, setMaterialTypes] = useState<Array<SelectOption>>();
+	const currentMaterialType = watch(
+		`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`,
+	);
 
 	const handleGetMaterials = (data: MaterialsFilterData) => {
 		from(
@@ -50,9 +53,10 @@ export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props)
 
 	useEffect(() => {
 		handleGetMaterials({
-			materialType: MaterialTypeEnum.Frame,
+			materialType: currentMaterialType,
 		});
-	}, []);
+		console.log(currentMaterialType);
+	}, [currentMaterialType]);
 
 	return (
 		<div className="flex flex-wrap gap-[16px]">
@@ -63,17 +67,17 @@ export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props)
 					<Select
 						{...field}
 						value={field.value || ''}
-						options={materials || []}
+						options={RuMaterialTypesSelectValues}
 						error={
 							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.materialId?.message
+							]?.userMaterials?.[fieldIndex]?.message
 						}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
 							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.materialId?.message
+							]?.userMaterials?.[fieldIndex]?.message
 								? 'text-error'
 								: '',
 						)}
@@ -83,6 +87,7 @@ export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props)
 					/>
 				)}
 			/>
+
 			<Controller
 				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`}
 				control={control}
@@ -110,6 +115,11 @@ export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props)
 					/>
 				)}
 			/>
+			{ConstructionFieldsMap({
+				fieldIndex,
+				constructionIndex,
+				materialType: currentMaterialType,
+			})}
 		</div>
 	);
 };
