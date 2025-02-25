@@ -72,30 +72,59 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 	return (
 		<>
 			<ConstructionLayer title="1. Облицовка">
-				{topFacingIndices.zeroIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
-						<ZPanelMaterialType
-							fieldIndex={topFacingIndices.zeroIndex}
-							constructionIndex={0}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={topFacingIndices.zeroIndex}
-							constructionIndex={0}
-						/>
-					</div>
-				)}
-
-				{topFacingIndices.oneIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
-						<BoardMaterialType
-							fieldIndex={topFacingIndices.zeroIndex}
-							constructionIndex={0}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={topFacingIndices.oneIndex}
-							constructionIndex={0}
-						/>
-					</div>
+				{topFacingIndices.threeIndex < 0 && topFacingIndices.twoIndex > 0 ? (
+					<AiOutlinePlusCircle
+						onClick={() => {
+							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+								...(topFacingUserMaterials || []),
+								{
+									positionId: '3',
+									materialId: '',
+									materialTypeValue: [
+										{
+											materialParameters: MaterialParametrs.Thickness,
+											value: '',
+										},
+										{
+											materialParameters: MaterialParametrs.Density,
+											value: '',
+										},
+									],
+								},
+							]);
+						}}
+						className="size-[40px] self-center text-primary"
+					/>
+				) : (
+					<>
+						{topFacingIndices.threeIndex >= 0 && (
+							<div className="flex justify-between">
+								<div className="flex gap-[20px]">
+									<SelectableMaterialType
+										fieldIndex={topFacingIndices.threeIndex}
+										constructionIndex={0}
+									/>
+									<ThicknessDensityFieldsType
+										fieldIndex={topFacingIndices.threeIndex}
+										constructionIndex={0}
+									/>
+								</div>
+								<DeleteIcon
+									className="self-end"
+									onClick={() => {
+										form.setValue(
+											'constructionTypeObject.constructions.0.userMaterials',
+											(topFacingUserMaterials &&
+												topFacingUserMaterials.filter(
+													(c) => c.positionId !== '3',
+												)) ||
+												[],
+										);
+									}}
+								/>
+							</div>
+						)}
+					</>
 				)}
 
 				{topFacingIndices.twoIndex < 0 ? (
@@ -152,59 +181,31 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 						)}
 					</>
 				)}
-				{topFacingIndices.threeIndex < 0 && topFacingIndices.twoIndex > 0 ? (
-					<AiOutlinePlusCircle
-						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
-								...(topFacingUserMaterials || []),
-								{
-									positionId: '3',
-									materialId: '',
-									materialTypeValue: [
-										{
-											materialParameters: MaterialParametrs.Thickness,
-											value: '',
-										},
-										{
-											materialParameters: MaterialParametrs.Density,
-											value: '',
-										},
-									],
-								},
-							]);
-						}}
-						className="size-[40px] self-center text-primary"
-					/>
-				) : (
-					<>
-						{topFacingIndices.threeIndex >= 0 && (
-							<div className="flex justify-between">
-								<div className="flex gap-[20px]">
-									<SelectableMaterialType
-										fieldIndex={topFacingIndices.threeIndex}
-										constructionIndex={0}
-									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={topFacingIndices.threeIndex}
-										constructionIndex={0}
-									/>
-								</div>
-								<DeleteIcon
-									className="self-end"
-									onClick={() => {
-										form.setValue(
-											'constructionTypeObject.constructions.0.userMaterials',
-											(topFacingUserMaterials &&
-												topFacingUserMaterials.filter(
-													(c) => c.positionId !== '3',
-												)) ||
-												[],
-										);
-									}}
-								/>
-							</div>
-						)}
-					</>
+
+				{topFacingIndices.oneIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<BoardMaterialType
+							fieldIndex={topFacingIndices.oneIndex}
+							constructionIndex={0}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={topFacingIndices.oneIndex}
+							constructionIndex={0}
+						/>
+					</div>
+				)}
+
+				{topFacingIndices.zeroIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<ZPanelMaterialType
+							fieldIndex={topFacingIndices.zeroIndex}
+							constructionIndex={0}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={topFacingIndices.zeroIndex}
+							constructionIndex={0}
+						/>
+					</div>
 				)}
 			</ConstructionLayer>
 

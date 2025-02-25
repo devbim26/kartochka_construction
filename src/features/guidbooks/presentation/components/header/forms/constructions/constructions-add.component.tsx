@@ -265,7 +265,7 @@ export const ConstructionsAdd = () => {
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
 							{
-								positionId: '0',
+								positionId: '1',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
@@ -273,7 +273,7 @@ export const ConstructionsAdd = () => {
 								],
 							},
 							{
-								positionId: '1',
+								positionId: '0',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
