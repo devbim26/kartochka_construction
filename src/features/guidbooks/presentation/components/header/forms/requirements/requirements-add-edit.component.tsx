@@ -153,10 +153,9 @@ export const RequirementsAddAndEdit = memoize(() => {
 				)}
 			/>
 			<Input
-				onChange={(event) => {
+				onBlur={(event) => {
 					setValue('standartValidityPeriod', event.target.value);
 				}}
-				value={form.watch('standartValidityPeriod')}
 				labelClassName={twMerge(
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.standartValidityPeriod?.message ? 'text-error' : '',
