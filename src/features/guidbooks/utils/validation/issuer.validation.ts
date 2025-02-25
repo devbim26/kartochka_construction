@@ -4,7 +4,9 @@ const IssuersSchema = z.object({
 	id: z.string().optional(),
 	name: z.string().nullable(),
 	country: z.string().nullable(),
-	logoUrl: z.string().nullable(),
+	logoUrl: z
+		.any()
+		.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),
 	webSite: z.string().nullable(),
 });
 

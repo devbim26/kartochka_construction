@@ -282,7 +282,7 @@ const IssuersScreen = () => {
 						</FormProvider>
 					),
 					add: () => (
-						<FormProvider {...form.editForm}>
+						<FormProvider {...form.addForm}>
 							<IssuersAddEdit />
 						</FormProvider>
 					),

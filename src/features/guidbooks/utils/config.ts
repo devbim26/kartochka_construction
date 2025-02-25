@@ -47,7 +47,7 @@ export const IssuersDataConfig: EntityConfig = {
 	defaultValues: {
 		name: '',
 		country: '',
-		logoUrl: '',
+		logoUrl: undefined,
 		webSite: '',
 	},
 };

@@ -89,7 +89,7 @@ export const IssuersAddEdit = memoize(() => {
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 							formState.errors.logoUrl?.message ? 'text-error' : '',
 						)}
-						errorMessage={formState.errors.logoUrl?.message}
+						errorMessage={formState.errors.logoUrl?.message?.toString()}
 					>
 						Логотип
 					</FormElementLabel>

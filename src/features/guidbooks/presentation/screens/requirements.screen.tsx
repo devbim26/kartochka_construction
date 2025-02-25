@@ -346,7 +346,7 @@ const RequirementsScreen = () => {
 						</FormProvider>
 					),
 					add: () => (
-						<FormProvider {...form.editForm}>
+						<FormProvider {...form.addForm}>
 							<RequirementsAddAndEdit />
 						</FormProvider>
 					),
