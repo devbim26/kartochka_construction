@@ -1,6 +1,5 @@
 import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { fileUpload } from '@features/auth';
 import type { Issuer } from '@features/guidbooks/types';
 import { RuCountryNamesMap, RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { useState } from 'react';
@@ -20,18 +19,12 @@ export const IssuersAddEdit = memoize(() => {
 		if (file) {
 			try {
 				const base64 = await convertToBase64(file);
-				const fileData = await file.arrayBuffer();
 				if (base64 && typeof base64 === 'string') {
 					setValue('logoUrl', file.name);
 					setPreview(base64);
-					dispatch(
-						fileUpload({
-							data: { mimeType: file.type, isPublic: true },
-							file: fileData,
-						}),
-					);
 					setUploadError(false);
 				}
+				form.trigger('logoUrl');
 			} catch (error) {
 				setUploadError(true);
 			}
@@ -96,7 +89,7 @@ export const IssuersAddEdit = memoize(() => {
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 							formState.errors.logoUrl?.message ? 'text-error' : '',
 						)}
-						errorMessage={formState.errors.logoUrl?.message}
+						errorMessage={formState.errors.logoUrl?.message?.toString()}
 					>
 						Логотип
 					</FormElementLabel>

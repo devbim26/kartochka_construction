@@ -31,7 +31,9 @@ export const convertToClientRequirementData = (
 	standartShortName: data.standartShortName ?? '',
 	standartFullName: data.standartFullName ?? '',
 	region: convertToClientRegionData(data.region!)! as string,
-	standartValidityPeriod: data.standartValidityPeriod ?? '',
+	standartValidityPeriod: data.standartValidityPeriod
+		? data.standartValidityPeriod.split('-').reverse().join('-')
+		: '',
 	class: convertToClientCategoryClassData(data.class!)! as string,
 	noizeIsolationIndex: String(data.noizeIsolationIndex),
 	noizeImpactIndex: String(data.noizeImpactIndex),
@@ -48,7 +50,7 @@ export const convertToServerRequirementData = (
 	standartShortName: data.standartShortName || null,
 	standartFullName: data.standartFullName || null,
 	region: data.region ? regionMap.toServer[data.region as ClientRegion] : undefined,
-	standartValidityPeriod: data.standartValidityPeriod,
+	standartValidityPeriod: data.standartValidityPeriod.split('-').reverse().join('-'),
 	class: categoryClassMap.toServer[data.class as ClientCategoryClass],
 	noizeIsolationIndex: +data.noizeIsolationIndex,
 	noizeImpactIndex: +data.noizeIsolationIndex,

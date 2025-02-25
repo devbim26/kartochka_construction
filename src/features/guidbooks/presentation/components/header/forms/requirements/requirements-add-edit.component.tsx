@@ -120,9 +120,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 						options={RuRoomTypeSelectValues}
 						{...field}
 						value={field.value || ''}
-						label={
-							formState.errors?.firstPlacementRoom?.message || 'Конструкция разделяет'
-						}
+						label={formState.errors?.firstPlacementRoom?.message || 'Первое помещение'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
@@ -142,10 +140,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 						options={RuRoomTypeSelectValues}
 						{...field}
 						value={field.value || ''}
-						label={
-							formState.errors?.secondPlacementRoom?.message ||
-							'Конструкция разделяет'
-						}
+						label={formState.errors?.secondPlacementRoom?.message || 'Второе помещение'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
@@ -158,7 +153,6 @@ export const RequirementsAddAndEdit = memoize(() => {
 				)}
 			/>
 			<Input
-				{...register('standartValidityPeriod')}
 				onChange={(event) => {
 					setValue('standartValidityPeriod', event.target.value);
 				}}
@@ -167,7 +161,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.standartValidityPeriod?.message ? 'text-error' : '',
 				)}
-				inputClassName="py-[6px] px-[12px] h-fit w-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] w-[100px]"
 				label={
 					formState.errors?.standartValidityPeriod?.message || 'Срок действия стандарта'
 				}
@@ -175,6 +169,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				max={10}
 				ref={dateRef}
 			/>
+
 			<Input
 				{...register('standartShortName')}
 				labelClassName={twMerge(
@@ -212,7 +207,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				type="number"
 				max={10}
 			/>
-			{construction === ConstructionType.Wall && (
+			{construction === ConstructionType.Floor && (
 				<Input
 					{...register('noizeImpactIndex')}
 					labelClassName={twMerge(

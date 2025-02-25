@@ -70,9 +70,7 @@ export const RequirementsFilter = memoize(() => {
 						options={RuRoomTypeSelectValues}
 						{...field}
 						value={field.value || ''}
-						label={
-							formState.errors?.firstPlacementRoom?.message || 'Конструкция разделяет'
-						}
+						label={formState.errors?.firstPlacementRoom?.message || 'Первое помещение'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
@@ -92,10 +90,7 @@ export const RequirementsFilter = memoize(() => {
 						options={RuRoomTypeSelectValues}
 						{...field}
 						value={field.value || ''}
-						label={
-							formState.errors?.secondPlacementRoom?.message ||
-							'Конструкция разделяет'
-						}
+						label={formState.errors?.secondPlacementRoom?.message || 'Второе помещение'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
