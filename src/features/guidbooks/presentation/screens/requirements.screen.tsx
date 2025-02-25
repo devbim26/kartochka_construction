@@ -153,6 +153,12 @@ const RequirementsScreen = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
+					Object.entries(data).forEach(([key, value]) => {
+						if (!['noizeIsolationIndex', 'noizeImpactIndex', 'notice'].includes(key)) {
+							sessionStorage.setItem(key, JSON.stringify(value));
+						}
+					});
+
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно добавлено');
 				}
