@@ -426,6 +426,7 @@ export const ConstructionsEdit = () => {
 							placeholder="R_calc"
 							{...form.register('estimatedRTotal')}
 							type={'text'}
+							disabled
 						/>
 						<Controller
 							name="labIndex"
@@ -444,6 +445,7 @@ export const ConstructionsEdit = () => {
 									buttonClassName="text-sm rounded-[8px]"
 									label={formState.errors.labIndex?.message || 'Индекс'}
 									placeholder="Выберите индекс"
+									isDisabled
 								/>
 							)}
 						/>
@@ -461,6 +463,7 @@ export const ConstructionsEdit = () => {
 							placeholder="Введите индекс"
 							{...form.register('estimatedIndexValue')}
 							type={'number'}
+							disabled
 						/>
 					</div>
 				</>
