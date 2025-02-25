@@ -137,6 +137,14 @@ export const ConstructionsAdd = () => {
 									},
 								],
 							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
 						],
 					},
 				]);
