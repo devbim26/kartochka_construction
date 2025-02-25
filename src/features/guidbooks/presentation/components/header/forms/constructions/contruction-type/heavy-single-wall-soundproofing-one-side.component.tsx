@@ -3,11 +3,9 @@ import { DeleteIcon } from '@core';
 import {
 	BoardMaterialType,
 	ConstructionLayer,
-	FrameMaterialType,
 	HeavyMaterialType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
-	WidthRacksStepFieldsType,
 	ZPanelMaterialType,
 	type ConstructionsAddData,
 } from '@features';
@@ -184,23 +182,23 @@ export const HeavySingleWallSoundproofingOneSideComponent = () => {
 				{facingIndices.zeroIndex >= 0 && (
 					<div className="flex flex-row gap-[16px]">
 						<ZPanelMaterialType
-						// fieldIndex={facingIndices.zeroIndex}
-						// constructionIndex={1}
+							fieldIndex={facingIndices.zeroIndex}
+							constructionIndex={1}
 						/>
-						<BoardMaterialType
-						// fieldIndex={facingIndices.zeroIndex}
-						// constructionIndex={1}
+						<ThicknessDensityFieldsType
+							fieldIndex={facingIndices.zeroIndex}
+							constructionIndex={1}
 						/>
 					</div>
 				)}
 
 				{facingIndices.oneIndex >= 0 && (
 					<div className="flex flex-row gap-[16px]">
-						<FrameMaterialType
-							fieldIndex={facingIndices.oneIndex}
+						<BoardMaterialType
+							fieldIndex={facingIndices.zeroIndex}
 							constructionIndex={1}
 						/>
-						<WidthRacksStepFieldsType
+						<ThicknessDensityFieldsType
 							fieldIndex={facingIndices.oneIndex}
 							constructionIndex={1}
 						/>
@@ -261,7 +259,7 @@ export const HeavySingleWallSoundproofingOneSideComponent = () => {
 						)}
 					</>
 				)}
-				{facingIndices.threeIndex < 0 && facingIndices.threeIndex > 0 ? (
+				{facingIndices.threeIndex < 0 && facingIndices.twoIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
