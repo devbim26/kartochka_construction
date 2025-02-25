@@ -35,6 +35,7 @@ import {
 	RuRegionNamesMap,
 	RuRoomTypeNamesMap,
 } from '@features/guidbooks/types';
+import { RequirementSessionStorageFields } from '@features/guidbooks/types/requirements/requirements-keys.types';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
@@ -153,6 +154,46 @@ const RequirementsScreen = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
+					sessionStorage.setItem(
+						RequirementSessionStorageFields.id,
+						JSON.stringify(data.id),
+					);
+					sessionStorage.setItem(
+						RequirementSessionStorageFields.region,
+						JSON.stringify(data.region),
+					);
+					sessionStorage.setItem(
+						RequirementSessionStorageFields.constructionType,
+						JSON.stringify(data.constructionType),
+					);
+					sessionStorage.setItem(
+						RequirementSessionStorageFields.class,
+						JSON.stringify(data.class),
+					);
+					sessionStorage.setItem(
+						RequirementSessionStorageFields.secondPlacementRoom,
+						JSON.stringify(data.secondPlacementRoom),
+					);
+					sessionStorage.setItem(
+						RequirementSessionStorageFields.firstPlacementRoom,
+						JSON.stringify(data.firstPlacementRoom),
+					);
+					sessionStorage.setItem(
+						RequirementSessionStorageFields.buildingType,
+						JSON.stringify(data.buildingType),
+					);
+					sessionStorage.setItem(
+						RequirementSessionStorageFields.standartValidityPeriod,
+						JSON.stringify(data.standartValidityPeriod),
+					);
+					sessionStorage.setItem(
+						RequirementSessionStorageFields.standartShortName,
+						JSON.stringify(data.standartShortName),
+					);
+					sessionStorage.setItem(
+						RequirementSessionStorageFields.standartFullName,
+						JSON.stringify(data.standartFullName),
+					);
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно добавлено');
 				}

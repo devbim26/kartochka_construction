@@ -1,0 +1,15 @@
+export enum RequirementSessionStorageFields {
+	id = 'id',
+	region = 'region',
+	constructionType = 'constructionType',
+	class = 'class',
+	secondPlacementRoom = 'secondPlacementRoom',
+	firstPlacementRoom = 'firstPlacementRoom',
+	buildingType = 'buildingType',
+	standartValidityPeriod = 'standartValidityPeriod',
+	standartShortName = 'standartShortName',
+	standartFullName = 'standartFullName',
+	noizeIsolationIndex = 'noizeIsolationIndex',
+	noizeImpactIndex = 'noizeImpactIndex',
+	notice = 'notice',
+}
