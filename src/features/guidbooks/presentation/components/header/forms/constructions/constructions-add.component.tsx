@@ -8,6 +8,8 @@ import {
 	FormSubTitle,
 	getGuidebooksPaginated,
 	Guidebooks,
+	HeavySingleWallComponent,
+	HeavySingleWallFacingOneSideComponent,
 	RuConstructionConstructionTypeSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
@@ -17,15 +19,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
-import {
-	HeavySingleWallComponent,
-	HeavySingleWallFacingOneSideComponent,
-} from './contruction-type';
 
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control, watch } = form;
-	const [displayChars, setDisplayChars] = useState(false);
+	const [displayChars, setDisplayChars] = useState(true);
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionType');
 
