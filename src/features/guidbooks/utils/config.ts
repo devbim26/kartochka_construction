@@ -1,4 +1,4 @@
-import type { EntityConfig } from '@core';
+import { getSessionStorageData, type EntityConfig } from '@core';
 import {
 	ConstructionsAddSchema,
 	ConstructionsEditSchema,
@@ -47,7 +47,7 @@ export const IssuersDataConfig: EntityConfig = {
 	defaultValues: {
 		name: '',
 		country: '',
-		logoUrl: '',
+		logoUrl: undefined,
 		webSite: '',
 	},
 };
@@ -64,7 +64,7 @@ export const IssuersFormCofig: EntityConfig = {
 
 export const RequirementsDataConfig: EntityConfig = {
 	schema: RequirementsSchema,
-	defaultValues: {
+	defaultValues: getSessionStorageData('RequirementsDataConfig') || {
 		region: '',
 		secondPlacementRoom: '',
 		firstPlacementRoom: '',

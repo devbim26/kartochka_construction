@@ -1,18 +1,12 @@
 import { ConstructionPosition, MaterialParametrs } from '@api-gen';
-import {
-	convertToPaginatedType,
-	convertToSelectValues,
-	Input,
-	Select,
-	SelectOption,
-	Switch,
-} from '@core';
+import type { SelectOption } from '@core';
+import { convertToPaginatedType, convertToSelectValues, Input, Select, Switch } from '@core';
+import type { ConstructionsEditData, FilterIssuer } from '@features';
 import {
 	ConstructionTypeEnum,
 	convertToClientIssuerData,
 	convertToServerIssuerData,
 	DescriptionFieldNames,
-	FilterIssuer,
 	FormSubTitle,
 	getGuidebooksPaginated,
 	Guidebooks,
@@ -20,9 +14,9 @@ import {
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	RuRegionNamesSelectValues,
-	type ConstructionsEditData,
 } from '@features';
-import { AxiosResponse } from 'axios';
+
+import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
@@ -432,6 +426,7 @@ export const ConstructionsEdit = () => {
 							placeholder="R_calc"
 							{...form.register('estimatedRTotal')}
 							type={'text'}
+							disabled
 						/>
 						<Controller
 							name="labIndex"
@@ -450,6 +445,7 @@ export const ConstructionsEdit = () => {
 									buttonClassName="text-sm rounded-[8px]"
 									label={formState.errors.labIndex?.message || 'Индекс'}
 									placeholder="Выберите индекс"
+									isDisabled
 								/>
 							)}
 						/>
@@ -467,6 +463,7 @@ export const ConstructionsEdit = () => {
 							placeholder="Введите индекс"
 							{...form.register('estimatedIndexValue')}
 							type={'number'}
+							disabled
 						/>
 					</div>
 				</>

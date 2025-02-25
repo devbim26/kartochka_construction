@@ -33,6 +33,7 @@ import {
 } from '@features';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FormProvider } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 
 const MaterialsScreen = () => {
@@ -297,9 +298,21 @@ const MaterialsScreen = () => {
 				}}
 				forms={forms}
 				formElements={{
-					filter: MaterialsFilter,
-					add: MaterialsAddAndEdit,
-					edit: MaterialsAddAndEdit,
+					filter: () => (
+						<FormProvider {...forms.filterForm}>
+							<MaterialsFilter />
+						</FormProvider>
+					),
+					add: () => (
+						<FormProvider {...forms.addForm}>
+							<MaterialsAddAndEdit />
+						</FormProvider>
+					),
+					edit: () => (
+						<FormProvider {...forms.editForm}>
+							<MaterialsAddAndEdit />
+						</FormProvider>
+					),
 				}}
 			/>
 			{!!tableData.length && (
