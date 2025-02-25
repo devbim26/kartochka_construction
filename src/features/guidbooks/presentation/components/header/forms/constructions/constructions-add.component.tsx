@@ -9,8 +9,8 @@ import {
 	getGuidebooksPaginated,
 	Guidebooks,
 	HeavySingleWallComponent,
-	HeavySingleWallFacingBothSideComponent,
-	HeavySingleWallSoundproofingOneSideComponent,
+	HeavySingleWallFacingOneSideComponent,
+	HeavySingleWallSoundproofingBothSideComponent,
 	RuConstructionConstructionTypeSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
@@ -79,29 +79,80 @@ export const ConstructionsAdd = () => {
 				]);
 			},
 		},
-		// [ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
-		// 	component: <HeavySingleWallFacingOneSideComponent />,
+		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
+			component: <HeavySingleWallFacingOneSideComponent />,
+			action: () => {
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		// [ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
+		// 	component: <HeavySingleWallFacingBothSideComponent />,
 		// 	action: () => {
+		// 		console.log(123);
 		// 		form.setValue(
 		// 			'constructionTypeObject.constructionTypeEnum',
-		// 			ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
+		// 			ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
 		// 		);
 		// 		form.setValue('constructionTypeObject.constructions', [
 		// 			{
 		// 				contructionPosition: ConstructionPosition.Left,
-		// 				userMaterials: [
-		// 					{
-		// 						positionId: '1',
-		// 						materialId: '',
-		// 						materialTypeValue: [
-		// 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-		// 							{ materialParameters: MaterialParametrs.Density, value: '' },
-		// 						],
-		// 					},
-		// 				],
-		// 			},
-		// 			{
-		// 				contructionPosition: ConstructionPosition.Center,
 		// 				userMaterials: [
 		// 					{
 		// 						positionId: '0',
@@ -139,13 +190,72 @@ export const ConstructionsAdd = () => {
 		// 					},
 		// 				],
 		// 			},
+		// 			{
+		// 				contructionPosition: ConstructionPosition.Center,
+		// 				userMaterials: [
+		// 					{
+		// 						positionId: '1',
+		// 						materialId: '',
+		// 						materialTypeValue: [
+		// 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+		// 							{ materialParameters: MaterialParametrs.Density, value: '' },
+		// 						],
+		// 					},
+		// 				],
+		// 			},
+		// 			{
+		// 				contructionPosition: ConstructionPosition.Right,
+		// 				userMaterials: [
+		// 					{
+		// 						positionId: '0',
+		// 						materialId: '',
+		// 						materialTypeValue: [
+		// 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+		// 							{ materialParameters: MaterialParametrs.Density, value: '' },
+		// 						],
+		// 					},
+		// 					{
+		// 						positionId: '1',
+		// 						materialId: '',
+		// 						materialTypeValue: [
+		// 							{ materialParameters: MaterialParametrs.Width, value: '' },
+		// 							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+		// 						],
+		// 					},
+		// 					{
+		// 						positionId: '2',
+		// 						materialId: '',
+		// 						materialTypeValue: [
+		// 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+		// 							{ materialParameters: MaterialParametrs.Density, value: '' },
+		// 						],
+		// 					},
+		// 					{
+		// 						positionId: '3',
+		// 						materialId: '',
+		// 						materialTypeValue: [
+		// 							{
+		// 								materialParameters: MaterialParametrs.ConnectionNumber,
+		// 								value: '',
+		// 							},
+		// 						],
+		// 					},
+		// 					{
+		// 						positionId: '4',
+		// 						materialId: '',
+		// 						materialTypeValue: [
+		// 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+		// 							{ materialParameters: MaterialParametrs.Density, value: '' },
+		// 						],
+		// 					},
+		// 				],
+		// 			},
 		// 		]);
 		// 	},
 		// },
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
-			component: <HeavySingleWallFacingBothSideComponent />,
+			component: <HeavySingleWallSoundproofingBothSideComponent />,
 			action: () => {
-				console.log(123);
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
@@ -166,26 +276,8 @@ export const ConstructionsAdd = () => {
 								positionId: '1',
 								materialId: '',
 								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
 								],
 							},
 						],
@@ -205,77 +297,6 @@ export const ConstructionsAdd = () => {
 					},
 					{
 						contructionPosition: ConstructionPosition.Right,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-					},
-				]);
-			},
-		},
-		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
-			component: <HeavySingleWallSoundproofingOneSideComponent />,
-			action: () => {
-				form.setValue(
-					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
-				);
-				form.setValue('constructionTypeObject.constructions', [
-					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '1',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-					},
-					{
-						contructionPosition: ConstructionPosition.Center,
 						userMaterials: [
 							{
 								positionId: '0',
