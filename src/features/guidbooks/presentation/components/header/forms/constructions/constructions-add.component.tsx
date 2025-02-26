@@ -23,7 +23,7 @@ import { twMerge } from 'tailwind-merge';
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control, watch } = form;
-	const [displayChars, setDisplayChars] = useState(false);
+	const [displayChars, setDisplayChars] = useState(true);
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionType');
 

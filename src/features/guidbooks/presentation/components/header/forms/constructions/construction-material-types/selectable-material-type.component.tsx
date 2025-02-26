@@ -2,7 +2,6 @@ import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
 import type { ConstructionsAddData, MaterialsFilterData } from '@features';
 import {
-	ConstructionFieldsMap,
 	convertToClientMaterialsAddAndEditData,
 	getGuidebooksPaginated,
 	Guidebooks,
@@ -24,7 +23,7 @@ export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props)
 	const { formState, control, watch } = form;
 	const [materials, setMaterials] = useState<Array<SelectOption>>();
 	const currentMaterialType = watch(
-		`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`,
+		`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`,
 	);
 
 	const handleGetMaterials = (data: MaterialsFilterData) => {
@@ -55,13 +54,12 @@ export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props)
 		handleGetMaterials({
 			materialType: currentMaterialType,
 		});
-		console.log(currentMaterialType);
 	}, [currentMaterialType]);
 
 	return (
 		<div className="flex flex-wrap gap-[16px]">
 			<Controller
-				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`}
+				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`}
 				control={control}
 				render={({ field }) => (
 					<Select
@@ -71,13 +69,13 @@ export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props)
 						error={
 							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.message
+							]?.userMaterialTypes?.[fieldIndex]?.value?.message
 						}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
 							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.message
+							]?.userMaterialTypes?.[fieldIndex]?.value?.message
 								? 'text-error'
 								: '',
 						)}
@@ -115,11 +113,6 @@ export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props)
 					/>
 				)}
 			/>
-			{ConstructionFieldsMap({
-				fieldIndex,
-				constructionIndex,
-				materialType: currentMaterialType,
-			})}
 		</div>
 	);
 };
