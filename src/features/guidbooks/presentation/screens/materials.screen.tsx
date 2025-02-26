@@ -225,6 +225,7 @@ const MaterialsScreen = () => {
 					...paginationState,
 					pageNumber: 1,
 				});
+				navigate('');
 			}
 		} catch (error) {
 			console.log('Error:', error);
@@ -242,6 +243,7 @@ const MaterialsScreen = () => {
 					...paginationState,
 					pageNumber: 1,
 				});
+				navigate('');
 			}
 		} catch (error) {
 			console.log(error);

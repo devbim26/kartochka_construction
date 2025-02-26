@@ -62,11 +62,8 @@ export const GuidbookPageHeaderWrapper = memoize(
 		}, [currentHeaderFormType]);
 
 		const submitHandle = useCallback(() => {
-			currentForm.handleSubmit(() => {
-				onSave();
-				navigate('');
-			})();
-		}, [currentForm, onSave, navigate]);
+			currentForm.handleSubmit(() => onSave())();
+		}, [currentForm, onSave]);
 
 		const formComponent = useMemo(() => {
 			return (
