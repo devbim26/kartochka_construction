@@ -182,6 +182,7 @@ const ConstructionsScreen = () => {
 					forms.filterForm.getValues() as ConstructionsFilterData,
 					paginationState,
 				);
+				navigate('');
 			}
 		} catch (error) {
 			console.log('Error:', error);
@@ -199,6 +200,7 @@ const ConstructionsScreen = () => {
 					forms.filterForm.getValues() as ConstructionsFilterData,
 					paginationState,
 				);
+				navigate('');
 			}
 		} catch (error) {
 			console.log(error);
