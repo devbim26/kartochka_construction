@@ -161,6 +161,7 @@ const RequirementsScreen = () => {
 
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно добавлено');
+					navigate('');
 				}
 			});
 	};
@@ -184,6 +185,7 @@ const RequirementsScreen = () => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно отредактировано');
+					navigate('');
 				}
 			});
 	};

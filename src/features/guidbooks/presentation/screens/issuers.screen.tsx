@@ -124,6 +124,7 @@ const IssuersScreen = () => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Производитель успешно добавлен');
+					navigate('');
 				}
 			});
 	};
@@ -165,6 +166,7 @@ const IssuersScreen = () => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Производитель успешно отредактирован');
+					navigate('');
 				}
 			});
 	};
