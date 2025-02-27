@@ -116,31 +116,6 @@ export const ConstructionsEdit = () => {
 				]);
 			},
 		},
-		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
-			component: <HeavySingleWallComponent />,
-			action: () => {
-				console.log(123);
-				form.setValue(
-					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLayerWall,
-				);
-				form.setValue('constructionTypeObject.constructions', [
-					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '1',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-					},
-				]);
-			},
-		},
 	};
 
 	return (
