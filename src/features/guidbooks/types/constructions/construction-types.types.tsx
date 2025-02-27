@@ -9,6 +9,8 @@ export enum ConstructionTypeEnum {
 	HeavySingleLayerWall = 'HeavySingleLayerWall',
 	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
 	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
+	HeavySingleLaterWallSoundproofingOneSide = 'HeavySingleLaterWallSoundproofingOneSide',
+	HeavySingleLaterWallSoundproofingBothSide = 'HeavySingleLaterWallSoundproofingBothSide',
 }
 
 export const RuConstructionConstructionTypeSelectValues = [
@@ -20,5 +22,13 @@ export const RuConstructionConstructionTypeSelectValues = [
 	{
 		label: 'Тяжелая однослойная стена + облицовка с двух сторон',
 		value: ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
+	},
+	{
+		label: 'Тяжелая однослойная стена + звукоизоляционная панель с одной стороны',
+		value: ConstructionTypeEnum.HeavySingleLaterWallSoundproofingOneSide,
+	},
+	{
+		label: 'Тяжелая однослойная стена + звукоизоляционная панель с двух сторон',
+		value: ConstructionTypeEnum.HeavySingleLaterWallSoundproofingBothSide,
 	},
 ];
