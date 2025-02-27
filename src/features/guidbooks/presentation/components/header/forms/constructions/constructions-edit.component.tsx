@@ -10,8 +10,8 @@ import {
 	FormSubTitle,
 	getGuidebooksPaginated,
 	Guidebooks,
+	HeavyMultiLayerWallComponent,
 	HeavySingleWallComponent,
-	HeavySingleWallSoundproofingBothSideComponent,
 	RuConstructionConstructionTypeSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
@@ -90,12 +90,12 @@ export const ConstructionsEdit = () => {
 				]);
 			},
 		},
-		[ConstructionTypeEnum.HeavySingleLaterWallSoundproofingBothSide]: {
-			component: <HeavySingleWallSoundproofingBothSideComponent />,
+		[ConstructionTypeEnum.HeavyMultiLaterWall]: {
+			component: <HeavyMultiLayerWallComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLaterWallSoundproofingBothSide,
+					ConstructionTypeEnum.HeavyMultiLaterWall,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
@@ -110,33 +110,7 @@ export const ConstructionsEdit = () => {
 								],
 							},
 							{
-								positionId: '0',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-					},
-					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '1',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-					},
-					{
-						contructionPosition: ConstructionPosition.Right,
-						userMaterials: [
-							{
-								positionId: '0',
+								positionId: '2',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
@@ -144,7 +118,17 @@ export const ConstructionsEdit = () => {
 								],
 							},
 							{
-								positionId: '1',
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
