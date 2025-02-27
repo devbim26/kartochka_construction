@@ -8,7 +8,6 @@ import {
 	FormSubTitle,
 	getGuidebooksPaginated,
 	Guidebooks,
-	HeavySingleWallComponent,
 	HeavySingleWallFacingOneSideComponent,
 	RuConstructionConstructionTypeSelectValues,
 	RuIndexTypeNamesSelectValues,
@@ -54,30 +53,6 @@ export const ConstructionsAdd = () => {
 	}, []);
 
 	const ConstructionTypeMap = {
-		[ConstructionTypeEnum.HeavySingleLayerWall]: {
-			component: <HeavySingleWallComponent />,
-			action: () => {
-				form.setValue(
-					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLayerWall,
-				);
-				form.setValue('constructionTypeObject.constructions', [
-					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '1',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-					},
-				]);
-			},
-		},
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
 			component: <HeavySingleWallFacingOneSideComponent />,
 			action: () => {
