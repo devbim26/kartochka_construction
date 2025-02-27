@@ -1,38 +1,30 @@
 import { ConstructionPosition, MaterialParametrs } from '@api-gen';
-import {
-	convertToPaginatedType,
-	convertToSelectValues,
-	Input,
-	Select,
-	SelectOption,
-	Switch,
-} from '@core';
+import type { SelectOption } from '@core';
+import { convertToPaginatedType, convertToSelectValues, Input, Select, Switch } from '@core';
+import type { ConstructionsEditData, FilterIssuer } from '@features';
 import {
 	ConstructionTypeEnum,
 	convertToClientIssuerData,
 	convertToServerIssuerData,
 	DescriptionFieldNames,
-	FilterIssuer,
 	FormSubTitle,
 	getGuidebooksPaginated,
 	Guidebooks,
+	HeavySingleWallComponent,
+	HeavySingleWallSoundproofingBothSideComponent,
 	RuConstructionConstructionTypeSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	RuRegionNamesSelectValues,
-	type ConstructionsEditData,
 } from '@features';
-import { AxiosResponse } from 'axios';
+import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
-import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
-import { HeavySingleWallComponent } from './contruction-type';
 
 export const ConstructionsEdit = () => {
-	const [search] = useSearchParams();
 	const form = useFormContext<ConstructionsEditData>();
 
 	const [isSpecsDisplay, setSpecsDisplay] = useState(false);
@@ -98,12 +90,12 @@ export const ConstructionsEdit = () => {
 				]);
 			},
 		},
-		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
-			component: <HeavySingleWallComponent />,
+		[ConstructionTypeEnum.HeavySingleLaterWallSoundproofingBothSide]: {
+			component: <HeavySingleWallSoundproofingBothSideComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLayerWall,
+					ConstructionTypeEnum.HeavySingleLaterWallSoundproofingBothSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
@@ -117,23 +109,40 @@ export const ConstructionsEdit = () => {
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
 							},
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
 						],
 					},
-				]);
-			},
-		},
-		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
-			component: <HeavySingleWallComponent />,
-			action: () => {
-				console.log(123);
-				form.setValue(
-					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLayerWall,
-				);
-				form.setValue('constructionTypeObject.constructions', [
 					{
-						contructionPosition: ConstructionPosition.Left,
+						contructionPosition: ConstructionPosition.Center,
 						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Right,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
 							{
 								positionId: '1',
 								materialId: '',
