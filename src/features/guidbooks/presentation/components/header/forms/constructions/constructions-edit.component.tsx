@@ -11,22 +11,20 @@ import {
 	getGuidebooksPaginated,
 	Guidebooks,
 	HeavySingleWallComponent,
+	HeavySingleWallFacingBothSideComponent,
 	RuConstructionConstructionTypeSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	RuRegionNamesSelectValues,
 } from '@features';
-
 import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
-import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
 export const ConstructionsEdit = () => {
-	const [search] = useSearchParams();
 	const form = useFormContext<ConstructionsEditData>();
 
 	const [isSpecsDisplay, setSpecsDisplay] = useState(false);
@@ -68,10 +66,9 @@ export const ConstructionsEdit = () => {
 	const currentConstruction = watch('constructionType');
 
 	const ConstructionTypeMap = {
-		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
+		[ConstructionTypeEnum.HeavySingleLayerWall]: {
 			component: <HeavySingleWallComponent />,
 			action: () => {
-				console.log(123);
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWall,
@@ -82,6 +79,125 @@ export const ConstructionsEdit = () => {
 						userMaterials: [
 							{
 								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
+			component: <HeavySingleWallFacingBothSideComponent />,
+			action: () => {
+				console.log(123);
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Right,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
