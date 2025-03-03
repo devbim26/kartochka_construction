@@ -222,6 +222,14 @@ export const ConstructionsEdit = () => {
 						contructionPosition: ConstructionPosition.Center,
 						userMaterials: [
 							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
 								positionId: '1',
 								materialId: '',
 								materialTypeValue: [
