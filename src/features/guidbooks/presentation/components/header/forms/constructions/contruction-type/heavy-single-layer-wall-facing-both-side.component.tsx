@@ -1,26 +1,33 @@
 import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
 import {
+	AirGapMaterialType,
 	BoardMaterialType,
 	ConstructionLayer,
+	FillerMaterialType,
+	FrameMaterialType,
 	HeavyMaterialType,
+	LinkMaterialType,
+	PointConnectionsFieldsType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
-	ZPanelMaterialType,
+	WidthRacksStepFieldsType,
 	type ConstructionsAddData,
 } from '@features';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
-export const HeavySingleWallSoundproofingBothSideComponent = () => {
+export const HeavySingleLayerWallFacingBothSideComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
-	const { watch } = form;
 	const [topFacingIndices, setTopFacingIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
 		twoIndex: -1,
 		threeIndex: -1,
+		fourIndex: -1,
+		fiveIndex: -1,
+		sixIndex: -1,
 	});
 	const [baseConstructionIndices, setBaseConstructionIndices] = useState({
 		zeroIndex: -1,
@@ -32,6 +39,9 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 		oneIndex: -1,
 		twoIndex: -1,
 		threeIndex: -1,
+		fourIndex: -1,
+		fiveIndex: -1,
+		sixIndex: -1,
 	});
 
 	const topFacingUserMaterials = form.watch(
@@ -50,6 +60,9 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 			oneIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
 			twoIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 			threeIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
+			fourIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
+			fiveIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
+			sixIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
 		});
 		setBaseConstructionIndices({
 			zeroIndex: baseConstructionUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
@@ -61,24 +74,27 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 			oneIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
 			twoIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 			threeIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
+			fourIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
+			fiveIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
+			sixIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
 		});
 	}, [
 		topFacingUserMaterials,
 		baseConstructionUserMaterials,
 		bottomFacingUserMaterials,
-		watch('constructionTypeObject.constructions'),
+		form.watch('constructionTypeObject.constructions'),
 	]);
 
 	return (
 		<>
 			<ConstructionLayer title="1. Облицовка">
-				{topFacingIndices.threeIndex < 0 && topFacingIndices.twoIndex > 0 ? (
+				{topFacingIndices.sixIndex < 0 && topFacingIndices.fiveIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
 								...(topFacingUserMaterials || []),
 								{
-									positionId: '3',
+									positionId: '6',
 									materialId: '',
 									materialTypeValue: [
 										{
@@ -97,15 +113,15 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 					/>
 				) : (
 					<>
-						{topFacingIndices.threeIndex >= 0 && (
+						{topFacingIndices.sixIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={topFacingIndices.threeIndex}
+										fieldIndex={topFacingIndices.sixIndex}
 										constructionIndex={0}
 									/>
 									<ThicknessDensityFieldsType
-										fieldIndex={topFacingIndices.threeIndex}
+										fieldIndex={topFacingIndices.sixIndex}
 										constructionIndex={0}
 									/>
 								</div>
@@ -116,7 +132,7 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 											'constructionTypeObject.constructions.0.userMaterials',
 											(topFacingUserMaterials &&
 												topFacingUserMaterials.filter(
-													(c) => c.positionId !== '3',
+													(c) => c.positionId !== '6',
 												)) ||
 												[],
 										);
@@ -126,14 +142,13 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 						)}
 					</>
 				)}
-
-				{topFacingIndices.twoIndex < 0 ? (
+				{topFacingIndices.fiveIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
 								...(topFacingUserMaterials || []),
 								{
-									positionId: '2',
+									positionId: '5',
 									materialId: '',
 									materialTypeValue: [
 										{
@@ -152,15 +167,15 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 					/>
 				) : (
 					<>
-						{topFacingIndices.twoIndex >= 0 && (
+						{topFacingIndices.fiveIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={topFacingIndices.twoIndex}
+										fieldIndex={topFacingIndices.fiveIndex}
 										constructionIndex={0}
 									/>
 									<ThicknessDensityFieldsType
-										fieldIndex={topFacingIndices.twoIndex}
+										fieldIndex={topFacingIndices.fiveIndex}
 										constructionIndex={0}
 									/>
 								</div>
@@ -171,7 +186,7 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 											'constructionTypeObject.constructions.0.userMaterials',
 											(topFacingUserMaterials &&
 												topFacingUserMaterials.filter(
-													(c) => c.positionId !== '2',
+													(c) => c.positionId !== '5',
 												)) ||
 												[],
 										);
@@ -180,15 +195,53 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 							</div>
 						)}
 					</>
+				)}
+				{topFacingIndices.fourIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<BoardMaterialType
+							fieldIndex={topFacingIndices.fourIndex}
+							constructionIndex={0}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={topFacingIndices.fourIndex}
+							constructionIndex={0}
+						/>
+					</div>
+				)}
+
+				{topFacingIndices.threeIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<LinkMaterialType
+							fieldIndex={topFacingIndices.threeIndex}
+							constructionIndex={0}
+						/>
+						<PointConnectionsFieldsType
+							fieldIndex={topFacingIndices.threeIndex}
+							constructionIndex={0}
+						/>
+					</div>
+				)}
+
+				{topFacingIndices.twoIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<FillerMaterialType
+							fieldIndex={topFacingIndices.twoIndex}
+							constructionIndex={0}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={topFacingIndices.twoIndex}
+							constructionIndex={0}
+						/>
+					</div>
 				)}
 
 				{topFacingIndices.oneIndex >= 0 && (
 					<div className="flex flex-row gap-[16px]">
-						<BoardMaterialType
+						<FrameMaterialType
 							fieldIndex={topFacingIndices.oneIndex}
 							constructionIndex={0}
 						/>
-						<ThicknessDensityFieldsType
+						<WidthRacksStepFieldsType
 							fieldIndex={topFacingIndices.oneIndex}
 							constructionIndex={0}
 						/>
@@ -197,7 +250,7 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 
 				{topFacingIndices.zeroIndex >= 0 && (
 					<div className="flex flex-row gap-[16px]">
-						<ZPanelMaterialType
+						<AirGapMaterialType
 							fieldIndex={topFacingIndices.zeroIndex}
 							constructionIndex={0}
 						/>
@@ -335,7 +388,7 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 			<ConstructionLayer title="3. Облицовка">
 				{bottomFacingIndices.zeroIndex >= 0 && (
 					<div className="flex flex-row gap-[16px]">
-						<ZPanelMaterialType
+						<AirGapMaterialType
 							fieldIndex={bottomFacingIndices.zeroIndex}
 							constructionIndex={2}
 						/>
@@ -348,24 +401,63 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 
 				{bottomFacingIndices.oneIndex >= 0 && (
 					<div className="flex flex-row gap-[16px]">
-						<BoardMaterialType
-							fieldIndex={bottomFacingIndices.zeroIndex}
+						<FrameMaterialType
+							fieldIndex={bottomFacingIndices.oneIndex}
 							constructionIndex={2}
 						/>
-						<ThicknessDensityFieldsType
+						<WidthRacksStepFieldsType
 							fieldIndex={bottomFacingIndices.oneIndex}
 							constructionIndex={2}
 						/>
 					</div>
 				)}
 
-				{bottomFacingIndices.twoIndex < 0 ? (
+				{bottomFacingIndices.twoIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<FillerMaterialType
+							fieldIndex={bottomFacingIndices.twoIndex}
+							constructionIndex={2}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={bottomFacingIndices.twoIndex}
+							constructionIndex={2}
+						/>
+					</div>
+				)}
+
+				{bottomFacingIndices.threeIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<LinkMaterialType
+							fieldIndex={bottomFacingIndices.threeIndex}
+							constructionIndex={2}
+						/>
+						<PointConnectionsFieldsType
+							fieldIndex={bottomFacingIndices.threeIndex}
+							constructionIndex={2}
+						/>
+					</div>
+				)}
+
+				{bottomFacingIndices.fourIndex >= 0 && (
+					<div className="flex flex-row gap-[16px]">
+						<BoardMaterialType
+							fieldIndex={bottomFacingIndices.fourIndex}
+							constructionIndex={2}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={bottomFacingIndices.fourIndex}
+							constructionIndex={2}
+						/>
+					</div>
+				)}
+
+				{bottomFacingIndices.fiveIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.2.userMaterials', [
 								...(bottomFacingUserMaterials || []),
 								{
-									positionId: '2',
+									positionId: '5',
 									materialId: '',
 									materialTypeValue: [
 										{
@@ -384,15 +476,15 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 					/>
 				) : (
 					<>
-						{bottomFacingIndices.twoIndex >= 0 && (
+						{bottomFacingIndices.fiveIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={bottomFacingIndices.twoIndex}
+										fieldIndex={bottomFacingIndices.fiveIndex}
 										constructionIndex={2}
 									/>
 									<ThicknessDensityFieldsType
-										fieldIndex={bottomFacingIndices.twoIndex}
+										fieldIndex={bottomFacingIndices.fiveIndex}
 										constructionIndex={2}
 									/>
 								</div>
@@ -403,7 +495,7 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 											'constructionTypeObject.constructions.2.userMaterials',
 											(bottomFacingUserMaterials &&
 												bottomFacingUserMaterials.filter(
-													(c) => c.positionId !== '2',
+													(c) => c.positionId !== '5',
 												)) ||
 												[],
 										);
@@ -413,13 +505,13 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 						)}
 					</>
 				)}
-				{bottomFacingIndices.threeIndex < 0 && bottomFacingIndices.twoIndex > 0 ? (
+				{bottomFacingIndices.sixIndex < 0 && bottomFacingIndices.fiveIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.2.userMaterials', [
 								...(bottomFacingUserMaterials || []),
 								{
-									positionId: '3',
+									positionId: '6',
 									materialId: '',
 									materialTypeValue: [
 										{
@@ -438,15 +530,15 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 					/>
 				) : (
 					<>
-						{bottomFacingIndices.threeIndex >= 0 && (
+						{bottomFacingIndices.sixIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={bottomFacingIndices.threeIndex}
+										fieldIndex={bottomFacingIndices.sixIndex}
 										constructionIndex={2}
 									/>
 									<ThicknessDensityFieldsType
-										fieldIndex={bottomFacingIndices.threeIndex}
+										fieldIndex={bottomFacingIndices.sixIndex}
 										constructionIndex={2}
 									/>
 								</div>
@@ -457,7 +549,7 @@ export const HeavySingleWallSoundproofingBothSideComponent = () => {
 											'constructionTypeObject.constructions.2.userMaterials',
 											(bottomFacingUserMaterials &&
 												bottomFacingUserMaterials.filter(
-													(c) => c.positionId !== '3',
+													(c) => c.positionId !== '6',
 												)) ||
 												[],
 										);

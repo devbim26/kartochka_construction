@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
-export const HeavySingleWallComponent = () => {
+export const HeavySingleLayerWallComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
 
 	const [indices, setIndices] = useState({

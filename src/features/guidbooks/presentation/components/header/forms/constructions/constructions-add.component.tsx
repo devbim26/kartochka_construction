@@ -9,12 +9,13 @@ import {
 	getGuidebooksPaginated,
 	Guidebooks,
 	HeavyMultiLayerWallComponent,
+	HeavyMultiLayerWallFacingBothSideComponent,
 	HeavyMultiLayerWallFacingOneSideComponent,
-	HeavySingleWallComponent,
-	HeavySingleWallFacingBothSideComponent,
-	HeavySingleWallFacingOneSideComponent,
-	HeavySingleWallSoundproofingBothSideComponent,
-	HeavySingleWallSoundproofingOneSideComponent,
+	HeavySingleLayerWallComponent,
+	HeavySingleLayerWallFacingBothSideComponent,
+	HeavySingleLayerWallFacingOneSideComponent,
+	HeavySingleLayerWallSoundproofingBothSideComponent,
+	HeavySingleLayerWallSoundproofingOneSideComponent,
 	RuConstructionConstructionTypeSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
@@ -60,7 +61,7 @@ export const ConstructionsAdd = () => {
 
 	const ConstructionTypeMap = {
 		[ConstructionTypeEnum.HeavySingleLayerWall]: {
-			component: <HeavySingleWallComponent />,
+			component: <HeavySingleLayerWallComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -84,7 +85,7 @@ export const ConstructionsAdd = () => {
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
-			component: <HeavySingleWallFacingOneSideComponent />,
+			component: <HeavySingleLayerWallFacingOneSideComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -155,11 +156,11 @@ export const ConstructionsAdd = () => {
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
-			component: <HeavySingleWallFacingBothSideComponent />,
+			component: <HeavySingleLayerWallFacingBothSideComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
+					ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
@@ -265,11 +266,11 @@ export const ConstructionsAdd = () => {
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide]: {
-			component: <HeavySingleWallSoundproofingOneSideComponent />,
+			component: <HeavySingleLayerWallSoundproofingOneSideComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
+					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
@@ -309,16 +310,37 @@ export const ConstructionsAdd = () => {
 				]);
 			},
 		},
-		[ConstructionTypeEnum.HeavySingleLaterWallSoundproofingBothSide]: {
-			component: <HeavySingleWallSoundproofingBothSideComponent />,
+		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]: {
+			component: <HeavySingleLayerWallSoundproofingBothSideComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavyMultiLaterWall,
+					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
 						userMaterials: [
 							{
 								positionId: '1',
@@ -328,8 +350,13 @@ export const ConstructionsAdd = () => {
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
 							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Right,
+						userMaterials: [
 							{
-								positionId: '2',
+								positionId: '0',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
@@ -337,21 +364,11 @@ export const ConstructionsAdd = () => {
 								],
 							},
 							{
-								positionId: '3',
+								positionId: '1',
 								materialId: '',
 								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
 								],
 							},
 						],
@@ -359,12 +376,62 @@ export const ConstructionsAdd = () => {
 				]);
 			},
 		},
-		[ConstructionTypeEnum.HeavyMultiLaterWall]: {
+		[ConstructionTypeEnum.HeavyMultiLayerWall]: {
 			component: <HeavyMultiLayerWallComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavyMultiLaterWallFacingOneSide,
+					ConstructionTypeEnum.HeavyMultiLayerWall,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide]: {
+			component: <HeavyMultiLayerWallFacingOneSideComponent />,
+			action: () => {
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
@@ -456,16 +523,63 @@ export const ConstructionsAdd = () => {
 				]);
 			},
 		},
-		[ConstructionTypeEnum.HeavyMultiLaterWallFacingOneSide]: {
-			component: <HeavyMultiLayerWallFacingOneSideComponent />,
+		[ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]: {
+			component: <HeavyMultiLayerWallFacingBothSideComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavyMultiLaterWallFacingOneSide,
+					ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
 						userMaterials: [
 							{
 								positionId: '1',
@@ -504,7 +618,7 @@ export const ConstructionsAdd = () => {
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Center,
+						contructionPosition: ConstructionPosition.Right,
 						userMaterials: [
 							{
 								positionId: '0',
