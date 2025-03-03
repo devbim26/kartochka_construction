@@ -11,6 +11,7 @@ import {
 	HeavySingleWallComponent,
 	HeavySingleWallFacingBothSideComponent,
 	HeavySingleWallFacingOneSideComponent,
+	HeavySingleWallSoundproofingBothSideComponent,
 	HeavySingleWallSoundproofingOneSideComponent,
 	RuConstructionConstructionTypeSelectValues,
 	RuIndexTypeNamesSelectValues,
@@ -163,7 +164,7 @@ export const ConstructionsAdd = () => {
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
 							{
-								positionId: '0',
+								positionId: '1',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
@@ -171,15 +172,7 @@ export const ConstructionsAdd = () => {
 								],
 							},
 							{
-								positionId: '1',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '2',
+								positionId: '0',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
@@ -307,6 +300,72 @@ export const ConstructionsAdd = () => {
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavySingleLaterWallSoundproofingBothSide]: {
+			component: <HeavySingleWallSoundproofingBothSideComponent />,
+			action: () => {
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLaterWallSoundproofingBothSide,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Right,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
 							},
 						],
@@ -570,7 +629,7 @@ export const ConstructionsAdd = () => {
 									'text-sm leading-5 tracking-[0.1px]',
 									formState.errors.constructionType?.message ? 'text-error' : '',
 								)}
-								wrapperClassname="w-fit min-w-[226px] ring-input-border-primary"
+								wrapperClassname="w-fit min-w-[452px] ring-input-border-primary"
 								buttonClassName="text-sm rounded-[8px]"
 								label={formState.errors.constructionType?.message || ''}
 								placeholder="Выберите тип"
