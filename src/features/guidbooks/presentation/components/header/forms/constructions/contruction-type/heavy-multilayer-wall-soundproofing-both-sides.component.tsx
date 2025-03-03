@@ -27,13 +27,13 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 		fiveIndex: -1,
 	});
 	const [facingIndices, setFacingIndices] = useState({
-		left: {
+		top: {
 			zeroIndex: -1,
 			oneIndex: -1,
 			twoIndex: -1,
 			threeIndex: -1,
 		},
-		right: {
+		bottom: {
 			zeroIndex: -1,
 			oneIndex: -1,
 			twoIndex: -1,
@@ -44,10 +44,10 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 	const baseConstructionUserMaterials = form.watch(
 		'constructionTypeObject.constructions.0.userMaterials',
 	);
-	const leftFacingUserMaterials = form.watch(
+	const topFacingUserMaterials = form.watch(
 		'constructionTypeObject.constructions.1.userMaterials',
 	);
-	const rightFacingUserMaterials = form.watch(
+	const bottomFacingUserMaterials = form.watch(
 		'constructionTypeObject.constructions.2.userMaterials',
 	);
 
@@ -61,31 +61,31 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 			fiveIndex: baseConstructionUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
 		});
 		setFacingIndices({
-			left: {
-				zeroIndex: leftFacingUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
-				oneIndex: leftFacingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
-				twoIndex: leftFacingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
-				threeIndex: leftFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
+			top: {
+				zeroIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
+				oneIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
+				twoIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
+				threeIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
 			},
-			right: {
-				zeroIndex: rightFacingUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
-				oneIndex: rightFacingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
-				twoIndex: rightFacingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
-				threeIndex: rightFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
+			bottom: {
+				zeroIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
+				oneIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
+				twoIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
+				threeIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
 			},
 		});
-	}, [baseConstructionUserMaterials, leftFacingUserMaterials, rightFacingUserMaterials]);
+	}, [baseConstructionUserMaterials, topFacingUserMaterials, bottomFacingUserMaterials]);
 
 	return (
 		<>
 			<ConstructionLayer title="1. Облицовка1">
-				{facingIndices.left.zeroIndex < 0 ? (
+				{facingIndices.top.twoIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
-								...(leftFacingUserMaterials || []),
+								...(topFacingUserMaterials || []),
 								{
-									positionId: '0',
+									positionId: '2',
 									materialId: '',
 									materialTypeValue: [
 										{
@@ -104,15 +104,15 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 					/>
 				) : (
 					<>
-						{facingIndices.left.zeroIndex >= 0 && (
+						{facingIndices.top.twoIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={facingIndices.left.zeroIndex}
+										fieldIndex={facingIndices.top.twoIndex}
 										constructionIndex={1}
 									/>
 									<ThicknessDensityFieldsType
-										fieldIndex={facingIndices.left.zeroIndex}
+										fieldIndex={facingIndices.top.twoIndex}
 										constructionIndex={1}
 									/>
 								</div>
@@ -121,9 +121,9 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 									onClick={() => {
 										form.setValue(
 											'constructionTypeObject.constructions.1.userMaterials',
-											(leftFacingUserMaterials &&
-												leftFacingUserMaterials.filter(
-													(c) => c.positionId !== '0',
+											(topFacingUserMaterials &&
+												topFacingUserMaterials.filter(
+													(c) => c.positionId !== '2',
 												)) ||
 												[],
 										);
@@ -133,13 +133,13 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 						)}
 					</>
 				)}
-				{facingIndices.left.oneIndex < 0 && facingIndices.left.zeroIndex > 0 ? (
+				{facingIndices.top.threeIndex < 0 && facingIndices.top.twoIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
-								...(leftFacingUserMaterials || []),
+								...(topFacingUserMaterials || []),
 								{
-									positionId: '1',
+									positionId: '3',
 									materialId: '',
 									materialTypeValue: [
 										{
@@ -158,15 +158,15 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 					/>
 				) : (
 					<>
-						{facingIndices.left.oneIndex >= 0 && (
+						{facingIndices.top.threeIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={facingIndices.left.oneIndex}
+										fieldIndex={facingIndices.top.threeIndex}
 										constructionIndex={1}
 									/>
 									<ThicknessDensityFieldsType
-										fieldIndex={facingIndices.left.oneIndex}
+										fieldIndex={facingIndices.top.threeIndex}
 										constructionIndex={1}
 									/>
 								</div>
@@ -175,9 +175,9 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 									onClick={() => {
 										form.setValue(
 											'constructionTypeObject.constructions.1.userMaterials',
-											(leftFacingUserMaterials &&
-												leftFacingUserMaterials.filter(
-													(c) => c.positionId !== '1',
+											(topFacingUserMaterials &&
+												topFacingUserMaterials.filter(
+													(c) => c.positionId !== '3',
 												)) ||
 												[],
 										);
@@ -187,28 +187,32 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 						)}
 					</>
 				)}
-				{facingIndices.left.twoIndex >= 0 && (
-					<div className="flex gap-[20px]">
-						<BoardMaterialType
-							fieldIndex={facingIndices.left.oneIndex}
-							constructionIndex={1}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={facingIndices.left.oneIndex}
-							constructionIndex={1}
-						/>
+				{facingIndices.top.zeroIndex >= 0 && (
+					<div className="flex justify-between">
+						<div className="flex gap-[20px]">
+							<ZPanelMaterialType
+								fieldIndex={facingIndices.top.zeroIndex}
+								constructionIndex={1}
+							/>
+							<ThicknessDensityFieldsType
+								fieldIndex={facingIndices.top.zeroIndex}
+								constructionIndex={1}
+							/>
+						</div>
 					</div>
 				)}
-				{facingIndices.left.threeIndex >= 0 && (
-					<div className="flex gap-[20px]">
-						<ZPanelMaterialType
-							fieldIndex={facingIndices.left.oneIndex}
-							constructionIndex={1}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={facingIndices.left.oneIndex}
-							constructionIndex={1}
-						/>
+				{facingIndices.top.oneIndex >= 0 && (
+					<div className="flex justify-between">
+						<div className="flex gap-[20px]">
+							<BoardMaterialType
+								fieldIndex={facingIndices.top.oneIndex}
+								constructionIndex={1}
+							/>
+							<ThicknessDensityFieldsType
+								fieldIndex={facingIndices.top.oneIndex}
+								constructionIndex={1}
+							/>
+						</div>
 					</div>
 				)}
 			</ConstructionLayer>
@@ -251,6 +255,19 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 										constructionIndex={0}
 									/>
 								</div>
+								<DeleteIcon
+									className="self-end"
+									onClick={() => {
+										form.setValue(
+											'constructionTypeObject.constructions.0.userMaterials',
+											(baseConstructionUserMaterials &&
+												baseConstructionUserMaterials.filter(
+													(c) => c.positionId !== '0',
+												)) ||
+												[],
+										);
+									}}
+								/>
 							</div>
 						)}
 					</>
@@ -294,11 +311,11 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 				{baseConstructionIndices.fourIndex >= 0 && (
 					<div className="flex flex-row gap-[16px]">
 						<HeavyMaterialType
-							fieldIndex={baseConstructionIndices.threeIndex}
+							fieldIndex={baseConstructionIndices.fourIndex}
 							constructionIndex={0}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={baseConstructionIndices.twoIndex}
+							fieldIndex={baseConstructionIndices.fourIndex}
 							constructionIndex={0}
 						/>
 					</div>
@@ -360,39 +377,39 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 			</ConstructionLayer>
 
 			<ConstructionLayer title="3. Облицовка 2">
-				{facingIndices.right.zeroIndex >= 0 && (
+				{facingIndices.bottom.zeroIndex >= 0 && (
 					<div className="flex justify-between">
 						<div className="flex gap-[20px]">
 							<ZPanelMaterialType
-								fieldIndex={facingIndices.right.zeroIndex}
+								fieldIndex={facingIndices.bottom.zeroIndex}
 								constructionIndex={2}
 							/>
 							<ThicknessDensityFieldsType
-								fieldIndex={facingIndices.right.zeroIndex}
+								fieldIndex={facingIndices.bottom.zeroIndex}
 								constructionIndex={2}
 							/>
 						</div>
 					</div>
 				)}
-				{facingIndices.right.oneIndex >= 0 && (
+				{facingIndices.bottom.oneIndex >= 0 && (
 					<div className="flex justify-between">
 						<div className="flex gap-[20px]">
 							<BoardMaterialType
-								fieldIndex={facingIndices.right.oneIndex}
+								fieldIndex={facingIndices.bottom.oneIndex}
 								constructionIndex={2}
 							/>
 							<ThicknessDensityFieldsType
-								fieldIndex={facingIndices.right.oneIndex}
+								fieldIndex={facingIndices.bottom.oneIndex}
 								constructionIndex={2}
 							/>
 						</div>
 					</div>
 				)}
-				{facingIndices.right.twoIndex < 0 ? (
+				{facingIndices.bottom.twoIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.2.userMaterials', [
-								...(rightFacingUserMaterials || []),
+								...(bottomFacingUserMaterials || []),
 								{
 									positionId: '2',
 									materialId: '',
@@ -413,15 +430,15 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 					/>
 				) : (
 					<>
-						{facingIndices.right.twoIndex >= 0 && (
+						{facingIndices.bottom.twoIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={facingIndices.right.twoIndex}
+										fieldIndex={facingIndices.bottom.twoIndex}
 										constructionIndex={2}
 									/>
 									<ThicknessDensityFieldsType
-										fieldIndex={facingIndices.right.twoIndex}
+										fieldIndex={facingIndices.bottom.twoIndex}
 										constructionIndex={2}
 									/>
 								</div>
@@ -430,8 +447,8 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 									onClick={() => {
 										form.setValue(
 											'constructionTypeObject.constructions.2.userMaterials',
-											(rightFacingUserMaterials &&
-												rightFacingUserMaterials.filter(
+											(bottomFacingUserMaterials &&
+												bottomFacingUserMaterials.filter(
 													(c) => c.positionId !== '2',
 												)) ||
 												[],
@@ -442,11 +459,11 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 						)}
 					</>
 				)}
-				{facingIndices.right.threeIndex < 0 && facingIndices.right.twoIndex > 0 ? (
+				{facingIndices.bottom.threeIndex < 0 && facingIndices.bottom.twoIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.2.userMaterials', [
-								...(rightFacingUserMaterials || []),
+								...(bottomFacingUserMaterials || []),
 								{
 									positionId: '3',
 									materialId: '',
@@ -467,15 +484,15 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 					/>
 				) : (
 					<>
-						{facingIndices.right.threeIndex >= 0 && (
+						{facingIndices.bottom.threeIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={facingIndices.right.threeIndex}
+										fieldIndex={facingIndices.bottom.threeIndex}
 										constructionIndex={2}
 									/>
 									<ThicknessDensityFieldsType
-										fieldIndex={facingIndices.right.threeIndex}
+										fieldIndex={facingIndices.bottom.threeIndex}
 										constructionIndex={2}
 									/>
 								</div>
@@ -484,8 +501,8 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 									onClick={() => {
 										form.setValue(
 											'constructionTypeObject.constructions.2.userMaterials',
-											(rightFacingUserMaterials &&
-												rightFacingUserMaterials.filter(
+											(bottomFacingUserMaterials &&
+												bottomFacingUserMaterials.filter(
 													(c) => c.positionId !== '3',
 												)) ||
 												[],

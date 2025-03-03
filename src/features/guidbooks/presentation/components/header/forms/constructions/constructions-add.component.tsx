@@ -274,6 +274,24 @@ export const ConstructionsAdd = () => {
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
 							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
 						],
 					},
 					{
@@ -295,31 +313,13 @@ export const ConstructionsAdd = () => {
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
 							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
 						],
 					},
 					{
 						contructionPosition: ConstructionPosition.Right,
 						userMaterials: [
 							{
-								positionId: '1',
+								positionId: '0',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
@@ -327,7 +327,7 @@ export const ConstructionsAdd = () => {
 								],
 							},
 							{
-								positionId: '2',
+								positionId: '1',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
