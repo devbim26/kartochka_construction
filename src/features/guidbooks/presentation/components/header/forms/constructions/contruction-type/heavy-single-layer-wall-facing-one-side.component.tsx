@@ -1,8 +1,10 @@
 import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
+import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
 import {
 	AirGapMaterialType,
 	BoardMaterialType,
+	ConstructionFieldsMap,
 	ConstructionLayer,
 	FillerMaterialType,
 	FrameMaterialType,
@@ -12,7 +14,6 @@ import {
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 	WidthRacksStepFieldsType,
-	type ConstructionsAddData,
 } from '@features';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -20,7 +21,6 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const HeavySingleLayerWallFacingOneSideComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
-	const { watch } = form;
 	const [baseConstructionIndices, setBaseConstructionIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
@@ -34,6 +34,10 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 		fourIndex: -1,
 		fiveIndex: -1,
 		sixIndex: -1,
+	});
+	const [currentFacingMaterialTypes, setCurrentFacingMaterialTypes] = useState({
+		five: '',
+		six: '',
 	});
 
 	const baseConstructionUserMaterials = form.watch(
@@ -62,7 +66,14 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 		form.watch('constructionTypeObject.constructions'),
 	]);
 
-	console.log(watch('constructionTypeObject.constructions'));
+	useEffect(() => {
+		setCurrentFacingMaterialTypes({
+			five: form.watch(`constructionTypeObject.constructions.1.userMaterialTypes.5.value`),
+			six: form.watch(`constructionTypeObject.constructions.1.userMaterialTypes.6.value`),
+		});
+	}, [form.watch(`constructionTypeObject.constructions.1.userMaterialTypes`)]);
+
+	console.log(currentFacingMaterialTypes.five);
 
 	return (
 		<>
@@ -95,7 +106,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 						{baseConstructionIndices.zeroIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
-									<HeavyMaterialType
+									<SelectableMaterialType
 										fieldIndex={baseConstructionIndices.zeroIndex}
 										constructionIndex={0}
 									/>
@@ -263,16 +274,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
-									materialTypeValue: [
-										{
-											materialParameters: MaterialParametrs.Thickness,
-											value: '',
-										},
-										{
-											materialParameters: MaterialParametrs.Density,
-											value: '',
-										},
-									],
+									materialTypeValue: [],
 								},
 							]);
 						}}
@@ -287,10 +289,12 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 										fieldIndex={facingIndices.fiveIndex}
 										constructionIndex={1}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={facingIndices.fiveIndex}
-										constructionIndex={1}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: facingIndices.fiveIndex,
+										constructionIndex: 1,
+										materialType:
+											currentFacingMaterialTypes.five as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"
@@ -317,16 +321,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '6',
 									materialId: '',
-									materialTypeValue: [
-										{
-											materialParameters: MaterialParametrs.Thickness,
-											value: '',
-										},
-										{
-											materialParameters: MaterialParametrs.Density,
-											value: '',
-										},
-									],
+									materialTypeValue: [],
 								},
 							]);
 						}}
