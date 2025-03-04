@@ -1,4 +1,3 @@
-import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
 import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
 import {
@@ -22,14 +21,13 @@ export const HeavySingleLayerWallComponent = () => {
 		twoIndex: -1,
 	});
 	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
-		zero: '',
-		two: '',
+		zeroValue: '',
+		twoValue: '',
 	});
-	const [userMaterials, constructions, currentMaterialTypeZero, currentMaterialTypeTwo] = watch([
+	const [userMaterials, userMaterialTypes, constructions] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
+		'constructionTypeObject.constructions.0.userMaterialTypes',
 		'constructionTypeObject.constructions',
-		'constructionTypeObject.constructions.0.userMaterialTypes.0.value',
-		'constructionTypeObject.constructions.0.userMaterialTypes.2.value',
 	]);
 
 	useEffect(() => {
@@ -39,10 +37,12 @@ export const HeavySingleLayerWallComponent = () => {
 			twoIndex: userMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zero: currentMaterialTypeZero,
-			two: currentMaterialTypeTwo,
+			zeroValue: String(userMaterialTypes?.findIndex((c) => c.positionId === '0')) ?? '',
+			twoValue: String(userMaterialTypes?.findIndex((c) => c.positionId === '2')) ?? '',
 		});
 	}, [userMaterials, constructions]);
+
+	console.log(constructions);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
@@ -55,6 +55,13 @@ export const HeavySingleLayerWallComponent = () => {
 								positionId: '0',
 								materialId: '',
 								materialTypeValue: [],
+							},
+						]);
+						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
+							...(userMaterialTypes || []),
+							{
+								positionId: '0',
+								value: '',
 							},
 						]);
 					}}
@@ -73,7 +80,8 @@ export const HeavySingleLayerWallComponent = () => {
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
 									constructionIndex: 0,
-									materialType: currentMaterialTypes.zero as MaterialTypeEnum,
+									materialType:
+										currentMaterialTypes.zeroValue as MaterialTypeEnum,
 								})}
 							</div>
 							<DeleteIcon
@@ -108,16 +116,14 @@ export const HeavySingleLayerWallComponent = () => {
 							{
 								positionId: '2',
 								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.Thickness,
-										value: '',
-									},
-									{
-										materialParameters: MaterialParametrs.Density,
-										value: '',
-									},
-								],
+								materialTypeValue: [],
+							},
+						]);
+						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
+							...(userMaterialTypes || []),
+							{
+								positionId: '2',
+								value: '',
 							},
 						]);
 					}}
@@ -136,7 +142,7 @@ export const HeavySingleLayerWallComponent = () => {
 								{ConstructionFieldsMap({
 									fieldIndex: indices.twoIndex,
 									constructionIndex: 0,
-									materialType: currentMaterialTypes.two as MaterialTypeEnum,
+									materialType: currentMaterialTypes.twoValue as MaterialTypeEnum,
 								})}
 							</div>
 							<DeleteIcon
