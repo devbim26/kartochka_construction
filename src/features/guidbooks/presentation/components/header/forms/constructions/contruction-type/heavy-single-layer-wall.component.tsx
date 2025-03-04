@@ -1,3 +1,4 @@
+import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
 import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
 import {
@@ -20,26 +21,13 @@ export const HeavySingleLayerWallComponent = () => {
 		oneIndex: -1,
 		twoIndex: -1,
 	});
-	const [currentUserMaterialTypes, setCurrentUserMaterialTypes] = useState({
-		zero: {
-			positionId: -1,
-			value: '',
-		},
-		two: {
-			positionId: -1,
-			value: '',
-		},
+	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
+		zero: '',
+		two: '',
 	});
-	const [
-		userMaterials,
-		constructions,
-		userMaterialTypes,
-		userMaterialTypesZeroValue,
-		userMaterialTypesTwoValue,
-	] = watch([
+	const [userMaterials, constructions, currentMaterialTypeZero, currentMaterialTypeTwo] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
 		'constructionTypeObject.constructions',
-		'constructionTypeObject.constructions.0.userMaterialTypes',
 		'constructionTypeObject.constructions.0.userMaterialTypes.0.value',
 		'constructionTypeObject.constructions.0.userMaterialTypes.2.value',
 	]);
@@ -50,20 +38,11 @@ export const HeavySingleLayerWallComponent = () => {
 			oneIndex: userMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
 			twoIndex: userMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 		});
-		setCurrentUserMaterialTypes({
-			zero: {
-				positionId: userMaterialTypes?.findIndex((c) => c.positionId === '0') ?? -1,
-				value: userMaterialTypesZeroValue,
-			},
-			two: {
-				positionId: userMaterialTypes?.findIndex((c) => c.positionId === '2') ?? -1,
-				value: userMaterialTypesTwoValue,
-			},
+		setCurrentMaterialTypes({
+			zero: currentMaterialTypeZero,
+			two: currentMaterialTypeTwo,
 		});
-	}, [userMaterials, userMaterialTypes, constructions]);
-
-	console.log(constructions);
-	console.log(currentUserMaterialTypes.zero);
+	}, [userMaterials, constructions]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
@@ -76,13 +55,6 @@ export const HeavySingleLayerWallComponent = () => {
 								positionId: '0',
 								materialId: '',
 								materialTypeValue: [],
-							},
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{
-								positionId: '0',
-								value: '',
 							},
 						]);
 					}}
@@ -101,8 +73,7 @@ export const HeavySingleLayerWallComponent = () => {
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
 									constructionIndex: 0,
-									materialType: currentUserMaterialTypes.zero
-										.value as MaterialTypeEnum,
+									materialType: currentMaterialTypes.zero as MaterialTypeEnum,
 								})}
 							</div>
 							<DeleteIcon
@@ -137,14 +108,16 @@ export const HeavySingleLayerWallComponent = () => {
 							{
 								positionId: '2',
 								materialId: '',
-								materialTypeValue: [],
-							},
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{
-								positionId: '2',
-								value: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.Thickness,
+										value: '',
+									},
+									{
+										materialParameters: MaterialParametrs.Density,
+										value: '',
+									},
+								],
 							},
 						]);
 					}}
@@ -156,15 +129,14 @@ export const HeavySingleLayerWallComponent = () => {
 						<div className="flex justify-between">
 							<div className="flex gap-[20px]">
 								<SelectableMaterialType
-									fieldIndex={indices.zeroIndex}
+									fieldIndex={indices.twoIndex}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 								/>
 								{ConstructionFieldsMap({
-									fieldIndex: indices.zeroIndex,
+									fieldIndex: indices.twoIndex,
 									constructionIndex: 0,
-									materialType: currentUserMaterialTypes.two
-										.value as MaterialTypeEnum,
+									materialType: currentMaterialTypes.two as MaterialTypeEnum,
 								})}
 							</div>
 							<DeleteIcon

@@ -33,10 +33,9 @@ export const SelectableMaterialType = ({
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control, watch, setValue } = form;
 	const [materials, setMaterials] = useState<Array<SelectOption>>();
-	const [userMaterialTypes, userMaterials, currentUserMaterialType] = watch([
-		`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes`,
-		`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
+	const [currentMaterialType, currentUserMaterials] = watch([
 		`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`,
+		`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
 	]);
 
 	const handleGetMaterials = (data: MaterialsFilterData) => {
@@ -65,25 +64,25 @@ export const SelectableMaterialType = ({
 
 	useEffect(() => {
 		handleGetMaterials({
-			materialType: currentUserMaterialType,
+			materialType: currentMaterialType,
 		});
-	}, [userMaterials]);
+	}, [currentUserMaterials]);
 
 	useEffect(() => {
 		setValue(
 			`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-			userMaterials!.map((material) =>
+			currentUserMaterials!.map((material) =>
 				material.positionId === String(fieldIndex)
 					? {
 							positionId: String(fieldIndex),
 							materialId: '',
 							materialTypeValue:
-								MaterialTypeValuesMap[currentUserMaterialType as MaterialTypeEnum],
+								MaterialTypeValuesMap[currentMaterialType as MaterialTypeEnum],
 						}
 					: material,
 			),
 		);
-	}, [userMaterials]);
+	}, [currentMaterialType]);
 
 	return (
 		<div className="flex flex-wrap gap-[16px]">
