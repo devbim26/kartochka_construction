@@ -1,18 +1,21 @@
 import { DeleteIcon } from '@core';
+import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
 import {
 	AirGapMaterialType,
 	BoardMaterialType,
+	ConstructionFieldsMap,
 	ConstructionLayer,
 	FillerMaterialType,
 	FrameMaterialType,
 	HeavyMaterialType,
 	LinkMaterialType,
+	MaterialTypesSelectValuesEnum,
 	PointConnectionsFieldsType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 	WidthRacksStepFieldsType,
-	type ConstructionsAddData,
 } from '@features';
+
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
@@ -20,7 +23,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
 
-	const [facingTopIndices, setFacingTopIndices] = useState({
+	const [topFacingIndices, setTopFacingIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
 		twoIndex: -1,
@@ -39,7 +42,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 		fiveIndex: -1,
 	});
 
-	const [facingBottomIndices, setFacingBottomIndices] = useState({
+	const [bottomFacingIndices, setBottomFacingIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
 		twoIndex: -1,
@@ -48,24 +51,32 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 		fiveIndex: -1,
 		sixIndex: -1,
 	});
+	const [currentTopFacingMaterialTypes, setCurrentTopFacingMaterialTypes] = useState({
+		five: '',
+		six: '',
+	});
+	const [currentBottomFacingMaterialTypes, setCurrentBottomFacingMaterialTypes] = useState({
+		five: '',
+		six: '',
+	});
 
-	const facingTopUserMaterials = form.watch(
+	const topFacingUserMaterials = form.watch(
 		'constructionTypeObject.constructions.0.userMaterials',
 	);
 	const baseUserMaterials = form.watch('constructionTypeObject.constructions.1.userMaterials');
-	const facingBottomUserMaterials = form.watch(
+	const bottomFacingUserMaterials = form.watch(
 		'constructionTypeObject.constructions.2.userMaterials',
 	);
 
 	useEffect(() => {
-		setFacingTopIndices({
-			zeroIndex: facingTopUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
-			oneIndex: facingTopUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
-			twoIndex: facingTopUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
-			threeIndex: facingTopUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
-			fourIndex: facingTopUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
-			fiveIndex: facingTopUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
-			sixIndex: facingTopUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
+		setTopFacingIndices({
+			zeroIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
+			oneIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
+			twoIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
+			threeIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
+			fourIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
+			fiveIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
+			sixIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
 		});
 		setBaseIndices({
 			zeroIndex: baseUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
@@ -75,30 +86,38 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 			fourIndex: baseUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
 			fiveIndex: baseUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
 		});
-		setFacingBottomIndices({
-			zeroIndex: facingBottomUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
-			oneIndex: facingBottomUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
-			twoIndex: facingBottomUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
-			threeIndex: facingBottomUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
-			fourIndex: facingBottomUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
-			fiveIndex: facingBottomUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
-			sixIndex: facingBottomUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
+		setBottomFacingIndices({
+			zeroIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
+			oneIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
+			twoIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
+			threeIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
+			fourIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
+			fiveIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
+			sixIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
+		});
+		setCurrentTopFacingMaterialTypes({
+			five: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.5.value`),
+			six: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.6.value`),
+		});
+		setCurrentBottomFacingMaterialTypes({
+			five: form.watch(`constructionTypeObject.constructions.2.userMaterialTypes.5.value`),
+			six: form.watch(`constructionTypeObject.constructions.2.userMaterialTypes.6.value`),
 		});
 	}, [
-		facingTopUserMaterials,
+		topFacingUserMaterials,
 		baseUserMaterials,
-		facingBottomUserMaterials,
+		bottomFacingUserMaterials,
 		form.watch('constructionTypeObject.constructions'),
 	]);
 
 	return (
 		<>
 			<ConstructionLayer title="1. Облицовка">
-				{facingTopIndices.sixIndex < 0 && facingTopIndices.fiveIndex > 0 ? (
+				{topFacingIndices.sixIndex < 0 && topFacingIndices.fiveIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
-								...(facingTopUserMaterials || []),
+								...(topFacingUserMaterials || []),
 								{
 									positionId: '6',
 									materialId: '',
@@ -110,25 +129,30 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 					/>
 				) : (
 					<>
-						{facingTopIndices.sixIndex >= 0 && (
+						{topFacingIndices.sixIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={facingTopIndices.sixIndex}
+										fieldIndex={topFacingIndices.sixIndex}
 										constructionIndex={0}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Facing
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={facingTopIndices.sixIndex}
-										constructionIndex={0}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: topFacingIndices.sixIndex,
+										constructionIndex: 0,
+										materialType:
+											currentTopFacingMaterialTypes.six as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
 										form.setValue(
 											'constructionTypeObject.constructions.0.userMaterials',
-											(facingTopUserMaterials &&
-												facingTopUserMaterials.filter(
+											(topFacingUserMaterials &&
+												topFacingUserMaterials.filter(
 													(c) => c.positionId !== '6',
 												)) ||
 												[],
@@ -140,11 +164,11 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 					</>
 				)}
 
-				{facingTopIndices.fiveIndex < 0 ? (
+				{topFacingIndices.fiveIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
-								...(facingTopUserMaterials || []),
+								...(topFacingUserMaterials || []),
 								{
 									positionId: '5',
 									materialId: '',
@@ -156,25 +180,30 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 					/>
 				) : (
 					<>
-						{facingTopIndices.fiveIndex >= 0 && (
+						{topFacingIndices.fiveIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={facingTopIndices.fiveIndex}
+										fieldIndex={topFacingIndices.fiveIndex}
 										constructionIndex={0}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Facing
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={facingTopIndices.fiveIndex}
-										constructionIndex={0}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: topFacingIndices.fiveIndex,
+										constructionIndex: 0,
+										materialType:
+											currentTopFacingMaterialTypes.five as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
 										form.setValue(
 											'constructionTypeObject.constructions.0.userMaterials',
-											(facingTopUserMaterials &&
-												facingTopUserMaterials.filter(
+											(topFacingUserMaterials &&
+												topFacingUserMaterials.filter(
 													(c) => c.positionId !== '5',
 												)) ||
 												[],
@@ -186,62 +215,62 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 					</>
 				)}
 
-				{facingTopIndices.fourIndex >= 0 && (
+				{topFacingIndices.fourIndex >= 0 && (
 					<div className="flex gap-[16px]">
 						<BoardMaterialType
-							fieldIndex={facingTopIndices.fourIndex}
+							fieldIndex={topFacingIndices.fourIndex}
 							constructionIndex={0}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={facingTopIndices.fourIndex}
+							fieldIndex={topFacingIndices.fourIndex}
 							constructionIndex={0}
 						/>
 					</div>
 				)}
-				{facingTopIndices.threeIndex >= 0 && (
+				{topFacingIndices.threeIndex >= 0 && (
 					<div className="flex gap-[16px]">
 						<FillerMaterialType
-							fieldIndex={facingTopIndices.threeIndex}
+							fieldIndex={topFacingIndices.threeIndex}
 							constructionIndex={0}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={facingTopIndices.threeIndex}
+							fieldIndex={topFacingIndices.threeIndex}
 							constructionIndex={0}
 						/>
 					</div>
 				)}
-				{facingTopIndices.twoIndex >= 0 && (
+				{topFacingIndices.twoIndex >= 0 && (
 					<div className="flex gap-[16px]">
 						<FrameMaterialType
-							fieldIndex={facingTopIndices.twoIndex}
+							fieldIndex={topFacingIndices.twoIndex}
 							constructionIndex={0}
 						/>
 						<WidthRacksStepFieldsType
-							fieldIndex={facingTopIndices.twoIndex}
+							fieldIndex={topFacingIndices.twoIndex}
 							constructionIndex={0}
 						/>
 					</div>
 				)}
-				{facingTopIndices.oneIndex >= 0 && (
+				{topFacingIndices.oneIndex >= 0 && (
 					<div className="flex gap-[16px]">
 						<LinkMaterialType
-							fieldIndex={facingTopIndices.oneIndex}
+							fieldIndex={topFacingIndices.oneIndex}
 							constructionIndex={0}
 						/>
 						<PointConnectionsFieldsType
-							fieldIndex={facingTopIndices.oneIndex}
+							fieldIndex={topFacingIndices.oneIndex}
 							constructionIndex={0}
 						/>
 					</div>
 				)}
-				{facingTopIndices.zeroIndex >= 0 && (
+				{topFacingIndices.zeroIndex >= 0 && (
 					<div className="flex gap-[16px]">
 						<AirGapMaterialType
-							fieldIndex={facingTopIndices.zeroIndex}
+							fieldIndex={topFacingIndices.zeroIndex}
 							constructionIndex={0}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={facingTopIndices.zeroIndex}
+							fieldIndex={topFacingIndices.zeroIndex}
 							constructionIndex={0}
 						/>
 					</div>
@@ -392,72 +421,72 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 			</ConstructionLayer>
 
 			<ConstructionLayer title="3. Облицовка">
-				{facingBottomIndices.zeroIndex >= 0 && (
+				{bottomFacingIndices.zeroIndex >= 0 && (
 					<div className="flex gap-[16px]">
 						<AirGapMaterialType
-							fieldIndex={facingBottomIndices.zeroIndex}
+							fieldIndex={bottomFacingIndices.zeroIndex}
 							constructionIndex={2}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={facingBottomIndices.zeroIndex}
+							fieldIndex={bottomFacingIndices.zeroIndex}
 							constructionIndex={2}
 						/>
 					</div>
 				)}
-				{facingBottomIndices.oneIndex >= 0 && (
+				{bottomFacingIndices.oneIndex >= 0 && (
 					<div className="flex gap-[16px]">
 						<LinkMaterialType
-							fieldIndex={facingBottomIndices.oneIndex}
+							fieldIndex={bottomFacingIndices.oneIndex}
 							constructionIndex={2}
 						/>
 						<PointConnectionsFieldsType
-							fieldIndex={facingBottomIndices.oneIndex}
+							fieldIndex={bottomFacingIndices.oneIndex}
 							constructionIndex={2}
 						/>
 					</div>
 				)}
-				{facingBottomIndices.twoIndex >= 0 && (
+				{bottomFacingIndices.twoIndex >= 0 && (
 					<div className="flex gap-[16px]">
 						<FrameMaterialType
-							fieldIndex={facingBottomIndices.twoIndex}
+							fieldIndex={bottomFacingIndices.twoIndex}
 							constructionIndex={2}
 						/>
 						<WidthRacksStepFieldsType
-							fieldIndex={facingBottomIndices.twoIndex}
+							fieldIndex={bottomFacingIndices.twoIndex}
 							constructionIndex={2}
 						/>
 					</div>
 				)}
-				{facingBottomIndices.threeIndex >= 0 && (
+				{bottomFacingIndices.threeIndex >= 0 && (
 					<div className="flex gap-[16px]">
 						<FillerMaterialType
-							fieldIndex={facingBottomIndices.threeIndex}
+							fieldIndex={bottomFacingIndices.threeIndex}
 							constructionIndex={2}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={facingBottomIndices.threeIndex}
+							fieldIndex={bottomFacingIndices.threeIndex}
 							constructionIndex={2}
 						/>
 					</div>
 				)}
-				{facingBottomIndices.fourIndex >= 0 && (
+				{bottomFacingIndices.fourIndex >= 0 && (
 					<div className="flex gap-[16px]">
 						<BoardMaterialType
-							fieldIndex={facingBottomIndices.fourIndex}
+							fieldIndex={bottomFacingIndices.fourIndex}
 							constructionIndex={2}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={facingBottomIndices.fourIndex}
+							fieldIndex={bottomFacingIndices.fourIndex}
 							constructionIndex={2}
 						/>
 					</div>
 				)}
 
-				{facingBottomIndices.fiveIndex < 0 ? (
+				{bottomFacingIndices.fiveIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.2.userMaterials', [
-								...(facingBottomUserMaterials || []),
+								...(bottomFacingUserMaterials || []),
 								{
 									positionId: '5',
 									materialId: '',
@@ -469,25 +498,30 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 					/>
 				) : (
 					<>
-						{facingBottomIndices.fiveIndex >= 0 && (
+						{bottomFacingIndices.fiveIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={facingBottomIndices.fiveIndex}
+										fieldIndex={bottomFacingIndices.fiveIndex}
 										constructionIndex={2}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Facing
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={facingBottomIndices.fiveIndex}
-										constructionIndex={2}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: bottomFacingIndices.fiveIndex,
+										constructionIndex: 2,
+										materialType:
+											currentBottomFacingMaterialTypes.five as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
 										form.setValue(
 											'constructionTypeObject.constructions.2.userMaterials',
-											(facingBottomUserMaterials &&
-												facingBottomUserMaterials.filter(
+											(bottomFacingUserMaterials &&
+												bottomFacingUserMaterials.filter(
 													(c) => c.positionId !== '5',
 												)) ||
 												[],
@@ -499,11 +533,11 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 					</>
 				)}
 
-				{facingBottomIndices.sixIndex < 0 && facingBottomIndices.fiveIndex > 0 ? (
+				{bottomFacingIndices.sixIndex < 0 && bottomFacingIndices.fiveIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							form.setValue('constructionTypeObject.constructions.2.userMaterials', [
-								...(facingBottomUserMaterials || []),
+								...(bottomFacingUserMaterials || []),
 								{
 									positionId: '6',
 									materialId: '',
@@ -515,25 +549,30 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 					/>
 				) : (
 					<>
-						{facingBottomIndices.sixIndex >= 0 && (
+						{bottomFacingIndices.sixIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={facingBottomIndices.sixIndex}
+										fieldIndex={bottomFacingIndices.sixIndex}
 										constructionIndex={2}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Facing
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={facingBottomIndices.sixIndex}
-										constructionIndex={2}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: bottomFacingIndices.sixIndex,
+										constructionIndex: 2,
+										materialType:
+											currentBottomFacingMaterialTypes.six as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
 										form.setValue(
 											'constructionTypeObject.constructions.2.userMaterials',
-											(facingBottomUserMaterials &&
-												facingBottomUserMaterials.filter(
+											(bottomFacingUserMaterials &&
+												bottomFacingUserMaterials.filter(
 													(c) => c.positionId !== '6',
 												)) ||
 												[],

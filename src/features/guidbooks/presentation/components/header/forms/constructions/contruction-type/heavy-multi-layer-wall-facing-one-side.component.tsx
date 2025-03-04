@@ -1,18 +1,22 @@
+import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
+import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
 import {
 	AirGapMaterialType,
 	BoardMaterialType,
+	ConstructionFieldsMap,
 	ConstructionLayer,
 	FillerMaterialType,
 	FrameMaterialType,
 	HeavyMaterialType,
 	LinkMaterialType,
+	MaterialTypesSelectValuesEnum,
 	PointConnectionsFieldsType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 	WidthRacksStepFieldsType,
-	type ConstructionsAddData,
 } from '@features';
+
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
@@ -38,6 +42,10 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 		fiveIndex: -1,
 		sixIndex: -1,
 	});
+	const [currentFacingMaterialTypes, setCurrentFacingMaterialTypes] = useState({
+		five: '',
+		six: '',
+	});
 
 	const baseUserMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
 	const facingUserMaterials = form.watch('constructionTypeObject.constructions.1.userMaterials');
@@ -60,6 +68,10 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 			fiveIndex: facingUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
 			sixIndex: facingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
 		});
+		setCurrentFacingMaterialTypes({
+			five: form.watch(`constructionTypeObject.constructions.1.userMaterialTypes.5.value`),
+			six: form.watch(`constructionTypeObject.constructions.1.userMaterialTypes.6.value`),
+		});
 	}, [
 		baseUserMaterials,
 		facingUserMaterials,
@@ -77,7 +89,16 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
-									materialTypeValue: [],
+									materialTypeValue: [
+										{
+											materialParameters: MaterialParametrs.Thickness,
+											value: '',
+										},
+										{
+											materialParameters: MaterialParametrs.Density,
+											value: '',
+										},
+									],
 								},
 							]);
 						}}
@@ -172,7 +193,16 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
-									materialTypeValue: [],
+									materialTypeValue: [
+										{
+											materialParameters: MaterialParametrs.Thickness,
+											value: '',
+										},
+										{
+											materialParameters: MaterialParametrs.Density,
+											value: '',
+										},
+									],
 								},
 							]);
 						}}
@@ -295,11 +325,16 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 									<SelectableMaterialType
 										fieldIndex={facingIndices.fiveIndex}
 										constructionIndex={1}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Facing
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={facingIndices.fiveIndex}
-										constructionIndex={1}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: facingIndices.fiveIndex,
+										constructionIndex: 1,
+										materialType:
+											currentFacingMaterialTypes.five as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"
@@ -341,11 +376,16 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 									<SelectableMaterialType
 										fieldIndex={facingIndices.sixIndex}
 										constructionIndex={1}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Facing
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={facingIndices.sixIndex}
-										constructionIndex={1}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: facingIndices.sixIndex,
+										constructionIndex: 1,
+										materialType:
+											currentFacingMaterialTypes.six as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"

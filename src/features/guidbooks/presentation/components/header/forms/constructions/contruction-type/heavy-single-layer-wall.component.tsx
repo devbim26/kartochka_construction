@@ -2,7 +2,6 @@ import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
 import type { ConstructionsAddData } from '@features';
 import { ConstructionLayer, HeavyMaterialType, ThicknessDensityFieldsType } from '@features';
-
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';

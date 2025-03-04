@@ -1,3 +1,4 @@
+import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
 import {
 	ConstructionLayer,
@@ -47,7 +48,16 @@ export const HeavyMultiLayerWallComponent = () => {
 							{
 								positionId: '0',
 								materialId: '',
-								materialTypeValue: [],
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.Thickness,
+										value: '',
+									},
+									{
+										materialParameters: MaterialParametrs.Density,
+										value: '',
+									},
+								],
 							},
 						]);
 					}}
@@ -128,7 +138,16 @@ export const HeavyMultiLayerWallComponent = () => {
 							{
 								positionId: '5',
 								materialId: '',
-								materialTypeValue: [],
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.Thickness,
+										value: '',
+									},
+									{
+										materialParameters: MaterialParametrs.Density,
+										value: '',
+									},
+								],
 							},
 						]);
 					}}

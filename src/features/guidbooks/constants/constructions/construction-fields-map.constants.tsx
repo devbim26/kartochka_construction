@@ -1,10 +1,10 @@
+import { MaterialParametrs } from '@api-gen';
 import {
-	MaterialTypeEnum,
 	PointConnectionsFieldsType,
 	ThicknessDensityFieldsType,
 	WidthRacksStepFieldsType,
 } from '@features';
-
+import { MaterialTypeEnum } from '@features/guidbooks/types';
 interface Props {
 	materialType: MaterialTypeEnum;
 	fieldIndex: number;
@@ -63,4 +63,74 @@ export const ConstructionFieldsMap = ({ materialType, fieldIndex, constructionIn
 	};
 
 	return componentsMap[materialType] || <></>;
+};
+
+export const MaterialTypeValuesMap = {
+	[MaterialTypeEnum.Heavy]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
+	[MaterialTypeEnum.AirGap]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
+	[MaterialTypeEnum.Link]: [
+		{
+			materialParameters: MaterialParametrs.ConnectionNumber,
+			value: '',
+		},
+	],
+	[MaterialTypeEnum.Frame]: [
+		{
+			materialParameters: MaterialParametrs.Width,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.RackStep,
+			value: '',
+		},
+	],
+	[MaterialTypeEnum.Filler]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
+	[MaterialTypeEnum.Board]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
+	[MaterialTypeEnum.AcousticTreatmentMaterials]: [],
+	[MaterialTypeEnum.FoamMaterials]: [],
+	[MaterialTypeEnum.Glazing]: [],
+	[MaterialTypeEnum.GypsumBondedbBoards]: [],
+	[MaterialTypeEnum.WoodBasedBoard]: [],
+	[MaterialTypeEnum.Metal]: [],
+	[MaterialTypeEnum.MasonryAndSolid]: [],
+	[MaterialTypeEnum.PorousMaterials]: [],
+	[MaterialTypeEnum.SandwichPanel]: [],
+	[MaterialTypeEnum.MineralBondedBoards]: [],
+	[MaterialTypeEnum.Membrane]: [],
 };
