@@ -1,15 +1,11 @@
 import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
-import type {
-	ConstructionsAddData,
-	MaterialsFilterData,
-	MaterialTypeEnum,
-	MaterialTypesSelectValuesEnum,
-} from '@features';
+import type { ConstructionsAddData, MaterialsFilterData, MaterialTypeEnum } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
 	getGuidebooksPaginated,
 	Guidebooks,
+	MaterialTypesSelectValuesEnum,
 	MaterialTypesSelectValuesMap,
 	MaterialTypeValuesMap,
 } from '@features';
@@ -32,7 +28,7 @@ export const SelectableMaterialType = ({
 }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control, watch } = form;
-	const [materials, setMaterials] = useState<Array<SelectOption>>();
+	const [materials, setMaterials] = useState<Array<SelectOption>>([]);
 	const currentMaterialType = watch(
 		`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`,
 	);
@@ -62,10 +58,12 @@ export const SelectableMaterialType = ({
 	};
 
 	useEffect(() => {
-		handleGetMaterials({
-			materialType: currentMaterialType,
-		});
-	}, [watch(`constructionTypeObject.constructions.${constructionIndex}.userMaterials`)]);
+		if (currentMaterialType === MaterialTypesSelectValuesEnum.Additional) {
+			setMaterials(MaterialTypesSelectValuesMap[MaterialTypesSelectValuesEnum.Additional]);
+		} else {
+			handleGetMaterials({ materialType: currentMaterialType });
+		}
+	}, [currentMaterialType]);
 
 	const currentUserMaterials =
 		form.watch(`constructionTypeObject.constructions.${constructionIndex}.userMaterials`) || [];
@@ -94,7 +92,13 @@ export const SelectableMaterialType = ({
 					<Select
 						{...field}
 						value={field.value || ''}
-						options={MaterialTypesSelectValuesMap[materialTypesSelectValues]}
+						options={[
+							...MaterialTypesSelectValuesMap[materialTypesSelectValues],
+							{
+								label: 'Дополнительные материалы',
+								value: MaterialTypesSelectValuesEnum.Additional,
+							},
+						]}
 						error={
 							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
@@ -116,7 +120,7 @@ export const SelectableMaterialType = ({
 			/>
 
 			<Controller
-				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`}
+				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`}
 				control={control}
 				render={({ field }) => (
 					<Select

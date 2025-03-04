@@ -8,6 +8,7 @@ import {
 	FillerMaterialType,
 	FrameMaterialType,
 	LinkMaterialType,
+	MaterialTypesSelectValuesEnum,
 	PointConnectionsFieldsType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
@@ -92,6 +93,11 @@ export const FramePartitionDouble = () => {
 						<div className="flex justify-between">
 							<div className="flex gap-[20px]">
 								<SelectableMaterialType
+									fieldIndex={indices.zeroIndex}
+									constructionIndex={0}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
+								/>
+								<ThicknessDensityFieldsType
 									fieldIndex={indices.zeroIndex}
 									constructionIndex={0}
 								/>
@@ -214,6 +220,11 @@ export const FramePartitionDouble = () => {
 						<div className="flex justify-between">
 							<div className="flex gap-[20px]">
 								<SelectableMaterialType
+									fieldIndex={indices.nineIndex}
+									constructionIndex={0}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
+								/>
+								<ThicknessDensityFieldsType
 									fieldIndex={indices.nineIndex}
 									constructionIndex={0}
 								/>
