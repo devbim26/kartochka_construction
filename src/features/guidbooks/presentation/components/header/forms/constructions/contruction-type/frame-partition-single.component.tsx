@@ -6,6 +6,7 @@ import {
 	ConstructionLayer,
 	FillerMaterialType,
 	FrameMaterialType,
+	MaterialTypesSelectValuesEnum,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 	WidthRacksStepFieldsType,
@@ -83,6 +84,7 @@ export const FramePartitionSingle = () => {
 								<SelectableMaterialType
 									fieldIndex={indices.zeroIndex}
 									constructionIndex={0}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
@@ -172,6 +174,7 @@ export const FramePartitionSingle = () => {
 								<SelectableMaterialType
 									fieldIndex={indices.fiveIndex}
 									constructionIndex={0}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.twoIndex,
