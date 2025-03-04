@@ -14,6 +14,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
+	const { watch, setValue } = form;
 	const [baseIndices, setBaseIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
@@ -25,9 +26,11 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 		twoIndex: -1,
 		threeIndex: -1,
 	});
-
-	const baseUserMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
-	const facingUserMaterials = form.watch('constructionTypeObject.constructions.1.userMaterials');
+	const [baseUserMaterials, facingUserMaterials, constructions] = watch([
+		'constructionTypeObject.constructions.0.userMaterials',
+		'constructionTypeObject.constructions.1.userMaterials',
+		'constructionTypeObject.constructions',
+	]);
 
 	useEffect(() => {
 		setBaseIndices({
@@ -41,11 +44,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 			twoIndex: facingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 			threeIndex: facingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
 		});
-	}, [
-		baseUserMaterials,
-		facingUserMaterials,
-		form.watch('constructionTypeObject.constructions'),
-	]);
+	}, [baseUserMaterials, facingUserMaterials, constructions]);
 
 	return (
 		<>
@@ -53,7 +52,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 				{baseIndices.zeroIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+							setValue('constructionTypeObject.constructions.0.userMaterials', [
 								...(baseUserMaterials || []),
 								{
 									positionId: '0',
@@ -90,7 +89,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.0.userMaterials',
 											(baseUserMaterials &&
 												baseUserMaterials.filter(
@@ -119,7 +118,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 				{baseIndices.twoIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+							setValue('constructionTypeObject.constructions.0.userMaterials', [
 								...(baseUserMaterials || []),
 								{
 									positionId: '2',
@@ -156,7 +155,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.0.userMaterials',
 											(baseUserMaterials &&
 												baseUserMaterials.filter(
@@ -202,7 +201,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 				{facingIndices.twoIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
+							setValue('constructionTypeObject.constructions.1.userMaterials', [
 								...(facingUserMaterials || []),
 								{
 									positionId: '2',
@@ -239,7 +238,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.1.userMaterials',
 											(facingUserMaterials &&
 												facingUserMaterials.filter(
@@ -256,7 +255,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 				{facingIndices.threeIndex < 0 && facingIndices.twoIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
+							setValue('constructionTypeObject.constructions.1.userMaterials', [
 								...(facingUserMaterials || []),
 								{
 									positionId: '3',
@@ -293,7 +292,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.1.userMaterials',
 											(facingUserMaterials &&
 												facingUserMaterials.filter(

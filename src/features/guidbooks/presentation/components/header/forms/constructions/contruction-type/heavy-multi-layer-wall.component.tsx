@@ -15,7 +15,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const HeavyMultiLayerWallComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
-
+	const { watch, setValue } = form;
 	const [indices, setIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
@@ -24,8 +24,10 @@ export const HeavyMultiLayerWallComponent = () => {
 		fourIndex: -1,
 		fiveIndex: -1,
 	});
-
-	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
+	const [userMaterials, constructions] = watch([
+		'constructionTypeObject.constructions.0.userMaterials',
+		'constructionTypeObject.constructions',
+	]);
 
 	useEffect(() => {
 		setIndices({
@@ -36,14 +38,14 @@ export const HeavyMultiLayerWallComponent = () => {
 			fourIndex: userMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
 			fiveIndex: userMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
 		});
-	}, [userMaterials, form.watch('constructionTypeObject.constructions')]);
+	}, [userMaterials, constructions]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
 			{indices.zeroIndex < 0 ? (
 				<AiOutlinePlusCircle
 					onClick={() => {
-						form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+						setValue('constructionTypeObject.constructions.0.userMaterials', [
 							...(userMaterials || []),
 							{
 								positionId: '0',
@@ -80,7 +82,7 @@ export const HeavyMultiLayerWallComponent = () => {
 							<DeleteIcon
 								className="self-end"
 								onClick={() => {
-									form.setValue(
+									setValue(
 										'constructionTypeObject.constructions.0.userMaterials',
 										(userMaterials &&
 											userMaterials.filter((c) => c.positionId !== '0')) ||
@@ -133,7 +135,7 @@ export const HeavyMultiLayerWallComponent = () => {
 			{indices.fiveIndex < 0 ? (
 				<AiOutlinePlusCircle
 					onClick={() => {
-						form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+						setValue('constructionTypeObject.constructions.0.userMaterials', [
 							...(userMaterials || []),
 							{
 								positionId: '5',
@@ -170,7 +172,7 @@ export const HeavyMultiLayerWallComponent = () => {
 							<DeleteIcon
 								className="self-end"
 								onClick={() => {
-									form.setValue(
+									setValue(
 										'constructionTypeObject.constructions.0.userMaterials',
 										(userMaterials &&
 											userMaterials.filter((c) => c.positionId !== '5')) ||

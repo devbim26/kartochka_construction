@@ -16,14 +16,13 @@ import {
 	ThicknessDensityFieldsType,
 	WidthRacksStepFieldsType,
 } from '@features';
-
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
-
+	const { watch, setValue } = form;
 	const [baseIndices, setBaseIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
@@ -32,7 +31,6 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 		fourIndex: -1,
 		fiveIndex: -1,
 	});
-
 	const [facingIndices, setFacingIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
@@ -46,9 +44,19 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 		five: '',
 		six: '',
 	});
-
-	const baseUserMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
-	const facingUserMaterials = form.watch('constructionTypeObject.constructions.1.userMaterials');
+	const [
+		baseUserMaterials,
+		facingUserMaterials,
+		constructions,
+		currentFacingMaterialTypeFive,
+		currentFacingMaterialTypeSix,
+	] = watch([
+		'constructionTypeObject.constructions.0.userMaterials',
+		'constructionTypeObject.constructions.1.userMaterials',
+		'constructionTypeObject.constructions',
+		'constructionTypeObject.constructions.1.userMaterialTypes.5.value',
+		'constructionTypeObject.constructions.1.userMaterialTypes.6.value',
+	]);
 
 	useEffect(() => {
 		setBaseIndices({
@@ -69,14 +77,10 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 			sixIndex: facingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
 		});
 		setCurrentFacingMaterialTypes({
-			five: form.watch(`constructionTypeObject.constructions.1.userMaterialTypes.5.value`),
-			six: form.watch(`constructionTypeObject.constructions.1.userMaterialTypes.6.value`),
+			five: currentFacingMaterialTypeFive,
+			six: currentFacingMaterialTypeSix,
 		});
-	}, [
-		baseUserMaterials,
-		facingUserMaterials,
-		form.watch('constructionTypeObject.constructions'),
-	]);
+	}, [baseUserMaterials, facingUserMaterials, constructions]);
 
 	return (
 		<>
@@ -84,7 +88,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 				{baseIndices.zeroIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+							setValue('constructionTypeObject.constructions.0.userMaterials', [
 								...(baseUserMaterials || []),
 								{
 									positionId: '0',
@@ -121,7 +125,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.0.userMaterials',
 											(baseUserMaterials &&
 												baseUserMaterials.filter(
@@ -188,7 +192,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 				{baseIndices.fiveIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+							setValue('constructionTypeObject.constructions.0.userMaterials', [
 								...(baseUserMaterials || []),
 								{
 									positionId: '5',
@@ -225,7 +229,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.0.userMaterials',
 											(baseUserMaterials &&
 												baseUserMaterials.filter(
@@ -306,7 +310,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 				{facingIndices.fiveIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
+							setValue('constructionTypeObject.constructions.1.userMaterials', [
 								...(facingUserMaterials || []),
 								{
 									positionId: '5',
@@ -339,7 +343,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.1.userMaterials',
 											(facingUserMaterials &&
 												facingUserMaterials.filter(
@@ -357,7 +361,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 				{facingIndices.sixIndex < 0 && facingIndices.fiveIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
+							setValue('constructionTypeObject.constructions.1.userMaterials', [
 								...(facingUserMaterials || []),
 								{
 									positionId: '6',
@@ -390,7 +394,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.1.userMaterials',
 											(facingUserMaterials &&
 												facingUserMaterials.filter(

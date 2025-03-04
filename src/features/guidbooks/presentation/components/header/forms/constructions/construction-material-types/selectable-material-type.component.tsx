@@ -31,11 +31,13 @@ export const SelectableMaterialType = ({
 	materialTypesSelectValues,
 }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
-	const { formState, control, watch } = form;
+	const { formState, control, watch, setValue } = form;
 	const [materials, setMaterials] = useState<Array<SelectOption>>();
-	const currentMaterialType = watch(
+	const [userMaterialTypes, userMaterials, currentUserMaterialType] = watch([
+		`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes`,
+		`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
 		`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`,
-	);
+	]);
 
 	const handleGetMaterials = (data: MaterialsFilterData) => {
 		from(
@@ -63,27 +65,25 @@ export const SelectableMaterialType = ({
 
 	useEffect(() => {
 		handleGetMaterials({
-			materialType: currentMaterialType,
+			materialType: currentUserMaterialType,
 		});
-	}, [watch(`constructionTypeObject.constructions.${constructionIndex}.userMaterials`)]);
-
-	const currentUserMaterials =
-		form.watch(`constructionTypeObject.constructions.${constructionIndex}.userMaterials`) || [];
+	}, [userMaterials]);
 
 	useEffect(() => {
-		form.setValue(
+		setValue(
 			`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-			currentUserMaterials.map((material) =>
+			userMaterials!.map((material) =>
 				material.positionId === String(fieldIndex)
 					? {
-							...material,
+							positionId: String(fieldIndex),
+							materialId: '',
 							materialTypeValue:
-								MaterialTypeValuesMap[currentMaterialType as MaterialTypeEnum],
+								MaterialTypeValuesMap[currentUserMaterialType as MaterialTypeEnum],
 						}
 					: material,
 			),
 		);
-	}, [currentMaterialType]);
+	}, [userMaterials]);
 
 	return (
 		<div className="flex flex-wrap gap-[16px]">

@@ -23,6 +23,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const HeavySingleLayerWallFacingBothSideComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
+	const { watch, setValue } = form;
 	const [topFacingIndices, setTopFacingIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
@@ -54,14 +55,25 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 		five: '',
 		six: '',
 	});
-
-	const topFacingUserMaterials = form.watch(
+	const [
+		constructions,
+		topFacingUserMaterials,
+		baseUserMaterials,
+		bottomFacingUserMaterials,
+		currentTopFacingMaterialTypeFive,
+		currentTopFacingMaterialTypeSix,
+		currentBottomFacingMaterialTypeFive,
+		currentBottomFacingMaterialTypeSix,
+	] = watch([
+		'constructionTypeObject.constructions',
 		'constructionTypeObject.constructions.0.userMaterials',
-	);
-	const baseUserMaterials = form.watch('constructionTypeObject.constructions.1.userMaterials');
-	const bottomFacingUserMaterials = form.watch(
+		'constructionTypeObject.constructions.1.userMaterials',
 		'constructionTypeObject.constructions.2.userMaterials',
-	);
+		'constructionTypeObject.constructions.0.userMaterialTypes.5.value',
+		'constructionTypeObject.constructions.0.userMaterialTypes.6.value',
+		'constructionTypeObject.constructions.2.userMaterialTypes.5.value',
+		'constructionTypeObject.constructions.2.userMaterialTypes.6.value',
+	]);
 
 	useEffect(() => {
 		setTopFacingIndices({
@@ -88,21 +100,14 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 			sixIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
 		});
 		setCurrentTopFacingMaterialTypes({
-			five: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.5.value`),
-			six: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.6.value`),
+			five: currentTopFacingMaterialTypeFive,
+			six: currentTopFacingMaterialTypeSix,
 		});
 		setCurrentBottomFacingMaterialTypes({
-			five: form.watch(`constructionTypeObject.constructions.2.userMaterialTypes.5.value`),
-			six: form.watch(`constructionTypeObject.constructions.2.userMaterialTypes.6.value`),
+			five: currentBottomFacingMaterialTypeFive,
+			six: currentBottomFacingMaterialTypeSix,
 		});
-	}, [
-		topFacingUserMaterials,
-		baseUserMaterials,
-		bottomFacingUserMaterials,
-		form.watch('constructionTypeObject.constructions'),
-	]);
-
-	console.log(form.watch('constructionTypeObject.constructions'));
+	}, [topFacingUserMaterials, baseUserMaterials, bottomFacingUserMaterials, constructions]);
 
 	return (
 		<>
@@ -110,7 +115,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 				{topFacingIndices.sixIndex < 0 && topFacingIndices.fiveIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+							setValue('constructionTypeObject.constructions.0.userMaterials', [
 								...(topFacingUserMaterials || []),
 								{
 									positionId: '6',
@@ -143,7 +148,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.0.userMaterials',
 											(topFacingUserMaterials &&
 												topFacingUserMaterials.filter(
@@ -160,7 +165,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 				{topFacingIndices.fiveIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+							setValue('constructionTypeObject.constructions.0.userMaterials', [
 								...(topFacingUserMaterials || []),
 								{
 									positionId: '5',
@@ -193,7 +198,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.0.userMaterials',
 											(topFacingUserMaterials &&
 												topFacingUserMaterials.filter(
@@ -277,7 +282,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 				{baseIndices.zeroIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
+							setValue('constructionTypeObject.constructions.1.userMaterials', [
 								...(baseUserMaterials || []),
 								{
 									positionId: '0',
@@ -314,7 +319,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.1.userMaterials',
 											(baseUserMaterials &&
 												baseUserMaterials.filter(
@@ -343,7 +348,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 				{baseIndices.twoIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.1.userMaterials', [
+							setValue('constructionTypeObject.constructions.1.userMaterials', [
 								...(baseUserMaterials || []),
 								{
 									positionId: '2',
@@ -380,7 +385,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.1.userMaterials',
 											(baseUserMaterials &&
 												baseUserMaterials.filter(
@@ -465,7 +470,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 				{bottomFacingIndices.fiveIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.2.userMaterials', [
+							setValue('constructionTypeObject.constructions.2.userMaterials', [
 								...(bottomFacingUserMaterials || []),
 								{
 									positionId: '5',
@@ -498,7 +503,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.2.userMaterials',
 											(bottomFacingUserMaterials &&
 												bottomFacingUserMaterials.filter(
@@ -515,7 +520,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 				{bottomFacingIndices.sixIndex < 0 && bottomFacingIndices.fiveIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
-							form.setValue('constructionTypeObject.constructions.2.userMaterials', [
+							setValue('constructionTypeObject.constructions.2.userMaterials', [
 								...(bottomFacingUserMaterials || []),
 								{
 									positionId: '6',
@@ -548,7 +553,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								<DeleteIcon
 									className="self-end"
 									onClick={() => {
-										form.setValue(
+										setValue(
 											'constructionTypeObject.constructions.2.userMaterials',
 											(bottomFacingUserMaterials &&
 												bottomFacingUserMaterials.filter(
