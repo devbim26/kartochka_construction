@@ -1,30 +1,18 @@
 import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
-import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
-import {
-	ConstructionFieldsMap,
-	ConstructionLayer,
-	HeavyMaterialType,
-	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-} from '@features';
-
+import type { ConstructionsAddData } from '@features';
+import { ConstructionLayer, HeavyMaterialType, ThicknessDensityFieldsType } from '@features';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
-export const HeavySingleWallComponent = () => {
+export const HeavySingleLayerWallComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
 
 	const [indices, setIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
 		twoIndex: -1,
-	});
-
-	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
-		zero: '',
-		two: '',
 	});
 
 	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
@@ -34,10 +22,6 @@ export const HeavySingleWallComponent = () => {
 			zeroIndex: userMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
 			oneIndex: userMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
 			twoIndex: userMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
-		});
-		setCurrentMaterialTypes({
-			zero: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
-			two: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
 		});
 	}, [userMaterials, form.watch('constructionTypeObject.constructions')]);
 
@@ -71,15 +55,14 @@ export const HeavySingleWallComponent = () => {
 					{indices.zeroIndex >= 0 && (
 						<div className="flex justify-between">
 							<div className="flex gap-[20px]">
-								<SelectableMaterialType
+								<HeavyMaterialType
 									fieldIndex={indices.zeroIndex}
 									constructionIndex={0}
 								/>
-								{ConstructionFieldsMap({
-									fieldIndex: indices.zeroIndex,
-									constructionIndex: 0,
-									materialType: currentMaterialTypes.zero as MaterialTypeEnum,
-								})}
+								<ThicknessDensityFieldsType
+									fieldIndex={indices.zeroIndex}
+									constructionIndex={0}
+								/>
 							</div>
 							<DeleteIcon
 								className="self-end"
@@ -133,15 +116,14 @@ export const HeavySingleWallComponent = () => {
 					{indices.twoIndex >= 0 && (
 						<div className="flex justify-between">
 							<div className="flex gap-[20px]">
-								<SelectableMaterialType
-									fieldIndex={indices.twoIndex}
+								<HeavyMaterialType
+									fieldIndex={indices.zeroIndex}
 									constructionIndex={0}
 								/>
-								{ConstructionFieldsMap({
-									fieldIndex: indices.twoIndex,
-									constructionIndex: 0,
-									materialType: currentMaterialTypes.two as MaterialTypeEnum,
-								})}
+								<ThicknessDensityFieldsType
+									fieldIndex={indices.zeroIndex}
+									constructionIndex={0}
+								/>
 							</div>
 							<DeleteIcon
 								className="self-end"

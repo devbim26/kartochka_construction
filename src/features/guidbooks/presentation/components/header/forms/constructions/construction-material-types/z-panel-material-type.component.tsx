@@ -2,7 +2,11 @@ import { MaterialTypeEnum } from '@api-gen';
 import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
 import type { ConstructionsAddData, MaterialsFilterData } from '@features';
-import { getGuidebooksPaginated, Guidebooks } from '@features';
+import {
+	convertToClientMaterialsAddAndEditData,
+	getGuidebooksPaginated,
+	Guidebooks,
+} from '@features';
 import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -29,7 +33,9 @@ export const ZPanelMaterialType = ({ fieldIndex, constructionIndex }: Props) => 
 		)
 			.pipe(
 				switchMap((response: AxiosResponse) => {
-					const items = convertToPaginatedType(response.data);
+					const items = convertToPaginatedType(convertToClientMaterialsAddAndEditData)(
+						response.data,
+					);
 					return from([items]);
 				}),
 				tap((items) => setMaterials(convertToSelectValues(items.items!)!)),
@@ -43,7 +49,7 @@ export const ZPanelMaterialType = ({ fieldIndex, constructionIndex }: Props) => 
 
 	useEffect(() => {
 		handleGetMaterials({
-			materialType: MaterialTypeEnum.AcousticTreatmentMaterials,
+			materialType: MaterialTypeEnum.Board,
 		});
 	}, []);
 

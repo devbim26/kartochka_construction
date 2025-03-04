@@ -50,6 +50,21 @@ export enum RuMaterialTypeEnum {
 	Board = 'Плиты',
 }
 
+export enum MaterialTypesSelectValuesEnum {
+	Facing = 'Facing',
+}
+
+export const MaterialTypesSelectValuesMap = {
+	[MaterialTypesSelectValuesEnum.Facing]: [
+		{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
+		{ label: 'Воздушные зазоры', value: MaterialTypeEnum.AirGap },
+		{ label: 'Связующие', value: MaterialTypeEnum.Link },
+		{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
+		{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
+		{ label: 'Плиты', value: MaterialTypeEnum.Board },
+	],
+};
+
 export const RuMaterialTypesSelectValues = [
 	{ label: 'Кирпичные и монолитные', value: MaterialTypeEnum.MasonryAndSolid },
 	{ label: 'Каркасные', value: MaterialTypeEnum.Frame },

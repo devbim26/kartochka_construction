@@ -1,11 +1,17 @@
 import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
-import type { ConstructionsAddData, MaterialsFilterData } from '@features';
+import type {
+	ConstructionsAddData,
+	MaterialsFilterData,
+	MaterialTypeEnum,
+	MaterialTypesSelectValuesEnum,
+} from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
 	getGuidebooksPaginated,
 	Guidebooks,
-	RuMaterialTypesSelectValues,
+	MaterialTypesSelectValuesMap,
+	MaterialTypeValuesMap,
 } from '@features';
 import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
@@ -16,9 +22,14 @@ import { twMerge } from 'tailwind-merge';
 interface Props {
 	fieldIndex: number;
 	constructionIndex: number;
+	materialTypesSelectValues: MaterialTypesSelectValuesEnum;
 }
 
-export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props) => {
+export const SelectableMaterialType = ({
+	fieldIndex,
+	constructionIndex,
+	materialTypesSelectValues,
+}: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control, watch } = form;
 	const [materials, setMaterials] = useState<Array<SelectOption>>();
@@ -54,6 +65,24 @@ export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props)
 		handleGetMaterials({
 			materialType: currentMaterialType,
 		});
+	}, [watch(`constructionTypeObject.constructions.${constructionIndex}.userMaterials`)]);
+
+	const currentUserMaterials =
+		form.watch(`constructionTypeObject.constructions.${constructionIndex}.userMaterials`) || [];
+
+	useEffect(() => {
+		form.setValue(
+			`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
+			currentUserMaterials.map((material) =>
+				material.positionId === String(fieldIndex)
+					? {
+							...material,
+							materialTypeValue:
+								MaterialTypeValuesMap[currentMaterialType as MaterialTypeEnum],
+						}
+					: material,
+			),
+		);
 	}, [currentMaterialType]);
 
 	return (
@@ -65,7 +94,7 @@ export const SelectableMaterialType = ({ fieldIndex, constructionIndex }: Props)
 					<Select
 						{...field}
 						value={field.value || ''}
-						options={RuMaterialTypesSelectValues}
+						options={MaterialTypesSelectValuesMap[materialTypesSelectValues]}
 						error={
 							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
