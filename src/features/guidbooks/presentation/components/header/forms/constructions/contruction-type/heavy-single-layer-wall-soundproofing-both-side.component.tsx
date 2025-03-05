@@ -1,4 +1,3 @@
-import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
 import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
 import {
@@ -11,7 +10,6 @@ import {
 	ThicknessDensityFieldsType,
 	ZPanelMaterialType,
 } from '@features';
-
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
@@ -185,16 +183,14 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialTypeValue: [
-										{
-											materialParameters: MaterialParametrs.Thickness,
-											value: '',
-										},
-										{
-											materialParameters: MaterialParametrs.Density,
-											value: '',
-										},
-									],
+									materialTypeValue: [],
+								},
+							]);
+							setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
+								...(topSoundproofingUserMaterialTypes || []),
+								{
+									positionId: '2',
+									value: '',
 								},
 							]);
 						}}
@@ -205,14 +201,20 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 						{topSoundproofingIndices.twoIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
-									<ZPanelMaterialType
+									<SelectableMaterialType
 										fieldIndex={topSoundproofingIndices.twoIndex}
+										positionId={2}
 										constructionIndex={0}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Soundproofing
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={topSoundproofingIndices.twoIndex}
-										constructionIndex={0}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: topSoundproofingIndices.twoIndex,
+										constructionIndex: 0,
+										materialType:
+											currentTopSoundproofingMaterialTypes.twoValue as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"
@@ -268,16 +270,14 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
-									materialTypeValue: [
-										{
-											materialParameters: MaterialParametrs.Thickness,
-											value: '',
-										},
-										{
-											materialParameters: MaterialParametrs.Density,
-											value: '',
-										},
-									],
+									materialTypeValue: [],
+								},
+							]);
+							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
+								...(baseUserMaterialTypes || []),
+								{
+									positionId: '0',
+									value: '',
 								},
 							]);
 						}}
@@ -288,14 +288,20 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 						{baseIndices.zeroIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
-									<HeavyMaterialType
+									<SelectableMaterialType
 										fieldIndex={baseIndices.zeroIndex}
+										positionId={0}
 										constructionIndex={1}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Base
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={baseIndices.zeroIndex}
-										constructionIndex={1}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: baseIndices.zeroIndex,
+										constructionIndex: 1,
+										materialType:
+											currentBaseMaterialTypes.zeroValue as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"
@@ -334,16 +340,14 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialTypeValue: [
-										{
-											materialParameters: MaterialParametrs.Thickness,
-											value: '',
-										},
-										{
-											materialParameters: MaterialParametrs.Density,
-											value: '',
-										},
-									],
+									materialTypeValue: [],
+								},
+							]);
+							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
+								...(baseUserMaterialTypes || []),
+								{
+									positionId: '2',
+									value: '',
 								},
 							]);
 						}}
@@ -354,14 +358,20 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 						{baseIndices.twoIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
-									<HeavyMaterialType
+									<SelectableMaterialType
 										fieldIndex={baseIndices.twoIndex}
+										positionId={2}
 										constructionIndex={1}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Base
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={baseIndices.twoIndex}
-										constructionIndex={1}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: baseIndices.twoIndex,
+										constructionIndex: 1,
+										materialType:
+											currentBaseMaterialTypes.twoValue as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"
@@ -417,16 +427,14 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialTypeValue: [
-										{
-											materialParameters: MaterialParametrs.Thickness,
-											value: '',
-										},
-										{
-											materialParameters: MaterialParametrs.Density,
-											value: '',
-										},
-									],
+									materialTypeValue: [],
+								},
+							]);
+							setValue('constructionTypeObject.constructions.2.userMaterialTypes', [
+								...(bottomSoundproofingUserMaterialTypes || []),
+								{
+									positionId: '2',
+									value: '',
 								},
 							]);
 						}}
@@ -437,14 +445,20 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 						{bottomSoundproofingIndices.twoIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
-									<ZPanelMaterialType
+									<SelectableMaterialType
 										fieldIndex={bottomSoundproofingIndices.twoIndex}
+										positionId={2}
 										constructionIndex={2}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Soundproofing
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={bottomSoundproofingIndices.twoIndex}
-										constructionIndex={2}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: bottomSoundproofingIndices.twoIndex,
+										constructionIndex: 2,
+										materialType:
+											currentBottomSoundproofingMaterialTypes.twoValue as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"
@@ -472,16 +486,14 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '3',
 									materialId: '',
-									materialTypeValue: [
-										{
-											materialParameters: MaterialParametrs.Thickness,
-											value: '',
-										},
-										{
-											materialParameters: MaterialParametrs.Density,
-											value: '',
-										},
-									],
+									materialTypeValue: [],
+								},
+							]);
+							setValue('constructionTypeObject.constructions.2.userMaterialTypes', [
+								...(bottomSoundproofingUserMaterialTypes || []),
+								{
+									positionId: '3',
+									value: '',
 								},
 							]);
 						}}
@@ -492,14 +504,20 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 						{bottomSoundproofingIndices.threeIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
-									<ZPanelMaterialType
+									<SelectableMaterialType
 										fieldIndex={bottomSoundproofingIndices.threeIndex}
+										positionId={3}
 										constructionIndex={2}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Soundproofing
+										}
 									/>
-									<ThicknessDensityFieldsType
-										fieldIndex={bottomSoundproofingIndices.threeIndex}
-										constructionIndex={2}
-									/>
+									{ConstructionFieldsMap({
+										fieldIndex: bottomSoundproofingIndices.threeIndex,
+										constructionIndex: 2,
+										materialType:
+											currentBottomSoundproofingMaterialTypes.threeValue as MaterialTypeEnum,
+									})}
 								</div>
 								<DeleteIcon
 									className="self-end"

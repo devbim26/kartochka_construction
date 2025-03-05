@@ -75,8 +75,6 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 		});
 	}, [baseUserMaterials, soundproofingUserMaterials, constructions]);
 
-	console.log(constructions);
-
 	return (
 		<>
 			<ConstructionLayer title="1. Базовая конструкция">
