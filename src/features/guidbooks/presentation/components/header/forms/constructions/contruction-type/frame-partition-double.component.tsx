@@ -38,7 +38,7 @@ export const FramePartitionDouble = () => {
 
 	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
 		zero: '',
-		two: '',
+		nine: '',
 	});
 
 	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
@@ -58,7 +58,7 @@ export const FramePartitionDouble = () => {
 		});
 		setCurrentMaterialTypes({
 			zero: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
-			two: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
+			nine: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.9.value`),
 		});
 	}, [userMaterials, form.watch('constructionTypeObject.constructions')]);
 
@@ -231,7 +231,7 @@ export const FramePartitionDouble = () => {
 								{ConstructionFieldsMap({
 									fieldIndex: indices.nineIndex,
 									constructionIndex: 0,
-									materialType: currentMaterialTypes.two as MaterialTypeEnum,
+									materialType: currentMaterialTypes.nine as MaterialTypeEnum,
 								})}
 							</div>
 							<DeleteIcon

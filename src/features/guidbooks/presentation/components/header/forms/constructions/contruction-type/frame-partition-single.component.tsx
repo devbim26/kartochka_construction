@@ -31,7 +31,7 @@ export const FramePartitionSingle = () => {
 
 	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
 		zero: '',
-		two: '',
+		five: '',
 	});
 
 	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
@@ -47,7 +47,7 @@ export const FramePartitionSingle = () => {
 		});
 		setCurrentMaterialTypes({
 			zero: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
-			two: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
+			five: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.5.value`),
 		});
 	}, [userMaterials, form.watch('constructionTypeObject.constructions')]);
 
@@ -87,9 +87,9 @@ export const FramePartitionSingle = () => {
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
 								/>
 								<ThicknessDensityFieldsType
-						fieldIndex={indices.zeroIndex}
-						constructionIndex={0}
-					/>
+									fieldIndex={indices.zeroIndex}
+									constructionIndex={0}
+								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
 									constructionIndex: 0,
@@ -185,9 +185,9 @@ export const FramePartitionSingle = () => {
 									constructionIndex={0}
 								/>
 								{ConstructionFieldsMap({
-									fieldIndex: indices.twoIndex,
+									fieldIndex: indices.fiveIndex,
 									constructionIndex: 0,
-									materialType: currentMaterialTypes.two as MaterialTypeEnum,
+									materialType: currentMaterialTypes.five as MaterialTypeEnum,
 								})}
 							</div>
 							<DeleteIcon
