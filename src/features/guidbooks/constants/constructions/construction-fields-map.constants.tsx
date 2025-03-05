@@ -61,6 +61,12 @@ export const ConstructionFieldsMap = ({ materialType, fieldIndex, constructionIn
 				constructionIndex={constructionIndex}
 			/>
 		),
+		[MaterialTypeEnum.ZPanel]: (
+			<ThicknessDensityFieldsType
+				fieldIndex={fieldIndex}
+				constructionIndex={constructionIndex}
+			/>
+		),
 		[MaterialTypeEnum.FoamMaterials]: <></>,
 		[MaterialTypeEnum.Glazing]: <></>,
 		[MaterialTypeEnum.GypsumBondedbBoards]: <></>,
@@ -144,6 +150,16 @@ export const MaterialTypeValuesMap = {
 	],
 
 	[MaterialTypeEnum.Membrane]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
+	[MaterialTypeEnum.ZPanel]: [
 		{
 			materialParameters: MaterialParametrs.Thickness,
 			value: '',

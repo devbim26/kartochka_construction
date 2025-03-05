@@ -28,6 +28,7 @@ export enum MaterialTypeEnum {
 	Filler = 'Filler',
 	Heavy = 'Heavy',
 	Board = 'Board',
+	ZPanel = 'ZPanel',
 }
 
 export enum RuMaterialTypeEnum {
@@ -53,6 +54,7 @@ export enum RuMaterialTypeEnum {
 export enum MaterialTypesSelectValuesEnum {
 	Facing = 'Facing',
 	Base = 'Base',
+	Soundproofing = 'Soundproofing',
 }
 
 export const MaterialTypesSelectValuesMap = {
@@ -67,6 +69,13 @@ export const MaterialTypesSelectValuesMap = {
 		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
 	],
 	[MaterialTypesSelectValuesEnum.Base]: [
+		{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
+		{ label: 'Плиты', value: MaterialTypeEnum.Board },
+		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
+		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	],
+	[MaterialTypesSelectValuesEnum.Soundproofing]: [
+		{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
 		{ label: 'Плиты', value: MaterialTypeEnum.Board },
 		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
 		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
@@ -91,6 +100,7 @@ export const RuMaterialTypesSelectValues = [
 	{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
 	{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
 	{ label: 'Плиты', value: MaterialTypeEnum.Board },
+	{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
 ];
 
 export interface MaterialType {

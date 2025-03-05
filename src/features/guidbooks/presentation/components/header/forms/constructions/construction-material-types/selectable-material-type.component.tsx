@@ -21,19 +21,21 @@ import { twMerge } from 'tailwind-merge';
 
 interface Props {
 	fieldIndex: number;
+	positionId: number;
 	constructionIndex: number;
 	materialTypesSelectValues: MaterialTypesSelectValuesEnum;
 }
 
 export const SelectableMaterialType = ({
 	fieldIndex,
+	positionId,
 	constructionIndex,
 	materialTypesSelectValues,
 }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control, watch, setValue } = form;
 	const [materials, setMaterials] = useState<Array<SelectOption>>();
-	const [currentMaterialType, currentUserMaterials] = watch([
+	const [currentMaterialType, userMaterials] = watch([
 		`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`,
 		`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
 	]);
@@ -66,15 +68,15 @@ export const SelectableMaterialType = ({
 		handleGetMaterials({
 			materialType: currentMaterialType,
 		});
-	}, [currentUserMaterials]);
+	}, [userMaterials]);
 
 	useEffect(() => {
 		setValue(
 			`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-			currentUserMaterials!.map((material) =>
-				material.positionId === String(fieldIndex)
+			userMaterials!.map((material) =>
+				material.positionId === String(positionId)
 					? {
-							positionId: String(fieldIndex),
+							positionId: String(positionId),
 							materialId: '',
 							materialTypeValue:
 								MaterialTypeValuesMap[currentMaterialType as MaterialTypeEnum],

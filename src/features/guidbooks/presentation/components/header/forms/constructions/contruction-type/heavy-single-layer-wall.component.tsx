@@ -37,12 +37,10 @@ export const HeavySingleLayerWallComponent = () => {
 			twoIndex: userMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zeroValue: String(userMaterialTypes?.findIndex((c) => c.positionId === '0')) ?? '',
-			twoValue: String(userMaterialTypes?.findIndex((c) => c.positionId === '2')) ?? '',
+			zeroValue: userMaterialTypes?.find((c) => c.positionId === '0')?.value ?? '',
+			twoValue: userMaterialTypes?.find((c) => c.positionId === '2')?.value ?? '',
 		});
-	}, [userMaterials, constructions]);
-
-	console.log(constructions);
+	}, [userMaterials, userMaterialTypes, constructions]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
@@ -74,6 +72,7 @@ export const HeavySingleLayerWallComponent = () => {
 							<div className="flex gap-[20px]">
 								<SelectableMaterialType
 									fieldIndex={indices.zeroIndex}
+									positionId={0}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 								/>
@@ -136,6 +135,7 @@ export const HeavySingleLayerWallComponent = () => {
 							<div className="flex gap-[20px]">
 								<SelectableMaterialType
 									fieldIndex={indices.twoIndex}
+									positionId={2}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 								/>
