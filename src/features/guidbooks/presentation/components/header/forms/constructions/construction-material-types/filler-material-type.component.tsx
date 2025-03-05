@@ -56,7 +56,7 @@ export const FillerMaterialType = ({ fieldIndex, constructionIndex }: Props) => 
 	return (
 		<div className="flex flex-wrap gap-[16px]">
 			<Controller
-				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`}
+				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`}
 				control={control}
 				render={({ field }) => (
 					<Select
