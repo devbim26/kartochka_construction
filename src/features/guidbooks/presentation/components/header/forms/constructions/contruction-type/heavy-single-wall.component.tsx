@@ -15,6 +15,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const HeavySingleWallComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
+	const { watch } = form;
 
 	const [indices, setIndices] = useState({
 		zeroIndex: -1,
@@ -27,7 +28,7 @@ export const HeavySingleWallComponent = () => {
 		two: '',
 	});
 
-	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
+	const [userMaterials] = watch(['constructionTypeObject.constructions.0.userMaterials']);
 
 	useEffect(() => {
 		setIndices({
