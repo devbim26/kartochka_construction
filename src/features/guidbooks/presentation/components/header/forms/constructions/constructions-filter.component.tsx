@@ -15,7 +15,7 @@ export const ConstructionsFilter = () => {
 	const { formState, control } = form;
 	const [constructionTypes, setConstructionTypes] = useState<ConstructionTypeTemplate[]>([]);
 
-	const handleGetMaterialTypeData = useCallback(async () => {
+	const handleGetConstructionTypesData = useCallback(async () => {
 		try {
 			const response = await getGuidebooksConstructionTypes();
 			const items = convertToClientConstructionTypesList(response.data as any);
@@ -26,7 +26,7 @@ export const ConstructionsFilter = () => {
 	}, []);
 
 	useEffect(() => {
-		handleGetMaterialTypeData();
+		handleGetConstructionTypesData();
 	}, []);
 
 	return (
@@ -52,7 +52,7 @@ export const ConstructionsFilter = () => {
 						{...field}
 						value={field.value || ''}
 						options={constructionTypes.map((data) => ({
-							label: data.name ?? '',
+							label: data.shortName ?? '',
 							value: data.constructionTypeTemplateId ?? '',
 						}))}
 						error={formState.errors.constructionTypeId?.message}
