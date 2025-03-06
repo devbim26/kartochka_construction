@@ -17,21 +17,24 @@ import { twMerge } from 'tailwind-merge';
 
 interface Props {
 	fieldIndex: number;
+	positionId: number;
 	constructionIndex: number;
 	materialTypesSelectValues: MaterialTypesSelectValuesEnum;
 }
 
 export const SelectableMaterialType = ({
 	fieldIndex,
+	positionId,
 	constructionIndex,
 	materialTypesSelectValues,
 }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
-	const { formState, control, watch } = form;
-	const [materials, setMaterials] = useState<Array<SelectOption>>([]);
-	const currentMaterialType = watch(
+	const { formState, control, watch, setValue } = form;
+	const [materials, setMaterials] = useState<Array<SelectOption>>();
+	const [currentMaterialType, userMaterials] = watch([
 		`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`,
-	);
+		`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
+	]);
 
 	const handleGetMaterials = (data: MaterialsFilterData) => {
 		from(
@@ -58,23 +61,19 @@ export const SelectableMaterialType = ({
 	};
 
 	useEffect(() => {
-		if (currentMaterialType === MaterialTypesSelectValuesEnum.Additional) {
-			setMaterials(MaterialTypesSelectValuesMap[MaterialTypesSelectValuesEnum.Additional]);
-		} else {
-			handleGetMaterials({ materialType: currentMaterialType });
-		}
-	}, [currentMaterialType]);
-
-	const currentUserMaterials =
-		form.watch(`constructionTypeObject.constructions.${constructionIndex}.userMaterials`) || [];
+		handleGetMaterials({
+			materialType: currentMaterialType,
+		});
+	}, [userMaterials]);
 
 	useEffect(() => {
-		form.setValue(
+		setValue(
 			`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-			currentUserMaterials.map((material) =>
-				material.positionId === String(fieldIndex)
+			userMaterials!.map((material) =>
+				material.positionId === String(positionId)
 					? {
-							...material,
+							positionId: String(positionId),
+							materialId: '',
 							materialTypeValue:
 								MaterialTypeValuesMap[currentMaterialType as MaterialTypeEnum],
 						}

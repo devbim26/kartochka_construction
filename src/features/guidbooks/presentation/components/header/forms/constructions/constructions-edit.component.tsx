@@ -28,7 +28,7 @@ import { twMerge } from 'tailwind-merge';
 
 export const ConstructionsEdit = () => {
 	const form = useFormContext<ConstructionsEditData>();
-	const { formState, control, watch } = form;
+	const { formState, control, watch, setValue, register } = form;
 	const [displayChars, setDisplayChars] = useState(false);
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionType');
@@ -63,11 +63,11 @@ export const ConstructionsEdit = () => {
 		[ConstructionTypeEnum.HeavySingleLayerWall]: {
 			component: <HeavySingleLayerWallComponent />,
 			action: () => {
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWall,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
@@ -87,11 +87,11 @@ export const ConstructionsEdit = () => {
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
 			component: <HeavySingleLayerWallFacingOneSideComponent />,
 			action: () => {
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
@@ -158,11 +158,11 @@ export const ConstructionsEdit = () => {
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
 			component: <HeavySingleLayerWallFacingBothSideComponent />,
 			action: () => {
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
@@ -268,11 +268,11 @@ export const ConstructionsEdit = () => {
 		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide]: {
 			component: <HeavySingleLayerWallSoundproofingOneSideComponent />,
 			action: () => {
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
@@ -313,11 +313,11 @@ export const ConstructionsEdit = () => {
 		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]: {
 			component: <HeavySingleLayerWallSoundproofingBothSideComponent />,
 			action: () => {
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
@@ -379,11 +379,11 @@ export const ConstructionsEdit = () => {
 		[ConstructionTypeEnum.HeavyMultiLayerWall]: {
 			component: <HeavyMultiLayerWallComponent />,
 			action: () => {
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavyMultiLayerWall,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
@@ -429,11 +429,11 @@ export const ConstructionsEdit = () => {
 		[ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide]: {
 			component: <HeavyMultiLayerWallFacingOneSideComponent />,
 			action: () => {
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
@@ -526,11 +526,11 @@ export const ConstructionsEdit = () => {
 		[ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]: {
 			component: <HeavyMultiLayerWallFacingBothSideComponent />,
 			action: () => {
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
@@ -703,7 +703,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.name?.message || 'Название конструкции'}
 							error={formState.errors.name?.message}
 							placeholder="Введите название"
-							{...form.register('name')}
+							{...register('name')}
 							type={'text'}
 						/>
 						<Input
@@ -716,7 +716,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.description?.message || 'Описание'}
 							error={formState.errors.description?.message}
 							placeholder="Введите описание"
-							{...form.register('description')}
+							{...register('description')}
 							type={'text'}
 						/>
 						<Controller
@@ -749,7 +749,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.descriptionSource?.message || 'Источник'}
 							error={formState.errors.descriptionSource?.message}
 							placeholder="Введите источник"
-							{...form.register('descriptionSource')}
+							{...register('descriptionSource')}
 							type={'text'}
 						/>
 						<Controller
@@ -806,7 +806,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.maxHeight?.message || 'Максимальная высота, м'}
 							error={formState.errors.maxHeight?.message}
 							placeholder="Введите высоту"
-							{...form.register('maxHeight')}
+							{...register('maxHeight')}
 							type={'number'}
 						/>
 						<Input
@@ -822,7 +822,7 @@ export const ConstructionsEdit = () => {
 							}
 							error={formState.errors.fireResistance?.message}
 							placeholder="Введите класс"
-							{...form.register('fireResistance')}
+							{...register('fireResistance')}
 							type={'number'}
 						/>
 						<Input
@@ -835,7 +835,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.propertySource?.message || 'Источник'}
 							error={formState.errors.propertySource?.message}
 							placeholder="Введите источник"
-							{...form.register('propertySource')}
+							{...register('propertySource')}
 							type={'text'}
 						/>
 					</div>
@@ -851,7 +851,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.labRTotal?.message || 'R_total'}
 							error={formState.errors.labRTotal?.message}
 							placeholder="Введите через запятую"
-							{...form.register('labRTotal')}
+							{...register('labRTotal')}
 							type={'text'}
 						/>
 						<Controller
@@ -884,7 +884,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.labIndexValue?.message || 'Index value, dBA'}
 							error={formState.errors.labIndexValue?.message}
 							placeholder="Введите индекс"
-							{...form.register('labIndexValue')}
+							{...register('labIndexValue')}
 							type={'number'}
 						/>
 						<Input
@@ -897,7 +897,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.propertySource?.message || 'Источник'}
 							error={formState.errors.propertySource?.message}
 							placeholder="Введите источник"
-							{...form.register('laboratoryTestSource')}
+							{...register('laboratoryTestSource')}
 							type={'text'}
 						/>
 					</div>
@@ -913,7 +913,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.laboratoryTestSource?.message || 'R_calcs'}
 							error={formState.errors.laboratoryTestSource?.message}
 							placeholder="R_calc"
-							{...form.register('estimatedRTotal')}
+							{...register('estimatedRTotal')}
 							type={'text'}
 						/>
 						<Controller
@@ -948,7 +948,7 @@ export const ConstructionsEdit = () => {
 							}
 							error={formState.errors.estimatedIndexValue?.message}
 							placeholder="Введите индекс"
-							{...form.register('estimatedIndexValue')}
+							{...register('estimatedIndexValue')}
 							type={'number'}
 						/>
 					</div>
@@ -964,7 +964,7 @@ export const ConstructionsEdit = () => {
 								{...field}
 								value={field.value || ''}
 								onChange={(value) => {
-									form.setValue('constructionType', value as string);
+									setValue('constructionType', value as string);
 									if (value)
 										ConstructionTypeMap[value as ConstructionTypeEnum].action();
 								}}
@@ -974,7 +974,7 @@ export const ConstructionsEdit = () => {
 									'text-sm leading-5 tracking-[0.1px]',
 									formState.errors.constructionType?.message ? 'text-error' : '',
 								)}
-								wrapperClassname="w-fit min-w-[226px] ring-input-border-primary"
+								wrapperClassname="w-fit min-w-[468px] ring-input-border-primary"
 								buttonClassName="text-sm rounded-[8px]"
 								label={formState.errors.constructionType?.message || ''}
 								placeholder="Выберите тип"

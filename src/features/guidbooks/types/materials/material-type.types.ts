@@ -6,7 +6,7 @@ export enum MaterialOriginType {
 
 export const RuMaterialOriginTypesSelectValues = [
 	{ label: 'Общий', value: MaterialOriginType.Generic },
-	{ label: 'Произвлдитель', value: MaterialOriginType.Manufacturer },
+	{ label: 'Производитель', value: MaterialOriginType.Manufacturer },
 	{ label: 'Пользовательский продукт', value: MaterialOriginType.UserDefinedProduct },
 ];
 
@@ -28,6 +28,7 @@ export enum MaterialTypeEnum {
 	Filler = 'Filler',
 	Heavy = 'Heavy',
 	Board = 'Board',
+	ZPanel = 'ZPanel',
 }
 
 export enum RuMaterialTypeEnum {
@@ -89,6 +90,7 @@ export const RuMaterialTypesSelectValues = [
 	{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
 	{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
 	{ label: 'Плиты', value: MaterialTypeEnum.Board },
+	{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
 ];
 
 export interface MaterialType {

@@ -49,7 +49,24 @@ export const ConstructionFieldsMap = ({ materialType, fieldIndex, constructionIn
 				constructionIndex={constructionIndex}
 			/>
 		),
-		[MaterialTypeEnum.AcousticTreatmentMaterials]: <></>,
+		[MaterialTypeEnum.AcousticTreatmentMaterials]: (
+			<ThicknessDensityFieldsType
+				fieldIndex={fieldIndex}
+				constructionIndex={constructionIndex}
+			/>
+		),
+		[MaterialTypeEnum.Membrane]: (
+			<ThicknessDensityFieldsType
+				fieldIndex={fieldIndex}
+				constructionIndex={constructionIndex}
+			/>
+		),
+		[MaterialTypeEnum.ZPanel]: (
+			<ThicknessDensityFieldsType
+				fieldIndex={fieldIndex}
+				constructionIndex={constructionIndex}
+			/>
+		),
 		[MaterialTypeEnum.FoamMaterials]: <></>,
 		[MaterialTypeEnum.Glazing]: <></>,
 		[MaterialTypeEnum.GypsumBondedbBoards]: <></>,
@@ -59,7 +76,6 @@ export const ConstructionFieldsMap = ({ materialType, fieldIndex, constructionIn
 		[MaterialTypeEnum.PorousMaterials]: <></>,
 		[MaterialTypeEnum.SandwichPanel]: <></>,
 		[MaterialTypeEnum.MineralBondedBoards]: <></>,
-		[MaterialTypeEnum.Membrane]: <></>,
 	};
 
 	return componentsMap[materialType] || <></>;
@@ -122,7 +138,37 @@ export const MaterialTypeValuesMap = {
 			value: '',
 		},
 	],
-	[MaterialTypeEnum.AcousticTreatmentMaterials]: [],
+	[MaterialTypeEnum.AcousticTreatmentMaterials]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
+
+	[MaterialTypeEnum.Membrane]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
+	[MaterialTypeEnum.ZPanel]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
 	[MaterialTypeEnum.FoamMaterials]: [],
 	[MaterialTypeEnum.Glazing]: [],
 	[MaterialTypeEnum.GypsumBondedbBoards]: [],
@@ -132,5 +178,4 @@ export const MaterialTypeValuesMap = {
 	[MaterialTypeEnum.PorousMaterials]: [],
 	[MaterialTypeEnum.SandwichPanel]: [],
 	[MaterialTypeEnum.MineralBondedBoards]: [],
-	[MaterialTypeEnum.Membrane]: [],
 };
