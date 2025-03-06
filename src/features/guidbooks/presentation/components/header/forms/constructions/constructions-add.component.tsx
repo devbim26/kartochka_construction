@@ -557,6 +557,24 @@ export const ConstructionsAdd = () => {
 								],
 							},
 						],
+						userMaterialTypes: [
+							{
+								positionId: '1',
+								value: MaterialTypeEnum.Heavy,
+							},
+							{
+								positionId: '2',
+								value: MaterialTypeEnum.Filler,
+							},
+							{
+								positionId: '3',
+								value: MaterialTypeEnum.Link,
+							},
+							{
+								positionId: '4',
+								value: MaterialTypeEnum.Heavy,
+							},
+						],
 					},
 				]);
 			},

@@ -117,7 +117,7 @@ export const SelectableMaterialType = ({
 			/>
 
 			<Controller
-				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`}
+				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`}
 				control={control}
 				render={({ field }) => (
 					<Select

@@ -1,14 +1,17 @@
-import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
+import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
 import {
+	ConstructionFieldsMap,
 	ConstructionLayer,
 	FillerMaterialType,
 	HeavyMaterialType,
 	LinkMaterialType,
+	MaterialTypesSelectValuesEnum,
 	PointConnectionsFieldsType,
+	SelectableMaterialType,
 	ThicknessDensityFieldsType,
-	type ConstructionsAddData,
 } from '@features';
+
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
@@ -24,8 +27,13 @@ export const HeavyMultiLayerWallComponent = () => {
 		fourIndex: -1,
 		fiveIndex: -1,
 	});
-	const [userMaterials, constructions] = watch([
+	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
+		zeroValue: '',
+		fiveValue: '',
+	});
+	const [userMaterials, userMaterialTypes, constructions] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
+		'constructionTypeObject.constructions.0.userMaterialTypes',
 		'constructionTypeObject.constructions',
 	]);
 
@@ -37,6 +45,10 @@ export const HeavyMultiLayerWallComponent = () => {
 			threeIndex: userMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
 			fourIndex: userMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
 			fiveIndex: userMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
+		});
+		setCurrentMaterialTypes({
+			zeroValue: userMaterialTypes?.find((c) => c.positionId === '0')?.value ?? '',
+			fiveValue: userMaterialTypes?.find((c) => c.positionId === '5')?.value ?? '',
 		});
 	}, [userMaterials, constructions]);
 
@@ -50,16 +62,14 @@ export const HeavyMultiLayerWallComponent = () => {
 							{
 								positionId: '0',
 								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.Thickness,
-										value: '',
-									},
-									{
-										materialParameters: MaterialParametrs.Density,
-										value: '',
-									},
-								],
+								materialTypeValue: [],
+							},
+						]);
+						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
+							...(userMaterialTypes || []),
+							{
+								positionId: '0',
+								value: '',
 							},
 						]);
 					}}
@@ -70,14 +80,18 @@ export const HeavyMultiLayerWallComponent = () => {
 					{indices.zeroIndex >= 0 && (
 						<div className="flex justify-between">
 							<div className="flex gap-[20px]">
-								<HeavyMaterialType
+								<SelectableMaterialType
 									fieldIndex={indices.zeroIndex}
+									positionId={0}
 									constructionIndex={0}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 								/>
-								<ThicknessDensityFieldsType
-									fieldIndex={indices.zeroIndex}
-									constructionIndex={0}
-								/>
+								{ConstructionFieldsMap({
+									fieldIndex: indices.zeroIndex,
+									constructionIndex: 0,
+									materialType:
+										currentMaterialTypes.zeroValue as MaterialTypeEnum,
+								})}
 							</div>
 							<DeleteIcon
 								className="self-end"
@@ -140,16 +154,14 @@ export const HeavyMultiLayerWallComponent = () => {
 							{
 								positionId: '5',
 								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.Thickness,
-										value: '',
-									},
-									{
-										materialParameters: MaterialParametrs.Density,
-										value: '',
-									},
-								],
+								materialTypeValue: [],
+							},
+						]);
+						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
+							...(userMaterialTypes || []),
+							{
+								positionId: '5',
+								value: '',
 							},
 						]);
 					}}
@@ -160,14 +172,18 @@ export const HeavyMultiLayerWallComponent = () => {
 					{indices.fiveIndex >= 0 && (
 						<div className="flex justify-between">
 							<div className="flex gap-[20px]">
-								<HeavyMaterialType
+								<SelectableMaterialType
 									fieldIndex={indices.fiveIndex}
+									positionId={5}
 									constructionIndex={0}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 								/>
-								<ThicknessDensityFieldsType
-									fieldIndex={indices.fiveIndex}
-									constructionIndex={0}
-								/>
+								{ConstructionFieldsMap({
+									fieldIndex: indices.fiveIndex,
+									constructionIndex: 0,
+									materialType:
+										currentMaterialTypes.fiveValue as MaterialTypeEnum,
+								})}
 							</div>
 							<DeleteIcon
 								className="self-end"

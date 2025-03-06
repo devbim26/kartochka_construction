@@ -40,7 +40,7 @@ export const HeavySingleLayerWallComponent = () => {
 			zeroValue: userMaterialTypes?.find((c) => c.positionId === '0')?.value ?? '',
 			twoValue: userMaterialTypes?.find((c) => c.positionId === '2')?.value ?? '',
 		});
-	}, [userMaterials, userMaterialTypes, constructions]);
+	}, [userMaterials, constructions]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
