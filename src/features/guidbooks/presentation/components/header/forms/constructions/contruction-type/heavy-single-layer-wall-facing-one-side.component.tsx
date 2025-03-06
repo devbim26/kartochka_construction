@@ -41,8 +41,10 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 		six: '',
 	});
 
-	const baseUserMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
-	const facingUserMaterials = form.watch('constructionTypeObject.constructions.1.userMaterials');
+	const [baseConstructionUserMaterials] = watch([
+		'constructionTypeObject.constructions.0.userMaterials',
+	]);
+	const [facingUserMaterials] = watch(['constructionTypeObject.constructions.1.userMaterials']);
 
 	useEffect(() => {
 		setBaseIndices({
@@ -66,7 +68,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 	}, [
 		baseUserMaterials,
 		facingUserMaterials,
-		form.watch('constructionTypeObject.constructions'),
+		watch('constructionTypeObject.constructions'),
 	]);
 
 	return (

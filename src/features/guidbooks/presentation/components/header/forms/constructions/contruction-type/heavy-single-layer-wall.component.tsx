@@ -8,6 +8,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const HeavySingleLayerWallComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
+	const { watch } = form;
 
 	const [indices, setIndices] = useState({
 		zeroIndex: -1,
@@ -15,7 +16,12 @@ export const HeavySingleLayerWallComponent = () => {
 		twoIndex: -1,
 	});
 
-	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
+	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
+		zero: '',
+		two: '',
+	});
+
+	const [userMaterials] = watch(['constructionTypeObject.constructions.0.userMaterials']);
 
 	useEffect(() => {
 		setIndices({
@@ -23,7 +29,11 @@ export const HeavySingleLayerWallComponent = () => {
 			oneIndex: userMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
 			twoIndex: userMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 		});
-	}, [userMaterials, form.watch('constructionTypeObject.constructions')]);
+		setCurrentMaterialTypes({
+			zero: watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
+			two: watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
+		});
+	}, [userMaterials, watch('constructionTypeObject.constructions')]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
