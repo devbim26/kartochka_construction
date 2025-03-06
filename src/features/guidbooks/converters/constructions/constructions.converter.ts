@@ -7,7 +7,6 @@ import type {
 	GetConstructionHeaderWithPaginationQuery,
 	IndexType,
 	MaterialParametrs,
-	Priority,
 } from '@api-gen';
 import { convertToClientRegionData, convertToServerRegionData } from '@core';
 import { convertToClientConstructionTypeDto } from '@core/converters/constructionType.converter';
@@ -21,6 +20,7 @@ import type {
 	ConstructionsEditData,
 	ConstructionsFilterData,
 	ConstructionTypeTemplate,
+	Priority,
 	Region,
 } from '@features';
 import type { ConstructionType } from '@features/guidbooks/types/constructions';

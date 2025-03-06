@@ -1,17 +1,27 @@
 export enum Priority {
-	Low = 'Low',
-	Medium = 'Medium',
-	High = 'High',
+	Zero = 'Zero',
+	One = 'One',
+	Two = 'Two',
+	Three = 'Three',
+	Four = 'Four',
+	Five = 'Five',
+	Six = 'Six',
+	Seven = 'Seven',
+	Eight = 'Eight',
+	Nine = 'Nine',
+	Ten = 'Ten',
 }
 
 export const RuPriorityNamesSelectValues = [
-	{ label: 'Низкий', value: Priority.Low },
-	{ label: 'Средний', value: Priority.Medium },
-	{ label: 'Высокий', value: Priority.High },
+	{ label: '0', value: Priority.Zero },
+	{ label: '1', value: Priority.One },
+	{ label: '2', value: Priority.Two },
+	{ label: '3', value: Priority.Three },
+	{ label: '4', value: Priority.Four },
+	{ label: '5', value: Priority.Five },
+	{ label: '6', value: Priority.Six },
+	{ label: '7', value: Priority.Seven },
+	{ label: '8', value: Priority.Eight },
+	{ label: '9', value: Priority.Nine },
+	{ label: '10', value: Priority.Ten },
 ];
-
-export const RuPriorityNamesMap = {
-	Low: 'Низкий',
-	Medium: 'Средний',
-	High: 'Высокий',
-};
