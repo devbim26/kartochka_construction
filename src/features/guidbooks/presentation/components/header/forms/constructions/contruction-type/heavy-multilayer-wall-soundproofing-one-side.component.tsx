@@ -6,6 +6,7 @@ import {
 	FillerMaterialType,
 	HeavyMaterialType,
 	LinkMaterialType,
+	MaterialTypesSelectValuesEnum,
 	PointConnectionsFieldsType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
@@ -279,6 +280,9 @@ export const HeavyMultiLayerWallSoundproofOneSide = () => {
 									<SelectableMaterialType
 										fieldIndex={facingIndices.twoIndex}
 										constructionIndex={1}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Facing
+										}
 									/>
 									<ThicknessDensityFieldsType
 										fieldIndex={facingIndices.twoIndex}
@@ -333,6 +337,9 @@ export const HeavyMultiLayerWallSoundproofOneSide = () => {
 									<SelectableMaterialType
 										fieldIndex={facingIndices.threeIndex}
 										constructionIndex={1}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Facing
+										}
 									/>
 									<ThicknessDensityFieldsType
 										fieldIndex={facingIndices.threeIndex}

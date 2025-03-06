@@ -8,6 +8,7 @@ import {
 	FillerMaterialType,
 	FrameMaterialType,
 	LinkMaterialType,
+	MaterialTypesSelectValuesEnum,
 	PointConnectionsFieldsType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
@@ -21,6 +22,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const FramePartitionDouble = () => {
 	const form = useFormContext<ConstructionsAddData>();
+	const { watch } = form;
 
 	const [indices, setIndices] = useState({
 		zeroIndex: -1,
@@ -40,7 +42,7 @@ export const FramePartitionDouble = () => {
 		two: '',
 	});
 
-	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
+	const [userMaterials] = watch(['constructionTypeObject.constructions.0.userMaterials']);
 
 	useEffect(() => {
 		setIndices({
@@ -56,10 +58,10 @@ export const FramePartitionDouble = () => {
 			nineIndex: userMaterials?.findIndex((c) => c.positionId === '9') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zero: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
-			two: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
+			zero: watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
+			two: watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
 		});
-	}, [userMaterials, form.watch('constructionTypeObject.constructions')]);
+	}, [userMaterials, watch('constructionTypeObject.constructions')]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
@@ -94,6 +96,7 @@ export const FramePartitionDouble = () => {
 								<SelectableMaterialType
 									fieldIndex={indices.zeroIndex}
 									constructionIndex={0}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
@@ -216,6 +219,7 @@ export const FramePartitionDouble = () => {
 								<SelectableMaterialType
 									fieldIndex={indices.nineIndex}
 									constructionIndex={0}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.nineIndex,
