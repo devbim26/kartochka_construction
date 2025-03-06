@@ -37,10 +37,10 @@ export const HeavySingleWallComponent = () => {
 			twoIndex: userMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zero: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
-			two: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
+			zero: watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
+			two: watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
 		});
-	}, [userMaterials, form.watch('constructionTypeObject.constructions')]);
+	}, [userMaterials, watch('constructionTypeObject.constructions')]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
