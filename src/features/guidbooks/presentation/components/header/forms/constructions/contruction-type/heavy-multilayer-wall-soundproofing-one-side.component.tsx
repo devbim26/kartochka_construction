@@ -35,10 +35,10 @@ export const HeavyMultiLayerWallSoundproofOneSide = () => {
 		threeIndex: -1,
 	});
 
-	const baseConstructionUserMaterials = form.watch(
+	const [baseConstructionUserMaterials] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
-	);
-	const facingUserMaterials = form.watch('constructionTypeObject.constructions.1.userMaterials');
+	]);
+	const [facingUserMaterials] = watch(['constructionTypeObject.constructions.1.userMaterials']);
 
 	useEffect(() => {
 		setBaseConstructionIndices({
@@ -58,10 +58,8 @@ export const HeavyMultiLayerWallSoundproofOneSide = () => {
 	}, [
 		baseConstructionUserMaterials,
 		facingUserMaterials,
-		form.watch('constructionTypeObject.constructions'),
+		watch('constructionTypeObject.constructions'),
 	]);
-
-	console.log(watch('constructionTypeObject.constructions'));
 
 	return (
 		<>

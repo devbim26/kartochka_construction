@@ -22,6 +22,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const FramePartitionDouble = () => {
 	const form = useFormContext<ConstructionsAddData>();
+	const { watch } = form;
 
 	const [indices, setIndices] = useState({
 		zeroIndex: -1,
@@ -41,7 +42,7 @@ export const FramePartitionDouble = () => {
 		nine: '',
 	});
 
-	const userMaterials = form.watch('constructionTypeObject.constructions.0.userMaterials');
+	const [userMaterials] = watch(['constructionTypeObject.constructions.0.userMaterials']);
 
 	useEffect(() => {
 		setIndices({
@@ -57,10 +58,10 @@ export const FramePartitionDouble = () => {
 			nineIndex: userMaterials?.findIndex((c) => c.positionId === '9') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zero: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
-			nine: form.watch(`constructionTypeObject.constructions.0.userMaterialTypes.9.value`),
+			zero: watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
+			two: watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
 		});
-	}, [userMaterials, form.watch('constructionTypeObject.constructions')]);
+	}, [userMaterials, watch('constructionTypeObject.constructions')]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
@@ -96,10 +97,6 @@ export const FramePartitionDouble = () => {
 									fieldIndex={indices.zeroIndex}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
-								/>
-								<ThicknessDensityFieldsType
-									fieldIndex={indices.zeroIndex}
-									constructionIndex={0}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
@@ -223,10 +220,6 @@ export const FramePartitionDouble = () => {
 									fieldIndex={indices.nineIndex}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
-								/>
-								<ThicknessDensityFieldsType
-									fieldIndex={indices.nineIndex}
-									constructionIndex={0}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.nineIndex,

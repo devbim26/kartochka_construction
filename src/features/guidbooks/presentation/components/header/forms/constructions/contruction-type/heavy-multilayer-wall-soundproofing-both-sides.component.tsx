@@ -19,6 +19,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const HeavyMultiLayerWallSoundproofBothSides = () => {
 	const form = useFormContext<ConstructionsAddData>();
+	const { watch } = form;
 	const [baseConstructionIndices, setBaseConstructionIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
@@ -42,15 +43,15 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 		},
 	});
 
-	const baseConstructionUserMaterials = form.watch(
+	const [baseConstructionUserMaterials] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
-	);
-	const topFacingUserMaterials = form.watch(
+	]);
+	const [topFacingUserMaterials] = watch([
 		'constructionTypeObject.constructions.1.userMaterials',
-	);
-	const bottomFacingUserMaterials = form.watch(
+	]);
+	const [bottomFacingUserMaterials] = watch([
 		'constructionTypeObject.constructions.2.userMaterials',
-	);
+	]);
 
 	useEffect(() => {
 		setBaseConstructionIndices({
