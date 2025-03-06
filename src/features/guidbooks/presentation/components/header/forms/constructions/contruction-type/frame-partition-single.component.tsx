@@ -19,7 +19,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const FramePartitionSingle = () => {
 	const form = useFormContext<ConstructionsAddData>();
-	const { watch } = form;
+	const { watch, setValue } = form;
 
 	const [indices, setIndices] = useState({
 		zeroIndex: -1,
@@ -48,7 +48,7 @@ export const FramePartitionSingle = () => {
 		});
 		setCurrentMaterialTypes({
 			zero: watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
-			two: watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
+			five: watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
 		});
 	}, [userMaterials, watch('constructionTypeObject.constructions')]);
 
@@ -57,7 +57,7 @@ export const FramePartitionSingle = () => {
 			{indices.zeroIndex < 0 ? (
 				<AiOutlinePlusCircle
 					onClick={() => {
-						form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+						setValue('constructionTypeObject.constructions.0.userMaterials', [
 							...(userMaterials || []),
 							{
 								positionId: '0',
@@ -100,7 +100,7 @@ export const FramePartitionSingle = () => {
 							<DeleteIcon
 								className="self-end"
 								onClick={() => {
-									form.setValue(
+									setValue(
 										'constructionTypeObject.constructions.0.userMaterials',
 										(userMaterials &&
 											userMaterials.filter((c) => c.positionId !== '0')) ||
@@ -151,7 +151,7 @@ export const FramePartitionSingle = () => {
 			{indices.fiveIndex < 0 ? (
 				<AiOutlinePlusCircle
 					onClick={() => {
-						form.setValue('constructionTypeObject.constructions.0.userMaterials', [
+						setValue('constructionTypeObject.constructions.0.userMaterials', [
 							...(userMaterials || []),
 							{
 								positionId: '5',
@@ -194,7 +194,7 @@ export const FramePartitionSingle = () => {
 							<DeleteIcon
 								className="self-end"
 								onClick={() => {
-									form.setValue(
+									setValue(
 										'constructionTypeObject.constructions.0.userMaterials',
 										(userMaterials &&
 											userMaterials.filter((c) => c.positionId !== '5')) ||
