@@ -12,7 +12,8 @@ import {
 import type { Country, MaterialsAddAndEditData, MaterialsFilterData } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
-	convertToServerMaterialsAddAndEditData,
+	convertToServerMaterialsCreateData,
+	convertToServerMaterialsEditData,
 	convertToServerMaterialsFilterData,
 	getGuidebooksCreate,
 	getGuidebooksDelete,
@@ -216,7 +217,7 @@ const MaterialsScreen = () => {
 	const handleAddTableData = async (data: MaterialsAddAndEditData) => {
 		try {
 			const response = await getGuidebooksCreate({
-				data: convertToServerMaterialsAddAndEditData(data),
+				data: convertToServerMaterialsCreateData(data),
 				guidebookType: Guidebooks.MATERIAL,
 			});
 			if (response.status === 200) {
@@ -233,7 +234,7 @@ const MaterialsScreen = () => {
 	const handleEditTableData = async (data: MaterialsAddAndEditData) => {
 		try {
 			const response = await getGuidebooksEdit({
-				data: convertToServerMaterialsAddAndEditData(data),
+				data: convertToServerMaterialsEditData(data),
 				guidebookType: Guidebooks.MATERIAL,
 			});
 			if (response.status === 200) {
