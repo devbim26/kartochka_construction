@@ -48,10 +48,20 @@ export const countryMap = createDataRecordConverter({
 	[ClientCountry.Ukrain]: ServerCountry.Ukrain,
 });
 
-export const convertToServerCountryData = (type: ClientCountry): ServerCountry => {
+export const convertToServerCountryData = (
+	type: ClientCountry | ClientCountry[],
+): ServerCountry | ServerCountry[] => {
+	if (Array.isArray(type)) {
+		return type.map((t) => countryMap.toServer[t]);
+	}
 	return countryMap.toServer[type];
 };
 
-export const convertToClientCountryData = (type: ServerCountry): ClientCountry => {
+export const convertToClientCountryData = (
+	type: ServerCountry | ServerCountry[],
+): ClientCountry | ClientCountry[] => {
+	if (Array.isArray(type)) {
+		return type.map((t) => countryMap.toClient[t]);
+	}
 	return countryMap.toClient[type];
 };

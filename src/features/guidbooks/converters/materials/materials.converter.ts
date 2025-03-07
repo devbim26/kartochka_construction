@@ -1,19 +1,18 @@
 import type { GetMaterialsWithPaginationParamsQuery } from '@api-gen';
-import {
-	convertToClientMaterialTypeData,
-	convertToServerMaterialTypeData,
-	type MaterialOriginType,
-	type MaterialsAddAndEditData,
-	type MaterialsFilterData,
-	type MaterialTypeEnum,
-	type Region,
+import { convertToClientCountryData, convertToServerCountryData } from '@core';
+import type {
+	Country,
+	MaterialOriginType,
+	MaterialsAddAndEditData,
+	MaterialsFilterData,
+	MaterialTypeEnum,
 } from '@features';
-
-import { convertToClientRegionData, convertToServerRegionData } from '@core';
 import {
 	convertToClientMaterialOriginTypeData,
+	convertToClientMaterialTypeData,
 	convertToServerMaterialOriginTypeData,
-} from './material-origin-type.converter';
+	convertToServerMaterialTypeData,
+} from '@features';
 
 export const convertToServerMaterialsFilterData = (
 	data: MaterialsFilterData,
@@ -33,7 +32,7 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	density: String(data.density) ?? '',
 	thickness: String(data.thickness) ?? '',
 	type: convertToClientMaterialOriginTypeData(data.type!) ?? '',
-	region: convertToClientRegionData(data.region!) ?? '',
+	country: (convertToClientCountryData(data.country!) as []) ?? '',
 	issuer: data.issuer?.id ?? '',
 	image: data.imageUrl ?? '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',
@@ -45,7 +44,7 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	solid: String(data.solid) ?? '',
 });
 
-export const convertToServerMaterialsAddAndEditData = (data: MaterialsAddAndEditData) => ({
+export const convertToServerMaterialsAddAndEditData = (data: MaterialsAddAndEditData): any => ({
 	id: data.id || null,
 	name: data.name || null,
 	description: data.description || null,
@@ -53,7 +52,7 @@ export const convertToServerMaterialsAddAndEditData = (data: MaterialsAddAndEdit
 	density: +data.density || null,
 	thickness: +data.thickness || null,
 	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || null,
-	region: convertToServerRegionData(data.region as Region) || null,
+	country: convertToServerCountryData(data.country as Country[]) || null,
 	issuerId: data.issuer || null,
 	formFile: data.image,
 	materialCoefficient: +data.materialCoefficient || null,
