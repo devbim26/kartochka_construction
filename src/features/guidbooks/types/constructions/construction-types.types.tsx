@@ -13,6 +13,7 @@ export enum ConstructionTypeEnum {
 	HeavySingleLayerWallSoundproofingBothSide = 'HeavySingleLaterWallSoundproofingBothSide',
 	HeavyMultiLayerWall = 'HeavyMultiLaterWall',
 	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLaterWallFacingBothSide',
+	HeavyMultilayerWallSoundproofingLeftSide = 'HeavyMultilayerWallSoundproofingLeftSide',
 	HeavyMultiLayerWallSoundproofOneSide = 'HeavyMultiLayerWallSoundproofOneSide',
 	HeavyMultiLayerWallSoundproofBothSides = 'HeavyMultiLayerWallSoundproofBothSides',
 	FramePartitionSingle = 'FramePartitionSingle',
@@ -64,5 +65,9 @@ export const RuConstructionConstructionTypeSelectValues = [
 	{
 		label: 'Каркасная перегородка (2 каркаса)',
 		value: ConstructionTypeEnum.FramePartitionDouble,
+	},
+	{
+		label: 'Тяжелая многослойная стена + звукоизоляционная панель слева',
+		value: ConstructionTypeEnum.HeavyMultilayerWallSoundproofingLeftSide,
 	},
 ];
