@@ -13,6 +13,7 @@ import {
 import {
 	convertToClientIssuerData,
 	convertToServerCreateIssuerData,
+	convertToServerEditIssuerData,
 	convertToServerIssuerData,
 } from '@features/guidbooks/converters';
 import {
@@ -150,7 +151,7 @@ const IssuersScreen = () => {
 	const handleEditTableData = (data: Issuer) => {
 		from(
 			getGuidebooksEdit({
-				data: convertToServerCreateIssuerData(data),
+				data: convertToServerEditIssuerData(data),
 				guidebookType: Guidebooks.ISSUER,
 			}),
 		)

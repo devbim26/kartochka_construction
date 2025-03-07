@@ -17,6 +17,14 @@ export const convertToServerCreateIssuerData = (data: Issuer) => ({
 	webSite: data.webSite || null,
 });
 
+export const convertToServerEditIssuerData = (data: Issuer) => ({
+	id: data.id,
+	name: data.name || null,
+	countries: convertToServerCountryData(data.countries as Country[]) || null,
+	logoUrl: data.logoUrl || null,
+	webSite: data.webSite || null,
+});
+
 export const convertToClientIssuerData = (data: IssuerDto): FilterIssuer => ({
 	...data,
 	name: data.name ?? '',
