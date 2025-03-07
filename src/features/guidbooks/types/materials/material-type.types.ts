@@ -53,8 +53,7 @@ export enum RuMaterialTypeEnum {
 
 export enum MaterialTypesSelectValuesEnum {
 	Facing = 'Facing',
-	Base = 'Base',
-	Soundproofing = 'Soundproofing',
+	Additional = 'Additional',
 }
 
 export const MaterialTypesSelectValuesMap = {
@@ -65,17 +64,8 @@ export const MaterialTypesSelectValuesMap = {
 		{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
 		{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
 		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
-		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
 	],
-	[MaterialTypesSelectValuesEnum.Base]: [
-		{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
-		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
-		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.Soundproofing]: [
-		{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
+	[MaterialTypesSelectValuesEnum.Additional]: [
 		{ label: 'Плиты', value: MaterialTypeEnum.Board },
 		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
 		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
