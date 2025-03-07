@@ -1,5 +1,4 @@
 export interface ConstructionTypeTemplate {
-	constructionTypeTemplateId?: string | undefined;
 	name?: string | null | undefined;
 	shortName?: string | null | undefined;
 	constructionRoot?: object | undefined;
@@ -7,7 +6,7 @@ export interface ConstructionTypeTemplate {
 
 export enum ConstructionTypeEnum {
 	HeavySingleLayerWall = 'HeavySingleLayerWall',
-	HeavyMultiLayerWallFacingOneSide = 'HeavyMultiLaterWallFacingOneSide',
+	HeavyMultiLayerWallFacingOneSide = 'HeavyMultiLayerWallFacingOneSide',
 	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
 	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
 	HeavySingleLayerWallSoundproofingOneSide = 'HeavySingleLaterWallSoundproofingOneSide',

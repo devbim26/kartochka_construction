@@ -2,13 +2,12 @@ import type {
 	ConstructionHeaderDto,
 	ConstructionPosition,
 	ConstructionTypeEnum,
+	CountryType,
 	CreateConstructionHeaderCommand,
 	CreateConstructionTypeDto,
-	CreateConstructionTypeTemplateDto,
 	GetConstructionHeaderWithPaginationQuery,
 	IndexType,
 	MaterialParametrs,
-	Priority,
 } from '@api-gen';
 import { convertToClientCountryData, convertToServerCountryData } from '@core';
 import { convertToClientConstructionTypeDto } from '@core/converters/constructionType.converter';
@@ -23,13 +22,12 @@ import type {
 	ConstructionsFilterData,
 	ConstructionTypeTemplate,
 	Country,
+	Priority,
 } from '@features';
 import type { ConstructionType } from '@features/guidbooks/types/constructions';
 
-export const convertToClientConstructionTypesList = (
-	data: CreateConstructionTypeTemplateDto[],
-): ConstructionTypeTemplate[] => {
-	return data.map((data) => ({
+export const convertToClientConstructionTypesList = (data: any): ConstructionTypeTemplate[] => {
+	return data.map((data: any) => ({
 		...data,
 	}));
 };
@@ -40,7 +38,7 @@ export const convertToServerConstructionsFilterData = (
 	name: data.name || null,
 	constructionTypeId: data.constructionTypeId || null,
 	description: data.description || null,
-	country: convertToServerCountryData(data.country as Country) || null,
+	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
 });
 
 export const convertToClientConstructionsAddData = (
@@ -52,7 +50,7 @@ export const convertToClientConstructionsAddData = (
 	description: data.description ?? '',
 	priority: (convertToClientPriorityData(data.priority!) as string) ?? '',
 	descriptionSource: data.descriptionSource ?? '',
-	country: (convertToClientCountryData(data.country) as []) ?? '',
+	country: (convertToClientCountryData(data.countries!) as []) ?? '',
 	maxHeight: String(data.maxHeight) ?? '',
 	fireResistance: String(data.fireResistance) ?? '',
 	propertySource: data.propertySource ?? '',
@@ -121,7 +119,7 @@ export const convertToServerConstructionsAddData = (
 	description: data.description || null,
 	priority: convertToServerPriorityData(data.priority as Priority) || null,
 	descriptionSource: data.descriptionSource || null,
-	country: convertToServerCountryData(data.country as Country[]) || null,
+	countries: (convertToServerCountryData(data.country as Country[]) as CountryType[]) || null,
 	issuerId: data.issuer || undefined,
 	maxHeight: +data.maxHeight || undefined,
 	fireResistance: data.fireResistance || null,

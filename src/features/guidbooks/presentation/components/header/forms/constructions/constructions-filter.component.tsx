@@ -54,7 +54,7 @@ export const ConstructionsFilter = () => {
 						value={field.value || ''}
 						options={constructionTypes.map((data) => ({
 							label: data.shortName ?? '',
-							value: data.constructionTypeTemplateId ?? '',
+							value: data.shortName ?? '',
 						}))}
 						error={formState.errors.constructionTypeId?.message}
 						labelClassName={twMerge(
