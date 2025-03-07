@@ -1,5 +1,5 @@
 const generateApi = require('swagger-typescript-api').generateApi;
-const apiUrl = 'http://192.168.10.23:5000/swagger/v1/swagger.json';
+const apiUrl = 'http://5.44.44.202:5000/swagger/v1/swagger.json';
 
 if (!apiUrl) {
 	console.error('API URL is not defined in .env file');

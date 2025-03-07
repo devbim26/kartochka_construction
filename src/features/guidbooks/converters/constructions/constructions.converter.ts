@@ -4,7 +4,6 @@ import type {
 	ConstructionTypeEnum,
 	CreateConstructionHeaderCommand,
 	CreateConstructionTypeDto,
-	CreateConstructionTypeTemplateDto,
 	GetConstructionHeaderWithPaginationQuery,
 	IndexType,
 	MaterialParametrs,
@@ -26,10 +25,8 @@ import type {
 } from '@features';
 import type { ConstructionType } from '@features/guidbooks/types/constructions';
 
-export const convertToClientConstructionTypesList = (
-	data: CreateConstructionTypeTemplateDto[],
-): ConstructionTypeTemplate[] => {
-	return data.map((data) => ({
+export const convertToClientConstructionTypesList = (data: any): ConstructionTypeTemplate[] => {
+	return data.map((data: any) => ({
 		...data,
 	}));
 };
@@ -40,7 +37,7 @@ export const convertToServerConstructionsFilterData = (
 	name: data.name || null,
 	constructionTypeId: data.constructionTypeId || null,
 	description: data.description || null,
-	country: convertToServerCountryData(data.country as Country) || null,
+	countryType: convertToServerCountryData(data.country as Country) || null,
 });
 
 export const convertToClientConstructionsAddData = (
@@ -52,7 +49,7 @@ export const convertToClientConstructionsAddData = (
 	description: data.description ?? '',
 	priority: (convertToClientPriorityData(data.priority!) as string) ?? '',
 	descriptionSource: data.descriptionSource ?? '',
-	country: (convertToClientCountryData(data.country) as []) ?? '',
+	country: (convertToClientCountryData(data.countries!) as []) ?? '',
 	maxHeight: String(data.maxHeight) ?? '',
 	fireResistance: String(data.fireResistance) ?? '',
 	propertySource: data.propertySource ?? '',

@@ -3,7 +3,7 @@ import { createDataRecordConverter } from '@core/utils/helpers';
 import { Priority as ClientPriority } from '@features/guidbooks/types';
 
 export const priorityMap = createDataRecordConverter({
-	[ClientPriority.Low]: ServerPriority.Low,
+	[ClientPriority.]: ServerPriority.Low,
 	[ClientPriority.Medium]: ServerPriority.Medium,
 	[ClientPriority.High]: ServerPriority.High,
 });
