@@ -9,11 +9,14 @@ export enum ConstructionTypeEnum {
 	HeavyMultiLayerWallFacingOneSide = 'HeavyMultiLayerWallFacingOneSide',
 	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
 	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
-	HeavySingleLayerWallSoundproofingOneSide = 'HeavySingleLayerWallSoundproofingOneSide',
-	HeavySingleLayerWallSoundproofingBothSide = 'HeavySingleLayerWallSoundproofingBothSide',
-	HeavyMultiLayerWall = 'HeavyMultiLayerWall',
-	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLayerWallFacingBothSide',
-	HeavyMultilayerWallSoundproofingLeftSide = 'HeavyMultilayerWallSoundproofingLeftSide',
+	HeavySingleLayerWallSoundproofingOneSide = 'HeavySingleLaterWallSoundproofingOneSide',
+	HeavySingleLayerWallSoundproofingBothSide = 'HeavySingleLaterWallSoundproofingBothSide',
+	HeavyMultiLayerWall = 'HeavyMultiLaterWall',
+	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLaterWallFacingBothSide',
+	HeavyMultiLayerWallSoundproofOneSide = 'HeavyMultiLayerWallSoundproofOneSide',
+	HeavyMultiLayerWallSoundproofBothSides = 'HeavyMultiLayerWallSoundproofBothSides',
+	FramePartitionSingle = 'FramePartitionSingle',
+	FramePartitionDouble = 'FramePartitionDouble',
 }
 
 export const RuConstructionConstructionTypeSelectValues = [
@@ -47,7 +50,19 @@ export const RuConstructionConstructionTypeSelectValues = [
 		value: ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide,
 	},
 	{
-		label: 'Тяжелая многослойная стена + звукоизоляционная панель слева',
-		value: ConstructionTypeEnum.HeavyMultilayerWallSoundproofingLeftSide,
+		label: 'Тяжелая многослойная стена + звукоизоляционная панель с одной стороны',
+		value: ConstructionTypeEnum.HeavyMultiLayerWallSoundproofOneSide,
+	},
+	{
+		label: 'Тяжелая многослойная стена + звукоизоляционная панель с двух сторон',
+		value: ConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSides,
+	},
+	{
+		label: 'Каркасная перегородка (1 каркас)',
+		value: ConstructionTypeEnum.FramePartitionSingle,
+	},
+	{
+		label: 'Каркасная перегородка (2 каркаса)',
+		value: ConstructionTypeEnum.FramePartitionDouble,
 	},
 ];
