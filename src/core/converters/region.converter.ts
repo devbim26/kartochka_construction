@@ -48,10 +48,10 @@ export const regionMap = createDataRecordConverter({
 	[ClientRegion.Ukrain]: ServerRegion.Ukrain,
 });
 
-export const convertToServerRegionData = (type: ClientRegion): ServerRegion => {
-	return regionMap.toServer[type];
+export const convertToServerRegionData = (type: ClientRegion[]): ServerRegion[] => {
+	return type.map((t) => regionMap.toServer[t]);
 };
 
-export const convertToClientRegionData = (type: ServerRegion): ClientRegion => {
-	return regionMap.toClient[type];
+export const convertToClientRegionData = (type: ServerRegion[]): ClientRegion[] => {
+	return type.map((t) => regionMap.toClient[t]);
 };

@@ -1,12 +1,13 @@
 import type { IssuerDto } from '@api-gen';
-import { countryMap } from '@core';
+import { convertToServerCountryData, countryMap } from '@core';
 
-import { Country as ClientCountry, FilterIssuer, Issuer } from '@features/guidbooks/types';
+import type { FilterIssuer, Issuer } from '@features/guidbooks/types';
+import { Country as ClientCountry } from '@features/guidbooks/types';
 
 export const convertToServerIssuerData = (data: Issuer) => ({
 	...data,
 	name: data.name || null,
-	country: data.country ? countryMap.toServer[data.country as ClientCountry] : undefined,
+	country: data.country ? convertToServerCountryData(data.country as ClientCountry[]) : undefined,
 	logoUrl: data.logoUrl || null,
 	webSite: data.webSite || null,
 });

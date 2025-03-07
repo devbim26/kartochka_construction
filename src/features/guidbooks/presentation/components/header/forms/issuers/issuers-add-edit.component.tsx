@@ -62,6 +62,7 @@ export const IssuersAddEdit = memoize(() => {
 				name={'country'}
 				render={({ field }) => (
 					<Select
+						multiple
 						options={[
 							{ label: RuCountryNamesMap.None, value: RuCountryNamesMap.None },
 							...RuCountryNamesSelectValues.filter(
@@ -69,7 +70,7 @@ export const IssuersAddEdit = memoize(() => {
 							).sort((a, b) => a.label.localeCompare(b.label)),
 						]}
 						{...field}
-						value={field.value || ''}
+						value={field.value || []}
 						label={formState.errors?.country?.message || 'Страна'}
 						isSearchable
 						labelClassName={twMerge(
