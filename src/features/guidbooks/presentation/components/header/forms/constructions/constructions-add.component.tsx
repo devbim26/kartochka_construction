@@ -30,6 +30,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
+import { HeavyMultilayerWallSoundproofingLeftSide } from './contruction-type/heavy-multilayer-wall-soundproofing-left.component';
 
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();
