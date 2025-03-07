@@ -2,6 +2,7 @@ import type {
 	ConstructionHeaderDto,
 	ConstructionPosition,
 	ConstructionTypeEnum,
+	CountryType,
 	CreateConstructionHeaderCommand,
 	CreateConstructionTypeDto,
 	GetConstructionHeaderWithPaginationQuery,
@@ -37,7 +38,7 @@ export const convertToServerConstructionsFilterData = (
 	name: data.name || null,
 	constructionTypeId: data.constructionTypeId || null,
 	description: data.description || null,
-	countryType: convertToServerCountryData(data.country as Country) || null,
+	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
 });
 
 export const convertToClientConstructionsAddData = (
@@ -118,7 +119,7 @@ export const convertToServerConstructionsAddData = (
 	description: data.description || null,
 	priority: convertToServerPriorityData(data.priority as Priority) || null,
 	descriptionSource: data.descriptionSource || null,
-	countries: convertToServerCountryData(data.country as Country[]) || null,
+	countries: (convertToServerCountryData(data.country as Country[]) as CountryType[]) || null,
 	issuerId: data.issuer || undefined,
 	maxHeight: +data.maxHeight || undefined,
 	fireResistance: data.fireResistance || null,
