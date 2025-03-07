@@ -2,7 +2,7 @@ import { Input, Select } from '@core';
 import {
 	convertToClientConstructionTypesList,
 	getGuidebooksConstructionTypes,
-	RuRegionNamesSelectValues,
+	RuCountryNamesSelectValues,
 	type ConstructionsFilterData,
 	type ConstructionTypeTemplate,
 } from '@features';
@@ -50,6 +50,7 @@ export const ConstructionsFilter = () => {
 				render={({ field }) => (
 					<Select
 						{...field}
+						isSearchable
 						value={field.value || ''}
 						options={constructionTypes.map((data) => ({
 							label: data.shortName ?? '',
@@ -81,22 +82,23 @@ export const ConstructionsFilter = () => {
 				type={'text'}
 			/>
 			<Controller
-				name="region"
+				name="country"
 				control={control}
 				render={({ field }) => (
 					<Select
 						{...field}
+						isSearchable
 						value={field.value || ''}
-						options={RuRegionNamesSelectValues}
-						error={formState.errors.region?.message}
+						options={RuCountryNamesSelectValues}
+						error={formState.errors.country?.message}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px]',
-							formState.errors.region?.message ? 'text-error' : '',
+							formState.errors.country?.message ? 'text-error' : '',
 						)}
 						wrapperClassname="w-[226px] ring-input-border-primary"
 						buttonClassName="text-sm rounded-[8px]"
-						label={formState.errors.region?.message || 'Регион'}
-						placeholder="Выберите регион"
+						label={formState.errors.country?.message || 'Страна'}
+						placeholder="Выберите страну"
 					/>
 				)}
 			/>

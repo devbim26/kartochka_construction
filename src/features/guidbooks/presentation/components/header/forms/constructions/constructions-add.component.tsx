@@ -22,14 +22,15 @@ import {
 	HeavySingleLayerWallSoundproofingOneSideComponent,
 	MaterialTypeEnum,
 	RuConstructionConstructionTypeSelectValues,
+	RuCountryNamesSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
-	RuRegionNamesSelectValues,
 } from '@features';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
+import { HeavyMultilayerWallSoundproofingLeftSide } from './contruction-type/heavy-multilayer-wall-soundproofing-left.component';
 
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();
@@ -1219,6 +1220,77 @@ export const ConstructionsAdd = () => {
 				]);
 			},
 		},
+		[ConstructionTypeEnum.HeavyMultilayerWallSoundproofingLeftSide]: {
+			component: <HeavyMultilayerWallSoundproofingLeftSide />,
+			action: () => {
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavyMultilayerWallSoundproofingLeftSide,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
 	};
 
 	return (
@@ -1277,6 +1349,7 @@ export const ConstructionsAdd = () => {
 							render={({ field }) => (
 								<Select
 									{...field}
+									isSearchable
 									value={field.value || ''}
 									options={RuPriorityNamesSelectValues}
 									error={formState.errors.priority?.message}
@@ -1305,23 +1378,24 @@ export const ConstructionsAdd = () => {
 							type={'text'}
 						/>
 						<Controller
-							name="region"
+							name="country"
 							control={control}
 							render={({ field }) => (
 								<Select
 									{...field}
 									isSearchable
-									value={field.value || ''}
-									options={RuRegionNamesSelectValues}
-									error={formState.errors.region?.message}
+									multiple
+									value={field.value || []}
+									options={RuCountryNamesSelectValues}
+									error={formState.errors.country?.message}
 									labelClassName={twMerge(
 										'text-sm leading-5 tracking-[0.1px]',
-										formState.errors.region?.message ? 'text-error' : '',
+										formState.errors.country?.message ? 'text-error' : '',
 									)}
 									wrapperClassname="w-[226px] ring-input-border-primary"
 									buttonClassName="text-sm rounded-[8px]"
-									label={formState.errors.region?.message || 'Регион'}
-									placeholder="Выберите регион"
+									label={formState.errors.country?.message || 'Страна'}
+									placeholder="Выберите страну"
 								/>
 							)}
 						/>
@@ -1331,6 +1405,7 @@ export const ConstructionsAdd = () => {
 							render={({ field }) => (
 								<Select
 									{...field}
+									isSearchable
 									value={field.value || ''}
 									options={convertToSelectValues(issuers) ?? []}
 									error={formState.errors.issuer?.message}
@@ -1412,6 +1487,7 @@ export const ConstructionsAdd = () => {
 							render={({ field }) => (
 								<Select
 									{...field}
+									isSearchable
 									value={field.value || ''}
 									options={RuIndexTypeNamesSelectValues}
 									error={formState.errors.labIndex?.message}
@@ -1463,6 +1539,7 @@ export const ConstructionsAdd = () => {
 						render={({ field }) => (
 							<Select
 								{...field}
+								isSearchable
 								value={field.value || ''}
 								onChange={(value) => {
 									setValue('constructionType', value as string);
