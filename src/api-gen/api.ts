@@ -298,8 +298,7 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	ordering?: string | null;
 	name?: string | null;
 	description?: string | null;
-	/** @format uuid */
-	constructionTypeId?: string | null;
+	constructionType?: ConstructionTypeEnum;
 	countryType?: CountryType;
 }
 
@@ -311,7 +310,7 @@ export interface GetIssuerWithPaginationParamsQuery {
 	sortOrder?: SortOrder;
 	ordering?: string | null;
 	name?: string | null;
-	country?: Country;
+	countryType?: CountryType;
 	webSite?: string | null;
 }
 

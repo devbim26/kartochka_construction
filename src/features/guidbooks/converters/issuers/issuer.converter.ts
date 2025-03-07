@@ -1,10 +1,11 @@
 import type { IssuerDto } from '@api-gen';
+import { convertToClientCountryData, convertToServerCountryData } from '@core';
 
-import type { FilterIssuer, Issuer } from '@features/guidbooks/types';
+import type { Country, FilterIssuer, Issuer } from '@features/guidbooks/types';
 
 export const convertToServerIssuerData = (data: Issuer) => ({
 	name: data.name || null,
-	countries: Array.isArray(data.countries) ? data.countries : [], // Пустой массив вместо null
+	countries: convertToServerCountryData(data.countries as Country[]) || null,
 	logoUrl: data.logoUrl || null,
 	webSite: data.webSite || null,
 });
@@ -12,11 +13,7 @@ export const convertToServerIssuerData = (data: Issuer) => ({
 export const convertToClientIssuerData = (data: IssuerDto): FilterIssuer => ({
 	...data,
 	name: data.name ?? '',
-	countries: Array.isArray(data.countries)
-		? data.countries
-		: data.countries
-			? [data.countries]
-			: [],
+	countries: (convertToClientCountryData(data.countries!) as []) ?? '',
 	logoUrl: data.logoUrl ?? '',
 	webSite: data.webSite ?? '',
 });
