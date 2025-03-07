@@ -963,6 +963,7 @@ export const ConstructionsEdit = () => {
 						render={({ field }) => (
 							<Select
 								{...field}
+								isSearchable
 								value={field.value || ''}
 								onChange={(value) => {
 									setValue('constructionType', value as string);

@@ -6,13 +6,13 @@ export interface ConstructionTypeTemplate {
 
 export enum ConstructionTypeEnum {
 	HeavySingleLayerWall = 'HeavySingleLayerWall',
-	HeavyMultiLayerWallFacingOneSide = 'HeavyMultiLaterWallFacingOneSide',
+	HeavyMultiLayerWallFacingOneSide = 'HeavyMultiLayerWallFacingOneSide',
 	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
 	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
-	HeavySingleLayerWallSoundproofingOneSide = 'HeavySingleLaterWallSoundproofingOneSide',
-	HeavySingleLayerWallSoundproofingBothSide = 'HeavySingleLaterWallSoundproofingBothSide',
-	HeavyMultiLayerWall = 'HeavyMultiLaterWall',
-	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLaterWallFacingBothSide',
+	HeavySingleLayerWallSoundproofingOneSide = 'HeavySingleLayerWallSoundproofingOneSide',
+	HeavySingleLayerWallSoundproofingBothSide = 'HeavySingleLayerWallSoundproofingBothSide',
+	HeavyMultiLayerWall = 'HeavyMultiLayerWall',
+	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLayerWallFacingBothSide',
 	HeavyMultilayerWallSoundproofingLeftSide = 'HeavyMultilayerWallSoundproofingLeftSide',
 }
 
