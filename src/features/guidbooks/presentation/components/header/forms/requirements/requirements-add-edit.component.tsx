@@ -27,6 +27,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				name={'region'}
 				render={({ field }) => (
 					<Select
+						multiple
 						options={[
 							{ label: RuRegionNamesMap.None, value: RuRegionNamesMap.None },
 							...RuRegionNamesSelectValues.filter(
@@ -34,7 +35,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 							).sort((a, b) => a.label.localeCompare(b.label)),
 						]}
 						{...field}
-						value={field.value || ''}
+						value={field.value || []}
 						label={formState.errors?.region?.message || 'Регион'}
 						isSearchable
 						labelClassName={twMerge(
