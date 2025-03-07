@@ -35,10 +35,12 @@ export const HeavyMultilayerWallSoundproofingLeftSide = () => {
 		threeIndex: -1,
 	});
 
-	const [baseConstructionUserMaterials] = watch([
+	const [baseConstructionUserMaterials, facingUserMaterials] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
+		'constructionTypeObject.constructions.1.userMaterials',
 	]);
-	const [facingUserMaterials] = watch(['constructionTypeObject.constructions.1.userMaterials']);
+
+	const [constructions] = watch(['constructionTypeObject.constructions']);
 
 	useEffect(() => {
 		setBaseConstructionIndices({
@@ -55,11 +57,7 @@ export const HeavyMultilayerWallSoundproofingLeftSide = () => {
 			twoIndex: facingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 			threeIndex: facingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
 		});
-	}, [
-		baseConstructionUserMaterials,
-		facingUserMaterials,
-		watch('constructionTypeObject.constructions'),
-	]);
+	}, [baseConstructionUserMaterials, facingUserMaterials, constructions]);
 
 	return (
 		<>
