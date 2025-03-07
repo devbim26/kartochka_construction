@@ -9,6 +9,5 @@ export * from './index.types';
 export * from './issuer';
 export * from './materials';
 export * from './priority.types';
-export * from './region.types';
 export * from './requirements';
 export * from './room.types';

@@ -1,4 +1,5 @@
 import type {
+	ConstructionHeaderDto,
 	ConstructionPosition,
 	ConstructionTypeEnum,
 	CreateConstructionHeaderCommand,
@@ -9,7 +10,7 @@ import type {
 	MaterialParametrs,
 	Priority,
 } from '@api-gen';
-import { convertToClientRegionData, convertToServerRegionData } from '@core';
+import { convertToClientCountryData, convertToServerCountryData } from '@core';
 import { convertToClientConstructionTypeDto } from '@core/converters/constructionType.converter';
 import { convertToClientIndexTypeData } from '@core/converters/index.converter';
 import {
@@ -21,7 +22,7 @@ import type {
 	ConstructionsEditData,
 	ConstructionsFilterData,
 	ConstructionTypeTemplate,
-	Region,
+	Country,
 } from '@features';
 import type { ConstructionType } from '@features/guidbooks/types/constructions';
 
@@ -39,25 +40,27 @@ export const convertToServerConstructionsFilterData = (
 	name: data.name || null,
 	constructionTypeId: data.constructionTypeId || null,
 	description: data.description || null,
-	region: convertToServerRegionData(data.region as Region) || null,
+	country: convertToServerCountryData(data.country as Country) || null,
 });
 
-export const convertToClientConstructionsAddData = (data: any) => ({
+export const convertToClientConstructionsAddData = (
+	data: ConstructionHeaderDto,
+): ConstructionsAddData => ({
 	...data,
-	id: data.id,
+	id: data.id ?? '',
 	name: data.name ?? '',
 	description: data.description ?? '',
-	priority: convertToClientPriorityData(data.priority!)! as string,
+	priority: (convertToClientPriorityData(data.priority!) as string) ?? '',
 	descriptionSource: data.descriptionSource ?? '',
-	region: convertToClientRegionData(data.region!)! as string,
-	maxHeight: String(data.maxHeight),
-	fireResistance: String(data.fireResistance),
+	country: (convertToClientCountryData(data.country) as []) ?? '',
+	maxHeight: String(data.maxHeight) ?? '',
+	fireResistance: String(data.fireResistance) ?? '',
 	propertySource: data.propertySource ?? '',
 	labRTotal: data.rTotal ? data.rTotal.join(', ') : '',
-	labIndex: convertToClientIndexTypeData(data.index!)! as string,
-	labIndexValue: String(data.laboratoryIndexValue),
-	constructionType: convertToClientConstructionTypeDto(data.constructionType!)!,
-	constructionTypeObject: convertToClientConstructionType(data.constructionType!)!,
+	labIndex: (convertToClientIndexTypeData(data.index!) as string) ?? '',
+	labIndexValue: String(data.laboratoryIndexValue) ?? '',
+	constructionType: convertToClientConstructionTypeDto(data.constructionType!) ?? '',
+	constructionTypeObject: convertToClientConstructionType(data.constructionType!) ?? '',
 	laboratoryTestSource: data.laboratoryTestSource ?? '',
 	issuer: data.issuerId ?? '',
 });
@@ -65,9 +68,9 @@ export const convertToClientConstructionsAddData = (data: any) => ({
 export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => {
 	return {
 		...convertToClientConstructionsAddData(data),
-		comment: data.notice,
-		estimatedRTotal: data.rw,
-		estimatedIndexValue: data.computingIndexValue,
+		comment: data.notice ?? '',
+		estimatedRTotal: data.rw ?? '',
+		estimatedIndexValue: data.computingIndexValue ?? '',
 	};
 };
 
@@ -114,20 +117,20 @@ export const convertToClientConstructionType = (
 export const convertToServerConstructionsAddData = (
 	data: ConstructionsAddData,
 ): CreateConstructionHeaderCommand => ({
-	name: data.name,
+	name: data.name || null,
 	description: data.description || null,
-	priority: convertToServerPriorityData(data.priority as Priority),
+	priority: convertToServerPriorityData(data.priority as Priority) || null,
 	descriptionSource: data.descriptionSource || null,
-	region: convertToServerRegionData(data.region as Region),
+	country: convertToServerCountryData(data.country as Country[]) || null,
 	issuerId: data.issuer || undefined,
-	maxHeight: +data.maxHeight,
-	fireResistance: data.fireResistance,
-	propertySource: data.propertySource,
-	rTotal: data.labRTotal.split(',').map((split) => +split),
-	index: data.labIndex as IndexType,
-	indexValue: +data.labIndexValue,
-	laboratoryTestSource: data.propertySource,
-	constructionType: convertToServerConstructionType(data.constructionTypeObject),
+	maxHeight: +data.maxHeight || undefined,
+	fireResistance: data.fireResistance || null,
+	propertySource: data.propertySource || null,
+	rTotal: data.labRTotal.split(',').map((split) => +split) || null,
+	index: (data.labIndex as IndexType) || null,
+	indexValue: +data.labIndexValue || undefined,
+	laboratoryTestSource: data.propertySource || null,
+	constructionType: convertToServerConstructionType(data.constructionTypeObject) || null,
 });
 
 export const convertToServerConstructionsEditData = (
