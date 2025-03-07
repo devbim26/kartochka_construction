@@ -3,13 +3,8 @@ import type { IssuerDto } from '@api-gen';
 import type { FilterIssuer, Issuer } from '@features/guidbooks/types';
 
 export const convertToServerIssuerData = (data: Issuer) => ({
-	...data,
 	name: data.name || null,
-	countries: data.countries
-		? Array.isArray(data.countries)
-			? data.countries
-			: [data.countries]
-		: undefined,
+	countries: Array.isArray(data.countries) ? data.countries : [], // Пустой массив вместо null
 	logoUrl: data.logoUrl || null,
 	webSite: data.webSite || null,
 });
