@@ -5,7 +5,14 @@ import type { Country, FilterIssuer, Issuer } from '@features/guidbooks/types';
 
 export const convertToServerIssuerData = (data: Issuer) => ({
 	name: data.name || null,
-	countries: convertToServerCountryData(data.countries as Country[]) || null,
+	countryType: convertToServerCountryData(data.countries as Country[]) || null,
+	logoUrl: data.logoUrl || null,
+	webSite: data.webSite || null,
+});
+
+export const convertToServerCreateIssuerData = (data: Issuer) => ({
+	name: data.name || null,
+	countryTypes: convertToServerCountryData(data.countries as Country[]) || null,
 	logoUrl: data.logoUrl || null,
 	webSite: data.webSite || null,
 });
