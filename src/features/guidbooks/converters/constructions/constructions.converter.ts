@@ -21,6 +21,7 @@ import type {
 	ConstructionsFilterData,
 	ConstructionTypeTemplate,
 	Country,
+	Priority,
 } from '@features';
 import type { ConstructionType } from '@features/guidbooks/types/constructions';
 
@@ -117,7 +118,7 @@ export const convertToServerConstructionsAddData = (
 	description: data.description || null,
 	priority: convertToServerPriorityData(data.priority as Priority) || null,
 	descriptionSource: data.descriptionSource || null,
-	country: convertToServerCountryData(data.country as Country[]) || null,
+	countries: convertToServerCountryData(data.country as Country[]) || null,
 	issuerId: data.issuer || undefined,
 	maxHeight: +data.maxHeight || undefined,
 	fireResistance: data.fireResistance || null,

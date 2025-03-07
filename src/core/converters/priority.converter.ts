@@ -3,17 +3,17 @@ import { createDataRecordConverter } from '@core/utils/helpers';
 import { Priority as ClientPriority } from '@features/guidbooks/types';
 
 export const priorityMap = createDataRecordConverter({
-	[ClientPriority.Zero]: ServerPriority.Low,
-	[ClientPriority.One]: ServerPriority.Medium,
-	[ClientPriority.Two]: ServerPriority.High,
-	[ClientPriority.Three]: ServerPriority.High,
-	[ClientPriority.Four]: ServerPriority.High,
-	[ClientPriority.Five]: ServerPriority.High,
-	[ClientPriority.Six]: ServerPriority.High,
-	[ClientPriority.Seven]: ServerPriority.High,
-	[ClientPriority.Eight]: ServerPriority.High,
-	[ClientPriority.Nine]: ServerPriority.High,
-	[ClientPriority.Ten]: ServerPriority.High,
+	[ClientPriority.Zero]: ServerPriority.Zero,
+	[ClientPriority.One]: ServerPriority.One,
+	[ClientPriority.Two]: ServerPriority.Two,
+	[ClientPriority.Three]: ServerPriority.Three,
+	[ClientPriority.Four]: ServerPriority.Four,
+	[ClientPriority.Five]: ServerPriority.Five,
+	[ClientPriority.Six]: ServerPriority.Six,
+	[ClientPriority.Seven]: ServerPriority.Seven,
+	[ClientPriority.Eight]: ServerPriority.Eight,
+	[ClientPriority.Nine]: ServerPriority.Nine,
+	[ClientPriority.Ten]: ServerPriority.Ten,
 });
 
 export const convertToServerPriorityData = (type: ClientPriority): ServerPriority => {
