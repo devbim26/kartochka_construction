@@ -7,7 +7,6 @@ import type {
 	GetConstructionHeaderWithPaginationQuery,
 	IndexType,
 	MaterialParametrs,
-	Priority,
 } from '@api-gen';
 import { convertToClientCountryData, convertToServerCountryData } from '@core';
 import { convertToClientConstructionTypeDto } from '@core/converters/constructionType.converter';
