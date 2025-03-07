@@ -59,7 +59,7 @@ export const IssuersAddEdit = memoize(() => {
 			/>
 			<Controller
 				control={control}
-				name={'country'}
+				name={'countries'}
 				render={({ field }) => (
 					<Select
 						multiple
@@ -71,11 +71,11 @@ export const IssuersAddEdit = memoize(() => {
 						]}
 						{...field}
 						value={field.value || []}
-						label={formState.errors?.country?.message || 'Страна'}
+						label={formState.errors?.countries?.message || 'Страна'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.country?.message ? 'text-error' : '',
+							formState.errors.countries?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите страну"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
