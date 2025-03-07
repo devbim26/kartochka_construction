@@ -39,6 +39,7 @@ export const HeavyMultiLayerWallSoundproofOneSide = () => {
 		'constructionTypeObject.constructions.0.userMaterials',
 	]);
 	const [facingUserMaterials] = watch(['constructionTypeObject.constructions.1.userMaterials']);
+	const [constructions] = watch(['constructionTypeObject.constructions']);
 
 	useEffect(() => {
 		setBaseConstructionIndices({
@@ -55,11 +56,7 @@ export const HeavyMultiLayerWallSoundproofOneSide = () => {
 			twoIndex: facingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 			threeIndex: facingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
 		});
-	}, [
-		baseConstructionUserMaterials,
-		facingUserMaterials,
-		watch('constructionTypeObject.constructions'),
-	]);
+	}, [baseConstructionUserMaterials, facingUserMaterials, constructions]);
 
 	return (
 		<>
@@ -280,6 +277,7 @@ export const HeavyMultiLayerWallSoundproofOneSide = () => {
 									<SelectableMaterialType
 										fieldIndex={facingIndices.twoIndex}
 										constructionIndex={1}
+										positionId={2}
 										materialTypesSelectValues={
 											MaterialTypesSelectValuesEnum.Facing
 										}
@@ -337,6 +335,7 @@ export const HeavyMultiLayerWallSoundproofOneSide = () => {
 									<SelectableMaterialType
 										fieldIndex={facingIndices.threeIndex}
 										constructionIndex={1}
+										positionId={3}
 										materialTypesSelectValues={
 											MaterialTypesSelectValuesEnum.Facing
 										}

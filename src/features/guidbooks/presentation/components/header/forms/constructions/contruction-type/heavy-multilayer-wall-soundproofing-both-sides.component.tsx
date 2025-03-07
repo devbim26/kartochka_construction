@@ -52,6 +52,7 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 	const [bottomFacingUserMaterials] = watch([
 		'constructionTypeObject.constructions.2.userMaterials',
 	]);
+	const [constructions] = watch(['constructionTypeObject.constructions']);
 
 	useEffect(() => {
 		setBaseConstructionIndices({
@@ -76,7 +77,12 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 				threeIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
 			},
 		});
-	}, [baseConstructionUserMaterials, topFacingUserMaterials, bottomFacingUserMaterials]);
+	}, [
+		baseConstructionUserMaterials,
+		topFacingUserMaterials,
+		bottomFacingUserMaterials,
+		constructions,
+	]);
 
 	return (
 		<>
@@ -112,6 +118,7 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 									<SelectableMaterialType
 										fieldIndex={facingIndices.top.twoIndex}
 										constructionIndex={1}
+										positionId={2}
 										materialTypesSelectValues={
 											MaterialTypesSelectValuesEnum.Facing
 										}
@@ -169,6 +176,7 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 									<SelectableMaterialType
 										fieldIndex={facingIndices.top.threeIndex}
 										constructionIndex={1}
+										positionId={3}
 										materialTypesSelectValues={
 											MaterialTypesSelectValuesEnum.Facing
 										}
@@ -444,6 +452,7 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 									<SelectableMaterialType
 										fieldIndex={facingIndices.bottom.twoIndex}
 										constructionIndex={2}
+										positionId={2}
 										materialTypesSelectValues={
 											MaterialTypesSelectValuesEnum.Facing
 										}
@@ -501,6 +510,7 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 									<SelectableMaterialType
 										fieldIndex={facingIndices.bottom.threeIndex}
 										constructionIndex={2}
+										positionId={3}
 										materialTypesSelectValues={
 											MaterialTypesSelectValuesEnum.Facing
 										}

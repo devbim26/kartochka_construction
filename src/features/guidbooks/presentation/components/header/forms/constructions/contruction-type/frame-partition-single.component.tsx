@@ -36,6 +36,7 @@ export const FramePartitionSingle = () => {
 	});
 
 	const [userMaterials] = watch(['constructionTypeObject.constructions.0.userMaterials']);
+	const [constructions] = watch(['constructionTypeObject.constructions']);
 
 	useEffect(() => {
 		setIndices({
@@ -50,7 +51,7 @@ export const FramePartitionSingle = () => {
 			zero: watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
 			five: watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
 		});
-	}, [userMaterials, watch('constructionTypeObject.constructions')]);
+	}, [userMaterials, constructions]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
@@ -85,6 +86,7 @@ export const FramePartitionSingle = () => {
 								<SelectableMaterialType
 									fieldIndex={indices.zeroIndex}
 									constructionIndex={0}
+									positionId={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
 								/>
 								<ThicknessDensityFieldsType
@@ -179,6 +181,7 @@ export const FramePartitionSingle = () => {
 								<SelectableMaterialType
 									fieldIndex={indices.fiveIndex}
 									constructionIndex={0}
+									positionId={5}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
 								/>
 								<ThicknessDensityFieldsType
