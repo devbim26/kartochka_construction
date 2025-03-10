@@ -4,3 +4,4 @@ export * from './constructions-add.component';
 export * from './constructions-edit.component';
 export * from './constructions-filter.component';
 export * from './constructions-layer.component';
+export * from './contruction-type';

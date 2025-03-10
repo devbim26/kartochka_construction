@@ -20,11 +20,12 @@ import {
 	RequirementsScreen,
 	USERS_LIST_ROUTES,
 } from '@features';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
 	return (
 		<Routes>
+			<Route path="/" element={<Navigate to={APP_ROUTES.landing.route} replace />} />
 			<Route path={APP_ROUTES.landing.route} element={<LandingScreen />} />
 			<Route path={APP_ROUTES.auth.route} element={<AuthorizationScreen />}>
 				<Route path={AUTH_ROUTES.login.route} element={<LoginPage />} />

@@ -4,7 +4,7 @@ export const ConstructionsFilterSchema = z.object({
 	name: z.string(),
 	constructionTypeId: z.string(),
 	description: z.string(),
-	region: z.string(),
+	country: z.string(),
 });
 
 export const MaterialTypeValues = z.object({
@@ -16,9 +16,14 @@ export const UserMaterial = z.object({
 	positionId: z.string().min(1, 'Поле обязательно для заполнения'),
 	materialTypeValue: z.array(MaterialTypeValues).optional().nullable(),
 });
+export const UserMaterialType = z.object({
+	positionId: z.string().min(1, 'Поле обязательно для заполнения'),
+	value: z.string().min(1, 'Поле обязательно для заполнения'),
+});
 export const subConstructionSchema = z.object({
 	contructionPosition: z.string().min(1, 'Поле обязательно для заполнения'),
 	userMaterials: z.array(UserMaterial).optional().nullable(),
+	userMaterialTypes: z.array(UserMaterialType).optional().nullable(),
 });
 export const ConstructionTypeShema = z.object({
 	constructionTypeEnum: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -33,7 +38,7 @@ export const ConstructionsAddSchema = z.object({
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	priority: z.string().min(1, 'Поле обязательно для заполнения'),
 	descriptionSource: z.string().min(1, 'Поле обязательно для заполнения'),
-	region: z.string().min(1, 'Поле обязательно для заполнения'),
+	country: z.array(z.string().min(1, 'Поле обязательно для заполнения')),
 	constructionType: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuerName: z.string().optional(),

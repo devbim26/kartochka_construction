@@ -50,7 +50,6 @@ export const HeavyMaterialType = ({ constructionIndex, fieldIndex }: Props) => {
 			)
 			.subscribe();
 	};
-	console.log(form.getValues());
 	useEffect(() => {
 		handleGetMaterials({
 			materialType: MaterialTypeEnum.Heavy,

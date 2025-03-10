@@ -1,81 +1,73 @@
 import { ConstructionPosition, MaterialParametrs } from '@api-gen';
-import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, Input, Select, Switch } from '@core';
-import type { ConstructionsEditData, FilterIssuer } from '@features';
+import type { ConstructionsEditData, Issuer } from '@features';
 import {
 	ConstructionTypeEnum,
 	convertToClientIssuerData,
-	convertToServerIssuerData,
 	DescriptionFieldNames,
 	FormSubTitle,
 	getGuidebooksPaginated,
 	Guidebooks,
+	HeavyMultiLayerWallComponent,
+	HeavyMultiLayerWallFacingBothSideComponent,
+	HeavyMultiLayerWallFacingOneSideComponent,
+	HeavySingleLayerWallComponent,
+	HeavySingleLayerWallFacingBothSideComponent,
+	HeavySingleLayerWallFacingOneSideComponent,
+	HeavySingleLayerWallSoundproofingBothSideComponent,
+	HeavySingleLayerWallSoundproofingOneSideComponent,
 	RuConstructionConstructionTypeSelectValues,
+	RuCountryNamesSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
-	RuRegionNamesSelectValues,
 } from '@features';
-
-import type { AxiosResponse } from 'axios';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
-import { useSearchParams } from 'react-router-dom';
-import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
-import { HeavySingleWallComponent } from './contruction-type';
 
 export const ConstructionsEdit = () => {
-	const [search] = useSearchParams();
 	const form = useFormContext<ConstructionsEditData>();
+	const { formState, control, watch, setValue, register } = form;
+	const [displayChars, setDisplayChars] = useState(false);
+	const [issuers, setIssuers] = useState<Issuer[]>([]);
+	const currentConstruction = watch('constructionType');
 
-	const [isSpecsDisplay, setSpecsDisplay] = useState(false);
-
-	const handleChangeDisplay = () => {
-		setSpecsDisplay(!isSpecsDisplay);
-	};
-
-	useEffect(() => {
-		handleGetIssuers({ name: '', country: '', webSite: '', logoUrl: '' });
+	const handleGetIssuerData = useCallback(async () => {
+		try {
+			const response = await getGuidebooksPaginated({
+				data: {
+					name: null,
+					country: null,
+					logoUrl: null,
+					webSite: null,
+				},
+				pagination: {
+					pageSize: 999999,
+					pageNumber: 1,
+				},
+				guidebookType: Guidebooks.ISSUER,
+			});
+			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
+			setIssuers(items.items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
 	}, []);
 
-	const [issuers, setIssuers] = useState<Array<SelectOption>>();
-
-	const handleGetIssuers = (data: FilterIssuer) => {
-		from(
-			getGuidebooksPaginated({
-				data: convertToServerIssuerData(data),
-				pagination: { pageSize: 999999, pageNumber: 1 },
-				guidebookType: Guidebooks.ISSUER,
-			}),
-		)
-			.pipe(
-				switchMap((response: AxiosResponse) => {
-					const items = convertToPaginatedType(convertToClientIssuerData)(response.data);
-					return from([items]);
-				}),
-				tap((items) => setIssuers(convertToSelectValues(items.items)!)),
-				catchError((error) => {
-					console.log('Error:', error);
-					return from([null]);
-				}),
-			)
-			.subscribe();
-	};
-
-	const { formState, control, watch } = form;
-
-	const currentConstruction = watch('constructionType');
+	useEffect(() => {
+		handleGetIssuerData();
+	}, []);
 
 	const ConstructionTypeMap = {
 		[ConstructionTypeEnum.HeavySingleLayerWall]: {
-			component: <HeavySingleWallComponent />,
+			component: <HeavySingleLayerWallComponent />,
 			action: () => {
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWall,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
@@ -93,13 +85,13 @@ export const ConstructionsEdit = () => {
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
-			component: <HeavySingleWallComponent />,
+			component: <HeavySingleLayerWallFacingOneSideComponent />,
 			action: () => {
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLayerWall,
+					ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
@@ -113,23 +105,557 @@ export const ConstructionsEdit = () => {
 							},
 						],
 					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
 				]);
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
-			component: <HeavySingleWallComponent />,
+			component: <HeavySingleLayerWallFacingBothSideComponent />,
 			action: () => {
-				console.log(123);
-				form.setValue(
+				setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavySingleLayerWall,
+					ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
 				);
-				form.setValue('constructionTypeObject.constructions', [
+				setValue('constructionTypeObject.constructions', [
 					{
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
 							{
 								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Right,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide]: {
+			component: <HeavySingleLayerWallSoundproofingOneSideComponent />,
+			action: () => {
+				setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide,
+				);
+				setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]: {
+			component: <HeavySingleLayerWallSoundproofingBothSideComponent />,
+			action: () => {
+				setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide,
+				);
+				setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Right,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavyMultiLayerWall]: {
+			component: <HeavyMultiLayerWallComponent />,
+			action: () => {
+				setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavyMultiLayerWall,
+				);
+				setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide]: {
+			component: <HeavyMultiLayerWallFacingOneSideComponent />,
+			action: () => {
+				setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide,
+				);
+				setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]: {
+			component: <HeavyMultiLayerWallFacingBothSideComponent />,
+			action: () => {
+				setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide,
+				);
+				setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Right,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '4',
 								materialId: '',
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
@@ -144,7 +670,7 @@ export const ConstructionsEdit = () => {
 	};
 
 	return (
-		<div className="flex w-full flex-col gap-[16px]">
+		<div className="flex w-full flex-col gap-[16px] px-[25px]">
 			<Switch
 				onText="Характеристики"
 				offText="Описание"
@@ -161,43 +687,9 @@ export const ConstructionsEdit = () => {
 					!!Object.keys(formState.errors).length && <IoMdWarning />
 				}
 				wrapperClassName="h-[30px] w-[400px] self-center p-[3px] bg-primary"
-				onChange={handleChangeDisplay}
+				onChange={() => setDisplayChars(!displayChars)}
 			/>
-			{isSpecsDisplay ? (
-				<>
-					<FormSubTitle text="Тип конструкции" />
-					<Controller
-						name="constructionType"
-						control={control}
-						render={({ field }) => (
-							<Select
-								{...field}
-								value={field.value || ''}
-								onChange={(value) => {
-									form.setValue('constructionType', value as string);
-									if (value)
-										ConstructionTypeMap[value as ConstructionTypeEnum].action();
-								}}
-								options={RuConstructionConstructionTypeSelectValues}
-								error={formState.errors.constructionType?.message}
-								labelClassName={twMerge(
-									'text-sm leading-5 tracking-[0.1px]',
-									formState.errors.constructionType?.message ? 'text-error' : '',
-								)}
-								wrapperClassname="w-fit min-w-[226px] ring-input-border-primary"
-								buttonClassName="text-sm rounded-[8px]"
-								label={formState.errors.constructionType?.message || ''}
-								placeholder="Выберите тип"
-							/>
-						)}
-					/>
-					{currentConstruction ? (
-						ConstructionTypeMap[currentConstruction as ConstructionTypeEnum].component
-					) : (
-						<></>
-					)}
-				</>
-			) : (
+			{!displayChars ? (
 				<>
 					<FormSubTitle text="Описание" />
 					<div className="flex flex-wrap gap-[16px]">
@@ -211,7 +703,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.name?.message || 'Название конструкции'}
 							error={formState.errors.name?.message}
 							placeholder="Введите название"
-							{...form.register('name')}
+							{...register('name')}
 							type={'text'}
 						/>
 						<Input
@@ -224,7 +716,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.description?.message || 'Описание'}
 							error={formState.errors.description?.message}
 							placeholder="Введите описание"
-							{...form.register('description')}
+							{...register('description')}
 							type={'text'}
 						/>
 						<Controller
@@ -257,27 +749,28 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.descriptionSource?.message || 'Источник'}
 							error={formState.errors.descriptionSource?.message}
 							placeholder="Введите источник"
-							{...form.register('descriptionSource')}
+							{...register('descriptionSource')}
 							type={'text'}
 						/>
 						<Controller
-							name="region"
+							name="country"
 							control={control}
 							render={({ field }) => (
 								<Select
 									{...field}
 									isSearchable
-									value={field.value || ''}
-									options={RuRegionNamesSelectValues}
-									error={formState.errors.region?.message}
+									multiple
+									value={field.value || []}
+									options={RuCountryNamesSelectValues}
+									error={formState.errors.country?.message}
 									labelClassName={twMerge(
 										'text-sm leading-5 tracking-[0.1px]',
-										formState.errors.region?.message ? 'text-error' : '',
+										formState.errors.country?.message ? 'text-error' : '',
 									)}
 									wrapperClassname="w-[226px] ring-input-border-primary"
 									buttonClassName="text-sm rounded-[8px]"
-									label={formState.errors.region?.message || 'Регион'}
-									placeholder="Выберите регион"
+									label={formState.errors.country?.message || 'Страна'}
+									placeholder="Выберите страну"
 								/>
 							)}
 						/>
@@ -288,7 +781,7 @@ export const ConstructionsEdit = () => {
 								<Select
 									{...field}
 									value={field.value || ''}
-									options={issuers || []}
+									options={convertToSelectValues(issuers) ?? []}
 									error={formState.errors.issuer?.message}
 									labelClassName={twMerge(
 										'text-sm leading-5 tracking-[0.1px]',
@@ -300,22 +793,6 @@ export const ConstructionsEdit = () => {
 									placeholder="Выберите производителя"
 								/>
 							)}
-						/>
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.maxHeight?.message ? 'text-error' : '',
-							)}
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={
-								formState.errors.comment?.message || 'Примечание (не обязательно)'
-							}
-							error={formState.errors.comment?.message}
-							placeholder="Примечание"
-							{...form.register('maxHeight')}
-							type={'text'}
-							maxLength={100}
 						/>
 					</div>
 					<FormSubTitle text="Характеристики" />
@@ -330,7 +807,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.maxHeight?.message || 'Максимальная высота, м'}
 							error={formState.errors.maxHeight?.message}
 							placeholder="Введите высоту"
-							{...form.register('maxHeight')}
+							{...register('maxHeight')}
 							type={'number'}
 						/>
 						<Input
@@ -346,7 +823,7 @@ export const ConstructionsEdit = () => {
 							}
 							error={formState.errors.fireResistance?.message}
 							placeholder="Введите класс"
-							{...form.register('fireResistance')}
+							{...register('fireResistance')}
 							type={'number'}
 						/>
 						<Input
@@ -359,7 +836,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.propertySource?.message || 'Источник'}
 							error={formState.errors.propertySource?.message}
 							placeholder="Введите источник"
-							{...form.register('propertySource')}
+							{...register('propertySource')}
 							type={'text'}
 						/>
 					</div>
@@ -375,7 +852,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.labRTotal?.message || 'R_total'}
 							error={formState.errors.labRTotal?.message}
 							placeholder="Введите через запятую"
-							{...form.register('labRTotal')}
+							{...register('labRTotal')}
 							type={'text'}
 						/>
 						<Controller
@@ -408,8 +885,21 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.labIndexValue?.message || 'Index value, dBA'}
 							error={formState.errors.labIndexValue?.message}
 							placeholder="Введите индекс"
-							{...form.register('labIndexValue')}
+							{...register('labIndexValue')}
 							type={'number'}
+						/>
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.propertySource?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[226px]"
+							label={formState.errors.propertySource?.message || 'Источник'}
+							error={formState.errors.propertySource?.message}
+							placeholder="Введите источник"
+							{...register('laboratoryTestSource')}
+							type={'text'}
 						/>
 					</div>
 					<FormSubTitle text="Расчетное значение" />
@@ -424,9 +914,8 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.laboratoryTestSource?.message || 'R_calcs'}
 							error={formState.errors.laboratoryTestSource?.message}
 							placeholder="R_calc"
-							{...form.register('estimatedRTotal')}
+							{...register('estimatedRTotal')}
 							type={'text'}
-							disabled
 						/>
 						<Controller
 							name="labIndex"
@@ -445,7 +934,6 @@ export const ConstructionsEdit = () => {
 									buttonClassName="text-sm rounded-[8px]"
 									label={formState.errors.labIndex?.message || 'Индекс'}
 									placeholder="Выберите индекс"
-									isDisabled
 								/>
 							)}
 						/>
@@ -461,11 +949,45 @@ export const ConstructionsEdit = () => {
 							}
 							error={formState.errors.estimatedIndexValue?.message}
 							placeholder="Введите индекс"
-							{...form.register('estimatedIndexValue')}
+							{...register('estimatedIndexValue')}
 							type={'number'}
-							disabled
 						/>
 					</div>
+				</>
+			) : (
+				<>
+					<FormSubTitle text="Тип конструкции" />
+					<Controller
+						name="constructionType"
+						control={control}
+						render={({ field }) => (
+							<Select
+								{...field}
+								isSearchable
+								value={field.value || ''}
+								onChange={(value) => {
+									setValue('constructionType', value as string);
+									if (value)
+										ConstructionTypeMap[value as ConstructionTypeEnum].action();
+								}}
+								options={RuConstructionConstructionTypeSelectValues}
+								error={formState.errors.constructionType?.message}
+								labelClassName={twMerge(
+									'text-sm leading-5 tracking-[0.1px]',
+									formState.errors.constructionType?.message ? 'text-error' : '',
+								)}
+								wrapperClassname="w-fit min-w-[468px] ring-input-border-primary"
+								buttonClassName="text-sm rounded-[8px]"
+								label={formState.errors.constructionType?.message || ''}
+								placeholder="Выберите тип"
+							/>
+						)}
+					/>
+					{currentConstruction ? (
+						ConstructionTypeMap[currentConstruction as ConstructionTypeEnum].component
+					) : (
+						<></>
+					)}
 				</>
 			)}
 		</div>

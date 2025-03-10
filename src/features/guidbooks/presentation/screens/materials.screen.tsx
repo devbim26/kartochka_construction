@@ -9,9 +9,11 @@ import {
 	useAppNavigate,
 	type PaginationState,
 } from '@core';
+import type { Country, MaterialsAddAndEditData, MaterialsFilterData } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
-	convertToServerMaterialsAddAndEditData,
+	convertToServerMaterialsCreateData,
+	convertToServerMaterialsEditData,
 	convertToServerMaterialsFilterData,
 	getGuidebooksCreate,
 	getGuidebooksDelete,
@@ -24,13 +26,11 @@ import {
 	MaterialsAddAndEditConfig,
 	MaterialsFilter,
 	MaterialsFilterConfig,
+	RuCountryNamesMap,
 	RuMaterialTypeEnum,
-	RuRegionNamesMap,
 	useHeaderForm,
-	type MaterialsAddAndEditData,
-	type MaterialsFilterData,
-	type Region,
 } from '@features';
+
 import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
@@ -105,10 +105,10 @@ const MaterialsScreen = () => {
 				),
 			},
 			{
-				accessorKey: 'region',
-				header: () => <SimpleTableHeaderCell text="Регион" />,
+				accessorKey: 'country',
+				header: () => <SimpleTableHeaderCell text="Страна" />,
 				cell: (info) => (
-					<SimpleTableCell content={RuRegionNamesMap[`${info.getValue() as Region}`]} />
+					<SimpleTableCell content={RuCountryNamesMap[`${info.getValue() as Country}`]} />
 				),
 			},
 			{
@@ -217,7 +217,7 @@ const MaterialsScreen = () => {
 	const handleAddTableData = async (data: MaterialsAddAndEditData) => {
 		try {
 			const response = await getGuidebooksCreate({
-				data: convertToServerMaterialsAddAndEditData(data),
+				data: convertToServerMaterialsCreateData(data),
 				guidebookType: Guidebooks.MATERIAL,
 			});
 			if (response.status === 200) {
@@ -235,7 +235,7 @@ const MaterialsScreen = () => {
 	const handleEditTableData = async (data: MaterialsAddAndEditData) => {
 		try {
 			const response = await getGuidebooksEdit({
-				data: convertToServerMaterialsAddAndEditData(data),
+				data: convertToServerMaterialsEditData(data),
 				guidebookType: Guidebooks.MATERIAL,
 			});
 			if (response.status === 200) {

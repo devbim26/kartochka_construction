@@ -6,7 +6,7 @@ export enum MaterialOriginType {
 
 export const RuMaterialOriginTypesSelectValues = [
 	{ label: 'Общий', value: MaterialOriginType.Generic },
-	{ label: 'Произвлдитель', value: MaterialOriginType.Manufacturer },
+	{ label: 'Производитель', value: MaterialOriginType.Manufacturer },
 	{ label: 'Пользовательский продукт', value: MaterialOriginType.UserDefinedProduct },
 ];
 
@@ -28,6 +28,7 @@ export enum MaterialTypeEnum {
 	Filler = 'Filler',
 	Heavy = 'Heavy',
 	Board = 'Board',
+	ZPanel = 'ZPanel',
 }
 
 export enum RuMaterialTypeEnum {
@@ -50,6 +51,27 @@ export enum RuMaterialTypeEnum {
 	Board = 'Плиты',
 }
 
+export enum MaterialTypesSelectValuesEnum {
+	Facing = 'Facing',
+	Additional = 'Additional',
+}
+
+export const MaterialTypesSelectValuesMap = {
+	[MaterialTypesSelectValuesEnum.Facing]: [
+		{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
+		{ label: 'Воздушные зазоры', value: MaterialTypeEnum.AirGap },
+		{ label: 'Связующие', value: MaterialTypeEnum.Link },
+		{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
+		{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
+		{ label: 'Плиты', value: MaterialTypeEnum.Board },
+	],
+	[MaterialTypesSelectValuesEnum.Additional]: [
+		{ label: 'Плиты', value: MaterialTypeEnum.Board },
+		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
+		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	],
+};
+
 export const RuMaterialTypesSelectValues = [
 	{ label: 'Кирпичные и монолитные', value: MaterialTypeEnum.MasonryAndSolid },
 	{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
@@ -68,6 +90,7 @@ export const RuMaterialTypesSelectValues = [
 	{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
 	{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
 	{ label: 'Плиты', value: MaterialTypeEnum.Board },
+	{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
 ];
 
 export interface MaterialType {

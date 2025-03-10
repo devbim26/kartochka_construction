@@ -76,14 +76,15 @@ export interface ConstructionHeaderDto {
 	name?: string | null;
 	description?: string | null;
 	priority?: Priority;
-	region?: Region;
+	countries?: CountryType[] | null;
 	descriptionSource?: string | null;
 	notation?: string | null;
 	/** @format uuid */
 	issuerId?: string;
-	issuer?: IssuerDto;
+	issuer?: Issuer;
 	/** @format double */
 	maxHeight?: number;
+	propertySource?: string | null;
 	fireResistance?: string | null;
 	rTotal?: number[] | null;
 	laboratoryTestSource?: string | null;
@@ -105,9 +106,17 @@ export enum ConstructionPosition {
 	Right = 'Right',
 }
 
+export interface ConstructionRootTemplate {
+	constructions?: ConstructionTemplate[] | null;
+}
+
+export interface ConstructionTemplate {
+	position?: ConstructionPosition;
+	subConstructions?: SubConstructionTemplate[] | null;
+}
+
 export interface ConstructionTypeDto {
-	name?: string | null;
-	shortName?: string | null;
+	constructionTypeEnum?: ConstructionTypeEnum;
 	constructions?: ConstructionDto[] | null;
 }
 
@@ -117,7 +126,19 @@ export enum ConstructionTypeEnum {
 	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
 }
 
-export enum Country {
+export interface ConstructionTypeTemplate {
+	name?: string | null;
+	shortName?: string | null;
+	constructionRoot?: ConstructionRootTemplate;
+}
+
+export interface Country {
+	/** @format uuid */
+	id?: string;
+	countryType?: CountryType;
+}
+
+export enum CountryType {
 	None = 'None',
 	Albania = 'Albania',
 	Andorra = 'Andorra',
@@ -163,12 +184,6 @@ export enum Country {
 	Ukrain = 'Ukrain',
 }
 
-export interface CraeteSubConstructionTemplateDto {
-	name?: string | null;
-	userMaterials?: UserMaterialTemplateDto[] | null;
-	subPosition?: ConstructionPosition;
-}
-
 export interface CreateConstructionDto {
 	constructionPosition?: ConstructionPosition;
 	userMaterials?: CreateUserMaterialDto[] | null;
@@ -178,7 +193,7 @@ export interface CreateConstructionHeaderCommand {
 	name?: string | null;
 	description?: string | null;
 	priority?: Priority;
-	region?: Region;
+	countries?: CountryType[] | null;
 	descriptionSource?: string | null;
 	/** @format uuid */
 	issuerId?: string;
@@ -194,26 +209,9 @@ export interface CreateConstructionHeaderCommand {
 	constructionType?: CreateConstructionTypeDto;
 }
 
-export interface CreateConstructionRootTemplateDto {
-	constructions?: CreateConstructionTemplateDto[] | null;
-}
-
-export interface CreateConstructionTemplateDto {
-	position?: ConstructionPosition;
-	subConstructions?: CraeteSubConstructionTemplateDto[] | null;
-}
-
 export interface CreateConstructionTypeDto {
 	constructionTypeEnum?: ConstructionTypeEnum;
 	constructions?: CreateConstructionDto[] | null;
-}
-
-export interface CreateConstructionTypeTemplateDto {
-	/** @format uuid */
-	constructionTypeTemplateId?: string;
-	name?: string | null;
-	shortName?: string | null;
-	constructionRoot?: CreateConstructionRootTemplateDto;
 }
 
 export interface CreateReportDto {
@@ -300,9 +298,8 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	ordering?: string | null;
 	name?: string | null;
 	description?: string | null;
-	/** @format uuid */
-	constructionTypeId?: string | null;
-	region?: Region;
+	constructionType?: ConstructionTypeEnum;
+	countryType?: CountryType;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -313,7 +310,7 @@ export interface GetIssuerWithPaginationParamsQuery {
 	sortOrder?: SortOrder;
 	ordering?: string | null;
 	name?: string | null;
-	country?: Country;
+	countryType?: CountryType;
 	webSite?: string | null;
 }
 
@@ -330,6 +327,18 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	/** @format float */
 	thickness?: number | null;
 	materialTypeEnum?: MaterialTypeEnum;
+}
+
+export interface GetPalacementRoomVariantsWithTypesQuery {
+	buildingType?: BuildingType;
+	constructionType?: ConstructionClass;
+}
+
+export interface GetPlacementRoomVariantByAllParametersQuery {
+	buildingType?: BuildingType;
+	constructionType?: ConstructionClass;
+	/** @format uuid */
+	placementRoomId?: string;
 }
 
 export interface GetReportWithPaginationQuery {
@@ -366,11 +375,20 @@ export enum IndexType {
 	ValueΔRw = 'ΔRw',
 }
 
+export interface Issuer {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	countries?: Country[] | null;
+	logoUrl?: string | null;
+	webSite?: string | null;
+}
+
 export interface IssuerDto {
 	/** @format uuid */
 	id: string;
 	name: string | null;
-	country?: Country;
+	countries?: CountryType[] | null;
 	logoUrl?: string | null;
 	webSite?: string | null;
 }
@@ -402,7 +420,7 @@ export interface MaterialDto {
 	thickness?: number;
 	materialType?: MaterialTypeEnum;
 	type?: MaterialOriginType;
-	region?: Region;
+	countries?: CountryType[] | null;
 	issuer?: IssuerDto;
 	imageUrl?: string | null;
 	/** @format float */
@@ -575,9 +593,17 @@ export interface PasswordGrantFlow {
 }
 
 export enum Priority {
-	Low = 'Low',
-	Medium = 'Medium',
-	High = 'High',
+	Zero = 'Zero',
+	One = 'One',
+	Two = 'Two',
+	Three = 'Three',
+	Four = 'Four',
+	Five = 'Five',
+	Six = 'Six',
+	Seven = 'Seven',
+	Eight = 'Eight',
+	Nine = 'Nine',
+	Ten = 'Ten',
 }
 
 export enum Region {
@@ -672,7 +698,7 @@ export interface RequirementDto {
 	/** @format float */
 	noizeIsolationIndex?: number;
 	/** @format float */
-	noizeImpactIndex?: number | null;
+	noizeImpactIndex?: number;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
 }
@@ -700,13 +726,19 @@ export enum SortOrder {
 	Desc = 'Desc',
 }
 
+export interface SubConstructionTemplate {
+	name?: string | null;
+	userMaterials?: UserMaterialTemplate[] | null;
+	subPosition?: ConstructionPosition;
+}
+
 export interface UpdateConstructionHeaderCommand {
 	/** @format uuid */
 	id?: string;
 	name?: string | null;
 	description?: string | null;
 	priority?: Priority;
-	region?: Region;
+	countries?: CountryType[] | null;
 	descriptionSource?: string | null;
 	notation?: string | null;
 	/** @format uuid */
@@ -744,13 +776,14 @@ export interface UpdateRequirementCommand {
 }
 
 export interface UserMaterialDto {
-	material?: NamedEntity;
+	/** @format uuid */
+	materialId?: string;
 	/** @format int32 */
 	positionId?: number;
 	materialTypeValue?: MaterialTypeValueDto[] | null;
 }
 
-export interface UserMaterialTemplateDto {
+export interface UserMaterialTemplate {
 	/** @format uuid */
 	materialId?: string;
 	/** @format float */
@@ -1172,7 +1205,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/Construction/ConstructionTypes
 		 */
 		constructionConstructionTypesList: (params: RequestParams = {}) =>
-			this.request<CreateConstructionTypeTemplateDto[], any>({
+			this.request<ConstructionTypeTemplate[], any>({
 				path: `/api/Construction/ConstructionTypes`,
 				method: 'GET',
 				format: 'json',
@@ -1294,7 +1327,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		issuerCreate: (
 			data: {
 				Name: string;
-				Country?: Country;
+				CountryTypes?: CountryType[];
 				WebSite?: string;
 				/** @format binary */
 				FormFile?: File;
@@ -1338,7 +1371,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				/** @format uuid */
 				Id: string;
 				Name: string;
-				Country?: Country;
+				Countries?: CountryType[];
 				WebSite?: string;
 				/** @format binary */
 				FormFile?: File;
@@ -1405,7 +1438,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				Density?: number;
 				/** @format float */
 				Thickness?: number;
-				Region?: Region;
+				CountryTypes?: CountryType[];
 				/** @format uuid */
 				IssuerId?: string;
 				/** @format binary */
@@ -1468,7 +1501,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				Density?: number;
 				/** @format float */
 				Thickness?: number;
-				Region?: Region;
+				Countries?: CountryType[];
 				/** @format uuid */
 				IssuerId?: string;
 				MaterialTypeEnum?: MaterialTypeEnum;
@@ -1510,6 +1543,44 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				path: `/api/MaterialType`,
 				method: 'GET',
 				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags PlacementRoomVariants
+		 * @name PlacementRoomVariantsCreate
+		 * @request POST:/api/PlacementRoomVariants
+		 */
+		placementRoomVariantsCreate: (
+			data: GetPalacementRoomVariantsWithTypesQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/PlacementRoomVariants`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags PlacementRoomVariants
+		 * @name PlacementRoomVariantsGetSecondRoomCreate
+		 * @request POST:/api/PlacementRoomVariants/get-second-room
+		 */
+		placementRoomVariantsGetSecondRoomCreate: (
+			data: GetPlacementRoomVariantByAllParametersQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/PlacementRoomVariants/get-second-room`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
 				...params,
 			}),
 

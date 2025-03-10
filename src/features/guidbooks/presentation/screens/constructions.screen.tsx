@@ -37,7 +37,6 @@ import {
 } from '@features';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormProvider } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 
 const ConstructionsScreen = () => {
@@ -93,8 +92,8 @@ const ConstructionsScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				accessorKey: 'region',
-				header: () => <SimpleTableHeaderCell text="Регион" />,
+				accessorKey: 'country',
+				header: () => <SimpleTableHeaderCell text="Страна" />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
@@ -127,7 +126,7 @@ const ConstructionsScreen = () => {
 	}, []);
 
 	const [filterName, filterConstructionTypeId, filterDescription, filterRegion] =
-		forms.filterForm.watch(['name', 'constructionTypeId', 'description', 'region']);
+		forms.filterForm.watch(['name', 'constructionTypeId', 'description', 'country']);
 
 	useEffect(() => {
 		handleGetTableData(
@@ -253,21 +252,9 @@ const ConstructionsScreen = () => {
 				}}
 				forms={forms}
 				formElements={{
-					filter: () => (
-						<FormProvider {...forms.filterForm}>
-							<ConstructionsFilter />
-						</FormProvider>
-					),
-					add: () => (
-						<FormProvider {...forms.addForm}>
-							<ConstructionsAdd />
-						</FormProvider>
-					),
-					edit: () => (
-						<FormProvider {...forms.editForm}>
-							<ConstructionsEdit />
-						</FormProvider>
-					),
+					filter: ConstructionsFilter,
+					add: ConstructionsAdd,
+					edit: ConstructionsEdit,
 				}}
 			/>
 			{!!tableData.length && (

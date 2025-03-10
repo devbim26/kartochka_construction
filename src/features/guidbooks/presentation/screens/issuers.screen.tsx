@@ -12,6 +12,8 @@ import {
 } from '@core';
 import {
 	convertToClientIssuerData,
+	convertToServerCreateIssuerData,
+	convertToServerEditIssuerData,
 	convertToServerIssuerData,
 } from '@features/guidbooks/converters';
 import {
@@ -57,7 +59,7 @@ const IssuersScreen = () => {
 
 	const [filterName, filterCountry, filterWebSite] = form.filterForm.watch([
 		'name',
-		'country',
+		'countries',
 		'webSite',
 	]);
 
@@ -108,7 +110,7 @@ const IssuersScreen = () => {
 	const handleAddTableData = (data: Issuer) => {
 		from(
 			getGuidebooksCreate({
-				data: convertToServerIssuerData(data),
+				data: convertToServerCreateIssuerData(data),
 				guidebookType: Guidebooks.ISSUER,
 			}),
 		)
@@ -150,7 +152,7 @@ const IssuersScreen = () => {
 	const handleEditTableData = (data: Issuer) => {
 		from(
 			getGuidebooksEdit({
-				data: convertToServerIssuerData(data),
+				data: convertToServerEditIssuerData(data),
 				guidebookType: Guidebooks.ISSUER,
 			}),
 		)
