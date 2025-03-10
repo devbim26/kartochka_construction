@@ -32,7 +32,7 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	density: String(data.density) ?? '',
 	thickness: String(data.thickness) ?? '',
 	type: convertToClientMaterialOriginTypeData(data.type!) ?? '',
-	country: (convertToClientCountryData(data.country!) as []) ?? '',
+	country: (convertToClientCountryData(data.countries!) as string[]) ?? '',
 	issuer: data.issuer?.id ?? '',
 	image: data.imageUrl ?? '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',

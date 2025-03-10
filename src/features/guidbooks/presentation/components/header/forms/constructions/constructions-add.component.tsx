@@ -1300,8 +1300,6 @@ export const ConstructionsAdd = () => {
 		},
 	};
 
-	console.log(form.watch('country'));
-
 	return (
 		<div className="flex w-full flex-col gap-[16px] px-[25px]">
 			<Switch
