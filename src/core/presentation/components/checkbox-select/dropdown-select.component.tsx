@@ -4,7 +4,7 @@ import type { IconType } from 'react-icons';
 import { twMerge } from 'tailwind-merge';
 
 interface DropdownSelectButtonProps {
-	displayText: string;
+	displayText: string | string[];
 	className?: string;
 	textClassName?: string;
 	iconClassName?: string;
@@ -16,17 +16,22 @@ export const DropdownSelectButton = memoize(
 		return (
 			<div
 				className={twMerge(
-					'bg-gray-isabelline flex flex-row items-center justify-between rounded-lg px-2 py-1',
+					'flex flex-row items-center justify-between rounded-lg px-[12px] py-[6px]',
 					className,
 				)}
 			>
-				<p className={twMerge('p-semibold-14 text-blue-yankees', textClassName)}>
+				<p
+					className={twMerge(
+						'font-sans text-sm font-normal text-input-label-primary',
+						textClassName,
+					)}
+				>
 					{displayText}
 				</p>
 				{Icon ? (
 					<Icon className={twMerge('h-[20px] w-[20px]', iconClassName)} />
 				) : (
-					<ChevronIcon className={twMerge('h-[20px] w-[20px]', iconClassName)} />
+					<ChevronIcon className={twMerge('w-[20px]', iconClassName)} />
 				)}
 			</div>
 		);

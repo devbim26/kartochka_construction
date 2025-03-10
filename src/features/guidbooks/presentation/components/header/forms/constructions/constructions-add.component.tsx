@@ -1,5 +1,12 @@
 import { ConstructionPosition, MaterialParametrs } from '@api-gen';
-import { convertToPaginatedType, convertToSelectValues, Input, Select, Switch } from '@core';
+import {
+	CheckboxSelect,
+	convertToPaginatedType,
+	convertToSelectValues,
+	Input,
+	Select,
+	Switch,
+} from '@core';
 import type { ConstructionsAddData, Issuer } from '@features';
 import {
 	ConstructionTypeEnum,
@@ -1293,6 +1300,8 @@ export const ConstructionsAdd = () => {
 		},
 	};
 
+	console.log(form.watch('country'));
+
 	return (
 		<div className="flex w-full flex-col gap-[16px] px-[25px]">
 			<Switch
@@ -1381,19 +1390,26 @@ export const ConstructionsAdd = () => {
 							name="country"
 							control={control}
 							render={({ field }) => (
-								<Select
+								<CheckboxSelect
 									{...field}
-									isSearchable
-									multiple
 									value={field.value || []}
 									options={RuCountryNamesSelectValues}
-									error={formState.errors.country?.message}
-									labelClassName={twMerge(
-										'text-sm leading-5 tracking-[0.1px]',
-										formState.errors.country?.message ? 'text-error' : '',
-									)}
-									wrapperClassname="w-[226px] ring-input-border-primary"
-									buttonClassName="text-sm rounded-[8px]"
+									searchable
+									multiple
+									classNames={{
+										popover: {
+											buttonClassName: twMerge(
+												formState.errors.country?.message
+													? 'ring-error'
+													: '',
+											),
+											labelClassName: twMerge(
+												formState.errors.country?.message
+													? 'text-error'
+													: '',
+											),
+										},
+									}}
 									label={formState.errors.country?.message || 'Страна'}
 									placeholder="Выберите страну"
 								/>

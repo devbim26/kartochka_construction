@@ -54,7 +54,7 @@ export const Checkbox = memoize(
 			return (
 				<FormElementLabel
 					className={twMerge(
-						'text-xxs whitespace-nowrap',
+						'whitespace-nowrap font-sans text-sm',
 						VARIANTS[variant].label,
 						rest.disabled && VARIANTS['disabled'].label,
 						labelClassName,
