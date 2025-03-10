@@ -63,7 +63,7 @@ export const HeavySingleLayerWallComponent = () => {
 									fieldIndex={indices.zeroIndex}
 									positionId={0}
 									constructionIndex={0}
-									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
