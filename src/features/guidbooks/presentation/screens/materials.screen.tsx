@@ -110,7 +110,11 @@ const MaterialsScreen = () => {
 				accessorKey: 'country',
 				header: () => <SimpleTableHeaderCell text="Страна" />,
 				cell: (info) => (
-					<SimpleTableCell content={RuCountryNamesMap[`${info.getValue() as Country}`]} />
+					<SimpleTableCell
+						content={info.row.original.country
+							.map((ct) => RuCountryNamesMap[ct as Country])
+							.join(', ')}
+					/>
 				),
 			},
 			{
