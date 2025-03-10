@@ -50,7 +50,7 @@ export const convertToClientConstructionsAddData = (
 	description: data.description ?? '',
 	priority: (convertToClientPriorityData(data.priority!) as string) ?? '',
 	descriptionSource: data.descriptionSource ?? '',
-	country: (convertToClientCountryData(data.countries!) as string[]) ?? '',
+	country: (convertToClientCountryData(data.countries!) as string[]) ?? [],
 	maxHeight: String(data.maxHeight) ?? '',
 	fireResistance: String(data.fireResistance) ?? '',
 	propertySource: data.propertySource ?? '',

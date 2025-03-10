@@ -557,7 +557,7 @@ export interface PaginatedMaterialDto {
 	thickness?: number;
 	materialType?: MaterialTypeEnum;
 	type?: MaterialOriginType;
-	region?: Region;
+	countries?: CountryType[] | null;
 	imageUrl?: string | null;
 	/** @format float */
 	materialCoefficient?: number;
