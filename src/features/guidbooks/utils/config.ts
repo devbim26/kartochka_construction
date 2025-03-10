@@ -18,7 +18,7 @@ export const MaterialsAddAndEditConfig: EntityConfig = {
 		shortName: '',
 		density: '',
 		thickness: '',
-		materialType: { id: '', name: '' },
+		materialType: '',
 		country: [],
 		type: '',
 		issuer: '',
