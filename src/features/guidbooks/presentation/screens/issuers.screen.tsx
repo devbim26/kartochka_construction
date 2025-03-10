@@ -207,11 +207,15 @@ const IssuersScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				accessorKey: 'country',
+				accessorKey: 'countries',
 				header: () => <SimpleTableHeaderCell text={'Страна'} />,
 				cell: (info) => {
 					return (
-						<SimpleTableCell content={RuCountryNamesMap[info.getValue() as Country]} />
+						<SimpleTableCell
+							content={info.row.original.countries
+								.map((ct) => RuCountryNamesMap[ct as Country])
+								.join(', ')}
+						/>
 					);
 				},
 			},

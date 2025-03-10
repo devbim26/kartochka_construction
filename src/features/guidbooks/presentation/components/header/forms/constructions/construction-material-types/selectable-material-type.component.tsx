@@ -61,9 +61,7 @@ export const SelectableMaterialType = ({
 	};
 
 	useEffect(() => {
-		handleGetMaterials({
-			materialType: currentMaterialType,
-		});
+		handleGetMaterials({ materialType: currentMaterialType });
 	}, [userMaterials]);
 
 	useEffect(() => {

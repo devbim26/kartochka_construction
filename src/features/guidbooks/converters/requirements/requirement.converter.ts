@@ -1,4 +1,5 @@
 import type {
+	CountryType,
 	CreateRequirementCommand,
 	GetRequirementsWithPaginationParamsQuery,
 	RequirementDto,
@@ -8,21 +9,20 @@ import {
 	categoryClassMap,
 	convertToClientBuildingTypeData,
 	convertToClientCategoryClassData,
-	convertToClientRegionData,
-	regionMap,
+	convertToClientCountryData,
+	convertToServerCountryData,
 } from '@core';
-import {
-	ConstructionType,
-	type BuildingType as ClientBuildingType,
-	type CategoryClass as ClientCategoryClass,
-	type Region as ClientRegion,
-	type RequirementFilter,
+import type {
+	BuildingType as ClientBuildingType,
+	CategoryClass as ClientCategoryClass,
+	Country,
+	FormRequirement,
+	Requirement,
+	RequirementFilter,
 } from '@features/guidbooks/types';
-import type { RequirementsDataSchemaType } from '@features/guidbooks/utils';
+import { ConstructionType } from '@features/guidbooks/types';
 
-export const convertToClientRequirementData = (
-	data: RequirementDto,
-): RequirementsDataSchemaType => ({
+export const convertToClientRequirementData = (data: RequirementDto): Requirement => ({
 	...data,
 	constructionType: ConstructionType.Wall,
 	secondPlacementRoom: data.secondPlacementRoom ?? '',
@@ -30,7 +30,7 @@ export const convertToClientRequirementData = (
 	buildingType: convertToClientBuildingTypeData(data.buildingType!)! as string,
 	standartShortName: data.standartShortName ?? '',
 	standartFullName: data.standartFullName ?? '',
-	region: convertToClientRegionData(data.region!)! as string,
+	countryType: convertToClientCountryData(data.countryType!)! as string,
 	standartValidityPeriod: data.standartValidityPeriod
 		? data.standartValidityPeriod.split('-').reverse().join('-')
 		: '',
@@ -41,15 +41,15 @@ export const convertToClientRequirementData = (
 });
 
 export const convertToServerRequirementData = (
-	data: RequirementsDataSchemaType,
+	data: FormRequirement,
 ): CreateRequirementCommand => ({
 	...data,
-	secondPlacementRoom: data.secondPlacementRoom || null,
-	firstPlacementRoom: data.firstPlacementRoom || null,
+	secondPlacementRoomId: data.secondPlacementRoomId || undefined,
+	firstPlacementRoomId: data.firstPlacementRoomId || undefined,
 	buildingType: buildingTypeMap.toServer[data.buildingType as ClientBuildingType] || null,
 	standartShortName: data.standartShortName || null,
 	standartFullName: data.standartFullName || null,
-	region: data.region ? regionMap.toServer[data.region as ClientRegion] : undefined,
+	countryType: convertToServerCountryData(data.countryType as Country) as CountryType,
 	standartValidityPeriod: data.standartValidityPeriod.split('-').reverse().join('-'),
 	class: categoryClassMap.toServer[data.class as ClientCategoryClass],
 	noizeIsolationIndex: +data.noizeIsolationIndex,
@@ -66,5 +66,5 @@ export const convertToServerFilterRequirementData = (
 	// secondPlacementRoom: data.secondPlacementRoom || null,
 	// firstPlacementRoom: data.firstPlacementRoom || null,
 	buildingType: buildingTypeMap.toServer[data.buildingType as ClientBuildingType] || null,
-	region: data.region ? regionMap.toServer[data.region as ClientRegion] : undefined,
+	countryType: convertToServerCountryData(data.countryType as Country)! as CountryType,
 });

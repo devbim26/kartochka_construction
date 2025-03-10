@@ -227,12 +227,12 @@ export interface CreateReportDto {
 }
 
 export interface CreateRequirementCommand {
-	secondPlacementRoom?: string | null;
-	firstPlacementRoom?: string | null;
+	secondPlacementRoomId?: string;
+	firstPlacementRoomId?: string;
 	buildingType?: BuildingType;
 	standartShortName?: string | null;
 	standartFullName?: string | null;
-	region?: Region;
+	countryType?: CountryType;
 	/** @format date */
 	standartValidityPeriod?: string;
 	class?: CategoryClass;
@@ -359,7 +359,7 @@ export interface GetRequirementsWithPaginationParamsQuery {
 	pageSize?: number;
 	sortOrder?: SortOrder;
 	ordering?: string | null;
-	region?: Region;
+	countryType?: CountryType;
 	buildingType?: BuildingType;
 	placementRoom?: string | null;
 	standartShortName?: string | null;
@@ -557,7 +557,7 @@ export interface PaginatedMaterialDto {
 	thickness?: number;
 	materialType?: MaterialTypeEnum;
 	type?: MaterialOriginType;
-	region?: Region;
+	countries?: CountryType[] | null;
 	imageUrl?: string | null;
 	/** @format float */
 	materialCoefficient?: number;
@@ -590,6 +590,12 @@ export interface PaginatedMaterialDtoPaginatedList {
 export interface PasswordGrantFlow {
 	phoneNumber: string | null;
 	password: string | null;
+}
+
+export interface PlacementRoom {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
 }
 
 export enum Priority {
@@ -691,7 +697,7 @@ export interface RequirementDto {
 	buildingType?: BuildingType;
 	standartShortName?: string | null;
 	standartFullName?: string | null;
-	region?: Region;
+	countryType?: CountryType;
 	/** @format date */
 	standartValidityPeriod?: string;
 	class?: CategoryClass;
@@ -763,7 +769,7 @@ export interface UpdateRequirementCommand {
 	buildingType?: BuildingType;
 	standartShortName?: string | null;
 	standartFullName?: string | null;
-	region?: Region;
+	countryType?: CountryType;
 	/** @format date */
 	standartValidityPeriod?: string;
 	class?: CategoryClass;
@@ -1162,11 +1168,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/api/Auth/refresh
 		 */
 		authRefreshCreate: (params: RequestParams = {}) =>
-			this.request<void, any>({
-				path: `/api/Auth/refresh`,
-				method: 'POST',
-				...params,
-			}),
+			this.request<void, any>({ path: `/api/Auth/refresh`, method: 'POST', ...params }),
 
 		/**
 		 * No description
@@ -1176,11 +1178,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/api/Auth/logout
 		 */
 		authLogoutCreate: (params: RequestParams = {}) =>
-			this.request<void, any>({
-				path: `/api/Auth/logout`,
-				method: 'POST',
-				...params,
-			}),
+			this.request<void, any>({ path: `/api/Auth/logout`, method: 'POST', ...params }),
 
 		/**
 		 * No description
