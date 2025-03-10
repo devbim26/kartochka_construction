@@ -97,13 +97,15 @@ export const CheckboxSelect = React.forwardRef<HTMLDivElement, CheckboxSelectPro
 					buttonContent={
 						<DropdownSelectButton
 							displayText={
-								value.length
-									? Array.isArray(value)
-										? value
-												.map((v) => RuCountryNamesMap[v as Country])
-												.join(', ')
-										: RuCountryNamesMap[value as Country]
-									: placeholder
+								value.length === options.length
+									? 'Все'
+									: value.length
+										? Array.isArray(value)
+											? value
+													.map((v) => RuCountryNamesMap[v as Country])
+													.join(', ')
+											: RuCountryNamesMap[value as Country]
+										: placeholder
 							}
 							className={twMerge(
 								'flex w-[226px] rounded-[8px] ring-1 ring-inset ring-input-border-primary',
