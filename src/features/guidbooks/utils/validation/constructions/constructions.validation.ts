@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const ConstructionsFilterSchema = z.object({
 	name: z.string(),
-	constructionTypeId: z.string(),
+	constructionType: z.string(),
 	description: z.string(),
 	country: z.string(),
 });
@@ -38,7 +38,9 @@ export const ConstructionsAddSchema = z.object({
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	priority: z.string().min(1, 'Поле обязательно для заполнения'),
 	descriptionSource: z.string().min(1, 'Поле обязательно для заполнения'),
-	country: z.array(z.string().min(1, 'Поле обязательно для заполнения')),
+	country: z
+		.array(z.string().min(1, 'Поле обязательно для заполнения'))
+		.min(1, 'Поле обязательно для заполнения'),
 	constructionType: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuerName: z.string().optional(),

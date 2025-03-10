@@ -1,10 +1,12 @@
-import { Checkbox, DropdownSelectButton, Input, Popover, SearchIcon, Separator } from '@core';
+import { Checkbox, DropdownSelectButton, Input, Popover, SearchIcon } from '@core';
+import type { Country } from '@features';
+import { RuCountryNamesMap } from '@features/guidbooks/types';
 import React, { useCallback, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export interface CheckboxSelectOptions {
-	id: string;
-	name: string;
+	label: string;
+	value: string;
 }
 
 interface CheckboxSelectPropsClassNames {
@@ -12,6 +14,7 @@ interface CheckboxSelectPropsClassNames {
 		buttonClassName?: string;
 		buttonTextClassName?: string;
 		bodyClassName?: string;
+		labelClassName?: string;
 	};
 	searchInput?: {
 		className?: string;
@@ -26,15 +29,25 @@ interface CheckboxSelectProps {
 	options: CheckboxSelectOptions[];
 	searchable?: boolean;
 	multiple?: boolean;
-	label: string;
+	placeholder: string;
+	label?: string;
 	classNames?: CheckboxSelectPropsClassNames;
-	value: CheckboxSelectOptions[] | CheckboxSelectOptions;
-	onChange: (value: CheckboxSelectOptions[] | CheckboxSelectOptions) => void;
+	value: string[] | string;
+	onChange: (value: string | string[]) => void;
 }
 
 export const CheckboxSelect = React.forwardRef<HTMLDivElement, CheckboxSelectProps>(
 	(
-		{ options, searchable, multiple, label, classNames, value, onChange }: CheckboxSelectProps,
+		{
+			options,
+			searchable,
+			multiple,
+			placeholder,
+			label,
+			classNames,
+			value,
+			onChange,
+		}: CheckboxSelectProps,
 		ref,
 	) => {
 		const [searchValue, setSearch] = useState<string>('');
@@ -42,51 +55,64 @@ export const CheckboxSelect = React.forwardRef<HTMLDivElement, CheckboxSelectPro
 
 		useEffect(() => {
 			const filtred = searchValue
-				? options.filter((v) => v.name?.toLowerCase().includes(searchValue.toLowerCase()))
+				? options.filter((v) => v.label?.toLowerCase().includes(searchValue.toLowerCase()))
 				: options;
 			setFiltredOptions(filtred);
 		}, [options, searchValue]);
 
-		const singleCheck = useCallback(
-			(sValue: CheckboxSelectOptions) => {
-				onChange(sValue);
-			},
-			[options],
-		);
+		const singleCheck = useCallback((sValue: string) => {
+			onChange(sValue);
+		}, []);
 
 		const multipleCheck = useCallback(
-			(mValue: CheckboxSelectOptions) => {
-				const clone = (value as CheckboxSelectOptions[]).map((o) => ({ ...o }));
-				const existI = clone.findIndex((v) => v.id == mValue.id);
+			(mValue: string) => {
+				const clone = (value as string[]).slice();
+				const existI = clone.findIndex((v) => v === mValue);
 				existI === -1 ? clone.push(mValue) : clone.splice(existI, 1);
 				onChange(clone);
 			},
-			[options, value],
+			[value],
 		);
 
 		const selectAll = useCallback(() => {
-			const isChecked = options.length === (value as CheckboxSelectOptions[]).length;
-			onChange(isChecked ? [] : options.map((o) => ({ ...o })));
+			const isChecked = options.length === (value as string[]).length;
+			onChange(isChecked ? [] : options.map((o) => o.value));
 		}, [options, value]);
 
 		return (
-			<div ref={ref}>
+			<div ref={ref} className="flex flex-col gap-y-2">
+				{label && (
+					<label
+						className={twMerge(
+							'block font-sans text-sm font-normal text-input-label-primary',
+							classNames?.popover?.labelClassName,
+						)}
+					>
+						{label}
+					</label>
+				)}
 				<Popover
 					hidePadding
-					bodyClassName={twMerge(
-						'bg-gray-isabelline',
-						classNames?.popover?.bodyClassName,
-					)}
+					bodyClassName={(twMerge(classNames?.popover?.bodyClassName), 'w-[226px]')}
 					buttonContent={
 						<DropdownSelectButton
-							displayText={multiple ? label : (value as CheckboxSelectOptions).name}
+							displayText={
+								value.length
+									? Array.isArray(value)
+										? value
+												.map((v) => RuCountryNamesMap[v as Country])
+												.join(', ')
+										: RuCountryNamesMap[value as Country]
+									: placeholder
+							}
 							className={twMerge(
-								'flex h-[26px]',
+								'flex w-[226px] rounded-[8px] ring-1 ring-inset ring-input-border-primary',
 								classNames?.popover?.buttonClassName,
 							)}
 							textClassName={twMerge(
 								'truncate',
 								classNames?.popover?.buttonTextClassName,
+								value.length && 'text-input-value-black',
 							)}
 						/>
 					}
@@ -94,7 +120,7 @@ export const CheckboxSelect = React.forwardRef<HTMLDivElement, CheckboxSelectPro
 					<div className="flex flex-col">
 						{searchable && (
 							<>
-								<div className="z-[60] p-1">
+								<div className="px-[16px] py-[8px]">
 									<Input
 										Icon={SearchIcon}
 										value={searchValue}
@@ -105,56 +131,53 @@ export const CheckboxSelect = React.forwardRef<HTMLDivElement, CheckboxSelectPro
 										)}
 										iconPos="left"
 										className={twMerge(
-											'z-[60] select-none shadow-none ring-transparent focus:ring-0',
+											'select-none font-sans font-normal shadow-none ring-input-border-primary',
 											classNames?.searchInput?.className,
 										)}
+										inputClassName="font-sans font-normal h-[32px]"
 										onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 											setSearch(e.target.value);
 										}}
 									/>
 								</div>
-								<Separator />
 							</>
 						)}
-						<div className="flex max-h-[180px] flex-col overflow-auto">
+						<div className="flex max-h-[360px] flex-col overflow-auto">
 							{multiple && !searchValue && (
 								<div className={'px-4 py-2'}>
 									<Checkbox
 										label={'Все'}
 										direction="row"
-										checked={
-											options.length ===
-											(value as CheckboxSelectOptions[]).length
-										}
+										checked={options.length === (value as string[]).length}
 										onChange={selectAll}
 										labelClassName={twMerge(
-											'text-black-eerie select-none',
 											classNames?.checkbox?.labelClassName,
+											'text-input-value-black',
 										)}
 									/>
 								</div>
 							)}
-							{filtredOptions.map((option, index) => (
+							{filtredOptions.map((option) => (
 								<div
-									key={option.id}
-									className={twMerge('px-4 py-2', index !== 0 && 'border-t')}
+									key={option.value}
+									className={twMerge('px-4 py-2', 'border-t')}
 								>
 									<Checkbox
-										label={option.name}
+										label={option.label}
 										direction="row"
 										checked={
 											multiple
-												? (value as CheckboxSelectOptions[]).findIndex(
-														(o) => option.id === o.id,
-													) !== -1
-												: (value as CheckboxSelectOptions).id === option.id
+												? (value as string[]).includes(option.value)
+												: value === option.value
 										}
 										onChange={() => {
-											multiple ? multipleCheck(option) : singleCheck(option);
+											multiple
+												? multipleCheck(option.value)
+												: singleCheck(option.value);
 										}}
 										labelClassName={twMerge(
-											'text-black-eerie select-none',
 											classNames?.checkbox?.labelClassName,
+											'text-input-value-black',
 										)}
 									/>
 								</div>

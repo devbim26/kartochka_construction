@@ -19,7 +19,7 @@ export const MaterialsAddAndEditConfig: EntityConfig = {
 		density: '',
 		thickness: '',
 		materialType: { id: '', name: '' },
-		region: '',
+		country: [],
 		type: '',
 		issuer: '',
 		image: undefined,
@@ -72,7 +72,7 @@ export const ConstructionsAddConfig: EntityConfig = {
 		description: '',
 		priority: '',
 		descriptionSource: '',
-		region: '',
+		country: [],
 		constructionType: '',
 		issuer: '',
 		maxHeight: '',
@@ -97,5 +97,10 @@ export const ConstructionsEditConfig: EntityConfig = {
 
 export const ConstructionsFilterConfig: EntityConfig = {
 	schema: ConstructionsFilterSchema,
-	defaultValues: { name: '', constructionType: '', description: '', region: '' },
+	defaultValues: {
+		name: '',
+		constructionTypeId: '',
+		description: '',
+		country: '',
+	},
 };

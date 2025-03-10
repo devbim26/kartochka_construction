@@ -36,7 +36,7 @@ export const convertToServerConstructionsFilterData = (
 	data: ConstructionsFilterData,
 ): GetConstructionHeaderWithPaginationQuery => ({
 	name: data.name || null,
-	constructionTypeId: data.constructionTypeId || null,
+	constructionType: (data.constructionType as ConstructionTypeEnum) || null,
 	description: data.description || null,
 	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
 });
@@ -50,7 +50,7 @@ export const convertToClientConstructionsAddData = (
 	description: data.description ?? '',
 	priority: (convertToClientPriorityData(data.priority!) as string) ?? '',
 	descriptionSource: data.descriptionSource ?? '',
-	country: (convertToClientCountryData(data.countries!) as []) ?? '',
+	country: (convertToClientCountryData(data.countries!) as string[]) ?? [],
 	maxHeight: String(data.maxHeight) ?? '',
 	fireResistance: String(data.fireResistance) ?? '',
 	propertySource: data.propertySource ?? '',

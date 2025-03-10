@@ -1,3 +1,4 @@
+import { ChevronIcon } from '@core/presentation/icons';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { motion } from 'framer-motion';
 import type { JSX } from 'react';
@@ -269,14 +270,7 @@ export const Select = memoize(
 			}, 'selectMenuList');
 
 			const DropdownIndicator = memoize((props) => {
-				return (
-					chevronIcon || (
-						<components.DropdownIndicator
-							{...props}
-							className="text-input-label-primary"
-						/>
-					)
-				);
+				return chevronIcon || <ChevronIcon />;
 			}, 'selectDropDownIndicator');
 
 			const Control = memoize((props) => {

@@ -1,4 +1,4 @@
-import type { GetMaterialsWithPaginationParamsQuery } from '@api-gen';
+import type { CountryType, GetMaterialsWithPaginationParamsQuery } from '@api-gen';
 import { convertToClientCountryData, convertToServerCountryData } from '@core';
 import type {
 	Country,
@@ -31,8 +31,8 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	shortName: data.shortName ?? '',
 	density: String(data.density) ?? '',
 	thickness: String(data.thickness) ?? '',
-	type: convertToClientMaterialOriginTypeData(data.type!) ?? '',
-	country: (convertToClientCountryData(data.country!) as []) ?? '',
+	type: convertToClientMaterialOriginTypeData(data.type!) ?? [],
+	country: (convertToClientCountryData(data.countries!) as string[]) ?? '',
 	issuer: data.issuer?.id ?? '',
 	image: data.imageUrl ?? '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',
@@ -44,26 +44,6 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	solid: String(data.solid) ?? '',
 });
 
-export const convertToServerMaterialsAddAndEditData = (data: MaterialsAddAndEditData): any => ({
-	id: data.id || null,
-	name: data.name || null,
-	description: data.description || null,
-	shortName: data.shortName || null,
-	density: +data.density || null,
-	thickness: +data.thickness || null,
-	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || null,
-	country: convertToServerCountryData(data.country as Country[]) || null,
-	issuerId: data.issuer || null,
-	formFile: data.image,
-	materialCoefficient: +data.materialCoefficient || null,
-	materialTypeEnum: data.materialType || null,
-	velocity: +data.velocity || null,
-	lossFactor: +data.lossFactor || null,
-	youngModulus: +data.youngModulus || null,
-	damping: +data.damping || null,
-	solid: +data.solid || null,
-});
-
 export const convertToServerMaterialsCreateData = (data: MaterialsAddAndEditData): any => ({
 	id: data.id || null,
 	name: data.name || null,
@@ -72,7 +52,7 @@ export const convertToServerMaterialsCreateData = (data: MaterialsAddAndEditData
 	density: +data.density || null,
 	thickness: +data.thickness || null,
 	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || null,
-	countryTypes: convertToServerCountryData(data.country as Country[]) || null,
+	countryTypes: (convertToServerCountryData(data.country as Country[]) as CountryType[]) || null,
 	issuerId: data.issuer || null,
 	formFile: data.image,
 	materialCoefficient: +data.materialCoefficient || null,
@@ -92,7 +72,7 @@ export const convertToServerMaterialsEditData = (data: MaterialsAddAndEditData):
 	density: +data.density || null,
 	thickness: +data.thickness || null,
 	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || null,
-	countries: convertToServerCountryData(data.country as Country[]) || null,
+	countryTypes: convertToServerCountryData(data.country as Country[]) || null,
 	issuerId: data.issuer || null,
 	formFile: data.image,
 	materialCoefficient: +data.materialCoefficient || null,
