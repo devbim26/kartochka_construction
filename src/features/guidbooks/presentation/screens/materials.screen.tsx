@@ -32,9 +32,11 @@ import {
 } from '@features';
 
 import type { ColumnDef } from '@tanstack/react-table';
+import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const MaterialsScreen = () => {
 	const navigate = useAppNavigate();
@@ -156,9 +158,7 @@ const MaterialsScreen = () => {
 										}
 									/>
 									<DeleteIcon
-										onClick={() =>
-											handleDeleteTableData(info.getValue() as string)
-										}
+										onClick={() => handleDeleteTableData(info.row.original.id!)}
 									/>
 								</div>
 							}
@@ -195,6 +195,9 @@ const MaterialsScreen = () => {
 			setTableData(resData.items);
 			setPaginationState(resData.pagination);
 		} catch (error) {
+			if (error instanceof AxiosError) {
+				toast.error(error.message);
+			}
 			console.log('Error:', error);
 		}
 	};
@@ -210,6 +213,9 @@ const MaterialsScreen = () => {
 				setSingleMaterial(data);
 			}
 		} catch (error) {
+			if (error instanceof AxiosError) {
+				toast.error(error.message);
+			}
 			console.log('Error:', error);
 		}
 	}, []);
@@ -225,8 +231,12 @@ const MaterialsScreen = () => {
 					...paginationState,
 					pageNumber: 1,
 				});
+				navigate('');
 			}
 		} catch (error) {
+			if (error instanceof AxiosError) {
+				toast.error(error.message);
+			}
 			console.log('Error:', error);
 		}
 	};
@@ -242,8 +252,12 @@ const MaterialsScreen = () => {
 					...paginationState,
 					pageNumber: 1,
 				});
+				navigate('');
 			}
 		} catch (error) {
+			if (error instanceof AxiosError) {
+				toast.error(error.response?.data);
+			}
 			console.log(error);
 		}
 	};
@@ -259,8 +273,12 @@ const MaterialsScreen = () => {
 					...paginationState,
 					pageNumber: 1,
 				});
+				toast.success('Успешное удаление');
 			}
 		} catch (error) {
+			if (error instanceof AxiosError) {
+				toast.error(error.response?.data);
+			}
 			console.log('Error:', error);
 		}
 	};

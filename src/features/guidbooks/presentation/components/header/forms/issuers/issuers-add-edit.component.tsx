@@ -1,36 +1,25 @@
-import { Button, convertToBase64, FormElementLabel, Input, Select, useAppDispatch } from '@core';
+import { Button, convertToBase64, FormElementLabel, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type { Issuer } from '@features/guidbooks/types';
 import { RuCountryNamesMap, RuCountryNamesSelectValues } from '@features/guidbooks/types';
-import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const IssuersAddEdit = memoize(() => {
 	const form = useFormContext<Issuer>();
-	const { setValue, register, control, formState, trigger } = form;
-
-	const dispatch = useAppDispatch();
-	const [preview, setPreview] = useState<string | null>(null);
-	const [uploadError, setUploadError] = useState<boolean>(false);
+	const { setValue, register, control, formState, trigger, watch } = form;
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
 		if (file) {
-			try {
-				const base64 = await convertToBase64(file);
-				if (base64 && typeof base64 === 'string') {
-					setValue('logoUrl', file.name);
-					setPreview(base64);
-					setUploadError(false);
-				}
-				form.trigger('logoUrl');
-			} catch (error) {
-				setUploadError(true);
+			const base64 = await convertToBase64(file);
+			if (base64 && typeof base64 === 'string') {
+				setValue('logoUrl', base64);
 			}
+			trigger('logoUrl');
 		}
 	};
-
+	const logo = watch('logoUrl');
 	return (
 		<>
 			<Input
@@ -116,10 +105,10 @@ export const IssuersAddEdit = memoize(() => {
 						/>
 					</div>
 				</div>
-				{preview && (
+				{logo && (
 					<div className="flex justify-center self-center">
 						<img
-							src={preview}
+							src={logo}
 							alt="Превью изображения"
 							className="size-[60px] rounded-md object-cover"
 						/>

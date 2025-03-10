@@ -17,6 +17,7 @@ import {
 } from '@features/guidbooks/converters';
 import {
 	getGuidebooksCreate,
+	getGuidebooksDelete,
 	getGuidebooksDetail,
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
@@ -24,16 +25,16 @@ import {
 import type {
 	BuildingType,
 	ConstructionType,
+	FormRequirement,
 	Region,
 	Requirement,
-	RoomType,
+	RequirementFilter,
 } from '@features/guidbooks/types';
 import {
 	Guidebooks,
 	RuBuildingTypeNamesMap,
 	RuConstructionTypeNamesMap,
 	RuRegionNamesMap,
-	RuRoomTypeNamesMap,
 } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';
@@ -57,7 +58,7 @@ const RequirementsScreen = () => {
 	const [tableData, setTableData] = useState<Array<Requirement>>([]);
 	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
 
-	const form = useHeaderForm<Requirement>(
+	const form = useHeaderForm<FormRequirement>(
 		{
 			filter: RequirementsDataConfig.defaultValues,
 			edit: RequirementsDataConfig.defaultValues,
@@ -71,16 +72,16 @@ const RequirementsScreen = () => {
 	);
 
 	const [
-		filterRegion,
+		filterCountry,
 		filterConstructionType,
 		filterFirstPlacementRoom,
 		filterSecondPlacementRoom,
 		filterBuildingType,
 	] = form.filterForm.watch([
-		'region',
+		'countryType',
 		'constructionType',
-		'firstPlacementRoom',
-		'secondPlacementRoom',
+		'firstPlacementRoomId',
+		'secondPlacementRoomId',
 		'buildingType',
 	]);
 
@@ -97,7 +98,7 @@ const RequirementsScreen = () => {
 	useEffect(() => {
 		handleGetTableData(form.filterForm.getValues(), paginationState);
 	}, [
-		filterRegion,
+		filterCountry,
 		filterConstructionType,
 		filterFirstPlacementRoom,
 		filterSecondPlacementRoom,
@@ -105,7 +106,7 @@ const RequirementsScreen = () => {
 	]);
 
 	const handleGetTableData = (
-		data: Requirement,
+		data: RequirementFilter,
 		pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>,
 	) => {
 		from(
@@ -123,6 +124,7 @@ const RequirementsScreen = () => {
 					return from([res]);
 				}),
 				tap((res) => {
+					console.log(res);
 					setTableData(res.items);
 					setPaginationState(res.pagination);
 				}),
@@ -136,7 +138,7 @@ const RequirementsScreen = () => {
 			.subscribe();
 	};
 
-	const handleAddTableData = (data: Requirement) => {
+	const handleAddTableData = (data: FormRequirement) => {
 		from(
 			getGuidebooksCreate({
 				data: convertToServerRequirementData(data),
@@ -161,11 +163,12 @@ const RequirementsScreen = () => {
 
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно добавлено');
+					navigate('');
 				}
 			});
 	};
 
-	const handleEditTableData = (data: Requirement) => {
+	const handleEditTableData = (data: FormRequirement) => {
 		from(
 			getGuidebooksEdit({
 				data: convertToServerRequirementData(data),
@@ -184,6 +187,7 @@ const RequirementsScreen = () => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно отредактировано');
+					navigate('');
 				}
 			});
 	};
@@ -207,7 +211,7 @@ const RequirementsScreen = () => {
 	};
 
 	const handleDeleteTableData = (id: string) => {
-		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.REQUIREMENT }))
+		from(getGuidebooksDelete({ data: { id: id }, guidebookType: Guidebooks.REQUIREMENT }))
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -235,7 +239,7 @@ const RequirementsScreen = () => {
 	const columns = useMemo(() => {
 		const cols: ColumnDef<Requirement>[] = [
 			{
-				accessorKey: 'region',
+				accessorKey: 'countryType',
 				header: () => <SimpleTableHeaderCell text={'Регион'} />,
 				cell: (info) => {
 					return (
@@ -286,22 +290,14 @@ const RequirementsScreen = () => {
 				accessorKey: 'firstPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Первое помещение'} />,
 				cell: (info) => {
-					return (
-						<SimpleTableCell
-							content={RuRoomTypeNamesMap[info.getValue() as RoomType]}
-						/>
-					);
+					return <SimpleTableCell content={info.getValue() as string} />;
 				},
 			},
 			{
 				accessorKey: 'secondPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
 				cell: (info) => {
-					return (
-						<SimpleTableCell
-							content={RuRoomTypeNamesMap[info.getValue() as RoomType]}
-						/>
-					);
+					return <SimpleTableCell content={info.getValue() as string} />;
 				},
 			},
 			{
@@ -334,7 +330,7 @@ const RequirementsScreen = () => {
 		];
 		return cols;
 	}, []);
-
+	console.log(tableData);
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper

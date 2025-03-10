@@ -34,32 +34,17 @@ export const MaterialsAddAndEditConfig: EntityConfig = {
 
 export const MaterialsFilterConfig: EntityConfig = {
 	schema: MaterialsFilterSchema,
-	defaultValues: {
-		name: '',
-		density: '',
-		thickness: '',
-		materialType: '',
-	},
+	defaultValues: { name: '', density: '', thickness: '', materialType: '' },
 };
 
 export const IssuersDataConfig: EntityConfig = {
 	schema: IssuersSchema,
-	defaultValues: {
-		name: '',
-		country: '',
-		logoUrl: undefined,
-		webSite: '',
-	},
+	defaultValues: { name: '', countries: '', logoUrl: undefined, webSite: '' },
 };
 
 export const IssuersFormCofig: EntityConfig = {
 	schema: FormIssuerSchema,
-	defaultValues: {
-		name: '',
-		country: '',
-		logoUrl: '',
-		webSite: '',
-	},
+	defaultValues: { name: '', countries: [], logoUrl: '', webSite: '' },
 };
 
 export const RequirementsDataConfig: EntityConfig = {

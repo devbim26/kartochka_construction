@@ -15,11 +15,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 export const HeavySingleLayerWallComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { watch, setValue } = form;
-	const [indices, setIndices] = useState({
-		zeroIndex: -1,
-		oneIndex: -1,
-		twoIndex: -1,
-	});
+	const [indices, setIndices] = useState({ zeroIndex: -1, oneIndex: -1, twoIndex: -1 });
 	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
 		zeroValue: '',
 		twoValue: '',
@@ -49,18 +45,11 @@ export const HeavySingleLayerWallComponent = () => {
 					onClick={() => {
 						setValue('constructionTypeObject.constructions.0.userMaterials', [
 							...(userMaterials || []),
-							{
-								positionId: '0',
-								materialId: '',
-								materialTypeValue: [],
-							},
+							{ positionId: '0', materialId: '', materialTypeValue: [] },
 						]);
 						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
 							...(userMaterialTypes || []),
-							{
-								positionId: '0',
-								value: '',
-							},
+							{ positionId: '0', value: '' },
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
@@ -74,7 +63,7 @@ export const HeavySingleLayerWallComponent = () => {
 									fieldIndex={indices.zeroIndex}
 									positionId={0}
 									constructionIndex={0}
-									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
@@ -112,18 +101,11 @@ export const HeavySingleLayerWallComponent = () => {
 					onClick={() => {
 						setValue('constructionTypeObject.constructions.0.userMaterials', [
 							...(userMaterials || []),
-							{
-								positionId: '2',
-								materialId: '',
-								materialTypeValue: [],
-							},
+							{ positionId: '2', materialId: '', materialTypeValue: [] },
 						]);
 						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
 							...(userMaterialTypes || []),
-							{
-								positionId: '2',
-								value: '',
-							},
+							{ positionId: '2', value: '' },
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
