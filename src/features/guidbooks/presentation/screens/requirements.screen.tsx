@@ -124,7 +124,6 @@ const RequirementsScreen = () => {
 					return from([res]);
 				}),
 				tap((res) => {
-					console.log(res);
 					setTableData(res.items);
 					setPaginationState(res.pagination);
 				}),
@@ -330,7 +329,7 @@ const RequirementsScreen = () => {
 		];
 		return cols;
 	}, []);
-	console.log(tableData);
+
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper

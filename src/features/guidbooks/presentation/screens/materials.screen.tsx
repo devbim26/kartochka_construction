@@ -32,10 +32,12 @@ import {
 } from '@features';
 
 import type { ColumnDef } from '@tanstack/react-table';
+import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
+import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 
 const MaterialsScreen = () => {
@@ -183,107 +185,126 @@ const MaterialsScreen = () => {
 		['name', 'materialType', 'thickness', 'density'],
 	);
 
-	const handleGetTableData = async (
+	const handleGetTableData = (
 		data: MaterialsFilterData,
 		pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>,
 	) => {
-		try {
-			const response = await getGuidebooksPaginated({
+		from(
+			getGuidebooksPaginated({
 				data: convertToServerMaterialsFilterData(data),
-				guidebookType: Guidebooks.MATERIAL,
+				guidebookType: Guidebooks.REQUIREMENT,
 				pagination,
-			});
-			const resData = convertToPaginatedType(convertToClientMaterialsAddAndEditData)(
-				response.data as any,
-			);
-			setTableData(resData.items);
-			setPaginationState(resData.pagination);
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				toast.error(error.message);
-			}
-			console.log('Error:', error);
-		}
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const res = convertToPaginatedType(convertToClientMaterialsAddAndEditData)(
+						response.data,
+					);
+					return from([res]);
+				}),
+				tap((res) => {
+					setTableData(res.items);
+					setPaginationState(res.pagination);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
 	};
 
-	const handleGetOneTableData = useCallback(async (id: string) => {
-		try {
-			const response = await getGuidebooksDetail({
-				id: id,
-				guidebookType: Guidebooks.MATERIAL,
-			});
-			if (response.status === 200) {
-				const data = convertToClientMaterialsAddAndEditData(response.data as any);
-				setSingleMaterial(data);
-			}
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				toast.error(error.message);
-			}
-			console.log('Error:', error);
-		}
-	}, []);
+	const handleGetOneTableData = (id: string) => {
+		from(getGuidebooksDetail({ id, guidebookType: Guidebooks.MATERIAL }))
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const data = convertToClientMaterialsAddAndEditData(response.data);
+					return from([data]);
+				}),
+				tap((data) => setSingleMaterial(data)),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
 
-	const handleAddTableData = async (data: MaterialsAddAndEditData) => {
-		try {
-			const response = await getGuidebooksCreate({
+	const handleAddTableData = (data: MaterialsAddAndEditData) => {
+		from(
+			getGuidebooksCreate({
 				data: convertToServerMaterialsCreateData(data),
 				guidebookType: Guidebooks.MATERIAL,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					Object.entries(data).forEach(([key, value]) => {
+						if (!['noizeIsolationIndex', 'noizeImpactIndex', 'notice'].includes(key)) {
+							sessionStorage.setItem(key, JSON.stringify(value));
+						}
+					});
+
+					handleGetTableData(forms.filterForm.getValues(), paginationState);
+					toast.success('Материал добавлен успешно');
+					navigate('');
+				}
 			});
-			if (response.status === 200) {
-				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData, {
-					...paginationState,
-					pageNumber: 1,
-				});
-				navigate('');
-			}
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				toast.error(error.message);
-			}
-			console.log('Error:', error);
-		}
 	};
 
-	const handleEditTableData = async (data: MaterialsAddAndEditData) => {
-		try {
-			const response = await getGuidebooksEdit({
+	const handleEditTableData = (data: MaterialsAddAndEditData) => {
+		from(
+			getGuidebooksEdit({
 				data: convertToServerMaterialsEditData(data),
 				guidebookType: Guidebooks.MATERIAL,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					handleGetTableData(forms.filterForm.getValues(), paginationState);
+					toast.success('Материал отредактирован успешно');
+					navigate('');
+				}
 			});
-			if (response.status === 200) {
-				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData, {
-					...paginationState,
-					pageNumber: 1,
-				});
-				navigate('');
-			}
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				toast.error(error.response?.data);
-			}
-		}
 	};
 
-	const handleDeleteTableData = async (id: string) => {
-		try {
-			const response = await getGuidebooksDelete({
-				data: { id: id },
-				guidebookType: Guidebooks.MATERIAL,
+	const handleDeleteTableData = (id: string) => {
+		from(getGuidebooksDelete({ data: { id: id }, guidebookType: Guidebooks.MATERIAL }))
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					handleGetTableData(forms.filterForm.getValues(), paginationState);
+					toast.success('Материал удален успешно');
+				}
 			});
-			if (response.status === 200) {
-				handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData, {
-					...paginationState,
-					pageNumber: 1,
-				});
-				toast.success('Успешное удаление');
-			}
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				toast.error(error.response?.data);
-			}
-			console.log('Error:', error);
-		}
 	};
 
 	useEffect(() => {
