@@ -124,7 +124,6 @@ const RequirementsScreen = () => {
 					return from([res]);
 				}),
 				tap((res) => {
-					console.log(res);
 					setTableData(res.items);
 					setPaginationState(res.pagination);
 				}),
@@ -160,7 +159,6 @@ const RequirementsScreen = () => {
 							sessionStorage.setItem(key, JSON.stringify(value));
 						}
 					});
-
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно добавлено');
 					navigate('');
@@ -330,7 +328,6 @@ const RequirementsScreen = () => {
 		];
 		return cols;
 	}, []);
-	console.log(tableData);
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper

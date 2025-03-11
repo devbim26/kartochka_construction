@@ -1,11 +1,7 @@
 import { Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type { RequirementFilter } from '@features/guidbooks/types';
-import {
-	RuConstructionTypeSelectValues,
-	RuRegionNamesMap,
-	RuRegionNamesSelectValues,
-} from '@features/guidbooks/types';
+import { RuRegionNamesMap, RuRegionNamesSelectValues } from '@features/guidbooks/types';
 import { RuBuildingTypeSelectValues } from '@features/guidbooks/types/building.types';
 import { RuRoomTypeSelectValues } from '@features/guidbooks/types/room.types';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -19,7 +15,7 @@ export const RequirementsFilter = memoize(() => {
 		<>
 			<Controller
 				control={control}
-				name={'region'}
+				name={'countryType'}
 				render={({ field }) => (
 					<Select
 						options={[
@@ -30,11 +26,11 @@ export const RequirementsFilter = memoize(() => {
 						]}
 						{...field}
 						value={field.value || ''}
-						label={formState.errors?.region?.message || 'Регион'}
+						label={formState.errors?.countryType?.message || 'Регион'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.region?.message ? 'text-error' : '',
+							formState.errors.countryType?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите регион"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
@@ -44,37 +40,19 @@ export const RequirementsFilter = memoize(() => {
 			/>
 			<Controller
 				control={control}
-				name={'constructionType'}
-				render={({ field }) => (
-					<Select
-						options={RuConstructionTypeSelectValues}
-						{...field}
-						value={field.value || ''}
-						label={formState.errors?.constructionType?.message || 'Конструкция'}
-						isSearchable
-						labelClassName={twMerge(
-							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.constructionType?.message ? 'text-error' : '',
-						)}
-						placeholder="Выберите конструкцию"
-						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
-					/>
-				)}
-			/>
-			<Controller
-				control={control}
-				name={'firstPlacementRoom'}
+				name={'firstPlacementRoomId'}
 				render={({ field }) => (
 					<Select
 						options={RuRoomTypeSelectValues}
 						{...field}
 						value={field.value || ''}
-						label={formState.errors?.firstPlacementRoom?.message || 'Первое помещение'}
+						label={
+							formState.errors?.firstPlacementRoomId?.message || 'Первое помещение'
+						}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.firstPlacementRoom?.message ? 'text-error' : '',
+							formState.errors.firstPlacementRoomId?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите первое помещение"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
@@ -84,17 +62,19 @@ export const RequirementsFilter = memoize(() => {
 			/>
 			<Controller
 				control={control}
-				name={'secondPlacementRoom'}
+				name={'secondPlacementRoomId'}
 				render={({ field }) => (
 					<Select
 						options={RuRoomTypeSelectValues}
 						{...field}
 						value={field.value || ''}
-						label={formState.errors?.secondPlacementRoom?.message || 'Второе помещение'}
+						label={
+							formState.errors?.secondPlacementRoomId?.message || 'Второе помещение'
+						}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.secondPlacementRoom?.message ? 'text-error' : '',
+							formState.errors.secondPlacementRoomId?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите второе помещение"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
@@ -110,11 +90,11 @@ export const RequirementsFilter = memoize(() => {
 						options={RuBuildingTypeSelectValues}
 						{...field}
 						value={field.value || ''}
-						label={formState.errors?.region?.message || 'Тип здания'}
+						label={formState.errors?.buildingType?.message || 'Тип здания'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.region?.message ? 'text-error' : '',
+							formState.errors.buildingType?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите тип здания"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
