@@ -42,8 +42,11 @@ export const FramePartitionDouble = () => {
 		nine: '',
 	});
 
-	const [userMaterials] = watch(['constructionTypeObject.constructions.0.userMaterials']);
-	const [constructions] = watch(['constructionTypeObject.constructions']);
+	const [userMaterials, userMaterialTypes, constructions] = watch([
+		'constructionTypeObject.constructions.0.userMaterials',
+		'constructionTypeObject.constructions.0.userMaterialTypes',
+		'constructionTypeObject.constructions',
+	]);
 
 	useEffect(() => {
 		setIndices({
@@ -59,10 +62,10 @@ export const FramePartitionDouble = () => {
 			nineIndex: userMaterials?.findIndex((c) => c.positionId === '9') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zero: watch(`constructionTypeObject.constructions.0.userMaterialTypes.0.value`),
-			nine: watch(`constructionTypeObject.constructions.0.userMaterialTypes.2.value`),
+			zero: userMaterialTypes?.find((c) => c.positionId === '0')?.value || '',
+			nine: userMaterialTypes?.find((c) => c.positionId === '9')?.value || '',
 		});
-	}, [userMaterials, constructions]);
+	}, [userMaterials, userMaterialTypes, constructions]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
@@ -85,6 +88,10 @@ export const FramePartitionDouble = () => {
 									},
 								],
 							},
+						]);
+						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
+							...(userMaterialTypes || []),
+							{ positionId: '0', value: '' },
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
@@ -209,6 +216,10 @@ export const FramePartitionDouble = () => {
 									},
 								],
 							},
+						]);
+						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
+							...(userMaterialTypes || []),
+							{ positionId: '9', value: '' },
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
