@@ -1,5 +1,6 @@
 import { fetchApi } from '@api-gen';
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import { AUTH_FETCH_ROUTES } from '../constants';
 import { convertToServerRegistrationData } from '../converters';
@@ -21,7 +22,7 @@ export const authLogin = createAsyncThunk(
 				},
 			};
 		} catch (error) {
-			if (error instanceof Error) {
+			if (error instanceof AxiosError) {
 				toast.error(error.message);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
@@ -48,7 +49,7 @@ export const authRegistration = createAsyncThunk(
 				},
 			};
 		} catch (error) {
-			if (error instanceof Error) {
+			if (error instanceof AxiosError) {
 				toast.error(error.message);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
@@ -74,7 +75,7 @@ export const smsCodeRequest = createAsyncThunk(
 				},
 			};
 		} catch (error) {
-			if (error instanceof Error) {
+			if (error instanceof AxiosError) {
 				toast.error(error.message);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
@@ -100,7 +101,7 @@ export const smsCodeApprove = createAsyncThunk(
 				},
 			};
 		} catch (error) {
-			if (error instanceof Error) {
+			if (error instanceof AxiosError) {
 				toast.error(error.message);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
@@ -134,7 +135,7 @@ export const fileUpload = createAsyncThunk(
 				},
 			};
 		} catch (error) {
-			if (error instanceof Error) {
+			if (error instanceof AxiosError) {
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
 			return thunkAPI.rejectWithValue({ error: 'Unknown error' });
@@ -158,7 +159,7 @@ export const logout = createAsyncThunk(
 				},
 			};
 		} catch (error) {
-			if (error instanceof Error) {
+			if (error instanceof AxiosError) {
 				toast.error(error.message);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
