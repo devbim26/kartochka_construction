@@ -328,6 +328,7 @@ const RequirementsScreen = () => {
 		];
 		return cols;
 	}, []);
+
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper

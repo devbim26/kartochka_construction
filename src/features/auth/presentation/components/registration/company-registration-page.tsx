@@ -20,7 +20,7 @@ import { TiDeleteOutline } from 'react-icons/ti';
 import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
-import { authRegistration, fileUpload } from '../../../services';
+import { authRegistration } from '../../../services';
 import type { RegistrationFormData } from '../../../types';
 import { RegistrationFormDataConfig } from '../../../utils';
 
@@ -73,10 +73,8 @@ const CompanyRegistrationPage = () => {
 		defaultValues: RegistrationFormDataConfig.defaultValues,
 	});
 
-	const { formState } = form;
-	const phoneNumbers = form.watch('phoneNumbers');
-	const logo = form.watch('companyLogo');
-
+	const { formState, watch, trigger, setValue } = form;
+	const phoneNumbers = watch('phoneNumbers');
 	const [showPassword, setShowPassword] = useState(false);
 
 	const onSubmit = () => {
@@ -95,21 +93,15 @@ const CompanyRegistrationPage = () => {
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
 		if (file) {
-			form.setValue('companyLogo.name', file.name);
 			const base64 = await convertToBase64(file);
-			const fileData = await file.arrayBuffer();
-			if (base64) {
-				form.setValue('companyLogo.data', base64);
-				dispatch(
-					fileUpload({
-						data: { mimeType: file.type, isPublic: true },
-						file: fileData,
-					}),
-				);
-				form.setValue('companyLogo.url', '123');
+			if (base64 && typeof base64 === 'string') {
+				setValue('companyLogo', base64);
 			}
+			trigger('companyLogo');
 		}
 	};
+
+	const logo = watch('companyLogo');
 
 	return (
 		<div className="mb-[100px] flex w-[508px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[23px]">
@@ -242,32 +234,48 @@ const CompanyRegistrationPage = () => {
 						type={'text'}
 						placeholder="Введите адрес"
 					/>
-					<div className="flex flex-col gap-[8px]">
-						<FormElementLabel
-							className={twMerge(
-								'font-raleway text-[14px] text-input-label-primary',
-								formState.errors.companyLogo?.url ? 'text-error' : '',
-							)}
-						>
-							{formState.errors.companyLogo?.url?.message || 'Логотип компании'}
-						</FormElementLabel>
-						<div className="flex items-center gap-[10px]">
-							<Button
-								variant="primary"
-								className="h-[36px] w-[168px]"
-								onClick={() => document.getElementById('file-upload')!.click()}
+					<div className="relative flex items-start gap-4">
+						<div className="flex flex-col gap-y-2">
+							<FormElementLabel
+								className={twMerge(
+									'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+									formState.errors.companyLogo?.message ? 'text-error' : '',
+								)}
+								errorMessage={formState.errors.companyLogo?.message?.toString()}
 							>
-								Загрузить
-							</Button>
-							<input
-								type="file"
-								id="file-upload"
-								accept="image/*"
-								onChange={handleFileChange}
-								className="hidden"
-							/>
-							<p>{logo.name}</p>
+								Логотип компании
+							</FormElementLabel>
+							<div className="flex items-center gap-[8px]">
+								<Button
+									variant="primary"
+									className={twMerge(
+										'group flex w-fit flex-row items-center gap-[4px] border-2 border-solid border-primary bg-white',
+										formState.errors.companyLogo?.message ? 'border-error' : '',
+									)}
+									onClick={() => document.getElementById('file-upload')!.click()}
+								>
+									<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
+										Выбрать изображение
+									</p>
+								</Button>
+								<input
+									type="file"
+									id="file-upload"
+									accept="image/*"
+									onChange={handleFileChange}
+									className="hidden"
+								/>
+							</div>
 						</div>
+						{logo && (
+							<div className="flex justify-center self-center">
+								<img
+									src={logo}
+									alt="Превью изображения"
+									className="size-[60px] rounded-md object-cover"
+								/>
+							</div>
+						)}
 					</div>
 					<Input
 						{...form.register('compannyInfo')}

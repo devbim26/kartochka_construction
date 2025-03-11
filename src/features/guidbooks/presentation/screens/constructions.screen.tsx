@@ -36,8 +36,12 @@ import {
 	useHeaderForm,
 } from '@features';
 import type { ColumnDef } from '@tanstack/react-table';
+import type { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { catchError, from, switchMap, tap } from 'rxjs';
+import { toast } from 'sonner';
 
 const ConstructionsScreen = () => {
 	const navigate = useAppNavigate();
@@ -135,92 +139,135 @@ const ConstructionsScreen = () => {
 		);
 	}, [filterName, filterConstructionTypeId, filterDescription, filterRegion]);
 
-	const handleGetTableData = async (
+	const handleGetTableData = (
 		data: ConstructionsFilterData,
 		pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>,
 	) => {
-		try {
-			const response = await getGuidebooksPaginated({
+		from(
+			getGuidebooksPaginated({
 				data: convertToServerConstructionsFilterData(data),
 				guidebookType: Guidebooks.CONSTRUCTION,
 				pagination,
-			});
-			const res = convertToPaginatedType(convertToClientConstructionsAddData)(
-				response.data as any,
-			);
-			setTableData(res.items);
-			setPaginationState(res.pagination);
-		} catch (error) {
-			console.log('Error:', error);
-		}
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const res = convertToPaginatedType(convertToClientConstructionsAddData)(
+						response.data,
+					);
+					return from([res]);
+				}),
+				tap((res) => {
+					setTableData(res.items);
+					setPaginationState(res.pagination);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
 	};
 
-	const handleGetOneTableData = useCallback(async (id: string) => {
-		try {
-			const response = await getGuidebooksDetail({
-				id: id,
-				guidebookType: Guidebooks.CONSTRUCTION,
-			});
-			if (response.status === 200) {
-				const data = convertToClientConstructionsEditData(response.data as any);
-				setSingleMaterial(data);
-			}
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	}, []);
+	const handleGetOneTableData = (id: string) => {
+		from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const data = convertToClientConstructionsEditData(response.data);
+					return from([data]);
+				}),
+				tap((data) => setSingleMaterial(data)),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
 
-	const handleAddTableData = async (data: ConstructionsAddData) => {
-		try {
-			const response = await getGuidebooksCreate({
+	const handleAddTableData = (data: ConstructionsAddData) => {
+		from(
+			getGuidebooksCreate({
 				data: convertToServerConstructionsAddData(data),
 				guidebookType: Guidebooks.CONSTRUCTION,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					Object.entries(data).forEach(([key, value]) => {
+						if (!['noizeIsolationIndex', 'noizeImpactIndex', 'notice'].includes(key)) {
+							sessionStorage.setItem(key, JSON.stringify(value));
+						}
+					});
+
+					handleGetTableData(
+						forms.filterForm.getValues() as ConstructionsFilterData,
+						paginationState,
+					);
+					toast.success('Конструкция добавлена успешно');
+					navigate('');
+				}
 			});
-			if (response.status === 200) {
-				handleGetTableData(
-					forms.filterForm.getValues() as ConstructionsFilterData,
-					paginationState,
-				);
-				navigate('');
-			}
-		} catch (error) {
-			console.log('Error:', error);
-		}
 	};
 
-	const handleEditTableData = async (data: ConstructionsEditData) => {
-		try {
-			const response = await getGuidebooksEdit({
+	const handleEditTableData = (data: ConstructionsEditData) => {
+		from(
+			getGuidebooksEdit({
 				data: convertToServerConstructionsEditData(data),
 				guidebookType: Guidebooks.CONSTRUCTION,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					handleGetTableData(
+						forms.filterForm.getValues() as ConstructionsFilterData,
+						paginationState,
+					);
+					toast.success('Конструкция отредактирована успешно');
+					navigate('');
+				}
 			});
-			if (response.status === 200) {
-				handleGetTableData(
-					forms.filterForm.getValues() as ConstructionsFilterData,
-					paginationState,
-				);
-				navigate('');
-			}
-		} catch (error) {
-			console.log(error);
-		}
 	};
 
-	const handleDeleteTableData = async (id: string) => {
-		try {
-			const response = await getGuidebooksDelete({
-				data: { id: id },
-				guidebookType: Guidebooks.CONSTRUCTION,
+	const handleDeleteTableData = (id: string) => {
+		from(getGuidebooksDelete({ data: { id }, guidebookType: Guidebooks.CONSTRUCTION }))
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					handleGetTableData(
+						forms.filterForm.getValues() as ConstructionsFilterData,
+						paginationState,
+					);
+					toast.success('Конструкция удалена успешно');
+				}
 			});
-			if (response.status === 200) {
-				handleGetTableData(
-					forms.filterForm.getValues() as ConstructionsFilterData,
-					paginationState,
-				);
-			}
-		} catch (error) {
-			console.log('Error:', error);
-		}
 	};
 
 	useEffect(() => {
