@@ -74,7 +74,7 @@ const CompanyRegistrationPage = () => {
 	});
 
 	const { formState, watch, trigger, setValue } = form;
-	const phoneNumbers = form.watch('phoneNumbers');
+	const phoneNumbers = watch('phoneNumbers');
 	const [showPassword, setShowPassword] = useState(false);
 
 	const onSubmit = () => {
