@@ -1,5 +1,6 @@
 import { fetchApi } from '@api-gen';
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { toast } from 'sonner';
 import { AUTH_FETCH_ROUTES } from '../constants';
 import { convertToServerRegistrationData } from '../converters';
 import type { ApproveFormData, LoginFormData, RegistrationFormData } from '../types';
@@ -9,6 +10,9 @@ export const authLogin = createAsyncThunk(
 	async (loginData: LoginFormData, thunkAPI) => {
 		try {
 			const response = await fetchApi.api.authLoginCreate(loginData);
+			if (response.status === 200) {
+				toast.success('Авторизация прошла успешно');
+			}
 			return {
 				payload: response.data,
 				fetch_data: {
@@ -18,9 +22,11 @@ export const authLogin = createAsyncThunk(
 			};
 		} catch (error) {
 			if (error instanceof Error) {
+				toast.error(error.message);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
-			return thunkAPI.rejectWithValue({ error: 'Unknown error' });
+			toast.error('Неизвестная ошибка');
+			return thunkAPI.rejectWithValue({ error: 'Unfnown error' });
 		}
 	},
 );
@@ -31,6 +37,9 @@ export const authRegistration = createAsyncThunk(
 		try {
 			const data = convertToServerRegistrationData(registrationData);
 			const response = await fetchApi.api.accountRegisterCreate(data);
+			if (response.status === 200) {
+				toast.success('Регистрация прошла успешно');
+			}
 			return {
 				payload: response.data,
 				fetch_data: {
@@ -40,9 +49,11 @@ export const authRegistration = createAsyncThunk(
 			};
 		} catch (error) {
 			if (error instanceof Error) {
+				toast.error(error.message);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
-			return thunkAPI.rejectWithValue({ error: 'Unknown error' });
+			toast.error('Неизвестная ошибка');
+			return thunkAPI.rejectWithValue({ error: 'Unfnown error' });
 		}
 	},
 );
@@ -52,6 +63,9 @@ export const smsCodeRequest = createAsyncThunk(
 	async (phoneNumber: string, thunkAPI) => {
 		try {
 			const response = await fetchApi.api.postApi({ phoneNumber });
+			if (response.status === 200) {
+				toast.success('Код подтверждения был отправлен на ваш номер телефона');
+			}
 			return {
 				payload: response.data,
 				fetch_data: {
@@ -61,8 +75,10 @@ export const smsCodeRequest = createAsyncThunk(
 			};
 		} catch (error) {
 			if (error instanceof Error) {
+				toast.error(error.message);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
+			toast.error('Неизвестная ошибка');
 			return thunkAPI.rejectWithValue({ error: 'Unknown error' });
 		}
 	},
@@ -73,6 +89,9 @@ export const smsCodeApprove = createAsyncThunk(
 	async (data: ApproveFormData, thunkAPI) => {
 		try {
 			const response = await fetchApi.api.smsApproveCreate(data);
+			if (response.status === 200) {
+				toast.success('Номер телефона успешно подтвержден');
+			}
 			return {
 				payload: response.data,
 				fetch_data: {
@@ -82,8 +101,10 @@ export const smsCodeApprove = createAsyncThunk(
 			};
 		} catch (error) {
 			if (error instanceof Error) {
+				toast.error(error.message);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
+			toast.error('Неизвестная ошибка');
 			return thunkAPI.rejectWithValue({ error: 'Unknown error' });
 		}
 	},
@@ -126,6 +147,9 @@ export const logout = createAsyncThunk(
 	async (_, thunkAPI) => {
 		try {
 			const response = await fetchApi.api.authLogoutCreate();
+			if (response.status === 200) {
+				toast.success('Выход из аккаунта прошел успешно');
+			}
 			return {
 				payload: response.data,
 				fetch_data: {
@@ -135,8 +159,10 @@ export const logout = createAsyncThunk(
 			};
 		} catch (error) {
 			if (error instanceof Error) {
+				toast.error(error.message);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
+			toast.error('Неизвестная ошибка');
 			return thunkAPI.rejectWithValue({ error: 'Unknown error' });
 		}
 	},
