@@ -192,7 +192,7 @@ const MaterialsScreen = () => {
 		from(
 			getGuidebooksPaginated({
 				data: convertToServerMaterialsFilterData(data),
-				guidebookType: Guidebooks.REQUIREMENT,
+				guidebookType: Guidebooks.MATERIAL,
 				pagination,
 			}),
 		)
