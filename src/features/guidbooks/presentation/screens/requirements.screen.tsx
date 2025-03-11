@@ -1,4 +1,5 @@
 import type { RequirementDto } from '@api-gen';
+import type { NamedEntity } from '@core';
 import {
 	convertToPaginatedType,
 	DeleteIcon,
@@ -288,14 +289,14 @@ const RequirementsScreen = () => {
 				accessorKey: 'firstPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Первое помещение'} />,
 				cell: (info) => {
-					return <SimpleTableCell content={info.row.original.firstPlacementRoom.name} />;
+					return <SimpleTableCell content={(info.getValue() as NamedEntity).name} />;
 				},
 			},
 			{
 				accessorKey: 'secondPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
 				cell: (info) => {
-					return <SimpleTableCell content={info.row.original.secondPlacementRoom.name} />;
+					return <SimpleTableCell content={(info.getValue() as NamedEntity).name} />;
 				},
 			},
 			{
