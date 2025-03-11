@@ -140,6 +140,10 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 									],
 								},
 							]);
+							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
+								...(topFacingUserMaterialTypes || []),
+								{ positionId: '2', value: '' },
+							]);
 						}}
 						className="size-[40px] self-center text-primary"
 					/>
@@ -203,6 +207,10 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 										},
 									],
 								},
+							]);
+							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
+								...(topFacingUserMaterialTypes || []),
+								{ positionId: '3', value: '' },
 							]);
 						}}
 						className="size-[40px] self-center text-primary"
@@ -486,6 +494,10 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 									],
 								},
 							]);
+							setValue('constructionTypeObject.constructions.2.userMaterialTypes', [
+								...(bottomFacingUserMaterialTypes || []),
+								{ positionId: '2', value: '' },
+							]);
 						}}
 						className="size-[40px] self-center text-primary"
 					/>
@@ -549,6 +561,10 @@ export const HeavyMultiLayerWallSoundproofBothSides = () => {
 										},
 									],
 								},
+							]);
+							setValue('constructionTypeObject.constructions.2.userMaterialTypes', [
+								...(bottomFacingUserMaterialTypes || []),
+								{ positionId: '3', value: '' },
 							]);
 						}}
 						className="size-[40px] self-center text-primary"
