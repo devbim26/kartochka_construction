@@ -288,14 +288,14 @@ const RequirementsScreen = () => {
 				accessorKey: 'firstPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Первое помещение'} />,
 				cell: (info) => {
-					return <SimpleTableCell content={info.getValue() as string} />;
+					return <SimpleTableCell content={info.row.original.firstPlacementRoom.name} />;
 				},
 			},
 			{
 				accessorKey: 'secondPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
 				cell: (info) => {
-					return <SimpleTableCell content={info.getValue() as string} />;
+					return <SimpleTableCell content={info.row.original.secondPlacementRoom.name} />;
 				},
 			},
 			{
