@@ -1,4 +1,5 @@
 import type { RequirementDto } from '@api-gen';
+import type { NamedEntity } from '@core';
 import {
 	convertToPaginatedType,
 	DeleteIcon,
@@ -159,7 +160,6 @@ const RequirementsScreen = () => {
 							sessionStorage.setItem(key, JSON.stringify(value));
 						}
 					});
-
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно добавлено');
 					navigate('');
@@ -289,14 +289,14 @@ const RequirementsScreen = () => {
 				accessorKey: 'firstPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Первое помещение'} />,
 				cell: (info) => {
-					return <SimpleTableCell content={info.getValue() as string} />;
+					return <SimpleTableCell content={(info.getValue() as NamedEntity).name} />;
 				},
 			},
 			{
 				accessorKey: 'secondPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
 				cell: (info) => {
-					return <SimpleTableCell content={info.getValue() as string} />;
+					return <SimpleTableCell content={(info.getValue() as NamedEntity).name} />;
 				},
 			},
 			{
