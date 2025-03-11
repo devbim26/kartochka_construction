@@ -115,8 +115,6 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 		});
 	}, [topFacingUserMaterials, baseUserMaterials, bottomFacingUserMaterials, constructions]);
 
-	console.log(constructions);
-
 	return (
 		<>
 			<ConstructionLayer title="1. Облицовка">
