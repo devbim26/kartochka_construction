@@ -6,7 +6,7 @@ import {
 	phoneNumberMask,
 	useAppDispatch,
 } from '@core';
-import { AccountDataConfig, ButtonTitles, fileUpload, FormTitles, updateUser } from '@features';
+import { AccountDataConfig, ButtonTitles, FormTitles, updateUser } from '@features';
 import type { AccountData } from '@features/account/types/account-data.types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
@@ -51,7 +51,6 @@ const PhoneInput = ({
 
 export const AccountForm = () => {
 	const [isViewMode, setIsViewMode] = useState(true);
-	const [preview, setPreview] = useState<string | null>(null);
 
 	const form = useForm<AccountData>({
 		resolver: zodResolver(AccountDataConfig.schema),
@@ -59,7 +58,7 @@ export const AccountForm = () => {
 	});
 
 	const dispatch = useAppDispatch();
-	const { register, setValue, watch, formState } = form;
+	const { register, setValue, watch, formState, trigger } = form;
 
 	const onSubmit = () => {
 		dispatch(
@@ -73,17 +72,10 @@ export const AccountForm = () => {
 		const file = event.target.files?.[0];
 		if (file) {
 			const base64 = await convertToBase64(file);
-			const fileData = await file.arrayBuffer();
-			if (base64) {
-				setPreview(String(base64));
-				dispatch(
-					fileUpload({
-						data: { mimeType: file.type, isPublic: true },
-						file: fileData,
-					}),
-				);
-				form.setValue('companyLogo', '123');
+			if (base64 && typeof base64 === 'string') {
+				setValue('companyLogo', base64);
 			}
+			trigger('companyLogo');
 		}
 	};
 
@@ -276,10 +268,10 @@ export const AccountForm = () => {
 									{formState.errors.companyLogo?.message || 'Логотип компании'}
 								</FormElementLabel>
 								<div className="flex flex-col items-center gap-[10px]">
-									{preview && (
+									{logo && (
 										<div className="flex justify-center self-center">
 											<img
-												src={preview}
+												src={logo}
 												alt="Превью изображения"
 												className="h-[80px] w-[220px] rounded-md object-cover"
 											/>
