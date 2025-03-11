@@ -6,5 +6,5 @@ export const convertToServerRegistrationData = (data: RegistrationFormData): Cre
 	additionalPhoneNumbers: data.phoneNumbers.map((ph) => ph.number.replaceAll(' ', '')),
 	phoneNumber: data.mainPhoneNumber.replaceAll(' ', ''),
 	companyDescription: data.compannyInfo,
-	logoUrl: data.companyLogo.url,
+	logoUrl: data.companyLogo || null,
 });

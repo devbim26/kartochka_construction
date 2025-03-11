@@ -55,11 +55,12 @@ const RegistrationFormDataSchema = z
 		paymentAccount: z.string().min(1, 'Поле обязательно для заполнения'),
 		bankIdNumber: z.string().min(1, 'Поле обязательно для заполнения'),
 		bankAddress: z.string().min(1, 'Поле обязательно для заполнения'),
-		companyLogo: z.object({
-			name: z.string().min(1, 'Логотип не выбран'),
-			data: z.union([z.string(), z.instanceof(ArrayBuffer)]).optional(),
-			url: z.string().optional(),
-		}),
+		companyLogo: z
+			.any()
+			.refine(
+				(file) => file instanceof File && file.size > 0,
+				'Поле обязательно для заполнения',
+			),
 
 		compannyInfo: z.string().optional(),
 	})

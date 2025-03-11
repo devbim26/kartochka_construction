@@ -95,17 +95,13 @@ const CompanyRegistrationPage = () => {
 		if (file) {
 			const base64 = await convertToBase64(file);
 			if (base64 && typeof base64 === 'string') {
-				setValue('companyLogo', {
-					name: file.name,
-					data: base64,
-					url: URL.createObjectURL(file),
-				});
+				setValue('companyLogo', base64);
 			}
 			trigger('companyLogo');
 		}
 	};
 
-	const companyLogo = watch('companyLogo');
+	const logo = watch('companyLogo');
 
 	return (
 		<div className="mb-[100px] flex w-[508px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[23px]">
@@ -238,41 +234,48 @@ const CompanyRegistrationPage = () => {
 						type={'text'}
 						placeholder="Введите адрес"
 					/>
-					<div className="flex flex-row items-center gap-[8px]">
-						<FormElementLabel
-							className={twMerge(
-								'w-[145px] font-sans text-sm font-normal leading-5 text-input-label-primary',
-								formState.errors.companyLogo ? 'text-error' : '',
-							)}
-						>
-							{formState.errors.companyLogo?.message || 'Логотип компании'}
-						</FormElementLabel>
-						<div className="flex flex-col items-center gap-[10px]">
-							{companyLogo?.url && (
-								<div className="flex justify-center self-center">
-									<img
-										src={companyLogo.url}
-										alt="Превью логотипа"
-										className="h-[80px] w-[220px] rounded-md object-cover"
-									/>
-								</div>
-							)}
-							<Button
-								variant="primary"
-								type="button"
-								className="h-[30px] w-[220px]"
-								onClick={() => document.getElementById('file-upload')!.click()}
+					<div className="relative flex items-start gap-4">
+						<div className="flex flex-col gap-y-2">
+							<FormElementLabel
+								className={twMerge(
+									'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+									formState.errors.companyLogo?.message ? 'text-error' : '',
+								)}
+								errorMessage={formState.errors.companyLogo?.message?.toString()}
 							>
-								Загрузить
-							</Button>
-							<input
-								type="file"
-								id="file-upload"
-								accept="image/*"
-								onChange={handleFileChange}
-								className="hidden"
-							/>
+								Логотип компании
+							</FormElementLabel>
+							<div className="flex items-center gap-[8px]">
+								<Button
+									variant="primary"
+									className={twMerge(
+										'group flex w-fit flex-row items-center gap-[4px] border-2 border-solid border-primary bg-white',
+										formState.errors.companyLogo?.message ? 'border-error' : '',
+									)}
+									onClick={() => document.getElementById('file-upload')!.click()}
+								>
+									<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
+										Выбрать изображение
+									</p>
+								</Button>
+								<input
+									type="file"
+									id="file-upload"
+									accept="image/*"
+									onChange={handleFileChange}
+									className="hidden"
+								/>
+							</div>
 						</div>
+						{logo && (
+							<div className="flex justify-center self-center">
+								<img
+									src={logo}
+									alt="Превью изображения"
+									className="size-[60px] rounded-md object-cover"
+								/>
+							</div>
+						)}
 					</div>
 					<Input
 						{...form.register('compannyInfo')}
