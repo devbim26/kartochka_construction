@@ -135,6 +135,7 @@ export const convertToServerConstructionsEditData = (
 	data: ConstructionsEditData,
 ): CreateConstructionHeaderCommand => ({
 	...convertToServerConstructionsAddData(data),
+	id: data.id || null,
 	rw: data.RCalcs || null,
 	conputingIndexValue: data.estimatedIndexValue || null,
 });
