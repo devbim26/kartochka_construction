@@ -99,7 +99,7 @@ const IssuersScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -117,7 +117,7 @@ const IssuersScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -136,7 +136,7 @@ const IssuersScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -159,7 +159,7 @@ const IssuersScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -183,7 +183,7 @@ const IssuersScreen = () => {
 				tap((data) => setSingleIssuer(data!)),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),

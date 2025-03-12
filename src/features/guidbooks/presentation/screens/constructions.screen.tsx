@@ -13,6 +13,8 @@ import type {
 	ConstructionsAddData,
 	ConstructionsEditData,
 	ConstructionsFilterData,
+	ConstructionTypeEnum,
+	Country,
 } from '@features';
 import {
 	ConstructionsAdd,
@@ -33,6 +35,8 @@ import {
 	getGuidebooksPaginated,
 	GuidbookPageHeaderWrapper,
 	Guidebooks,
+	RuConstructionTypesMap,
+	RuCountryNamesMap,
 	useHeaderForm,
 } from '@features';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -93,12 +97,22 @@ const ConstructionsScreen = () => {
 			{
 				accessorKey: 'constructionType',
 				header: () => <SimpleTableHeaderCell text="Тип конструкции" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => (
+					<SimpleTableCell
+						content={RuConstructionTypesMap[info.getValue() as ConstructionTypeEnum]}
+					/>
+				),
 			},
 			{
 				accessorKey: 'country',
 				header: () => <SimpleTableHeaderCell text="Страна" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.row.original.country
+							.map((ct) => RuCountryNamesMap[ct as Country])
+							.join(', ')}
+					/>
+				),
 			},
 			{
 				accessorKey: 'id',
@@ -163,7 +177,7 @@ const ConstructionsScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -181,7 +195,7 @@ const ConstructionsScreen = () => {
 				tap((data) => setSingleMaterial(data)),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -199,7 +213,7 @@ const ConstructionsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -232,7 +246,7 @@ const ConstructionsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -254,7 +268,7 @@ const ConstructionsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
