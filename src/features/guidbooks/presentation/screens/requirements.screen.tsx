@@ -130,7 +130,7 @@ const RequirementsScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -148,7 +148,7 @@ const RequirementsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -178,7 +178,7 @@ const RequirementsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -202,7 +202,7 @@ const RequirementsScreen = () => {
 				tap((data) => setSingleRequirement(data!)),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -215,7 +215,7 @@ const RequirementsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
