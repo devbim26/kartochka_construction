@@ -36,7 +36,7 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	issuer: data.issuer?.id ?? '',
 	image: data.imageUrl ?? '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',
-	materialType: convertToClientMaterialTypeData(data.materialType) ?? '',
+	materialType: convertToClientMaterialTypeData(data.materialType!) ?? '',
 	velocity: String(data.velocity) ?? '',
 	lossFactor: String(data.lossFactor) ?? '',
 	youngModulus: String(data.youngModulus) ?? '',

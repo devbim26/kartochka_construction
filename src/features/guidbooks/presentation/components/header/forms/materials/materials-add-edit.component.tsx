@@ -1,12 +1,4 @@
-import {
-	Button,
-	CheckboxSelect,
-	convertToBase64,
-	FormElementLabel,
-	Input,
-	Select,
-	useAppDispatch,
-} from '@core';
+import { Button, CheckboxSelect, convertToBase64, FormElementLabel, Input, Select } from '@core';
 import { convertToPaginatedType, convertToSelectValues } from '@core/converters';
 import {
 	FormSubTitle,
@@ -25,10 +17,7 @@ import { twMerge } from 'tailwind-merge';
 
 export const MaterialsAddAndEdit = () => {
 	const form = useFormContext<MaterialsAddAndEditData>();
-	const { formState, control, setValue } = form;
-	const dispatch = useAppDispatch();
-	const [preview, setPreview] = useState<string | null>(null);
-	const [uploadError, setUploadError] = useState<boolean>(false);
+	const { formState, control, setValue, trigger, watch } = form;
 	const [issuerData, setIssuerData] = useState<Array<Issuer>>([]);
 
 	const handleGetIssuerData = useCallback(async () => {
@@ -53,19 +42,14 @@ export const MaterialsAddAndEdit = () => {
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
 		if (file) {
-			try {
-				const base64 = await convertToBase64(file);
-				if (base64 && typeof base64 === 'string') {
-					setValue('image', file);
-					setPreview(base64);
-					setUploadError(false);
-				}
-				form.trigger('image');
-			} catch (error) {
-				setUploadError(true);
+			const base64 = await convertToBase64(file);
+			if (base64 && typeof base64 === 'string') {
+				setValue('image', base64);
 			}
+			trigger('image');
 		}
 	};
+	const image = watch('image');
 
 	return (
 		<div className="flex flex-col gap-[16px]">
@@ -257,10 +241,10 @@ export const MaterialsAddAndEdit = () => {
 							/>
 						</div>
 					</div>
-					{preview && (
+					{image && (
 						<div className="flex justify-center self-center">
 							<img
-								src={preview}
+								src={image}
 								alt="Превью изображения"
 								className="size-[60px] rounded-md object-cover"
 							/>

@@ -1,7 +1,9 @@
 import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
+import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
 import {
 	BoardMaterialType,
+	ConstructionFieldsMap,
 	ConstructionLayer,
 	FillerMaterialType,
 	HeavyMaterialType,
@@ -11,8 +13,8 @@ import {
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 	ZPanelMaterialType,
-	type ConstructionsAddData,
 } from '@features';
+
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
@@ -34,13 +36,18 @@ export const HeavyMultilayerWallSoundproofingLeftSide = () => {
 		twoIndex: -1,
 		threeIndex: -1,
 	});
+	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
+		three: '',
+		two: '',
+	});
 
-	const [baseConstructionUserMaterials, facingUserMaterials] = watch([
-		'constructionTypeObject.constructions.0.userMaterials',
-		'constructionTypeObject.constructions.1.userMaterials',
-	]);
-
-	const [constructions] = watch(['constructionTypeObject.constructions']);
+	const [baseConstructionUserMaterials, facingUserMaterials, userMaterialTypes, constructions] =
+		watch([
+			'constructionTypeObject.constructions.0.userMaterials',
+			'constructionTypeObject.constructions.1.userMaterials',
+			'constructionTypeObject.constructions.1.userMaterialTypes',
+			'constructionTypeObject.constructions',
+		]);
 
 	useEffect(() => {
 		setBaseConstructionIndices({
@@ -57,7 +64,11 @@ export const HeavyMultilayerWallSoundproofingLeftSide = () => {
 			twoIndex: facingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 			threeIndex: facingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
 		});
-	}, [baseConstructionUserMaterials, facingUserMaterials, constructions]);
+		setCurrentMaterialTypes({
+			three: userMaterialTypes?.find((c) => c.positionId === '3')?.value || '',
+			two: userMaterialTypes?.find((c) => c.positionId === '2')?.value || '',
+		});
+	}, [baseConstructionUserMaterials, facingUserMaterials, userMaterialTypes, constructions]);
 
 	return (
 		<>
@@ -82,6 +93,10 @@ export const HeavyMultilayerWallSoundproofingLeftSide = () => {
 									],
 								},
 							]);
+							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
+								...(userMaterialTypes || []),
+								{ positionId: '3', value: '' },
+							]);
 						}}
 						className="size-[40px] self-center text-primary"
 					/>
@@ -98,6 +113,12 @@ export const HeavyMultilayerWallSoundproofingLeftSide = () => {
 											MaterialTypesSelectValuesEnum.Facing
 										}
 									/>
+									{ConstructionFieldsMap({
+										fieldIndex: facingIndices.threeIndex,
+										constructionIndex: 1,
+										materialType:
+											currentMaterialTypes.three as MaterialTypeEnum,
+									})}
 									<ThicknessDensityFieldsType
 										fieldIndex={facingIndices.threeIndex}
 										constructionIndex={1}
@@ -140,6 +161,10 @@ export const HeavyMultilayerWallSoundproofingLeftSide = () => {
 									],
 								},
 							]);
+							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
+								...(userMaterialTypes || []),
+								{ positionId: '2', value: '' },
+							]);
 						}}
 						className="size-[40px] self-center text-primary"
 					/>
@@ -156,6 +181,11 @@ export const HeavyMultilayerWallSoundproofingLeftSide = () => {
 											MaterialTypesSelectValuesEnum.Facing
 										}
 									/>
+									{ConstructionFieldsMap({
+										fieldIndex: facingIndices.twoIndex,
+										constructionIndex: 1,
+										materialType: currentMaterialTypes.two as MaterialTypeEnum,
+									})}
 									<ThicknessDensityFieldsType
 										fieldIndex={facingIndices.twoIndex}
 										constructionIndex={1}
