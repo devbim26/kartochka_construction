@@ -1,5 +1,5 @@
 import { createDataRecordConverter } from '@core';
-import { ConstructionType as ClientConstructionType } from '@features/guidbooks/types';
+import { ConstructionClass as ClientConstructionType } from '@features/guidbooks/types';
 
 export const constructionTypeMap = createDataRecordConverter({
 	[ClientConstructionType.Wall]: ClientConstructionType.Wall,

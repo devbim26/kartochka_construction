@@ -94,7 +94,9 @@ export const getGuidebooksConstructionTypes = async () => {
 	return await fetchApi.api.constructionConstructionTypesList();
 };
 
-export const createPlacementRoomVariant = async (data: GetPalacementRoomVariantsWithTypesQuery) => {
+export const getFirstPlacementRoomVariant = async (
+	data: GetPalacementRoomVariantsWithTypesQuery,
+) => {
 	return await fetchApi.api.placementRoomVariantsCreate(data);
 };
 

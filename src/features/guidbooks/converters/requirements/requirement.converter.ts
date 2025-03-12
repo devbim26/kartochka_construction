@@ -12,19 +12,19 @@ import {
 	convertToClientCountryData,
 	convertToServerCountryData,
 } from '@core';
-import type {
-	BuildingType as ClientBuildingType,
-	CategoryClass as ClientCategoryClass,
-	Country,
-	FormRequirement,
-	Requirement,
-	RequirementFilter,
+import {
+	ConstructionClass,
+	type BuildingType as ClientBuildingType,
+	type CategoryClass as ClientCategoryClass,
+	type Country,
+	type FormRequirement,
+	type Requirement,
+	type RequirementFilter,
 } from '@features/guidbooks/types';
-import { ConstructionType } from '@features/guidbooks/types';
 
 export const convertToClientRequirementData = (data: RequirementDto): Requirement => ({
 	...data,
-	constructionType: ConstructionType.Wall,
+	constructionType: ConstructionClass.Wall,
 	secondPlacementRoom: data.secondPlacementRoom ?? '',
 	firstPlacementRoom: data.firstPlacementRoom ?? '',
 	buildingType: convertToClientBuildingTypeData(data.buildingType!)! as string,

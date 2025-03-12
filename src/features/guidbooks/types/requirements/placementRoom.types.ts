@@ -5,3 +5,6 @@ import type {
 
 export type PlacementRoom = PlacementRoomDataSchemaType;
 export type FilterPlacementRoom = FormPlacementRoomDataSchemaType;
+export type PlacementRoomResponse = {
+	placementRoom: PlacementRoom;
+};

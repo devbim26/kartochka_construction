@@ -1,12 +1,10 @@
-import type {
-	GetPalacementRoomVariantsWithTypesQuery,
-	GetPlacementRoomVariantByAllParametersQuery,
-} from '@api-gen';
-import { dateMask, Input, Select } from '@core';
+import type { GetPalacementRoomVariantsWithTypesQuery } from '@api-gen';
+import type { SelectOption } from '@core';
+import { convertToSelectValues, dateMask, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { createPlacementRoomVariant, getSecondRoomVariant } from '@features/guidbooks/services';
+import { getFirstPlacementRoomVariant } from '@features/guidbooks/services';
+import type { BuildingType } from '@features/guidbooks/types';
 import {
-	BuildingType,
 	ConstructionClass,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
@@ -15,54 +13,54 @@ import {
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
 import type { Requirement } from '@features/guidbooks/types/requirements';
-import type { PlacementRoom } from '@features/guidbooks/types/requirements/placementRoom.types';
+import type { PlacementRoomResponse } from '@features/guidbooks/types/requirements/placementRoom.types';
 import { useMask } from '@react-input/mask';
-import { AxiosResponse } from 'axios';
+import { AxiosError, type AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { catchError, from, map } from 'rxjs';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
 export const RequirementsAddAndEdit = memoize(() => {
 	const form = useFormContext<Requirement>();
 	const { setValue, register, control, formState, watch } = form;
 	const dateRef = useMask(dateMask);
-	const construction = watch('constructionType');
+	const [construction, buildingType] = watch(['constructionType', 'buildingType']);
 
-	const [placementRoomVariants, setPlacementRoomVariants] = useState<PlacementRoom[]>([]);
-	const [secondRoomVariants, setSecondRoomVariants] = useState<PlacementRoom[]>([]);
+	const [placementRoomVariants, setPlacementRoomVariants] = useState<SelectOption[]>([]);
+	const [secondRoomVariants, setSecondRoomVariants] = useState<SelectOption[]>([]);
 
-	const handleRoomVariants = async () => {
-		const buildingTypes = Object.values(BuildingType);
-		const constructionClasses = Object.values(ConstructionClass);
-
-		for (const buildingType of buildingTypes) {
-			for (const constructionType of constructionClasses) {
-				const secondRoomParams: GetPlacementRoomVariantByAllParametersQuery = {
-					buildingType,
-					constructionType,
-				};
-				try {
-					const response: AxiosResponse<PlacementRoom | undefined> =
-						await getSecondRoomVariant(secondRoomParams);
-					const secondRoomData = response.data;
-					if (secondRoomData) {
-						setSecondRoomVariants((prev) => [...prev, secondRoomData]);
-						const createRoomData: GetPalacementRoomVariantsWithTypesQuery = {
-							buildingType,
-							constructionType,
-						};
-						await createPlacementRoomVariant(createRoomData);
+	const onGetFirstPlacementRoom = (data: GetPalacementRoomVariantsWithTypesQuery) => {
+		from(getFirstPlacementRoomVariant(data))
+			.pipe(
+				map((r: AxiosResponse) => {
+					const variants =
+						convertToSelectValues(
+							(r.data as PlacementRoomResponse[]).map((r) => ({
+								...r.placementRoom,
+							})),
+						) || [];
+					setPlacementRoomVariants(variants);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data.message);
 					}
-				} catch (error) {
-					console.log(error);
-				}
-			}
-		}
+					return from([null]);
+				}),
+			)
+			.subscribe();
 	};
 
 	useEffect(() => {
-		handleRoomVariants();
-	}, []);
+		if (construction && buildingType) {
+			onGetFirstPlacementRoom({
+				constructionType: construction as ConstructionClass,
+				buildingType: buildingType as BuildingType,
+			});
+		}
+	}, [buildingType, construction]);
 
 	return (
 		<>
@@ -138,7 +136,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				render={({ field }) => (
 					<Select
 						onChange={(value) => {
-							construction === ConstructionType.Floor
+							construction === ConstructionClass.Floor
 								? () => setValue('noizeImpactIndex', '1')
 								: () => setValue('noizeImpactIndex', '');
 							setValue('constructionType', value as string);
@@ -252,7 +250,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				type="number"
 				max={10}
 			/>
-			{construction === ConstructionType.Floor && (
+			{construction === ConstructionClass.Floor && (
 				<Input
 					{...register('noizeImpactIndex')}
 					labelClassName={twMerge(
