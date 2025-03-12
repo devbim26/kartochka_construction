@@ -6,6 +6,7 @@ export * from './current-sub';
 export * from './forms';
 export * from './inputs';
 export * from './loaders';
+export * from './modals';
 export * from './pagination';
 export * from './popover';
 export * from './select';

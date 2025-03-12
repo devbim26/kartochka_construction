@@ -2,6 +2,7 @@ import type { IssuerDto } from '@api-gen';
 import {
 	convertToPaginatedType,
 	DeleteIcon,
+	DeleteModal,
 	EditIcon,
 	paginationStateDefault,
 	SimpleTable,
@@ -43,6 +44,11 @@ const IssuersScreen = () => {
 	const [singleIssuer, setSingleIssuer] = useState<Issuer>();
 	const [tableData, setTableData] = useState<Array<Issuer>>([]);
 	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [itemToDelete, setItemToDelete] = useState({
+		id: '',
+		name: '',
+	});
 
 	const form = useHeaderForm<Issuer>(
 		{
@@ -254,14 +260,20 @@ const IssuersScreen = () => {
 										onClick={() => {
 											navigate('', {
 												edit: 'true',
-												entityId: info.getValue() as string,
+												entityId: info.row.original.id!,
 											});
 										}}
 									/>
 									<DeleteIcon
-										onClick={() =>
-											handleDeleteTableData(info.getValue() as string)
-										}
+										onClick={() => {
+											{
+												setItemToDelete({
+													id: info.row.original.id!,
+													name: info.row.original.name!,
+												});
+											}
+											setIsModalOpen(true);
+										}}
 									/>
 								</div>
 							}
@@ -311,6 +323,18 @@ const IssuersScreen = () => {
 					}}
 				/>
 			)}
+			<DeleteModal
+				isOpen={isModalOpen}
+				onCancel={() => setIsModalOpen(false)}
+				onClose={() => setIsModalOpen(false)}
+				onConfirm={() => {
+					handleDeleteTableData(itemToDelete.id);
+					setIsModalOpen(false);
+				}}
+				headerTitle="Подтвердите действие"
+			>
+				Вы уверены, что хотите удалить производителя {itemToDelete.name}?
+			</DeleteModal>
 		</div>
 	);
 };
