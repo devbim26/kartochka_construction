@@ -1,16 +1,24 @@
+import type {
+	GetPalacementRoomVariantsWithTypesQuery,
+	GetPlacementRoomVariantByAllParametersQuery,
+} from '@api-gen';
 import { dateMask, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import { createPlacementRoomVariant, getSecondRoomVariant } from '@features/guidbooks/services';
 import {
-	ConstructionType,
+	BuildingType,
+	ConstructionClass,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuConstructionTypeSelectValues,
-	RuRegionNamesMap,
-	RuRegionNamesSelectValues,
+	RuCountryNamesMap,
+	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
 import type { Requirement } from '@features/guidbooks/types/requirements';
-import { RuRoomTypeSelectValues } from '@features/guidbooks/types/room.types';
+import type { PlacementRoom } from '@features/guidbooks/types/requirements/placementRoom.types';
 import { useMask } from '@react-input/mask';
+import { AxiosResponse } from 'axios';
+import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -20,27 +28,63 @@ export const RequirementsAddAndEdit = memoize(() => {
 	const dateRef = useMask(dateMask);
 	const construction = watch('constructionType');
 
+	const [placementRoomVariants, setPlacementRoomVariants] = useState<PlacementRoom[]>([]);
+	const [secondRoomVariants, setSecondRoomVariants] = useState<PlacementRoom[]>([]);
+
+	const handleRoomVariants = async () => {
+		const buildingTypes = Object.values(BuildingType);
+		const constructionClasses = Object.values(ConstructionClass);
+
+		for (const buildingType of buildingTypes) {
+			for (const constructionType of constructionClasses) {
+				const secondRoomParams: GetPlacementRoomVariantByAllParametersQuery = {
+					buildingType,
+					constructionType,
+				};
+				try {
+					const response: AxiosResponse<PlacementRoom | undefined> =
+						await getSecondRoomVariant(secondRoomParams);
+					const secondRoomData = response.data;
+					if (secondRoomData) {
+						setSecondRoomVariants((prev) => [...prev, secondRoomData]);
+						const createRoomData: GetPalacementRoomVariantsWithTypesQuery = {
+							buildingType,
+							constructionType,
+						};
+						await createPlacementRoomVariant(createRoomData);
+					}
+				} catch (error) {
+					console.log(error);
+				}
+			}
+		}
+	};
+
+	useEffect(() => {
+		handleRoomVariants();
+	}, []);
+
 	return (
 		<>
 			<Controller
 				control={control}
-				name={'region'}
+				name={'countryType'}
 				render={({ field }) => (
 					<Select
 						multiple
 						options={[
-							{ label: RuRegionNamesMap.None, value: RuRegionNamesMap.None },
-							...RuRegionNamesSelectValues.filter(
-								(reg) => reg.label !== RuRegionNamesMap.None,
+							{ label: RuCountryNamesMap.None, value: RuCountryNamesMap.None },
+							...RuCountryNamesSelectValues.filter(
+								(reg) => reg.label !== RuCountryNamesMap.None,
 							).sort((a, b) => a.label.localeCompare(b.label)),
 						]}
 						{...field}
 						value={field.value || []}
-						label={formState.errors?.region?.message || 'Регион'}
+						label={formState.errors?.countryType?.message || 'Регион'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.region?.message ? 'text-error' : '',
+							formState.errors.countryType?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите регион"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
@@ -118,7 +162,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				name={'firstPlacementRoom'}
 				render={({ field }) => (
 					<Select
-						options={RuRoomTypeSelectValues}
+						options={placementRoomVariants}
 						{...field}
 						value={field.value || ''}
 						label={formState.errors?.firstPlacementRoom?.message || 'Первое помещение'}
@@ -138,7 +182,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				name={'secondPlacementRoom'}
 				render={({ field }) => (
 					<Select
-						options={RuRoomTypeSelectValues}
+						options={secondRoomVariants}
 						{...field}
 						value={field.value || ''}
 						label={formState.errors?.secondPlacementRoom?.message || 'Второе помещение'}
