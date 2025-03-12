@@ -23,7 +23,7 @@ export const authLogin = createAsyncThunk(
 			};
 		} catch (error) {
 			if (error instanceof AxiosError) {
-				toast.error(error.message);
+				toast.error(error.response?.data);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
 			toast.error('Неизвестная ошибка');
@@ -50,7 +50,7 @@ export const authRegistration = createAsyncThunk(
 			};
 		} catch (error) {
 			if (error instanceof AxiosError) {
-				toast.error(error.message);
+				toast.error(error.response?.data);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
 			toast.error('Неизвестная ошибка');
@@ -76,7 +76,7 @@ export const smsCodeRequest = createAsyncThunk(
 			};
 		} catch (error) {
 			if (error instanceof AxiosError) {
-				toast.error(error.message);
+				toast.error(error.response?.data);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
 			toast.error('Неизвестная ошибка');
@@ -102,7 +102,7 @@ export const smsCodeApprove = createAsyncThunk(
 			};
 		} catch (error) {
 			if (error instanceof AxiosError) {
-				toast.error(error.message);
+				toast.error(error.response?.data);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
 			toast.error('Неизвестная ошибка');
@@ -128,7 +128,7 @@ export const logout = createAsyncThunk(
 			};
 		} catch (error) {
 			if (error instanceof AxiosError) {
-				toast.error(error.message);
+				toast.error(error.response?.data);
 				return thunkAPI.rejectWithValue({ error: error.message });
 			}
 			toast.error('Неизвестная ошибка');
