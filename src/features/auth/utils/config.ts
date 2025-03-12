@@ -35,7 +35,7 @@ export const RegistrationFormDataConfig: EntityConfig = {
 		paymentAccount: '',
 		bankIdNumber: '',
 		bankAdress: '',
-		companyLogo: {},
+		companyLogo: '',
 		compannyInfo: '',
 	},
 };

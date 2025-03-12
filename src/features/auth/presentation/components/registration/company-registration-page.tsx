@@ -96,12 +96,15 @@ const CompanyRegistrationPage = () => {
 			const base64 = await convertToBase64(file);
 			if (base64 && typeof base64 === 'string') {
 				setValue('companyLogo', base64);
+				setValue('formFile', file);
 			}
 			trigger('companyLogo');
 		}
 	};
 
 	const logo = watch('companyLogo');
+
+	console.log(formState.errors);
 
 	return (
 		<div className="mb-[100px] flex w-[508px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[23px]">
@@ -221,7 +224,7 @@ const CompanyRegistrationPage = () => {
 						labelClassName={formState.errors.bankIdNumber?.message ? 'text-error' : ''}
 						error={formState.errors.bankIdNumber?.message}
 						{...form.register('bankIdNumber')}
-						type={'number'}
+						type={'text'}
 						placeholder="Введите  БИК"
 					/>
 

@@ -89,38 +89,6 @@ export const smsCodeApprove = createAsyncThunk(
 	},
 );
 
-export const fileUpload = createAsyncThunk(
-	AUTH_FETCH_ROUTES.fileUpload.async_thunk_route,
-	async (
-		request: {
-			data: { mimeType: string | null; isPublic: boolean };
-			file: string | ArrayBuffer;
-		},
-		thunkAPI,
-	) => {
-		try {
-			const response = await fetchApi.api.fileCreate(request.data);
-			const upload = await fetch(String(response.data), {
-				method: 'PUT',
-				body: request.file,
-			});
-			console.log(upload);
-			return {
-				payload: upload.body,
-				fetch_data: {
-					group: AUTH_FETCH_ROUTES.group,
-					fetch_name: AUTH_FETCH_ROUTES.fileUpload.fetch_name,
-				},
-			};
-		} catch (error) {
-			if (error instanceof Error) {
-				return thunkAPI.rejectWithValue({ error: error.message });
-			}
-			return thunkAPI.rejectWithValue({ error: 'Unknown error' });
-		}
-	},
-);
-
 export const logout = createAsyncThunk(
 	AUTH_FETCH_ROUTES.logout.async_thunk_route,
 	async (_, thunkAPI) => {
