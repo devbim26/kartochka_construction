@@ -9,10 +9,10 @@ export enum ConstructionTypeEnum {
 	HeavyMultiLayerWallFacingOneSide = 'HeavyMultiLayerWallFacingOneSide',
 	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
 	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
-	HeavySingleLayerWallSoundproofingOneSide = 'HeavySingleLaterWallSoundproofingOneSide',
-	HeavySingleLayerWallSoundproofingBothSide = 'HeavySingleLaterWallSoundproofingBothSide',
-	HeavyMultiLayerWall = 'HeavyMultiLaterWall',
-	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLaterWallFacingBothSide',
+	HeavySingleLayerWallSoundproofingOneSide = 'HeavySingleLayerWallSoundproofingOneSide',
+	HeavySingleLayerWallSoundproofingBothSide = 'HeavySingleLayerWallSoundproofingBothSide',
+	HeavyMultiLayerWall = 'HeavyMultiLayerWall',
+	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLayerWallFacingBothSide',
 	HeavyMultilayerWallSoundproofingLeftSide = 'HeavyMultilayerWallSoundproofingLeftSide',
 	HeavyMultiLayerWallSoundproofOneSide = 'HeavyMultiLayerWallSoundproofOneSide',
 	HeavyMultiLayerWallSoundproofBothSides = 'HeavyMultiLayerWallSoundproofBothSides',
@@ -20,7 +20,28 @@ export enum ConstructionTypeEnum {
 	FramePartitionDouble = 'FramePartitionDouble',
 }
 
-export const RuConstructionConstructionTypeSelectValues = [
+export const RuConstructionTypesMap = {
+	HeavySingleLayerWall: 'Тяжелая однослойная стена',
+	HeavySingleLayerWallFacingOneSide: 'Тяжелая однослойная стена + облицовка с одной стороны',
+	HeavySingleLayerWallFacingBothSide: 'Тяжелая однослойная стена + облицовка с двух сторон',
+	HeavySingleLayerWallSoundproofingOneSide:
+		'Тяжелая однослойная стена + звукоизоляционная панель с одной стороны',
+	HeavySingleLayerWallSoundproofingBothSide:
+		'Тяжелая однослойная стена + звукоизоляционная панель с двух сторон',
+	HeavyMultiLayerWall: 'Тяжелая многослойная стена',
+	HeavyMultiLayerWallFacingOneSide: 'Тяжелая многослойная стена + облицовка с одной стороны',
+	HeavyMultiLayerWallFacingBothSide: 'Тяжелая многослойная стена + облицовка с двух сторон',
+	HeavyMultilayerWallSoundproofingLeftSide:
+		'Тяжелая многослойная стена + звукоизоляционная панель слева',
+	HeavyMultiLayerWallSoundproofOneSide:
+		'Тяжелая многослойная стена + звукоизоляционная панель с одной стороны',
+	HeavyMultiLayerWallSoundproofBothSides:
+		'Тяжелая многослойная стена + звукоизоляционная панель с двух сторон',
+	FramePartitionSingle: 'Каркасная перегородка (1 каркас)',
+	FramePartitionDouble: 'Каркасная перегородка (2 каркаса)',
+};
+
+export const RuConstructionTypesSelectValues = [
 	{ label: 'Тяжелая однослойная стена', value: ConstructionTypeEnum.HeavySingleLayerWall },
 	{
 		label: 'Тяжелая однослойная стена + облицовка с одной стороны',

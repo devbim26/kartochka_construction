@@ -28,7 +28,7 @@ import {
 	HeavySingleLayerWallSoundproofingBothSideComponent,
 	HeavySingleLayerWallSoundproofingOneSideComponent,
 	MaterialTypeEnum,
-	RuConstructionConstructionTypeSelectValues,
+	RuConstructionTypesSelectValues,
 	RuCountryNamesSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
@@ -1560,7 +1560,7 @@ export const ConstructionsAdd = () => {
 									if (value)
 										ConstructionTypeMap[value as ConstructionTypeEnum].action();
 								}}
-								options={RuConstructionConstructionTypeSelectValues}
+								options={RuConstructionTypesSelectValues}
 								error={formState.errors.constructionType?.message}
 								labelClassName={twMerge(
 									'text-sm leading-5 tracking-[0.1px]',

@@ -10,7 +10,6 @@ import type {
 	MaterialParametrs,
 } from '@api-gen';
 import { convertToClientCountryData, convertToServerCountryData } from '@core';
-import { convertToClientConstructionTypeDto } from '@core/converters/constructionType.converter';
 import { convertToClientIndexTypeData } from '@core/converters/index.converter';
 import {
 	convertToClientPriorityData,
@@ -57,10 +56,11 @@ export const convertToClientConstructionsAddData = (
 	labRTotal: data.rTotal ? data.rTotal.join(', ') : '',
 	labIndex: (convertToClientIndexTypeData(data.index!) as string) ?? '',
 	labIndexValue: String(data.laboratoryIndexValue) ?? '',
-	constructionType: convertToClientConstructionTypeDto(data.constructionType!) ?? '',
+	constructionType: data.constructionType! ?? '',
 	constructionTypeObject: convertToClientConstructionType(data.constructionType!) ?? '',
 	laboratoryTestSource: data.laboratoryTestSource ?? '',
 	issuer: data.issuerId ?? '',
+	issuerName: data.issuer?.name ?? '',
 });
 
 export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => {
