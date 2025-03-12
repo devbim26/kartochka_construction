@@ -177,7 +177,7 @@ const ConstructionsScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -195,7 +195,7 @@ const ConstructionsScreen = () => {
 				tap((data) => setSingleMaterial(data)),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -213,7 +213,7 @@ const ConstructionsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -246,7 +246,7 @@ const ConstructionsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -268,7 +268,7 @@ const ConstructionsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),

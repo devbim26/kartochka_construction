@@ -56,7 +56,7 @@ export const convertToClientConstructionsAddData = (
 	labRTotal: data.rTotal ? data.rTotal.join(', ') : '',
 	labIndex: (convertToClientIndexTypeData(data.index!) as string) ?? '',
 	labIndexValue: String(data.laboratoryIndexValue) ?? '',
-	constructionType: data.constructionType! ?? '',
+	constructionType: data.constructionType ?? '',
 	constructionTypeObject: convertToClientConstructionType(data.constructionType!) ?? '',
 	laboratoryTestSource: data.laboratoryTestSource ?? '',
 	issuer: data.issuerId ?? '',
@@ -66,9 +66,9 @@ export const convertToClientConstructionsAddData = (
 export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => {
 	return {
 		...convertToClientConstructionsAddData(data),
-		comment: data.notice ?? '',
-		estimatedRTotal: data.rw ?? '',
-		estimatedIndexValue: data.computingIndexValue ?? '',
+		constructionType: data.constructionType.constructionTypeEnum ?? '',
+		RCalcs: String(data.rw) ?? '',
+		estimatedIndexValue: String(data.computingIndexValue) ?? '',
 	};
 };
 
@@ -135,8 +135,6 @@ export const convertToServerConstructionsEditData = (
 	data: ConstructionsEditData,
 ): CreateConstructionHeaderCommand => ({
 	...convertToServerConstructionsAddData(data),
-	// comment: data.comment || null,
-	// estimatedRTotal: data.estimatedRTotal || null,
-	// estimatedIndex: data.estimatedIndex || null,
-	// estimatedIndexValue: data.estimatedIndexValue || null,
+	rw: data.RCalcs || null,
+	conputingIndexValue: data.estimatedIndexValue || null,
 });
