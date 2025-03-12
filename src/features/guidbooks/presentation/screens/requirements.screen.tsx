@@ -1,4 +1,5 @@
 import type { RequirementDto } from '@api-gen';
+import type { NamedEntity } from '@core';
 import {
 	convertToPaginatedType,
 	DeleteIcon,
@@ -129,7 +130,7 @@ const RequirementsScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -147,7 +148,7 @@ const RequirementsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -159,7 +160,6 @@ const RequirementsScreen = () => {
 							sessionStorage.setItem(key, JSON.stringify(value));
 						}
 					});
-
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно добавлено');
 					navigate('');
@@ -177,7 +177,7 @@ const RequirementsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -201,7 +201,7 @@ const RequirementsScreen = () => {
 				tap((data) => setSingleRequirement(data!)),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -214,7 +214,7 @@ const RequirementsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data.message);
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -289,14 +289,14 @@ const RequirementsScreen = () => {
 				accessorKey: 'firstPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Первое помещение'} />,
 				cell: (info) => {
-					return <SimpleTableCell content={info.getValue() as string} />;
+					return <SimpleTableCell content={(info.getValue() as NamedEntity).name} />;
 				},
 			},
 			{
 				accessorKey: 'secondPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
 				cell: (info) => {
-					return <SimpleTableCell content={info.getValue() as string} />;
+					return <SimpleTableCell content={(info.getValue() as NamedEntity).name} />;
 				},
 			},
 			{

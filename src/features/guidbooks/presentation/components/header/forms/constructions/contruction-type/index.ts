@@ -4,6 +4,7 @@ export * from './heavy-multi-layer-wall-facing-both-side.component';
 export * from './heavy-multi-layer-wall-facing-one-side.component';
 export * from './heavy-multi-layer-wall.component';
 export * from './heavy-multilayer-wall-soundproofing-both-sides.component';
+export * from './heavy-multilayer-wall-soundproofing-left.component';
 export * from './heavy-multilayer-wall-soundproofing-right.component';
 export * from './heavy-single-layer-wall-facing-both-side.component';
 export * from './heavy-single-layer-wall-facing-one-side.component';

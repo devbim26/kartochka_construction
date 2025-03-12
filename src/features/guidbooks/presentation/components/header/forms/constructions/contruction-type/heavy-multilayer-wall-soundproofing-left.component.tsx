@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
-export const HeavyMultilayerWallSoundproofingLeftSide = () => {
+export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { watch, setValue } = form;
 	const [baseConstructionIndices, setBaseConstructionIndices] = useState({

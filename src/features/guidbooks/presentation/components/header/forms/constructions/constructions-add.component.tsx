@@ -20,7 +20,8 @@ import {
 	HeavyMultiLayerWallComponent,
 	HeavyMultiLayerWallFacingBothSideComponent,
 	HeavyMultiLayerWallFacingOneSideComponent,
-	HeavyMultiLayerWallSoundproofBothSides,
+	HeavyMultiLayerWallSoundproofBothSide,
+	HeavyMultiLayerWallSoundproofingLeftSide,
 	HeavyMultiLayerWallSoundproofOneSide,
 	HeavySingleLayerWallComponent,
 	HeavySingleLayerWallFacingBothSideComponent,
@@ -28,7 +29,7 @@ import {
 	HeavySingleLayerWallSoundproofingBothSideComponent,
 	HeavySingleLayerWallSoundproofingOneSideComponent,
 	MaterialTypeEnum,
-	RuConstructionConstructionTypeSelectValues,
+	RuConstructionTypesSelectValues,
 	RuCountryNamesSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
@@ -37,7 +38,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
-import { HeavyMultilayerWallSoundproofingLeftSide } from './contruction-type/heavy-multilayer-wall-soundproofing-left.component';
 
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();
@@ -1005,12 +1005,12 @@ export const ConstructionsAdd = () => {
 				]);
 			},
 		},
-		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSides]: {
-			component: <HeavyMultiLayerWallSoundproofBothSides />,
+		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSide]: {
+			component: <HeavyMultiLayerWallSoundproofBothSide />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSides,
+					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
@@ -1227,12 +1227,12 @@ export const ConstructionsAdd = () => {
 				]);
 			},
 		},
-		[ConstructionTypeEnum.HeavyMultilayerWallSoundproofingLeftSide]: {
-			component: <HeavyMultilayerWallSoundproofingLeftSide />,
+		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingLeftSide]: {
+			component: <HeavyMultiLayerWallSoundproofingLeftSide />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavyMultilayerWallSoundproofingLeftSide,
+					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingLeftSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
@@ -1560,7 +1560,7 @@ export const ConstructionsAdd = () => {
 									if (value)
 										ConstructionTypeMap[value as ConstructionTypeEnum].action();
 								}}
-								options={RuConstructionConstructionTypeSelectValues}
+								options={RuConstructionTypesSelectValues}
 								error={formState.errors.constructionType?.message}
 								labelClassName={twMerge(
 									'text-sm leading-5 tracking-[0.1px]',
