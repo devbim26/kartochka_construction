@@ -18,15 +18,14 @@ import {
 	type CategoryClass as ClientCategoryClass,
 	type Country,
 	type FormRequirement,
-	type Requirement,
 	type RequirementFilter,
 } from '@features/guidbooks/types';
 
-export const convertToClientRequirementData = (data: RequirementDto): Requirement => ({
+export const convertToClientRequirementData = (data: RequirementDto): FormRequirement => ({
 	...data,
 	constructionType: ConstructionClass.Wall,
-	secondPlacementRoom: data.secondPlacementRoom ?? '',
-	firstPlacementRoom: data.firstPlacementRoom ?? '',
+	secondPlacementRoomId: data.secondPlacementRoom?.id ?? '',
+	firstPlacementRoomId: data.firstPlacementRoom?.id ?? '',
 	buildingType: convertToClientBuildingTypeData(data.buildingType!)! as string,
 	standartShortName: data.standartShortName ?? '',
 	standartFullName: data.standartFullName ?? '',
