@@ -62,8 +62,7 @@ export const convertToServerRequirementData = (
 export const convertToServerFilterRequirementData = (
 	data: RequirementFilter,
 ): GetRequirementsWithPaginationParamsQuery => ({
-	// secondPlacementRoom: data.secondPlacementRoom || null,
-	// firstPlacementRoom: data.firstPlacementRoom || null,
+	placementRoomId: data.firstPlacementRoomId || data.secondPlacementRoomId || null,
 	buildingType: buildingTypeMap.toServer[data.buildingType as ClientBuildingType] || null,
 	countryType: convertToServerCountryData(data.countryType as Country)! as CountryType,
 });
