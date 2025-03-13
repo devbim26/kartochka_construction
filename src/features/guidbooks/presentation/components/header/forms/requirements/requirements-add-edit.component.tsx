@@ -1,46 +1,127 @@
-import { dateMask, Input, Select } from '@core';
+import type {
+	GetPalacementRoomVariantsWithTypesQuery,
+	GetPlacementRoomVariantByAllParametersQuery,
+} from '@api-gen';
+import type { SelectOption } from '@core';
+import { convertToSelectValues, dateMask, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import { getFirstPlacementRoomVariant, getSecondRoomVariant } from '@features/guidbooks/services';
+import type { BuildingType } from '@features/guidbooks/types';
 import {
-	ConstructionType,
+	ConstructionClass,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuConstructionTypeSelectValues,
-	RuRegionNamesMap,
-	RuRegionNamesSelectValues,
+	RuCountryNamesMap,
+	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
-import type { Requirement } from '@features/guidbooks/types/requirements';
-import { RuRoomTypeSelectValues } from '@features/guidbooks/types/room.types';
+import type { FormRequirement } from '@features/guidbooks/types/requirements';
+import type { PlacementRoomResponse } from '@features/guidbooks/types/requirements/placementRoom.types';
 import { useMask } from '@react-input/mask';
+import { AxiosError, type AxiosResponse } from 'axios';
+import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { catchError, from, map } from 'rxjs';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
 export const RequirementsAddAndEdit = memoize(() => {
-	const form = useFormContext<Requirement>();
+	const form = useFormContext<FormRequirement>();
 	const { setValue, register, control, formState, watch } = form;
 	const dateRef = useMask(dateMask);
-	const construction = watch('constructionType');
+	const [construction, buildingType, firstPlacementRoomId] = watch([
+		'constructionType',
+		'buildingType',
+		'firstPlacementRoomId',
+	]);
+
+	const [placementRoomVariants, setPlacementRoomVariants] = useState<SelectOption[]>([]);
+	const [secondRoomVariants, setSecondRoomVariants] = useState<SelectOption[]>([]);
+
+	const onGetFirstPlacementRoom = (data: GetPalacementRoomVariantsWithTypesQuery) => {
+		from(getFirstPlacementRoomVariant(data))
+			.pipe(
+				map((r: AxiosResponse) => {
+					const variants =
+						convertToSelectValues(
+							(r.data as PlacementRoomResponse[]).map((r) => ({
+								...r.placementRoom,
+							})),
+						) || [];
+					setPlacementRoomVariants(variants);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
+
+	const onGetSecondRoomVariant = (data: GetPlacementRoomVariantByAllParametersQuery) => {
+		from(getSecondRoomVariant(data))
+			.pipe(
+				map((r: AxiosResponse) => {
+					const variants =
+						convertToSelectValues(
+							(r.data as PlacementRoomResponse[]).map((r) => ({
+								...r.placementRoom,
+							})),
+						) || [];
+					setSecondRoomVariants(variants);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
+
+	useEffect(() => {
+		if (construction && buildingType) {
+			onGetFirstPlacementRoom({
+				constructionType: construction as ConstructionClass,
+				buildingType: buildingType as BuildingType,
+			});
+		}
+	}, [buildingType, construction]);
+
+	useEffect(() => {
+		if (construction && buildingType && firstPlacementRoomId) {
+			onGetSecondRoomVariant({
+				constructionType: construction as ConstructionClass,
+				buildingType: buildingType as BuildingType,
+				placementRoomId: firstPlacementRoomId as string,
+			});
+		}
+	}, [buildingType, construction, firstPlacementRoomId]);
 
 	return (
 		<>
 			<Controller
 				control={control}
-				name={'region'}
+				name={'countryType'}
 				render={({ field }) => (
 					<Select
 						multiple
 						options={[
-							{ label: RuRegionNamesMap.None, value: RuRegionNamesMap.None },
-							...RuRegionNamesSelectValues.filter(
-								(reg) => reg.label !== RuRegionNamesMap.None,
+							{ label: RuCountryNamesMap.None, value: RuCountryNamesMap.None },
+							...RuCountryNamesSelectValues.filter(
+								(reg) => reg.label !== RuCountryNamesMap.None,
 							).sort((a, b) => a.label.localeCompare(b.label)),
 						]}
 						{...field}
 						value={field.value || []}
-						label={formState.errors?.region?.message || 'Регион'}
+						label={formState.errors?.countryType?.message || 'Регион'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.region?.message ? 'text-error' : '',
+							formState.errors.countryType?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите регион"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
@@ -94,7 +175,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				render={({ field }) => (
 					<Select
 						onChange={(value) => {
-							construction === ConstructionType.Floor
+							construction === ConstructionClass.Floor
 								? () => setValue('noizeImpactIndex', '1')
 								: () => setValue('noizeImpactIndex', '');
 							setValue('constructionType', value as string);
@@ -115,17 +196,19 @@ export const RequirementsAddAndEdit = memoize(() => {
 			/>
 			<Controller
 				control={control}
-				name={'firstPlacementRoom'}
+				name={'firstPlacementRoomId'}
 				render={({ field }) => (
 					<Select
-						options={RuRoomTypeSelectValues}
+						options={placementRoomVariants}
 						{...field}
 						value={field.value || ''}
-						label={formState.errors?.firstPlacementRoom?.message || 'Первое помещение'}
+						label={
+							formState.errors?.firstPlacementRoomId?.message || 'Первое помещение'
+						}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.firstPlacementRoom?.message ? 'text-error' : '',
+							formState.errors.firstPlacementRoomId?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите первое помещение"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
@@ -135,17 +218,19 @@ export const RequirementsAddAndEdit = memoize(() => {
 			/>
 			<Controller
 				control={control}
-				name={'secondPlacementRoom'}
+				name={'secondPlacementRoomId'}
 				render={({ field }) => (
 					<Select
-						options={RuRoomTypeSelectValues}
+						options={secondRoomVariants}
 						{...field}
 						value={field.value || ''}
-						label={formState.errors?.secondPlacementRoom?.message || 'Второе помещение'}
+						label={
+							formState.errors?.secondPlacementRoomId?.message || 'Второе помещение'
+						}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.secondPlacementRoom?.message ? 'text-error' : '',
+							formState.errors.secondPlacementRoomId?.message ? 'text-error' : '',
 						)}
 						placeholder="Выберите второе помещение"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
@@ -208,7 +293,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				type="number"
 				max={10}
 			/>
-			{construction === ConstructionType.Floor && (
+			{construction === ConstructionClass.Floor && (
 				<Input
 					{...register('noizeImpactIndex')}
 					labelClassName={twMerge(

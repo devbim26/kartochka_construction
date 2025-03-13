@@ -1,7 +1,7 @@
 import { Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type { RequirementFilter } from '@features/guidbooks/types';
-import { RuRegionNamesMap, RuRegionNamesSelectValues } from '@features/guidbooks/types';
+import { RuCountryNamesMap, RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { RuBuildingTypeSelectValues } from '@features/guidbooks/types/building.types';
 import { RuRoomTypeSelectValues } from '@features/guidbooks/types/room.types';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -19,9 +19,9 @@ export const RequirementsFilter = memoize(() => {
 				render={({ field }) => (
 					<Select
 						options={[
-							{ label: RuRegionNamesMap.None, value: RuRegionNamesMap.None },
-							...RuRegionNamesSelectValues.filter(
-								(reg) => reg.label !== RuRegionNamesMap.None,
+							{ label: RuCountryNamesMap.None, value: RuCountryNamesMap.None },
+							...RuCountryNamesSelectValues.filter(
+								(reg) => reg.label !== RuCountryNamesMap.None,
 							).sort((a, b) => a.label.localeCompare(b.label)),
 						]}
 						{...field}

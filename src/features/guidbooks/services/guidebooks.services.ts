@@ -1,3 +1,7 @@
+import type {
+	GetPalacementRoomVariantsWithTypesQuery,
+	GetPlacementRoomVariantByAllParametersQuery,
+} from '@api-gen';
 import { fetchApi } from '@api-gen';
 import type { PaginationState } from '@core';
 import type { GuideBooksCreateDataTypes, GuidebooksFiltersDataTypes } from '../types';
@@ -88,4 +92,14 @@ export const getGuidebooksMaterialTypes = async () => {
 
 export const getGuidebooksConstructionTypes = async () => {
 	return await fetchApi.api.constructionConstructionTypesList();
+};
+
+export const getFirstPlacementRoomVariant = async (
+	data: GetPalacementRoomVariantsWithTypesQuery,
+) => {
+	return await fetchApi.api.placementRoomVariantsCreate(data);
+};
+
+export const getSecondRoomVariant = async (data: GetPlacementRoomVariantByAllParametersQuery) => {
+	return await fetchApi.api.placementRoomVariantsGetSecondRoomCreate(data);
 };

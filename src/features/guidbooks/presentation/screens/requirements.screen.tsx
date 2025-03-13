@@ -26,9 +26,9 @@ import {
 } from '@features/guidbooks/services';
 import type {
 	BuildingType,
-	ConstructionType,
+	ConstructionClass,
+	Country,
 	FormRequirement,
-	Region,
 	Requirement,
 	RequirementFilter,
 } from '@features/guidbooks/types';
@@ -36,7 +36,7 @@ import {
 	Guidebooks,
 	RuBuildingTypeNamesMap,
 	RuConstructionTypeNamesMap,
-	RuRegionNamesMap,
+	RuCountryNamesMap,
 } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';
@@ -248,7 +248,7 @@ const RequirementsScreen = () => {
 				header: () => <SimpleTableHeaderCell text={'Регион'} />,
 				cell: (info) => {
 					return (
-						<SimpleTableCell content={RuRegionNamesMap[info.getValue() as Region]} />
+						<SimpleTableCell content={RuCountryNamesMap[info.getValue() as Country]} />
 					);
 				},
 			},
@@ -270,7 +270,7 @@ const RequirementsScreen = () => {
 					return (
 						<SimpleTableCell
 							content={
-								RuConstructionTypeNamesMap[info.getValue() as ConstructionType]
+								RuConstructionTypeNamesMap[info.getValue() as ConstructionClass]
 							}
 						/>
 					);
