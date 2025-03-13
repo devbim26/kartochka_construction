@@ -1,9 +1,7 @@
 import type {
-	ConstructionHeaderDto,
 	ConstructionPosition,
 	ConstructionTypeEnum,
 	CountryType,
-	CreateConstructionHeaderCommand,
 	CreateConstructionTypeDto,
 	GetConstructionHeaderWithPaginationQuery,
 	IndexType,
@@ -40,9 +38,7 @@ export const convertToServerConstructionsFilterData = (
 	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
 });
 
-export const convertToClientConstructionsAddData = (
-	data: ConstructionHeaderDto,
-): ConstructionsAddData => ({
+export const convertToClientConstructionsAddData = (data: any): ConstructionsAddData => ({
 	...data,
 	id: data.id ?? '',
 	name: data.name ?? '',
@@ -112,9 +108,7 @@ export const convertToClientConstructionType = (
 		})) || [],
 });
 
-export const convertToServerConstructionsAddData = (
-	data: ConstructionsAddData,
-): CreateConstructionHeaderCommand => ({
+export const convertToServerConstructionsAddData = (data: ConstructionsAddData): any => ({
 	name: data.name || null,
 	description: data.description || null,
 	priority: convertToServerPriorityData(data.priority as Priority) || null,
@@ -127,13 +121,11 @@ export const convertToServerConstructionsAddData = (
 	rTotal: data.labRTotal.split(',').map((split) => +split) || null,
 	index: (data.labIndex as IndexType) || null,
 	indexValue: +data.labIndexValue || undefined,
-	laboratoryTestSource: data.propertySource || null,
+	laboratoryTestSource: data.laboratoryTestSource || null,
 	constructionType: convertToServerConstructionType(data.constructionTypeObject) || null,
 });
 
-export const convertToServerConstructionsEditData = (
-	data: ConstructionsEditData,
-): CreateConstructionHeaderCommand => ({
+export const convertToServerConstructionsEditData = (data: ConstructionsEditData): any => ({
 	...convertToServerConstructionsAddData(data),
 	id: data.id || null,
 	rw: data.RCalcs || null,

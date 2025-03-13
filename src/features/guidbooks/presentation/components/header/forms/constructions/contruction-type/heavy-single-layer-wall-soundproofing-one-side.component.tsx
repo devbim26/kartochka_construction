@@ -225,7 +225,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 				{soundproofingIndices.oneIndex >= 0 && (
 					<div className="flex flex-row gap-[16px]">
 						<BoardMaterialType
-							fieldIndex={soundproofingIndices.zeroIndex}
+							fieldIndex={soundproofingIndices.oneIndex}
 							constructionIndex={1}
 						/>
 						<ThicknessDensityFieldsType
