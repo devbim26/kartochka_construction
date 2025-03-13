@@ -3,7 +3,6 @@ import {
 	ConstructionsAddSchema,
 	ConstructionsEditSchema,
 	ConstructionsFilterSchema,
-	FormIssuerSchema,
 	IssuersSchema,
 	MaterialsAddAndEditSchema,
 	MaterialsFilterSchema,
@@ -22,7 +21,8 @@ export const MaterialsAddAndEditConfig: EntityConfig = {
 		country: [],
 		type: '',
 		issuer: '',
-		image: undefined,
+		imageUrl: '',
+		imageFile: '',
 		materialCoefficient: '',
 		velocity: '',
 		lossFactor: '',
@@ -37,14 +37,14 @@ export const MaterialsFilterConfig: EntityConfig = {
 	defaultValues: { name: '', density: '', thickness: '', materialType: '' },
 };
 
-export const IssuersDataConfig: EntityConfig = {
+export const IssuersAddAndEditConfig: EntityConfig = {
 	schema: IssuersSchema,
-	defaultValues: { name: '', countries: '', logoUrl: undefined, webSite: '' },
+	defaultValues: { name: '', countries: '', logoUrl: '', logoFile: '', webSite: '' },
 };
 
-export const IssuersFormCofig: EntityConfig = {
-	schema: FormIssuerSchema,
-	defaultValues: { name: '', countries: [], logoUrl: '', webSite: '' },
+export const IssuersFilterConfig: EntityConfig = {
+	schema: IssuersSchema,
+	defaultValues: { name: '', countries: '', webSite: '' },
 };
 
 export const RequirementsDataConfig: EntityConfig = {

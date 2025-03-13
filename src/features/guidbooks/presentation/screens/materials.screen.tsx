@@ -13,7 +13,7 @@ import {
 import type { Country, MaterialsAddAndEditData, MaterialsFilterData } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
-	convertToServerMaterialsCreateData,
+	convertToServerMaterialsAddData,
 	convertToServerMaterialsEditData,
 	convertToServerMaterialsFilterData,
 	getGuidebooksCreate,
@@ -76,8 +76,8 @@ const MaterialsScreen = () => {
 						<SimpleTableCell
 							contentClassName="h-[39px] w-[39px]"
 							content={
-								info.row.original.image ? (
-									<img src={info.row.original.image} className="size-[39px]" />
+								info.row.original.imageUrl ? (
+									<img src={info.row.original.imageUrl} className="size-fit" />
 								) : (
 									''
 								)
@@ -254,7 +254,7 @@ const MaterialsScreen = () => {
 	const handleAddTableData = (data: MaterialsAddAndEditData) => {
 		from(
 			getGuidebooksCreate({
-				data: convertToServerMaterialsCreateData(data),
+				data: convertToServerMaterialsAddData(data),
 				guidebookType: Guidebooks.MATERIAL,
 			}),
 		)

@@ -104,8 +104,6 @@ const CompanyRegistrationPage = () => {
 
 	const logo = watch('companyLogo');
 
-	console.log(formState.errors);
-
 	return (
 		<div className="mb-[100px] flex w-[508px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[23px]">
 			<p className="text-center font-raleway text-[28px] font-semibold text-black">

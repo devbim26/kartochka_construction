@@ -44,12 +44,15 @@ export const MaterialsAddAndEdit = () => {
 		if (file) {
 			const base64 = await convertToBase64(file);
 			if (base64 && typeof base64 === 'string') {
-				setValue('image', base64);
+				setValue('imageUrl', base64);
+				setValue('imageFile', file);
 			}
-			trigger('image');
+			trigger('imageUrl');
+			trigger('imageFile');
 		}
 	};
-	const image = watch('image');
+
+	const imageUrl = watch('imageUrl');
 
 	return (
 		<div className="flex flex-col gap-[16px]">
@@ -213,18 +216,27 @@ export const MaterialsAddAndEdit = () => {
 						<FormElementLabel
 							className={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-								formState.errors.image?.message ? 'text-error' : '',
+								formState.errors.imageUrl?.message ||
+									formState.errors.imageFile?.message?.toString()
+									? 'text-error'
+									: '',
 							)}
-							errorMessage={formState.errors.image?.message?.toString()}
+							errorMessage={
+								formState.errors.imageUrl?.message ||
+								formState.errors.imageFile?.message?.toString()
+							}
 						>
-							Логотип
+							Изображение
 						</FormElementLabel>
 						<div className="flex items-center gap-[8px]">
 							<Button
 								variant="primary"
 								className={twMerge(
 									'group flex w-fit flex-row items-center gap-[4px] border-2 border-solid border-primary bg-white',
-									formState.errors.image?.message ? 'border-error' : '',
+									formState.errors.imageUrl?.message ||
+										formState.errors.imageFile?.message
+										? 'border-error'
+										: '',
 								)}
 								onClick={() => document.getElementById('file-upload')!.click()}
 							>
@@ -241,10 +253,10 @@ export const MaterialsAddAndEdit = () => {
 							/>
 						</div>
 					</div>
-					{image && (
+					{imageUrl && (
 						<div className="flex justify-center self-center">
 							<img
-								src={image}
+								src={imageUrl}
 								alt="Превью изображения"
 								className="size-[60px] rounded-md object-cover"
 							/>
