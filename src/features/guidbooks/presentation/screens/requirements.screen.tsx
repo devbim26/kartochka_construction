@@ -42,7 +42,6 @@ import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormProvider } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -353,21 +352,9 @@ const RequirementsScreen = () => {
 				}}
 				forms={form}
 				formElements={{
-					filter: () => (
-						<FormProvider {...form.filterForm}>
-							<RequirementsFilter />
-						</FormProvider>
-					),
-					add: () => (
-						<FormProvider {...form.addForm}>
-							<RequirementsAddAndEdit />
-						</FormProvider>
-					),
-					edit: () => (
-						<FormProvider {...form.editForm}>
-							<RequirementsAddAndEdit />
-						</FormProvider>
-					),
+					filter: RequirementsFilter,
+					add: RequirementsAddAndEdit,
+					edit: RequirementsAddAndEdit,
 				}}
 			/>
 			{!!tableData.length && (

@@ -36,7 +36,6 @@ import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormProvider } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -356,21 +355,9 @@ const MaterialsScreen = () => {
 				}}
 				forms={forms}
 				formElements={{
-					filter: () => (
-						<FormProvider {...forms.filterForm}>
-							<MaterialsFilter />
-						</FormProvider>
-					),
-					add: () => (
-						<FormProvider {...forms.addForm}>
-							<MaterialsAddAndEdit />
-						</FormProvider>
-					),
-					edit: () => (
-						<FormProvider {...forms.editForm}>
-							<MaterialsAddAndEdit />
-						</FormProvider>
-					),
+					filter: MaterialsFilter,
+					add: MaterialsAddAndEdit,
+					edit: MaterialsAddAndEdit,
 				}}
 			/>
 			{!!tableData.length && (

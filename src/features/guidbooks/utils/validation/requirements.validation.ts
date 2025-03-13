@@ -49,10 +49,10 @@ const RequirementsFormSchema = z.object({
 });
 
 const RequirementsFilterSchema = z.object({
-	countryType: z.string().min(1, 'Поле обязательно для заполнения'),
-	firstPlacementRoomId: z.string().min(1, 'Поле обязательно для заполнения'),
-	secondPlacementRoomId: z.string().min(1, 'Поле обязательно для заполнения'),
-	buildingType: z.string().min(1, 'Поле обязательно для заполнения'),
+	countryType: z.string(),
+	firstPlacementRoomId: z.string(),
+	secondPlacementRoomId: z.string(),
+	buildingType: z.string(),
 });
 
 type RequirementsDataSchemaType = z.infer<typeof RequirementsSchema>;
