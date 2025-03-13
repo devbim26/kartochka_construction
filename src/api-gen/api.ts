@@ -91,8 +91,6 @@ export interface ConstructionHeaderDto {
 	index?: IndexType;
 	/** @format float */
 	laboratoryIndexValue?: number;
-	/** @format uuid */
-	constructionTypeId?: string;
 	constructionType?: ConstructionTypeDto;
 	/** @format double */
 	rw?: number;
@@ -363,8 +361,8 @@ export interface GetRequirementsWithPaginationParamsQuery {
 	ordering?: string | null;
 	countryType?: CountryType;
 	buildingType?: BuildingType;
-	/** @format uuid */
-	placementRoomId?: string | null;
+	firstPlacementRoomName?: string | null;
+	secondPlacementRoomName?: string | null;
 	standartShortName?: string | null;
 	standartFullName?: string | null;
 	/** @format date */
@@ -926,19 +924,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 */
 		accountRegisterCreate: (
 			data: {
-				PhoneNumber?: string;
-				CompanyName?: string;
-				BankIdNumber?: string;
-				PayersRegistrationNumber?: string;
-				PaymentAccount?: string;
-				BankAddress?: string;
-				CompanyAddress?: string;
-				DirectorFullName?: string;
-				CompanyDescription?: string;
-				AdditionalPhoneNumbers?: string[];
+				phoneNumber?: string;
+				companyName?: string;
+				bankIdNumber?: string;
+				payersRegistrationNumber?: string;
+				paymentAccount?: string;
+				bankAddress?: string;
+				companyAddress?: string;
+				directorFullName?: string;
+				companyDescription?: string;
+				additionalPhoneNumbers?: string[];
 				/** @format binary */
-				FormFile?: File;
-				Password: string;
+				formFile?: File;
+				password: string;
 			},
 			params: RequestParams = {},
 		) =>
@@ -974,18 +972,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 */
 		accountUpdateUpdate: (
 			data: {
-				CompanyName?: string;
-				PhoneNumber?: string;
-				PayersRegistrationNumber?: string;
-				PaymentAccount?: string;
-				BankIdNumber?: string;
-				DirectorFullName?: string;
-				BankAddress?: string;
-				CompanyAddress?: string;
-				CompanyDescription?: string;
-				AdditionalPhoneNumbers?: AdditionalPhoneNumber[];
+				companyName?: string;
+				phoneNumber?: string;
+				payersRegistrationNumber?: string;
+				paymentAccount?: string;
+				bankIdNumber?: string;
+				directorFullName?: string;
+				bankAddress?: string;
+				companyAddress?: string;
+				companyDescription?: string;
+				additionalPhoneNumbers?: AdditionalPhoneNumber[];
 				/** @format binary */
-				FormFile?: File;
+				formFile?: File;
 			},
 			params: RequestParams = {},
 		) =>
@@ -1057,12 +1055,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 */
 		articleCreate: (
 			data: {
-				Title?: string;
-				BodyText?: string;
+				title?: string;
+				bodyText?: string;
 				/** @format date */
-				PublishDate?: string;
+				publishDate?: string;
 				/** @format binary */
-				FormFile?: File;
+				formFile?: File;
 			},
 			params: RequestParams = {},
 		) =>
@@ -1085,13 +1083,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		articleUpdate: (
 			data: {
 				/** @format uuid */
-				Id?: string;
-				Title?: string;
-				BodyText?: string;
+				id?: string;
+				title?: string;
+				bodyText?: string;
 				/** @format date */
-				PublishDate?: string;
+				publishDate?: string;
 				/** @format binary */
-				FormFile?: File;
+				formFile?: File;
 			},
 			params: RequestParams = {},
 		) =>
@@ -1291,11 +1289,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 */
 		issuerCreate: (
 			data: {
-				Name: string;
-				CountryTypes?: CountryType[];
-				WebSite?: string;
+				name: string;
+				countryTypes?: CountryType[];
+				webSite?: string;
 				/** @format binary */
-				FormFile?: File;
+				formFile?: File;
 			},
 			params: RequestParams = {},
 		) =>
@@ -1334,12 +1332,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		issuerUpdate: (
 			data: {
 				/** @format uuid */
-				Id: string;
-				Name: string;
-				Countries?: CountryType[];
-				WebSite?: string;
+				id: string;
+				name: string;
+				countries?: CountryType[];
+				webSite?: string;
 				/** @format binary */
-				FormFile?: File;
+				formFile?: File;
 			},
 			params: RequestParams = {},
 		) =>
@@ -1396,31 +1394,31 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 */
 		materialCreate: (
 			data: {
-				Name?: string;
-				Description?: string;
-				ShortName?: string;
+				name?: string;
+				description?: string;
+				shortName?: string;
 				/** @format float */
-				Density?: number;
+				density?: number;
 				/** @format float */
-				Thickness?: number;
-				CountryTypes?: CountryType[];
+				thickness?: number;
+				countryTypes?: CountryType[];
 				/** @format uuid */
-				IssuerId?: string;
+				issuerId?: string;
 				/** @format binary */
-				FormFile?: File;
+				formFile?: File;
 				/** @format float */
-				MaterialCoefficient?: number;
-				MaterialTypeEnum?: MaterialTypeEnum;
+				materialCoefficient?: number;
+				materialTypeEnum?: MaterialTypeEnum;
 				/** @format float */
-				Velocity?: number;
+				velocity?: number;
 				/** @format float */
-				LossFactor?: number;
+				lossFactor?: number;
 				/** @format float */
-				YoungModulus?: number;
+				youngModulus?: number;
 				/** @format float */
-				Damping?: number;
+				damping?: number;
 				/** @format float */
-				Solid?: number;
+				solid?: number;
 			},
 			params: RequestParams = {},
 		) =>
@@ -1459,31 +1457,31 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		materialUpdate: (
 			data: {
 				/** @format uuid */
-				Id?: string;
-				Name?: string;
-				Description?: string;
+				id?: string;
+				name?: string;
+				description?: string;
 				/** @format float */
-				Density?: number;
+				density?: number;
 				/** @format float */
-				Thickness?: number;
-				Countries?: CountryType[];
+				thickness?: number;
+				countries?: CountryType[];
 				/** @format uuid */
-				IssuerId?: string;
-				MaterialTypeEnum?: MaterialTypeEnum;
+				issuerId?: string;
+				materialTypeEnum?: MaterialTypeEnum;
 				/** @format float */
-				MaterialCoefficient?: number;
+				materialCoefficient?: number;
 				/** @format float */
-				Velocity?: number;
+				velocity?: number;
 				/** @format float */
-				LossFactor?: number;
+				lossFactor?: number;
 				/** @format float */
-				YoungModulus?: number;
+				youngModulus?: number;
 				/** @format float */
-				Damping?: number;
+				damping?: number;
 				/** @format float */
-				Solid?: number;
+				solid?: number;
 				/** @format binary */
-				FormFile?: File;
+				formFile?: File;
 			},
 			params: RequestParams = {},
 		) =>

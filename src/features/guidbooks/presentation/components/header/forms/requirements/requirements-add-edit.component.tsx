@@ -34,7 +34,6 @@ export const RequirementsAddAndEdit = memoize(() => {
 		'buildingType',
 		'firstPlacementRoomId',
 	]);
-
 	const [placementRoomVariants, setPlacementRoomVariants] = useState<SelectOption[]>([]);
 	const [secondRoomVariants, setSecondRoomVariants] = useState<SelectOption[]>([]);
 
@@ -108,7 +107,6 @@ export const RequirementsAddAndEdit = memoize(() => {
 				name={'countryType'}
 				render={({ field }) => (
 					<Select
-						multiple
 						options={[
 							{ label: RuCountryNamesMap.None, value: RuCountryNamesMap.None },
 							...RuCountryNamesSelectValues.filter(
@@ -174,12 +172,7 @@ export const RequirementsAddAndEdit = memoize(() => {
 				name={'constructionType'}
 				render={({ field }) => (
 					<Select
-						onChange={(value) => {
-							construction === ConstructionClass.Floor
-								? () => setValue('noizeImpactIndex', '1')
-								: () => setValue('noizeImpactIndex', '');
-							setValue('constructionType', value as string);
-						}}
+						{...field}
 						options={RuConstructionTypeSelectValues}
 						value={field.value || ''}
 						label={formState.errors?.constructionType?.message || 'Конструкция'}

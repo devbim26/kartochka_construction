@@ -1,5 +1,5 @@
 import type { RequirementDto } from '@api-gen';
-import type { NamedEntity, PaginationState } from '@core';
+import type { PaginationState } from '@core';
 import {
 	convertToPaginatedType,
 	DeleteIcon,
@@ -14,8 +14,10 @@ import {
 import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {
 	convertToClientRequirementData,
+	convertToClientRequirementTableData,
 	convertToServerFilterRequirementData,
 	convertToServerRequirementData,
+	convertToServerRequirementUpdateData,
 } from '@features/guidbooks/converters';
 import {
 	getGuidebooksCreate,
@@ -45,7 +47,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
-import { RequirementsDataConfig, useHeaderForm } from '../../utils';
+import {
+	RequirementsFilterDataConfig,
+	RequirementsFormDataConfig,
+	useHeaderForm,
+} from '../../utils';
 import {
 	GuidbookPageHeaderWrapper,
 	RequirementsAddAndEdit,
@@ -55,7 +61,7 @@ import {
 const RequirementsScreen = () => {
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
-	const [singleRequirement, setSingleRequirement] = useState<Requirement>();
+	const [singleRequirement, setSingleRequirement] = useState<FormRequirement>();
 	const [tableData, setTableData] = useState<Array<Requirement>>([]);
 	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -64,16 +70,16 @@ const RequirementsScreen = () => {
 		name: '',
 	});
 
-	const form = useHeaderForm<FormRequirement>(
+	const form = useHeaderForm<FormRequirement | RequirementFilter>(
 		{
-			filter: RequirementsDataConfig.defaultValues,
-			edit: RequirementsDataConfig.defaultValues,
-			add: RequirementsDataConfig.defaultValues,
+			filter: RequirementsFilterDataConfig.defaultValues,
+			edit: RequirementsFormDataConfig.defaultValues,
+			add: RequirementsFormDataConfig.defaultValues,
 		},
 		{
-			filter: RequirementsDataConfig.schema,
-			edit: RequirementsDataConfig.schema,
-			add: RequirementsDataConfig.schema,
+			filter: RequirementsFilterDataConfig.schema,
+			edit: RequirementsFormDataConfig.schema,
+			add: RequirementsFormDataConfig.schema,
 		},
 	);
 
@@ -124,7 +130,7 @@ const RequirementsScreen = () => {
 		)
 			.pipe(
 				switchMap((response: AxiosResponse) => {
-					const res = convertToPaginatedType(convertToClientRequirementData)(
+					const res = convertToPaginatedType(convertToClientRequirementTableData)(
 						response.data,
 					);
 					return from([res]);
@@ -167,6 +173,7 @@ const RequirementsScreen = () => {
 					});
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно добавлено');
+					setPaginationState(paginationStateDefault);
 					navigate('');
 				}
 			});
@@ -175,7 +182,7 @@ const RequirementsScreen = () => {
 	const handleEditTableData = (data: FormRequirement) => {
 		from(
 			getGuidebooksEdit({
-				data: convertToServerRequirementData(data),
+				data: convertToServerRequirementUpdateData(data),
 				guidebookType: Guidebooks.REQUIREMENT,
 			}),
 		)
@@ -191,6 +198,7 @@ const RequirementsScreen = () => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
 					toast.success('Требование успешно отредактировано');
+					setPaginationState(paginationStateDefault);
 					navigate('');
 				}
 			});
@@ -227,17 +235,18 @@ const RequirementsScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
+					setPaginationState(paginationStateDefault);
 					toast.success('Требование успешно удалено');
 				}
 			});
 	};
 
 	const onSaveHandle = useCallback(() => {
-		handleAddTableData(form.addForm.getValues());
+		handleAddTableData(form.addForm.getValues() as FormRequirement);
 	}, [handleAddTableData, form.addForm.getValues()]);
 
 	const onEditHandle = useCallback(() => {
-		handleEditTableData(form.editForm.getValues());
+		handleEditTableData(form.editForm.getValues() as FormRequirement);
 	}, [handleEditTableData, form.editForm.getValues()]);
 
 	const columns = useMemo(() => {
@@ -294,14 +303,14 @@ const RequirementsScreen = () => {
 				accessorKey: 'firstPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Первое помещение'} />,
 				cell: (info) => {
-					return <SimpleTableCell content={(info.getValue() as NamedEntity).name} />;
+					return <SimpleTableCell content={info.getValue() as string} />;
 				},
 			},
 			{
 				accessorKey: 'secondPlacementRoom',
 				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
 				cell: (info) => {
-					return <SimpleTableCell content={(info.getValue() as NamedEntity).name} />;
+					return <SimpleTableCell content={info.getValue() as string} />;
 				},
 			},
 			{
@@ -357,16 +366,16 @@ const RequirementsScreen = () => {
 					edit: RequirementsAddAndEdit,
 				}}
 			/>
-			{!!tableData.length && (
-				<SimpleTable
-					data={tableData}
-					columns={columns}
-					paginationState={paginationState}
-					onChangePaginationState={(newState) => {
-						handleGetTableData(form.filterForm.getValues(), newState);
-					}}
-				/>
-			)}
+
+			<SimpleTable
+				data={tableData}
+				columns={columns}
+				paginationState={paginationState}
+				onChangePaginationState={(newState) => {
+					handleGetTableData(form.filterForm.getValues(), newState);
+				}}
+			/>
+
 			<DeleteModal
 				isOpen={isModalOpen}
 				onCancel={() => setIsModalOpen(false)}

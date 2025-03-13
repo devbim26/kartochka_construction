@@ -299,16 +299,14 @@ const IssuersScreen = () => {
 					edit: IssuersAddEdit,
 				}}
 			/>
-			{!!tableData.length && (
-				<SimpleTable
-					data={tableData}
-					columns={columns}
-					paginationState={paginationState}
-					onChangePaginationState={(newState) => {
-						handleGetTableData(form.filterForm.getValues(), newState);
-					}}
-				/>
-			)}
+			<SimpleTable
+				data={tableData}
+				columns={columns}
+				paginationState={paginationState}
+				onChangePaginationState={(newState) => {
+					handleGetTableData(form.filterForm.getValues(), newState);
+				}}
+			/>
 			<DeleteModal
 				isOpen={isModalOpen}
 				onCancel={() => setIsModalOpen(false)}

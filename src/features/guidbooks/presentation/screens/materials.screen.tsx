@@ -360,19 +360,19 @@ const MaterialsScreen = () => {
 					edit: MaterialsAddAndEdit,
 				}}
 			/>
-			{!!tableData.length && (
-				<SimpleTable
-					data={tableData}
-					columns={columns}
-					paginationState={paginationState}
-					onChangePaginationState={(newState) => {
-						handleGetTableData(
-							forms.filterForm.getValues() as MaterialsFilterData,
-							newState,
-						);
-					}}
-				/>
-			)}
+
+			<SimpleTable
+				data={tableData}
+				columns={columns}
+				paginationState={paginationState}
+				onChangePaginationState={(newState) => {
+					handleGetTableData(
+						forms.filterForm.getValues() as MaterialsFilterData,
+						newState,
+					);
+				}}
+			/>
+
 			<DeleteModal
 				isOpen={isModalOpen}
 				onCancel={() => setIsModalOpen(false)}
