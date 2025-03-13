@@ -8,7 +8,7 @@ import { twMerge } from 'tailwind-merge';
 
 export const RequirementsFilter = memoize(() => {
 	const form = useFormContext<RequirementFilter>();
-	const { control, formState, register } = form;
+	const { control, formState } = form;
 
 	return (
 		<>
@@ -38,28 +38,30 @@ export const RequirementsFilter = memoize(() => {
 				)}
 			/>
 			<Input
-				{...register('firstPlacementRoomId')}
 				labelClassName={twMerge(
-					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
 					formState.errors.firstPlacementRoomId?.message ? 'text-error' : '',
 				)}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
-				label={formState.errors?.firstPlacementRoomId?.message || 'Первое помещение'}
+				label={formState.errors.firstPlacementRoomId?.message || 'Первое помещение'}
+				error={formState.errors.firstPlacementRoomId?.message}
 				placeholder="Введите первое помещение"
-				max={50}
+				{...form.register('firstPlacementRoomId')}
+				type={'text'}
 			/>
 			<Input
-				{...register('secondPlacementRoomId')}
 				labelClassName={twMerge(
-					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
 					formState.errors.secondPlacementRoomId?.message ? 'text-error' : '',
 				)}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
-				label={formState.errors?.secondPlacementRoomId?.message || 'Второе помещение'}
+				label={formState.errors.secondPlacementRoomId?.message || 'Второе помещение'}
+				error={formState.errors.secondPlacementRoomId?.message}
 				placeholder="Введите второе помещение"
-				max={50}
+				{...form.register('secondPlacementRoomId')}
+				type={'text'}
 			/>
 			<Controller
 				control={control}
