@@ -6,7 +6,8 @@ import {
 	IssuersSchema,
 	MaterialsAddAndEditSchema,
 	MaterialsFilterSchema,
-	RequirementsSchema,
+	RequirementsFilterSchema,
+	RequirementsFormSchema,
 } from './validation';
 
 export const MaterialsAddAndEditConfig: EntityConfig = {
@@ -47,9 +48,9 @@ export const IssuersFilterConfig: EntityConfig = {
 	defaultValues: { name: '', countries: '', webSite: '' },
 };
 
-export const RequirementsDataConfig: EntityConfig = {
-	schema: RequirementsSchema,
-	defaultValues: getSessionStorageData('RequirementsDataConfig') || {
+export const RequirementsFilterDataConfig: EntityConfig = {
+	schema: RequirementsFilterSchema,
+	defaultValues: {
 		region: '',
 		secondPlacementRoom: '',
 		firstPlacementRoom: '',
@@ -59,6 +60,24 @@ export const RequirementsDataConfig: EntityConfig = {
 		class: '',
 		noizeIsolationIndex: '',
 		noizeImpactIndex: '',
+		notice: '',
+		constructionType: '',
+		standartValidityPeriod: '',
+	},
+};
+
+export const RequirementsFormDataConfig: EntityConfig = {
+	schema: RequirementsFormSchema,
+	defaultValues: getSessionStorageData('RequirementsDataConfig') || {
+		region: '',
+		secondPlacementRoom: '',
+		firstPlacementRoom: '',
+		buildingType: '',
+		standartShortName: '',
+		standartFullName: '',
+		class: '',
+		noizeIsolationIndex: '',
+		noizeImpactIndex: '1',
 		notice: '',
 		constructionType: '',
 		standartValidityPeriod: '',

@@ -35,7 +35,6 @@ import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormProvider } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -298,33 +297,19 @@ const IssuersScreen = () => {
 				}}
 				forms={form}
 				formElements={{
-					filter: () => (
-						<FormProvider {...form.filterForm}>
-							<IssuersFilter />
-						</FormProvider>
-					),
-					add: () => (
-						<FormProvider {...form.addForm}>
-							<IssuersAddEdit />
-						</FormProvider>
-					),
-					edit: () => (
-						<FormProvider {...form.editForm}>
-							<IssuersAddEdit />
-						</FormProvider>
-					),
+					filter: IssuersFilter,
+					add: IssuersAddEdit,
+					edit: IssuersAddEdit,
 				}}
 			/>
-			{!!tableData.length && (
-				<SimpleTable
-					data={tableData}
-					columns={columns}
-					paginationState={paginationState}
-					onChangePaginationState={(newState) => {
-						handleGetTableData(form.filterForm.getValues(), newState);
-					}}
-				/>
-			)}
+			<SimpleTable
+				data={tableData}
+				columns={columns}
+				paginationState={paginationState}
+				onChangePaginationState={(newState) => {
+					handleGetTableData(form.filterForm.getValues(), newState);
+				}}
+			/>
 			<DeleteModal
 				isOpen={isModalOpen}
 				onCancel={() => setIsModalOpen(false)}

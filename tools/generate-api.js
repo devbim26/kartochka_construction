@@ -12,6 +12,9 @@ generateApi({
 	output: '../../../src/api-gen',
 	url: apiUrl,
 	httpClientType: 'axios',
+	nameVariants: {
+		patterns: ['camelCase'], // Выбор CamelCase для имен
+	},
 })
 	.then(() => {
 		console.log('API generation completed successfully.');

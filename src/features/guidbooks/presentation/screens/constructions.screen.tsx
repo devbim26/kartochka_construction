@@ -332,19 +332,17 @@ const ConstructionsScreen = () => {
 					edit: ConstructionsEdit,
 				}}
 			/>
-			{!!tableData.length && (
-				<SimpleTable
-					data={tableData}
-					columns={columns}
-					paginationState={paginationState}
-					onChangePaginationState={(newState) => {
-						handleGetTableData(
-							forms.filterForm.getValues() as ConstructionsFilterData,
-							newState,
-						);
-					}}
-				/>
-			)}
+			<SimpleTable
+				data={tableData}
+				columns={columns}
+				paginationState={paginationState}
+				onChangePaginationState={(newState) => {
+					handleGetTableData(
+						forms.filterForm.getValues() as ConstructionsFilterData,
+						newState,
+					);
+				}}
+			/>
 			<DeleteModal
 				isOpen={isModalOpen}
 				onCancel={() => setIsModalOpen(false)}
