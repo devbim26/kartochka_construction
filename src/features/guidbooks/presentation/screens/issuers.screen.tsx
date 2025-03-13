@@ -24,9 +24,10 @@ import {
 	getGuidebooksPaginated,
 	GuidbookPageHeaderWrapper,
 	Guidebooks,
+	IssuersAddAndEditConfig,
 	IssuersAddEdit,
-	IssuersDataConfig,
 	IssuersFilter,
+	IssuersFilterConfig,
 	RuCountryNamesMap,
 	useHeaderForm,
 } from '@features';
@@ -53,14 +54,14 @@ const IssuersScreen = () => {
 
 	const form = useHeaderForm<Issuer>(
 		{
-			filter: IssuersDataConfig.defaultValues,
-			edit: IssuersDataConfig.defaultValues,
-			add: IssuersDataConfig.defaultValues,
+			filter: IssuersFilterConfig.defaultValues,
+			edit: IssuersAddAndEditConfig.defaultValues,
+			add: IssuersAddAndEditConfig.defaultValues,
 		},
 		{
-			filter: IssuersDataConfig.schema,
-			edit: IssuersDataConfig.schema,
-			add: IssuersDataConfig.schema,
+			filter: IssuersFilterConfig.schema,
+			edit: IssuersAddAndEditConfig.schema,
+			add: IssuersAddAndEditConfig.schema,
 		},
 	);
 

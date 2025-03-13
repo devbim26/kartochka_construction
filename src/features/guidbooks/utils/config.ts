@@ -37,9 +37,14 @@ export const MaterialsFilterConfig: EntityConfig = {
 	defaultValues: { name: '', density: '', thickness: '', materialType: '' },
 };
 
-export const IssuersDataConfig: EntityConfig = {
+export const IssuersAddAndEditConfig: EntityConfig = {
 	schema: IssuersSchema,
 	defaultValues: { name: '', countries: '', logoUrl: '', logoFile: '', webSite: '' },
+};
+
+export const IssuersFilterConfig: EntityConfig = {
+	schema: IssuersSchema,
+	defaultValues: { name: '', countries: '', webSite: '' },
 };
 
 export const RequirementsDataConfig: EntityConfig = {
