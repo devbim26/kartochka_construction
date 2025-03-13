@@ -1,6 +1,7 @@
 import {
 	convertToPaginatedType,
 	DeleteIcon,
+	DeleteModal,
 	EditIcon,
 	paginationStateDefault,
 	SimpleTable,
@@ -46,6 +47,11 @@ const MaterialsScreen = () => {
 	const [singleMaterial, setSingleMaterial] = useState<MaterialsAddAndEditData>();
 	const [tableData, setTableData] = useState<Array<MaterialsAddAndEditData>>([]);
 	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [itemToDelete, setItemToDelete] = useState({
+		id: '',
+		name: '',
+	});
 
 	const forms = useHeaderForm(
 		{
@@ -153,18 +159,28 @@ const MaterialsScreen = () => {
 				accessorKey: 'actions',
 				header: () => <SimpleTableHeaderCell text="Действия" />,
 				cell: (info) => {
-					const entityId = info.row.original.id;
 					return (
 						<SimpleTableCell
 							content={
 								<div className="flex gap-2">
 									<EditIcon
 										onClick={() =>
-											navigate('', { edit: 'true', entityId: entityId! })
+											navigate('', {
+												edit: 'true',
+												entityId: info.row.original.id!,
+											})
 										}
 									/>
 									<DeleteIcon
-										onClick={() => handleDeleteTableData(info.row.original.id!)}
+										onClick={() => {
+											{
+												setItemToDelete({
+													id: info.row.original.id!,
+													name: info.row.original.name,
+												});
+											}
+											setIsModalOpen(true);
+										}}
 									/>
 								</div>
 							}
@@ -259,7 +275,7 @@ const MaterialsScreen = () => {
 					});
 
 					handleGetTableData(forms.filterForm.getValues(), paginationState);
-					toast.success('Материал добавлен успешно');
+					toast.success('Материал успешно добавлен');
 					navigate('');
 				}
 			});
@@ -283,7 +299,7 @@ const MaterialsScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(forms.filterForm.getValues(), paginationState);
-					toast.success('Материал отредактирован успешно');
+					toast.success('Материал успешно отредактирован');
 					navigate('');
 				}
 			});
@@ -302,7 +318,7 @@ const MaterialsScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(forms.filterForm.getValues(), paginationState);
-					toast.success('Материал удален успешно');
+					toast.success('Материал успешно удален ');
 				}
 			});
 	};
@@ -370,6 +386,18 @@ const MaterialsScreen = () => {
 					}}
 				/>
 			)}
+			<DeleteModal
+				isOpen={isModalOpen}
+				onCancel={() => setIsModalOpen(false)}
+				onClose={() => setIsModalOpen(false)}
+				onConfirm={() => {
+					handleDeleteTableData(itemToDelete.id);
+					setIsModalOpen(false);
+				}}
+				headerTitle="Подтвердите действие"
+			>
+				Вы уверены, что хотите удалить материал {itemToDelete.name}?
+			</DeleteModal>
 		</div>
 	);
 };

@@ -1,6 +1,7 @@
 import {
 	convertToPaginatedType,
 	DeleteIcon,
+	DeleteModal,
 	EditIcon,
 	paginationStateDefault,
 	SimpleTable,
@@ -53,6 +54,11 @@ const ConstructionsScreen = () => {
 	const [singleMaterial, setSingleMaterial] = useState<ConstructionsEditData>();
 	const [tableData, setTableData] = useState<ConstructionsAddData[]>([]);
 	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [itemToDelete, setItemToDelete] = useState({
+		id: '',
+		name: '',
+	});
 
 	const forms = useHeaderForm(
 		{
@@ -118,20 +124,28 @@ const ConstructionsScreen = () => {
 				accessorKey: 'id',
 				header: () => <SimpleTableHeaderCell text="Действия" />,
 				cell: (info) => {
-					const entityId = info.row.original.id;
 					return (
 						<SimpleTableCell
 							content={
 								<div className="flex gap-2">
 									<EditIcon
 										onClick={() =>
-											navigate('', { edit: 'true', entityId: entityId! })
+											navigate('', {
+												edit: 'true',
+												entityId: info.row.original.id!,
+											})
 										}
 									/>
 									<DeleteIcon
-										onClick={() =>
-											handleDeleteTableData(info.getValue() as string)
-										}
+										onClick={() => {
+											{
+												setItemToDelete({
+													id: info.row.original.id!,
+													name: info.row.original.name,
+												});
+											}
+											setIsModalOpen(true);
+										}}
 									/>
 								</div>
 							}
@@ -230,7 +244,7 @@ const ConstructionsScreen = () => {
 						forms.filterForm.getValues() as ConstructionsFilterData,
 						paginationState,
 					);
-					toast.success('Конструкция добавлена успешно');
+					toast.success('Конструкция успешно добавлена');
 					navigate('');
 				}
 			});
@@ -257,7 +271,7 @@ const ConstructionsScreen = () => {
 						forms.filterForm.getValues() as ConstructionsFilterData,
 						paginationState,
 					);
-					toast.success('Конструкция отредактирована успешно');
+					toast.success('Конструкция успешно отредактирована');
 					navigate('');
 				}
 			});
@@ -279,7 +293,7 @@ const ConstructionsScreen = () => {
 						forms.filterForm.getValues() as ConstructionsFilterData,
 						paginationState,
 					);
-					toast.success('Конструкция удалена успешно');
+					toast.success('Конструкция успешно удалена');
 				}
 			});
 	};
@@ -331,6 +345,18 @@ const ConstructionsScreen = () => {
 					}}
 				/>
 			)}
+			<DeleteModal
+				isOpen={isModalOpen}
+				onCancel={() => setIsModalOpen(false)}
+				onClose={() => setIsModalOpen(false)}
+				onConfirm={() => {
+					handleDeleteTableData(itemToDelete.id);
+					setIsModalOpen(false);
+				}}
+				headerTitle="Подтвердите действие"
+			>
+				Вы уверены, что хотите удалить конструкцию {itemToDelete.name}?
+			</DeleteModal>
 		</div>
 	);
 };

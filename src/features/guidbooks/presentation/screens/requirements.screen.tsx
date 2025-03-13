@@ -1,15 +1,16 @@
 import type { RequirementDto } from '@api-gen';
-import type { NamedEntity } from '@core';
+import type { NamedEntity, PaginationState } from '@core';
 import {
 	convertToPaginatedType,
 	DeleteIcon,
+	DeleteModal,
 	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
-	type PaginationState,
 } from '@core';
+
 import { EditIcon } from '@core/presentation/icons/edit.icon';
 import {
 	convertToClientRequirementData,
@@ -58,6 +59,11 @@ const RequirementsScreen = () => {
 	const [singleRequirement, setSingleRequirement] = useState<Requirement>();
 	const [tableData, setTableData] = useState<Array<Requirement>>([]);
 	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [itemToDelete, setItemToDelete] = useState({
+		id: '',
+		name: '',
+	});
 
 	const form = useHeaderForm<FormRequirement>(
 		{
@@ -311,14 +317,20 @@ const RequirementsScreen = () => {
 										onClick={() =>
 											navigate('', {
 												edit: 'true',
-												entityId: info.getValue() as string,
+												entityId: info.row.original.id!,
 											})
 										}
 									/>
 									<DeleteIcon
-										onClick={() =>
-											handleDeleteTableData(info.getValue() as string)
-										}
+										onClick={() => {
+											{
+												setItemToDelete({
+													id: info.row.original.id!,
+													name: info.row.original.standartFullName,
+												});
+											}
+											setIsModalOpen(true);
+										}}
 									/>
 								</div>
 							}
@@ -368,6 +380,18 @@ const RequirementsScreen = () => {
 					}}
 				/>
 			)}
+			<DeleteModal
+				isOpen={isModalOpen}
+				onCancel={() => setIsModalOpen(false)}
+				onClose={() => setIsModalOpen(false)}
+				onConfirm={() => {
+					handleDeleteTableData(itemToDelete.id);
+					setIsModalOpen(false);
+				}}
+				headerTitle="Подтвердите действие"
+			>
+				Вы уверены, что хотите удалить требование {itemToDelete.name}?
+			</DeleteModal>
 		</div>
 	);
 };
