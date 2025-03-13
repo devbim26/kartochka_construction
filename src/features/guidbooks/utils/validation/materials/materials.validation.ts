@@ -4,10 +4,7 @@ export const MaterialsAddAndEditSchema = z.object({
 	id: z.string().optional(),
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
-	shortName: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => value.length < 10, 'Значение не должно превышать 10 символов'),
+	shortName: z.string().min(1, 'Поле обязательно для заполнения'),
 	density: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
@@ -22,7 +19,8 @@ export const MaterialsAddAndEditSchema = z.object({
 		.min(1, 'Поле обязательно для заполнения'),
 	type: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
-	image: z
+	imageUrl: z.string().min(1, 'Поле обязательно для заполнения'),
+	imageFile: z
 		.any()
 		.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),
 	materialCoefficient: z

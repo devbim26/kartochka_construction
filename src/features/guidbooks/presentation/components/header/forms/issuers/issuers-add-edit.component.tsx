@@ -1,7 +1,7 @@
-import { Button, convertToBase64, FormElementLabel, Input, Select } from '@core';
+import { Button, CheckboxSelect, convertToBase64, FormElementLabel, Input } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type { Issuer } from '@features/guidbooks/types';
-import { RuCountryNamesMap, RuCountryNamesSelectValues } from '@features/guidbooks/types';
+import { RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -15,11 +15,16 @@ export const IssuersAddEdit = memoize(() => {
 			const base64 = await convertToBase64(file);
 			if (base64 && typeof base64 === 'string') {
 				setValue('logoUrl', base64);
+				setValue('logoFile', file);
 			}
 			trigger('logoUrl');
+			trigger('logoFile');
 		}
 	};
-	const logo = watch('logoUrl');
+
+	const logoUrl = watch('logoUrl');
+	console.log(watch('logoFile'));
+
 	return (
 		<>
 			<Input
@@ -50,25 +55,24 @@ export const IssuersAddEdit = memoize(() => {
 				control={control}
 				name={'countries'}
 				render={({ field }) => (
-					<Select
-						multiple
-						options={[
-							{ label: RuCountryNamesMap.None, value: RuCountryNamesMap.None },
-							...RuCountryNamesSelectValues.filter(
-								(reg) => reg.label !== RuCountryNamesMap.None,
-							).sort((a, b) => a.label.localeCompare(b.label)),
-						]}
+					<CheckboxSelect
 						{...field}
 						value={field.value || []}
-						label={formState.errors?.countries?.message || 'Страна'}
-						isSearchable
-						labelClassName={twMerge(
-							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.countries?.message ? 'text-error' : '',
-						)}
+						options={RuCountryNamesSelectValues}
+						searchable
+						multiple
+						classNames={{
+							popover: {
+								buttonClassName: twMerge(
+									formState.errors.countries?.message ? 'ring-error' : '',
+								),
+								labelClassName: twMerge(
+									formState.errors.countries?.message ? 'text-error' : '',
+								),
+							},
+						}}
+						label={formState.errors.countries?.message || 'Страна'}
 						placeholder="Выберите страну"
-						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
 					/>
 				)}
 			/>
@@ -77,18 +81,27 @@ export const IssuersAddEdit = memoize(() => {
 					<FormElementLabel
 						className={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.logoUrl?.message ? 'text-error' : '',
+							formState.errors.logoUrl?.message ||
+								formState.errors.logoFile?.message?.toString()
+								? 'text-error'
+								: '',
 						)}
-						errorMessage={formState.errors.logoUrl?.message?.toString()}
+						errorMessage={
+							formState.errors.logoUrl?.message?.toString() ||
+							formState.errors.logoFile?.message?.toString()
+						}
 					>
-						Логотип
+						Изображение
 					</FormElementLabel>
 					<div className="flex items-center gap-[8px]">
 						<Button
 							variant="primary"
 							className={twMerge(
 								'group flex w-fit flex-row items-center gap-[4px] border-2 border-solid border-primary bg-white',
-								formState.errors.logoUrl?.message ? 'border-error' : '',
+								formState.errors.logoUrl?.message ||
+									formState.errors.logoFile?.message
+									? 'border-error'
+									: '',
 							)}
 							onClick={() => document.getElementById('file-upload')!.click()}
 						>
@@ -105,10 +118,10 @@ export const IssuersAddEdit = memoize(() => {
 						/>
 					</div>
 				</div>
-				{logo && (
+				{logoUrl && (
 					<div className="flex justify-center self-center">
 						<img
-							src={logo}
+							src={logoUrl}
 							alt="Превью изображения"
 							className="size-[60px] rounded-md object-cover"
 						/>

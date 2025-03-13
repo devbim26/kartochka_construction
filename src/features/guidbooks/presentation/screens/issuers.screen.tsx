@@ -11,21 +11,26 @@ import {
 	useAppNavigate,
 	type PaginationState,
 } from '@core';
+import type { Country, Issuer } from '@features';
 import {
 	convertToClientIssuerData,
-	convertToServerCreateIssuerData,
-	convertToServerEditIssuerData,
-	convertToServerIssuerData,
-} from '@features/guidbooks/converters';
-import {
+	convertToServerIssuerAddData,
+	convertToServerIssuerEditData,
+	convertToServerIssuerFilterData,
 	getGuidebooksCreate,
 	getGuidebooksDelete,
 	getGuidebooksDetail,
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
-} from '@features/guidbooks/services';
-import type { Country, Issuer } from '@features/guidbooks/types';
-import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
+	GuidbookPageHeaderWrapper,
+	Guidebooks,
+	IssuersAddAndEditConfig,
+	IssuersAddEdit,
+	IssuersFilter,
+	IssuersFilterConfig,
+	RuCountryNamesMap,
+	useHeaderForm,
+} from '@features';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
@@ -33,8 +38,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
-import { IssuersDataConfig, IssuersFormCofig, useHeaderForm } from '../../utils';
-import { GuidbookPageHeaderWrapper, IssuersAddEdit, IssuersFilter } from '../components';
 
 const IssuersScreen = () => {
 	const navigate = useAppNavigate();
@@ -50,14 +53,14 @@ const IssuersScreen = () => {
 
 	const form = useHeaderForm<Issuer>(
 		{
-			filter: IssuersDataConfig.defaultValues,
-			edit: IssuersFormCofig.defaultValues,
-			add: IssuersFormCofig.defaultValues,
+			filter: IssuersFilterConfig.defaultValues,
+			edit: IssuersAddAndEditConfig.defaultValues,
+			add: IssuersAddAndEditConfig.defaultValues,
 		},
 		{
-			filter: IssuersDataConfig.schema,
-			edit: IssuersFormCofig.schema,
-			add: IssuersFormCofig.schema,
+			filter: IssuersFilterConfig.schema,
+			edit: IssuersAddAndEditConfig.schema,
+			add: IssuersAddAndEditConfig.schema,
 		},
 	);
 
@@ -87,7 +90,7 @@ const IssuersScreen = () => {
 	) => {
 		from(
 			getGuidebooksPaginated({
-				data: convertToServerIssuerData(data),
+				data: convertToServerIssuerFilterData(data),
 				guidebookType: Guidebooks.ISSUER,
 				pagination,
 			}),
@@ -114,7 +117,7 @@ const IssuersScreen = () => {
 	const handleAddTableData = (data: Issuer) => {
 		from(
 			getGuidebooksCreate({
-				data: convertToServerCreateIssuerData(data),
+				data: convertToServerIssuerAddData(data),
 				guidebookType: Guidebooks.ISSUER,
 			}),
 		)
@@ -156,7 +159,7 @@ const IssuersScreen = () => {
 	const handleEditTableData = (data: Issuer) => {
 		from(
 			getGuidebooksEdit({
-				data: convertToServerEditIssuerData(data),
+				data: convertToServerIssuerEditData(data),
 				guidebookType: Guidebooks.ISSUER,
 			}),
 		)
@@ -232,7 +235,7 @@ const IssuersScreen = () => {
 							contentClassName="h-[39px] w-[39px]"
 							content={
 								info.getValue() ? (
-									<img src={info.getValue() as string} className="size-[39px]" />
+									<img src={info.getValue() as string} className="size-fit" />
 								) : (
 									''
 								)

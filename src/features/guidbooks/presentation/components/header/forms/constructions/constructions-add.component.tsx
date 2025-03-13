@@ -9,9 +9,10 @@ import {
 } from '@core';
 import type { ConstructionsAddData, Issuer } from '@features';
 import {
+	ConstructionsAddFieldNames,
 	ConstructionTypeEnum,
+	ConstructionTypeFieldNames,
 	convertToClientIssuerData,
-	DescriptionFieldNames,
 	FormSubTitle,
 	FramePartitionDouble,
 	FramePartitionSingle,
@@ -41,7 +42,7 @@ import { twMerge } from 'tailwind-merge';
 
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();
-	const { formState, control, watch, setValue, register } = form;
+	const { formState, control, watch, setValue, register, trigger } = form;
 	const [displayChars, setDisplayChars] = useState(false);
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionType');
@@ -1308,14 +1309,13 @@ export const ConstructionsAdd = () => {
 				textClassName="font-sans text-[17px] font-normal leading-5 tracking-[0.1px]"
 				offIcon={
 					Object.keys(formState.errors).some((key) =>
-						DescriptionFieldNames.includes(key),
+						ConstructionsAddFieldNames.includes(key),
 					) && <IoMdWarning />
 				}
 				onIcon={
-					!Object.keys(formState.errors).some((key) =>
-						DescriptionFieldNames.includes(key),
-					) &&
-					!!Object.keys(formState.errors).length && <IoMdWarning />
+					Object.keys(formState.errors).some((key) =>
+						ConstructionTypeFieldNames.includes(key),
+					) && <IoMdWarning />
 				}
 				wrapperClassName="h-[30px] w-[400px] self-center p-[3px] bg-primary"
 				onChange={() => setDisplayChars(!displayChars)}
@@ -1532,12 +1532,12 @@ export const ConstructionsAdd = () => {
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.propertySource?.message ? 'text-error' : '',
+								formState.errors.laboratoryTestSource?.message ? 'text-error' : '',
 							)}
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 							containerClassName="w-[226px]"
-							label={formState.errors.propertySource?.message || 'Источник'}
-							error={formState.errors.propertySource?.message}
+							label={formState.errors.laboratoryTestSource?.message || 'Источник'}
+							error={formState.errors.laboratoryTestSource?.message}
 							placeholder="Введите источник"
 							{...register('laboratoryTestSource')}
 							type={'text'}
@@ -1559,6 +1559,7 @@ export const ConstructionsAdd = () => {
 									setValue('constructionType', value as string);
 									if (value)
 										ConstructionTypeMap[value as ConstructionTypeEnum].action();
+									trigger('constructionType');
 								}}
 								options={RuConstructionTypesSelectValues}
 								error={formState.errors.constructionType?.message}
