@@ -135,7 +135,7 @@ const CompanyRegistrationPage = () => {
 						{phoneNumbers &&
 							phoneNumbers.map((phoneNumber, index) => (
 								<PhoneInput
-									key={crypto.randomUUID()}
+									key={index}
 									form={form}
 									index={index}
 									phoneNumber={phoneNumber}
