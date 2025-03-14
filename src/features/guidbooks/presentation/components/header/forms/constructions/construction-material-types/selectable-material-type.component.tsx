@@ -1,11 +1,15 @@
 import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
-import type { ConstructionsAddData, MaterialsFilterData, MaterialTypeEnum } from '@features';
+import type {
+	ConstructionsAddData,
+	MaterialsFilterData,
+	MaterialTypeEnum,
+	MaterialTypesSelectValuesEnum,
+} from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
 	getGuidebooksPaginated,
 	Guidebooks,
-	MaterialTypesSelectValuesEnum,
 	MaterialTypesSelectValuesMap,
 	MaterialTypeValuesMap,
 } from '@features';
@@ -92,13 +96,7 @@ export const SelectableMaterialType = ({
 					<Select
 						{...field}
 						value={field.value || ''}
-						options={[
-							...MaterialTypesSelectValuesMap[materialTypesSelectValues],
-							{
-								label: 'Дополнительные материалы',
-								value: MaterialTypesSelectValuesEnum.Additional,
-							},
-						]}
+						options={[...MaterialTypesSelectValuesMap[materialTypesSelectValues]]}
 						error={
 							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex

@@ -55,7 +55,7 @@ export enum MaterialTypesSelectValuesEnum {
 	Base = 'Base',
 	Facing = 'Facing',
 	Soundproofing = 'Soundproofing',
-	Additional = 'Additional',
+	// Additional = 'Additional',
 	FramePartition = 'Frame Partition',
 	AirGapFiller = 'AirGapFiller',
 }
@@ -63,11 +63,17 @@ export enum MaterialTypesSelectValuesEnum {
 export const MaterialTypesSelectValuesMap = {
 	[MaterialTypesSelectValuesEnum.Base]: [
 		{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
+		//доп материалы
 		{ label: 'Плиты', value: MaterialTypeEnum.Board },
 		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
+		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
 	],
 	[MaterialTypesSelectValuesEnum.Soundproofing]: [
 		{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
+		//доп материалы
+		{ label: 'Плиты', value: MaterialTypeEnum.Board },
+		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
+		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
 	],
 	[MaterialTypesSelectValuesEnum.Facing]: [
 		{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
@@ -75,20 +81,30 @@ export const MaterialTypesSelectValuesMap = {
 		{ label: 'Связующие', value: MaterialTypeEnum.Link },
 		{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
 		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-	],
-	[MaterialTypesSelectValuesEnum.Additional]: [
-		{ label: 'Плиты', value: MaterialTypeEnum.Board },
+		//доп материалы
 		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
 		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
 	],
+	// [MaterialTypesSelectValuesEnum.Additional]: [
+	// 	{ label: 'Плиты', value: MaterialTypeEnum.Board },
+	// 	{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
+	// 	{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	// ],
 	[MaterialTypesSelectValuesEnum.FramePartition]: [
 		{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
 		{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
 		{ label: 'Плиты', value: MaterialTypeEnum.Board },
+		//доп материалы
+		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
+		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
 	],
 	[MaterialTypesSelectValuesEnum.AirGapFiller]: [
 		{ label: 'Воздушные зазоры', value: MaterialTypeEnum.AirGap },
 		{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
+		//доп материалы
+		{ label: 'Плиты', value: MaterialTypeEnum.Board },
+		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
+		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
 	],
 };
 
