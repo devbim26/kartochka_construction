@@ -32,7 +32,6 @@ export const GuidbookPageHeaderWrapper = memoize(
 		const navigate = useAppNavigate();
 		const [search] = useSearchParams();
 		const onCancelHandle = useCallback(() => {
-			currentForm.reset();
 			navigate('');
 			setCurrentHeaderFormType(HeaderFormTypes.filter);
 		}, []);
@@ -59,6 +58,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 			else if (currentHeaderFormType === HeaderFormTypes.filter)
 				setCurrentForm(forms.filterForm);
 			else if (currentHeaderFormType === HeaderFormTypes.edit) setCurrentForm(forms.editForm);
+			currentForm.reset();
 		}, [currentHeaderFormType]);
 
 		const submitHandle = useCallback(() => {

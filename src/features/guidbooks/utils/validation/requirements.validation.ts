@@ -94,8 +94,8 @@ const RequirementsFormSchema = z
 
 const RequirementsFilterSchema = z.object({
 	countryType: z.string(),
-	firstPlacementRoomId: z.string(),
-	secondPlacementRoomId: z.string(),
+	firstPlacementRoom: z.string(),
+	secondPlacementRoom: z.string(),
 	buildingType: z.string(),
 });
 

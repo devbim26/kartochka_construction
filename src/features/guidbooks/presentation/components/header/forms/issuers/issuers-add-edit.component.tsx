@@ -23,7 +23,6 @@ export const IssuersAddEdit = memoize(() => {
 	};
 
 	const logoUrl = watch('logoUrl');
-	console.log(watch('logoFile'));
 
 	return (
 		<>

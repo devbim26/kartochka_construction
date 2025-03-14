@@ -16,6 +16,7 @@ interface PopoverProps {
 	bodyClassName?: string;
 	hidePadding?: boolean;
 	buttonClassName?: string;
+	containerClassName?: string;
 	triggerOn?: 'click' | 'hover';
 	anchor?: Anchor;
 }
@@ -31,6 +32,7 @@ export const Popover = memoize(
 		hidePadding,
 		bodyClassName,
 		buttonClassName,
+		containerClassName,
 		anchor = 'bottom',
 		triggerOn = 'click',
 	}: PopoverProps) => {
@@ -51,6 +53,7 @@ export const Popover = memoize(
 					<div
 						onMouseEnter={() => handleEnter(open)}
 						onMouseLeave={() => handleLeave(open)}
+						className={containerClassName}
 					>
 						<PopoverButton
 							className={twMerge('focus:outline-none', buttonClassName)}

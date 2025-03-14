@@ -38,9 +38,7 @@ export const convertToClientRequirementData = (data: RequirementDto): FormRequir
 	standartShortName: data.standartShortName ?? '',
 	standartFullName: data.standartFullName ?? '',
 	countryType: convertToClientCountryData(data.countryType!)! as string,
-	standartValidityPeriod: data.standartValidityPeriod
-		? data.standartValidityPeriod.split('-').reverse().join('-')
-		: '',
+	standartValidityPeriod: data.standartValidityPeriod!.split('-').reverse().join('-'),
 	class: convertToClientCategoryClassData(data.class!)! as string,
 	noizeIsolationIndex: String(data.noizeIsolationIndex),
 	noizeImpactIndex: String(data.noizeImpactIndex),
@@ -146,8 +144,8 @@ export const convertToServerRequirementUpdateData = (
 export const convertToServerFilterRequirementData = (
 	data: RequirementFilter,
 ): GetRequirementsWithPaginationParamsQuery => ({
-	firstPlacementRoomName: data.firstPlacementRoomId || null,
-	secondPlacementRoomName: data.secondPlacementRoomId || null,
+	firstPlacementRoomName: data.firstPlacementRoom || null,
+	secondPlacementRoomName: data.secondPlacementRoom || null,
 	buildingType: buildingTypeMap.toServer[data.buildingType as ClientBuildingType] || null,
 	countryType: (convertToServerCountryData(data.countryType as Country) as CountryType) || null,
 });

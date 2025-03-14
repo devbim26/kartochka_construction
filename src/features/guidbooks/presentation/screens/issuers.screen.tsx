@@ -232,10 +232,13 @@ const IssuersScreen = () => {
 				cell: (info) => {
 					return (
 						<SimpleTableCell
-							contentClassName="h-[39px] w-[39px]"
+							contentClassName="flex items-center size-[80px]"
 							content={
 								info.getValue() ? (
-									<img src={info.getValue() as string} className="size-fit" />
+									<img
+										src={info.getValue() as string}
+										className="size-fit rounded-lg"
+									/>
 								) : (
 									''
 								)

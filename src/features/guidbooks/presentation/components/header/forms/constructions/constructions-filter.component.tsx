@@ -45,7 +45,7 @@ export const ConstructionsFilter = () => {
 				type={'text'}
 			/>
 			<Controller
-				name="constructionTypeId"
+				name="constructionType"
 				control={control}
 				render={({ field }) => (
 					<Select
@@ -56,14 +56,14 @@ export const ConstructionsFilter = () => {
 							label: data.shortName ?? '',
 							value: data.shortName ?? '',
 						}))}
-						error={formState.errors.constructionTypeId?.message}
+						error={formState.errors.constructionType?.message}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px]',
-							formState.errors.constructionTypeId?.message ? 'text-error' : '',
+							formState.errors.constructionType?.message ? 'text-error' : '',
 						)}
 						wrapperClassname="w-fit min-w-[226px] ring-input-border-primary"
 						buttonClassName="text-sm rounded-[8px]"
-						label={formState.errors.constructionTypeId?.message || 'Тип конструкции'}
+						label={formState.errors.constructionType?.message || 'Тип конструкции'}
 						placeholder="Выберите тип"
 					/>
 				)}

@@ -1335,6 +1335,7 @@ export const ConstructionsAdd = () => {
 							error={formState.errors.name?.message}
 							placeholder="Введите название"
 							{...register('name')}
+							disabled
 							type={'text'}
 						/>
 						<Input

@@ -4,6 +4,7 @@ import {
 	DeleteModal,
 	EditIcon,
 	paginationStateDefault,
+	ShortenedTextCell,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
@@ -73,10 +74,13 @@ const MaterialsScreen = () => {
 				cell: (info) => {
 					return (
 						<SimpleTableCell
-							contentClassName="h-[39px] w-[39px]"
+							contentClassName="flex size-[80px] items-center"
 							content={
 								info.row.original.imageUrl ? (
-									<img src={info.row.original.imageUrl} className="size-fit" />
+									<img
+										src={info.row.original.imageUrl}
+										className="size-fit rounded-lg"
+									/>
 								) : (
 									''
 								)
@@ -98,7 +102,15 @@ const MaterialsScreen = () => {
 			{
 				accessorKey: 'description',
 				header: () => <SimpleTableHeaderCell text="Описание" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => (
+					<ShortenedTextCell
+						classNames={{
+							textClassName: 'max-w-[100px]',
+							containerClassName: 'justify-center',
+						}}
+						text={info.getValue() as string}
+					/>
+				),
 			},
 			{
 				accessorKey: 'materialType',

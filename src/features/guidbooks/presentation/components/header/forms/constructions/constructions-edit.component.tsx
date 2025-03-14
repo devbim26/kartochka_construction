@@ -1335,6 +1335,7 @@ export const ConstructionsEdit = () => {
 							label={formState.errors.name?.message || 'Название конструкции'}
 							error={formState.errors.name?.message}
 							placeholder="Введите название"
+							disabled
 							{...register('name')}
 							type={'text'}
 						/>

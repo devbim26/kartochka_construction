@@ -108,7 +108,7 @@ const RequirementsScreen = () => {
 	}, [singleRequirement]);
 
 	useEffect(() => {
-		handleGetTableData(form.filterForm.getValues(), paginationState);
+		handleGetTableData(form.filterForm.getValues() as RequirementFilter, paginationState);
 	}, [
 		filterCountry,
 		filterConstructionType,
@@ -171,7 +171,10 @@ const RequirementsScreen = () => {
 							sessionStorage.setItem(key, JSON.stringify(value));
 						}
 					});
-					handleGetTableData(form.filterForm.getValues(), paginationState);
+					handleGetTableData(
+						form.filterForm.getValues() as RequirementFilter,
+						paginationState,
+					);
 					toast.success('Требование успешно добавлено');
 					setPaginationState(paginationStateDefault);
 					navigate('');
@@ -196,7 +199,10 @@ const RequirementsScreen = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					handleGetTableData(form.filterForm.getValues(), paginationState);
+					handleGetTableData(
+						form.filterForm.getValues() as RequirementFilter,
+						paginationState,
+					);
 					toast.success('Требование успешно отредактировано');
 					setPaginationState(paginationStateDefault);
 					navigate('');
@@ -234,7 +240,10 @@ const RequirementsScreen = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					handleGetTableData(form.filterForm.getValues(), paginationState);
+					handleGetTableData(
+						form.filterForm.getValues() as RequirementFilter,
+						paginationState,
+					);
 					setPaginationState(paginationStateDefault);
 					toast.success('Требование успешно удалено');
 				}
@@ -372,7 +381,7 @@ const RequirementsScreen = () => {
 				columns={columns}
 				paginationState={paginationState}
 				onChangePaginationState={(newState) => {
-					handleGetTableData(form.filterForm.getValues(), newState);
+					handleGetTableData(form.filterForm.getValues() as RequirementFilter, newState);
 				}}
 			/>
 

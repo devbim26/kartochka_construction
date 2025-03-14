@@ -34,7 +34,7 @@ module.exports = {
 				use: {
 					loader: 'ts-loader',
 					options: {
-						transpileOnly: false,
+						transpileOnly: true, //false
 						compilerOptions: {
 							sourceMap: runStatus === 'development',
 						},
@@ -109,7 +109,7 @@ module.exports = {
 		port: 3000,
 		historyApiFallback: true,
 		client: {
-			logging: 'info',
+			logging: 'error', //info
 		},
 		devMiddleware: {
 			stats: 'minimal',
