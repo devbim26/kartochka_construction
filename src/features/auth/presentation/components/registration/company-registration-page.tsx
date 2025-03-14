@@ -88,7 +88,7 @@ const CompanyRegistrationPage = () => {
 	useEffect(() => {
 		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.registration.fetch_name &&
 			navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.login.route);
-	}, [authData.fetch_data?.fetch_name]);
+	}, [authData.fetch_data]);
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
@@ -206,6 +206,7 @@ const CompanyRegistrationPage = () => {
 						{...form.register('payersRegistrationNumber')}
 						type={'number'}
 						placeholder="Введите УНП"
+						max={9}
 					/>
 					<Input
 						label={formState.errors.paymentAccount?.message || 'Расчетный счет'}
@@ -216,6 +217,7 @@ const CompanyRegistrationPage = () => {
 						{...form.register('paymentAccount')}
 						type={'text'}
 						placeholder="Введите расчетный счет"
+						max={20}
 					/>
 					<Input
 						label={formState.errors.bankIdNumber?.message || 'БИК'}
@@ -224,6 +226,7 @@ const CompanyRegistrationPage = () => {
 						{...form.register('bankIdNumber')}
 						type={'text'}
 						placeholder="Введите  БИК"
+						max={9}
 					/>
 
 					<Input

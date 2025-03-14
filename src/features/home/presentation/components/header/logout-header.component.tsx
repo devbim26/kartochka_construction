@@ -1,17 +1,18 @@
 import { useAppDispatch, useAppNavigate, useAppSelector } from '@core';
+import { ACCOUNT_FETCH_ROUTES, logout } from '@features/account';
 import { useEffect } from 'react';
 import { ImExit } from 'react-icons/im';
-import { AUTH_FETCH_ROUTES, logout } from '../../../../auth';
 
 export const LogoutHeader = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
-	const authData = useAppSelector((store) => store.authData);
+	const userData = useAppSelector((store) => store.userData);
 
 	useEffect(() => {
-		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.logout.fetch_name &&
-			navigate('/auth' + '/');
-	}, [authData.fetch_data?.fetch_name]);
+		if (userData.fetch_data?.fetch_name === ACCOUNT_FETCH_ROUTES.logout.fetch_name) {
+			navigate('/landing');
+		}
+	}, [userData.fetch_data]);
 
 	const logoutHandler = () => {
 		dispatch(logout());
@@ -19,13 +20,21 @@ export const LogoutHeader = () => {
 
 	return (
 		<div className="flex flex-row items-center gap-[21px]">
-			<p className="text-sm font-normal leading-5 tracking-tight text-[#14181F]">Admin</p>
-			<div
-				className="relative size-[32px] cursor-pointer rounded-lg border border-solid border-[#EDEFF2]"
-				onClick={logoutHandler}
-			>
-				<ImExit className="absolute left-[6px] top-[6px] size-[20px]" />
-			</div>
+			{userData.data ? (
+				<>
+					<p className="text-sm font-normal leading-5 tracking-tight text-[#14181F]">
+						{userData.data.companyName}
+					</p>
+					<div
+						className="relative size-[32px] cursor-pointer rounded-lg border border-solid border-[#EDEFF2]"
+						onClick={logoutHandler}
+					>
+						<ImExit className="absolute left-[6px] top-[6px] size-[20px]" />
+					</div>
+				</>
+			) : (
+				<></>
+			)}
 		</div>
 	);
 };
