@@ -1,16 +1,13 @@
 import { createAsyncCases, type SliceInitialState } from '@core/utils/fetch/create-cases.util';
 import { createSlice } from '@reduxjs/toolkit';
-import { getCurrentUser, updateUser } from '../services';
+import { getCurrentUser, logout, updateUser } from '../services';
+import type { AccountData } from '../types';
 import { accountReducer } from './account.reducer';
 
-export interface AccountDataState {
-	isAuth: boolean;
-	user_id: string;
-	user_role: string;
-}
+export type AccountDataState = AccountData;
 
 export interface AccountSliceState extends SliceInitialState {
-	data: AccountDataState;
+	data: AccountDataState | null;
 }
 
 const initialState: AccountSliceState = {
@@ -21,11 +18,7 @@ const initialState: AccountSliceState = {
 	loading: false,
 	status: 0,
 	error: null,
-	data: {
-		isAuth: false,
-		user_id: '',
-		user_role: '',
-	},
+	data: null,
 };
 
 export const accountSlice = createSlice({
@@ -41,5 +34,8 @@ export const accountSlice = createSlice({
 		createAsyncCases(builder, updateUser, (state: AccountSliceState, action) =>
 			console.log(action.payload),
 		);
+		createAsyncCases(builder, logout, (state: AccountSliceState, action) => {
+			console.log(action.payload);
+		});
 	},
 });
