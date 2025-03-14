@@ -167,6 +167,16 @@ const MaterialsScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
+				accessorKey: 'damping',
+				header: () => <SimpleTableHeaderCell text="Коэффициент демпфирования" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'solid',
+				header: () => <SimpleTableHeaderCell text="Полнотелость %" />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
 				accessorKey: 'actions',
 				header: () => <SimpleTableHeaderCell text="Действия" />,
 				cell: (info) => {

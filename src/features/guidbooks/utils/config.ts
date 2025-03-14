@@ -40,7 +40,7 @@ export const MaterialsFilterConfig: EntityConfig = {
 
 export const IssuersAddAndEditConfig: EntityConfig = {
 	schema: IssuersSchema,
-	defaultValues: { name: '', countries: '', logoUrl: '', logoFile: '', webSite: '' },
+	defaultValues: { name: '', countries: [], logoUrl: '', logoFile: '', webSite: '' },
 };
 
 export const IssuersFilterConfig: EntityConfig = {

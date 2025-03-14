@@ -209,24 +209,6 @@ const IssuersScreen = () => {
 	const columns = useMemo(() => {
 		const cols: ColumnDef<Issuer>[] = [
 			{
-				accessorKey: 'name',
-				header: () => <SimpleTableHeaderCell text={'Производитель'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
-			},
-			{
-				accessorKey: 'countries',
-				header: () => <SimpleTableHeaderCell text={'Страна'} />,
-				cell: (info) => {
-					return (
-						<SimpleTableCell
-							content={info.row.original.countries
-								.map((ct) => RuCountryNamesMap[ct as Country])
-								.join(', ')}
-						/>
-					);
-				},
-			},
-			{
 				accessorKey: 'logoUrl',
 				header: () => <SimpleTableHeaderCell text={'Логотип'} />,
 				cell: (info) => {
@@ -248,9 +230,40 @@ const IssuersScreen = () => {
 				},
 			},
 			{
+				accessorKey: 'name',
+				header: () => <SimpleTableHeaderCell text={'Производитель'} />,
+				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+			},
+			{
+				accessorKey: 'countries',
+				header: () => <SimpleTableHeaderCell text={'Страна'} />,
+				cell: (info) => {
+					return (
+						<SimpleTableCell
+							content={info.row.original.countries
+								.map((ct) => RuCountryNamesMap[ct as Country])
+								.join(', ')}
+						/>
+					);
+				},
+			},
+			{
 				accessorKey: 'webSite',
 				header: () => <SimpleTableHeaderCell text={'Сайт'} />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => (
+					<SimpleTableCell
+						content={
+							<a
+								href={info.getValue() as string}
+								target="_blank"
+								style={{ color: 'blue', textDecoration: 'underline' }}
+								rel="noreferrer"
+							>
+								{info.getValue() as string}
+							</a>
+						}
+					/>
+				),
 			},
 			{
 				accessorKey: 'id',
