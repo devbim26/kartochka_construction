@@ -34,7 +34,7 @@ export type ConstructionTypeSchemaType = z.infer<typeof ConstructionTypeShema>;
 
 export const ConstructionsAddSchema = z.object({
 	id: z.string().optional(),
-	name: z.string().min(1, 'Поле обязательно для заполнения'),
+	name: z.string().optional().nullable(),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	priority: z.string().min(1, 'Поле обязательно для заполнения'),
 	descriptionSource: z.string().min(1, 'Поле обязательно для заполнения'),

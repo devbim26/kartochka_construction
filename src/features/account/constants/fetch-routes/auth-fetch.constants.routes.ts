@@ -10,4 +10,9 @@ export const ACCOUNT_FETCH_ROUTES = {
 		fetch_name: 'updateAccount',
 		async_thunk_route: 'account/update',
 	},
+	logout: {
+		url: `${process.env.REACT_APP_API_URL}/logout`,
+		fetch_name: 'logout',
+		async_thunk_route: 'logout',
+	},
 };

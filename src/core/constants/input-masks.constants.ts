@@ -1,5 +1,5 @@
 export const phoneNumberMask = {
-	mask: '+375 (__) ___-__-__',
+	mask: '+375(__)___-__-__',
 	replacement: { _: /\d/ },
 	showMask: true,
 };

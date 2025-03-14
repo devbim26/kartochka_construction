@@ -19,6 +19,7 @@ export function createAsyncCases<T extends SliceInitialState>(
 	onError?: (state: Draft<T>, action: PayloadAction<any>) => void,
 ) {
 	const handleSuccess = (state: Draft<T>, action: PayloadAction<any>) => {
+		console.log(action.payload);
 		state.fetch_data = action.payload.fetch_data;
 		state.status = action.payload.status;
 		if (action.payload.status === 200) {
@@ -53,7 +54,11 @@ export function createAsyncCases<T extends SliceInitialState>(
 	builder
 		.addCase(asyncThunk.pending, (state: Draft<T>) => {
 			state.loading = true;
+			console.log(123);
 		})
-		.addCase(asyncThunk.fulfilled, (state: Draft<T>, action) => handleSuccess(state, action))
+		.addCase(asyncThunk.fulfilled, (state: Draft<T>, action) => {
+			console.log(action);
+			handleSuccess(state, action);
+		})
 		.addCase(asyncThunk.rejected, (state: Draft<T>, action) => handleError(state, action));
 }

@@ -1,13 +1,20 @@
-import type { AccountDto } from '@api-gen';
 import type { AccountData } from '../types';
 
-export const convertToServerAccountData = (data: AccountData): AccountDto => ({
-	...data,
-	additionalPhoneNumbers: data.phoneNumbers.map((ph) => ({
-		number: ph.number.replaceAll(' ', ''),
-		id: ph.id,
-	})),
-	phoneNumber: data.mainPhoneNumber.replaceAll(' ', ''),
-	companyDescription: data.compannyInfo,
-	logoUrl: data.companyLogo,
-});
+export const convertToServerAccountData = (data: AccountData) => {
+	return {
+		companyName: data.companyName!,
+		phoneNumber: data.mainPhoneNumber?.replaceAll(' ', ''),
+		payersRegistrationNumber: data.payersRegistrationNumber!,
+		paymentAccount: data.paymentAccount!,
+		bankIdNumber: data.bankIdNumber!,
+		directorFullName: data.directorFullName!,
+		bankAddress: data.bankAddress!,
+		companyAddress: data.companyAddress!,
+		companyDescription: data.compannyInfo!,
+		additionalPhoneNumbers: data.phoneNumbers.map((ph) => ({
+			number: ph.number.replaceAll(' ', ''),
+			id: ph.id,
+		})),
+		formFile: data.formFile || null,
+	};
+};
