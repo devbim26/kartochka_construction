@@ -20,11 +20,11 @@ export const HeavySingleLayerWallComponent = () => {
 		zeroValue: '',
 		twoValue: '',
 	});
-	const [userMaterials, userMaterialTypes, constructions] = watch([
+	const [userMaterials, constructions] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
-		'constructionTypeObject.constructions.0.userMaterialTypes',
 		'constructionTypeObject.constructions',
 	]);
+	const materialTypes = userMaterials!.map((m) => m.materialType);
 
 	useEffect(() => {
 		//TODO: хуйня
@@ -34,8 +34,8 @@ export const HeavySingleLayerWallComponent = () => {
 			twoIndex: userMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zeroValue: userMaterialTypes?.find((c) => c.positionId === '0')?.value ?? '',
-			twoValue: userMaterialTypes?.find((c) => c.positionId === '2')?.value ?? '',
+			zeroValue: userMaterials?.find((c) => c.positionId === '0')?.materialType ?? '',
+			twoValue: userMaterials?.find((c) => c.positionId === '2')?.materialType ?? '',
 		});
 	}, [userMaterials, constructions]);
 
@@ -46,11 +46,12 @@ export const HeavySingleLayerWallComponent = () => {
 					onClick={() => {
 						setValue('constructionTypeObject.constructions.0.userMaterials', [
 							...(userMaterials || []),
-							{ positionId: '0', materialId: '', materialTypeValue: [] },
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{ positionId: '0', value: '' },
+							{
+								positionId: '0',
+								materialId: '',
+								materialType: currentMaterialTypes.zeroValue,
+								materialTypeValue: [],
+							},
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
@@ -102,11 +103,12 @@ export const HeavySingleLayerWallComponent = () => {
 					onClick={() => {
 						setValue('constructionTypeObject.constructions.0.userMaterials', [
 							...(userMaterials || []),
-							{ positionId: '2', materialId: '', materialTypeValue: [] },
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{ positionId: '2', value: '' },
+							{
+								positionId: '2',
+								materialId: '',
+								materialType: currentMaterialTypes.twoValue,
+								materialTypeValue: [],
+							},
 						]);
 					}}
 					className="size-[40px] self-center text-primary"

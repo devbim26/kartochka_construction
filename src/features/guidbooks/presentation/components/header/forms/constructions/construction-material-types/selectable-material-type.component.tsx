@@ -32,7 +32,7 @@ export const SelectableMaterialType = ({
 	const { formState, control, watch, setValue } = form;
 	const [materials, setMaterials] = useState<Array<SelectOption>>();
 	const [currentMaterialType, userMaterials] = watch([
-		`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`,
+		`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialType`,
 		`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
 	]);
 
@@ -72,6 +72,7 @@ export const SelectableMaterialType = ({
 					? {
 							positionId: String(positionId),
 							materialId: '',
+							materialType: currentMaterialType as MaterialTypeEnum,
 							materialTypeValue:
 								MaterialTypeValuesMap[currentMaterialType as MaterialTypeEnum],
 						}
@@ -80,10 +81,12 @@ export const SelectableMaterialType = ({
 		);
 	}, [currentMaterialType]);
 
+	console.log(currentMaterialType);
+
 	return (
 		<div className="flex flex-wrap gap-[16px]">
 			<Controller
-				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`}
+				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialType`}
 				control={control}
 				render={({ field }) => (
 					<Select
@@ -99,13 +102,13 @@ export const SelectableMaterialType = ({
 						error={
 							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterialTypes?.[fieldIndex]?.value?.message
+							]?.userMaterials?.[fieldIndex]?.materialType?.message
 						}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
 							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
-							]?.userMaterialTypes?.[fieldIndex]?.value?.message
+							]?.userMaterials?.[fieldIndex]?.materialType?.message
 								? 'text-error'
 								: '',
 						)}
