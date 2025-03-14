@@ -51,7 +51,7 @@ const CodeConfirmPage = () => {
 			navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.company_registration.route, {
 				phoneNumber: form.getValues('phoneNumber'),
 			});
-	}, [authData.fetch_data?.fetch_name]);
+	}, [authData.fetch_data]);
 
 	const onSubmit = (type: string) => {
 		type === 'code'

@@ -30,9 +30,4 @@ export const AUTH_FETCH_ROUTES = {
 		fetch_name: 'fileupload',
 		async_thunk_route: 'fileupload',
 	},
-	logout: {
-		url: `${process.env.REACT_APP_API_URL}/logout`,
-		fetch_name: 'logout',
-		async_thunk_route: 'logout',
-	},
 };

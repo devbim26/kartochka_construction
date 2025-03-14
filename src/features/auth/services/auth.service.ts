@@ -15,7 +15,8 @@ export const authLogin = createAsyncThunk(
 				toast.success('Авторизация прошла успешно');
 			}
 			return {
-				payload: response.data,
+				status: response.status,
+				data: response.data,
 				fetch_data: {
 					group: AUTH_FETCH_ROUTES.group,
 					fetch_name: AUTH_FETCH_ROUTES.login.fetch_name,
@@ -42,7 +43,8 @@ export const authRegistration = createAsyncThunk(
 				toast.success('Регистрация прошла успешно');
 			}
 			return {
-				payload: response.data,
+				status: response.status,
+				data: response.data,
 				fetch_data: {
 					group: AUTH_FETCH_ROUTES.group,
 					fetch_name: AUTH_FETCH_ROUTES.registration.fetch_name,
@@ -68,7 +70,8 @@ export const smsCodeRequest = createAsyncThunk(
 				toast.success('Код подтверждения был отправлен на ваш номер телефона');
 			}
 			return {
-				payload: response.data,
+				status: response.status,
+				data: response.data,
 				fetch_data: {
 					group: AUTH_FETCH_ROUTES.group,
 					fetch_name: AUTH_FETCH_ROUTES.sms.fetch_name,
@@ -94,36 +97,11 @@ export const smsCodeApprove = createAsyncThunk(
 				toast.success('Номер телефона успешно подтвержден');
 			}
 			return {
-				payload: response.data,
+				status: response.status,
+				data: response.data,
 				fetch_data: {
 					group: AUTH_FETCH_ROUTES.group,
 					fetch_name: AUTH_FETCH_ROUTES.smsApprove.fetch_name,
-				},
-			};
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				toast.error(error.response?.data);
-				return thunkAPI.rejectWithValue({ error: error.message });
-			}
-			toast.error('Неизвестная ошибка');
-			return thunkAPI.rejectWithValue({ error: 'Unknown error' });
-		}
-	},
-);
-
-export const logout = createAsyncThunk(
-	AUTH_FETCH_ROUTES.logout.async_thunk_route,
-	async (_, thunkAPI) => {
-		try {
-			const response = await fetchApi.api.authLogoutCreate();
-			if (response.status === 200) {
-				toast.success('Выход из аккаунта прошел успешно');
-			}
-			return {
-				payload: response.data,
-				fetch_data: {
-					group: AUTH_FETCH_ROUTES.group,
-					fetch_name: AUTH_FETCH_ROUTES.fileUpload.fetch_name,
 				},
 			};
 		} catch (error) {

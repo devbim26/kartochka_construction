@@ -9,6 +9,7 @@ import {
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
+import { getCurrentUser } from '@features/account';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import { useEffect, useState } from 'react';
@@ -26,9 +27,11 @@ const LoginPage = () => {
 	const authData = useAppSelector((store) => store.authData);
 
 	useEffect(() => {
-		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name &&
-			navigate(APP_ROUTES.designing.route);
-	}, [authData.fetch_data?.fetch_name]);
+		if (authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name) {
+			dispatch(getCurrentUser());
+			navigate(APP_ROUTES.landing.route);
+		}
+	}, [authData.fetch_data]);
 
 	const form = useForm<LoginFormData>({
 		resolver: zodResolver(LoginFormDataConfig.schema),
