@@ -50,19 +50,13 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 		});
 	const [
 		topSoundproofingUserMaterials,
-		topSoundproofingUserMaterialTypes,
 		baseUserMaterials,
-		baseUserMaterialTypes,
 		bottomSoundproofingUserMaterials,
-		bottomSoundproofingUserMaterialTypes,
 		constructions,
 	] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
-		'constructionTypeObject.constructions.0.userMaterialTypes',
 		'constructionTypeObject.constructions.1.userMaterials',
-		'constructionTypeObject.constructions.1.userMaterialTypes',
 		'constructionTypeObject.constructions.2.userMaterials',
-		'constructionTypeObject.constructions.2.userMaterialTypes',
 		'constructionTypeObject.constructions',
 	]);
 
@@ -89,21 +83,23 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 				bottomSoundproofingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
 		});
 		setCurrentBaseMaterialTypes({
-			zeroValue: baseUserMaterialTypes?.find((c) => c.positionId === '0')?.value ?? '',
-			twoValue: baseUserMaterialTypes?.find((c) => c.positionId === '2')?.value ?? '',
+			zeroValue: baseUserMaterials?.find((c) => c.positionId === '0')?.materialType ?? '',
+			twoValue: baseUserMaterials?.find((c) => c.positionId === '2')?.materialType ?? '',
 		});
 		setCurrentTopSoundproofingMaterialTypes({
 			twoValue:
-				topSoundproofingUserMaterialTypes?.find((c) => c.positionId === '2')?.value ?? '',
+				topSoundproofingUserMaterials?.find((c) => c.positionId === '2')?.materialType ??
+				'',
 			threeValue:
-				topSoundproofingUserMaterialTypes?.find((c) => c.positionId === '3')?.value ?? '',
+				topSoundproofingUserMaterials?.find((c) => c.positionId === '3')?.materialType ??
+				'',
 		});
 		setCurrentBottomSoundproofingMaterialTypes({
 			twoValue:
-				bottomSoundproofingUserMaterialTypes?.find((c) => c.positionId === '2')?.value ??
+				bottomSoundproofingUserMaterials?.find((c) => c.positionId === '2')?.materialType ??
 				'',
 			threeValue:
-				bottomSoundproofingUserMaterialTypes?.find((c) => c.positionId === '3')?.value ??
+				bottomSoundproofingUserMaterials?.find((c) => c.positionId === '3')?.materialType ??
 				'',
 		});
 	}, [
@@ -124,14 +120,8 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '3',
 									materialId: '',
+									materialType: currentTopSoundproofingMaterialTypes.threeValue,
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-								...(topSoundproofingUserMaterialTypes || []),
-								{
-									positionId: '3',
-									value: '',
 								},
 							]);
 						}}
@@ -183,14 +173,9 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
+									materialType: currentTopSoundproofingMaterialTypes.twoValue,
+
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-								...(topSoundproofingUserMaterialTypes || []),
-								{
-									positionId: '2',
-									value: '',
 								},
 							]);
 						}}
@@ -270,14 +255,8 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
+									materialType: currentBaseMaterialTypes.zeroValue,
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
-								...(baseUserMaterialTypes || []),
-								{
-									positionId: '0',
-									value: '',
 								},
 							]);
 						}}
@@ -340,14 +319,9 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
+									materialType: currentBaseMaterialTypes.twoValue,
+
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
-								...(baseUserMaterialTypes || []),
-								{
-									positionId: '2',
-									value: '',
 								},
 							]);
 						}}
@@ -427,14 +401,8 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
+									materialType: currentBottomSoundproofingMaterialTypes.twoValue,
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.2.userMaterialTypes', [
-								...(bottomSoundproofingUserMaterialTypes || []),
-								{
-									positionId: '2',
-									value: '',
 								},
 							]);
 						}}
@@ -486,14 +454,10 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '3',
 									materialId: '',
+									materialType:
+										currentBottomSoundproofingMaterialTypes.threeValue,
+
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.2.userMaterialTypes', [
-								...(bottomSoundproofingUserMaterialTypes || []),
-								{
-									positionId: '3',
-									value: '',
 								},
 							]);
 						}}

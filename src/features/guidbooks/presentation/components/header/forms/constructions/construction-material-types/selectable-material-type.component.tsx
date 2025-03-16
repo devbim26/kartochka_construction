@@ -85,8 +85,6 @@ export const SelectableMaterialType = ({
 		);
 	}, [currentMaterialType]);
 
-	console.log(currentMaterialType);
-
 	return (
 		<div className="flex flex-wrap gap-[16px]">
 			<Controller

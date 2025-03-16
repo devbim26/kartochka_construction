@@ -1,4 +1,3 @@
-import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
 import {
 	BoardMaterialType,
@@ -17,7 +16,7 @@ import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
-export const FramePartitionSingle = () => {
+export const FramePartitionSingleComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { watch, setValue } = form;
 
@@ -31,13 +30,12 @@ export const FramePartitionSingle = () => {
 	});
 
 	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
-		zero: '',
-		five: '',
+		zeroValue: '',
+		fiveValue: '',
 	});
 
-	const [userMaterials, userMaterialTypes, constructions] = watch([
+	const [userMaterials, constructions] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
-		'constructionTypeObject.constructions.0.userMaterialTypes',
 		'constructionTypeObject.constructions',
 	]);
 
@@ -51,10 +49,10 @@ export const FramePartitionSingle = () => {
 			fiveIndex: userMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zero: userMaterialTypes?.find((c) => c.positionId === '0')?.value || '',
-			five: userMaterialTypes?.find((c) => c.positionId === '5')?.value || '',
+			zeroValue: userMaterials?.find((c) => c.positionId === '0')?.materialType || '',
+			fiveValue: userMaterials?.find((c) => c.positionId === '5')?.materialType || '',
 		});
-	}, [userMaterials, userMaterialTypes, constructions]);
+	}, [userMaterials, constructions]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
@@ -66,21 +64,9 @@ export const FramePartitionSingle = () => {
 							{
 								positionId: '0',
 								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.Thickness,
-										value: '',
-									},
-									{
-										materialParameters: MaterialParametrs.Density,
-										value: '',
-									},
-								],
+								materialType: currentMaterialTypes.zeroValue,
+								materialTypeValue: [],
 							},
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{ positionId: '0', value: '' },
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
@@ -94,16 +80,15 @@ export const FramePartitionSingle = () => {
 									fieldIndex={indices.zeroIndex}
 									constructionIndex={0}
 									positionId={0}
-									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
-								/>
-								<ThicknessDensityFieldsType
-									fieldIndex={indices.zeroIndex}
-									constructionIndex={0}
+									materialTypesSelectValues={
+										MaterialTypesSelectValuesEnum.FramePartition
+									}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
 									constructionIndex: 0,
-									materialType: currentMaterialTypes.zero as MaterialTypeEnum,
+									materialType:
+										currentMaterialTypes.zeroValue as MaterialTypeEnum,
 								})}
 							</div>
 							<DeleteIcon
@@ -165,21 +150,9 @@ export const FramePartitionSingle = () => {
 							{
 								positionId: '5',
 								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.Thickness,
-										value: '',
-									},
-									{
-										materialParameters: MaterialParametrs.Density,
-										value: '',
-									},
-								],
+								materialType: currentMaterialTypes.fiveValue,
+								materialTypeValue: [],
 							},
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{ positionId: '5', value: '' },
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
@@ -193,16 +166,15 @@ export const FramePartitionSingle = () => {
 									fieldIndex={indices.fiveIndex}
 									constructionIndex={0}
 									positionId={5}
-									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
-								/>
-								<ThicknessDensityFieldsType
-									fieldIndex={indices.fiveIndex}
-									constructionIndex={0}
+									materialTypesSelectValues={
+										MaterialTypesSelectValuesEnum.FramePartition
+									}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.fiveIndex,
 									constructionIndex: 0,
-									materialType: currentMaterialTypes.five as MaterialTypeEnum,
+									materialType:
+										currentMaterialTypes.fiveValue as MaterialTypeEnum,
 								})}
 							</div>
 							<DeleteIcon

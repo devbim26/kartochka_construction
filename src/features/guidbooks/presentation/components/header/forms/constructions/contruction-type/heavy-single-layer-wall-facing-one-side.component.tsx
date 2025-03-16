@@ -44,17 +44,9 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 		fiveValue: '',
 		sixValue: '',
 	});
-	const [
-		baseUserMaterials,
-		baseUserMaterialTypes,
-		facingUserMaterials,
-		facingUserMaterialTypes,
-		constructions,
-	] = watch([
+	const [baseUserMaterials, facingUserMaterials, constructions] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
-		'constructionTypeObject.constructions.0.userMaterialTypes',
 		'constructionTypeObject.constructions.1.userMaterials',
-		'constructionTypeObject.constructions.1.userMaterialTypes',
 		'constructionTypeObject.constructions',
 	]);
 
@@ -74,12 +66,12 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 			sixIndex: facingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
 		});
 		setCurrentBaseMaterialTypes({
-			zeroValue: baseUserMaterialTypes?.find((c) => c.positionId === '0')?.value ?? '',
-			twoValue: baseUserMaterialTypes?.find((c) => c.positionId === '2')?.value ?? '',
+			zeroValue: baseUserMaterials?.find((c) => c.positionId === '0')?.materialType ?? '',
+			twoValue: baseUserMaterials?.find((c) => c.positionId === '2')?.materialType ?? '',
 		});
 		setCurrentFacingMaterialTypes({
-			fiveValue: facingUserMaterialTypes?.find((c) => c.positionId === '5')?.value ?? '',
-			sixValue: facingUserMaterialTypes?.find((c) => c.positionId === '6')?.value ?? '',
+			fiveValue: facingUserMaterials?.find((c) => c.positionId === '5')?.materialType ?? '',
+			sixValue: facingUserMaterials?.find((c) => c.positionId === '6')?.materialType ?? '',
 		});
 	}, [baseUserMaterials, facingUserMaterials, constructions]);
 
@@ -94,14 +86,8 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
+									materialType: currentBaseMaterialTypes.zeroValue,
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-								...(baseUserMaterialTypes || []),
-								{
-									positionId: '0',
-									value: '',
 								},
 							]);
 						}}
@@ -164,14 +150,8 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
+									materialType: currentBaseMaterialTypes.twoValue,
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-								...(baseUserMaterialTypes || []),
-								{
-									positionId: '2',
-									value: '',
 								},
 							]);
 						}}
@@ -290,14 +270,8 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
+									materialType: currentFacingMaterialTypes.fiveValue,
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
-								...(facingUserMaterialTypes || []),
-								{
-									positionId: '5',
-									value: '',
 								},
 							]);
 						}}
@@ -348,14 +322,8 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '6',
 									materialId: '',
+									materialType: currentFacingMaterialTypes.sixValue,
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
-								...(facingUserMaterialTypes || []),
-								{
-									positionId: '6',
-									value: '',
 								},
 							]);
 						}}

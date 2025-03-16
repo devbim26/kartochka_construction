@@ -141,7 +141,7 @@ const ConstructionsScreen = () => {
 											{
 												setItemToDelete({
 													id: info.row.original.id!,
-													name: info.row.original.name,
+													name: info.row.original.name!,
 												});
 											}
 											setIsModalOpen(true);
@@ -157,15 +157,15 @@ const ConstructionsScreen = () => {
 		return cols;
 	}, []);
 
-	const [filterName, filterConstructionTypeId, filterDescription, filterRegion] =
-		forms.filterForm.watch(['name', 'constructionTypeId', 'description', 'country']);
+	const [filterName, filterConstructionType, filterDescription, filterRegion] =
+		forms.filterForm.watch(['name', 'constructionType', 'description', 'country']);
 
 	useEffect(() => {
 		handleGetTableData(
 			forms.filterForm.getValues() as ConstructionsFilterData,
 			paginationState,
 		);
-	}, [filterName, filterConstructionTypeId, filterDescription, filterRegion]);
+	}, [filterName, filterConstructionType, filterDescription, filterRegion]);
 
 	const handleGetTableData = (
 		data: ConstructionsFilterData,

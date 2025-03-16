@@ -33,7 +33,7 @@ export const convertToServerConstructionsFilterData = (
 	data: ConstructionsFilterData,
 ): GetConstructionHeaderWithPaginationQuery => ({
 	name: data.name || null,
-	constructionType: (data.constructionType as ConstructionTypeEnum) || null,
+	// constructionType: (data.constructionType as ConstructionTypeEnum) || null,
 	description: data.description || null,
 	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
 });
@@ -79,6 +79,7 @@ export const convertToServerConstructionType = (
 				construction.userMaterials?.map((userMaterial) => ({
 					materialId: userMaterial.materialId,
 					positionId: +userMaterial.positionId,
+					materialType: userMaterial.materialType,
 					materialTypeValue:
 						userMaterial.materialTypeValue?.map((mtv) => ({
 							value: +mtv.value,
@@ -99,6 +100,7 @@ export const convertToClientConstructionType = (
 				construction.userMaterials?.map((userMaterial) => ({
 					materialId: userMaterial.materialId ?? '',
 					positionId: String(userMaterial.positionId ?? ''),
+					materialType: userMaterial.materialType ?? '',
 					materialTypeValue:
 						userMaterial.materialTypeValue?.map((mtv) => ({
 							value: String(mtv.value ?? ''),

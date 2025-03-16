@@ -24,7 +24,6 @@ export const HeavySingleLayerWallComponent = () => {
 		'constructionTypeObject.constructions.0.userMaterials',
 		'constructionTypeObject.constructions',
 	]);
-	const materialTypes = userMaterials!.map((m) => m.materialType);
 
 	useEffect(() => {
 		//TODO: хуйня
