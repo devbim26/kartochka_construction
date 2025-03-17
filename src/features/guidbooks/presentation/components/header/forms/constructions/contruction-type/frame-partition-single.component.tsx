@@ -64,7 +64,7 @@ export const FramePartitionSingleComponent = () => {
 							{
 								positionId: '0',
 								materialId: '',
-								materialType: currentMaterialTypes.zeroValue,
+								materialType: '',
 								materialTypeValue: [],
 							},
 						]);
@@ -150,7 +150,7 @@ export const FramePartitionSingleComponent = () => {
 							{
 								positionId: '5',
 								materialId: '',
-								materialType: currentMaterialTypes.fiveValue,
+								materialType: '',
 								materialTypeValue: [],
 							},
 						]);

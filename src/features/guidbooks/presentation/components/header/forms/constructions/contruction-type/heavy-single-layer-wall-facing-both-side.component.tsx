@@ -118,7 +118,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '6',
 									materialId: '',
-									materialType: currentTopFacingMaterialTypes.sixValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -170,7 +170,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
-									materialType: currentTopFacingMaterialTypes.fiveValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -289,7 +289,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.zeroValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -353,7 +353,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.twoValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -473,7 +473,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
-									materialType: currentBottomFacingMaterialTypes.fiveValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -525,7 +525,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '6',
 									materialId: '',
-									materialType: currentBottomFacingMaterialTypes.sixValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);

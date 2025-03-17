@@ -67,8 +67,6 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 		});
 	}, [baseUserMaterials, soundproofingUserMaterials, constructions]);
 
-	console.log(watch('constructionTypeObject.constructions.0.userMaterials.0.materialType'));
-
 	return (
 		<>
 			<ConstructionLayer title="1. Базовая конструкция">
@@ -80,7 +78,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.zeroValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -144,7 +142,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.twoValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -225,7 +223,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialType: currentSoundproofingMaterialTypes.twoValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -277,7 +275,7 @@ export const HeavySingleLayerWallSoundproofingOneSideComponent = () => {
 								{
 									positionId: '3',
 									materialId: '',
-									materialType: currentSoundproofingMaterialTypes.threeValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);

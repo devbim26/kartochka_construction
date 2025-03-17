@@ -130,7 +130,7 @@ export const HeavyMultiLayerWallSoundproofBothSideComponent = () => {
 								{
 									positionId: '3',
 									materialId: '',
-									materialType: currentTopSoundproofingMaterialTypes.threeValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -183,8 +183,7 @@ export const HeavyMultiLayerWallSoundproofBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialType: currentTopSoundproofingMaterialTypes.twoValue,
-
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -265,7 +264,7 @@ export const HeavyMultiLayerWallSoundproofBothSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.zeroValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -367,7 +366,7 @@ export const HeavyMultiLayerWallSoundproofBothSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.fiveValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -430,7 +429,7 @@ export const HeavyMultiLayerWallSoundproofBothSideComponent = () => {
 				{bottomSoundproofingIndices.oneIndex >= 0 && (
 					<div className="flex flex-row gap-[16px]">
 						<BoardMaterialType
-							fieldIndex={bottomSoundproofingIndices.zeroIndex}
+							fieldIndex={bottomSoundproofingIndices.oneIndex}
 							constructionIndex={2}
 						/>
 						<ThicknessDensityFieldsType
@@ -448,7 +447,7 @@ export const HeavyMultiLayerWallSoundproofBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialType: currentBottomSoundproofingMaterialTypes.twoValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -501,9 +500,7 @@ export const HeavyMultiLayerWallSoundproofBothSideComponent = () => {
 								{
 									positionId: '3',
 									materialId: '',
-									materialType:
-										currentBottomSoundproofingMaterialTypes.threeValue,
-
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);

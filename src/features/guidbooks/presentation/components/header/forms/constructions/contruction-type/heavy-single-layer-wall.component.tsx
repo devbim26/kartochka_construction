@@ -48,7 +48,7 @@ export const HeavySingleLayerWallComponent = () => {
 							{
 								positionId: '0',
 								materialId: '',
-								materialType: currentMaterialTypes.zeroValue,
+								materialType: '',
 								materialTypeValue: [],
 							},
 						]);
@@ -105,7 +105,7 @@ export const HeavySingleLayerWallComponent = () => {
 							{
 								positionId: '2',
 								materialId: '',
-								materialType: currentMaterialTypes.twoValue,
+								materialType: '',
 								materialTypeValue: [],
 							},
 						]);

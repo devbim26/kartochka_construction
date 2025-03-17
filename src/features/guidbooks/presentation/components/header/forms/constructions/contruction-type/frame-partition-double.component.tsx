@@ -75,7 +75,7 @@ export const FramePartitionDoubleComponent = () => {
 							{
 								positionId: '0',
 								materialId: '',
-								materialType: currentMaterialTypes.zero,
+								materialType: '',
 								materialTypeValue: [],
 							},
 						]);
@@ -193,7 +193,7 @@ export const FramePartitionDoubleComponent = () => {
 							{
 								positionId: '9',
 								materialId: '',
-								materialType: currentMaterialTypes.nine,
+								materialType: '',
 								materialTypeValue: [],
 							},
 						]);

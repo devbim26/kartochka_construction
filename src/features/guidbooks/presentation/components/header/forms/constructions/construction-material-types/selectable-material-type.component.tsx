@@ -35,8 +35,9 @@ export const SelectableMaterialType = ({
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control, watch, setValue } = form;
 	const [materials, setMaterials] = useState<Array<SelectOption>>();
-	const [currentMaterialType, userMaterials] = watch([
+	const [currentMaterialType, currentMaterialId, userMaterials] = watch([
 		`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialType`,
+		`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`,
 		`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
 	]);
 
@@ -66,7 +67,7 @@ export const SelectableMaterialType = ({
 
 	useEffect(() => {
 		handleGetMaterials({ materialType: currentMaterialType });
-	}, [userMaterials]);
+	}, [currentMaterialType]);
 
 	useEffect(() => {
 		setValue(
@@ -74,8 +75,8 @@ export const SelectableMaterialType = ({
 			userMaterials!.map((material) =>
 				material.positionId === String(positionId)
 					? {
-							positionId: String(positionId),
-							materialId: '',
+							...material,
+							materialId: currentMaterialId,
 							materialType: currentMaterialType as MaterialTypeEnum,
 							materialTypeValue:
 								MaterialTypeValuesMap[currentMaterialType as MaterialTypeEnum],

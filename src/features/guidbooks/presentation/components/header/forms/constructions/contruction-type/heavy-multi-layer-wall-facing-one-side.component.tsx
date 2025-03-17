@@ -92,7 +92,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.zeroValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -194,7 +194,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.fiveValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -310,7 +310,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
-									materialType: currentFacingMaterialTypes.fiveValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -363,7 +363,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = () => {
 								{
 									positionId: '6',
 									materialId: '',
-									materialType: currentFacingMaterialTypes.sixValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);

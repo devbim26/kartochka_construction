@@ -87,33 +87,32 @@ export const convertToServerConstructionType = (
 					materialId: userMaterial.materialId,
 					positionId: +userMaterial.positionId,
 					materialTypeValue:
-						userMaterial.materialTypeValue?.map((mtv) => ({
-							value: +mtv.value,
-							materialParametrs: mtv.materialParameters as MaterialParametrs,
+						userMaterial.materialTypeValue?.map((materialTypeValue) => ({
+							value: +materialTypeValue.value,
+							materialParametrs:
+								materialTypeValue.materialParameters as MaterialParametrs,
 						})) || [],
 				})) || [],
 		})) || [],
 });
 
-export const convertToClientConstructionType = (
-	data: CreateConstructionTypeDto,
-): ConstructionType => ({
+export const convertToClientConstructionType = (data: any): ConstructionType => ({
 	constructionTypeEnum:
 		convertToClientConstructionTypeEnumData(
 			data.constructionTypeEnum as ServerConstructionTypeEnum,
 		) ?? '',
 	constructions:
-		data.constructions?.map((construction) => ({
+		data.constructions?.map((construction: any) => ({
 			contructionPosition: construction.constructionPosition ?? '',
 			userMaterials:
-				construction.userMaterials?.map((userMaterial) => ({
+				construction.userMaterials?.map((userMaterial: any) => ({
 					materialId: userMaterial.materialId ?? '',
 					positionId: String(userMaterial.positionId ?? ''),
 					materialType: userMaterial.materialType ?? '',
 					materialTypeValue:
-						userMaterial.materialTypeValue?.map((mtv) => ({
-							value: String(mtv.value ?? ''),
-							materialParameters: String(mtv.materialParametrs ?? ''),
+						userMaterial.materialTypeValue?.map((materialTypeValue: any) => ({
+							value: String(materialTypeValue.value ?? ''),
+							materialParameters: String(materialTypeValue.materialParametrs ?? ''),
 						})) || [],
 				})) || [],
 		})) || [],

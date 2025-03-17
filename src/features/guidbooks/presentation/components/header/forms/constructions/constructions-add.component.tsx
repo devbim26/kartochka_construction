@@ -544,6 +544,17 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
 								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
@@ -551,23 +562,12 @@ export const ConstructionsAdd = () => {
 								],
 							},
 							{
-								positionId: '2',
+								positionId: '3',
 								materialId: '',
 								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
 								],
 							},
 							{
@@ -607,6 +607,17 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
 								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
@@ -614,23 +625,12 @@ export const ConstructionsAdd = () => {
 								],
 							},
 							{
-								positionId: '2',
+								positionId: '3',
 								materialId: '',
 								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
 								],
 							},
 							{
@@ -702,6 +702,17 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
 								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
@@ -709,23 +720,12 @@ export const ConstructionsAdd = () => {
 								],
 							},
 							{
-								positionId: '2',
+								positionId: '3',
 								materialId: '',
 								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
 								],
 							},
 							{
@@ -742,12 +742,12 @@ export const ConstructionsAdd = () => {
 				]);
 			},
 		},
-		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofOneSide]: {
+		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide]: {
 			component: <HeavyMultiLayerWallSoundproofingOneSideComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofOneSide,
+					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{
@@ -819,12 +819,12 @@ export const ConstructionsAdd = () => {
 				]);
 			},
 		},
-		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSide]: {
+		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide]: {
 			component: <HeavyMultiLayerWallSoundproofBothSideComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSide,
+					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide,
 				);
 				form.setValue('constructionTypeObject.constructions', [
 					{

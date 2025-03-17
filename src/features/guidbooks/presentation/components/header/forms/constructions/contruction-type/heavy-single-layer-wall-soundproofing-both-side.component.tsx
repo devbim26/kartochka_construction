@@ -120,7 +120,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '3',
 									materialId: '',
-									materialType: currentTopSoundproofingMaterialTypes.threeValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -173,8 +173,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialType: currentTopSoundproofingMaterialTypes.twoValue,
-
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -255,7 +254,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.zeroValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -319,8 +318,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.twoValue,
-
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -383,7 +381,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 				{bottomSoundproofingIndices.oneIndex >= 0 && (
 					<div className="flex flex-row gap-[16px]">
 						<BoardMaterialType
-							fieldIndex={bottomSoundproofingIndices.zeroIndex}
+							fieldIndex={bottomSoundproofingIndices.oneIndex}
 							constructionIndex={2}
 						/>
 						<ThicknessDensityFieldsType
@@ -401,7 +399,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialType: currentBottomSoundproofingMaterialTypes.twoValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -454,9 +452,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 								{
 									positionId: '3',
 									materialId: '',
-									materialType:
-										currentBottomSoundproofingMaterialTypes.threeValue,
-
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);

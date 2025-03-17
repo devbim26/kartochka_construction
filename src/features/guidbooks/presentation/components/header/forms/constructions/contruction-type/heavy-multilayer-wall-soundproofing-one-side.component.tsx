@@ -87,7 +87,7 @@ export const HeavyMultiLayerWallSoundproofingOneSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.zeroValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -189,7 +189,7 @@ export const HeavyMultiLayerWallSoundproofingOneSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
-									materialType: currentBaseMaterialTypes.fiveValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -270,7 +270,7 @@ export const HeavyMultiLayerWallSoundproofingOneSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
-									materialType: currentSoundproofingMaterialTypes.twoValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
@@ -322,7 +322,7 @@ export const HeavyMultiLayerWallSoundproofingOneSideComponent = () => {
 								{
 									positionId: '3',
 									materialId: '',
-									materialType: currentSoundproofingMaterialTypes.threeValue,
+									materialType: '',
 									materialTypeValue: [],
 								},
 							]);
