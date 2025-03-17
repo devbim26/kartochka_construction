@@ -1,27 +1,33 @@
 import type {
 	ConstructionPosition,
-	ConstructionTypeEnum,
+	ConstructionTypeEnum as ServerConstructionTypeEnum,
 	CountryType,
 	CreateConstructionTypeDto,
 	GetConstructionHeaderWithPaginationQuery,
 	IndexType,
 	MaterialParametrs,
 } from '@api-gen';
-import { convertToClientCountryData, convertToServerCountryData } from '@core';
-import { convertToClientIndexTypeData } from '@core/converters/index.converter';
 import {
+	convertToClientCountryData,
+	convertToClientIndexTypeData,
 	convertToClientPriorityData,
+	convertToServerCountryData,
 	convertToServerPriorityData,
-} from '@core/converters/priority.converter';
-import type {
-	ConstructionsAddData,
-	ConstructionsEditData,
-	ConstructionsFilterData,
-	ConstructionTypeTemplate,
-	Country,
-	Priority,
+} from '@core';
+import {
+	convertToClientConstructionTypeEnumData,
+	convertToServerConstructionTypeEnumData,
+	type ConstructionsAddData,
+	type ConstructionsEditData,
+	type ConstructionsFilterData,
+	type ConstructionTypeTemplate,
+	type Country,
+	type Priority,
 } from '@features';
-import type { ConstructionType } from '@features/guidbooks/types/constructions';
+import type {
+	ConstructionType,
+	ConstructionTypeEnum as ClientConstructionTypeEnum,
+} from '@features/guidbooks/types';
 
 export const convertToClientConstructionTypesList = (data: any): ConstructionTypeTemplate[] => {
 	return data.map((data: any) => ({
@@ -39,7 +45,6 @@ export const convertToServerConstructionsFilterData = (
 });
 
 export const convertToClientConstructionsAddData = (data: any): ConstructionsAddData => ({
-	...data,
 	id: data.id ?? '',
 	name: data.name ?? '',
 	description: data.description ?? '',
@@ -52,7 +57,7 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 	labRTotal: data.rTotal ? data.rTotal.join(', ') : '',
 	labIndex: (convertToClientIndexTypeData(data.index!) as string) ?? '',
 	labIndexValue: String(data.laboratoryIndexValue) ?? '',
-	constructionType: data.constructionType ?? '',
+	constructionType: convertToClientConstructionTypeEnumData(data.constructionType) ?? '',
 	constructionTypeObject: convertToClientConstructionType(data.constructionType!) ?? '',
 	laboratoryTestSource: data.laboratoryTestSource ?? '',
 	issuer: data.issuerId ?? '',
@@ -71,7 +76,9 @@ export const convertToClientConstructionsEditData = (data: any): ConstructionsEd
 export const convertToServerConstructionType = (
 	data: ConstructionType,
 ): CreateConstructionTypeDto => ({
-	constructionTypeEnum: data.constructionTypeEnum as ConstructionTypeEnum,
+	constructionTypeEnum: convertToServerConstructionTypeEnumData(
+		data.constructionTypeEnum as ClientConstructionTypeEnum,
+	),
 	constructions:
 		data.constructions?.map((construction) => ({
 			constructionPosition: construction.contructionPosition as ConstructionPosition,
@@ -79,7 +86,6 @@ export const convertToServerConstructionType = (
 				construction.userMaterials?.map((userMaterial) => ({
 					materialId: userMaterial.materialId,
 					positionId: +userMaterial.positionId,
-					materialType: userMaterial.materialType,
 					materialTypeValue:
 						userMaterial.materialTypeValue?.map((mtv) => ({
 							value: +mtv.value,
@@ -92,7 +98,10 @@ export const convertToServerConstructionType = (
 export const convertToClientConstructionType = (
 	data: CreateConstructionTypeDto,
 ): ConstructionType => ({
-	constructionTypeEnum: data.constructionTypeEnum ?? '',
+	constructionTypeEnum:
+		convertToClientConstructionTypeEnumData(
+			data.constructionTypeEnum as ServerConstructionTypeEnum,
+		) ?? '',
 	constructions:
 		data.constructions?.map((construction) => ({
 			contructionPosition: construction.constructionPosition ?? '',
