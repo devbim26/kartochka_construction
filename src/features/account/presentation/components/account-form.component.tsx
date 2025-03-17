@@ -3,7 +3,6 @@ import {
 	convertToBase64,
 	FormElementLabel,
 	Input,
-	memoize,
 	phoneNumberMask,
 	useAppDispatch,
 	useAppNavigate,
@@ -21,55 +20,67 @@ import type { AccountData } from '@features/account/types/account-data.types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import { useEffect } from 'react';
-import type { UseFormReturn } from 'react-hook-form';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { TiDeleteOutline } from 'react-icons/ti';
 import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
-const PhoneInput = memoize(
-	({
-		form,
-		index,
-		phoneNumber,
-		isViewMode,
-	}: {
-		form: UseFormReturn<AccountData>;
-		index: number;
-		isViewMode: boolean;
-		phoneNumber: { id: string; number: string };
-	}) => {
-		const phoneRef = useMask(phoneNumberMask);
-		const currentValue = form.watch(`phoneNumbers.${index}.number`);
+const PhoneInput = ({
+	index,
+	phoneNumber,
+	isViewMode,
+}: {
+	index: number;
+	isViewMode: boolean;
+	phoneNumber: { id: string; number: string };
+}) => {
+	const { setValue, watch } = useFormContext();
+	const phoneRef = useMask(phoneNumberMask);
+	const currentValue = watch(`phoneNumbers.${index}.number`);
 
-		return (
-			<Input
-				ref={phoneRef}
-				disabled={isViewMode}
-				placeholder="+375(__)___-__-__"
-				onChange={(e) => form.setValue(`phoneNumbers.${index}.number`, e.target.value)}
-				value={currentValue}
-				wrapperClassName="flex-row items-center gap-[10px]"
-				inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-				error={form.formState.errors.phoneNumbers?.[index]?.message}
-				iconPos="right"
-				iconClassName={twMerge(
-					isViewMode ? 'invisible' : 'visible',
-					'size-[25px] text-error right-[2px]',
-				)}
-				Icon={TiDeleteOutline}
-				onIconClick={() => {
-					const updatedPhoneNumbers = form
-						.watch('phoneNumbers')
-						.filter((ph) => ph.id !== phoneNumber.id);
-					form.setValue('phoneNumbers', updatedPhoneNumbers);
-				}}
-			/>
-		);
-	},
-	'PhoneInput',
-);
+	return (
+		<Input
+			ref={phoneRef}
+			disabled={isViewMode}
+			placeholder="+375(__)___-__-__"
+			onChange={(e) => setValue(`phoneNumbers.${index}.number`, e.target.value)}
+			value={currentValue}
+			wrapperClassName="flex-row items-center gap-[10px]"
+			inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+			iconPos="right"
+			iconClassName={twMerge(
+				isViewMode ? 'invisible' : 'visible',
+				'size-[25px] text-error right-[2px]',
+			)}
+			Icon={TiDeleteOutline}
+			onIconClick={() => {
+				const updatedPhoneNumbers = watch('phoneNumbers').filter(
+					(ph: { id: string }) => ph.id !== phoneNumber.id,
+				);
+				setValue('phoneNumbers', updatedPhoneNumbers);
+			}}
+		/>
+	);
+};
+
+export const PhoneNumbersList = ({ isViewMode }: { isViewMode: boolean }) => {
+	const { watch } = useFormContext();
+	const phoneNumbers = watch('phoneNumbers');
+
+	return (
+		<>
+			{phoneNumbers.map((phoneNumber: { number: string; id: string }, index: number) => (
+				<PhoneInput
+					key={phoneNumber.id}
+					index={index}
+					phoneNumber={phoneNumber}
+					isViewMode={isViewMode}
+				/>
+			))}
+		</>
+	);
+};
 
 export const AccountForm = () => {
 	const userData = useAppSelector((store) => store.userData);
@@ -90,7 +101,7 @@ export const AccountForm = () => {
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
 	const [search] = useSearchParams();
-	const { register, setValue, watch, formState, trigger } = form;
+	const { setValue, watch, formState, trigger, reset } = form;
 
 	const onSubmit = () => {
 		dispatch(
@@ -102,7 +113,7 @@ export const AccountForm = () => {
 	};
 
 	useEffect(() => {
-		userData.data ? form.reset({ ...(userData.data as AccountData) }) : form.reset();
+		userData.data ? reset({ ...(userData.data as AccountData) }) : reset();
 	}, [userData.data]);
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
@@ -117,7 +128,8 @@ export const AccountForm = () => {
 		}
 	};
 
-	const [phoneNumbers, logo] = watch(['phoneNumbers', 'companyLogo']);
+	const phoneNumbers = watch('phoneNumbers');
+	const logo = watch('companyLogo');
 
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
@@ -165,24 +177,18 @@ export const AccountForm = () => {
 									'size-[25px] text-primary right-[2px]',
 								)}
 								Icon={phoneNumbers.length < 3 ? AiOutlinePlusCircle : undefined}
-								onIconClick={() =>
-									form.setValue('phoneNumbers', [
+								onIconClick={() => {
+									const updatedPhoneNumbers = [
 										...phoneNumbers,
-										{ id: crypto.randomUUID(), number: '' },
-									])
-								}
+										{ id: String(phoneNumbers.length), number: '' },
+									];
+									setValue('phoneNumbers', updatedPhoneNumbers);
+								}}
 							/>
 							<div className="flex gap-[10px]">
-								{phoneNumbers &&
-									phoneNumbers.map((phoneNumber, index) => (
-										<PhoneInput
-											key={crypto.randomUUID()}
-											form={form}
-											index={index}
-											phoneNumber={phoneNumber}
-											isViewMode={!search.get('edit')}
-										/>
-									))}
+								{phoneNumbers && (
+									<PhoneNumbersList isViewMode={!search.get('edit')} />
+								)}
 							</div>
 						</div>
 						<Input
