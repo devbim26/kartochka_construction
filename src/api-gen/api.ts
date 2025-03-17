@@ -308,6 +308,7 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	ordering?: string | null;
 	name?: string | null;
 	description?: string | null;
+	shortName?: string | null;
 	constructionType?: ConstructionTypeEnum;
 	countryType?: CountryType;
 }
@@ -558,6 +559,7 @@ export interface PaginatedConstructionHeaderDto {
 	constructionType?: ConstructionTypeEnum;
 	issuer?: NamedEntity;
 	issuerLogo?: string | null;
+	shortName?: string | null;
 }
 
 export interface PaginatedConstructionHeaderDtoPaginatedList {
@@ -1165,11 +1167,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 *
 		 * @tags Construction
 		 * @name ConstructionDetail
-		 * @request GET:/api/Construction/{ConstructionHeaderId}
+		 * @request GET:/api/Construction/{id}
 		 */
-		constructionDetail: (constructionHeaderId: string, params: RequestParams = {}) =>
+		constructionDetail: (id: string, params: RequestParams = {}) =>
 			this.request<ConstructionHeaderDto, any>({
-				path: `/api/Construction/${constructionHeaderId}`,
+				path: `/api/Construction/${id}`,
 				method: 'GET',
 				format: 'json',
 				...params,

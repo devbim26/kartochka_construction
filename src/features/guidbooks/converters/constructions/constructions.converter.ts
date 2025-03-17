@@ -3,7 +3,6 @@ import type {
 	ConstructionTypeEnum as ServerConstructionTypeEnum,
 	CountryType,
 	CreateConstructionTypeDto,
-	GetConstructionHeaderWithPaginationQuery,
 	IndexType,
 	MaterialParametrs,
 } from '@api-gen';
@@ -35,11 +34,9 @@ export const convertToClientConstructionTypesList = (data: any): ConstructionTyp
 	}));
 };
 
-export const convertToServerConstructionsFilterData = (
-	data: ConstructionsFilterData,
-): GetConstructionHeaderWithPaginationQuery => ({
+export const convertToServerConstructionsFilterData = (data: ConstructionsFilterData): any => ({
 	name: data.name || null,
-	// constructionType: (data.constructionType as ConstructionTypeEnum) || null,
+	shortName: data.constructionType || null,
 	description: data.description || null,
 	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
 });

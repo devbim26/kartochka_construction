@@ -1,6 +1,6 @@
 import { MaterialTypeEnum } from '@api-gen';
 import type { SelectOption } from '@core';
-import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
+import { convertToPaginatedType, convertToSelectValues, memoize, Select } from '@core';
 import type { ConstructionsAddData, MaterialsFilterData } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
@@ -18,7 +18,7 @@ interface Props {
 	constructionIndex: number;
 }
 
-export const FillerMaterialType = ({ fieldIndex, constructionIndex }: Props) => {
+export const FillerMaterialType = memoize(({ fieldIndex, constructionIndex }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control } = form;
 	const [materials, setMaterials] = useState<Array<SelectOption>>();
@@ -89,4 +89,4 @@ export const FillerMaterialType = ({ fieldIndex, constructionIndex }: Props) => 
 			/>
 		</div>
 	);
-};
+}, 'FillerMaterialType');

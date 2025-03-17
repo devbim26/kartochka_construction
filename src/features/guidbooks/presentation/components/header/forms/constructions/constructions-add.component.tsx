@@ -1396,10 +1396,15 @@ export const ConstructionsAdd = () => {
 								isSearchable
 								value={field.value || ''}
 								onChange={(value) => {
-									setValue('constructionType', value as string);
-									if (value)
-										ConstructionTypeMap[value as ConstructionTypeEnum].action();
-									trigger('constructionType');
+									if (value !== currentConstruction) {
+										setValue('constructionType', value as string);
+										if (value) {
+											ConstructionTypeMap[
+												value as ConstructionTypeEnum
+											].action();
+										}
+										trigger('constructionType');
+									}
 								}}
 								options={RuConstructionTypesSelectValues}
 								error={formState.errors.constructionType?.message}

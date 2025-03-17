@@ -1,4 +1,4 @@
-import { Input } from '@core';
+import { Input, memoize } from '@core';
 import type { ConstructionsAddData } from '@features';
 
 import { useFormContext } from 'react-hook-form';
@@ -9,7 +9,7 @@ type Props = {
 	constructionIndex: number;
 };
 
-export const ThicknessDensityFieldsType = ({ fieldIndex, constructionIndex }: Props) => {
+export const ThicknessDensityFieldsType = memoize(({ fieldIndex, constructionIndex }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState } = form;
 
@@ -67,4 +67,4 @@ export const ThicknessDensityFieldsType = ({ fieldIndex, constructionIndex }: Pr
 			/>
 		</div>
 	);
-};
+}, 'ThicknessDensityFieldsType');
