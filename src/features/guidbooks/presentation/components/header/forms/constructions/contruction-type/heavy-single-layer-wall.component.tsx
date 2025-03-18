@@ -26,7 +26,6 @@ export const HeavySingleLayerWallComponent = () => {
 	]);
 
 	useEffect(() => {
-		//TODO: хуйня
 		setIndices({
 			zeroIndex: userMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
 			oneIndex: userMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
