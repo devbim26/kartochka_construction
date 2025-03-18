@@ -3,7 +3,8 @@ name: Send repository dispatch
 on:
   push:
     branches:
-      - production  # Событие push в ветке main
+      - production
+      - develop
 
 jobs:
   trigger:
