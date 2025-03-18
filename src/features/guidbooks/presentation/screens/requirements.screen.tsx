@@ -92,8 +92,8 @@ const RequirementsScreen = () => {
 	] = form.filterForm.watch([
 		'countryType',
 		'constructionType',
-		'firstPlacementRoomId',
-		'secondPlacementRoomId',
+		'firstPlacementRoom',
+		'secondPlacementRoom',
 		'buildingType',
 	]);
 

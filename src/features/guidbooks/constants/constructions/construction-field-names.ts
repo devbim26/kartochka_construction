@@ -19,4 +19,4 @@ export const ConstructionsEditFieldNames = [
 	'estimatedIndexValue',
 ];
 
-export const ConstructionTypeFieldNames = ['constructionType'];
+export const ConstructionTypeFieldNames = ['constructionType', 'constructionTypeObject'];

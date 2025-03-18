@@ -31,9 +31,8 @@ export const HeavyMultiLayerWallComponent = () => {
 		zeroValue: '',
 		fiveValue: '',
 	});
-	const [userMaterials, userMaterialTypes, constructions] = watch([
+	const [userMaterials, constructions] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
-		'constructionTypeObject.constructions.0.userMaterialTypes',
 		'constructionTypeObject.constructions',
 	]);
 
@@ -47,8 +46,8 @@ export const HeavyMultiLayerWallComponent = () => {
 			fiveIndex: userMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zeroValue: userMaterialTypes?.find((c) => c.positionId === '0')?.value ?? '',
-			fiveValue: userMaterialTypes?.find((c) => c.positionId === '5')?.value ?? '',
+			zeroValue: userMaterials?.find((c) => c.positionId === '0')?.materialType ?? '',
+			fiveValue: userMaterials?.find((c) => c.positionId === '5')?.materialType ?? '',
 		});
 	}, [userMaterials, constructions]);
 
@@ -62,14 +61,8 @@ export const HeavyMultiLayerWallComponent = () => {
 							{
 								positionId: '0',
 								materialId: '',
+								materialType: '',
 								materialTypeValue: [],
-							},
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{
-								positionId: '0',
-								value: '',
 							},
 						]);
 					}}
@@ -154,14 +147,8 @@ export const HeavyMultiLayerWallComponent = () => {
 							{
 								positionId: '5',
 								materialId: '',
+								materialType: '',
 								materialTypeValue: [],
-							},
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{
-								positionId: '5',
-								value: '',
 							},
 						]);
 					}}

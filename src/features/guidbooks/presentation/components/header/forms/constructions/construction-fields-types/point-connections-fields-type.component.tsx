@@ -1,4 +1,4 @@
-import { Input } from '@core';
+import { Input, memoize } from '@core';
 import type { ConstructionsAddData } from '@features';
 
 import { useFormContext } from 'react-hook-form';
@@ -9,7 +9,7 @@ type Props = {
 	constructionIndex: number;
 };
 
-export const PointConnectionsFieldsType = ({ fieldIndex, constructionIndex }: Props) => {
+export const PointConnectionsFieldsType = memoize(({ fieldIndex, constructionIndex }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState } = form;
 
@@ -42,4 +42,4 @@ export const PointConnectionsFieldsType = ({ fieldIndex, constructionIndex }: Pr
 			/>
 		</div>
 	);
-};
+}, 'PointConnectionsFieldsType');

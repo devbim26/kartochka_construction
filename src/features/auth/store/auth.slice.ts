@@ -44,17 +44,9 @@ export const authSlice = createSlice({
 		authReducer,
 	},
 	extraReducers: (builder) => {
-		createAsyncCases(builder, authLogin, (state: AuthSliceState, action) =>
-			console.log(action.payload),
-		);
-		createAsyncCases(builder, smsCodeRequest, (state: AuthSliceState, action) => {
-			console.log(action.payload);
-		});
-		createAsyncCases(builder, smsCodeApprove, (state: AuthSliceState, action) => {
-			console.log(action.payload);
-		});
-		createAsyncCases(builder, authRegistration, (state: AuthSliceState, action) => {
-			console.log(action.payload);
-		});
+		createAsyncCases(builder, authLogin, (state: AuthSliceState, action) => {});
+		createAsyncCases(builder, smsCodeRequest, (state: AuthSliceState, action) => {});
+		createAsyncCases(builder, smsCodeApprove, (state: AuthSliceState, action) => {});
+		createAsyncCases(builder, authRegistration, (state: AuthSliceState, action) => {});
 	},
 });

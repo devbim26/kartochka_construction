@@ -15,6 +15,7 @@ export const UserMaterial = z.object({
 	materialId: z.string().min(1, 'Поле обязательно для заполнения'),
 	positionId: z.string().min(1, 'Поле обязательно для заполнения'),
 	materialTypeValue: z.array(MaterialTypeValues).optional().nullable(),
+	materialType: z.string().min(1, 'Поле обязательно для заполнения'),
 });
 export const UserMaterialType = z.object({
 	positionId: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -23,7 +24,6 @@ export const UserMaterialType = z.object({
 export const subConstructionSchema = z.object({
 	contructionPosition: z.string().min(1, 'Поле обязательно для заполнения'),
 	userMaterials: z.array(UserMaterial).optional().nullable(),
-	userMaterialTypes: z.array(UserMaterialType).optional().nullable(),
 });
 export const ConstructionTypeShema = z.object({
 	constructionTypeEnum: z.string().min(1, 'Поле обязательно для заполнения'),
