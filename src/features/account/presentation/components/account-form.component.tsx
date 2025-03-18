@@ -298,9 +298,10 @@ export const AccountForm = () => {
 						/>
 						<Input
 							{...form.register('compannyInfo')}
-							label="Информация о компании"
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+
+								formState.errors.compannyInfo?.message ? 'text-error' : '',
 							)}
 							disabled={!search.get('edit')}
 							wrapperClassName="flex-row items-center gap-[10px]"
@@ -309,6 +310,10 @@ export const AccountForm = () => {
 							type={'text'}
 							max={200}
 							placeholder="Введите информацию"
+							label={
+								formState.errors.compannyInfo?.message || 'Информация о компании'
+							}
+							error={formState.errors.compannyInfo?.message}
 						/>
 						<div className="flex flex-row items-center gap-[8px]">
 							<FormElementLabel

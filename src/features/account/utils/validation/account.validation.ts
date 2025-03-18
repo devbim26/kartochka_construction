@@ -21,7 +21,7 @@ const AccountDataSchema = z.object({
 	paymentAccount: z.string().min(1, 'Поле обязательно для заполнения'),
 	bankIdNumber: z.string().min(1, 'Поле обязательно для заполнения'),
 	bankAddress: z.string().min(1, 'Поле обязательно для заполнения'),
-	compannyInfo: z.string().optional(),
+	compannyInfo: z.string().min(1, 'Поле обязательно для заполнения'),
 	companyLogo: z.string().optional(),
 	formFile: z.any().refine((file) => file instanceof File && file.size > 0, 'Логотип не выбран'),
 });
