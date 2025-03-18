@@ -28,7 +28,7 @@ const CodeConfirmPage = () => {
 			<Button
 				disabled={
 					!!formState.errors.phoneNumber?.message ||
-					form.watch('phoneNumber').length < 19 ||
+					form.watch('phoneNumber').length < 17 ||
 					form.watch('phoneNumber').includes('_')
 				}
 				variant="primary"
