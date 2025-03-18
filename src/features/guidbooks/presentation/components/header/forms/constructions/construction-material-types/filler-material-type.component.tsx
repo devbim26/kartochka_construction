@@ -84,6 +84,7 @@ export const FillerMaterialType = memoize(({ fieldIndex, constructionIndex }: Pr
 							]?.userMaterials?.[fieldIndex]?.materialId?.message || 'Заполнитель'
 						}
 						placeholder="Выберите материал"
+						isSearchable
 					/>
 				)}
 			/>

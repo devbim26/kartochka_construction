@@ -84,6 +84,7 @@ export const AirGapMaterialType = memoize(({ fieldIndex, constructionIndex }: Pr
 							]?.userMaterials?.[fieldIndex]?.materialId?.message || 'Воздушный зазор'
 						}
 						placeholder="Выберите материал"
+						isSearchable
 					/>
 				)}
 			/>

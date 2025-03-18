@@ -85,6 +85,7 @@ export const ZPanelMaterialType = memoize(({ fieldIndex, constructionIndex }: Pr
 							'Звукоизоляционная панель'
 						}
 						placeholder="Выберите материал"
+						isSearchable
 					/>
 				)}
 			/>

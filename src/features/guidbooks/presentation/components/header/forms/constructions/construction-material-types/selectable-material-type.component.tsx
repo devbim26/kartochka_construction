@@ -109,6 +109,7 @@ export const SelectableMaterialType = memoize(
 									),
 								);
 							}}
+							isSearchable
 						/>
 					)}
 				/>
@@ -137,6 +138,7 @@ export const SelectableMaterialType = memoize(
 							wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
 							buttonClassName="text-sm rounded-[8px] w-[226px]"
 							placeholder="Выберите материал"
+							isSearchable
 						/>
 					)}
 				/>

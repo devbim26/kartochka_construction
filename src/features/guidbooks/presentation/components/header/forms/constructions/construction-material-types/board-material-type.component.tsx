@@ -85,6 +85,7 @@ export const BoardMaterialType = memoize(({ fieldIndex, constructionIndex }: Pro
 							'Плитные материалы'
 						}
 						placeholder="Выберите материал"
+						isSearchable
 					/>
 				)}
 			/>

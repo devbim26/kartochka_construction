@@ -87,6 +87,7 @@ export const HeavyMaterialType = memoize(({ constructionIndex, fieldIndex }: Pro
 							'Тяжелая однослойная стена'
 						}
 						placeholder="Выберите материал"
+						isSearchable
 					/>
 				)}
 			/>
