@@ -31,9 +31,8 @@ export const SelectableMaterialType = memoize(
 		const form = useFormContext<ConstructionsAddData>();
 		const { formState, control, watch, setValue } = form;
 		const [materials, setMaterials] = useState<Array<SelectOption>>();
-		const [currentMaterialType, currentMaterialId, userMaterials] = watch([
+		const [currentMaterialType, userMaterials] = watch([
 			`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialType`,
-			`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`,
 			`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
 		]);
 
@@ -63,21 +62,7 @@ export const SelectableMaterialType = memoize(
 
 		useEffect(() => {
 			handleGetMaterials({ materialType: currentMaterialType });
-			setValue(
-				`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-				userMaterials!.map((material) =>
-					material.positionId === String(positionId)
-						? {
-								...material,
-								materialId: currentMaterialId,
-								materialType: currentMaterialType as MaterialTypeEnum,
-								materialTypeValue:
-									MaterialTypeValuesMap[currentMaterialType as MaterialTypeEnum],
-							}
-						: material,
-				),
-			);
-		}, [currentMaterialType]);
+		}, []);
 
 		return (
 			<div className="flex flex-wrap gap-[16px]">
@@ -105,6 +90,25 @@ export const SelectableMaterialType = memoize(
 							wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
 							buttonClassName="text-sm rounded-[8px] w-[226px]"
 							placeholder="Выберите тип материала"
+							onChange={(selectedOption: any) => {
+								handleGetMaterials({ materialType: selectedOption });
+								setValue(
+									`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
+									userMaterials!.map((material) =>
+										material.positionId === String(positionId)
+											? {
+													...material,
+													materialId: '',
+													materialType: selectedOption,
+													materialTypeValue:
+														MaterialTypeValuesMap[
+															selectedOption as MaterialTypeEnum
+														],
+												}
+											: material,
+									),
+								);
+							}}
 						/>
 					)}
 				/>
