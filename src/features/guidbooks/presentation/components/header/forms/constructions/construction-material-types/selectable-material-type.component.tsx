@@ -64,8 +64,6 @@ export const SelectableMaterialType = memoize(
 			handleGetMaterials({ materialType: currentMaterialType });
 		}, []);
 
-		console.log(watch('constructionTypeObject.constructions'));
-
 		return (
 			<div className="flex flex-wrap gap-[16px]">
 				<Controller
