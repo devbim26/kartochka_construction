@@ -1,27 +1,32 @@
 import type {
 	ConstructionPosition,
-	ConstructionTypeEnum,
+	ConstructionTypeEnum as ServerConstructionTypeEnum,
 	CountryType,
 	CreateConstructionTypeDto,
-	GetConstructionHeaderWithPaginationQuery,
 	IndexType,
 	MaterialParametrs,
 } from '@api-gen';
-import { convertToClientCountryData, convertToServerCountryData } from '@core';
-import { convertToClientIndexTypeData } from '@core/converters/index.converter';
 import {
+	convertToClientCountryData,
+	convertToClientIndexTypeData,
 	convertToClientPriorityData,
+	convertToServerCountryData,
 	convertToServerPriorityData,
-} from '@core/converters/priority.converter';
-import type {
-	ConstructionsAddData,
-	ConstructionsEditData,
-	ConstructionsFilterData,
-	ConstructionTypeTemplate,
-	Country,
-	Priority,
+} from '@core';
+import {
+	convertToClientConstructionTypeEnumData,
+	convertToServerConstructionTypeEnumData,
+	type ConstructionsAddData,
+	type ConstructionsEditData,
+	type ConstructionsFilterData,
+	type ConstructionTypeTemplate,
+	type Country,
+	type Priority,
 } from '@features';
-import type { ConstructionType } from '@features/guidbooks/types/constructions';
+import type {
+	ConstructionType,
+	ConstructionTypeEnum as ClientConstructionTypeEnum,
+} from '@features/guidbooks/types';
 
 export const convertToClientConstructionTypesList = (data: any): ConstructionTypeTemplate[] => {
 	return data.map((data: any) => ({
@@ -29,17 +34,14 @@ export const convertToClientConstructionTypesList = (data: any): ConstructionTyp
 	}));
 };
 
-export const convertToServerConstructionsFilterData = (
-	data: ConstructionsFilterData,
-): GetConstructionHeaderWithPaginationQuery => ({
+export const convertToServerConstructionsFilterData = (data: ConstructionsFilterData): any => ({
 	name: data.name || null,
-	constructionType: (data.constructionType as ConstructionTypeEnum) || null,
+	shortName: data.constructionType || null,
 	description: data.description || null,
 	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
 });
 
 export const convertToClientConstructionsAddData = (data: any): ConstructionsAddData => ({
-	...data,
 	id: data.id ?? '',
 	name: data.name ?? '',
 	description: data.description ?? '',
@@ -52,7 +54,7 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 	labRTotal: data.rTotal ? data.rTotal.join(', ') : '',
 	labIndex: (convertToClientIndexTypeData(data.index!) as string) ?? '',
 	labIndexValue: String(data.laboratoryIndexValue) ?? '',
-	constructionType: data.constructionType ?? '',
+	constructionType: convertToClientConstructionTypeEnumData(data.constructionType) ?? '',
 	constructionTypeObject: convertToClientConstructionType(data.constructionType!) ?? '',
 	laboratoryTestSource: data.laboratoryTestSource ?? '',
 	issuer: data.issuerId ?? '',
@@ -71,7 +73,9 @@ export const convertToClientConstructionsEditData = (data: any): ConstructionsEd
 export const convertToServerConstructionType = (
 	data: ConstructionType,
 ): CreateConstructionTypeDto => ({
-	constructionTypeEnum: data.constructionTypeEnum as ConstructionTypeEnum,
+	constructionTypeEnum: convertToServerConstructionTypeEnumData(
+		data.constructionTypeEnum as ClientConstructionTypeEnum,
+	),
 	constructions:
 		data.constructions?.map((construction) => ({
 			constructionPosition: construction.contructionPosition as ConstructionPosition,
@@ -80,29 +84,32 @@ export const convertToServerConstructionType = (
 					materialId: userMaterial.materialId,
 					positionId: +userMaterial.positionId,
 					materialTypeValue:
-						userMaterial.materialTypeValue?.map((mtv) => ({
-							value: +mtv.value,
-							materialParametrs: mtv.materialParameters as MaterialParametrs,
+						userMaterial.materialTypeValue?.map((materialTypeValue) => ({
+							value: +materialTypeValue.value,
+							materialParametrs:
+								materialTypeValue.materialParameters as MaterialParametrs,
 						})) || [],
 				})) || [],
 		})) || [],
 });
 
-export const convertToClientConstructionType = (
-	data: CreateConstructionTypeDto,
-): ConstructionType => ({
-	constructionTypeEnum: data.constructionTypeEnum ?? '',
+export const convertToClientConstructionType = (data: any): ConstructionType => ({
+	constructionTypeEnum:
+		convertToClientConstructionTypeEnumData(
+			data.constructionTypeEnum as ServerConstructionTypeEnum,
+		) ?? '',
 	constructions:
-		data.constructions?.map((construction) => ({
+		data.constructions?.map((construction: any) => ({
 			contructionPosition: construction.constructionPosition ?? '',
 			userMaterials:
-				construction.userMaterials?.map((userMaterial) => ({
+				construction.userMaterials?.map((userMaterial: any) => ({
 					materialId: userMaterial.materialId ?? '',
 					positionId: String(userMaterial.positionId ?? ''),
+					materialType: userMaterial.materialType ?? '',
 					materialTypeValue:
-						userMaterial.materialTypeValue?.map((mtv) => ({
-							value: String(mtv.value ?? ''),
-							materialParameters: String(mtv.materialParametrs ?? ''),
+						userMaterial.materialTypeValue?.map((materialTypeValue: any) => ({
+							value: String(materialTypeValue.value ?? ''),
+							materialParameters: String(materialTypeValue.materialParametrs ?? ''),
 						})) || [],
 				})) || [],
 		})) || [],

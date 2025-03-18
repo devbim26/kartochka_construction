@@ -14,16 +14,16 @@ import {
 	ConstructionTypeFieldNames,
 	convertToClientIssuerData,
 	FormSubTitle,
-	FramePartitionDouble,
-	FramePartitionSingle,
+	FramePartitionDoubleComponent,
+	FramePartitionSingleComponent,
 	getGuidebooksPaginated,
 	Guidebooks,
 	HeavyMultiLayerWallComponent,
 	HeavyMultiLayerWallFacingBothSideComponent,
 	HeavyMultiLayerWallFacingOneSideComponent,
-	HeavyMultiLayerWallSoundproofBothSide,
-	HeavyMultiLayerWallSoundproofingLeftSide,
-	HeavyMultiLayerWallSoundproofOneSide,
+	HeavyMultiLayerWallSoundproofBothSideComponent,
+	HeavyMultiLayerWallSoundproofingLeftSideComponent,
+	HeavyMultiLayerWallSoundproofingOneSideComponent,
 	HeavySingleLayerWallComponent,
 	HeavySingleLayerWallFacingBothSideComponent,
 	HeavySingleLayerWallFacingOneSideComponent,
@@ -88,16 +88,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Heavy,
 							},
 						],
 					},
@@ -118,16 +113,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Heavy,
 							},
 						],
 					},
@@ -137,6 +127,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '0',
 								materialId: '',
+								materialType: MaterialTypeEnum.AirGap,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -145,6 +136,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
@@ -153,6 +145,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -161,6 +154,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '3',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{
 										materialParameters: MaterialParametrs.ConnectionNumber,
@@ -171,32 +165,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '4',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '0',
-								value: MaterialTypeEnum.AirGap,
-							},
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Link,
-							},
-							{
-								positionId: '2',
-								value: MaterialTypeEnum.Frame,
-							},
-							{
-								positionId: '3',
-								value: MaterialTypeEnum.Filler,
-							},
-							{
-								positionId: '4',
-								value: MaterialTypeEnum.Board,
 							},
 						],
 					},
@@ -217,6 +190,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '0',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -225,6 +199,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
@@ -233,6 +208,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -241,6 +217,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '3',
 								materialId: '',
+								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{
 										materialParameters: MaterialParametrs.ConnectionNumber,
@@ -251,32 +228,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '4',
 								materialId: '',
+								materialType: MaterialTypeEnum.AirGap,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '0',
-								value: MaterialTypeEnum.AirGap,
-							},
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Link,
-							},
-							{
-								positionId: '2',
-								value: MaterialTypeEnum.Frame,
-							},
-							{
-								positionId: '3',
-								value: MaterialTypeEnum.Filler,
-							},
-							{
-								positionId: '4',
-								value: MaterialTypeEnum.Board,
 							},
 						],
 					},
@@ -286,16 +242,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Heavy,
 							},
 						],
 					},
@@ -305,6 +256,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '0',
 								materialId: '',
+								materialType: MaterialTypeEnum.AirGap,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -313,6 +265,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
@@ -321,6 +274,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -329,6 +283,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '3',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{
 										materialParameters: MaterialParametrs.ConnectionNumber,
@@ -339,32 +294,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '4',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '0',
-								value: MaterialTypeEnum.AirGap,
-							},
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Link,
-							},
-							{
-								positionId: '2',
-								value: MaterialTypeEnum.Frame,
-							},
-							{
-								positionId: '3',
-								value: MaterialTypeEnum.Filler,
-							},
-							{
-								positionId: '4',
-								value: MaterialTypeEnum.Board,
 							},
 						],
 					},
@@ -385,16 +319,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Heavy,
 							},
 						],
 					},
@@ -404,6 +333,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '0',
 								materialId: '',
+								materialType: MaterialTypeEnum.ZPanel,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -412,20 +342,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '0',
-								value: MaterialTypeEnum.ZPanel,
-							},
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Board,
 							},
 						],
 					},
@@ -446,6 +367,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '0',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -454,20 +376,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.ZPanel,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '0',
-								value: MaterialTypeEnum.ZPanel,
-							},
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Board,
 							},
 						],
 					},
@@ -477,16 +390,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Heavy,
 							},
 						],
 					},
@@ -496,6 +404,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '0',
 								materialId: '',
+								materialType: MaterialTypeEnum.ZPanel,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -504,20 +413,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '0',
-								value: MaterialTypeEnum.ZPanel,
-							},
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Board,
 							},
 						],
 					},
@@ -538,6 +438,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -546,6 +447,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -554,6 +456,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '3',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{
 										materialParameters: MaterialParametrs.ConnectionNumber,
@@ -564,28 +467,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '4',
 								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Heavy,
-							},
-							{
-								positionId: '2',
-								value: MaterialTypeEnum.Filler,
-							},
-							{
-								positionId: '3',
-								value: MaterialTypeEnum.Link,
-							},
-							{
-								positionId: '4',
-								value: MaterialTypeEnum.Heavy,
 							},
 						],
 					},
@@ -606,6 +492,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -614,6 +501,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -622,6 +510,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '3',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{
 										materialParameters: MaterialParametrs.ConnectionNumber,
@@ -632,28 +521,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '4',
 								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Heavy,
-							},
-							{
-								positionId: '2',
-								value: MaterialTypeEnum.Filler,
-							},
-							{
-								positionId: '3',
-								value: MaterialTypeEnum.Link,
-							},
-							{
-								positionId: '4',
-								value: MaterialTypeEnum.Heavy,
 							},
 						],
 					},
@@ -663,6 +535,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '0',
 								materialId: '',
+								materialType: MaterialTypeEnum.AirGap,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -671,6 +544,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{
 										materialParameters: MaterialParametrs.ConnectionNumber,
@@ -681,6 +555,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
@@ -689,6 +564,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '3',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -697,32 +573,11 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '4',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '0',
-								value: MaterialTypeEnum.AirGap,
-							},
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Link,
-							},
-							{
-								positionId: '2',
-								value: MaterialTypeEnum.Frame,
-							},
-							{
-								positionId: '3',
-								value: MaterialTypeEnum.Filler,
-							},
-							{
-								positionId: '4',
-								value: MaterialTypeEnum.Board,
 							},
 						],
 					},
@@ -743,6 +598,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '0',
 								materialId: '',
+								materialType: MaterialTypeEnum.AirGap,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -751,6 +607,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{
 										materialParameters: MaterialParametrs.ConnectionNumber,
@@ -761,6 +618,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
@@ -769,6 +627,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '3',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -777,204 +636,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '4',
 								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '0',
-								value: MaterialTypeEnum.AirGap,
-							},
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Link,
-							},
-							{
-								positionId: '2',
-								value: MaterialTypeEnum.Frame,
-							},
-							{
-								positionId: '3',
-								value: MaterialTypeEnum.Filler,
-							},
-							{
-								positionId: '4',
-								value: MaterialTypeEnum.Board,
-							},
-						],
-					},
-					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '1',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Heavy,
-							},
-							{
-								positionId: '2',
-								value: MaterialTypeEnum.Filler,
-							},
-							{
-								positionId: '3',
-								value: MaterialTypeEnum.Link,
-							},
-							{
-								positionId: '4',
-								value: MaterialTypeEnum.Heavy,
-							},
-						],
-					},
-					{
-						contructionPosition: ConstructionPosition.Right,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-						userMaterialTypes: [
-							{
-								positionId: '0',
-								value: MaterialTypeEnum.AirGap,
-							},
-							{
-								positionId: '1',
-								value: MaterialTypeEnum.Link,
-							},
-							{
-								positionId: '2',
-								value: MaterialTypeEnum.Frame,
-							},
-							{
-								positionId: '3',
-								value: MaterialTypeEnum.Filler,
-							},
-							{
-								positionId: '4',
-								value: MaterialTypeEnum.Board,
-							},
-						],
-					},
-				]);
-			},
-		},
-		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofOneSide]: {
-			component: <HeavyMultiLayerWallSoundproofOneSide />,
-			action: () => {
-				form.setValue(
-					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofOneSide,
-				);
-				form.setValue('constructionTypeObject.constructions', [
-					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '1',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -986,40 +648,9 @@ export const ConstructionsAdd = () => {
 						contructionPosition: ConstructionPosition.Center,
 						userMaterials: [
 							{
-								positionId: '0',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
 								positionId: '1',
 								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-					},
-				]);
-			},
-		},
-		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSide]: {
-			component: <HeavyMultiLayerWallSoundproofBothSide />,
-			action: () => {
-				form.setValue(
-					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSide,
-				);
-				form.setValue('constructionTypeObject.constructions', [
-					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '1',
-								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1028,6 +659,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1036,6 +668,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '3',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{
 										materialParameters: MaterialParametrs.ConnectionNumber,
@@ -1046,27 +679,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '4',
 								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-					},
-					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1080,6 +693,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '0',
 								materialId: '',
+								materialType: MaterialTypeEnum.AirGap,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1088,6 +702,213 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialType: MaterialTypeEnum.Frame,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialType: MaterialTypeEnum.Board,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide]: {
+			component: <HeavyMultiLayerWallSoundproofingOneSideComponent />,
+			action: () => {
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialType: MaterialTypeEnum.Link,
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialType: MaterialTypeEnum.ZPanel,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialType: MaterialTypeEnum.Board,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide]: {
+			component: <HeavyMultiLayerWallSoundproofBothSideComponent />,
+			action: () => {
+				form.setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide,
+				);
+				form.setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialType: MaterialTypeEnum.ZPanel,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialType: MaterialTypeEnum.Board,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Center,
+						userMaterials: [
+							{
+								positionId: '1',
+								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialType: MaterialTypeEnum.Link,
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+					{
+						contructionPosition: ConstructionPosition.Right,
+						userMaterials: [
+							{
+								positionId: '0',
+								materialId: '',
+								materialType: MaterialTypeEnum.ZPanel,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1099,7 +920,7 @@ export const ConstructionsAdd = () => {
 			},
 		},
 		[ConstructionTypeEnum.FramePartitionSingle]: {
-			component: <FramePartitionSingle />,
+			component: <FramePartitionSingleComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -1112,6 +933,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1120,6 +942,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1128,6 +951,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '3',
 								materialId: '',
+								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
@@ -1136,6 +960,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '4',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1147,7 +972,7 @@ export const ConstructionsAdd = () => {
 			},
 		},
 		[ConstructionTypeEnum.FramePartitionDouble]: {
-			component: <FramePartitionDouble />,
+			component: <FramePartitionDoubleComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -1160,6 +985,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1168,6 +994,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1176,6 +1003,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '3',
 								materialId: '',
+								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
@@ -1184,6 +1012,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '4',
 								materialId: '',
+								materialType: MaterialTypeEnum.AirGap,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1192,6 +1021,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '5',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{
 										materialParameters: MaterialParametrs.ConnectionNumber,
@@ -1202,6 +1032,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '6',
 								materialId: '',
+								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
 									{ materialParameters: MaterialParametrs.RackStep, value: '' },
@@ -1210,6 +1041,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '7',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1218,6 +1050,7 @@ export const ConstructionsAdd = () => {
 							{
 								positionId: '8',
 								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1229,7 +1062,7 @@ export const ConstructionsAdd = () => {
 			},
 		},
 		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingLeftSide]: {
-			component: <HeavyMultiLayerWallSoundproofingLeftSide />,
+			component: <HeavyMultiLayerWallSoundproofingLeftSideComponent />,
 			action: () => {
 				form.setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -1240,34 +1073,18 @@ export const ConstructionsAdd = () => {
 						contructionPosition: ConstructionPosition.Center,
 						userMaterials: [
 							{
+								positionId: '0',
+								materialId: '',
+								materialType: MaterialTypeEnum.ZPanel,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
 								positionId: '1',
 								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
+								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1279,16 +1096,38 @@ export const ConstructionsAdd = () => {
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
 							{
-								positionId: '0',
+								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
 							},
 							{
-								positionId: '1',
+								positionId: '2',
 								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialType: MaterialTypeEnum.Link,
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '4',
+								materialId: '',
+								materialType: MaterialTypeEnum.Heavy,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -1557,10 +1396,15 @@ export const ConstructionsAdd = () => {
 								isSearchable
 								value={field.value || ''}
 								onChange={(value) => {
-									setValue('constructionType', value as string);
-									if (value)
-										ConstructionTypeMap[value as ConstructionTypeEnum].action();
-									trigger('constructionType');
+									if (value !== currentConstruction) {
+										setValue('constructionType', value as string);
+										if (value) {
+											ConstructionTypeMap[
+												value as ConstructionTypeEnum
+											].action();
+										}
+										trigger('constructionType');
+									}
 								}}
 								options={RuConstructionTypesSelectValues}
 								error={formState.errors.constructionType?.message}

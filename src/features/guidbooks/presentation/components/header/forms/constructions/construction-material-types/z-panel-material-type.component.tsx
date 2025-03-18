@@ -1,5 +1,5 @@
 import type { SelectOption } from '@core';
-import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
+import { convertToPaginatedType, convertToSelectValues, memoize, Select } from '@core';
 import type { ConstructionsAddData, MaterialsFilterData } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
@@ -18,7 +18,7 @@ interface Props {
 	constructionIndex: number;
 }
 
-export const ZPanelMaterialType = ({ fieldIndex, constructionIndex }: Props) => {
+export const ZPanelMaterialType = memoize(({ fieldIndex, constructionIndex }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control } = form;
 	const [materials, setMaterials] = useState<Array<SelectOption>>();
@@ -90,4 +90,4 @@ export const ZPanelMaterialType = ({ fieldIndex, constructionIndex }: Props) => 
 			/>
 		</div>
 	);
-};
+}, 'ZPanelMaterialType');
