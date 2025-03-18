@@ -54,7 +54,6 @@ export function createAsyncCases<T extends SliceInitialState>(
 	builder
 		.addCase(asyncThunk.pending, (state: Draft<T>) => {
 			state.loading = true;
-			console.log(123);
 		})
 		.addCase(asyncThunk.fulfilled, (state: Draft<T>, action) => {
 			console.log(action);

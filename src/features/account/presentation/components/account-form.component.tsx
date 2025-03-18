@@ -20,6 +20,7 @@ import type { AccountData } from '@features/account/types/account-data.types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import { useEffect } from 'react';
+import type { FieldErrors } from 'react-hook-form';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { TiDeleteOutline } from 'react-icons/ti';
@@ -35,9 +36,13 @@ const PhoneInput = ({
 	isViewMode: boolean;
 	phoneNumber: { id: string; number: string };
 }) => {
-	const { setValue, watch } = useFormContext();
+	const { setValue, watch, formState } = useFormContext();
 	const phoneRef = useMask(phoneNumberMask);
 	const currentValue = watch(`phoneNumbers.${index}.number`);
+
+	const errors = formState.errors as FieldErrors<{
+		phoneNumbers: { number: { message: string } }[];
+	}>;
 
 	return (
 		<Input
@@ -60,6 +65,11 @@ const PhoneInput = ({
 				);
 				setValue('phoneNumbers', updatedPhoneNumbers);
 			}}
+			labelClassName={twMerge(
+				'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+				errors.phoneNumbers?.[index]?.number ? 'text-error' : '',
+			)}
+			error={errors.phoneNumbers?.[index]?.number?.message as string | undefined}
 		/>
 	);
 };
