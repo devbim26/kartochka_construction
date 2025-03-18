@@ -18,8 +18,7 @@ export const convertToServerMaterialsFilterData = (
 	data: MaterialsFilterData,
 ): GetMaterialsWithPaginationParamsQuery => ({
 	name: data.name || null,
-	materialTypeEnum:
-		convertToServerMaterialTypeData(data.materialType as MaterialTypeEnum) || null,
+	materialType: convertToServerMaterialTypeData(data.materialType as MaterialTypeEnum) || null,
 	density: data.density ? +data.density : null,
 	thickness: data.thickness ? +data.thickness : null,
 });
