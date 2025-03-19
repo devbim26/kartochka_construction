@@ -217,7 +217,7 @@ export const Select = memoize(
 
 			const SingleValue = memoize((props) => {
 				return (
-					<div className="flex size-full" {...props.innerProps}>
+					<div className="absolute" {...props.innerProps}>
 						{headerImage}
 						<div className={twMerge('flex items-center gap-3')}>
 							{props.data.icon}
