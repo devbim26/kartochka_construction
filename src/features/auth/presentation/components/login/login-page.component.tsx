@@ -10,7 +10,6 @@ import {
 	useAppSelector,
 } from '@core';
 import { getCurrentUser } from '@features/account';
-import { DESIGNING_ROUTES } from '@features/home';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import { useEffect, useState } from 'react';
@@ -30,7 +29,7 @@ const LoginPage = () => {
 	useEffect(() => {
 		if (authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name) {
 			dispatch(getCurrentUser());
-			navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.main.route);
+			navigate(APP_ROUTES.landing.route);
 		}
 	}, [authData.fetch_data]);
 
