@@ -60,6 +60,10 @@ export enum CategoryClass {
 	C = 'C',
 }
 
+export interface ConstructionBase {
+	constructions?: ConstructionTemplate[] | null;
+}
+
 export enum ConstructionClass {
 	Wall = 'Wall',
 	Floor = 'Floor',
@@ -104,13 +108,9 @@ export enum ConstructionPosition {
 	Right = 'Right',
 }
 
-export interface ConstructionRootTemplate {
-	constructions?: ConstructionTemplate[] | null;
-}
-
 export interface ConstructionTemplate {
-	position?: ConstructionPosition;
-	subConstructions?: SubConstructionTemplate[] | null;
+	constructionPosition?: ConstructionPosition;
+	materialTypes?: MaterialType[] | null;
 }
 
 export interface ConstructionTypeDto {
@@ -122,13 +122,23 @@ export enum ConstructionTypeEnum {
 	HeavySingleLayerWall = 'HeavySingleLayerWall',
 	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
 	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
+	HeavySingleLayerWallZPanelOneSide = 'HeavySingleLayerWallZPanelOneSide',
+	HeavySingleLayerWallZPanelBothSide = 'HeavySingleLayerWallZPanelBothSide',
+	HeavyMultipleLayerWall = 'HeavyMultipleLayerWall',
+	HeavyMultipleLayerWallFacingOneSide = 'HeavyMultipleLayerWallFacingOneSide',
+	HeavyMultipleLayerWallFacingBothSide = 'HeavyMultipleLayerWallFacingBothSide',
+	HeavyMultipleLayerWallZPanelOneSide = 'HeavyMultipleLayerWallZPanelOneSide',
+	HeavyMultipleLayerWallZPanelBothSide = 'HeavyMultipleLayerWallZPanelBothSide',
+	OneFramePartition = 'OneFramePartition',
+	TwoFramePartition = 'TwoFramePartition',
+	HeavySingleWallFacing = 'HeavySingleWallFacing',
 }
 
 export interface ConstructionTypeTemplate {
 	name?: string | null;
 	shortName?: string | null;
 	constructionTypeEnum?: ConstructionTypeEnum;
-	constructionRoot?: ConstructionRootTemplate;
+	constructionBase?: ConstructionBase;
 }
 
 export interface Country {
@@ -298,6 +308,7 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	ordering?: string | null;
 	name?: string | null;
 	description?: string | null;
+	shortName?: string | null;
 	constructionType?: ConstructionTypeEnum;
 	countryType?: CountryType;
 }
@@ -326,7 +337,7 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	density?: number | null;
 	/** @format float */
 	thickness?: number | null;
-	materialTypeEnum?: MaterialTypeEnum;
+	materialType?: MaterialTypeEnum;
 }
 
 export interface GetPalacementRoomVariantsWithTypesQuery {
@@ -452,6 +463,16 @@ export enum MaterialParametrs {
 	Width = 'Width',
 }
 
+export interface MaterialType {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	shortName?: string | null;
+	materialTypeEnum?: MaterialTypeEnum;
+	materialTypeValues?: MaterialTypeValue[] | null;
+	fullName?: string | null;
+}
+
 export interface MaterialTypeDto {
 	/** @format uuid */
 	id?: string;
@@ -480,6 +501,15 @@ export enum MaterialTypeEnum {
 	Filler = 'Filler',
 	Heavy = 'Heavy',
 	Board = 'Board',
+	ZPanel = 'ZPanel',
+}
+
+export interface MaterialTypeValue {
+	/** @format uuid */
+	id?: string;
+	/** @format double */
+	value?: number;
+	materialParametrs?: MaterialParametrs;
 }
 
 export interface MaterialTypeValueDto {
@@ -529,6 +559,7 @@ export interface PaginatedConstructionHeaderDto {
 	constructionType?: ConstructionTypeEnum;
 	issuer?: NamedEntity;
 	issuerLogo?: string | null;
+	shortName?: string | null;
 }
 
 export interface PaginatedConstructionHeaderDtoPaginatedList {
@@ -687,12 +718,6 @@ export enum SortOrder {
 	Desc = 'Desc',
 }
 
-export interface SubConstructionTemplate {
-	name?: string | null;
-	userMaterials?: UserMaterialTemplate[] | null;
-	subPosition?: ConstructionPosition;
-}
-
 export interface UpdateConstructionHeaderCommand {
 	/** @format uuid */
 	id?: string;
@@ -741,18 +766,10 @@ export interface UpdateRequirementCommand {
 export interface UserMaterialDto {
 	/** @format uuid */
 	materialId?: string;
+	materialType?: MaterialTypeEnum;
 	/** @format int32 */
 	positionId?: number;
 	materialTypeValue?: MaterialTypeValueDto[] | null;
-}
-
-export interface UserMaterialTemplate {
-	/** @format uuid */
-	materialId?: string;
-	/** @format float */
-	thickness?: number;
-	/** @format float */
-	density?: number;
 }
 
 import type {
@@ -1150,11 +1167,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 *
 		 * @tags Construction
 		 * @name ConstructionDetail
-		 * @request GET:/api/Construction/{ConstructionHeaderId}
+		 * @request GET:/api/Construction/{id}
 		 */
-		constructionDetail: (constructionHeaderId: string, params: RequestParams = {}) =>
+		constructionDetail: (id: string, params: RequestParams = {}) =>
 			this.request<ConstructionHeaderDto, any>({
-				path: `/api/Construction/${constructionHeaderId}`,
+				path: `/api/Construction/${id}`,
 				method: 'GET',
 				format: 'json',
 				...params,

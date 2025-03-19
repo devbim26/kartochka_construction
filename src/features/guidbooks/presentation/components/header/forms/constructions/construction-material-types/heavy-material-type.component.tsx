@@ -1,6 +1,6 @@
 import { MaterialTypeEnum } from '@api-gen';
 import type { SelectOption } from '@core';
-import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
+import { convertToPaginatedType, convertToSelectValues, memoize, Select } from '@core';
 import type { ConstructionsAddData, MaterialsFilterData } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
@@ -21,7 +21,7 @@ type Props = {
 	constructionIndex: number;
 };
 
-export const HeavyMaterialType = ({ constructionIndex, fieldIndex }: Props) => {
+export const HeavyMaterialType = memoize(({ constructionIndex, fieldIndex }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState, control } = form;
 
@@ -92,4 +92,4 @@ export const HeavyMaterialType = ({ constructionIndex, fieldIndex }: Props) => {
 			/>
 		</div>
 	);
-};
+}, 'HeavyMaterialType');

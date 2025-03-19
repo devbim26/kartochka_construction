@@ -58,23 +58,13 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 		fiveValue: '',
 		sixValue: '',
 	});
-	const [
-		constructions,
-		topFacingUserMaterials,
-		topFacingUserMaterialTypes,
-		baseUserMaterials,
-		baseUserMaterialTypes,
-		bottomFacingUserMaterials,
-		bottomFacingUserMaterialTypes,
-	] = watch([
-		'constructionTypeObject.constructions',
-		'constructionTypeObject.constructions.0.userMaterials',
-		'constructionTypeObject.constructions.0.userMaterialTypes',
-		'constructionTypeObject.constructions.1.userMaterials',
-		'constructionTypeObject.constructions.1.userMaterialTypes',
-		'constructionTypeObject.constructions.2.userMaterials',
-		'constructionTypeObject.constructions.2.userMaterialTypes',
-	]);
+	const [constructions, topFacingUserMaterials, baseUserMaterials, bottomFacingUserMaterials] =
+		watch([
+			'constructionTypeObject.constructions',
+			'constructionTypeObject.constructions.0.userMaterials',
+			'constructionTypeObject.constructions.1.userMaterials',
+			'constructionTypeObject.constructions.2.userMaterials',
+		]);
 
 	useEffect(() => {
 		setTopFacingIndices({
@@ -101,17 +91,19 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 			sixIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
 		});
 		setCurrentTopFacingMaterialTypes({
-			fiveValue: topFacingUserMaterialTypes?.find((c) => c.positionId === '5')?.value ?? '',
-			sixValue: topFacingUserMaterialTypes?.find((c) => c.positionId === '6')?.value ?? '',
+			fiveValue:
+				topFacingUserMaterials?.find((c) => c.positionId === '5')?.materialType ?? '',
+			sixValue: topFacingUserMaterials?.find((c) => c.positionId === '6')?.materialType ?? '',
 		});
 		setCurrentBaseMaterialTypes({
-			zeroValue: baseUserMaterialTypes?.find((c) => c.positionId === '0')?.value ?? '',
-			twoValue: baseUserMaterialTypes?.find((c) => c.positionId === '2')?.value ?? '',
+			zeroValue: baseUserMaterials?.find((c) => c.positionId === '0')?.materialType ?? '',
+			twoValue: baseUserMaterials?.find((c) => c.positionId === '2')?.materialType ?? '',
 		});
 		setCurrentBottomFacingMaterialTypes({
 			fiveValue:
-				bottomFacingUserMaterialTypes?.find((c) => c.positionId === '5')?.value ?? '',
-			sixValue: bottomFacingUserMaterialTypes?.find((c) => c.positionId === '6')?.value ?? '',
+				bottomFacingUserMaterials?.find((c) => c.positionId === '5')?.materialType ?? '',
+			sixValue:
+				bottomFacingUserMaterials?.find((c) => c.positionId === '6')?.materialType ?? '',
 		});
 	}, [topFacingUserMaterials, baseUserMaterials, bottomFacingUserMaterials, constructions]);
 
@@ -126,14 +118,8 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '6',
 									materialId: '',
+									materialType: '',
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-								...(topFacingUserMaterialTypes || []),
-								{
-									positionId: '6',
-									value: '',
 								},
 							]);
 						}}
@@ -184,14 +170,8 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
+									materialType: '',
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-								...(topFacingUserMaterialTypes || []),
-								{
-									positionId: '5',
-									value: '',
 								},
 							]);
 						}}
@@ -309,14 +289,8 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '0',
 									materialId: '',
+									materialType: '',
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
-								...(baseUserMaterialTypes || []),
-								{
-									positionId: '0',
-									value: '',
 								},
 							]);
 						}}
@@ -379,14 +353,8 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '2',
 									materialId: '',
+									materialType: '',
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.1.userMaterialTypes', [
-								...(baseUserMaterialTypes || []),
-								{
-									positionId: '2',
-									value: '',
 								},
 							]);
 						}}
@@ -505,14 +473,8 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '5',
 									materialId: '',
+									materialType: '',
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.2.userMaterialTypes', [
-								...(bottomFacingUserMaterialTypes || []),
-								{
-									positionId: '5',
-									value: '',
 								},
 							]);
 						}}
@@ -563,14 +525,8 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 								{
 									positionId: '6',
 									materialId: '',
+									materialType: '',
 									materialTypeValue: [],
-								},
-							]);
-							setValue('constructionTypeObject.constructions.2.userMaterialTypes', [
-								...(bottomFacingUserMaterialTypes || []),
-								{
-									positionId: '6',
-									value: '',
 								},
 							]);
 						}}

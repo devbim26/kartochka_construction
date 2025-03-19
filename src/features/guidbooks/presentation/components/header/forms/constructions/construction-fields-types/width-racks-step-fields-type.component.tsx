@@ -1,4 +1,4 @@
-import { Input } from '@core';
+import { Input, memoize } from '@core';
 import type { ConstructionsAddData } from '@features';
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
@@ -8,7 +8,7 @@ type Props = {
 	constructionIndex: number;
 };
 
-export const WidthRacksStepFieldsType = ({ fieldIndex, constructionIndex }: Props) => {
+export const WidthRacksStepFieldsType = memoize(({ fieldIndex, constructionIndex }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { formState } = form;
 
@@ -66,4 +66,4 @@ export const WidthRacksStepFieldsType = ({ fieldIndex, constructionIndex }: Prop
 			/>
 		</div>
 	);
-};
+}, 'WidthRacksStepFieldsType');

@@ -1,4 +1,3 @@
-import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
 import {
 	AirGapMaterialType,
@@ -20,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
-export const FramePartitionDouble = () => {
+export const FramePartitionDoubleComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();
 	const { watch, setValue } = form;
 
@@ -42,9 +41,8 @@ export const FramePartitionDouble = () => {
 		nine: '',
 	});
 
-	const [userMaterials, userMaterialTypes, constructions] = watch([
+	const [userMaterials, constructions] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
-		'constructionTypeObject.constructions.0.userMaterialTypes',
 		'constructionTypeObject.constructions',
 	]);
 
@@ -62,10 +60,10 @@ export const FramePartitionDouble = () => {
 			nineIndex: userMaterials?.findIndex((c) => c.positionId === '9') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zero: userMaterialTypes?.find((c) => c.positionId === '0')?.value || '',
-			nine: userMaterialTypes?.find((c) => c.positionId === '9')?.value || '',
+			zero: userMaterials?.find((c) => c.positionId === '0')?.materialType || '',
+			nine: userMaterials?.find((c) => c.positionId === '9')?.materialType || '',
 		});
-	}, [userMaterials, userMaterialTypes, constructions]);
+	}, [userMaterials, constructions]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
@@ -77,21 +75,9 @@ export const FramePartitionDouble = () => {
 							{
 								positionId: '0',
 								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.Thickness,
-										value: '',
-									},
-									{
-										materialParameters: MaterialParametrs.Density,
-										value: '',
-									},
-								],
+								materialType: '',
+								materialTypeValue: [],
 							},
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{ positionId: '0', value: '' },
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
@@ -105,7 +91,9 @@ export const FramePartitionDouble = () => {
 									fieldIndex={indices.zeroIndex}
 									constructionIndex={0}
 									positionId={0}
-									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
+									materialTypesSelectValues={
+										MaterialTypesSelectValuesEnum.FramePartition
+									}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
@@ -205,21 +193,9 @@ export const FramePartitionDouble = () => {
 							{
 								positionId: '9',
 								materialId: '',
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.Thickness,
-										value: '',
-									},
-									{
-										materialParameters: MaterialParametrs.Density,
-										value: '',
-									},
-								],
+								materialType: '',
+								materialTypeValue: [],
 							},
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{ positionId: '9', value: '' },
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
@@ -233,7 +209,9 @@ export const FramePartitionDouble = () => {
 									fieldIndex={indices.nineIndex}
 									constructionIndex={0}
 									positionId={9}
-									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Facing}
+									materialTypesSelectValues={
+										MaterialTypesSelectValuesEnum.FramePartition
+									}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.nineIndex,
