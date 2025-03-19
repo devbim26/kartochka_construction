@@ -5,13 +5,17 @@ import {
 	WidthRacksStepFieldsType,
 } from '@features';
 import { MaterialTypeEnum } from '@features/guidbooks/types';
-interface Props {
+interface ConstructionFieldsMapProps {
 	materialType: MaterialTypeEnum;
 	fieldIndex: number;
 	constructionIndex: number;
 }
 
-export const ConstructionFieldsMap = ({ materialType, fieldIndex, constructionIndex }: Props) => {
+export const ConstructionFieldsMap = ({
+	materialType,
+	fieldIndex,
+	constructionIndex,
+}: ConstructionFieldsMapProps) => {
 	const componentsMap = {
 		[MaterialTypeEnum.Heavy]: (
 			<ThicknessDensityFieldsType
