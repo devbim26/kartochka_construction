@@ -1,7 +1,6 @@
 import { MaterialTypeEnum } from '@api-gen';
-import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, memoize, Select } from '@core';
-import type { ConstructionsAddData, MaterialsFilterData } from '@features';
+import type { ConstructionsAddData, MaterialsAddAndEditData, MaterialsFilterData } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
 	getGuidebooksPaginated,
@@ -20,8 +19,8 @@ interface Props {
 
 export const FillerMaterialType = memoize(({ fieldIndex, constructionIndex }: Props) => {
 	const form = useFormContext<ConstructionsAddData>();
-	const { formState, control } = form;
-	const [materials, setMaterials] = useState<Array<SelectOption>>();
+	const { formState, control, setValue } = form;
+	const [materials, setMaterials] = useState<MaterialsAddAndEditData[]>();
 
 	const handleGetMaterials = (data: MaterialsFilterData) => {
 		from(
@@ -38,7 +37,7 @@ export const FillerMaterialType = memoize(({ fieldIndex, constructionIndex }: Pr
 					);
 					return from([items]);
 				}),
-				tap((items) => setMaterials(convertToSelectValues(items.items!)!)),
+				tap((items) => setMaterials(items.items || [])),
 				catchError((error) => {
 					console.log('Error:', error);
 					return from([null]);
@@ -62,7 +61,7 @@ export const FillerMaterialType = memoize(({ fieldIndex, constructionIndex }: Pr
 					<Select
 						{...field}
 						value={field.value || ''}
-						options={materials || []}
+						options={convertToSelectValues(materials) || []}
 						error={
 							formState.errors?.constructionTypeObject?.constructions?.[
 								constructionIndex
@@ -84,6 +83,24 @@ export const FillerMaterialType = memoize(({ fieldIndex, constructionIndex }: Pr
 							]?.userMaterials?.[fieldIndex]?.materialId?.message || 'Заполнитель'
 						}
 						placeholder="Выберите материал"
+						isSearchable
+						onChange={(selectedOption: string) => {
+							setValue(
+								`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`,
+								selectedOption,
+							);
+							const selectedMaterial = materials?.find(
+								(m) => m.id === selectedOption,
+							);
+							setValue<any>(
+								`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.0.value`,
+								selectedMaterial?.thickness,
+							);
+							setValue<any>(
+								`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.1.value`,
+								selectedMaterial?.density,
+							);
+						}}
 					/>
 				)}
 			/>

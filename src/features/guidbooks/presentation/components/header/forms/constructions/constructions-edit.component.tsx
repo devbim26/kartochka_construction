@@ -1208,6 +1208,7 @@ export const ConstructionsEdit = () => {
 									buttonClassName="text-sm rounded-[8px]"
 									label={formState.errors.priority?.message || 'Приоритет'}
 									placeholder="Выберите приоритет"
+									isSearchable
 								/>
 							)}
 						/>
@@ -1270,6 +1271,7 @@ export const ConstructionsEdit = () => {
 									buttonClassName="text-sm rounded-[8px]"
 									label={formState.errors.issuer?.message || 'Производитель'}
 									placeholder="Выберите производителя"
+									isSearchable
 								/>
 							)}
 						/>
@@ -1351,6 +1353,7 @@ export const ConstructionsEdit = () => {
 									buttonClassName="text-sm rounded-[8px]"
 									label={formState.errors.labIndex?.message || 'Индекс'}
 									placeholder="Выберите индекс"
+									isSearchable
 								/>
 							)}
 						/>
