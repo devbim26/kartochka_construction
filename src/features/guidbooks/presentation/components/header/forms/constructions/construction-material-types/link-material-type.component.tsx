@@ -84,6 +84,7 @@ export const LinkMaterialType = memoize(({ fieldIndex, constructionIndex }: Prop
 							]?.userMaterials?.[fieldIndex]?.materialId?.message || 'Тип связи'
 						}
 						placeholder="Выберите материал"
+						isSearchable
 					/>
 				)}
 			/>

@@ -84,6 +84,7 @@ export const FrameMaterialType = memoize(({ fieldIndex, constructionIndex }: Pro
 							]?.userMaterials?.[fieldIndex]?.materialId?.message || 'Каркас'
 						}
 						placeholder="Выберите материал"
+						isSearchable
 					/>
 				)}
 			/>
