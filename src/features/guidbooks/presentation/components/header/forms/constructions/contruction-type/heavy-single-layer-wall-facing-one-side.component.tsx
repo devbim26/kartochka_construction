@@ -314,7 +314,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 
 			<ConstructionLayer title="2. Облицовка">
 				{facingIndices.zeroIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
+					<div className="flex gap-[16px]">
 						<AirGapMaterialType
 							fieldIndex={facingIndices.zeroIndex}
 							constructionIndex={1}
@@ -325,48 +325,44 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 						/>
 					</div>
 				)}
-
 				{facingIndices.oneIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
-						<FrameMaterialType
-							fieldIndex={facingIndices.oneIndex}
-							constructionIndex={1}
-						/>
-						<WidthRacksStepFieldsType
-							fieldIndex={facingIndices.oneIndex}
-							constructionIndex={1}
-						/>
-					</div>
-				)}
-
-				{facingIndices.twoIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
-						<FillerMaterialType
-							fieldIndex={facingIndices.twoIndex}
-							constructionIndex={1}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={facingIndices.twoIndex}
-							constructionIndex={1}
-						/>
-					</div>
-				)}
-
-				{facingIndices.threeIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
+					<div className="flex gap-[16px]">
 						<LinkMaterialType
-							fieldIndex={facingIndices.threeIndex}
+							fieldIndex={facingIndices.oneIndex}
 							constructionIndex={1}
 						/>
 						<PointConnectionsFieldsType
+							fieldIndex={facingIndices.oneIndex}
+							constructionIndex={1}
+						/>
+					</div>
+				)}
+				{facingIndices.twoIndex >= 0 && (
+					<div className="flex gap-[16px]">
+						<FrameMaterialType
+							fieldIndex={facingIndices.twoIndex}
+							constructionIndex={1}
+						/>
+						<WidthRacksStepFieldsType
+							fieldIndex={facingIndices.twoIndex}
+							constructionIndex={1}
+						/>
+					</div>
+				)}
+				{facingIndices.threeIndex >= 0 && (
+					<div className="flex gap-[16px]">
+						<FillerMaterialType
+							fieldIndex={facingIndices.threeIndex}
+							constructionIndex={1}
+						/>
+						<ThicknessDensityFieldsType
 							fieldIndex={facingIndices.threeIndex}
 							constructionIndex={1}
 						/>
 					</div>
 				)}
-
 				{facingIndices.fourIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
+					<div className="flex gap-[16px]">
 						<BoardMaterialType
 							fieldIndex={facingIndices.fourIndex}
 							constructionIndex={1}
@@ -377,7 +373,6 @@ export const HeavySingleLayerWallFacingOneSideComponent = () => {
 						/>
 					</div>
 				)}
-
 				{facingIndices.fiveIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {

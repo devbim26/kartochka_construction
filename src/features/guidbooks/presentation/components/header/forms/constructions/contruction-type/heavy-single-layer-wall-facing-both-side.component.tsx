@@ -225,7 +225,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 					</>
 				)}
 				{topFacingIndices.fourIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
+					<div className="flex gap-[16px]">
 						<BoardMaterialType
 							fieldIndex={topFacingIndices.fourIndex}
 							constructionIndex={0}
@@ -236,48 +236,44 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 						/>
 					</div>
 				)}
-
 				{topFacingIndices.threeIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
-						<LinkMaterialType
-							fieldIndex={topFacingIndices.threeIndex}
-							constructionIndex={0}
-						/>
-						<PointConnectionsFieldsType
-							fieldIndex={topFacingIndices.threeIndex}
-							constructionIndex={0}
-						/>
-					</div>
-				)}
-
-				{topFacingIndices.twoIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
+					<div className="flex gap-[16px]">
 						<FillerMaterialType
-							fieldIndex={topFacingIndices.twoIndex}
+							fieldIndex={topFacingIndices.threeIndex}
 							constructionIndex={0}
 						/>
 						<ThicknessDensityFieldsType
+							fieldIndex={topFacingIndices.threeIndex}
+							constructionIndex={0}
+						/>
+					</div>
+				)}
+				{topFacingIndices.twoIndex >= 0 && (
+					<div className="flex gap-[16px]">
+						<FrameMaterialType
+							fieldIndex={topFacingIndices.twoIndex}
+							constructionIndex={0}
+						/>
+						<WidthRacksStepFieldsType
 							fieldIndex={topFacingIndices.twoIndex}
 							constructionIndex={0}
 						/>
 					</div>
 				)}
-
 				{topFacingIndices.oneIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
-						<FrameMaterialType
+					<div className="flex gap-[16px]">
+						<LinkMaterialType
 							fieldIndex={topFacingIndices.oneIndex}
 							constructionIndex={0}
 						/>
-						<WidthRacksStepFieldsType
+						<PointConnectionsFieldsType
 							fieldIndex={topFacingIndices.oneIndex}
 							constructionIndex={0}
 						/>
 					</div>
 				)}
-
 				{topFacingIndices.zeroIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
+					<div className="flex gap-[16px]">
 						<AirGapMaterialType
 							fieldIndex={topFacingIndices.zeroIndex}
 							constructionIndex={0}
@@ -519,7 +515,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 
 			<ConstructionLayer title="3. Облицовка">
 				{bottomFacingIndices.zeroIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
+					<div className="flex gap-[16px]">
 						<AirGapMaterialType
 							fieldIndex={bottomFacingIndices.zeroIndex}
 							constructionIndex={2}
@@ -530,48 +526,44 @@ export const HeavySingleLayerWallFacingBothSideComponent = () => {
 						/>
 					</div>
 				)}
-
 				{bottomFacingIndices.oneIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
-						<FrameMaterialType
-							fieldIndex={bottomFacingIndices.oneIndex}
-							constructionIndex={2}
-						/>
-						<WidthRacksStepFieldsType
-							fieldIndex={bottomFacingIndices.oneIndex}
-							constructionIndex={2}
-						/>
-					</div>
-				)}
-
-				{bottomFacingIndices.twoIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
-						<FillerMaterialType
-							fieldIndex={bottomFacingIndices.twoIndex}
-							constructionIndex={2}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={bottomFacingIndices.twoIndex}
-							constructionIndex={2}
-						/>
-					</div>
-				)}
-
-				{bottomFacingIndices.threeIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
+					<div className="flex gap-[16px]">
 						<LinkMaterialType
-							fieldIndex={bottomFacingIndices.threeIndex}
+							fieldIndex={bottomFacingIndices.oneIndex}
 							constructionIndex={2}
 						/>
 						<PointConnectionsFieldsType
+							fieldIndex={bottomFacingIndices.oneIndex}
+							constructionIndex={2}
+						/>
+					</div>
+				)}
+				{bottomFacingIndices.twoIndex >= 0 && (
+					<div className="flex gap-[16px]">
+						<FrameMaterialType
+							fieldIndex={bottomFacingIndices.twoIndex}
+							constructionIndex={2}
+						/>
+						<WidthRacksStepFieldsType
+							fieldIndex={bottomFacingIndices.twoIndex}
+							constructionIndex={2}
+						/>
+					</div>
+				)}
+				{bottomFacingIndices.threeIndex >= 0 && (
+					<div className="flex gap-[16px]">
+						<FillerMaterialType
+							fieldIndex={bottomFacingIndices.threeIndex}
+							constructionIndex={2}
+						/>
+						<ThicknessDensityFieldsType
 							fieldIndex={bottomFacingIndices.threeIndex}
 							constructionIndex={2}
 						/>
 					</div>
 				)}
-
 				{bottomFacingIndices.fourIndex >= 0 && (
-					<div className="flex flex-row gap-[16px]">
+					<div className="flex gap-[16px]">
 						<BoardMaterialType
 							fieldIndex={bottomFacingIndices.fourIndex}
 							constructionIndex={2}
