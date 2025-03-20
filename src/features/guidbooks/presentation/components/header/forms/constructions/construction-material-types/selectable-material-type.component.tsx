@@ -63,7 +63,7 @@ export const SelectableMaterialType = memoize(
 		};
 
 		useEffect(() => {
-			currentMaterialType && handleGetMaterials({ materialType: currentMaterialType });
+			handleGetMaterials({ materialType: currentMaterialType });
 		}, []);
 
 		return (
@@ -93,7 +93,9 @@ export const SelectableMaterialType = memoize(
 							buttonClassName="text-sm rounded-[8px] w-[226px]"
 							placeholder="Выберите тип материала"
 							onChange={(selectedOption: any) => {
-								handleGetMaterials({ materialType: selectedOption });
+								!selectedOption
+									? setMaterials([])
+									: handleGetMaterials({ materialType: selectedOption });
 								setValue(
 									`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
 									userMaterials!.map((material) =>
