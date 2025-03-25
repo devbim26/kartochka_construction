@@ -1,20 +1,19 @@
 import { DeleteIcon } from '@core';
-import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
 import {
 	AirGapMaterialType,
 	BoardMaterialType,
-	ConstructionFieldsMap,
 	ConstructionLayer,
 	FillerMaterialType,
 	FrameMaterialType,
 	HeavyMaterialType,
 	LinkMaterialType,
-	MaterialTypesSelectValuesEnum,
 	PointConnectionsFieldsType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 	WidthRacksStepFieldsType,
 } from '@features';
+import { ConstructionFieldsMap } from '@features/guidbooks/constants';
+import { ConstructionsAddData, MaterialTypeEnum, MaterialTypesSelectValuesEnum } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';

@@ -1,4 +1,4 @@
-import { HeaderFormTypes, type HeaderFormTitles } from '../types';
+import { HeaderFormTitles, HeaderFormTypes } from '../types';
 
 type guidbookHeaderTitlesMapValueType = (titles: HeaderFormTitles) => string;
 

@@ -1,4 +1,3 @@
-import { ConstructionPosition, MaterialParametrs } from '@api-gen';
 import {
 	CheckboxSelect,
 	convertToPaginatedType,
@@ -7,38 +6,20 @@ import {
 	Select,
 	Switch,
 } from '@core';
-import type { ConstructionsAddData, Issuer } from '@features';
 import {
 	ConstructionsAddFieldNames,
-	ConstructionTypeEnum,
 	ConstructionTypeFieldNames,
-	convertToClientIssuerData,
-	FormSubTitle,
-	FramePartitionDouble,
-	FramePartitionSingle,
-	getGuidebooksPaginated,
-	Guidebooks,
-	HeavyMultiLayerWallComponent,
-	HeavyMultiLayerWallFacingBothSideComponent,
-	HeavyMultiLayerWallFacingOneSideComponent,
-	HeavyMultiLayerWallSoundproofBothSide,
-	HeavyMultiLayerWallSoundproofingLeftSide,
-	HeavyMultiLayerWallSoundproofOneSide,
-	HeavySingleLayerWallComponent,
-	HeavySingleLayerWallFacingBothSideComponent,
-	HeavySingleLayerWallFacingOneSideComponent,
-	HeavySingleLayerWallSoundproofingBothSideComponent,
-	HeavySingleLayerWallSoundproofingOneSideComponent,
-	MaterialTypeEnum,
-	RuConstructionTypesSelectValues,
-	RuCountryNamesSelectValues,
-	RuIndexTypeNamesSelectValues,
-	RuPriorityNamesSelectValues,
-} from '@features';
+} from '@features/guidbooks/constants';
+import { convertToClientIssuerData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
+import { ConstructionsAddData, ConstructionTypeEnum, Guidebooks, Issuer, MaterialTypeEnum, RuConstructionTypesSelectValues, RuCountryNamesSelectValues, RuIndexTypeNamesSelectValues, RuPriorityNamesSelectValues } from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
+import { FramePartitionDouble, FramePartitionSingle, HeavyMultiLayerWallComponent, HeavyMultiLayerWallFacingBothSideComponent, HeavyMultiLayerWallFacingOneSideComponent, HeavyMultiLayerWallSoundproofBothSide, HeavyMultiLayerWallSoundproofingLeftSide, HeavyMultiLayerWallSoundproofOneSide, HeavySingleLayerWallComponent, HeavySingleLayerWallFacingBothSideComponent, HeavySingleLayerWallFacingOneSideComponent, HeavySingleLayerWallSoundproofingBothSideComponent, HeavySingleLayerWallSoundproofingOneSideComponent } from './contruction-type';
+import { ConstructionPosition, MaterialParametrs } from '@api-gen';
+import { FormSubTitle } from '../../../form-sub-title.component';
 
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();

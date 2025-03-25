@@ -326,7 +326,7 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	density?: number | null;
 	/** @format float */
 	thickness?: number | null;
-	materialTypeEnum?: MaterialTypeEnum;
+	materialType?: MaterialTypeEnum;
 }
 
 export interface GetPalacementRoomVariantsWithTypesQuery {
@@ -741,6 +741,7 @@ export interface UpdateRequirementCommand {
 export interface UserMaterialDto {
 	/** @format uuid */
 	materialId?: string;
+	materialType?: MaterialTypeEnum;
 	/** @format int32 */
 	positionId?: number;
 	materialTypeValue?: MaterialTypeValueDto[] | null;

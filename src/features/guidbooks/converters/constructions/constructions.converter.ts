@@ -13,15 +13,15 @@ import {
 	convertToClientPriorityData,
 	convertToServerPriorityData,
 } from '@core/converters/priority.converter';
+import { Country, Priority } from '@features/guidbooks/types';
+
 import type {
 	ConstructionsAddData,
 	ConstructionsEditData,
 	ConstructionsFilterData,
+	ConstructionType,
 	ConstructionTypeTemplate,
-	Country,
-	Priority,
-} from '@features';
-import type { ConstructionType } from '@features/guidbooks/types/constructions';
+} from '@features/guidbooks/types/constructions';
 
 export const convertToClientConstructionTypesList = (data: any): ConstructionTypeTemplate[] => {
 	return data.map((data: any) => ({

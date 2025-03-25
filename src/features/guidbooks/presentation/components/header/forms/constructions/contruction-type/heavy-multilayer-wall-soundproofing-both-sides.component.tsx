@@ -1,23 +1,27 @@
-import type { MaterialTypeEnum } from '@api-gen';
 import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
+import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import {
-	BoardMaterialType,
-	ConstructionFieldsMap,
-	ConstructionLayer,
-	FillerMaterialType,
-	HeavyMaterialType,
-	LinkMaterialType,
+	ConstructionsAddData,
+	MaterialTypeEnum,
 	MaterialTypesSelectValuesEnum,
-	PointConnectionsFieldsType,
-	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-	ZPanelMaterialType,
-	type ConstructionsAddData,
-} from '@features';
+} from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
+import {
+	PointConnectionsFieldsType,
+	ThicknessDensityFieldsType,
+} from '../construction-fields-types';
+import {
+	BoardMaterialType,
+	FillerMaterialType,
+	HeavyMaterialType,
+	LinkMaterialType,
+	SelectableMaterialType,
+	ZPanelMaterialType,
+} from '../construction-material-types';
+import { ConstructionLayer } from '../constructions-layer.component';
 
 export const HeavyMultiLayerWallSoundproofBothSide = () => {
 	const form = useFormContext<ConstructionsAddData>();

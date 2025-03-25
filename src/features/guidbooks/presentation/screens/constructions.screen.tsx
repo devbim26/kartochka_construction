@@ -10,36 +10,42 @@ import {
 	useAppNavigate,
 	type PaginationState,
 } from '@core';
-import type {
-	ConstructionsAddData,
-	ConstructionsEditData,
-	ConstructionsFilterData,
-	ConstructionTypeEnum,
-	Country,
-} from '@features';
 import {
 	ConstructionsAdd,
-	ConstructionsAddConfig,
 	ConstructionsEdit,
-	ConstructionsEditConfig,
 	ConstructionsFilter,
-	ConstructionsFilterConfig,
+	GuidbookPageHeaderWrapper,
+} from '@features';
+import {
 	convertToClientConstructionsAddData,
 	convertToClientConstructionsEditData,
 	convertToServerConstructionsAddData,
 	convertToServerConstructionsEditData,
 	convertToServerConstructionsFilterData,
+} from '@features/guidbooks/converters';
+import {
 	getGuidebooksCreate,
 	getGuidebooksDelete,
 	getGuidebooksDetail,
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
-	GuidbookPageHeaderWrapper,
+} from '@features/guidbooks/services';
+import {
+	ConstructionTypeEnum,
 	Guidebooks,
 	RuConstructionTypesMap,
 	RuCountryNamesMap,
+	type ConstructionsAddData,
+	type ConstructionsEditData,
+	type ConstructionsFilterData,
+	type Country,
+} from '@features/guidbooks/types';
+import {
+	ConstructionsAddConfig,
+	ConstructionsEditConfig,
+	ConstructionsFilterConfig,
 	useHeaderForm,
-} from '@features';
+} from '@features/guidbooks/utils';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
@@ -141,7 +147,7 @@ const ConstructionsScreen = () => {
 											{
 												setItemToDelete({
 													id: info.row.original.id!,
-													name: info.row.original.name,
+													name: info.row.original.name!,
 												});
 											}
 											setIsModalOpen(true);

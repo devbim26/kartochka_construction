@@ -1,5 +1,5 @@
 import { Input } from '@core';
-import type { ConstructionsAddData } from '@features';
+import { ConstructionsAddData } from '@features/guidbooks/types';
 
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';

@@ -1,4 +1,4 @@
-import type { PaginationState } from '@core/types';
+import { PaginationState } from '@core/types';
 
 export const paginationStateDefault: PaginationState = {
 	pageNumber: 1,

@@ -1,6 +1,5 @@
 import { Checkbox, DropdownSelectButton, Input, Popover, SearchIcon } from '@core';
-import type { Country } from '@features';
-import { RuCountryNamesMap } from '@features/guidbooks/types';
+import { Country, RuCountryNamesMap } from '@features/guidbooks/types';
 import React, { useCallback, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 

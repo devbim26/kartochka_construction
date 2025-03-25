@@ -1,25 +1,14 @@
 import type { GetMaterialsWithPaginationParamsQuery } from '@api-gen';
 import { convertToClientCountryData, convertToServerCountryData } from '@core';
-import type {
-	Country,
-	MaterialOriginType,
-	MaterialsAddAndEditData,
-	MaterialsFilterData,
-	MaterialTypeEnum,
-} from '@features';
-import {
-	convertToClientMaterialOriginTypeData,
-	convertToClientMaterialTypeData,
-	convertToServerMaterialOriginTypeData,
-	convertToServerMaterialTypeData,
-} from '@features';
+import { Country, MaterialOriginType, MaterialsAddAndEditData, MaterialsFilterData, MaterialTypeEnum } from '@features/guidbooks/types';
+import { convertToClientMaterialTypeData, convertToServerMaterialTypeData } from './material-type.converter';
+import { convertToClientMaterialOriginTypeData, convertToServerMaterialOriginTypeData } from './material-origin-type.converter';
 
 export const convertToServerMaterialsFilterData = (
 	data: MaterialsFilterData,
 ): GetMaterialsWithPaginationParamsQuery => ({
 	name: data.name || null,
-	materialTypeEnum:
-		convertToServerMaterialTypeData(data.materialType as MaterialTypeEnum) || null,
+	materialType: convertToServerMaterialTypeData(data.materialType as MaterialTypeEnum) || null,
 	density: data.density ? +data.density : null,
 	thickness: data.thickness ? +data.thickness : null,
 });

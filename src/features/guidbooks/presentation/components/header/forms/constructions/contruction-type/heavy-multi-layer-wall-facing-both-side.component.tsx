@@ -1,23 +1,25 @@
+import { MaterialTypeEnum } from '@api-gen';
 import { DeleteIcon } from '@core';
-import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
+import { ConstructionFieldsMap } from '@features/guidbooks/constants';
+import { ConstructionsAddData, MaterialTypesSelectValuesEnum } from '@features/guidbooks/types';
+import { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { AiOutlinePlusCircle } from 'react-icons/ai';
+import {
+	PointConnectionsFieldsType,
+	ThicknessDensityFieldsType,
+	WidthRacksStepFieldsType,
+} from '../construction-fields-types';
 import {
 	AirGapMaterialType,
 	BoardMaterialType,
-	ConstructionFieldsMap,
-	ConstructionLayer,
 	FillerMaterialType,
 	FrameMaterialType,
 	HeavyMaterialType,
 	LinkMaterialType,
-	MaterialTypesSelectValuesEnum,
-	PointConnectionsFieldsType,
 	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-	WidthRacksStepFieldsType,
-} from '@features';
-import { useEffect, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
+} from '../construction-material-types';
+import { ConstructionLayer } from '../constructions-layer.component';
 
 export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 	const form = useFormContext<ConstructionsAddData>();

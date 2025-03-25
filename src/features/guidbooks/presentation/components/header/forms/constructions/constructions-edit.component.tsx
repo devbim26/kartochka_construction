@@ -7,17 +7,31 @@ import {
 	Select,
 	Switch,
 } from '@core';
-import type { ConstructionsEditData, Issuer } from '@features';
 import {
 	ConstructionsEditFieldNames,
-	ConstructionTypeEnum,
 	ConstructionTypeFieldNames,
-	convertToClientIssuerData,
-	FormSubTitle,
+} from '@features/guidbooks/constants';
+import { convertToClientIssuerData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
+import {
+	ConstructionsEditData,
+	ConstructionTypeEnum,
+	Guidebooks,
+	Issuer,
+	MaterialTypeEnum,
+	RuConstructionTypesSelectValues,
+	RuCountryNamesSelectValues,
+	RuIndexTypeNamesSelectValues,
+	RuPriorityNamesSelectValues,
+} from '@features/guidbooks/types';
+import { useCallback, useEffect, useState } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { IoMdWarning } from 'react-icons/io';
+import { twMerge } from 'tailwind-merge';
+import { FormSubTitle } from '../../../form-sub-title.component';
+import {
 	FramePartitionDouble,
 	FramePartitionSingle,
-	getGuidebooksPaginated,
-	Guidebooks,
 	HeavyMultiLayerWallComponent,
 	HeavyMultiLayerWallFacingBothSideComponent,
 	HeavyMultiLayerWallFacingOneSideComponent,
@@ -29,16 +43,7 @@ import {
 	HeavySingleLayerWallFacingOneSideComponent,
 	HeavySingleLayerWallSoundproofingBothSideComponent,
 	HeavySingleLayerWallSoundproofingOneSideComponent,
-	MaterialTypeEnum,
-	RuConstructionTypesSelectValues,
-	RuCountryNamesSelectValues,
-	RuIndexTypeNamesSelectValues,
-	RuPriorityNamesSelectValues,
-} from '@features';
-import { useCallback, useEffect, useState } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
-import { IoMdWarning } from 'react-icons/io';
-import { twMerge } from 'tailwind-merge';
+} from './contruction-type';
 
 export const ConstructionsEdit = () => {
 	const form = useFormContext<ConstructionsEditData>();

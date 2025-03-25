@@ -8,15 +8,10 @@ import {
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
-import {
-	AccountDataConfig,
-	ACCOUNT_FETCH_ROUTES,
-	ButtonTitles,
-	FormTitles,
-	getCurrentUser,
-	updateUser,
-} from '@features';
-import type { AccountData } from '@features/account/types/account-data.types';
+import { ACCOUNT_FETCH_ROUTES, ButtonTitles, FormTitles } from '@features/account/constants';
+import { getCurrentUser, updateUser } from '@features/account/services';
+import { AccountData } from '@features/account/types';
+import { AccountDataConfig } from '@features/account/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import { useEffect } from 'react';

@@ -34,8 +34,9 @@ module.exports = {
 				use: {
 					loader: 'ts-loader',
 					options: {
-						transpileOnly: true, //false
+						transpileOnly: false,
 						compilerOptions: {
+							noEmitOnError: true,
 							sourceMap: runStatus === 'development',
 						},
 					},

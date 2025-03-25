@@ -1,4 +1,4 @@
-import type { AUTH_ACTIONS } from '@features/auth';
+import { AUTH_ACTIONS } from '@features/auth/constants';
 import type { AccountSliceState } from './account.slice';
 
 type ActionType = (typeof AUTH_ACTIONS)[keyof typeof AUTH_ACTIONS];

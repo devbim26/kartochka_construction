@@ -1,14 +1,9 @@
 import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
-import type { ConstructionsAddData, MaterialsFilterData, MaterialTypeEnum } from '@features';
-import {
-	convertToClientMaterialsAddAndEditData,
-	getGuidebooksPaginated,
-	Guidebooks,
-	MaterialTypesSelectValuesEnum,
-	MaterialTypesSelectValuesMap,
-	MaterialTypeValuesMap,
-} from '@features';
+import { MaterialTypeValuesMap } from '@features/guidbooks/constants';
+import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
+import { ConstructionsAddData, Guidebooks, MaterialsFilterData, MaterialTypeEnum, MaterialTypesSelectValuesEnum, MaterialTypesSelectValuesMap } from '@features/guidbooks/types';
 import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';

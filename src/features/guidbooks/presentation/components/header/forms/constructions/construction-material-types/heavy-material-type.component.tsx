@@ -1,18 +1,16 @@
-import { MaterialTypeEnum } from '@api-gen';
 import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
-import type { ConstructionsAddData, MaterialsFilterData } from '@features';
+import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
-	convertToClientMaterialsAddAndEditData,
-	getGuidebooksPaginated,
+	ConstructionsAddData,
 	Guidebooks,
-} from '@features';
-
+	MaterialsFilterData,
+	MaterialTypeEnum,
+} from '@features/guidbooks/types';
 import type { AxiosResponse } from 'axios';
-
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 

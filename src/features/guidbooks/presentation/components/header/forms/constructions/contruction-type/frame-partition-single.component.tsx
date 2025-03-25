@@ -1,21 +1,22 @@
 import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
+import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import {
-	BoardMaterialType,
-	ConstructionFieldsMap,
-	ConstructionLayer,
-	FillerMaterialType,
-	FrameMaterialType,
+	ConstructionsAddData,
+	MaterialTypeEnum,
 	MaterialTypesSelectValuesEnum,
-	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-	WidthRacksStepFieldsType,
-	type ConstructionsAddData,
-	type MaterialTypeEnum,
-} from '@features/guidbooks';
+} from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
+import { ThicknessDensityFieldsType, WidthRacksStepFieldsType } from '../construction-fields-types';
+import {
+	BoardMaterialType,
+	FillerMaterialType,
+	FrameMaterialType,
+	SelectableMaterialType,
+} from '../construction-material-types';
+import { ConstructionLayer } from '../constructions-layer.component';
 
 export const FramePartitionSingle = () => {
 	const form = useFormContext<ConstructionsAddData>();

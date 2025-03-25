@@ -1,24 +1,28 @@
 import { MaterialParametrs } from '@api-gen';
 import { DeleteIcon } from '@core';
+import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import {
-	AirGapMaterialType,
-	BoardMaterialType,
-	ConstructionFieldsMap,
-	ConstructionLayer,
-	FillerMaterialType,
-	FrameMaterialType,
-	LinkMaterialType,
+	ConstructionsAddData,
+	MaterialTypeEnum,
 	MaterialTypesSelectValuesEnum,
-	PointConnectionsFieldsType,
-	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-	WidthRacksStepFieldsType,
-	type ConstructionsAddData,
-	type MaterialTypeEnum,
-} from '@features/guidbooks';
+} from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
+import {
+	PointConnectionsFieldsType,
+	ThicknessDensityFieldsType,
+	WidthRacksStepFieldsType,
+} from '../construction-fields-types';
+import {
+	AirGapMaterialType,
+	BoardMaterialType,
+	FillerMaterialType,
+	FrameMaterialType,
+	LinkMaterialType,
+	SelectableMaterialType,
+} from '../construction-material-types';
+import { ConstructionLayer } from '../constructions-layer.component';
 
 export const FramePartitionDouble = () => {
 	const form = useFormContext<ConstructionsAddData>();

@@ -2,14 +2,11 @@ import { APP_ROUTES } from '@core';
 import {
 	AccountScreen,
 	AuthorizationScreen,
-	AUTH_ROUTES,
 	CodeConfirmPage,
 	CompanyRegistrationPage,
 	ConstructionsScreen,
-	DESIGNING_ROUTES,
 	DevScreen,
 	GuidbooksLauout,
-	GUIDBOOKS_ROUTES,
 	HomeScreen,
 	IssuersScreen,
 	LandingScreen,
@@ -18,8 +15,10 @@ import {
 	MaterialsScreen,
 	NotFoundScreen,
 	RequirementsScreen,
-	USERS_LIST_ROUTES,
 } from '@features';
+import { AUTH_ROUTES } from '@features/auth/constants';
+import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
+import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {

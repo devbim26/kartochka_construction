@@ -20,6 +20,7 @@ export const materialTypeMap = createDataRecordConverter({
 	[ClientMaterialType.Filler]: ServerMaterialType.Filler,
 	[ClientMaterialType.Heavy]: ServerMaterialType.Heavy,
 	[ClientMaterialType.Board]: ServerMaterialType.Board,
+	[ClientMaterialType.ZPanel]: ServerMaterialType.Glazing,
 });
 
 export const convertToServerMaterialTypeData = (type: ClientMaterialType): ServerMaterialType => {
