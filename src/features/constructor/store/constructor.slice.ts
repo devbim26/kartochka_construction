@@ -1,9 +1,9 @@
 import { createAsyncCases, type SliceInitialState } from '@core/utils/fetch/create-cases.util';
 import { getCurrentUser, logout, updateUser, type AccountData } from '@features/account';
-import { accountReducer } from '@features/account/store';
 import { createSlice } from '@reduxjs/toolkit';
+import { constructorReducer } from './constructor.reducer';
 
-export type ConstructorDataState = AccountData;
+export type ConstructorDataState = AccountData; //потом поменять тип
 
 export interface ConstructorSliceState extends SliceInitialState {
 	data: ConstructorDataState | null;
@@ -24,7 +24,7 @@ export const constructorSlice = createSlice({
 	name: 'responseData',
 	initialState: initialState,
 	reducers: {
-		accountReducer,
+		constructorReducer,
 	},
 	extraReducers: (builder) => {
 		createAsyncCases(builder, getCurrentUser, (state: ConstructorSliceState, action) => {});

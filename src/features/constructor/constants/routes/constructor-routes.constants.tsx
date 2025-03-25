@@ -1,8 +1,4 @@
 export const CONSTRUCTOR_ROUTES = {
-	aboutBuilding: {
-		id: 'constructor-about-building-pade-id',
-		route: 'about-building',
-	},
 	floorPlan: {
 		id: 'constructor-floorplans-page-id',
 		route: 'floor-plans',

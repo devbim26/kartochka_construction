@@ -43,10 +43,6 @@ export const AppRouter = () => {
 					element={<DevScreen title="Конструктор" />}
 				>
 					<Route
-						path={CONSTRUCTOR_ROUTES.aboutBuilding.route}
-						element={<DevScreen title="О здании" />}
-					/>
-					<Route
 						path={CONSTRUCTOR_ROUTES.floorPlan.route}
 						element={<DevScreen title="Поэтажные планы" />}
 					/>
