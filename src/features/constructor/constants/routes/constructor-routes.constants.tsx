@@ -3,16 +3,16 @@ export const CONSTRUCTOR_ROUTES = {
 		id: 'constructor-main-pade-id',
 		route: 'main',
 	},
-	plan: {
-		id: 'constructions-floorplans-page-id',
-		route: 'plan',
+	floorPlan: {
+		id: 'constructor-floorplans-page-id',
+		route: 'floor-plans',
 	},
-	requirements: {
-		id: 'requirements-page-id',
-		route: 'requirements',
+	constructionChoice: {
+		id: 'constructor-construction-choice-page-id',
+		route: 'construction-choice',
 	},
-	issuers: {
-		id: 'issuers-page-id',
-		route: 'issuers',
+	constructionEditor: {
+		id: 'constructor-construction-editor-page-id',
+		route: 'construction-editor',
 	},
 };
