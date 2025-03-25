@@ -11,8 +11,8 @@ export const CONSTRUCTOR_ROUTES = {
 		id: 'constructor-construction-choice-page-id',
 		route: 'construction-choice',
 	},
-	constructionEditor: {
-		id: 'constructor-construction-editor-page-id',
-		route: 'construction-editor',
+	constructorDesigning: {
+		id: 'constructor-designing-page-id',
+		route: 'designing',
 	},
 };
