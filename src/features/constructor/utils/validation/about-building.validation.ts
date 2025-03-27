@@ -11,6 +11,8 @@ const AboutBuildingSchema = z.object({
 		.refine((value) => Number.isInteger(Number(value)), 'Значение должно быть целым числом')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
 	comfortClass: z.string().min(1, 'Поле обязательно для заполнения'),
+	isFloorPlan: z.boolean(),
+	isBim: z.boolean(),
 });
 
 type AboutBuildingDataSchemaType = z.infer<typeof AboutBuildingSchema>;

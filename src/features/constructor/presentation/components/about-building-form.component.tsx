@@ -1,6 +1,7 @@
-import { Input, Select } from '@core';
+import { Button, Input, Select, Switch } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type { AboutBuildingData } from '@features/constructor/types';
+import { ConstructorAboutBuildingFormDataConfig } from '@features/constructor/utils';
 import {
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
@@ -11,8 +12,15 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const AboutBuildingForm = memoize(() => {
-	const form = useForm<AboutBuildingData>();
+	const form = useForm<AboutBuildingData>({
+		defaultValues: ConstructorAboutBuildingFormDataConfig.defaultValues,
+	});
 	const { register, control, formState } = form;
+
+	const onSubmit = (data: AboutBuildingData) => {
+		console.log(data);
+	};
+
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
 			<div className="flex border-b px-[24px] py-[18px]">
@@ -100,7 +108,6 @@ export const AboutBuildingForm = memoize(() => {
 								/>
 							</div>
 						</div>
-
 						<Input
 							{...register('maxHeight')}
 							labelClassName={twMerge(
@@ -138,6 +145,50 @@ export const AboutBuildingForm = memoize(() => {
 								/>
 							)}
 						/>
+						<p className="font-sans text-lg font-semibold leading-6">
+							Ввод информации о конструкциях здания
+						</p>
+						<div className="flex items-center gap-x-[70px]">
+							<label className="font-sans text-sm font-semibold leading-6">
+								Поэтажные планы (pdf)
+							</label>
+							<Controller
+								control={control}
+								name="isFloorPlan"
+								render={({ field }) => (
+									<Switch
+										onChange={(value) => field.onChange(value)}
+										wrapperClassName="w-[36px] h-[20px]"
+									/>
+								)}
+							/>
+						</div>
+						<div className="flex items-center gap-x-[50px]">
+							<label className="font-sans text-sm font-semibold leading-6">
+								BIM-модель (в разработке)
+							</label>
+							<Controller
+								control={control}
+								name="isBim"
+								render={({ field }) => (
+									<Switch
+										onChange={(value) => field.onChange(value)}
+										wrapperClassName="w-[36px] h-[20px]"
+									/>
+								)}
+							/>
+						</div>
+						<div className="flex justify-end px-[16px] py-[13px]">
+							<Button
+								type={'submit'}
+								onClick={() => {
+									form.handleSubmit(onSubmit)();
+								}}
+								className="h-[40px] w-[76px] px-[16px]"
+							>
+								<p className="font-sans text-sm font-semibold leading-4">Далее</p>
+							</Button>
+						</div>
 					</div>
 				</FormProvider>
 			</div>
