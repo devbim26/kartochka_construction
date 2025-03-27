@@ -1,5 +1,4 @@
-import { ConstructorHeader } from '../components';
-import { AboutBuildingForm } from '../components/about-building-form.component';
+import { AboutBuildingForm, ConstructorHeader } from '../components';
 
 const ConstructorScreen = () => {
 	return (
