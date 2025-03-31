@@ -1,5 +1,7 @@
-import { Button, Input, Select, Switch } from '@core';
+import { APP_ROUTES, Button, Input, Select, Switch, useAppDispatch, useAppNavigate } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
+import { constructorSlice } from '@features/constructor/store';
 import type { AboutBuildingData } from '@features/constructor/types';
 import { ConstructorAboutBuildingFormDataConfig } from '@features/constructor/utils';
 import {
@@ -16,9 +18,12 @@ export const AboutBuildingForm = memoize(() => {
 		defaultValues: ConstructorAboutBuildingFormDataConfig.defaultValues,
 	});
 	const { register, control, formState } = form;
+	const dispatch = useAppDispatch();
+	const navigate = useAppNavigate();
 
 	const onSubmit = (data: AboutBuildingData) => {
-		console.log(data);
+		dispatch(constructorSlice.actions.setAboutBuilding(data));
+		navigate(APP_ROUTES.designing.route + CONSTRUCTOR_ROUTES.floorPlan.route);
 	};
 
 	return (

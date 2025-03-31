@@ -1,2 +1,2 @@
-export * from './about-building.validation';
 export * from './config';
+export * from './constructor.validation';

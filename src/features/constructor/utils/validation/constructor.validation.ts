@@ -15,5 +15,20 @@ const AboutBuildingSchema = z.object({
 	isBim: z.boolean(),
 });
 
+const FloorPlanSchema = z.object({
+	floorPlanFile: z
+		.any()
+		.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения')
+		.refine((file) => file.type === 'application/pdf', 'Файл должен быть в формате PDF'),
+	floorPlanPdf: z.string().min(1, 'Поле обязательно дляя заполнения'),
+});
+
 type AboutBuildingDataSchemaType = z.infer<typeof AboutBuildingSchema>;
-export { AboutBuildingSchema, type AboutBuildingDataSchemaType };
+type FloorPlanSchemaType = z.infer<typeof FloorPlanSchema>;
+
+export {
+	AboutBuildingSchema,
+	FloorPlanSchema,
+	type AboutBuildingDataSchemaType,
+	type FloorPlanSchemaType,
+};

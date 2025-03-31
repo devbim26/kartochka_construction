@@ -1,5 +1,5 @@
 import type { EntityConfig } from '@core';
-import { AboutBuildingSchema } from './about-building.validation';
+import { AboutBuildingSchema, FloorPlanSchema } from './constructor.validation';
 
 export const ConstructorAboutBuildingFormDataConfig: EntityConfig = {
 	schema: AboutBuildingSchema,
@@ -12,5 +12,13 @@ export const ConstructorAboutBuildingFormDataConfig: EntityConfig = {
 		comfortClass: '',
 		isFloorPlan: false,
 		isBim: false,
+	},
+};
+
+export const ConstructorFloorPlanFormDataConfig: EntityConfig = {
+	schema: FloorPlanSchema,
+	defaultValues: {
+		floorPlanFile: null,
+		floorPlanPdf: '',
 	},
 };
