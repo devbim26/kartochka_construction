@@ -21,6 +21,7 @@ import {
 	USERS_LIST_ROUTES,
 } from '@features';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor';
+import ConstructorScreen from '@features/constructor/presentation/screens/constructor-main.screen';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
@@ -38,10 +39,7 @@ export const AppRouter = () => {
 			</Route>
 			<Route path={APP_ROUTES.designing.route} element={<HomeScreen />}>
 				<Route path={DESIGNING_ROUTES.main.route} element={<MainScreen />} />
-				<Route
-					path={DESIGNING_ROUTES.constructor.route}
-					element={<DevScreen title="Конструктор" />}
-				>
+				<Route path={DESIGNING_ROUTES.constructor.route} element={<ConstructorScreen />}>
 					<Route
 						path={CONSTRUCTOR_ROUTES.floorPlan.route}
 						element={<DevScreen title="Поэтажные планы" />}

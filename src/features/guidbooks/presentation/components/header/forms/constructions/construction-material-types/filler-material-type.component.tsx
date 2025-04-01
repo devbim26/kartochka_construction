@@ -1,5 +1,6 @@
 import { MaterialTypeEnum } from '@api-gen';
-import { convertToPaginatedType, convertToSelectValues, memoize, Select } from '@core';
+import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import type { ConstructionsAddData, MaterialsAddAndEditData, MaterialsFilterData } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,

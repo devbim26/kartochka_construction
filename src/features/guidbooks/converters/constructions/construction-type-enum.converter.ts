@@ -1,5 +1,5 @@
 import { ConstructionTypeEnum as ServerConstructionTypeEnum } from '@api-gen';
-import { createDataRecordConverter } from '@core';
+import { createDataRecordConverter } from '@core/utils/helpers/enum-converter.helper';
 import { ConstructionTypeEnum as ClientConstructionTypeEnum } from '@features/guidbooks/types';
 
 const constructionTypeEnumMap = createDataRecordConverter({
