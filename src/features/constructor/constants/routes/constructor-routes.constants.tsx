@@ -1,13 +1,17 @@
 export const CONSTRUCTOR_ROUTES = {
-	floorPlan: {
-		id: 'constructor-floorplans-page-id',
+	aboutBuilding: {
+		id: 'constructor-about-building-page-id',
+		route: 'about-building',
+	},
+	floorPlans: {
+		id: 'constructor-floor-plans-page-id',
 		route: 'floor-plans',
 	},
-	constructionChoice: {
+	constructionSelect: {
 		id: 'constructor-construction-choice-page-id',
 		route: 'construction-choice',
 	},
-	constructorDesigning: {
+	designing: {
 		id: 'constructor-designing-page-id',
 		route: 'designing',
 	},
