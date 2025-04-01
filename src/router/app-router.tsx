@@ -20,6 +20,7 @@ import {
 	RequirementsScreen,
 	USERS_LIST_ROUTES,
 } from '@features';
+import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
@@ -40,7 +41,20 @@ export const AppRouter = () => {
 				<Route
 					path={DESIGNING_ROUTES.constructor.route}
 					element={<DevScreen title="Конструктор" />}
-				/>
+				>
+					<Route
+						path={CONSTRUCTOR_ROUTES.floorPlan.route}
+						element={<DevScreen title="Поэтажные планы" />}
+					/>
+					<Route
+						path={CONSTRUCTOR_ROUTES.constructionChoice.route}
+						element={<DevScreen title="Выбор конструкции" />}
+					/>
+					<Route
+						path={CONSTRUCTOR_ROUTES.constructorDesigning.route}
+						element={<DevScreen title="Проектирование" />}
+					/>
+				</Route>
 				<Route path={DESIGNING_ROUTES.account.route} element={<AccountScreen />} />
 				<Route
 					path={DESIGNING_ROUTES.accounts.route}
