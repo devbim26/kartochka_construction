@@ -1,4 +1,4 @@
-import { createDataRecordConverter } from '@core';
+import { createDataRecordConverter } from '@core/utils/helpers/enum-converter.helper';
 import { ConstructionClass as ClientConstructionType } from '@features/guidbooks/types';
 
 export const constructionTypeMap = createDataRecordConverter({

@@ -1,4 +1,5 @@
-import { Input, memoize } from '@core';
+import { Input } from '@core';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import type { ConstructionsAddData } from '@features';
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';

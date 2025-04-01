@@ -1,4 +1,5 @@
-import { getSessionStorageData, type EntityConfig } from '@core';
+import { type EntityConfig } from '@core';
+import { getSessionStorageData } from '@core/utils/helpers/session.helper';
 import {
 	ConstructionsAddSchema,
 	ConstructionsEditSchema,
