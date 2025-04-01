@@ -1,4 +1,13 @@
-import { APP_ROUTES, Button, Input, Select, Switch, useAppDispatch, useAppNavigate } from '@core';
+import {
+	APP_ROUTES,
+	Button,
+	FormElementLabel,
+	Input,
+	Select,
+	Switch,
+	useAppDispatch,
+	useAppNavigate,
+} from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { constructorSlice } from '@features/constructor/store';
@@ -20,6 +29,10 @@ export const AboutBuildingForm = memoize(() => {
 	const { register, control, formState } = form;
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
+
+	const handleSubmit = () => {
+		form.handleSubmit(onSubmit)();
+	};
 
 	const onSubmit = (data: AboutBuildingData) => {
 		dispatch(constructorSlice.actions.setAboutBuilding(data));
@@ -46,7 +59,7 @@ export const AboutBuildingForm = memoize(() => {
 							containerClassName="w-[226px]"
 							label="Название"
 							placeholder="Введите название"
-							max={50}
+							maxLength={50}
 						/>
 						<Controller
 							control={control}
@@ -124,6 +137,7 @@ export const AboutBuildingForm = memoize(() => {
 							error={formState.errors.name?.message}
 							containerClassName="w-[226px]"
 							label="Наибольшая допустимая высота здания, м"
+							type="number"
 							placeholder="Введите высоту"
 							max={3}
 						/>
@@ -150,9 +164,9 @@ export const AboutBuildingForm = memoize(() => {
 								/>
 							)}
 						/>
-						<p className="font-sans text-lg font-semibold leading-6">
+						<FormElementLabel className="font-sans text-lg font-semibold leading-6">
 							Ввод информации о конструкциях здания
-						</p>
+						</FormElementLabel>
 						<div className="flex items-center gap-x-[70px]">
 							<label className="font-sans text-sm font-semibold leading-6">
 								Поэтажные планы (pdf)
@@ -186,9 +200,7 @@ export const AboutBuildingForm = memoize(() => {
 						<div className="flex justify-end px-[16px] py-[13px]">
 							<Button
 								type={'submit'}
-								onClick={() => {
-									form.handleSubmit(onSubmit)();
-								}}
+								onClick={handleSubmit}
 								className="h-[40px] w-[76px] px-[16px]"
 							>
 								<p className="font-sans text-sm font-semibold leading-4">Далее</p>
