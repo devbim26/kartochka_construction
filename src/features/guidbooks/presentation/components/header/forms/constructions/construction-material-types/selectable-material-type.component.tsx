@@ -63,7 +63,7 @@ export const SelectableMaterialType = memoize(
 		};
 
 		useEffect(() => {
-			handleGetMaterials({ materialType: currentMaterialType });
+			currentMaterialType && handleGetMaterials({ materialType: currentMaterialType });
 		}, []);
 
 		return (

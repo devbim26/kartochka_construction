@@ -23,7 +23,7 @@ export function createAsyncCases<T extends SliceInitialState>(
 		state.status = action.payload.status;
 		if (action.payload.status === 200) {
 			state.error = null;
-			state.data = action.payload.data;
+			state.data = typeof action.payload.data === 'string' ? {} : action.payload.data;
 		} else {
 			state.data = null;
 			state.error = action.payload.data;
