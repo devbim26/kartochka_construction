@@ -1,7 +1,32 @@
+import type { UseFormReturn } from 'react-hook-form';
+
 export interface ConstructionTypeTemplate {
 	name?: string | null | undefined;
 	shortName?: string | null | undefined;
 	constructionRoot?: object | undefined;
+}
+
+export interface ConstructionTypeProps {
+	currentForm: UseFormReturn<any>;
+}
+
+export interface ConstructionMaterialTypesProps {
+	fieldIndex: number;
+	constructionIndex: number;
+	currentForm: UseFormReturn<any>;
+}
+
+export interface ConstructionFieldTypesProps {
+	fieldIndex: number;
+	constructionIndex: number;
+	currentForm: UseFormReturn<any>;
+}
+
+export interface UserMaterials {
+	materialId: string;
+	positionId: string;
+	materialTypeValue: Array<any>;
+	materialType: string;
 }
 
 export enum ConstructionTypeEnum {
