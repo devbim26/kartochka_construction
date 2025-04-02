@@ -1,5 +1,4 @@
 import {
-	APP_ROUTES,
 	Button,
 	FormElementLabel,
 	Input,
@@ -22,7 +21,7 @@ import {
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
-export const AboutBuildingForm = memoize(() => {
+export const AboutBuilding = memoize(() => {
 	const form = useForm<AboutBuildingData>({
 		defaultValues: ConstructorAboutBuildingFormDataConfig.defaultValues,
 	});
@@ -36,7 +35,7 @@ export const AboutBuildingForm = memoize(() => {
 
 	const onSubmit = (data: AboutBuildingData) => {
 		dispatch(constructorSlice.actions.setAboutBuilding(data));
-		navigate(APP_ROUTES.designing.route + '/' + CONSTRUCTOR_ROUTES.floorPlan.route);
+		navigate(CONSTRUCTOR_ROUTES.floorPlans.route);
 	};
 
 	return (

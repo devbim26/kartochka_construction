@@ -1,9 +1,10 @@
-import { Button, convertToBase64, memoize, useAppSelector } from '@core';
+import { Button, convertToBase64, useAppSelector } from '@core';
+import { memoize } from '@core/utils';
 import type { FloorPlanData } from '@features/constructor/types';
 import { ConstructorFloorPlanFormDataConfig } from '@features/constructor/utils';
 import { useForm } from 'react-hook-form';
 
-export const FloorPlanForm = memoize(() => {
+export const FloorPlans = memoize(() => {
 	const form = useForm<FloorPlanData>({
 		defaultValues: ConstructorFloorPlanFormDataConfig.defaultValues,
 	});
@@ -48,4 +49,4 @@ export const FloorPlanForm = memoize(() => {
 			)}
 		</div>
 	);
-}, 'FloorPlan');
+}, 'FloorPlans');

@@ -1,5 +1,6 @@
 export * from './account';
 export * from './auth';
+export * from './constructor';
 export * from './dev';
 export * from './guidbooks';
 export * from './home';
