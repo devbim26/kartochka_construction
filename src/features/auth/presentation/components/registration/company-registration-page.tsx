@@ -206,7 +206,7 @@ const CompanyRegistrationPage = () => {
 						{...form.register('payersRegistrationNumber')}
 						type={'number'}
 						placeholder="Введите УНП"
-						max={9}
+						maxLength={9}
 					/>
 					<Input
 						label={formState.errors.paymentAccount?.message || 'Расчетный счет'}
@@ -217,7 +217,7 @@ const CompanyRegistrationPage = () => {
 						{...form.register('paymentAccount')}
 						type={'text'}
 						placeholder="Введите расчетный счет"
-						max={20}
+						maxLength={20}
 					/>
 					<Input
 						label={formState.errors.bankIdNumber?.message || 'БИК'}
@@ -226,7 +226,7 @@ const CompanyRegistrationPage = () => {
 						{...form.register('bankIdNumber')}
 						type={'text'}
 						placeholder="Введите  БИК"
-						max={9}
+						maxLength={9}
 					/>
 
 					<Input
@@ -283,9 +283,11 @@ const CompanyRegistrationPage = () => {
 					</div>
 					<Input
 						{...form.register('compannyInfo')}
-						label="Информация о компании"
+						label={formState.errors.compannyInfo?.message || 'Информация о компании'}
 						maxLength={100}
 						type={'text'}
+						error={formState.errors.compannyInfo?.message}
+						labelClassName={formState.errors.compannyInfo?.message ? 'text-error' : ''}
 						placeholder="Введите информацию"
 					/>
 					<Button variant="primary" className="h-[36px]">
