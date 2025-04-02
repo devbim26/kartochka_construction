@@ -27,6 +27,8 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 		zeroIndex: -1,
 		oneIndex: -1,
 		twoIndex: -1,
+		threeIndex: -1,
+		fourIndex: -1,
 	});
 	const [bottomSoundproofingIndices, setBottomSoundproofingIndices] = useState({
 		zeroIndex: -1,
@@ -36,7 +38,9 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 	});
 	const [currentBaseMaterialTypes, setCurrentBaseMaterialTypes] = useState({
 		zeroValue: '',
-		twoValue: '',
+		oneValue: '',
+		threeValue: '',
+		fourValue: '',
 	});
 	const [currentTopSoundproofingMaterialTypes, setCurrentTopSoundproofingMaterialTypes] =
 		useState({
@@ -71,6 +75,8 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 			zeroIndex: baseUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
 			oneIndex: baseUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
 			twoIndex: baseUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
+			threeIndex: baseUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
+			fourIndex: baseUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
 		});
 		setBottomSoundproofingIndices({
 			zeroIndex:
@@ -84,7 +90,9 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 		});
 		setCurrentBaseMaterialTypes({
 			zeroValue: baseUserMaterials?.find((c) => c.positionId === '0')?.materialType ?? '',
-			twoValue: baseUserMaterials?.find((c) => c.positionId === '2')?.materialType ?? '',
+			oneValue: baseUserMaterials?.find((c) => c.positionId === '1')?.materialType ?? '',
+			threeValue: baseUserMaterials?.find((c) => c.positionId === '3')?.materialType ?? '',
+			fourValue: baseUserMaterials?.find((c) => c.positionId === '4')?.materialType ?? '',
 		});
 		setCurrentTopSoundproofingMaterialTypes({
 			twoValue:
@@ -200,19 +208,21 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 											currentTopSoundproofingMaterialTypes.twoValue as MaterialTypeEnum,
 									})}
 								</div>
-								<DeleteIcon
-									className="self-end"
-									onClick={() => {
-										setValue(
-											'constructionTypeObject.constructions.0.userMaterials',
-											(topSoundproofingUserMaterials &&
-												topSoundproofingUserMaterials.filter(
-													(c) => c.positionId !== '2',
-												)) ||
-												[],
-										);
-									}}
-								/>
+								{topSoundproofingIndices.threeIndex < 0 && (
+									<DeleteIcon
+										className="self-end"
+										onClick={() => {
+											setValue(
+												'constructionTypeObject.constructions.0.userMaterials',
+												(topSoundproofingUserMaterials &&
+													topSoundproofingUserMaterials.filter(
+														(c) => c.positionId !== '2',
+													)) ||
+													[],
+											);
+										}}
+									/>
+								)}
 							</div>
 						)}
 					</>
@@ -246,7 +256,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 			</ConstructionLayer>
 
 			<ConstructionLayer title="2. Базовая конструкция">
-				{baseIndices.zeroIndex < 0 ? (
+				{baseIndices.zeroIndex < 0 && baseIndices.oneIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							setValue('constructionTypeObject.constructions.1.userMaterials', [
@@ -298,25 +308,13 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 						)}
 					</>
 				)}
-				{baseIndices.oneIndex >= 0 && (
-					<div className="flex gap-[20px]">
-						<HeavyMaterialType
-							fieldIndex={baseIndices.oneIndex}
-							constructionIndex={1}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={baseIndices.oneIndex}
-							constructionIndex={1}
-						/>
-					</div>
-				)}
-				{baseIndices.twoIndex < 0 ? (
+				{baseIndices.oneIndex < 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
 							setValue('constructionTypeObject.constructions.1.userMaterials', [
 								...(baseUserMaterials || []),
 								{
-									positionId: '2',
+									positionId: '1',
 									materialId: '',
 									materialType: '',
 									materialTypeValue: [],
@@ -327,22 +325,142 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 					/>
 				) : (
 					<>
-						{baseIndices.twoIndex >= 0 && (
+						{baseIndices.oneIndex >= 0 && (
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
-										fieldIndex={baseIndices.twoIndex}
-										positionId={2}
+										fieldIndex={baseIndices.oneIndex}
+										positionId={1}
 										constructionIndex={1}
 										materialTypesSelectValues={
 											MaterialTypesSelectValuesEnum.Base
 										}
 									/>
 									{ConstructionFieldsMap({
-										fieldIndex: baseIndices.twoIndex,
+										fieldIndex: baseIndices.oneIndex,
 										constructionIndex: 1,
 										materialType:
-											currentBaseMaterialTypes.twoValue as MaterialTypeEnum,
+											currentBaseMaterialTypes.oneValue as MaterialTypeEnum,
+									})}
+								</div>
+								{baseIndices.zeroIndex < 0 && (
+									<DeleteIcon
+										className="self-end"
+										onClick={() => {
+											setValue(
+												'constructionTypeObject.constructions.1.userMaterials',
+												(baseUserMaterials &&
+													baseUserMaterials.filter(
+														(c) => c.positionId !== '1',
+													)) ||
+													[],
+											);
+										}}
+									/>
+								)}
+							</div>
+						)}
+					</>
+				)}
+				{baseIndices.twoIndex >= 0 && (
+					<div className="flex gap-[20px]">
+						<HeavyMaterialType
+							fieldIndex={baseIndices.twoIndex}
+							constructionIndex={1}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={baseIndices.twoIndex}
+							constructionIndex={1}
+						/>
+					</div>
+				)}
+				{baseIndices.threeIndex < 0 ? (
+					<AiOutlinePlusCircle
+						onClick={() => {
+							setValue('constructionTypeObject.constructions.1.userMaterials', [
+								...(baseUserMaterials || []),
+								{
+									positionId: '3',
+									materialId: '',
+									materialType: '',
+									materialTypeValue: [],
+								},
+							]);
+						}}
+						className="size-[40px] self-center text-primary"
+					/>
+				) : (
+					<>
+						{baseIndices.threeIndex >= 0 && (
+							<div className="flex justify-between">
+								<div className="flex gap-[20px]">
+									<SelectableMaterialType
+										fieldIndex={baseIndices.threeIndex}
+										positionId={3}
+										constructionIndex={1}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Base
+										}
+									/>
+									{ConstructionFieldsMap({
+										fieldIndex: baseIndices.threeIndex,
+										constructionIndex: 1,
+										materialType:
+											currentBaseMaterialTypes.threeValue as MaterialTypeEnum,
+									})}
+								</div>
+								{baseIndices.fourIndex < 0 && (
+									<DeleteIcon
+										className="self-end"
+										onClick={() => {
+											setValue(
+												'constructionTypeObject.constructions.1.userMaterials',
+												(baseUserMaterials &&
+													baseUserMaterials.filter(
+														(c) => c.positionId !== '3',
+													)) ||
+													[],
+											);
+										}}
+									/>
+								)}
+							</div>
+						)}
+					</>
+				)}
+				{baseIndices.fourIndex < 0 && baseIndices.threeIndex > 0 ? (
+					<AiOutlinePlusCircle
+						onClick={() => {
+							setValue('constructionTypeObject.constructions.1.userMaterials', [
+								...(baseUserMaterials || []),
+								{
+									positionId: '4',
+									materialId: '',
+									materialType: '',
+									materialTypeValue: [],
+								},
+							]);
+						}}
+						className="size-[40px] self-center text-primary"
+					/>
+				) : (
+					<>
+						{baseIndices.fourIndex >= 0 && (
+							<div className="flex justify-between">
+								<div className="flex gap-[20px]">
+									<SelectableMaterialType
+										fieldIndex={baseIndices.fourIndex}
+										positionId={4}
+										constructionIndex={1}
+										materialTypesSelectValues={
+											MaterialTypesSelectValuesEnum.Base
+										}
+									/>
+									{ConstructionFieldsMap({
+										fieldIndex: baseIndices.fourIndex,
+										constructionIndex: 1,
+										materialType:
+											currentBaseMaterialTypes.fourValue as MaterialTypeEnum,
 									})}
 								</div>
 								<DeleteIcon
@@ -352,7 +470,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 											'constructionTypeObject.constructions.1.userMaterials',
 											(baseUserMaterials &&
 												baseUserMaterials.filter(
-													(c) => c.positionId !== '2',
+													(c) => c.positionId !== '4',
 												)) ||
 												[],
 										);
@@ -426,19 +544,21 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = () => {
 											currentBottomSoundproofingMaterialTypes.twoValue as MaterialTypeEnum,
 									})}
 								</div>
-								<DeleteIcon
-									className="self-end"
-									onClick={() => {
-										setValue(
-											'constructionTypeObject.constructions.2.userMaterials',
-											(bottomSoundproofingUserMaterials &&
-												bottomSoundproofingUserMaterials.filter(
-													(c) => c.positionId !== '2',
-												)) ||
-												[],
-										);
-									}}
-								/>
+								{bottomSoundproofingIndices.threeIndex < 0 && (
+									<DeleteIcon
+										className="self-end"
+										onClick={() => {
+											setValue(
+												'constructionTypeObject.constructions.2.userMaterials',
+												(bottomSoundproofingUserMaterials &&
+													bottomSoundproofingUserMaterials.filter(
+														(c) => c.positionId !== '2',
+													)) ||
+													[],
+											);
+										}}
+									/>
+								)}
 							</div>
 						)}
 					</>

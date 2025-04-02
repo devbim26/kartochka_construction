@@ -15,3 +15,9 @@ export const dateMask = {
 	replacement: { _: /\d/ },
 	showMask: true,
 };
+
+export const accountMask = {
+	mask: 'BY__ ____ ____ ____ ____ ____ ____',
+	replacement: { _: /\d/ },
+	showMask: true,
+};

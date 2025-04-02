@@ -44,9 +44,22 @@ export const authSlice = createSlice({
 		authReducer,
 	},
 	extraReducers: (builder) => {
-		createAsyncCases(builder, authLogin, (state: AuthSliceState, action) => {});
-		createAsyncCases(builder, smsCodeRequest, (state: AuthSliceState, action) => {});
-		createAsyncCases(builder, smsCodeApprove, (state: AuthSliceState, action) => {});
-		createAsyncCases(builder, authRegistration, (state: AuthSliceState, action) => {});
+		createAsyncCases(builder, authLogin, (state: AuthSliceState, action) => {
+			console.log(action.payload);
+			if (action.payload?.status === 200) {
+				state.data = typeof action.payload.data === 'string' ? {} : action.payload.data;
+				state.data.isAuth = true;
+				state.data.user_id = action.payload.data.user_id;
+			}
+		});
+		createAsyncCases(builder, smsCodeRequest, (state: AuthSliceState, action) => {
+			console.log(action.payload);
+		});
+		createAsyncCases(builder, smsCodeApprove, (state: AuthSliceState, action) => {
+			console.log(action.payload);
+		});
+		createAsyncCases(builder, authRegistration, (state: AuthSliceState, action) => {
+			console.log(action.payload);
+		});
 	},
 });

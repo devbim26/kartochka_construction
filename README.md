@@ -40,6 +40,7 @@ File `Dockerfile` for `master` branch. App starts on https.
 ### 2. HTTP
 
 File `Dockerfile.dev` for `dev` branch. App starts on http.
+Test commit
 
 **Command:**
 

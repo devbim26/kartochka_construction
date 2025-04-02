@@ -1,6 +1,7 @@
 import { MaterialTypeEnum } from '@api-gen';
 import type { SelectOption } from '@core';
-import { convertToPaginatedType, convertToSelectValues, memoize, Select } from '@core';
+import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import type { ConstructionsAddData, MaterialsFilterData } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
@@ -84,6 +85,7 @@ export const LinkMaterialType = memoize(({ fieldIndex, constructionIndex }: Prop
 							]?.userMaterials?.[fieldIndex]?.materialId?.message || 'Тип связи'
 						}
 						placeholder="Выберите материал"
+						isSearchable
 					/>
 				)}
 			/>

@@ -1,7 +1,9 @@
-import type { SelectOption } from '@core';
-import { convertToPaginatedType, convertToSelectValues, memoize, Select } from '@core';
+import { MaterialParametrs } from '@api-gen';
+import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import type {
 	ConstructionsAddData,
+	MaterialsAddAndEditData,
 	MaterialsFilterData,
 	MaterialTypeEnum,
 	MaterialTypesSelectValuesEnum,
@@ -30,10 +32,11 @@ export const SelectableMaterialType = memoize(
 	({ fieldIndex, positionId, constructionIndex, materialTypesSelectValues }: Props) => {
 		const form = useFormContext<ConstructionsAddData>();
 		const { formState, control, watch, setValue } = form;
-		const [materials, setMaterials] = useState<Array<SelectOption>>();
-		const [currentMaterialType, userMaterials] = watch([
+		const [materials, setMaterials] = useState<MaterialsAddAndEditData[]>([]);
+		const [currentMaterialType, userMaterials, materialTypeValue] = watch([
 			`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialType`,
 			`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
+			`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue`,
 		]);
 
 		const handleGetMaterials = (data: MaterialsFilterData) => {
@@ -51,7 +54,7 @@ export const SelectableMaterialType = memoize(
 						)(response.data);
 						return from([items]);
 					}),
-					tap((items) => setMaterials(convertToSelectValues(items.items!)!)),
+					tap((items) => setMaterials(items.items || [])),
 					catchError((error) => {
 						console.log('Error:', error);
 						return from([null]);
@@ -61,7 +64,7 @@ export const SelectableMaterialType = memoize(
 		};
 
 		useEffect(() => {
-			handleGetMaterials({ materialType: currentMaterialType });
+			currentMaterialType && handleGetMaterials({ materialType: currentMaterialType });
 		}, []);
 
 		return (
@@ -91,7 +94,9 @@ export const SelectableMaterialType = memoize(
 							buttonClassName="text-sm rounded-[8px] w-[226px]"
 							placeholder="Выберите тип материала"
 							onChange={(selectedOption: any) => {
-								handleGetMaterials({ materialType: selectedOption });
+								!selectedOption
+									? setMaterials([])
+									: handleGetMaterials({ materialType: selectedOption });
 								setValue(
 									`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
 									userMaterials!.map((material) =>
@@ -109,6 +114,7 @@ export const SelectableMaterialType = memoize(
 									),
 								);
 							}}
+							isSearchable
 						/>
 					)}
 				/>
@@ -120,7 +126,7 @@ export const SelectableMaterialType = memoize(
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={materials || []}
+							options={convertToSelectValues(materials) || []}
 							error={
 								formState.errors?.constructionTypeObject?.constructions?.[
 									constructionIndex
@@ -137,6 +143,31 @@ export const SelectableMaterialType = memoize(
 							wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
 							buttonClassName="text-sm rounded-[8px] w-[226px]"
 							placeholder="Выберите материал"
+							onChange={(selectedOption: string) => {
+								setValue(
+									`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`,
+									selectedOption,
+								);
+								if (
+									materialTypeValue?.[0].materialParameters ===
+										MaterialParametrs.Thickness &&
+									materialTypeValue?.[1].materialParameters ===
+										MaterialParametrs.Density
+								) {
+									const selectedMaterial = materials?.find(
+										(m) => m.id === selectedOption,
+									);
+									setValue<any>(
+										`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.0.value`,
+										selectedMaterial?.thickness,
+									);
+									setValue<any>(
+										`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.1.value`,
+										selectedMaterial?.density,
+									);
+								}
+							}}
+							isSearchable
 						/>
 					)}
 				/>
