@@ -1,3 +1,3 @@
 #!/bin/sh
-envsubst '${API_URL}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+envsubst '${SERVER_NAME} ${API_URL}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 exec "$@"
