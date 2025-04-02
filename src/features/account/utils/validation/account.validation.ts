@@ -17,9 +17,18 @@ const AccountDataSchema = z.object({
 	companyName: z.string().min(1, 'Поле обязательно для заполнения'),
 	directorFullName: z.string().min(1, 'Поле обязательно для заполнения'),
 	companyAddress: z.string().min(1, 'Поле обязательно для заполнения'),
-	payersRegistrationNumber: z.string().min(1, 'Поле обязательно для заполнения'),
-	paymentAccount: z.string().min(1, 'Поле обязательно для заполнения'),
-	bankIdNumber: z.string().min(1, 'Поле обязательно для заполнения'),
+	payersRegistrationNumber: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.min(9, 'УНП должен содержать 9 символов'),
+	paymentAccount: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.min(28, 'Расчетный счет должен содержать 28 символов'),
+	bankIdNumber: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.min(8, 'БИК должен содержать 8 символов'),
 	bankAddress: z.string().min(1, 'Поле обязательно для заполнения'),
 	compannyInfo: z.string().optional(),
 	companyLogo: z.string().optional(),
