@@ -35,7 +35,7 @@ export const AboutBuilding = memoize(() => {
 
 	const onSubmit = (data: AboutBuildingData) => {
 		dispatch(constructorSlice.actions.setAboutBuilding(data));
-		navigate(CONSTRUCTOR_ROUTES.floorPlans.route);
+		navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`);
 	};
 
 	return (
