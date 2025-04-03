@@ -4,7 +4,6 @@ import type { FloorPlanData } from '@features/constructor/types';
 import { ConstructorFloorPlanFormDataConfig } from '@features/constructor/utils';
 import { useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
-import { twMerge } from 'tailwind-merge';
 
 export const FloorPlans = memoize(() => {
 	const form = useForm<FloorPlanData>({
@@ -31,11 +30,7 @@ export const FloorPlans = memoize(() => {
 		<div className="flex flex-col rounded-xl bg-white">
 			<div className="flex flex-col gap-[18px] border-b px-[24px] py-[18px]">
 				<p className="font-sans text-lg font-semibold leading-4">Добавить уровень</p>
-				<Button
-					className={twMerge(
-						'flex h-[28px] w-[100px] flex-row items-center bg-white px-[10px] py-[6px] font-sans font-semibold text-primary shadow-none ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
-					)}
-				>
+				<Button className="flex h-[28px] w-[100px] flex-row items-center bg-white px-[10px] py-[6px] font-sans font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-white">
 					<FaPlus width={'16px'} height={'16px'} />
 					0.000
 					<DeleteIcon
