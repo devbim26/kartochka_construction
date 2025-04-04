@@ -18,12 +18,14 @@ import {
 	RuCountryNamesMap,
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const AboutBuilding = memoize(() => {
 	const form = useForm<AboutBuildingData>({
 		defaultValues: AboutBuildingConfig.defaultValues,
+		resolver: zodResolver(AboutBuildingConfig.schema),
 	});
 	const { register, control, formState } = form;
 	const dispatch = useAppDispatch();
@@ -35,7 +37,7 @@ export const AboutBuilding = memoize(() => {
 
 	const onSubmit = (data: AboutBuildingData) => {
 		dispatch(constructorSlice.actions.setAboutBuilding(data));
-		navigate(CONSTRUCTOR_ROUTES.floorPlans.route);
+		navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`);
 	};
 
 	return (
@@ -56,7 +58,7 @@ export const AboutBuilding = memoize(() => {
 							inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.name?.message}
 							containerClassName="w-[226px]"
-							label="Название"
+							label={formState.errors?.name?.message || 'Название'}
 							placeholder="Введите название"
 							maxLength={50}
 						/>
@@ -76,7 +78,8 @@ export const AboutBuilding = memoize(() => {
 									]}
 									{...field}
 									value={field.value || ''}
-									label="Регион"
+									label={formState.errors?.region?.message || 'Регион'}
+									error={formState.errors.region?.message}
 									isSearchable
 									labelClassName={twMerge(
 										'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
@@ -89,9 +92,21 @@ export const AboutBuilding = memoize(() => {
 							)}
 						/>
 						<div className="flex items-center gap-x-[50px]">
-							<label className="w-[145px] font-sans text-sm font-normal leading-5 text-input-label-primary">
-								Тип здания
-							</label>
+							<div className="w-[145px]">
+								<label
+									className={twMerge(
+										'font-sans text-sm font-normal leading-5 text-input-label-primary',
+										(formState.errors.buildingPurpose ||
+											formState.errors.buildingType) &&
+											'text-error',
+									)}
+								>
+									{formState.errors.buildingPurpose ||
+									formState.errors.buildingType
+										? 'Поле обязательно для заполнения'
+										: 'Тип здания'}
+								</label>
+							</div>
 							<div className="flex gap-x-[12px]">
 								<Controller
 									control={control}
@@ -100,6 +115,7 @@ export const AboutBuilding = memoize(() => {
 										<Select
 											options={RuCategoryClassSelectValues}
 											{...field}
+											error={formState.errors.buildingPurpose?.message}
 											value={field.value || ''}
 											placeholder="Выберите назначение"
 											isSearchable
@@ -115,6 +131,7 @@ export const AboutBuilding = memoize(() => {
 										<Select
 											options={RuBuildingTypeSelectValues}
 											{...field}
+											error={formState.errors.buildingType?.message}
 											value={field.value || ''}
 											placeholder="Выберите тип"
 											isSearchable
@@ -125,6 +142,7 @@ export const AboutBuilding = memoize(() => {
 								/>
 							</div>
 						</div>
+
 						<Input
 							{...register('maxHeight')}
 							labelClassName={twMerge(
@@ -133,9 +151,12 @@ export const AboutBuilding = memoize(() => {
 							)}
 							wrapperClassName="flex-row items-center gap-[24px]"
 							inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-							error={formState.errors.name?.message}
+							error={formState.errors.maxHeight?.message}
 							containerClassName="w-[226px]"
-							label="Наибольшая допустимая высота здания, м"
+							label={
+								formState.errors?.maxHeight?.message ||
+								'Наибольшая допустимая высота здания, м'
+							}
 							type="number"
 							placeholder="Введите высоту"
 							max={3}
@@ -153,6 +174,7 @@ export const AboutBuilding = memoize(() => {
 										'Класс комфортности'
 									}
 									isSearchable
+									error={formState.errors.comfortClass?.message}
 									labelClassName={twMerge(
 										'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
 										formState.errors.comfortClass?.message ? 'text-error' : '',

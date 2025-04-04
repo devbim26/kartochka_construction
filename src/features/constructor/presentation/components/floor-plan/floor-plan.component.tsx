@@ -1,5 +1,5 @@
 import { Button, convertToBase64, DeleteIcon, useAppSelector } from '@core';
-import { memoize } from '@core/utils';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import type { FloorPlansData } from '@features/constructor/types';
 import { FloorPlansConfig } from '@features/constructor/utils';
 import { useForm } from 'react-hook-form';
