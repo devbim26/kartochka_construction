@@ -1,5 +1,5 @@
-import type { AboutBuildingDataSchemaType } from '../utils';
+import type { AboutBuildingSchemaType } from '../utils';
 
-type AboutBuildingData = AboutBuildingDataSchemaType;
+type AboutBuildingData = AboutBuildingSchemaType;
 
 export { type AboutBuildingData };

@@ -11,7 +11,7 @@ import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { constructorSlice } from '@features/constructor/store';
 import type { AboutBuildingData } from '@features/constructor/types';
-import { ConstructorAboutBuildingFormDataConfig } from '@features/constructor/utils';
+import { AboutBuildingConfig } from '@features/constructor/utils';
 import {
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
@@ -24,7 +24,7 @@ import { twMerge } from 'tailwind-merge';
 
 export const AboutBuilding = memoize(() => {
 	const form = useForm<AboutBuildingData>({
-		defaultValues: ConstructorAboutBuildingFormDataConfig.defaultValues,
+		defaultValues: AboutBuildingConfig.defaultValues,
 		resolver: zodResolver(ConstructorAboutBuildingFormDataConfig.schema),
 	});
 	const { register, control, formState } = form;

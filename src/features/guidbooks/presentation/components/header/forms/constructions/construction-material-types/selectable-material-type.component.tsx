@@ -2,11 +2,11 @@ import { MaterialParametrs } from '@api-gen';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type {
-	ConstructionsAddData,
 	MaterialsAddAndEditData,
 	MaterialsFilterData,
 	MaterialTypeEnum,
 	MaterialTypesSelectValuesEnum,
+	UserMaterials,
 } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
@@ -17,7 +17,8 @@ import {
 } from '@features';
 import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import type { UseFormReturn } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
@@ -26,12 +27,18 @@ interface Props {
 	positionId: number;
 	constructionIndex: number;
 	materialTypesSelectValues: MaterialTypesSelectValuesEnum;
+	currentForm: UseFormReturn<any>;
 }
 
 export const SelectableMaterialType = memoize(
-	({ fieldIndex, positionId, constructionIndex, materialTypesSelectValues }: Props) => {
-		const form = useFormContext<ConstructionsAddData>();
-		const { formState, control, watch, setValue } = form;
+	({
+		fieldIndex,
+		positionId,
+		constructionIndex,
+		materialTypesSelectValues,
+		currentForm,
+	}: Props) => {
+		const { formState, control, watch, setValue } = currentForm;
 		const [materials, setMaterials] = useState<MaterialsAddAndEditData[]>([]);
 		const [currentMaterialType, userMaterials, materialTypeValue] = watch([
 			`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialType`,
@@ -78,13 +85,13 @@ export const SelectableMaterialType = memoize(
 							value={field.value || ''}
 							options={[...MaterialTypesSelectValuesMap[materialTypesSelectValues]]}
 							error={
-								formState.errors?.constructionTypeObject?.constructions?.[
+								(formState.errors as any)?.constructionTypeObject?.constructions?.[
 									constructionIndex
 								]?.userMaterials?.[fieldIndex]?.materialType?.message
 							}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
-								formState.errors?.constructionTypeObject?.constructions?.[
+								(formState.errors as any)?.constructionTypeObject?.constructions?.[
 									constructionIndex
 								]?.userMaterials?.[fieldIndex]?.materialType?.message
 									? 'text-error'
@@ -99,7 +106,7 @@ export const SelectableMaterialType = memoize(
 									: handleGetMaterials({ materialType: selectedOption });
 								setValue(
 									`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-									userMaterials!.map((material) =>
+									userMaterials!.map((material: UserMaterials) =>
 										material.positionId === String(positionId)
 											? {
 													...material,
@@ -128,13 +135,13 @@ export const SelectableMaterialType = memoize(
 							value={field.value || ''}
 							options={convertToSelectValues(materials) || []}
 							error={
-								formState.errors?.constructionTypeObject?.constructions?.[
+								(formState.errors as any)?.constructionTypeObject?.constructions?.[
 									constructionIndex
 								]?.userMaterials?.[fieldIndex]?.materialId?.message
 							}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
-								formState.errors?.constructionTypeObject?.constructions?.[
+								(formState.errors as any)?.constructionTypeObject?.constructions?.[
 									constructionIndex
 								]?.userMaterials?.[fieldIndex]?.materialId?.message
 									? 'text-error'

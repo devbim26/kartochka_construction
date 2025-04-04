@@ -1,13 +1,13 @@
 import { Button, convertToBase64, DeleteIcon, useAppSelector } from '@core';
 import { memoize } from '@core/utils';
-import type { FloorPlanData } from '@features/constructor/types';
-import { ConstructorFloorPlanFormDataConfig } from '@features/constructor/utils';
+import type { FloorPlansData } from '@features/constructor/types';
+import { FloorPlansConfig } from '@features/constructor/utils';
 import { useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 
 export const FloorPlans = memoize(() => {
-	const form = useForm<FloorPlanData>({
-		defaultValues: ConstructorFloorPlanFormDataConfig.defaultValues,
+	const form = useForm<FloorPlansData>({
+		defaultValues: FloorPlansConfig.defaultValues,
 	});
 	const { trigger, control, formState, setValue } = form;
 
