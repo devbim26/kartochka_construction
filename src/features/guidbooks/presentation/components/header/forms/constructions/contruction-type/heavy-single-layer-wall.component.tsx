@@ -1,5 +1,5 @@
 import { DeleteIcon } from '@core';
-import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
+import type { ConstructionTypeProps, MaterialTypeEnum, UserMaterials } from '@features';
 import {
 	ConstructionFieldsMap,
 	ConstructionLayer,
@@ -9,12 +9,10 @@ import {
 	ThicknessDensityFieldsType,
 } from '@features';
 import { useEffect, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
-export const HeavySingleLayerWallComponent = () => {
-	const form = useFormContext<ConstructionsAddData>();
-	const { watch, setValue } = form;
+export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
+	const { watch, setValue } = currentForm;
 	const [indices, setIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
@@ -35,17 +33,21 @@ export const HeavySingleLayerWallComponent = () => {
 
 	useEffect(() => {
 		setIndices({
-			zeroIndex: userMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
-			oneIndex: userMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
-			twoIndex: userMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
-			threeIndex: userMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
-			fourIndex: userMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
+			zeroIndex: userMaterials?.findIndex((c: UserMaterials) => c.positionId === '0') ?? -1,
+			oneIndex: userMaterials?.findIndex((c: UserMaterials) => c.positionId === '1') ?? -1,
+			twoIndex: userMaterials?.findIndex((c: UserMaterials) => c.positionId === '2') ?? -1,
+			threeIndex: userMaterials?.findIndex((c: UserMaterials) => c.positionId === '3') ?? -1,
+			fourIndex: userMaterials?.findIndex((c: UserMaterials) => c.positionId === '4') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zeroValue: userMaterials?.find((c) => c.positionId === '0')?.materialType ?? '',
-			oneValue: userMaterials?.find((c) => c.positionId === '1')?.materialType ?? '',
-			threeValue: userMaterials?.find((c) => c.positionId === '3')?.materialType ?? '',
-			fourValue: userMaterials?.find((c) => c.positionId === '4')?.materialType ?? '',
+			zeroValue:
+				userMaterials?.find((c: UserMaterials) => c.positionId === '0')?.materialType ?? '',
+			oneValue:
+				userMaterials?.find((c: UserMaterials) => c.positionId === '1')?.materialType ?? '',
+			threeValue:
+				userMaterials?.find((c: UserMaterials) => c.positionId === '3')?.materialType ?? '',
+			fourValue:
+				userMaterials?.find((c: UserMaterials) => c.positionId === '4')?.materialType ?? '',
 		});
 	}, [userMaterials, constructions]);
 
@@ -76,12 +78,14 @@ export const HeavySingleLayerWallComponent = () => {
 									positionId={0}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+									currentForm={currentForm}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
 									constructionIndex: 0,
 									materialType:
 										currentMaterialTypes.zeroValue as MaterialTypeEnum,
+									currentForm: currentForm,
 								})}
 							</div>
 							<DeleteIcon
@@ -90,7 +94,9 @@ export const HeavySingleLayerWallComponent = () => {
 									setValue(
 										'constructionTypeObject.constructions.0.userMaterials',
 										(userMaterials &&
-											userMaterials.filter((c) => c.positionId !== '0')) ||
+											userMaterials.filter(
+												(c: UserMaterials) => c.positionId !== '0',
+											)) ||
 											[],
 									);
 								}}
@@ -124,11 +130,13 @@ export const HeavySingleLayerWallComponent = () => {
 									positionId={1}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+									currentForm={currentForm}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.oneIndex,
 									constructionIndex: 0,
 									materialType: currentMaterialTypes.oneValue as MaterialTypeEnum,
+									currentForm: currentForm,
 								})}
 							</div>
 							{indices.zeroIndex < 0 && (
@@ -139,7 +147,7 @@ export const HeavySingleLayerWallComponent = () => {
 											'constructionTypeObject.constructions.0.userMaterials',
 											(userMaterials &&
 												userMaterials.filter(
-													(c) => c.positionId !== '1',
+													(c: UserMaterials) => c.positionId !== '1',
 												)) ||
 												[],
 										);
@@ -152,10 +160,15 @@ export const HeavySingleLayerWallComponent = () => {
 			)}
 			{indices.twoIndex >= 0 && (
 				<div className="flex gap-[20px]">
-					<HeavyMaterialType fieldIndex={indices.twoIndex} constructionIndex={0} />
+					<HeavyMaterialType
+						fieldIndex={indices.twoIndex}
+						constructionIndex={0}
+						currentForm={currentForm}
+					/>
 					<ThicknessDensityFieldsType
 						fieldIndex={indices.twoIndex}
 						constructionIndex={0}
+						currentForm={currentForm}
 					/>
 				</div>
 			)}
@@ -184,12 +197,14 @@ export const HeavySingleLayerWallComponent = () => {
 									positionId={3}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+									currentForm={currentForm}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.threeIndex,
 									constructionIndex: 0,
 									materialType:
 										currentMaterialTypes.threeValue as MaterialTypeEnum,
+									currentForm: currentForm,
 								})}
 							</div>
 							{indices.fourIndex < 0 && (
@@ -200,7 +215,7 @@ export const HeavySingleLayerWallComponent = () => {
 											'constructionTypeObject.constructions.0.userMaterials',
 											(userMaterials &&
 												userMaterials.filter(
-													(c) => c.positionId !== '3',
+													(c: UserMaterials) => c.positionId !== '3',
 												)) ||
 												[],
 										);
@@ -236,12 +251,14 @@ export const HeavySingleLayerWallComponent = () => {
 									positionId={4}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+									currentForm={currentForm}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.fourIndex,
 									constructionIndex: 0,
 									materialType:
 										currentMaterialTypes.fourValue as MaterialTypeEnum,
+									currentForm: currentForm,
 								})}
 							</div>
 							<DeleteIcon
@@ -250,7 +267,9 @@ export const HeavySingleLayerWallComponent = () => {
 									setValue(
 										'constructionTypeObject.constructions.0.userMaterials',
 										(userMaterials &&
-											userMaterials.filter((c) => c.positionId !== '4')) ||
+											userMaterials.filter(
+												(c: UserMaterials) => c.positionId !== '4',
+											)) ||
 											[],
 									);
 								}}

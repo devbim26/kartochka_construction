@@ -1,5 +1,5 @@
 import { DeleteIcon } from '@core';
-import type { ConstructionsAddData, MaterialTypeEnum } from '@features';
+import type { ConstructionTypeProps, MaterialTypeEnum, UserMaterials } from '@features';
 import {
 	AirGapMaterialType,
 	BoardMaterialType,
@@ -16,12 +16,12 @@ import {
 	WidthRacksStepFieldsType,
 } from '@features';
 import { useEffect, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
-export const HeavyMultiLayerWallFacingBothSideComponent = () => {
-	const form = useFormContext<ConstructionsAddData>();
-	const { watch, setValue } = form;
+export const HeavyMultiLayerWallFacingBothSideComponent = ({
+	currentForm,
+}: ConstructionTypeProps) => {
+	const { watch, setValue } = currentForm;
 	const [topFacingIndices, setTopFacingIndices] = useState({
 		zeroIndex: -1,
 		oneIndex: -1,
@@ -74,49 +74,91 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 
 	useEffect(() => {
 		setTopFacingIndices({
-			zeroIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
-			oneIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
-			twoIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
-			threeIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
-			fourIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
-			fiveIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
-			sixIndex: topFacingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
+			zeroIndex:
+				topFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '0') ?? -1,
+			oneIndex:
+				topFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '1') ?? -1,
+			twoIndex:
+				topFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '2') ?? -1,
+			threeIndex:
+				topFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '3') ?? -1,
+			fourIndex:
+				topFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '4') ?? -1,
+			fiveIndex:
+				topFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '5') ?? -1,
+			sixIndex:
+				topFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '6') ?? -1,
 		});
 		setBaseIndices({
-			zeroIndex: baseUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
-			oneIndex: baseUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
-			twoIndex: baseUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
-			threeIndex: baseUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
-			fourIndex: baseUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
-			fiveIndex: baseUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
-			sixIndex: baseUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
-			sevenIndex: baseUserMaterials?.findIndex((c) => c.positionId === '7') ?? -1,
+			zeroIndex:
+				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '0') ?? -1,
+			oneIndex:
+				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '1') ?? -1,
+			twoIndex:
+				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '2') ?? -1,
+			threeIndex:
+				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '3') ?? -1,
+			fourIndex:
+				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '4') ?? -1,
+			fiveIndex:
+				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '5') ?? -1,
+			sixIndex:
+				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '6') ?? -1,
+			sevenIndex:
+				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '7') ?? -1,
 		});
 		setBottomFacingIndices({
-			zeroIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
-			oneIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
-			twoIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
-			threeIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '3') ?? -1,
-			fourIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '4') ?? -1,
-			fiveIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '5') ?? -1,
-			sixIndex: bottomFacingUserMaterials?.findIndex((c) => c.positionId === '6') ?? -1,
+			zeroIndex:
+				bottomFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '0') ??
+				-1,
+			oneIndex:
+				bottomFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '1') ??
+				-1,
+			twoIndex:
+				bottomFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '2') ??
+				-1,
+			threeIndex:
+				bottomFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '3') ??
+				-1,
+			fourIndex:
+				bottomFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '4') ??
+				-1,
+			fiveIndex:
+				bottomFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '5') ??
+				-1,
+			sixIndex:
+				bottomFacingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '6') ??
+				-1,
 		});
 		setCurrentTopFacingMaterialTypes({
 			fiveValue:
-				topFacingUserMaterials?.find((c) => c.positionId === '5')?.materialType ?? '',
-			sixValue: topFacingUserMaterials?.find((c) => c.positionId === '6')?.materialType ?? '',
+				topFacingUserMaterials?.find((c: UserMaterials) => c.positionId === '5')
+					?.materialType ?? '',
+			sixValue:
+				topFacingUserMaterials?.find((c: UserMaterials) => c.positionId === '6')
+					?.materialType ?? '',
 		});
 		setCurrentBaseMaterialTypes({
-			zeroValue: baseUserMaterials?.find((c) => c.positionId === '0')?.materialType ?? '',
-			oneValue: baseUserMaterials?.find((c) => c.positionId === '1')?.materialType ?? '',
-			sixValue: baseUserMaterials?.find((c) => c.positionId === '6')?.materialType ?? '',
-			sevenValue: baseUserMaterials?.find((c) => c.positionId === '7')?.materialType ?? '',
+			zeroValue:
+				baseUserMaterials?.find((c: UserMaterials) => c.positionId === '0')?.materialType ??
+				'',
+			oneValue:
+				baseUserMaterials?.find((c: UserMaterials) => c.positionId === '1')?.materialType ??
+				'',
+			sixValue:
+				baseUserMaterials?.find((c: UserMaterials) => c.positionId === '6')?.materialType ??
+				'',
+			sevenValue:
+				baseUserMaterials?.find((c: UserMaterials) => c.positionId === '7')?.materialType ??
+				'',
 		});
 		setCurrentBottomFacingMaterialTypes({
 			fiveValue:
-				bottomFacingUserMaterials?.find((c) => c.positionId === '5')?.materialType ?? '',
+				bottomFacingUserMaterials?.find((c: UserMaterials) => c.positionId === '5')
+					?.materialType ?? '',
 			sixValue:
-				bottomFacingUserMaterials?.find((c) => c.positionId === '6')?.materialType ?? '',
+				bottomFacingUserMaterials?.find((c: UserMaterials) => c.positionId === '6')
+					?.materialType ?? '',
 		});
 	}, [topFacingUserMaterials, baseUserMaterials, bottomFacingUserMaterials, constructions]);
 
@@ -144,6 +186,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
+										currentForm={currentForm}
 										fieldIndex={topFacingIndices.sixIndex}
 										positionId={6}
 										constructionIndex={0}
@@ -152,6 +195,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 										}
 									/>
 									{ConstructionFieldsMap({
+										currentForm: currentForm,
 										fieldIndex: topFacingIndices.sixIndex,
 										constructionIndex: 0,
 										materialType:
@@ -165,7 +209,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 											'constructionTypeObject.constructions.0.userMaterials',
 											(topFacingUserMaterials &&
 												topFacingUserMaterials.filter(
-													(c) => c.positionId !== '6',
+													(c: UserMaterials) => c.positionId !== '6',
 												)) ||
 												[],
 										);
@@ -196,6 +240,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
+										currentForm={currentForm}
 										fieldIndex={topFacingIndices.fiveIndex}
 										positionId={5}
 										constructionIndex={0}
@@ -204,6 +249,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 										}
 									/>
 									{ConstructionFieldsMap({
+										currentForm: currentForm,
 										fieldIndex: topFacingIndices.fiveIndex,
 										constructionIndex: 0,
 										materialType:
@@ -218,7 +264,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 												'constructionTypeObject.constructions.0.userMaterials',
 												(topFacingUserMaterials &&
 													topFacingUserMaterials.filter(
-														(c) => c.positionId !== '5',
+														(c: UserMaterials) => c.positionId !== '5',
 													)) ||
 													[],
 											);
@@ -234,10 +280,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<BoardMaterialType
 							fieldIndex={topFacingIndices.fourIndex}
 							constructionIndex={0}
+							currentForm={currentForm}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={topFacingIndices.fourIndex}
 							constructionIndex={0}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -246,10 +294,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<FillerMaterialType
 							fieldIndex={topFacingIndices.threeIndex}
 							constructionIndex={0}
+							currentForm={currentForm}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={topFacingIndices.threeIndex}
 							constructionIndex={0}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -258,10 +308,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<FrameMaterialType
 							fieldIndex={topFacingIndices.twoIndex}
 							constructionIndex={0}
+							currentForm={currentForm}
 						/>
 						<WidthRacksStepFieldsType
 							fieldIndex={topFacingIndices.twoIndex}
 							constructionIndex={0}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -270,10 +322,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<LinkMaterialType
 							fieldIndex={topFacingIndices.oneIndex}
 							constructionIndex={0}
+							currentForm={currentForm}
 						/>
 						<PointConnectionsFieldsType
 							fieldIndex={topFacingIndices.oneIndex}
 							constructionIndex={0}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -282,10 +336,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<AirGapMaterialType
 							fieldIndex={topFacingIndices.zeroIndex}
 							constructionIndex={0}
+							currentForm={currentForm}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={topFacingIndices.zeroIndex}
 							constructionIndex={0}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -313,6 +369,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
+										currentForm={currentForm}
 										fieldIndex={baseIndices.zeroIndex}
 										positionId={0}
 										constructionIndex={1}
@@ -321,6 +378,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 										}
 									/>
 									{ConstructionFieldsMap({
+										currentForm: currentForm,
 										fieldIndex: baseIndices.zeroIndex,
 										constructionIndex: 1,
 										materialType:
@@ -334,7 +392,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 											'constructionTypeObject.constructions.1.userMaterials',
 											(baseUserMaterials &&
 												baseUserMaterials.filter(
-													(c) => c.positionId !== '0',
+													(c: UserMaterials) => c.positionId !== '0',
 												)) ||
 												[],
 										);
@@ -365,6 +423,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
+										currentForm={currentForm}
 										fieldIndex={baseIndices.oneIndex}
 										positionId={1}
 										constructionIndex={1}
@@ -373,6 +432,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 										}
 									/>
 									{ConstructionFieldsMap({
+										currentForm: currentForm,
 										fieldIndex: baseIndices.oneIndex,
 										constructionIndex: 1,
 										materialType:
@@ -387,7 +447,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 												'constructionTypeObject.constructions.1.userMaterials',
 												(baseUserMaterials &&
 													baseUserMaterials.filter(
-														(c) => c.positionId !== '1',
+														(c: UserMaterials) => c.positionId !== '1',
 													)) ||
 													[],
 											);
@@ -404,10 +464,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<HeavyMaterialType
 							fieldIndex={baseIndices.twoIndex}
 							constructionIndex={1}
+							currentForm={currentForm}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={baseIndices.twoIndex}
 							constructionIndex={1}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -416,10 +478,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<FillerMaterialType
 							fieldIndex={baseIndices.threeIndex}
 							constructionIndex={1}
+							currentForm={currentForm}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={baseIndices.threeIndex}
 							constructionIndex={1}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -428,10 +492,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<LinkMaterialType
 							fieldIndex={baseIndices.fourIndex}
 							constructionIndex={1}
+							currentForm={currentForm}
 						/>
 						<PointConnectionsFieldsType
 							fieldIndex={baseIndices.fourIndex}
 							constructionIndex={1}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -440,10 +506,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<HeavyMaterialType
 							fieldIndex={baseIndices.fiveIndex}
 							constructionIndex={1}
+							currentForm={currentForm}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={baseIndices.fiveIndex}
 							constructionIndex={1}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -469,6 +537,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
+										currentForm={currentForm}
 										fieldIndex={baseIndices.sixIndex}
 										positionId={6}
 										constructionIndex={1}
@@ -477,6 +546,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 										}
 									/>
 									{ConstructionFieldsMap({
+										currentForm: currentForm,
 										fieldIndex: baseIndices.sixIndex,
 										constructionIndex: 1,
 										materialType:
@@ -491,7 +561,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 												'constructionTypeObject.constructions.1.userMaterials',
 												(baseUserMaterials &&
 													baseUserMaterials.filter(
-														(c) => c.positionId !== '6',
+														(c: UserMaterials) => c.positionId !== '6',
 													)) ||
 													[],
 											);
@@ -523,6 +593,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
+										currentForm={currentForm}
 										fieldIndex={baseIndices.sevenIndex}
 										positionId={7}
 										constructionIndex={1}
@@ -531,6 +602,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 										}
 									/>
 									{ConstructionFieldsMap({
+										currentForm: currentForm,
 										fieldIndex: baseIndices.sevenIndex,
 										constructionIndex: 1,
 										materialType:
@@ -544,7 +616,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 											'constructionTypeObject.constructions.1.userMaterials',
 											(baseUserMaterials &&
 												baseUserMaterials.filter(
-													(c) => c.positionId !== '7',
+													(c: UserMaterials) => c.positionId !== '7',
 												)) ||
 												[],
 										);
@@ -562,10 +634,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<AirGapMaterialType
 							fieldIndex={bottomFacingIndices.zeroIndex}
 							constructionIndex={2}
+							currentForm={currentForm}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={bottomFacingIndices.zeroIndex}
 							constructionIndex={2}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -574,10 +648,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<LinkMaterialType
 							fieldIndex={bottomFacingIndices.oneIndex}
 							constructionIndex={2}
+							currentForm={currentForm}
 						/>
 						<PointConnectionsFieldsType
 							fieldIndex={bottomFacingIndices.oneIndex}
 							constructionIndex={2}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -586,10 +662,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<FrameMaterialType
 							fieldIndex={bottomFacingIndices.twoIndex}
 							constructionIndex={2}
+							currentForm={currentForm}
 						/>
 						<WidthRacksStepFieldsType
 							fieldIndex={bottomFacingIndices.twoIndex}
 							constructionIndex={2}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -598,10 +676,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<FillerMaterialType
 							fieldIndex={bottomFacingIndices.threeIndex}
 							constructionIndex={2}
+							currentForm={currentForm}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={bottomFacingIndices.threeIndex}
 							constructionIndex={2}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -610,10 +690,12 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 						<BoardMaterialType
 							fieldIndex={bottomFacingIndices.fourIndex}
 							constructionIndex={2}
+							currentForm={currentForm}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={bottomFacingIndices.fourIndex}
 							constructionIndex={2}
+							currentForm={currentForm}
 						/>
 					</div>
 				)}
@@ -639,6 +721,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
+										currentForm={currentForm}
 										fieldIndex={bottomFacingIndices.fiveIndex}
 										positionId={5}
 										constructionIndex={2}
@@ -647,6 +730,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 										}
 									/>
 									{ConstructionFieldsMap({
+										currentForm: currentForm,
 										fieldIndex: bottomFacingIndices.fiveIndex,
 										constructionIndex: 2,
 										materialType:
@@ -661,7 +745,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 												'constructionTypeObject.constructions.2.userMaterials',
 												(bottomFacingUserMaterials &&
 													bottomFacingUserMaterials.filter(
-														(c) => c.positionId !== '5',
+														(c: UserMaterials) => c.positionId !== '5',
 													)) ||
 													[],
 											);
@@ -693,6 +777,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 							<div className="flex justify-between">
 								<div className="flex gap-[20px]">
 									<SelectableMaterialType
+										currentForm={currentForm}
 										fieldIndex={bottomFacingIndices.sixIndex}
 										positionId={6}
 										constructionIndex={2}
@@ -701,6 +786,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 										}
 									/>
 									{ConstructionFieldsMap({
+										currentForm: currentForm,
 										fieldIndex: bottomFacingIndices.sixIndex,
 										constructionIndex: 2,
 										materialType:
@@ -714,7 +800,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = () => {
 											'constructionTypeObject.constructions.2.userMaterials',
 											(bottomFacingUserMaterials &&
 												bottomFacingUserMaterials.filter(
-													(c) => c.positionId !== '6',
+													(c: UserMaterials) => c.positionId !== '6',
 												)) ||
 												[],
 										);

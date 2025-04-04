@@ -1,5 +1,5 @@
-import type { FloorPlanSchemaType } from '../utils';
+import type { FloorPlansSchemaType } from '../utils';
 
-type FloorPlanData = FloorPlanSchemaType;
+type FloorPlansData = FloorPlansSchemaType;
 
-export { type FloorPlanData };
+export { type FloorPlansData };
