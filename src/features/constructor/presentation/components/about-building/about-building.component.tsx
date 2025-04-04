@@ -25,7 +25,7 @@ import { twMerge } from 'tailwind-merge';
 export const AboutBuilding = memoize(() => {
 	const form = useForm<AboutBuildingData>({
 		defaultValues: AboutBuildingConfig.defaultValues,
-		resolver: zodResolver(ConstructorAboutBuildingFormDataConfig.schema),
+		resolver: zodResolver(AboutBuildingConfig.schema),
 	});
 	const { register, control, formState } = form;
 	const dispatch = useAppDispatch();
