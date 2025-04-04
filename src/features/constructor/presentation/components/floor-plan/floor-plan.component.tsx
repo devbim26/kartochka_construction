@@ -33,11 +33,7 @@ export const FloorPlans = memoize(() => {
 				<Button className="flex h-[28px] w-[100px] flex-row items-center bg-white px-[10px] py-[6px] font-sans font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-white">
 					<FaPlus width={'16px'} height={'16px'} />
 					0.000
-					<DeleteIcon
-						onClick={() => document.getElementById('pdf-upload')?.click()}
-						withoutBg
-						withoutBorder
-					/>
+					<DeleteIcon onClick={() => console.log(123)} withoutBg withoutBorder />
 				</Button>
 			</div>
 			<div className="flex flex-col border-b px-[24px] py-[110px]">
