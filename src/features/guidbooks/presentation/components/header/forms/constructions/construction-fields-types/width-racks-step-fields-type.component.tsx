@@ -1,70 +1,72 @@
 import { Input } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import type { ConstructionsAddData } from '@features';
-import { useFormContext } from 'react-hook-form';
+import type { ConstructionFieldTypesProps } from '@features';
 import { twMerge } from 'tailwind-merge';
 
-type Props = {
-	fieldIndex: number;
-	constructionIndex: number;
-};
+export const WidthRacksStepFieldsType = memoize(
+	({ fieldIndex, constructionIndex, currentForm }: ConstructionFieldTypesProps) => {
+		const { formState, register } = currentForm;
 
-export const WidthRacksStepFieldsType = memoize(({ fieldIndex, constructionIndex }: Props) => {
-	const form = useFormContext<ConstructionsAddData>();
-	const { formState } = form;
-
-	return (
-		<div className="flex flex-wrap gap-[16px]">
-			<Input
-				labelClassName={twMerge(
-					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
-					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
-						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
-						? 'text-error'
-						: '',
-				)}
-				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] w-[78px]"
-				wrapperClassName="flex-row items-center gap-[16px]"
-				label={
-					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
-						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message ||
-					'Ширина, мм'
-				}
-				error={
-					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
-						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
-				}
-				placeholder="Введите ширину"
-				{...form.register(
-					`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`,
-				)}
-				type={'number'}
-			/>
-			<Input
-				labelClassName={twMerge(
-					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
-					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
-						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[1]?.value?.message
-						? 'text-error'
-						: '',
-				)}
-				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] w-[78px]"
-				wrapperClassName="flex-row items-center gap-[16px]"
-				label={
-					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
-						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[1]?.value?.message ||
-					'Шаг стоек, мм'
-				}
-				error={
-					formState.errors?.constructionTypeObject?.constructions?.[constructionIndex]
-						?.userMaterials?.[fieldIndex]?.materialTypeValue?.[1]?.value?.message
-				}
-				placeholder="Введите шаг стоек"
-				{...form.register(
-					`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${1}.value`,
-				)}
-				type={'number'}
-			/>
-		</div>
-	);
-}, 'WidthRacksStepFieldsType');
+		return (
+			<div className="flex flex-wrap gap-[16px]">
+				<Input
+					labelClassName={twMerge(
+						'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
+						(formState.errors as any)?.constructionTypeObject?.constructions?.[
+							constructionIndex
+						]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
+							? 'text-error'
+							: '',
+					)}
+					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] w-[78px]"
+					wrapperClassName="flex-row items-center gap-[16px]"
+					label={
+						(formState.errors as any)?.constructionTypeObject?.constructions?.[
+							constructionIndex
+						]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message ||
+						'Ширина, мм'
+					}
+					error={
+						(formState.errors as any)?.constructionTypeObject?.constructions?.[
+							constructionIndex
+						]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[0]?.value?.message
+					}
+					placeholder="Введите ширину"
+					{...register(
+						`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${0}.value`,
+					)}
+					type={'number'}
+				/>
+				<Input
+					labelClassName={twMerge(
+						'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
+						(formState.errors as any)?.constructionTypeObject?.constructions?.[
+							constructionIndex
+						]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[1]?.value?.message
+							? 'text-error'
+							: '',
+					)}
+					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] w-[78px]"
+					wrapperClassName="flex-row items-center gap-[16px]"
+					label={
+						(formState.errors as any)?.constructionTypeObject?.constructions?.[
+							constructionIndex
+						]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[1]?.value?.message ||
+						'Шаг стоек, мм'
+					}
+					error={
+						(formState.errors as any)?.constructionTypeObject?.constructions?.[
+							constructionIndex
+						]?.userMaterials?.[fieldIndex]?.materialTypeValue?.[1]?.value?.message
+					}
+					placeholder="Введите шаг стоек"
+					{...register(
+						`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.${1}.value`,
+					)}
+					type={'number'}
+				/>
+			</div>
+		);
+	},
+	'WidthRacksStepFieldsType',
+);
