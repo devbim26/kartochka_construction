@@ -10,7 +10,7 @@ jobs:
 
         steps:
             - name: Trigger external repository
-              run: 
+              run: |
                   curl -X POST \
                   -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
                   -H "Accept: application/vnd.github.v3+json" \
