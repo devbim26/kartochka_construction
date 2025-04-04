@@ -1,2 +1,3 @@
-export * from './config';
-export * from './constructor.validation';
+export * from './about-building.validation';
+export * from './designing.validation';
+export * from './floor-plans.validation';

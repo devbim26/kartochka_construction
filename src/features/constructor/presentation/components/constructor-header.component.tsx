@@ -16,7 +16,7 @@ export const ConstructorHeader = () => {
 			<div className="flex flex-row gap-[20px]">
 				<Button
 					className={twMerge(
-						'flex h-[30px] flex-row items-center px-[16px] py-[6px] font-sans text-sm font-semibold shadow-none',
+						'flex h-[30px] flex-row items-center px-[16px] font-sans text-sm font-semibold shadow-none',
 						isActive(CONSTRUCTOR_ROUTES.aboutBuilding.route)
 							? ''
 							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
@@ -27,7 +27,7 @@ export const ConstructorHeader = () => {
 				</Button>
 				<Button
 					className={twMerge(
-						'flex h-[30px] flex-row items-center px-[16px] py-[6px] font-sans text-sm font-semibold shadow-none',
+						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
 						isActive(CONSTRUCTOR_ROUTES.floorPlans.route)
 							? ''
 							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
@@ -38,7 +38,7 @@ export const ConstructorHeader = () => {
 				</Button>
 				<Button
 					className={twMerge(
-						'flex h-[30px] flex-row items-center px-[16px] py-[6px] font-sans text-sm font-semibold shadow-none',
+						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
 						isActive(CONSTRUCTOR_ROUTES.designing.route)
 							? ''
 							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',

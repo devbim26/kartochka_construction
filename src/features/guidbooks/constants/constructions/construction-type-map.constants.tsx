@@ -29,7 +29,7 @@ export const ConstructionTypeMap = ({
 
 	const typeMap = {
 		[ConstructionTypeEnum.HeavySingleLayerWall]: {
-			component: <HeavySingleLayerWallComponent />,
+			component: <HeavySingleLayerWallComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -54,7 +54,7 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
-			component: <HeavySingleLayerWallFacingOneSideComponent />,
+			component: <HeavySingleLayerWallFacingOneSideComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -131,7 +131,7 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
-			component: <HeavySingleLayerWallFacingBothSideComponent />,
+			component: <HeavySingleLayerWallFacingBothSideComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -260,7 +260,9 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide]: {
-			component: <HeavySingleLayerWallSoundproofingOneSideComponent />,
+			component: (
+				<HeavySingleLayerWallSoundproofingOneSideComponent currentForm={currentForm} />
+			),
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -308,7 +310,9 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]: {
-			component: <HeavySingleLayerWallSoundproofingBothSideComponent />,
+			component: (
+				<HeavySingleLayerWallSoundproofingBothSideComponent currentForm={currentForm} />
+			),
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -379,7 +383,7 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.HeavyMultiLayerWall]: {
-			component: <HeavyMultiLayerWallComponent />,
+			component: <HeavyMultiLayerWallComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -433,7 +437,7 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide]: {
-			component: <HeavyMultiLayerWallFacingOneSideComponent />,
+			component: <HeavyMultiLayerWallFacingOneSideComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -539,7 +543,7 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]: {
-			component: <HeavyMultiLayerWallFacingBothSideComponent />,
+			component: <HeavyMultiLayerWallFacingBothSideComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -697,7 +701,9 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide]: {
-			component: <HeavyMultiLayerWallSoundproofingOneSideComponent />,
+			component: (
+				<HeavyMultiLayerWallSoundproofingOneSideComponent currentForm={currentForm} />
+			),
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -774,7 +780,7 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide]: {
-			component: <HeavyMultiLayerWallSoundproofBothSideComponent />,
+			component: <HeavyMultiLayerWallSoundproofBothSideComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -874,7 +880,7 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.FramePartitionSingle]: {
-			component: <FramePartitionSingleComponent />,
+			component: <FramePartitionSingleComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
@@ -926,7 +932,7 @@ export const ConstructionTypeMap = ({
 			},
 		},
 		[ConstructionTypeEnum.FramePartitionDouble]: {
-			component: <FramePartitionDoubleComponent />,
+			component: <FramePartitionDoubleComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
