@@ -34,6 +34,8 @@ export const AddConstructionModal = ({
 			)}
 			contentClassName={twJoin('text-center', props.contentClassName ?? '')}
 			{...props}
-		></Modal>
+		>
+			{children}
+		</Modal>
 	);
 };

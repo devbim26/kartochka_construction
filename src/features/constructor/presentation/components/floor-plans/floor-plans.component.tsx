@@ -1,15 +1,19 @@
 import { Button, convertToBase64, DeleteIcon, useAppSelector } from '@core';
-import { memoize } from '@core/utils';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import type { FloorPlansData } from '@features/constructor/types';
 import { FloorPlansConfig } from '@features/constructor/utils';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
+import { AddConstructionModal } from '../modals/add-construction-modal.component';
+import { AddConstructionForm } from '../modals/modal-forms';
 
 export const FloorPlans = memoize(() => {
 	const form = useForm<FloorPlansData>({
 		defaultValues: FloorPlansConfig.defaultValues,
 	});
-	const { trigger, control, formState, setValue } = form;
+	const { trigger, setValue } = form;
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 	const handleUploadPdf = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
@@ -33,7 +37,7 @@ export const FloorPlans = memoize(() => {
 				<Button className="flex h-[28px] w-[100px] flex-row items-center bg-white px-[10px] py-[6px] font-sans font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-white">
 					<FaPlus width={'16px'} height={'16px'} />
 					0.000
-					<DeleteIcon onClick={() => console.log(123)} withoutBg withoutBorder />
+					<DeleteIcon onClick={() => setIsModalOpen(true)} withoutBg withoutBorder />
 				</Button>
 			</div>
 			<div className="flex flex-col border-b px-[24px] py-[110px]">
@@ -59,6 +63,17 @@ export const FloorPlans = memoize(() => {
 				</div>
 			</div>
 			<div className="flex border-b py-[30px]"></div>
+			<AddConstructionModal
+				isOpen={isModalOpen}
+				onCancel={() => setIsModalOpen(false)}
+				onClose={() => setIsModalOpen(false)}
+				onConfirm={() => {
+					setIsModalOpen(false);
+				}}
+				headerTitle="Добавить конструкцию"
+			>
+				<AddConstructionForm />
+			</AddConstructionModal>
 		</div>
 	);
 }, 'FloorPlans');
