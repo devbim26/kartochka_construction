@@ -2,7 +2,10 @@ import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { CreateConstructionConfig } from '@features/constructor/utils';
-import { RuConstructionTypeSelectValues } from '@features/guidbooks';
+import {
+	RuConstructionTypeSelectValues,
+	RuConstructionTypesSelectValues,
+} from '@features/guidbooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
@@ -22,7 +25,6 @@ export const CreateConstructionForm = memoize(() => {
 	useEffect(() => {
 		const parsedLength = parseInt(length);
 		const parsedWidth = parseInt(width);
-
 		if (!isNaN(parsedLength) && !isNaN(parsedWidth)) {
 			const area = parsedLength * parsedWidth;
 			setValue('area', area.toString());
@@ -54,7 +56,7 @@ export const CreateConstructionForm = memoize(() => {
 						name={'constructionType'}
 						render={({ field }) => (
 							<Select
-								options={RuConstructionTypeSelectValues}
+								options={RuConstructionTypesSelectValues}
 								{...field}
 								value={field.value || ''}
 								label={
@@ -188,6 +190,7 @@ export const CreateConstructionForm = memoize(() => {
 						readOnly
 					/>
 				</div>
+				<div className="flex border-b py-[10px]"></div>
 			</FormProvider>
 		</div>
 	);

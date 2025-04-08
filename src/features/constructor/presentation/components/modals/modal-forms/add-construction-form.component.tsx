@@ -2,7 +2,10 @@ import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type { AddConstructionData } from '@features/constructor/types';
 import { AddConstructionConfig } from '@features/constructor/utils';
-import { RuConstructionTypeSelectValues } from '@features/guidbooks';
+import {
+	RuConstructionTypeSelectValues,
+	RuConstructionTypesSelectValues,
+} from '@features/guidbooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
@@ -37,7 +40,7 @@ export const AddConstructionForm = memoize(() => {
 						name={'constructionType'}
 						render={({ field }) => (
 							<Select
-								options={RuConstructionTypeSelectValues}
+								options={RuConstructionTypesSelectValues}
 								{...field}
 								value={field.value || ''}
 								label={
@@ -106,6 +109,7 @@ export const AddConstructionForm = memoize(() => {
 							/>
 						</div>
 					</div>
+					<div className="flex border-b py-[2px]"></div>
 				</div>
 			</FormProvider>
 		</div>
