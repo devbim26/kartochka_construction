@@ -41,11 +41,11 @@ export const FloorPlans = memoize(() => {
 				<p className="font-sans text-lg font-semibold leading-4">Добавить уровень</p>
 				<Button
 					className="flex h-[28px] w-[100px] flex-row items-center bg-white px-[10px] py-[6px] font-sans font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-white"
-					onClick={() => setIsCreateModalOpen(true)}
+					onClick={() => setIsAddModalOpen(true)}
 				>
 					<FaPlus width={'16px'} height={'16px'} />
 					0.000
-					<DeleteIcon onClick={() => setIsAddModalOpen(true)} withoutBg withoutBorder />
+					<DeleteIcon onClick={() => console.log(123)} withoutBg withoutBorder />
 				</Button>
 			</div>
 			<div className="flex flex-col border-b px-[24px] py-[110px]">
@@ -65,7 +65,10 @@ export const FloorPlans = memoize(() => {
 						className="hidden"
 					/>
 					<p className="font-sans text-lg leading-4">или</p>
-					<Button className="h-[40px] w-[190px] bg-white px-[16px] text-[16px] text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white">
+					<Button
+						className="h-[40px] w-[190px] bg-white px-[16px] text-[16px] text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
+						onClick={() => setIsCreateModalOpen(true)}
+					>
 						Создать конструкцию
 					</Button>
 				</div>
