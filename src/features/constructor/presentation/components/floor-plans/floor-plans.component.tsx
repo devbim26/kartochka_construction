@@ -5,8 +5,7 @@ import { FloorPlansConfig } from '@features/constructor/utils';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
-import { AddConstructionModal } from '../modals/add-construction-modal.component';
-import { AddConstructionForm } from '../modals/modal-forms';
+import { AddConstructionForm, AddConstructionModal } from '../modals';
 
 export const FloorPlans = memoize(() => {
 	const form = useForm<FloorPlansData>({
@@ -71,6 +70,7 @@ export const FloorPlans = memoize(() => {
 					setIsModalOpen(false);
 				}}
 				headerTitle="Добавить конструкцию"
+				className="!w-[1000px] md:!w-[900px]"
 			>
 				<AddConstructionForm />
 			</AddConstructionModal>

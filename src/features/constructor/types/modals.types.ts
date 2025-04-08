@@ -1,5 +1,7 @@
-import type { AddConstructionSchemaType } from '../utils';
+import type { AddConstructionSchemaType, CreateConstructionSchemaType } from '../utils';
 
 type AddConstructionData = AddConstructionSchemaType;
 
-export { type AddConstructionData };
+type CreateConstructionData = CreateConstructionSchemaType;
+
+export { type AddConstructionData, type CreateConstructionData };

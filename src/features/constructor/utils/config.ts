@@ -1,5 +1,5 @@
 import type { EntityConfig } from '@core';
-import { AddConstructionSchema } from './validation';
+import { AddConstructionSchema, CreateConstructionSchema } from './validation';
 import { AboutBuildingSchema } from './validation/about-building.validation';
 import { DesigningSchema } from './validation/designing.validation';
 import { FloorPlansSchema } from './validation/floor-plans.validation';
@@ -33,6 +33,20 @@ export const AddConstructionConfig: EntityConfig = {
 		constructionType: '',
 		firstPlacementRoom: '',
 		secondPlacementRoom: '',
+	},
+};
+
+export const CreateConstructionConfig: EntityConfig = {
+	schema: CreateConstructionSchema,
+	defaultValues: {
+		name: '',
+		constructionType: '',
+		construction: '',
+		firstPlacementRoom: '',
+		secondPlacementRoom: '',
+		area: '',
+		width: '',
+		length: '',
 	},
 };
 
