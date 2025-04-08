@@ -3,12 +3,14 @@ import { memoize } from '@core/utils/hoc/memo.utils';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { CreateConstructionConfig } from '@features/constructor/utils';
 import { RuConstructionTypeSelectValues } from '@features/guidbooks';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const CreateConstructionForm = memoize(() => {
 	const form = useForm<CreateConstructionData>({
 		defaultValues: CreateConstructionConfig.defaultValues,
+		resolver: zodResolver(CreateConstructionConfig.schema),
 	});
 
 	const { register, formState, control } = form;

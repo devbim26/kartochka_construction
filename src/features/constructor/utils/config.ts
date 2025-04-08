@@ -13,6 +13,7 @@ export const AboutBuildingConfig: EntityConfig = {
 		buildingType: '',
 		maxHeight: '',
 		comfortClass: '',
+		requirement: '',
 		isFloorPlan: false,
 		isBim: false,
 	},

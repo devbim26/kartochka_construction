@@ -1,5 +1,7 @@
 import {
 	Button,
+	convertToPaginatedType,
+	convertToSelectValues,
 	FormElementLabel,
 	Input,
 	Select,
@@ -13,12 +15,19 @@ import { constructorSlice } from '@features/constructor/store';
 import type { AboutBuildingData } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
 import {
+	convertToClientRequirementData,
+	getGuidebooksPaginated,
+	Guidebooks,
+} from '@features/guidbooks';
+import type { FormRequirement } from '@features/guidbooks/types';
+import {
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuCountryNamesMap,
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useCallback, useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -30,6 +39,7 @@ export const AboutBuilding = memoize(() => {
 	const { register, control, formState } = form;
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
+	const [requirementData, setRequirementData] = useState<Array<FormRequirement>>([]);
 
 	const handleSubmit = () => {
 		form.handleSubmit(onSubmit)();
@@ -39,6 +49,38 @@ export const AboutBuilding = memoize(() => {
 		dispatch(constructorSlice.actions.setAboutBuilding(data));
 		navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`);
 	};
+
+	const handleGetRequirementData = useCallback(async () => {
+		try {
+			const response = await getGuidebooksPaginated({
+				data: {
+					countryType: null,
+					buildingType: null,
+					firstPlacementRoomName: null,
+					secondPlacementRoomName: null,
+					standartShortName: null,
+					standartFullName: null,
+					standartValidityPeriod: null,
+					class: null,
+				},
+				guidebookType: Guidebooks.REQUIREMENT,
+				pagination: { pageNumber: 1, pageSize: 99999 },
+			});
+			console.log(response.data);
+			const resData = convertToPaginatedType(convertToClientRequirementData)(
+				response.data as any,
+			);
+			console.log(resData.items);
+
+			setRequirementData(resData.items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
+	useEffect(() => {
+		handleGetRequirementData();
+	}, []);
 
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
@@ -180,6 +222,27 @@ export const AboutBuilding = memoize(() => {
 										formState.errors.comfortClass?.message ? 'text-error' : '',
 									)}
 									placeholder="Выберите класс"
+									buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+									wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
+								/>
+							)}
+						/>
+						<Controller
+							control={control}
+							name={'requirement'}
+							render={({ field }) => (
+								<Select
+									{...field}
+									options={convertToSelectValues(requirementData) ?? []}
+									value={field.value || ''}
+									label={formState.errors?.requirement?.message || 'Требование'}
+									isSearchable
+									error={formState.errors.requirement?.message}
+									labelClassName={twMerge(
+										'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
+										formState.errors.requirement?.message ? 'text-error' : '',
+									)}
+									placeholder="Выберите требование"
 									buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 									wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 								/>

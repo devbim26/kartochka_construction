@@ -1,4 +1,5 @@
 export const convertToSelectValues = (data?: Array<object>) => {
+	console.log(data);
 	if (!data) return null;
 	return data.map((el) => {
 		const obj = el as {
@@ -9,6 +10,7 @@ export const convertToSelectValues = (data?: Array<object>) => {
 			firstName: string;
 			lastName: string;
 			middleName: string;
+			standartShortName: string;
 		};
 		const fullName =
 			!!obj.firstName?.length && !!obj.lastName?.length
@@ -18,7 +20,7 @@ export const convertToSelectValues = (data?: Array<object>) => {
 				: '';
 
 		return {
-			label: obj.name ?? obj.title ?? fullName ?? obj.username,
+			label: obj.name ?? obj.title ?? fullName ?? obj.username ?? obj.standartShortName,
 			value: obj.id!,
 		};
 	});
