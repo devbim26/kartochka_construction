@@ -4,6 +4,7 @@ import type { CreateConstructionData } from '@features/constructor/types';
 import { CreateConstructionConfig } from '@features/constructor/utils';
 import { RuConstructionTypeSelectValues } from '@features/guidbooks';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -13,7 +14,22 @@ export const CreateConstructionForm = memoize(() => {
 		resolver: zodResolver(CreateConstructionConfig.schema),
 	});
 
-	const { register, formState, control } = form;
+	const { register, formState, control, setValue, watch } = form;
+
+	const length = watch('length');
+	const width = watch('width');
+
+	useEffect(() => {
+		const parsedLength = parseInt(length);
+		const parsedWidth = parseInt(width);
+
+		if (!isNaN(parsedLength) && !isNaN(parsedWidth)) {
+			const area = parsedLength * parsedWidth;
+			setValue('area', area.toString());
+		} else {
+			setValue('area', '');
+		}
+	}, [length, width, setValue]);
 
 	return (
 		<div className="flex flex-col border-b">
@@ -129,20 +145,6 @@ export const CreateConstructionForm = memoize(() => {
 						</div>
 					</div>
 					<Input
-						{...register('area')}
-						labelClassName={twMerge(
-							'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px] text-left',
-							formState.errors.area?.message ? 'text-error' : '',
-						)}
-						wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
-						inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						error={formState.errors.area?.message}
-						containerClassName="w-[226px]"
-						label={formState.errors?.area?.message || 'Площадь, м2'}
-						placeholder="Введите площадь"
-						maxLength={50}
-					/>
-					<Input
 						{...register('width')}
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px] text-left',
@@ -169,6 +171,21 @@ export const CreateConstructionForm = memoize(() => {
 						label={formState.errors?.length?.message || 'Длина, м'}
 						placeholder="Введите длину"
 						maxLength={50}
+					/>
+					<Input
+						{...register('area')}
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px] text-left',
+							formState.errors.area?.message ? 'text-error' : '',
+						)}
+						wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
+						inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+						error={formState.errors.area?.message}
+						containerClassName="w-[226px]"
+						label={formState.errors?.area?.message || 'Площадь, м2'}
+						placeholder="Введите площадь"
+						maxLength={50}
+						readOnly
 					/>
 				</div>
 			</FormProvider>

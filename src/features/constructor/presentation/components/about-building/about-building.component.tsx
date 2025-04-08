@@ -1,7 +1,6 @@
 import {
 	Button,
 	convertToPaginatedType,
-	convertToSelectValues,
 	FormElementLabel,
 	Input,
 	Select,
@@ -11,6 +10,7 @@ import {
 } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
+import { convertToRequirementSelectValues } from '@features/constructor/converters';
 import { constructorSlice } from '@features/constructor/store';
 import type { AboutBuildingData } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
@@ -233,7 +233,9 @@ export const AboutBuilding = memoize(() => {
 							render={({ field }) => (
 								<Select
 									{...field}
-									options={convertToSelectValues(requirementData) ?? []}
+									options={
+										convertToRequirementSelectValues(requirementData) ?? []
+									}
 									value={field.value || ''}
 									label={formState.errors?.requirement?.message || 'Требование'}
 									isSearchable
