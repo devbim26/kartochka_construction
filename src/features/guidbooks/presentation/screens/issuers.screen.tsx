@@ -2,8 +2,10 @@ import type { IssuerDto } from '@api-gen';
 import {
 	convertToPaginatedType,
 	DeleteIcon,
+	DeleteModal,
 	EditIcon,
 	paginationStateDefault,
+	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
@@ -20,8 +22,11 @@ import {
 	getGuidebooksDetail,
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
+	GuidbookPageHeaderWrapper,
 	Guidebooks,
 	IssuersAddAndEditConfig,
+	IssuersAddEdit,
+	IssuersFilter,
 	IssuersFilterConfig,
 	RuCountryNamesMap,
 	useHeaderForm,
@@ -33,7 +38,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
-import { PDFViewer } from '../components/header/forms/issuers/pdf';
 
 const IssuersScreen = () => {
 	const navigate = useAppNavigate();
@@ -300,8 +304,7 @@ const IssuersScreen = () => {
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
-			<PDFViewer />
-			{/* <GuidbookPageHeaderWrapper
+			<GuidbookPageHeaderWrapper
 				onSave={search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
 					pageTitle: 'Производители',
@@ -334,7 +337,7 @@ const IssuersScreen = () => {
 				headerTitle="Подтвердите действие"
 			>
 				Вы уверены, что хотите удалить производителя {itemToDelete.name}?
-			</DeleteModal> */}
+			</DeleteModal>
 		</div>
 	);
 };
