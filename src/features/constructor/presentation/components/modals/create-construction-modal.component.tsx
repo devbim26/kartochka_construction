@@ -14,7 +14,6 @@ interface CreateConstructionModalProps extends Omit<ModalProps, 'Footer'> {
 export const CreateConstructionModal = ({
 	onCancel,
 	onConfirm,
-	children,
 	...props
 }: CreateConstructionModalProps) => {
 	const formRef = useRef<CreateConstructionFormHandle>(null);

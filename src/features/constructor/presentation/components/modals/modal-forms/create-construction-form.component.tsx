@@ -34,10 +34,6 @@ export const CreateConstructionForm = memoize(
 		const length = watch('length');
 		const width = watch('width');
 
-		const onSubmit = (data: CreateConstructionData) => {
-			dispatch(constructorSlice.actions.setCreateConstructionData(data));
-		};
-
 		useImperativeHandle(ref, () => ({
 			submit: () => {
 				handleSubmit((data) => {
@@ -49,14 +45,8 @@ export const CreateConstructionForm = memoize(
 		}));
 
 		useEffect(() => {
-			const parsedLength = parseInt(length);
-			const parsedWidth = parseInt(width);
-			if (!isNaN(parsedLength) && !isNaN(parsedWidth)) {
-				const area = parsedLength * parsedWidth;
-				setValue('area', area.toString());
-			} else {
-				setValue('area', '');
-			}
+			const area = parseInt(length) * parseInt(width);
+			setValue('area', area.toString());
 		}, [length, width, setValue]);
 
 		// const handleGetConstructionData = useCallback(async () => {
@@ -167,7 +157,7 @@ export const CreateConstructionForm = memoize(
 									{formState.errors.firstPlacementRoom ||
 									formState.errors.secondPlacementRoom
 										? 'Поле обязательно для заполнения'
-										: 'Тип здания'}
+										: 'Конструкция разделяет'}
 								</label>
 							</div>
 							<div className="flex gap-x-[12px]">
