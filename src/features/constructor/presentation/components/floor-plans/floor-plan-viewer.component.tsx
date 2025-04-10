@@ -4,26 +4,24 @@ import React, { useEffect, useRef, useState } from 'react';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@5.1.91/build/pdf.worker.min.mjs`;
 
-export const FloorPlanViewer = () => {
+type Props = {
+	pdfFile: pdfjs.PDFDocumentProxy;
+};
+
+export const FloorPlanViewer = ({ pdfFile }: Props) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
+
 	const [pageNum, setPageNum] = useState(1);
 	const [numPages, setNumPages] = useState(0);
 
-	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (file) {
-			const arrayBuffer = await file.arrayBuffer();
-			const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
-			setPdfDoc(pdf);
-			setNumPages(pdf.numPages);
-			setPageNum(1);
-		}
-	};
+	useEffect(() => {
+		setNumPages(pdfFile.numPages);
+		setPageNum(1);
+	}, []);
 
 	const renderPage = async (num: number) => {
-		if (!pdfDoc || !canvasRef.current) return;
-		const page = await pdfDoc.getPage(num);
+		if (!pdfFile || !canvasRef.current) return;
+		const page = await pdfFile.getPage(num);
 		const viewport = page.getViewport({ scale: 1.5 });
 
 		const canvas = canvasRef.current;
@@ -39,15 +37,48 @@ export const FloorPlanViewer = () => {
 		}).promise;
 	};
 
-	const drawFrame = (x: number, y: number) => {
+	const drawConstruction = (x: number, y: number, text: string) => {
 		if (!canvasRef.current) return;
-		const context = canvasRef.current.getContext('2d');
+		const canvas = canvasRef.current;
+		const context = canvas.getContext('2d');
 		if (!context) return;
 
-		const frameSize = 50;
-		context.strokeStyle = 'blue';
+		const boxWidth = 100;
+		const boxHeight = 50;
+		const padding = 10;
+		const arrowThickness = 5;
+		const dotSize = 6;
+
+		let boxX = x + 180;
+		const boxY = y - 100;
+
+		if (boxX + boxWidth + padding > canvas.width) {
+			boxX = x - 50 - boxWidth;
+		}
+
+		context.fillStyle = '#2175F3';
+		context.beginPath();
+		context.arc(x, y, dotSize, 0, Math.PI * 2);
+		context.fill();
+
+		context.strokeStyle = '#2175F3';
+		context.lineWidth = arrowThickness;
+		context.beginPath();
+		context.moveTo(x, y);
+		context.lineTo(boxX + 10, boxY + 45);
+		context.stroke();
+
+		context.fillStyle = 'white';
+		context.fillRect(boxX, boxY, boxWidth, boxHeight);
+		context.strokeStyle = '#2175F3';
 		context.lineWidth = 2;
-		context.strokeRect(x - frameSize / 2, y - frameSize / 2, frameSize, frameSize);
+		context.strokeRect(boxX, boxY, boxWidth, boxHeight);
+
+		context.fillStyle = 'black';
+		context.font = '14px Arial';
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
+		context.fillText(text, boxX + boxWidth / 2, boxY + boxHeight / 2);
 	};
 
 	const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -59,37 +90,30 @@ export const FloorPlanViewer = () => {
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
 
-		drawFrame(x, y);
+		drawConstruction(x, y, 'Конструкция');
 	};
 
 	useEffect(() => {
-		if (pdfDoc) {
+		if (pdfFile) {
 			renderPage(pageNum);
 		}
-	}, [pdfDoc, pageNum]);
+	}, [pdfFile, pageNum]);
 
 	const handlePrev = () => {
 		if (pageNum > 1) setPageNum(pageNum - 1);
 	};
 
 	const handleNext = () => {
-		if (pdfDoc && pageNum < numPages) setPageNum(pageNum + 1);
+		if (pdfFile && pageNum < numPages) setPageNum(pageNum + 1);
 	};
 
 	return (
-		<div className="flex items-center justify-center rounded-[20px]">
+		<div className="flex items-center justify-center rounded-[20px] py-[30px]">
 			<div className="flex w-fit flex-col gap-[18px] rounded-[20px] bg-white">
-				<input
-					type="file"
-					accept="application/pdf"
-					onChange={handleFileChange}
-					className="mb-4"
-				/>
-
 				<div className="h-[400px] w-[933px] overflow-auto border border-input-label-primary">
 					<canvas ref={canvasRef} onContextMenu={handleCanvasRightClick} />
 				</div>
-				{pdfDoc && (
+				{pdfFile && (
 					<div className="flex items-center justify-between gap-3 self-end">
 						<Button
 							onClick={handlePrev}

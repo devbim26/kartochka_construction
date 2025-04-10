@@ -4,7 +4,7 @@ import type { FloorPlansData } from '@features/constructor/types';
 import { FloorPlansConfig } from '@features/constructor/utils';
 import { useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
-import { FloorPlanViewer } from './floor-plan-viewer.component';
+import { FloorPlanViewer } from '../floor-plans/floor-plan-viewer.component';
 
 export const FloorPlans = memoize(() => {
 	const form = useForm<FloorPlansData>({
