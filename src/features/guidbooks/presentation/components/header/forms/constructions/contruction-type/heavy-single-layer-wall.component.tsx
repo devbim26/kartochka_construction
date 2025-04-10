@@ -91,13 +91,12 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 							<DeleteIcon
 								className="self-end"
 								onClick={() => {
+									if (!userMaterials) return;
+									const updated = [...userMaterials];
+									updated.splice(indices.zeroIndex, 1);
 									setValue(
 										'constructionTypeObject.constructions.0.userMaterials',
-										(userMaterials &&
-											userMaterials.filter(
-												(c: UserMaterials) => c.positionId !== '0',
-											)) ||
-											[],
+										updated,
 									);
 								}}
 							/>
@@ -139,21 +138,18 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 									currentForm: currentForm,
 								})}
 							</div>
-							{indices.zeroIndex < 0 && (
-								<DeleteIcon
-									className="self-end"
-									onClick={() => {
-										setValue(
-											'constructionTypeObject.constructions.0.userMaterials',
-											(userMaterials &&
-												userMaterials.filter(
-													(c: UserMaterials) => c.positionId !== '1',
-												)) ||
-												[],
-										);
-									}}
-								/>
-							)}
+							<DeleteIcon
+								className="self-end"
+								onClick={() => {
+									if (!userMaterials) return;
+									const updated = [...userMaterials];
+									updated.splice(indices.oneIndex, 1);
+									setValue(
+										'constructionTypeObject.constructions.0.userMaterials',
+										updated,
+									);
+								}}
+							/>
 						</div>
 					)}
 				</>
@@ -207,21 +203,18 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 									currentForm: currentForm,
 								})}
 							</div>
-							{indices.fourIndex < 0 && (
-								<DeleteIcon
-									className="self-end"
-									onClick={() => {
-										setValue(
-											'constructionTypeObject.constructions.0.userMaterials',
-											(userMaterials &&
-												userMaterials.filter(
-													(c: UserMaterials) => c.positionId !== '3',
-												)) ||
-												[],
-										);
-									}}
-								/>
-							)}
+							<DeleteIcon
+								className="self-end"
+								onClick={() => {
+									if (!userMaterials) return;
+									const updated = [...userMaterials];
+									updated.splice(indices.threeIndex, 1);
+									setValue(
+										'constructionTypeObject.constructions.0.userMaterials',
+										updated,
+									);
+								}}
+							/>
 						</div>
 					)}
 				</>
@@ -264,13 +257,12 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 							<DeleteIcon
 								className="self-end"
 								onClick={() => {
+									if (!userMaterials) return;
+									const updated = [...userMaterials];
+									updated.splice(indices.fourIndex, 1);
 									setValue(
 										'constructionTypeObject.constructions.0.userMaterials',
-										(userMaterials &&
-											userMaterials.filter(
-												(c: UserMaterials) => c.positionId !== '4',
-											)) ||
-											[],
+										updated,
 									);
 								}}
 							/>
