@@ -222,18 +222,6 @@ export interface CreateConstructionTypeDto {
 	constructions?: CreateConstructionDto[] | null;
 }
 
-export interface CreateReportDto {
-	reportNumber?: string | null;
-	client?: string | null;
-	description?: string | null;
-	projectName?: string | null;
-	engenierFullName?: string | null;
-	city?: string | null;
-	code?: string | null;
-	/** @format uuid */
-	constructionHeaderId?: string;
-}
-
 export interface CreateRequirementCommand {
 	/** @format uuid */
 	secondPlacementRoomId?: string;
@@ -350,17 +338,6 @@ export interface GetPlacementRoomVariantByAllParametersQuery {
 	constructionType?: ConstructionClass;
 	/** @format uuid */
 	placementRoomId?: string;
-}
-
-export interface GetReportWithPaginationQuery {
-	/** @format int32 */
-	pageNumber?: number;
-	/** @format int32 */
-	pageSize?: number;
-	sortOrder?: SortOrder;
-	ordering?: string | null;
-	name?: string | null;
-	client?: string | null;
 }
 
 export interface GetRequirementsWithPaginationParamsQuery {
@@ -642,37 +619,6 @@ export enum Priority {
 	Eight = 'Eight',
 	Nine = 'Nine',
 	Ten = 'Ten',
-}
-
-export interface ReportDto {
-	/** @format uuid */
-	id?: string;
-	name?: string | null;
-	client?: string | null;
-	/** @format date */
-	lastUpdated?: string;
-	status?: ReportStatus;
-	fileUrl?: string | null;
-}
-
-export interface ReportDtoPaginatedList {
-	items?: ReportDto[] | null;
-	/** @format int32 */
-	pageNumber?: number;
-	/** @format int32 */
-	totalPages?: number;
-	/** @format int32 */
-	totalCount?: number;
-	/** @format int32 */
-	pageSize?: number;
-	hasPreviousPage?: boolean;
-	hasNextPage?: boolean;
-}
-
-export enum ReportStatus {
-	None = 'None',
-	ValueСonsideration = 'Сonsideration',
-	Confirmed = 'Confirmed',
 }
 
 export interface RequirementDto {
@@ -1167,11 +1113,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 *
 		 * @tags Construction
 		 * @name ConstructionDetail
-		 * @request GET:/api/Construction/{id}
+		 * @request GET:/api/Construction/{ConstructionHeaderId}
 		 */
-		constructionDetail: (id: string, params: RequestParams = {}) =>
+		constructionDetail: (constructionHeaderId: string, params: RequestParams = {}) =>
 			this.request<ConstructionHeaderDto, any>({
-				path: `/api/Construction/${id}`,
+				path: `/api/Construction/${constructionHeaderId}`,
 				method: 'GET',
 				format: 'json',
 				...params,
@@ -1353,6 +1299,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				name: string;
 				countries?: CountryType[];
 				webSite?: string;
+				editFile?: boolean;
 				/** @format binary */
 				formFile?: File;
 			},
@@ -1497,6 +1444,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				damping?: number;
 				/** @format float */
 				solid?: number;
+				editFile?: boolean;
 				/** @format binary */
 				formFile?: File;
 			},
@@ -1561,43 +1509,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags Report
-		 * @name ReportGetPaginatedCreate
-		 * @request POST:/api/Report/get-paginated
-		 */
-		reportGetPaginatedCreate: (
-			data: GetReportWithPaginationQuery,
-			params: RequestParams = {},
-		) =>
-			this.request<ReportDtoPaginatedList, any>({
-				path: `/api/Report/get-paginated`,
-				method: 'POST',
-				body: data,
-				type: ContentType.Json,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags Report
-		 * @name ReportCreate
-		 * @request POST:/api/Report
-		 */
-		reportCreate: (data: CreateReportDto, params: RequestParams = {}) =>
-			this.request<ReportDto, any>({
-				path: `/api/Report`,
-				method: 'POST',
-				body: data,
-				type: ContentType.Json,
-				format: 'json',
 				...params,
 			}),
 

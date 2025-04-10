@@ -9,7 +9,7 @@ export const FloorPlans = memoize(() => {
 	const form = useForm<FloorPlansData>({
 		defaultValues: FloorPlansConfig.defaultValues,
 	});
-	const { trigger, control, formState, setValue } = form;
+	const { trigger, setValue } = form;
 
 	const handleUploadPdf = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
