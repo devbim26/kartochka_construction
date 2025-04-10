@@ -18,6 +18,7 @@ import {
 	convertToClientRequirementData,
 	getGuidebooksPaginated,
 	Guidebooks,
+	RuConstructionTypeSelectValues,
 } from '@features/guidbooks';
 import type { FormRequirement } from '@features/guidbooks/types';
 import {
@@ -36,10 +37,23 @@ export const AboutBuilding = memoize(() => {
 		defaultValues: AboutBuildingConfig.defaultValues,
 		resolver: zodResolver(AboutBuildingConfig.schema),
 	});
-	const { register, control, formState } = form;
+	const { register, control, formState, watch } = form;
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
 	const [requirementData, setRequirementData] = useState<Array<FormRequirement>>([]);
+
+	const selectedRegion = watch('region');
+	const selectedPurpose = watch('buildingPurpose');
+	const selectedType = watch('buildingType');
+
+	const filteredRequirements = convertToRequirementSelectValues(
+		requirementData.filter(
+			(req) =>
+				(!selectedRegion || req.countryType === selectedRegion) &&
+				(!selectedPurpose || req.constructionType === selectedPurpose) &&
+				(!selectedType || req.buildingType === selectedType),
+		),
+	);
 
 	const handleSubmit = () => {
 		form.handleSubmit(onSubmit)();
@@ -155,7 +169,7 @@ export const AboutBuilding = memoize(() => {
 									name="buildingPurpose"
 									render={({ field }) => (
 										<Select
-											options={RuCategoryClassSelectValues}
+											options={RuConstructionTypeSelectValues}
 											{...field}
 											error={formState.errors.buildingPurpose?.message}
 											value={field.value || ''}
@@ -233,9 +247,7 @@ export const AboutBuilding = memoize(() => {
 							render={({ field }) => (
 								<Select
 									{...field}
-									options={
-										convertToRequirementSelectValues(requirementData) ?? []
-									}
+									options={filteredRequirements ?? []}
 									value={field.value || ''}
 									label={formState.errors?.requirement?.message || 'Требование'}
 									isSearchable

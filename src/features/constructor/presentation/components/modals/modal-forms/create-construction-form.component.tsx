@@ -1,12 +1,9 @@
-import { Input, Select, useAppDispatch } from '@core';
+import { Input, Select, useAppDispatch, useAppSelector } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { constructorSlice } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { CreateConstructionConfig } from '@features/constructor/utils';
-import {
-	RuConstructionTypeSelectValues,
-	RuConstructionTypesSelectValues,
-} from '@features/guidbooks';
+import { RuConstructionTypeSelectValues } from '@features/guidbooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { forwardRef, useEffect, useImperativeHandle } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
@@ -48,6 +45,8 @@ export const CreateConstructionForm = memoize(
 			const area = parseInt(length) * parseInt(width);
 			setValue('area', area.toString());
 		}, [length, width, setValue]);
+
+		const aboutBuildingData = useAppSelector((store) => store.constructorData);
 
 		// const handleGetConstructionData = useCallback(async () => {
 		// 	try {
@@ -102,7 +101,7 @@ export const CreateConstructionForm = memoize(
 							name={'constructionType'}
 							render={({ field }) => (
 								<Select
-									options={RuConstructionTypesSelectValues}
+									options={RuConstructionTypeSelectValues}
 									{...field}
 									value={field.value || ''}
 									label={
