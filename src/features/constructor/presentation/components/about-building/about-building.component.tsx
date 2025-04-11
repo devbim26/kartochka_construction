@@ -19,12 +19,12 @@ import {
 	getGuidebooksPaginated,
 	Guidebooks,
 	RuConstructionTypeSelectValues,
+	RuCountryNamesMap,
 } from '@features/guidbooks';
 import type { FormRequirement } from '@features/guidbooks/types';
 import {
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
-	RuCountryNamesMap,
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -50,7 +50,6 @@ export const AboutBuilding = memoize(() => {
 		requirementData.filter(
 			(req) =>
 				(!selectedRegion || req.countryType === selectedRegion) &&
-				(!selectedPurpose || req.constructionType === selectedPurpose) &&
 				(!selectedType || req.buildingType === selectedType),
 		),
 	);
@@ -124,19 +123,20 @@ export const AboutBuilding = memoize(() => {
 							render={({ field }) => (
 								<Select
 									options={[
-										{
-											label: RuCountryNamesMap.None,
-											value: RuCountryNamesMap.None,
-										},
+										{ label: 'Нет', value: RuCountryNamesMap.None },
+										{ label: 'Беларусь', value: RuCountryNamesMap.Belarus },
+										{ label: 'Россия', value: RuCountryNamesMap.Russia },
 										...RuCountryNamesSelectValues.filter(
-											(reg) => reg.label !== RuCountryNamesMap.None,
+											(reg) =>
+												!['Беларусь', 'Россия', 'Нет'].includes(reg.label),
 										).sort((a, b) => a.label.localeCompare(b.label)),
 									]}
 									{...field}
 									value={field.value || ''}
-									label={formState.errors?.region?.message || 'Регион'}
+									label={formState.errors?.region?.message || 'Страна'}
 									error={formState.errors.region?.message}
 									isSearchable
+									highlightOnlyRussiaBelarus
 									labelClassName={twMerge(
 										'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 										formState.errors.region?.message ? 'text-error' : '',
@@ -166,22 +166,6 @@ export const AboutBuilding = memoize(() => {
 							<div className="flex gap-x-[12px]">
 								<Controller
 									control={control}
-									name="buildingPurpose"
-									render={({ field }) => (
-										<Select
-											options={RuConstructionTypeSelectValues}
-											{...field}
-											error={formState.errors.buildingPurpose?.message}
-											value={field.value || ''}
-											placeholder="Выберите назначение"
-											isSearchable
-											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-											wrapperClassname="shadow-none ring-input-border-primary"
-										/>
-									)}
-								/>
-								<Controller
-									control={control}
 									name="buildingType"
 									render={({ field }) => (
 										<Select
@@ -190,6 +174,22 @@ export const AboutBuilding = memoize(() => {
 											error={formState.errors.buildingType?.message}
 											value={field.value || ''}
 											placeholder="Выберите тип"
+											isSearchable
+											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+											wrapperClassname="shadow-none ring-input-border-primary"
+										/>
+									)}
+								/>
+								<Controller
+									control={control}
+									name="buildingPurpose"
+									render={({ field }) => (
+										<Select
+											options={RuConstructionTypeSelectValues}
+											{...field}
+											error={formState.errors.buildingPurpose?.message}
+											value={field.value || ''}
+											placeholder="Выберите назначение"
 											isSearchable
 											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 											wrapperClassname="shadow-none ring-input-border-primary"
