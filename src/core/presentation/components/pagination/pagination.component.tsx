@@ -1,8 +1,8 @@
 import type { PaginationState } from '@core/types';
 import { memoize } from '@core/utils';
 import { useCallback, useEffect, useState } from 'react';
+import { Select, type SelectOption } from '../select';
 import { PaginationButton } from './pagination-button.component';
-import { Select, SelectOption } from '../select';
 
 export const pageSizeSelectOptions: SelectOption[] = [
 	{ label: '10 строк', value: 10 },

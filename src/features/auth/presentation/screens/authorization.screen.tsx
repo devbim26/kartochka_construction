@@ -1,12 +1,10 @@
 import { APP_ROUTES, LogoIcon, LogoTextIcon, PageLoader } from '@core';
 import { AUTH_ROUTES } from '@features/auth/constants';
 import { Suspense, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 export const AuthorizationScreen = () => {
 	const navigate = useNavigate();
-	const dispatch = useDispatch();
 
 	useEffect(() => {
 		if (!location.pathname.startsWith(`/auth/login`))

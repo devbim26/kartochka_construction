@@ -1,3 +1,4 @@
+import { ConstructionPosition, MaterialParametrs } from '@api-gen';
 import {
 	CheckboxSelect,
 	convertToPaginatedType,
@@ -12,14 +13,37 @@ import {
 } from '@features/guidbooks/constants';
 import { convertToClientIssuerData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
-import { ConstructionsAddData, ConstructionTypeEnum, Guidebooks, Issuer, MaterialTypeEnum, RuConstructionTypesSelectValues, RuCountryNamesSelectValues, RuIndexTypeNamesSelectValues, RuPriorityNamesSelectValues } from '@features/guidbooks/types';
+import {
+	ConstructionTypeEnum,
+	Guidebooks,
+	MaterialTypeEnum,
+	RuConstructionTypesSelectValues,
+	RuCountryNamesSelectValues,
+	RuIndexTypeNamesSelectValues,
+	RuPriorityNamesSelectValues,
+	type ConstructionsAddData,
+	type Issuer,
+} from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
-import { FramePartitionDouble, FramePartitionSingle, HeavyMultiLayerWallComponent, HeavyMultiLayerWallFacingBothSideComponent, HeavyMultiLayerWallFacingOneSideComponent, HeavyMultiLayerWallSoundproofBothSide, HeavyMultiLayerWallSoundproofingLeftSide, HeavyMultiLayerWallSoundproofOneSide, HeavySingleLayerWallComponent, HeavySingleLayerWallFacingBothSideComponent, HeavySingleLayerWallFacingOneSideComponent, HeavySingleLayerWallSoundproofingBothSideComponent, HeavySingleLayerWallSoundproofingOneSideComponent } from './contruction-type';
-import { ConstructionPosition, MaterialParametrs } from '@api-gen';
 import { FormSubTitle } from '../../../form-sub-title.component';
+import {
+	FramePartitionDouble,
+	FramePartitionSingle,
+	HeavyMultiLayerWallComponent,
+	HeavyMultiLayerWallFacingBothSideComponent,
+	HeavyMultiLayerWallFacingOneSideComponent,
+	HeavyMultiLayerWallSoundproofBothSide,
+	HeavyMultiLayerWallSoundproofingLeftSide,
+	HeavyMultiLayerWallSoundproofOneSide,
+	HeavySingleLayerWallComponent,
+	HeavySingleLayerWallFacingBothSideComponent,
+	HeavySingleLayerWallFacingOneSideComponent,
+	HeavySingleLayerWallSoundproofingBothSideComponent,
+	HeavySingleLayerWallSoundproofingOneSideComponent,
+} from './contruction-type';
 
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();

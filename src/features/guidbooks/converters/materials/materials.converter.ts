@@ -1,8 +1,20 @@
 import type { GetMaterialsWithPaginationParamsQuery } from '@api-gen';
 import { convertToClientCountryData, convertToServerCountryData } from '@core';
-import { Country, MaterialOriginType, MaterialsAddAndEditData, MaterialsFilterData, MaterialTypeEnum } from '@features/guidbooks/types';
-import { convertToClientMaterialTypeData, convertToServerMaterialTypeData } from './material-type.converter';
-import { convertToClientMaterialOriginTypeData, convertToServerMaterialOriginTypeData } from './material-origin-type.converter';
+import type {
+	Country,
+	MaterialOriginType,
+	MaterialsAddAndEditData,
+	MaterialsFilterData,
+	MaterialTypeEnum,
+} from '@features/guidbooks/types';
+import {
+	convertToClientMaterialOriginTypeData,
+	convertToServerMaterialOriginTypeData,
+} from './material-origin-type.converter';
+import {
+	convertToClientMaterialTypeData,
+	convertToServerMaterialTypeData,
+} from './material-type.converter';
 
 export const convertToServerMaterialsFilterData = (
 	data: MaterialsFilterData,

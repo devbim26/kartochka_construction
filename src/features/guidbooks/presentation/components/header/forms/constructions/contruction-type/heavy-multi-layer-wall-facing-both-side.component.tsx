@@ -1,7 +1,10 @@
-import { MaterialTypeEnum } from '@api-gen';
+import type { MaterialTypeEnum } from '@api-gen';
 import { DeleteIcon } from '@core';
 import { ConstructionFieldsMap } from '@features/guidbooks/constants';
-import { ConstructionsAddData, MaterialTypesSelectValuesEnum } from '@features/guidbooks/types';
+import {
+	MaterialTypesSelectValuesEnum,
+	type ConstructionsAddData,
+} from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';

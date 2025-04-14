@@ -1,9 +1,9 @@
 import { DeleteIcon } from '@core';
 import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import {
-	ConstructionsAddData,
-	MaterialTypeEnum,
 	MaterialTypesSelectValuesEnum,
+	type ConstructionsAddData,
+	type MaterialTypeEnum,
 } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';

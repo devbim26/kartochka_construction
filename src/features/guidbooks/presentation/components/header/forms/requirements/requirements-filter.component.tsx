@@ -8,7 +8,7 @@ import { twMerge } from 'tailwind-merge';
 
 export const RequirementsFilter = memoize(() => {
 	const form = useFormContext<RequirementFilter>();
-	const { control, formState, setValue, getValues } = form;
+	const { formState, setValue, getValues } = form;
 
 	return (
 		<>

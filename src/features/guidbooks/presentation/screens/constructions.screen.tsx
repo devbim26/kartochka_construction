@@ -31,13 +31,13 @@ import {
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
 import {
-	ConstructionTypeEnum,
 	Guidebooks,
 	RuConstructionTypesMap,
 	RuCountryNamesMap,
 	type ConstructionsAddData,
 	type ConstructionsEditData,
 	type ConstructionsFilterData,
+	type ConstructionTypeEnum,
 	type Country,
 } from '@features/guidbooks/types';
 import {

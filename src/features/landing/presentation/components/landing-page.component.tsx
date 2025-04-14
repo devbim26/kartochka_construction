@@ -1,4 +1,4 @@
-import { APP_ROUTES, SubSelect, useAppNavigate } from '@core';
+import { APP_ROUTES, useAppNavigate } from '@core';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { LandingSections } from '@features/landing/constants';
 import { useEffect, useRef } from 'react';
@@ -9,6 +9,7 @@ import { FAQ } from './faq.component';
 import { Footer } from './footer.component';
 import { HowOurServiceWorks } from './how-our-service-works.component';
 import { PageTop } from './page-top.component';
+import { SubSelect } from './sub-select';
 
 const LandingPage = () => {
 	const pageContentWrapperRef = useRef<HTMLDivElement>(null);

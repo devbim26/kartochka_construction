@@ -13,7 +13,7 @@ import {
 	convertToClientPriorityData,
 	convertToServerPriorityData,
 } from '@core/converters/priority.converter';
-import { Country, Priority } from '@features/guidbooks/types';
+import type { Country, Priority } from '@features/guidbooks/types';
 
 import type {
 	ConstructionsAddData,

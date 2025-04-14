@@ -25,7 +25,12 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import { Country, Guidebooks, Issuer, RuCountryNamesMap } from '@features/guidbooks/types';
+import {
+	Guidebooks,
+	RuCountryNamesMap,
+	type Country,
+	type Issuer,
+} from '@features/guidbooks/types';
 import {
 	IssuersAddAndEditConfig,
 	IssuersFilterConfig,
