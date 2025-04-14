@@ -28,14 +28,8 @@ export const accountSlice = createSlice({
 		accountReducer,
 	},
 	extraReducers: (builder) => {
-		createAsyncCases(builder, getCurrentUser, (state: AccountSliceState, action) =>
-			console.log(action.payload),
-		);
-		createAsyncCases(builder, updateUser, (state: AccountSliceState, action) =>
-			console.log(action.payload),
-		);
-		createAsyncCases(builder, logout, (state: AccountSliceState, action) => {
-			console.log(action.payload);
-		});
+		createAsyncCases(builder, getCurrentUser, (state: AccountSliceState, action) => {});
+		createAsyncCases(builder, updateUser, (state: AccountSliceState, action) => {});
+		createAsyncCases(builder, logout, (state: AccountSliceState, action) => {});
 	},
 });

@@ -36,7 +36,7 @@ export const updateUser = createAsyncThunk(
 				convertToServerAccountData(data),
 			);
 			if (response.status === 200) {
-				toast.success('Выход из аккаунта прошел успешно');
+				toast.success('Успешное редактирование данных о компании!');
 			}
 			return {
 				payload: response.data,

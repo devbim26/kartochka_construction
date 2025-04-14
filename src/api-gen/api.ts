@@ -60,6 +60,10 @@ export enum CategoryClass {
 	C = 'C',
 }
 
+export interface ConstructionBase {
+	constructions?: ConstructionTemplate[] | null;
+}
+
 export enum ConstructionClass {
 	Wall = 'Wall',
 	Floor = 'Floor',
@@ -104,13 +108,9 @@ export enum ConstructionPosition {
 	Right = 'Right',
 }
 
-export interface ConstructionRootTemplate {
-	constructions?: ConstructionTemplate[] | null;
-}
-
 export interface ConstructionTemplate {
-	position?: ConstructionPosition;
-	subConstructions?: SubConstructionTemplate[] | null;
+	constructionPosition?: ConstructionPosition;
+	materialTypes?: MaterialType[] | null;
 }
 
 export interface ConstructionTypeDto {
@@ -122,13 +122,23 @@ export enum ConstructionTypeEnum {
 	HeavySingleLayerWall = 'HeavySingleLayerWall',
 	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
 	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
+	HeavySingleLayerWallZPanelOneSide = 'HeavySingleLayerWallZPanelOneSide',
+	HeavySingleLayerWallZPanelBothSide = 'HeavySingleLayerWallZPanelBothSide',
+	HeavyMultipleLayerWall = 'HeavyMultipleLayerWall',
+	HeavyMultipleLayerWallFacingOneSide = 'HeavyMultipleLayerWallFacingOneSide',
+	HeavyMultipleLayerWallFacingBothSide = 'HeavyMultipleLayerWallFacingBothSide',
+	HeavyMultipleLayerWallZPanelOneSide = 'HeavyMultipleLayerWallZPanelOneSide',
+	HeavyMultipleLayerWallZPanelBothSide = 'HeavyMultipleLayerWallZPanelBothSide',
+	OneFramePartition = 'OneFramePartition',
+	TwoFramePartition = 'TwoFramePartition',
+	HeavySingleWallFacing = 'HeavySingleWallFacing',
 }
 
 export interface ConstructionTypeTemplate {
 	name?: string | null;
 	shortName?: string | null;
 	constructionTypeEnum?: ConstructionTypeEnum;
-	constructionRoot?: ConstructionRootTemplate;
+	constructionBase?: ConstructionBase;
 }
 
 export interface Country {
@@ -212,18 +222,6 @@ export interface CreateConstructionTypeDto {
 	constructions?: CreateConstructionDto[] | null;
 }
 
-export interface CreateReportDto {
-	reportNumber?: string | null;
-	client?: string | null;
-	description?: string | null;
-	projectName?: string | null;
-	engenierFullName?: string | null;
-	city?: string | null;
-	code?: string | null;
-	/** @format uuid */
-	constructionHeaderId?: string;
-}
-
 export interface CreateRequirementCommand {
 	/** @format uuid */
 	secondPlacementRoomId?: string;
@@ -298,6 +296,7 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	ordering?: string | null;
 	name?: string | null;
 	description?: string | null;
+	shortName?: string | null;
 	constructionType?: ConstructionTypeEnum;
 	countryType?: CountryType;
 }
@@ -339,17 +338,6 @@ export interface GetPlacementRoomVariantByAllParametersQuery {
 	constructionType?: ConstructionClass;
 	/** @format uuid */
 	placementRoomId?: string;
-}
-
-export interface GetReportWithPaginationQuery {
-	/** @format int32 */
-	pageNumber?: number;
-	/** @format int32 */
-	pageSize?: number;
-	sortOrder?: SortOrder;
-	ordering?: string | null;
-	name?: string | null;
-	client?: string | null;
 }
 
 export interface GetRequirementsWithPaginationParamsQuery {
@@ -452,6 +440,16 @@ export enum MaterialParametrs {
 	Width = 'Width',
 }
 
+export interface MaterialType {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	shortName?: string | null;
+	materialTypeEnum?: MaterialTypeEnum;
+	materialTypeValues?: MaterialTypeValue[] | null;
+	fullName?: string | null;
+}
+
 export interface MaterialTypeDto {
 	/** @format uuid */
 	id?: string;
@@ -480,6 +478,15 @@ export enum MaterialTypeEnum {
 	Filler = 'Filler',
 	Heavy = 'Heavy',
 	Board = 'Board',
+	ZPanel = 'ZPanel',
+}
+
+export interface MaterialTypeValue {
+	/** @format uuid */
+	id?: string;
+	/** @format double */
+	value?: number;
+	materialParametrs?: MaterialParametrs;
 }
 
 export interface MaterialTypeValueDto {
@@ -529,6 +536,7 @@ export interface PaginatedConstructionHeaderDto {
 	constructionType?: ConstructionTypeEnum;
 	issuer?: NamedEntity;
 	issuerLogo?: string | null;
+	shortName?: string | null;
 }
 
 export interface PaginatedConstructionHeaderDtoPaginatedList {
@@ -613,37 +621,6 @@ export enum Priority {
 	Ten = 'Ten',
 }
 
-export interface ReportDto {
-	/** @format uuid */
-	id?: string;
-	name?: string | null;
-	client?: string | null;
-	/** @format date */
-	lastUpdated?: string;
-	status?: ReportStatus;
-	fileUrl?: string | null;
-}
-
-export interface ReportDtoPaginatedList {
-	items?: ReportDto[] | null;
-	/** @format int32 */
-	pageNumber?: number;
-	/** @format int32 */
-	totalPages?: number;
-	/** @format int32 */
-	totalCount?: number;
-	/** @format int32 */
-	pageSize?: number;
-	hasPreviousPage?: boolean;
-	hasNextPage?: boolean;
-}
-
-export enum ReportStatus {
-	None = 'None',
-	ValueСonsideration = 'Сonsideration',
-	Confirmed = 'Confirmed',
-}
-
 export interface RequirementDto {
 	/** @format uuid */
 	id?: string;
@@ -685,12 +662,6 @@ export interface SendSmsCommand {
 export enum SortOrder {
 	Asc = 'Asc',
 	Desc = 'Desc',
-}
-
-export interface SubConstructionTemplate {
-	name?: string | null;
-	userMaterials?: UserMaterialTemplate[] | null;
-	subPosition?: ConstructionPosition;
 }
 
 export interface UpdateConstructionHeaderCommand {
@@ -745,15 +716,6 @@ export interface UserMaterialDto {
 	/** @format int32 */
 	positionId?: number;
 	materialTypeValue?: MaterialTypeValueDto[] | null;
-}
-
-export interface UserMaterialTemplate {
-	/** @format uuid */
-	materialId?: string;
-	/** @format float */
-	thickness?: number;
-	/** @format float */
-	density?: number;
 }
 
 import type {
@@ -1337,6 +1299,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				name: string;
 				countries?: CountryType[];
 				webSite?: string;
+				editFile?: boolean;
 				/** @format binary */
 				formFile?: File;
 			},
@@ -1481,6 +1444,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				damping?: number;
 				/** @format float */
 				solid?: number;
+				editFile?: boolean;
 				/** @format binary */
 				formFile?: File;
 			},
@@ -1545,43 +1509,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags Report
-		 * @name ReportGetPaginatedCreate
-		 * @request POST:/api/Report/get-paginated
-		 */
-		reportGetPaginatedCreate: (
-			data: GetReportWithPaginationQuery,
-			params: RequestParams = {},
-		) =>
-			this.request<ReportDtoPaginatedList, any>({
-				path: `/api/Report/get-paginated`,
-				method: 'POST',
-				body: data,
-				type: ContentType.Json,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags Report
-		 * @name ReportCreate
-		 * @request POST:/api/Report
-		 */
-		reportCreate: (data: CreateReportDto, params: RequestParams = {}) =>
-			this.request<ReportDto, any>({
-				path: `/api/Report`,
-				method: 'POST',
-				body: data,
-				type: ContentType.Json,
-				format: 'json',
 				...params,
 			}),
 

@@ -1,11 +1,15 @@
 import { APP_ROUTES } from '@core';
 import {
+	AboutBuilding,
 	AccountScreen,
 	AuthorizationScreen,
 	CodeConfirmPage,
 	CompanyRegistrationPage,
 	ConstructionsScreen,
+	CONSTRUCTOR_ROUTES,
+	Designing,
 	DevScreen,
+	FloorPlans,
 	GuidbooksLauout,
 	HomeScreen,
 	IssuersScreen,
@@ -17,6 +21,7 @@ import {
 	RequirementsScreen,
 } from '@features';
 import { AUTH_ROUTES } from '@features/auth/constants';
+import ConstructorScreen from '@features/constructor/presentation/screens/constructor-main.screen';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
 import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants';
 import { Navigate, Route, Routes } from 'react-router-dom';
@@ -36,10 +41,22 @@ export const AppRouter = () => {
 			</Route>
 			<Route path={APP_ROUTES.designing.route} element={<HomeScreen />}>
 				<Route path={DESIGNING_ROUTES.main.route} element={<MainScreen />} />
-				<Route
-					path={DESIGNING_ROUTES.constructor.route}
-					element={<DevScreen title="Конструктор" />}
-				/>
+				<Route path={DESIGNING_ROUTES.constructor.route} element={<ConstructorScreen />}>
+					<Route
+						index
+						element={<Navigate to={CONSTRUCTOR_ROUTES.aboutBuilding.route} replace />}
+					/>
+					<Route
+						path={CONSTRUCTOR_ROUTES.aboutBuilding.route}
+						element={<AboutBuilding />}
+					/>
+					<Route path={CONSTRUCTOR_ROUTES.floorPlans.route} element={<FloorPlans />} />
+					<Route
+						path={CONSTRUCTOR_ROUTES.constructionSelect.route}
+						element={<DevScreen title="Выбор конструкции" />}
+					/>
+					<Route path={CONSTRUCTOR_ROUTES.designing.route} element={<Designing />} />
+				</Route>
 				<Route path={DESIGNING_ROUTES.account.route} element={<AccountScreen />} />
 				<Route
 					path={DESIGNING_ROUTES.accounts.route}

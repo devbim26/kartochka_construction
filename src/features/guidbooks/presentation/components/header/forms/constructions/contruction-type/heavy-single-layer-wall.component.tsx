@@ -1,4 +1,8 @@
 import { DeleteIcon } from '@core';
+<<<<<<< HEAD
+=======
+import type { ConstructionTypeProps, MaterialTypeEnum, UserMaterials } from '@features';
+>>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 import {
 	ConstructionLayer,
 	HeavyMaterialType,
@@ -12,48 +16,61 @@ import {
 	type MaterialTypeEnum,
 } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
-export const HeavySingleLayerWallComponent = () => {
-	const form = useFormContext<ConstructionsAddData>();
-	const { watch, setValue } = form;
-	const [indices, setIndices] = useState({ zeroIndex: -1, oneIndex: -1, twoIndex: -1 });
+export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
+	const { watch, setValue } = currentForm;
+	const [indices, setIndices] = useState({
+		zeroIndex: -1,
+		oneIndex: -1,
+		twoIndex: -1,
+		threeIndex: -1,
+		fourIndex: -1,
+	});
 	const [currentMaterialTypes, setCurrentMaterialTypes] = useState({
 		zeroValue: '',
-		twoValue: '',
+		oneValue: '',
+		threeValue: '',
+		fourValue: '',
 	});
-	const [userMaterials, userMaterialTypes, constructions] = watch([
+	const [userMaterials, constructions] = watch([
 		'constructionTypeObject.constructions.0.userMaterials',
-		'constructionTypeObject.constructions.0.userMaterialTypes',
 		'constructionTypeObject.constructions',
 	]);
 
 	useEffect(() => {
-		//TODO: хуйня
 		setIndices({
-			zeroIndex: userMaterials?.findIndex((c) => c.positionId === '0') ?? -1,
-			oneIndex: userMaterials?.findIndex((c) => c.positionId === '1') ?? -1,
-			twoIndex: userMaterials?.findIndex((c) => c.positionId === '2') ?? -1,
+			zeroIndex: userMaterials?.findIndex((c: UserMaterials) => c.positionId === '0') ?? -1,
+			oneIndex: userMaterials?.findIndex((c: UserMaterials) => c.positionId === '1') ?? -1,
+			twoIndex: userMaterials?.findIndex((c: UserMaterials) => c.positionId === '2') ?? -1,
+			threeIndex: userMaterials?.findIndex((c: UserMaterials) => c.positionId === '3') ?? -1,
+			fourIndex: userMaterials?.findIndex((c: UserMaterials) => c.positionId === '4') ?? -1,
 		});
 		setCurrentMaterialTypes({
-			zeroValue: userMaterialTypes?.find((c) => c.positionId === '0')?.value ?? '',
-			twoValue: userMaterialTypes?.find((c) => c.positionId === '2')?.value ?? '',
+			zeroValue:
+				userMaterials?.find((c: UserMaterials) => c.positionId === '0')?.materialType ?? '',
+			oneValue:
+				userMaterials?.find((c: UserMaterials) => c.positionId === '1')?.materialType ?? '',
+			threeValue:
+				userMaterials?.find((c: UserMaterials) => c.positionId === '3')?.materialType ?? '',
+			fourValue:
+				userMaterials?.find((c: UserMaterials) => c.positionId === '4')?.materialType ?? '',
 		});
 	}, [userMaterials, constructions]);
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
-			{indices.zeroIndex < 0 ? (
+			{indices.zeroIndex < 0 && indices.oneIndex > 0 ? (
 				<AiOutlinePlusCircle
 					onClick={() => {
 						setValue('constructionTypeObject.constructions.0.userMaterials', [
 							...(userMaterials || []),
-							{ positionId: '0', materialId: '', materialTypeValue: [] },
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{ positionId: '0', value: '' },
+							{
+								positionId: '0',
+								materialId: '',
+								materialType: '',
+								materialTypeValue: [],
+							},
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
@@ -68,22 +85,25 @@ export const HeavySingleLayerWallComponent = () => {
 									positionId={0}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+									currentForm={currentForm}
 								/>
 								{ConstructionFieldsMap({
 									fieldIndex: indices.zeroIndex,
 									constructionIndex: 0,
 									materialType:
 										currentMaterialTypes.zeroValue as MaterialTypeEnum,
+									currentForm: currentForm,
 								})}
 							</div>
 							<DeleteIcon
 								className="self-end"
 								onClick={() => {
+									if (!userMaterials) return;
+									const updated = [...userMaterials];
+									updated.splice(indices.zeroIndex, 1);
 									setValue(
 										'constructionTypeObject.constructions.0.userMaterials',
-										(userMaterials &&
-											userMaterials.filter((c) => c.positionId !== '0')) ||
-											[],
+										updated,
 									);
 								}}
 							/>
@@ -91,54 +111,165 @@ export const HeavySingleLayerWallComponent = () => {
 					)}
 				</>
 			)}
-			{indices.oneIndex >= 0 && (
-				<div className="flex gap-[20px]">
-					<HeavyMaterialType fieldIndex={indices.oneIndex} constructionIndex={0} />
-					<ThicknessDensityFieldsType
-						fieldIndex={indices.oneIndex}
-						constructionIndex={0}
-					/>
-				</div>
-			)}
-			{indices.twoIndex < 0 ? (
+			{indices.oneIndex < 0 ? (
 				<AiOutlinePlusCircle
 					onClick={() => {
 						setValue('constructionTypeObject.constructions.0.userMaterials', [
 							...(userMaterials || []),
-							{ positionId: '2', materialId: '', materialTypeValue: [] },
-						]);
-						setValue('constructionTypeObject.constructions.0.userMaterialTypes', [
-							...(userMaterialTypes || []),
-							{ positionId: '2', value: '' },
+							{
+								positionId: '1',
+								materialId: '',
+								materialType: '',
+								materialTypeValue: [],
+							},
 						]);
 					}}
 					className="size-[40px] self-center text-primary"
 				/>
 			) : (
 				<>
-					{indices.twoIndex >= 0 && (
+					{indices.oneIndex >= 0 && (
 						<div className="flex justify-between">
 							<div className="flex gap-[20px]">
 								<SelectableMaterialType
-									fieldIndex={indices.twoIndex}
-									positionId={2}
+									fieldIndex={indices.oneIndex}
+									positionId={1}
 									constructionIndex={0}
 									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+									currentForm={currentForm}
 								/>
 								{ConstructionFieldsMap({
-									fieldIndex: indices.twoIndex,
+									fieldIndex: indices.oneIndex,
 									constructionIndex: 0,
-									materialType: currentMaterialTypes.twoValue as MaterialTypeEnum,
+									materialType: currentMaterialTypes.oneValue as MaterialTypeEnum,
+									currentForm: currentForm,
 								})}
 							</div>
 							<DeleteIcon
 								className="self-end"
 								onClick={() => {
+									if (!userMaterials) return;
+									const updated = [...userMaterials];
+									updated.splice(indices.oneIndex, 1);
 									setValue(
 										'constructionTypeObject.constructions.0.userMaterials',
-										(userMaterials &&
-											userMaterials.filter((c) => c.positionId !== '2')) ||
-											[],
+										updated,
+									);
+								}}
+							/>
+						</div>
+					)}
+				</>
+			)}
+			{indices.twoIndex >= 0 && (
+				<div className="flex gap-[20px]">
+					<HeavyMaterialType
+						fieldIndex={indices.twoIndex}
+						constructionIndex={0}
+						currentForm={currentForm}
+					/>
+					<ThicknessDensityFieldsType
+						fieldIndex={indices.twoIndex}
+						constructionIndex={0}
+						currentForm={currentForm}
+					/>
+				</div>
+			)}
+			{indices.threeIndex < 0 ? (
+				<AiOutlinePlusCircle
+					onClick={() => {
+						setValue('constructionTypeObject.constructions.0.userMaterials', [
+							...(userMaterials || []),
+							{
+								positionId: '3',
+								materialId: '',
+								materialType: '',
+								materialTypeValue: [],
+							},
+						]);
+					}}
+					className="size-[40px] self-center text-primary"
+				/>
+			) : (
+				<>
+					{indices.threeIndex >= 0 && (
+						<div className="flex justify-between">
+							<div className="flex gap-[20px]">
+								<SelectableMaterialType
+									fieldIndex={indices.threeIndex}
+									positionId={3}
+									constructionIndex={0}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+									currentForm={currentForm}
+								/>
+								{ConstructionFieldsMap({
+									fieldIndex: indices.threeIndex,
+									constructionIndex: 0,
+									materialType:
+										currentMaterialTypes.threeValue as MaterialTypeEnum,
+									currentForm: currentForm,
+								})}
+							</div>
+							<DeleteIcon
+								className="self-end"
+								onClick={() => {
+									if (!userMaterials) return;
+									const updated = [...userMaterials];
+									updated.splice(indices.threeIndex, 1);
+									setValue(
+										'constructionTypeObject.constructions.0.userMaterials',
+										updated,
+									);
+								}}
+							/>
+						</div>
+					)}
+				</>
+			)}
+			{indices.fourIndex < 0 && indices.threeIndex > 0 ? (
+				<AiOutlinePlusCircle
+					onClick={() => {
+						setValue('constructionTypeObject.constructions.0.userMaterials', [
+							...(userMaterials || []),
+							{
+								positionId: '4',
+								materialId: '',
+								materialType: '',
+								materialTypeValue: [],
+							},
+						]);
+					}}
+					className="size-[40px] self-center text-primary"
+				/>
+			) : (
+				<>
+					{indices.fourIndex >= 0 && (
+						<div className="flex justify-between">
+							<div className="flex gap-[20px]">
+								<SelectableMaterialType
+									fieldIndex={indices.fourIndex}
+									positionId={4}
+									constructionIndex={0}
+									materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+									currentForm={currentForm}
+								/>
+								{ConstructionFieldsMap({
+									fieldIndex: indices.fourIndex,
+									constructionIndex: 0,
+									materialType:
+										currentMaterialTypes.fourValue as MaterialTypeEnum,
+									currentForm: currentForm,
+								})}
+							</div>
+							<DeleteIcon
+								className="self-end"
+								onClick={() => {
+									if (!userMaterials) return;
+									const updated = [...userMaterials];
+									updated.splice(indices.fourIndex, 1);
+									setValue(
+										'constructionTypeObject.constructions.0.userMaterials',
+										updated,
 									);
 								}}
 							/>

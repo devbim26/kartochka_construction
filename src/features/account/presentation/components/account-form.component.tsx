@@ -1,4 +1,5 @@
 import {
+	accountMask,
 	Button,
 	convertToBase64,
 	FormElementLabel,
@@ -88,6 +89,7 @@ export const PhoneNumbersList = ({ isViewMode }: { isViewMode: boolean }) => {
 };
 
 export const AccountForm = () => {
+	const accountRef = useMask(accountMask);
 	const userData = useAppSelector((store) => store.userData);
 	const form = useForm<AccountData>({
 		resolver: zodResolver(AccountDataConfig.schema),
@@ -215,6 +217,10 @@ export const AccountForm = () => {
 						/>
 						<Input
 							label={formState.errors.paymentAccount?.message || 'Расчетный счет'}
+							onChange={(event) => {
+								setValue('paymentAccount', event.target.value);
+							}}
+							value={form.watch('paymentAccount')}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.paymentAccount?.message ? 'text-error' : '',
@@ -223,10 +229,10 @@ export const AccountForm = () => {
 							wrapperClassName="flex-row items-center gap-[10px]"
 							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.paymentAccount?.message}
-							{...form.register('paymentAccount')}
 							type={'text'}
 							placeholder="Введите расчетный счет"
-							maxLength={20}
+							maxLength={28}
+							ref={accountRef}
 						/>
 						<Input
 							label={formState.errors.bankIdNumber?.message || 'БИК'}
@@ -240,8 +246,8 @@ export const AccountForm = () => {
 							error={formState.errors.bankIdNumber?.message}
 							{...form.register('bankIdNumber')}
 							type={'text'}
-							placeholder="Введите  БИК"
-							max={9}
+							placeholder="Введите БИК"
+							maxLength={8}
 						/>
 						<Input
 							label={formState.errors.directorFullName?.message || 'ФИО директора'}
@@ -293,9 +299,10 @@ export const AccountForm = () => {
 						/>
 						<Input
 							{...form.register('compannyInfo')}
-							label="Информация о компании"
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+
+								formState.errors.compannyInfo?.message ? 'text-error' : '',
 							)}
 							disabled={!search.get('edit')}
 							wrapperClassName="flex-row items-center gap-[10px]"
@@ -304,6 +311,10 @@ export const AccountForm = () => {
 							type={'text'}
 							max={200}
 							placeholder="Введите информацию"
+							label={
+								formState.errors.compannyInfo?.message || 'Информация о компании'
+							}
+							error={formState.errors.compannyInfo?.message}
 						/>
 						<div className="flex flex-row items-center gap-[8px]">
 							<FormElementLabel

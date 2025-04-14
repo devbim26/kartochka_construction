@@ -50,7 +50,23 @@ const actions = new Map<ActionType, MapFnc>([
 	[
 		AUTH_ACTIONS.LOGOUT,
 		(data: AuthSliceDataState) => {
-			return { ...data, user_id: '', user_role: '' };
+			return {
+				...data,
+				isAuth: false,
+				user_id: '',
+				user_role: '',
+				invalid_code: false,
+				existed_email: false,
+				invalid_email: false,
+				existed_username: false,
+				invalid_data: false,
+			};
+		},
+	],
+	[
+		AUTH_ACTIONS.SET_IS_AUTH,
+		(data: AuthSliceDataState, payload: boolean) => {
+			return { ...data, isAuth: payload };
 		},
 	],
 ]);

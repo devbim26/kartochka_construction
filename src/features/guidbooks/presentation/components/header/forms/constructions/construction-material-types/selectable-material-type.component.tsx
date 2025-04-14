@@ -1,11 +1,21 @@
-import type { SelectOption } from '@core';
+import { MaterialParametrs } from '@api-gen';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
+<<<<<<< HEAD
 import { MaterialTypeValuesMap } from '@features/guidbooks/constants';
 import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
+=======
+import { memoize } from '@core/utils/hoc/memo.utils';
+import type {
+	MaterialsAddAndEditData,
+	MaterialsFilterData,
+	MaterialTypeEnum,
+	MaterialTypesSelectValuesEnum,
+	UserMaterials,
+} from '@features';
+>>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 import {
 	Guidebooks,
-	MaterialTypesSelectValuesEnum,
 	MaterialTypesSelectValuesMap,
 	type ConstructionsAddData,
 	type MaterialsFilterData,
@@ -13,7 +23,8 @@ import {
 } from '@features/guidbooks/types';
 import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import type { UseFormReturn } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
@@ -22,129 +33,159 @@ interface Props {
 	positionId: number;
 	constructionIndex: number;
 	materialTypesSelectValues: MaterialTypesSelectValuesEnum;
+	currentForm: UseFormReturn<any>;
 }
 
-export const SelectableMaterialType = ({
-	fieldIndex,
-	positionId,
-	constructionIndex,
-	materialTypesSelectValues,
-}: Props) => {
-	const form = useFormContext<ConstructionsAddData>();
-	const { formState, control, watch, setValue } = form;
-	const [materials, setMaterials] = useState<Array<SelectOption>>();
-	const [currentMaterialType, userMaterials] = watch([
-		`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`,
-		`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-	]);
+export const SelectableMaterialType = memoize(
+	({
+		fieldIndex,
+		positionId,
+		constructionIndex,
+		materialTypesSelectValues,
+		currentForm,
+	}: Props) => {
+		const { formState, control, watch, setValue } = currentForm;
+		const [materials, setMaterials] = useState<MaterialsAddAndEditData[]>([]);
+		const [currentMaterialType, userMaterials, materialTypeValue] = watch([
+			`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialType`,
+			`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
+			`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue`,
+		]);
 
-	const handleGetMaterials = (data: MaterialsFilterData) => {
-		from(
-			getGuidebooksPaginated({
-				data: data,
-				pagination: { pageSize: 999999, pageNumber: 1 },
-				guidebookType: Guidebooks.MATERIAL,
-			}),
-		)
-			.pipe(
-				switchMap((response: AxiosResponse) => {
-					const items = convertToPaginatedType(convertToClientMaterialsAddAndEditData)(
-						response.data,
-					);
-					return from([items]);
-				}),
-				tap((items) => setMaterials(convertToSelectValues(items.items!)!)),
-				catchError((error) => {
-					console.log('Error:', error);
-					return from([null]);
+		const handleGetMaterials = (data: MaterialsFilterData) => {
+			from(
+				getGuidebooksPaginated({
+					data: data,
+					pagination: { pageSize: 999999, pageNumber: 1 },
+					guidebookType: Guidebooks.MATERIAL,
 				}),
 			)
-			.subscribe();
-	};
+				.pipe(
+					switchMap((response: AxiosResponse) => {
+						const items = convertToPaginatedType(
+							convertToClientMaterialsAddAndEditData,
+						)(response.data);
+						return from([items]);
+					}),
+					tap((items) => setMaterials(items.items || [])),
+					catchError((error) => {
+						console.log('Error:', error);
+						return from([null]);
+					}),
+				)
+				.subscribe();
+		};
 
-	useEffect(() => {
-		handleGetMaterials({ materialType: currentMaterialType });
-	}, [userMaterials]);
+		useEffect(() => {
+			currentMaterialType && handleGetMaterials({ materialType: currentMaterialType });
+		}, []);
 
-	useEffect(() => {
-		setValue(
-			`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-			userMaterials!.map((material) =>
-				material.positionId === String(positionId)
-					? {
-							positionId: String(positionId),
-							materialId: '',
-							materialTypeValue:
-								MaterialTypeValuesMap[currentMaterialType as MaterialTypeEnum],
-						}
-					: material,
-			),
+		return (
+			<div className="flex flex-wrap gap-[16px]">
+				<Controller
+					name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialType`}
+					control={control}
+					render={({ field }) => (
+						<Select
+							{...field}
+							value={field.value || ''}
+							options={[...MaterialTypesSelectValuesMap[materialTypesSelectValues]]}
+							error={
+								(formState.errors as any)?.constructionTypeObject?.constructions?.[
+									constructionIndex
+								]?.userMaterials?.[fieldIndex]?.materialType?.message
+							}
+							labelClassName={twMerge(
+								'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
+								(formState.errors as any)?.constructionTypeObject?.constructions?.[
+									constructionIndex
+								]?.userMaterials?.[fieldIndex]?.materialType?.message
+									? 'text-error'
+									: '',
+							)}
+							wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
+							buttonClassName="text-sm rounded-[8px] w-[226px]"
+							placeholder="Выберите тип материала"
+							onChange={(selectedOption: any) => {
+								!selectedOption
+									? setMaterials([])
+									: handleGetMaterials({ materialType: selectedOption });
+								setValue(
+									`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
+									userMaterials!.map((material: UserMaterials) =>
+										material.positionId === String(positionId)
+											? {
+													...material,
+													materialId: '',
+													materialType: selectedOption,
+													materialTypeValue:
+														MaterialTypeValuesMap[
+															selectedOption as MaterialTypeEnum
+														],
+												}
+											: material,
+									),
+								);
+							}}
+							isSearchable
+						/>
+					)}
+				/>
+
+				<Controller
+					name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`}
+					control={control}
+					render={({ field }) => (
+						<Select
+							{...field}
+							value={field.value || ''}
+							options={convertToSelectValues(materials) || []}
+							error={
+								(formState.errors as any)?.constructionTypeObject?.constructions?.[
+									constructionIndex
+								]?.userMaterials?.[fieldIndex]?.materialId?.message
+							}
+							labelClassName={twMerge(
+								'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
+								(formState.errors as any)?.constructionTypeObject?.constructions?.[
+									constructionIndex
+								]?.userMaterials?.[fieldIndex]?.materialId?.message
+									? 'text-error'
+									: '',
+							)}
+							wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
+							buttonClassName="text-sm rounded-[8px] w-[226px]"
+							placeholder="Выберите материал"
+							onChange={(selectedOption: string) => {
+								setValue(
+									`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`,
+									selectedOption,
+								);
+								if (
+									materialTypeValue?.[0].materialParameters ===
+										MaterialParametrs.Thickness &&
+									materialTypeValue?.[1].materialParameters ===
+										MaterialParametrs.Density
+								) {
+									const selectedMaterial = materials?.find(
+										(m) => m.id === selectedOption,
+									);
+									setValue<any>(
+										`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.0.value`,
+										selectedMaterial?.thickness,
+									);
+									setValue<any>(
+										`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.1.value`,
+										selectedMaterial?.density,
+									);
+								}
+							}}
+							isSearchable
+						/>
+					)}
+				/>
+			</div>
 		);
-	}, [currentMaterialType]);
-
-	return (
-		<div className="flex flex-wrap gap-[16px]">
-			<Controller
-				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterialTypes.${fieldIndex}.value`}
-				control={control}
-				render={({ field }) => (
-					<Select
-						{...field}
-						value={field.value || ''}
-						options={[
-							...MaterialTypesSelectValuesMap[materialTypesSelectValues],
-							{
-								label: 'Дополнительные материалы',
-								value: MaterialTypesSelectValuesEnum.Additional,
-							},
-						]}
-						error={
-							formState.errors?.constructionTypeObject?.constructions?.[
-								constructionIndex
-							]?.userMaterialTypes?.[fieldIndex]?.value?.message
-						}
-						labelClassName={twMerge(
-							'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
-							formState.errors?.constructionTypeObject?.constructions?.[
-								constructionIndex
-							]?.userMaterialTypes?.[fieldIndex]?.value?.message
-								? 'text-error'
-								: '',
-						)}
-						wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
-						buttonClassName="text-sm rounded-[8px] w-[226px]"
-						placeholder="Выберите тип материала"
-					/>
-				)}
-			/>
-
-			<Controller
-				name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`}
-				control={control}
-				render={({ field }) => (
-					<Select
-						{...field}
-						value={field.value || ''}
-						options={materials || []}
-						error={
-							formState.errors?.constructionTypeObject?.constructions?.[
-								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.materialId?.message
-						}
-						labelClassName={twMerge(
-							'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
-							formState.errors?.constructionTypeObject?.constructions?.[
-								constructionIndex
-							]?.userMaterials?.[fieldIndex]?.materialId?.message
-								? 'text-error'
-								: '',
-						)}
-						wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
-						buttonClassName="text-sm rounded-[8px] w-[226px]"
-						placeholder="Выберите материал"
-					/>
-				)}
-			/>
-		</div>
-	);
-};
+	},
+	'SelectableMaterialType',
+);

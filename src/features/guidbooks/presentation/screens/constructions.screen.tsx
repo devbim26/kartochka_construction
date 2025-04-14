@@ -3,6 +3,7 @@ import {
 	DeleteIcon,
 	DeleteModal,
 	EditIcon,
+	memoize,
 	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
@@ -54,7 +55,7 @@ import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 
-const ConstructionsScreen = () => {
+const ConstructionsScreen = memoize(() => {
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const [singleMaterial, setSingleMaterial] = useState<ConstructionsEditData>();
@@ -163,15 +164,15 @@ const ConstructionsScreen = () => {
 		return cols;
 	}, []);
 
-	const [filterName, filterConstructionTypeId, filterDescription, filterRegion] =
-		forms.filterForm.watch(['name', 'constructionTypeId', 'description', 'country']);
+	const [filterName, filterConstructionType, filterDescription, filterRegion] =
+		forms.filterForm.watch(['name', 'constructionType', 'description', 'country']);
 
 	useEffect(() => {
 		handleGetTableData(
 			forms.filterForm.getValues() as ConstructionsFilterData,
 			paginationState,
 		);
-	}, [filterName, filterConstructionTypeId, filterDescription, filterRegion]);
+	}, [filterName, filterConstructionType, filterDescription, filterRegion]);
 
 	const handleGetTableData = (
 		data: ConstructionsFilterData,
@@ -363,6 +364,6 @@ const ConstructionsScreen = () => {
 			</DeleteModal>
 		</div>
 	);
-};
+}, 'ConstructionsScreen');
 
 export default ConstructionsScreen;

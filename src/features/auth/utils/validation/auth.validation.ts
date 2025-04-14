@@ -62,7 +62,7 @@ const RegistrationFormDataSchema = z
 				(file) => file instanceof File && file.size > 0,
 				'Поле обязательно для заполнения',
 			),
-		compannyInfo: z.string().optional(),
+		compannyInfo: z.string().min(1, 'Поле обязательно для заполнения'),
 	})
 	.superRefine(({ password, secondPassword }, ctx) => {
 		if (password !== secondPassword) {

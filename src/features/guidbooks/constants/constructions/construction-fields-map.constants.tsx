@@ -5,66 +5,82 @@ import {
 	WidthRacksStepFieldsType,
 } from '@features/guidbooks/presentation';
 import { MaterialTypeEnum } from '@features/guidbooks/types';
-interface Props {
+import type { UseFormReturn } from 'react-hook-form';
+interface ConstructionFieldsMapProps {
 	materialType: MaterialTypeEnum;
 	fieldIndex: number;
 	constructionIndex: number;
+	currentForm: UseFormReturn<any>;
 }
 
-export const ConstructionFieldsMap = ({ materialType, fieldIndex, constructionIndex }: Props) => {
+export const ConstructionFieldsMap = ({
+	materialType,
+	fieldIndex,
+	constructionIndex,
+	currentForm,
+}: ConstructionFieldsMapProps) => {
 	const componentsMap = {
 		[MaterialTypeEnum.Heavy]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
 				constructionIndex={constructionIndex}
+				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.AirGap]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
 				constructionIndex={constructionIndex}
+				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.Link]: (
 			<PointConnectionsFieldsType
 				fieldIndex={fieldIndex}
 				constructionIndex={constructionIndex}
+				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.Frame]: (
 			<WidthRacksStepFieldsType
 				fieldIndex={fieldIndex}
 				constructionIndex={constructionIndex}
+				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.Filler]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
 				constructionIndex={constructionIndex}
+				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.Board]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
 				constructionIndex={constructionIndex}
+				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.AcousticTreatmentMaterials]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
 				constructionIndex={constructionIndex}
+				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.Membrane]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
 				constructionIndex={constructionIndex}
+				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.ZPanel]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
 				constructionIndex={constructionIndex}
+				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.FoamMaterials]: <></>,

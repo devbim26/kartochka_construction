@@ -1,7 +1,32 @@
+import type { UseFormReturn } from 'react-hook-form';
+
 export interface ConstructionTypeTemplate {
 	name?: string | null | undefined;
 	shortName?: string | null | undefined;
 	constructionRoot?: object | undefined;
+}
+
+export interface ConstructionTypeProps {
+	currentForm: UseFormReturn<any>;
+}
+
+export interface ConstructionMaterialTypesProps {
+	fieldIndex: number;
+	constructionIndex: number;
+	currentForm: UseFormReturn<any>;
+}
+
+export interface ConstructionFieldTypesProps {
+	fieldIndex: number;
+	constructionIndex: number;
+	currentForm: UseFormReturn<any>;
+}
+
+export interface UserMaterials {
+	materialId: string;
+	positionId: string;
+	materialTypeValue: Array<any>;
+	materialType: string;
 }
 
 export enum ConstructionTypeEnum {
@@ -13,9 +38,8 @@ export enum ConstructionTypeEnum {
 	HeavySingleLayerWallSoundproofingBothSide = 'HeavySingleLayerWallSoundproofingBothSide',
 	HeavyMultiLayerWall = 'HeavyMultiLayerWall',
 	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLayerWallFacingBothSide',
-	HeavyMultiLayerWallSoundproofingLeftSide = 'HeavyMultiLayerWallSoundproofingLeftSide',
-	HeavyMultiLayerWallSoundproofOneSide = 'HeavyMultiLayerWallSoundproofOneSide',
-	HeavyMultiLayerWallSoundproofBothSide = 'HeavyMultiLayerWallSoundproofBothSide',
+	HeavyMultiLayerWallSoundproofingOneSide = 'HeavyMultiLayerWallSoundproofingOneSide',
+	HeavyMultiLayerWallSoundproofingBothSide = 'HeavyMultiLayerWallSoundproofingBothSide',
 	FramePartitionSingle = 'FramePartitionSingle',
 	FramePartitionDouble = 'FramePartitionDouble',
 }
@@ -31,11 +55,9 @@ export const RuConstructionTypesMap = {
 	HeavyMultiLayerWall: 'Тяжелая многослойная стена',
 	HeavyMultiLayerWallFacingOneSide: 'Тяжелая многослойная стена + облицовка с одной стороны',
 	HeavyMultiLayerWallFacingBothSide: 'Тяжелая многослойная стена + облицовка с двух сторон',
-	HeavyMultiLayerWallSoundproofingLeftSide:
-		'Тяжелая многослойная стена + звукоизоляционная панель слева',
-	HeavyMultiLayerWallSoundproofOneSide:
+	HeavyMultiLayerWallSoundproofingOneSide:
 		'Тяжелая многослойная стена + звукоизоляционная панель с одной стороны',
-	HeavyMultiLayerWallSoundproofBothSide:
+	HeavyMultiLayerWallSoundproofingBothSide:
 		'Тяжелая многослойная стена + звукоизоляционная панель с двух сторон',
 	FramePartitionSingle: 'Каркасная перегородка (1 каркас)',
 	FramePartitionDouble: 'Каркасная перегородка (2 каркаса)',
@@ -73,11 +95,11 @@ export const RuConstructionTypesSelectValues = [
 	},
 	{
 		label: 'Тяжелая многослойная стена + звукоизоляционная панель с одной стороны',
-		value: ConstructionTypeEnum.HeavyMultiLayerWallSoundproofOneSide,
+		value: ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide,
 	},
 	{
 		label: 'Тяжелая многослойная стена + звукоизоляционная панель с двух сторон',
-		value: ConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSide,
+		value: ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide,
 	},
 	{
 		label: 'Каркасная перегородка (1 каркас)',
@@ -86,9 +108,5 @@ export const RuConstructionTypesSelectValues = [
 	{
 		label: 'Каркасная перегородка (2 каркаса)',
 		value: ConstructionTypeEnum.FramePartitionDouble,
-	},
-	{
-		label: 'Тяжелая многослойная стена + звукоизоляционная панель слева',
-		value: ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingLeftSide,
 	},
 ];
