@@ -1,4 +1,4 @@
-import { LogoIcon, LogoTextIcon } from '../../logos';
+import { LogoIcon, LogoTextIcon } from "@core/presentation/logos";
 
 export const PageLoader = () => {
 	return (

@@ -1,18 +1,16 @@
+import { APP_ROUTES, Button, Switch } from '@core';
+import { LandingSections } from '@features/landing/constants';
+import { useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 import {
-	APP_ROUTES,
-	Button,
-	CheckMarkImage,
 	crossedPoints,
 	monthPrices,
 	points,
 	subscriptionDescriptions,
-	Switch,
 	titles,
 	yearPrices,
-} from '@core';
-import { LandingSections } from '@features/landing/constants';
-import { useState } from 'react';
-import { twMerge } from 'tailwind-merge';
+} from './constants';
+import { CheckMarkImage } from './images';
 
 interface SubSelectProps {
 	wrapperClassName?: string;

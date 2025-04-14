@@ -9,16 +9,25 @@ interface DropdownSelectButtonProps {
 	textClassName?: string;
 	iconClassName?: string;
 	Icon?: IconType;
+	title?: string;
 }
 
 export const DropdownSelectButton = memoize(
-	({ displayText, className, textClassName, Icon, iconClassName }: DropdownSelectButtonProps) => {
+	({
+		displayText,
+		className,
+		textClassName,
+		Icon,
+		iconClassName,
+		title,
+	}: DropdownSelectButtonProps) => {
 		return (
 			<div
 				className={twMerge(
 					'flex flex-row items-center justify-between rounded-lg px-[12px] py-[6px]',
 					className,
 				)}
+				title={title}
 			>
 				<p
 					className={twMerge(

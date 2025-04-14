@@ -1,5 +1,6 @@
-import { CurrentSub, SubSelect } from '@core';
+import { CurrentSub } from '@core';
 import { MainHeader, News } from '../components';
+import { SubSelect } from '@features/landing';
 
 const MainScreen = () => {
 	return (
