@@ -6,62 +6,28 @@ import {
 	Select,
 	Switch,
 } from '@core';
-<<<<<<< HEAD
-import {
-	ConstructionsAddFieldNames,
-	ConstructionTypeFieldNames,
-} from '@features/guidbooks/constants';
-import { convertToClientIssuerData } from '@features/guidbooks/converters';
-import { getGuidebooksPaginated } from '@features/guidbooks/services';
-import {
-	ConstructionTypeEnum,
-	Guidebooks,
-	MaterialTypeEnum,
-=======
-import type { ConstructionsAddData, ConstructionTypeEnum, Issuer } from '@features';
 import {
 	ConstructionsAddFieldNames,
 	ConstructionTypeFieldNames,
 	ConstructionTypeMap,
-	convertToClientIssuerData,
-	FormSubTitle,
-	getGuidebooksPaginated,
+} from '@features/guidbooks/constants';
+import { convertToClientIssuerData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
+import {
+	ConstructionsAddData,
+	ConstructionTypeEnum,
 	Guidebooks,
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
+	Issuer,
 	RuConstructionTypesSelectValues,
 	RuCountryNamesSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
-<<<<<<< HEAD
-	type ConstructionsAddData,
-	type Issuer,
 } from '@features/guidbooks/types';
-=======
-} from '@features';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
-<<<<<<< HEAD
-import { FormSubTitle } from '../../../form-sub-title.component';
-import {
-	FramePartitionDouble,
-	FramePartitionSingle,
-	HeavyMultiLayerWallComponent,
-	HeavyMultiLayerWallFacingBothSideComponent,
-	HeavyMultiLayerWallFacingOneSideComponent,
-	HeavyMultiLayerWallSoundproofBothSide,
-	HeavyMultiLayerWallSoundproofingLeftSide,
-	HeavyMultiLayerWallSoundproofOneSide,
-	HeavySingleLayerWallComponent,
-	HeavySingleLayerWallFacingBothSideComponent,
-	HeavySingleLayerWallFacingOneSideComponent,
-	HeavySingleLayerWallSoundproofingBothSideComponent,
-	HeavySingleLayerWallSoundproofingOneSideComponent,
-} from './contruction-type';
-=======
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
+import { FormSubTitle } from '../../form-sub-title.component';
 
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();

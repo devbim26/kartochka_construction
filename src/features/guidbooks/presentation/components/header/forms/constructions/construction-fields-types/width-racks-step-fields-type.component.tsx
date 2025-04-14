@@ -1,11 +1,5 @@
-import { Input } from '@core';
-<<<<<<< HEAD
-import type { ConstructionsAddData } from '@features/guidbooks/types';
-import { useFormContext } from 'react-hook-form';
-=======
-import { memoize } from '@core/utils/hoc/memo.utils';
-import type { ConstructionFieldTypesProps } from '@features';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
+import { Input, memoize } from '@core';
+import { ConstructionFieldTypesProps } from '@features/guidbooks/types';
 import { twMerge } from 'tailwind-merge';
 
 export const WidthRacksStepFieldsType = memoize(

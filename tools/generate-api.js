@@ -1,5 +1,5 @@
 const generateApi = require('swagger-typescript-api').generateApi;
-const apiUrl = 'https://5.44.44.202:5001/swagger/v1/swagger.json';
+const apiUrl = 'https://192.168.10.23:5001/swagger/v1/swagger.json';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -9,7 +9,7 @@ generateApi({
 	url: apiUrl,
 	httpClientType: 'axios',
 	nameVariants: {
-		patterns: ['camelCase'], // Выбор CamelCase для имен
+		patterns: ['camelCase'],
 	},
 })
 	.then(() => {

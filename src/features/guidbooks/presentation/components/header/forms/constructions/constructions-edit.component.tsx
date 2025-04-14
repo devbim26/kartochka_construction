@@ -6,62 +6,28 @@ import {
 	Select,
 	Switch,
 } from '@core';
-<<<<<<< HEAD
 import {
 	ConstructionsEditFieldNames,
 	ConstructionTypeFieldNames,
+	ConstructionTypeMap,
 } from '@features/guidbooks/constants';
 import { convertToClientIssuerData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
 	ConstructionTypeEnum,
 	Guidebooks,
-	MaterialTypeEnum,
-=======
-import type { ConstructionsEditData, ConstructionTypeEnum, Issuer } from '@features';
-import {
-	ConstructionsEditFieldNames,
-	ConstructionTypeFieldNames,
-	ConstructionTypeMap,
-	convertToClientIssuerData,
-	FormSubTitle,
-	getGuidebooksPaginated,
-	Guidebooks,
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 	RuConstructionTypesSelectValues,
 	RuCountryNamesSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
-<<<<<<< HEAD
 	type ConstructionsEditData,
 	type Issuer,
 } from '@features/guidbooks/types';
-=======
-} from '@features';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
-<<<<<<< HEAD
-import { FormSubTitle } from '../../../form-sub-title.component';
-import {
-	FramePartitionDouble,
-	FramePartitionSingle,
-	HeavyMultiLayerWallComponent,
-	HeavyMultiLayerWallFacingBothSideComponent,
-	HeavyMultiLayerWallFacingOneSideComponent,
-	HeavyMultiLayerWallSoundproofBothSide,
-	HeavyMultiLayerWallSoundproofingLeftSide,
-	HeavyMultiLayerWallSoundproofOneSide,
-	HeavySingleLayerWallComponent,
-	HeavySingleLayerWallFacingBothSideComponent,
-	HeavySingleLayerWallFacingOneSideComponent,
-	HeavySingleLayerWallSoundproofingBothSideComponent,
-	HeavySingleLayerWallSoundproofingOneSideComponent,
-} from './contruction-type';
-=======
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
+import { FormSubTitle } from '../../form-sub-title.component';
 
 export const ConstructionsEdit = () => {
 	const form = useFormContext<ConstructionsEditData>();

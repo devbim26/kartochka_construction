@@ -1,22 +1,11 @@
 import { DeleteIcon } from '@core';
-<<<<<<< HEAD
 import { ConstructionFieldsMap } from '@features/guidbooks/constants';
-=======
-import type { ConstructionTypeProps, MaterialTypeEnum, UserMaterials } from '@features/guidbooks';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 import {
+	ConstructionTypeProps,
 	MaterialTypesSelectValuesEnum,
-<<<<<<< HEAD
-	type ConstructionsAddData,
+	UserMaterials,
 	type MaterialTypeEnum,
 } from '@features/guidbooks/types';
-=======
-	PointConnectionsFieldsType,
-	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-	WidthRacksStepFieldsType,
-} from '@features/guidbooks';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 import { useEffect, useState } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import {

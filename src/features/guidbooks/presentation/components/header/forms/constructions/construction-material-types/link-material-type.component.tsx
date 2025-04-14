@@ -1,16 +1,12 @@
 import type { SelectOption } from '@core';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
-<<<<<<< HEAD
+import { memoize } from '@core/utils/hoc/memo.utils';
 import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
-=======
-import { memoize } from '@core/utils/hoc/memo.utils';
-import type { ConstructionMaterialTypesProps, MaterialsFilterData } from '@features';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 import {
+	ConstructionMaterialTypesProps,
 	Guidebooks,
 	MaterialTypeEnum,
-	type ConstructionsAddData,
 	type MaterialsFilterData,
 } from '@features/guidbooks/types';
 import type { AxiosResponse } from 'axios';

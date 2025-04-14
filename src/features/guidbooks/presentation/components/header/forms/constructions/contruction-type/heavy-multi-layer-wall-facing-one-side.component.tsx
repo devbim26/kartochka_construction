@@ -1,22 +1,19 @@
 import { DeleteIcon } from '@core';
-<<<<<<< HEAD
+import { ConstructionLayer } from '@features';
 import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import {
+	ConstructionTypeProps,
 	MaterialTypesSelectValuesEnum,
-	type ConstructionsAddData,
+	UserMaterials,
 	type MaterialTypeEnum,
 } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import {
 	PointConnectionsFieldsType,
 	ThicknessDensityFieldsType,
 	WidthRacksStepFieldsType,
 } from '../construction-fields-types';
-=======
-import type { ConstructionTypeProps, MaterialTypeEnum, UserMaterials } from '@features';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 import {
 	AirGapMaterialType,
 	BoardMaterialType,
@@ -25,16 +22,7 @@ import {
 	HeavyMaterialType,
 	LinkMaterialType,
 	SelectableMaterialType,
-<<<<<<< HEAD
 } from '../construction-material-types';
-import { ConstructionLayer } from '../constructions-layer.component';
-=======
-	ThicknessDensityFieldsType,
-	WidthRacksStepFieldsType,
-} from '@features';
-import { useEffect, useState } from 'react';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 
 export const HeavyMultiLayerWallFacingOneSideComponent = ({
 	currentForm,

@@ -1,19 +1,17 @@
 import type { MaterialTypeEnum } from '@api-gen';
 import { DeleteIcon } from '@core';
-import type { ConstructionTypeProps, UserMaterials } from '@features';
 import {
 	BoardMaterialType,
-	ConstructionFieldsMap,
 	ConstructionLayer,
 	FillerMaterialType,
 	HeavyMaterialType,
 	LinkMaterialType,
-	MaterialTypesSelectValuesEnum,
 	PointConnectionsFieldsType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 	ZPanelMaterialType,
 } from '@features';
+import { ConstructionTypeProps, UserMaterials } from '@features/guidbooks/types';
 
 import { useEffect, useState } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';

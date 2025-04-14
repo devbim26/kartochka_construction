@@ -1,8 +1,4 @@
 import { DeleteIcon } from '@core';
-<<<<<<< HEAD
-=======
-import type { ConstructionTypeProps, MaterialTypeEnum, UserMaterials } from '@features';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 import {
 	AirGapMaterialType,
 	BoardMaterialType,
@@ -18,8 +14,9 @@ import {
 } from '@features';
 import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import {
+	ConstructionTypeProps,
 	MaterialTypesSelectValuesEnum,
-	type ConstructionsAddData,
+	UserMaterials,
 	type MaterialTypeEnum,
 } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';

@@ -9,24 +9,23 @@ const constructionTypeEnumMap = createDataRecordConverter({
 		ServerConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 	[ClientConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]:
 		ServerConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
-	[ClientConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide]:
+	[ClientConstructionTypeEnum.HeavySingleLayerWallZPanelOneSide]:
 		ServerConstructionTypeEnum.HeavySingleLayerWallZPanelOneSide,
-	[ClientConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]:
+	[ClientConstructionTypeEnum.HeavySingleLayerWallZPanelBothSide]:
 		ServerConstructionTypeEnum.HeavySingleLayerWallZPanelBothSide,
-	[ClientConstructionTypeEnum.HeavyMultiLayerWall]:
+	[ClientConstructionTypeEnum.HeavyMultipleLayerWall]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWall,
-	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide]:
+	[ClientConstructionTypeEnum.HeavyMultipleLayerWallFacingOneSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingOneSide,
-	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]:
+	[ClientConstructionTypeEnum.HeavyMultipleLayerWallFacingBothSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingBothSide,
-	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofOneSide]:
+	[ClientConstructionTypeEnum.HeavyMultipleLayerWallZPanelOneSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallZPanelOneSide,
-	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSide]:
+	[ClientConstructionTypeEnum.HeavyMultipleLayerWallZPanelBothSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallZPanelBothSide,
-	[ClientConstructionTypeEnum.FramePartitionSingle]: ServerConstructionTypeEnum.OneFramePartition,
-	[ClientConstructionTypeEnum.FramePartitionDouble]: ServerConstructionTypeEnum.TwoFramePartition,
-	//в работе
-	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingLeftSide]:
+	[ClientConstructionTypeEnum.OneFramePartition]: ServerConstructionTypeEnum.OneFramePartition,
+	[ClientConstructionTypeEnum.TwoFramePartition]: ServerConstructionTypeEnum.TwoFramePartition,
+	[ClientConstructionTypeEnum.HeavySingleWallFacing]:
 		ServerConstructionTypeEnum.HeavySingleWallFacing,
 });
 

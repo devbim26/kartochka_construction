@@ -1,32 +1,17 @@
-<<<<<<< HEAD
-import type { SelectOption } from '@core';
-import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
-import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
-import { getGuidebooksPaginated } from '@features/guidbooks/services';
-=======
-import { MaterialTypeEnum } from '@api-gen';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import type {
-	ConstructionMaterialTypesProps,
-	MaterialsAddAndEditData,
-	MaterialsFilterData,
-} from '@features';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
+import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
+	ConstructionMaterialTypesProps,
 	Guidebooks,
+	MaterialsAddAndEditData,
 	MaterialTypeEnum,
-	type ConstructionsAddData,
 	type MaterialsFilterData,
 } from '@features/guidbooks/types';
 import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
-<<<<<<< HEAD
-import { Controller, useFormContext } from 'react-hook-form';
-=======
 import { Controller } from 'react-hook-form';
-
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 

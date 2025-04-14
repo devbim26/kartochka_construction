@@ -12,34 +12,20 @@ import {
 	convertToClientPriorityData,
 	convertToServerCountryData,
 	convertToServerPriorityData,
-<<<<<<< HEAD
-} from '@core/converters/priority.converter';
+} from '@core';
 import type { Country, Priority } from '@features/guidbooks/types';
-
 import type {
 	ConstructionsAddData,
 	ConstructionsEditData,
 	ConstructionsFilterData,
 	ConstructionType,
+	ConstructionTypeEnum,
 	ConstructionTypeTemplate,
 } from '@features/guidbooks/types/constructions';
-=======
-} from '@core';
 import {
 	convertToClientConstructionTypeEnumData,
 	convertToServerConstructionTypeEnumData,
-	type ConstructionsAddData,
-	type ConstructionsEditData,
-	type ConstructionsFilterData,
-	type ConstructionTypeTemplate,
-	type Country,
-	type Priority,
-} from '@features';
-import type {
-	ConstructionType,
-	ConstructionTypeEnum as ClientConstructionTypeEnum,
-} from '@features/guidbooks/types';
->>>>>>> 4998cc9780d3370f0ee984a9961ae51ae777b894
+} from './construction-type-enum.converter';
 
 export const convertToClientConstructionTypesList = (data: any): ConstructionTypeTemplate[] => {
 	return data.map((data: any) => ({
@@ -87,7 +73,7 @@ export const convertToServerConstructionType = (
 	data: ConstructionType,
 ): CreateConstructionTypeDto => ({
 	constructionTypeEnum: convertToServerConstructionTypeEnumData(
-		data.constructionTypeEnum as ClientConstructionTypeEnum,
+		data.constructionTypeEnum as ConstructionTypeEnum,
 	),
 	constructions:
 		data.constructions?.map((construction) => ({
