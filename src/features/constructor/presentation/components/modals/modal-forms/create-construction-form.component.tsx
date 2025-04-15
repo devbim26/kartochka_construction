@@ -1,11 +1,24 @@
-import { Input, Select, useAppDispatch, useAppSelector } from '@core';
+import {
+	convertToPaginatedType,
+	convertToSelectValues,
+	Input,
+	Select,
+	useAppDispatch,
+	useAppSelector,
+} from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { constructorSlice } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { CreateConstructionConfig } from '@features/constructor/utils';
-import { RuConstructionTypeSelectValues } from '@features/guidbooks';
+import type { ConstructionsAddData } from '@features/guidbooks';
+import {
+	convertToClientConstructionsAddData,
+	getGuidebooksPaginated,
+	Guidebooks,
+	RuConstructionTypeSelectValues,
+} from '@features/guidbooks';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { forwardRef, useEffect, useImperativeHandle } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -26,7 +39,7 @@ export const CreateConstructionForm = memoize(
 
 		const { register, formState, control, setValue, watch, handleSubmit } = form;
 		const dispatch = useAppDispatch();
-		// const [constructionData, setConstructionData] = useState<Array<ConstructionType>>([]);
+		const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>([]);
 
 		const length = watch('length');
 		const width = watch('width');
@@ -48,35 +61,27 @@ export const CreateConstructionForm = memoize(
 
 		const aboutBuildingData = useAppSelector((store) => store.constructorData);
 
-		// const handleGetConstructionData = useCallback(async () => {
-		// 	try {
-		// 		const response = await getGuidebooksPaginated({
-		// 			data: {
-		// 				countryType: null,
-		// 				buildingType: null,
-		// 				name: null,
-		// 				description: null,
-		// 				shortName: null,
-		// 				constructionType: null,
-		// 			},
-		// 			guidebookType: Guidebooks.CONSTRUCTION,
-		// 			pagination: { pageNumber: 1, pageSize: 99999 },
-		// 		});
+		const handleGetConstructionData = useCallback(async () => {
+			try {
+				const response = await getGuidebooksPaginated({
+					data: {},
+					guidebookType: Guidebooks.CONSTRUCTION,
+					pagination: { pageNumber: 1, pageSize: 99999 },
+				});
+				console.log(response.data);
+				const resData = convertToPaginatedType(convertToClientConstructionsAddData)(
+					response.data as any,
+				);
+				console.log(resData.items);
+				setConstructionData(resData.items);
+			} catch (error) {
+				console.log('error:', error);
+			}
+		}, []);
 
-		// 		const resData = convertToPaginatedType(convertToClientConstructionTypeData)(
-		// 			response.data as any,
-		// 		);
-		// 		console.log(resData.items);
-
-		// 		setConstructionData(resData.items);
-		// 	} catch (error) {
-		// 		console.log('Error:', error);
-		// 	}
-		// }, []);
-
-		// useEffect(() => {
-		// 	handleGetConstructionData();
-		// }, []);
+		useEffect(() => {
+			handleGetConstructionData();
+		}, []);
 
 		return (
 			<div className="flex flex-col border-b">
@@ -127,7 +132,7 @@ export const CreateConstructionForm = memoize(
 							name={'construction'}
 							render={({ field }) => (
 								<Select
-									options={RuConstructionTypeSelectValues}
+									options={convertToSelectValues(constructionData) ?? []}
 									{...field}
 									value={field.value || ''}
 									label={formState.errors?.construction?.message || 'Конструкция'}

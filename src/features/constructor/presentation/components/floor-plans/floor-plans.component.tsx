@@ -65,7 +65,10 @@ export const FloorPlans = memoize(() => {
 							<p className="font-sans text-lg leading-4 text-input-border-primary">
 								или
 							</p>
-							<Button className="h-[40px] w-[190px] bg-white px-[16px] text-[16px] text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white">
+							<Button
+								onClick={() => setIsCreateModalOpen(true)}
+								className="h-[40px] w-[190px] bg-white px-[16px] text-[16px] text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
+							>
 								Создать конструкцию
 							</Button>
 						</div>
