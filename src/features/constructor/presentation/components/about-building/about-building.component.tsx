@@ -15,12 +15,12 @@ import { constructorSlice } from '@features/constructor/store';
 import type { AboutBuildingData } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
 import {
-	convertToClientRequirementData,
+	convertToClientRequirementTableData,
 	getGuidebooksPaginated,
 	Guidebooks,
 	RuConstructionTypeSelectValues,
 } from '@features/guidbooks';
-import type { FormRequirement } from '@features/guidbooks/types';
+import type { Requirement } from '@features/guidbooks/types';
 import {
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
@@ -40,7 +40,7 @@ export const AboutBuilding = memoize(() => {
 	const { register, control, formState, watch } = form;
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
-	const [requirementData, setRequirementData] = useState<Array<FormRequirement>>([]);
+	const [requirementData, setRequirementData] = useState<Array<Requirement>>([]);
 
 	const selectedRegion = watch('region');
 	const selectedPurpose = watch('buildingPurpose');
@@ -81,7 +81,7 @@ export const AboutBuilding = memoize(() => {
 				pagination: { pageNumber: 1, pageSize: 99999 },
 			});
 			console.log(response.data);
-			const resData = convertToPaginatedType(convertToClientRequirementData)(
+			const resData = convertToPaginatedType(convertToClientRequirementTableData)(
 				response.data as any,
 			);
 			console.log(resData.items);
