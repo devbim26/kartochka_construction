@@ -1,4 +1,5 @@
 import type { AUTH_ACTIONS } from '@features/auth';
+import type { Requirement } from '@features/guidbooks';
 import type { AboutBuildingData, CreateConstructionData } from '../types';
 import type { ConstructorSliceState } from './constructor.slice';
 
@@ -19,5 +20,14 @@ export const constructorReducer = {
 		action: { payload: CreateConstructionData },
 	) => {
 		state.createConstructionData = action.payload;
+	},
+	setSelectedRequirement: (
+		state: ConstructorSliceState,
+		action: { payload: Requirement | null },
+	) => {
+		state.selectedRequirement = action.payload;
+	},
+	setAllRequirements: (state: ConstructorSliceState, action: { payload: Requirement[] }) => {
+		state.allRequirements = action.payload;
 	},
 };

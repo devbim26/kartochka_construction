@@ -40,6 +40,11 @@ export const CreateConstructionForm = memoize(
 		const { register, formState, control, setValue, watch, handleSubmit } = form;
 		const dispatch = useAppDispatch();
 		const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>([]);
+		const firstPlacementRoomValue = watch('firstPlacementRoom');
+		const secondPlacementRoomValue = watch('secondPlacementRoom');
+		const selectedRequirement = useAppSelector(
+			(store) => store.constructorData.selectedRequirement,
+		);
 
 		const length = watch('length');
 		const width = watch('width');
@@ -59,7 +64,13 @@ export const CreateConstructionForm = memoize(
 			setValue('area', area.toString());
 		}, [length, width, setValue]);
 
-		const aboutBuildingData = useAppSelector((store) => store.constructorData);
+		useEffect(() => {
+			console.log(selectedRequirement);
+			if (selectedRequirement) {
+				setValue('firstPlacementRoom', selectedRequirement.firstPlacementRoom);
+				setValue('secondPlacementRoom', selectedRequirement.secondPlacementRoom);
+			}
+		}, [selectedRequirement, setValue]);
 
 		const handleGetConstructionData = useCallback(async () => {
 			try {
@@ -165,37 +176,25 @@ export const CreateConstructionForm = memoize(
 								</label>
 							</div>
 							<div className="flex gap-x-[12px]">
-								<Controller
-									control={control}
-									name="firstPlacementRoom"
-									render={({ field }) => (
-										<Select
-											options={RuConstructionTypeSelectValues}
-											{...field}
-											error={formState.errors.firstPlacementRoom?.message}
-											value={field.value || ''}
-											placeholder="Выберите первое помещение"
-											isSearchable
-											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-											wrapperClassname="shadow-none ring-input-border-primary"
-										/>
-									)}
+								<Input
+									{...register('firstPlacementRoom')}
+									value={firstPlacementRoomValue || ''}
+									wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
+									inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+									error={formState.errors.firstPlacementRoom?.message}
+									containerClassName="w-[226px]"
+									placeholder="помещение"
+									maxLength={50}
 								/>
-								<Controller
-									control={control}
-									name="secondPlacementRoom"
-									render={({ field }) => (
-										<Select
-											options={RuConstructionTypeSelectValues}
-											{...field}
-											error={formState.errors.secondPlacementRoom?.message}
-											value={field.value || ''}
-											placeholder="Выберите второе помещение"
-											isSearchable
-											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-											wrapperClassname="shadow-none ring-input-border-primary"
-										/>
-									)}
+								<Input
+									{...register('secondPlacementRoom')}
+									value={secondPlacementRoomValue || ''}
+									wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
+									inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+									error={formState.errors.secondPlacementRoom?.message}
+									containerClassName="w-[226px]"
+									placeholder="помещение"
+									maxLength={50}
 								/>
 							</div>
 						</div>
