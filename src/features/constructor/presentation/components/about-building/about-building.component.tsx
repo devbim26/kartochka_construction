@@ -60,13 +60,7 @@ export const AboutBuilding = memoize(() => {
 	};
 
 	const onSubmit = (data: AboutBuildingData) => {
-		const selectedReq = requirementData.find(
-			(req) => req.standartShortName === data.requirement,
-		);
 		dispatch(constructorSlice.actions.setAboutBuilding(data));
-		if (selectedReq) {
-			dispatch(constructorSlice.actions.setSelectedRequirement(selectedReq));
-		}
 		navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`);
 	};
 
@@ -91,7 +85,6 @@ export const AboutBuilding = memoize(() => {
 				response.data as any,
 			);
 			console.log(resData.items);
-
 			setRequirementData(resData.items);
 			dispatch(constructorSlice.actions.setAllRequirements(resData.items));
 		} catch (error) {

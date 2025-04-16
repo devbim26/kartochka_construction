@@ -8,12 +8,14 @@ import {
 	AddConstructionModal,
 	CreateConstructionForm,
 	CreateConstructionModal,
+	EditConstructionModal,
 } from '../modals';
 import { FloorPlanViewer } from './floor-plan-viewer.component';
 
 export const FloorPlans = memoize(() => {
 	const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+	const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
 	const handleUploadPdf = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
@@ -83,7 +85,7 @@ export const FloorPlans = memoize(() => {
 				onConfirm={() => {
 					setIsAddModalOpen(false);
 				}}
-				headerTitle="Добавить конструкцию"
+				headerTitle="Добавление конструкции"
 				className="!w-[1000px] md:!w-[900px]"
 			>
 				<AddConstructionForm />
@@ -95,11 +97,23 @@ export const FloorPlans = memoize(() => {
 				onConfirm={() => {
 					setIsCreateModalOpen(false);
 				}}
-				headerTitle="Добавить конструкцию"
+				headerTitle="Добавление конструкции"
 				className="!w-[1000px] md:!w-[900px]"
 			>
 				<CreateConstructionForm />
 			</CreateConstructionModal>
+			<EditConstructionModal
+				isOpen={isEditModalOpen}
+				onCancel={() => setIsEditModalOpen(false)}
+				onClose={() => setIsEditModalOpen(false)}
+				onConfirm={() => {
+					setIsEditModalOpen(false);
+				}}
+				headerTitle="Редактирование конструкцию"
+				className="!w-[1000px] md:!w-[900px]"
+			>
+				<CreateConstructionForm />
+			</EditConstructionModal>
 		</div>
 	);
 }, 'FloorPlans');

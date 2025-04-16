@@ -4,7 +4,6 @@ import {
 	Input,
 	Select,
 	useAppDispatch,
-	useAppSelector,
 } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { constructorSlice } from '@features/constructor/store';
@@ -40,11 +39,6 @@ export const CreateConstructionForm = memoize(
 		const { register, formState, control, setValue, watch, handleSubmit } = form;
 		const dispatch = useAppDispatch();
 		const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>([]);
-		const firstPlacementRoomValue = watch('firstPlacementRoom');
-		const secondPlacementRoomValue = watch('secondPlacementRoom');
-		const selectedRequirement = useAppSelector(
-			(store) => store.constructorData.selectedRequirement,
-		);
 
 		const length = watch('length');
 		const width = watch('width');
@@ -63,14 +57,6 @@ export const CreateConstructionForm = memoize(
 			const area = parseInt(length) * parseInt(width);
 			setValue('area', area.toString());
 		}, [length, width, setValue]);
-
-		useEffect(() => {
-			console.log(selectedRequirement);
-			if (selectedRequirement) {
-				setValue('firstPlacementRoom', selectedRequirement.firstPlacementRoom);
-				setValue('secondPlacementRoom', selectedRequirement.secondPlacementRoom);
-			}
-		}, [selectedRequirement, setValue]);
 
 		const handleGetConstructionData = useCallback(async () => {
 			try {
@@ -178,7 +164,6 @@ export const CreateConstructionForm = memoize(
 							<div className="flex gap-x-[12px]">
 								<Input
 									{...register('firstPlacementRoom')}
-									value={firstPlacementRoomValue || ''}
 									wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
 									inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 									error={formState.errors.firstPlacementRoom?.message}
@@ -188,7 +173,6 @@ export const CreateConstructionForm = memoize(
 								/>
 								<Input
 									{...register('secondPlacementRoom')}
-									value={secondPlacementRoomValue || ''}
 									wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
 									inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 									error={formState.errors.secondPlacementRoom?.message}
