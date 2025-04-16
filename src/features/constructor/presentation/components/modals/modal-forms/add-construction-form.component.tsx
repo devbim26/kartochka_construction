@@ -30,7 +30,6 @@ export const AddConstructionForm = memoize(
 		useImperativeHandle(ref, () => ({
 			submit: () => {
 				handleSubmit((data) => {
-					console.log(data);
 					onSuccess?.();
 				})();
 			},

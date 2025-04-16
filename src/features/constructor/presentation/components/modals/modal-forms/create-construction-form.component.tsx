@@ -17,8 +17,10 @@ import {
 	RuConstructionTypeSelectValues,
 } from '@features/guidbooks';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import type { AxiosResponse } from 'axios';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
 export interface CreateConstructionFormHandle {
@@ -39,14 +41,11 @@ export const CreateConstructionForm = memoize(
 		const { register, formState, control, setValue, watch, handleSubmit } = form;
 		const dispatch = useAppDispatch();
 		const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>([]);
-
-		const length = watch('length');
-		const width = watch('width');
+		const [length, width] = watch(['length', 'width']);
 
 		useImperativeHandle(ref, () => ({
 			submit: () => {
 				handleSubmit((data) => {
-					console.log(data);
 					dispatch(constructorSlice.actions.setCreateConstructionData(data));
 					onSuccess?.();
 				})();
@@ -61,23 +60,31 @@ export const CreateConstructionForm = memoize(
 			}
 		}, [length, width, setValue]);
 
-		const handleGetConstructionData = useCallback(async () => {
-			try {
-				const response = await getGuidebooksPaginated({
+		const handleGetConstructionData = () => {
+			from(
+				getGuidebooksPaginated({
 					data: {},
 					guidebookType: Guidebooks.CONSTRUCTION,
 					pagination: { pageNumber: 1, pageSize: 99999 },
-				});
-				console.log(response.data);
-				const resData = convertToPaginatedType(convertToClientConstructionsAddData)(
-					response.data as any,
-				);
-				console.log(resData.items);
-				setConstructionData(resData.items);
-			} catch (error) {
-				console.log('error:', error);
-			}
-		}, []);
+				}),
+			)
+				.pipe(
+					switchMap((response: AxiosResponse) => {
+						const resData = convertToPaginatedType(convertToClientConstructionsAddData)(
+							response.data,
+						);
+						return from([resData]);
+					}),
+					tap((resData) => {
+						setConstructionData(resData.items);
+					}),
+					catchError((error) => {
+						console.log('error:', error);
+						return from([null]);
+					}),
+				)
+				.subscribe();
+		};
 
 		useEffect(() => {
 			handleGetConstructionData();
