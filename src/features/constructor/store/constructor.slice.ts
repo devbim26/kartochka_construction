@@ -1,6 +1,5 @@
 import { createAsyncCases, type SliceInitialState } from '@core/utils/fetch/create-cases.util';
 import { getCurrentUser, logout, updateUser } from '@features/account';
-import type { Requirement } from '@features/guidbooks';
 import { createSlice } from '@reduxjs/toolkit';
 import type { AboutBuildingData, CreateConstructionData } from '../types';
 import { constructorReducer } from './constructor.reducer';
@@ -10,8 +9,6 @@ export type ConstructorDataState = AboutBuildingData;
 export interface ConstructorSliceState extends SliceInitialState {
 	data: ConstructorDataState | null;
 	createConstructionData: CreateConstructionData | null;
-	selectedRequirement: Requirement | null;
-	allRequirements: Requirement[];
 }
 
 const initialState: ConstructorSliceState = {
@@ -24,8 +21,6 @@ const initialState: ConstructorSliceState = {
 	error: null,
 	data: null,
 	createConstructionData: null,
-	selectedRequirement: null,
-	allRequirements: [],
 };
 
 export const constructorSlice = createSlice({
@@ -34,8 +29,6 @@ export const constructorSlice = createSlice({
 	reducers: {
 		setAboutBuilding: constructorReducer.setAboutBuilding,
 		setCreateConstructionData: constructorReducer.setCreateConstructionData,
-		setSelectedRequirement: constructorReducer.setSelectedRequirement,
-		setAllRequirements: constructorReducer.setAllRequirements,
 	},
 	extraReducers: (builder) => {
 		createAsyncCases(builder, getCurrentUser, (state: ConstructorSliceState, action) => {});
