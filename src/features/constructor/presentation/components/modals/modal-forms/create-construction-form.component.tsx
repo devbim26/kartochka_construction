@@ -54,8 +54,11 @@ export const CreateConstructionForm = memoize(
 		}));
 
 		useEffect(() => {
-			const area = parseInt(length) * parseInt(width);
-			setValue('area', area.toString());
+			if (length && width) {
+				setValue('area', (parseInt(length) * parseInt(width)).toString());
+			} else {
+				setValue('area', '');
+			}
 		}, [length, width, setValue]);
 
 		const handleGetConstructionData = useCallback(async () => {
