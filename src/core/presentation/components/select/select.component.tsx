@@ -48,6 +48,7 @@ interface AppSelectProps {
 	disableDefaultValue?: boolean;
 	isSearchable?: boolean;
 	menuPosition?: MenuPosition;
+	highlightOnlyRussiaBelarus?: boolean;
 	onChange?(value: unknown): void;
 }
 
@@ -108,6 +109,7 @@ export const Select = memoize(
 				disableDefaultValue = false,
 				isSearchable = false,
 				menuPosition = 'fixed',
+				highlightOnlyRussiaBelarus = false,
 				className,
 				onChange,
 			} = props;
@@ -198,6 +200,7 @@ export const Select = memoize(
 			const Option = memoize((props) => {
 				const currentValue = props.getValue()?.[0];
 				const isCurrent = currentValue?.value === props.data?.value;
+				const isHighlighted = ['Беларусь', 'Россия', 'Нет'].includes(props.data.label);
 				return (
 					<div
 						className={twMerge(
@@ -208,7 +211,13 @@ export const Select = memoize(
 					>
 						{headerImage}
 						{props.data.icon}
-						<p className={twMerge('ml-3 truncate', isCurrent && 'font-bold')}>
+						<p
+							className={twMerge(
+								'ml-3 truncate',
+								isCurrent && 'font-bold',
+								highlightOnlyRussiaBelarus && !isHighlighted && 'text-gray-400',
+							)}
+						>
 							{props.data.label}
 						</p>
 					</div>
