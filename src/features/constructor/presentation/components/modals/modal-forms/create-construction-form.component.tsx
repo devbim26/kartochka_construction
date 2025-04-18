@@ -1,12 +1,26 @@
-import { Input, Select, useAppDispatch, useAppSelector } from '@core';
+import {
+	convertToPaginatedType,
+	convertToSelectValues,
+	Input,
+	Select,
+	useAppDispatch,
+} from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { constructorSlice } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { CreateConstructionConfig } from '@features/constructor/utils';
-import { RuConstructionTypeSelectValues } from '@features/guidbooks';
+import type { ConstructionsAddData } from '@features/guidbooks';
+import {
+	convertToClientConstructionsAddData,
+	getGuidebooksPaginated,
+	Guidebooks,
+	RuConstructionTypeSelectValues,
+} from '@features/guidbooks';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { forwardRef, useEffect, useImperativeHandle } from 'react';
+import type { AxiosResponse } from 'axios';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
 export interface CreateConstructionFormHandle {
@@ -26,15 +40,12 @@ export const CreateConstructionForm = memoize(
 
 		const { register, formState, control, setValue, watch, handleSubmit } = form;
 		const dispatch = useAppDispatch();
-		// const [constructionData, setConstructionData] = useState<Array<ConstructionType>>([]);
-
-		const length = watch('length');
-		const width = watch('width');
+		const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>([]);
+		const [length, width] = watch(['length', 'width']);
 
 		useImperativeHandle(ref, () => ({
 			submit: () => {
 				handleSubmit((data) => {
-					console.log(data);
 					dispatch(constructorSlice.actions.setCreateConstructionData(data));
 					onSuccess?.();
 				})();
@@ -42,41 +53,42 @@ export const CreateConstructionForm = memoize(
 		}));
 
 		useEffect(() => {
-			const area = parseInt(length) * parseInt(width);
-			setValue('area', area.toString());
+			if (length && width) {
+				setValue('area', (parseInt(length) * parseInt(width)).toString());
+			} else {
+				setValue('area', '');
+			}
 		}, [length, width, setValue]);
 
-		const aboutBuildingData = useAppSelector((store) => store.constructorData);
+		const handleGetConstructionData = () => {
+			from(
+				getGuidebooksPaginated({
+					data: {},
+					guidebookType: Guidebooks.CONSTRUCTION,
+					pagination: { pageNumber: 1, pageSize: 99999 },
+				}),
+			)
+				.pipe(
+					switchMap((response: AxiosResponse) => {
+						const resData = convertToPaginatedType(convertToClientConstructionsAddData)(
+							response.data,
+						);
+						return from([resData]);
+					}),
+					tap((resData) => {
+						setConstructionData(resData.items);
+					}),
+					catchError((error) => {
+						console.log('error:', error);
+						return from([null]);
+					}),
+				)
+				.subscribe();
+		};
 
-		// const handleGetConstructionData = useCallback(async () => {
-		// 	try {
-		// 		const response = await getGuidebooksPaginated({
-		// 			data: {
-		// 				countryType: null,
-		// 				buildingType: null,
-		// 				name: null,
-		// 				description: null,
-		// 				shortName: null,
-		// 				constructionType: null,
-		// 			},
-		// 			guidebookType: Guidebooks.CONSTRUCTION,
-		// 			pagination: { pageNumber: 1, pageSize: 99999 },
-		// 		});
-
-		// 		const resData = convertToPaginatedType(convertToClientConstructionTypeData)(
-		// 			response.data as any,
-		// 		);
-		// 		console.log(resData.items);
-
-		// 		setConstructionData(resData.items);
-		// 	} catch (error) {
-		// 		console.log('Error:', error);
-		// 	}
-		// }, []);
-
-		// useEffect(() => {
-		// 	handleGetConstructionData();
-		// }, []);
+		useEffect(() => {
+			handleGetConstructionData();
+		}, []);
 
 		return (
 			<div className="flex flex-col border-b">
@@ -127,7 +139,7 @@ export const CreateConstructionForm = memoize(
 							name={'construction'}
 							render={({ field }) => (
 								<Select
-									options={RuConstructionTypeSelectValues}
+									options={convertToSelectValues(constructionData) ?? []}
 									{...field}
 									value={field.value || ''}
 									label={formState.errors?.construction?.message || 'Конструкция'}
@@ -160,37 +172,23 @@ export const CreateConstructionForm = memoize(
 								</label>
 							</div>
 							<div className="flex gap-x-[12px]">
-								<Controller
-									control={control}
-									name="firstPlacementRoom"
-									render={({ field }) => (
-										<Select
-											options={RuConstructionTypeSelectValues}
-											{...field}
-											error={formState.errors.firstPlacementRoom?.message}
-											value={field.value || ''}
-											placeholder="Выберите первое помещение"
-											isSearchable
-											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-											wrapperClassname="shadow-none ring-input-border-primary"
-										/>
-									)}
+								<Input
+									{...register('firstPlacementRoom')}
+									wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
+									inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+									error={formState.errors.firstPlacementRoom?.message}
+									containerClassName="w-[226px]"
+									placeholder="помещение"
+									maxLength={50}
 								/>
-								<Controller
-									control={control}
-									name="secondPlacementRoom"
-									render={({ field }) => (
-										<Select
-											options={RuConstructionTypeSelectValues}
-											{...field}
-											error={formState.errors.secondPlacementRoom?.message}
-											value={field.value || ''}
-											placeholder="Выберите второе помещение"
-											isSearchable
-											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-											wrapperClassname="shadow-none ring-input-border-primary"
-										/>
-									)}
+								<Input
+									{...register('secondPlacementRoom')}
+									wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
+									inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+									error={formState.errors.secondPlacementRoom?.message}
+									containerClassName="w-[226px]"
+									placeholder="помещение"
+									maxLength={50}
 								/>
 							</div>
 						</div>

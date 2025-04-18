@@ -15,8 +15,20 @@ interface SimpleTableProps<T> {
 	onChangePaginationState: (pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>) => void;
 }
 
+interface DesigningTableProps<T> {
+	data: Array<T>;
+	columns: ColumnDef<T>[];
+	classNames?: {
+		tableClassName?: string;
+		contentRowClassName?: string;
+		headerRowClassName?: string;
+		headerCellClassName?: string;
+		tableContainerClassName?: string;
+	};
+}
+
 interface SimpleTableData<T> {
 	rows: T[];
 }
 
-export type { SimpleTableProps, SimpleTableData };
+export type { SimpleTableProps, SimpleTableData, DesigningTableProps };
