@@ -16,10 +16,10 @@ import type { AboutBuildingData } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
 import {
 	convertToClientRequirementTableData,
+	Country,
 	getGuidebooksPaginated,
 	Guidebooks,
 	RuConstructionTypeSelectValues,
-	RuCountryNamesMap,
 } from '@features/guidbooks';
 import type { Requirement } from '@features/guidbooks/types';
 import {
@@ -54,6 +54,7 @@ export const AboutBuilding = memoize(() => {
 		requirementData.filter(
 			(req) =>
 				(!selectedRegion || req.countryType === selectedRegion) &&
+				(!selectedPurpose || req.constructionType === selectedPurpose) &&
 				(!selectedType || req.buildingType === selectedType),
 		),
 	);
@@ -130,13 +131,13 @@ export const AboutBuilding = memoize(() => {
 						/>
 						<Controller
 							control={control}
-							name={'region'}
+							name="region"
 							render={({ field }) => (
 								<Select
 									options={[
-										{ label: 'Нет', value: RuCountryNamesMap.None },
-										{ label: 'Беларусь', value: RuCountryNamesMap.Belarus },
-										{ label: 'Россия', value: RuCountryNamesMap.Russia },
+										{ label: 'Нет', value: Country.None },
+										{ label: 'Беларусь', value: Country.Belarus },
+										{ label: 'Россия', value: Country.Russia },
 										...RuCountryNamesSelectValues.filter(
 											(reg) =>
 												!['Беларусь', 'Россия', 'Нет'].includes(reg.label),
@@ -144,6 +145,7 @@ export const AboutBuilding = memoize(() => {
 									]}
 									{...field}
 									value={field.value || ''}
+									onChange={(val) => field.onChange(val)}
 									label={formState.errors?.region?.message || 'Страна'}
 									error={formState.errors.region?.message}
 									isSearchable
