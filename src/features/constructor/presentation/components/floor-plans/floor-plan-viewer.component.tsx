@@ -1,4 +1,4 @@
-import { Button, ChevronIcon } from '@core';
+import { Button, ChevronIcon, useAppNavigate } from '@core';
 import * as pdfjs from 'pdfjs-dist';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
@@ -15,6 +15,8 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 	const [pageNum, setPageNum] = useState(1);
 	const [numPages, setNumPages] = useState(0);
 	const [scale, setScale] = useState(1.5);
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+	const navigate = useAppNavigate();
 
 	useEffect(() => {
 		setNumPages(pdfFile.numPages);
@@ -59,14 +61,20 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 		[scale, pageNum, pdfFile],
 	);
 
-	const drawConstruction = (x: number, y: number, text: string) => {
+	const drawConstruction = (
+		x: number,
+		y: number,
+		constructionName: string,
+		guidebookConstructionName: string,
+		dividedRooms: string,
+	) => {
 		if (!canvasRef.current) return;
 		const canvas = canvasRef.current;
 		const context = canvas.getContext('2d');
 		if (!context) return;
 
-		const boxWidth = 100;
-		const boxHeight = 50;
+		const boxWidth = 220;
+		const boxHeight = 70;
 		const padding = 10;
 		const arrowThickness = 2;
 		const dotSize = 2;
@@ -97,15 +105,39 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 		context.strokeRect(boxX, boxY, boxWidth, boxHeight);
 
 		context.fillStyle = 'black';
-		context.font = '14px Arial';
-		context.textAlign = 'center';
+		context.font = '300 16px Source Sans Pro';
+		context.textAlign = 'left';
 		context.textBaseline = 'middle';
-		context.fillText(text, boxX + boxWidth / 2, boxY + boxHeight / 2);
+		context.fillText(constructionName, boxX + 10, boxY + 20);
+
+		context.fillStyle = 'black';
+		context.font = '600 16px Source Sans Pro';
+		context.textAlign = 'left';
+		context.textBaseline = 'middle';
+		context.fillText('Конструкция:', boxX + 10, boxY + 35);
+
+		context.fillStyle = '#2175F3';
+		context.font = '800 16px Source Sans Pro';
+		context.textAlign = 'left';
+		context.textBaseline = 'middle';
+		context.fillText(guidebookConstructionName, boxX + 110, boxY + 35);
+
+		context.fillStyle = 'black';
+		context.font = '600 16px Source Sans Pro';
+		context.textAlign = 'left';
+		context.textBaseline = 'middle';
+		context.fillText('разделяет:', boxX + 10, boxY + 50);
+
+		context.fillStyle = 'black';
+		context.font = '800 16px Source Sans Pro';
+		context.textAlign = 'left';
+		context.textBaseline = 'middle';
+		context.fillText(dividedRooms, boxX + 90, boxY + 50);
 	};
 
 	const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
 		event.preventDefault();
-
+		navigate('', { add: 'true' });
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 
@@ -113,7 +145,7 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
 
-		drawConstruction(x, y, 'Конструкция');
+		drawConstruction(x, y, 'Тяжелая однослойная стена', 'HZ11', 'жилье/жилье');
 	};
 
 	useEffect(() => {
@@ -140,7 +172,7 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 					<div className="flex w-full items-center justify-between gap-3 self-end">
 						<div className="flex gap-[10px]">
 							<Button
-								onClick={() => setScale(1.5)}
+								onClick={() => setScale(1)}
 								variant="primary"
 								className="p-[10px]"
 							>

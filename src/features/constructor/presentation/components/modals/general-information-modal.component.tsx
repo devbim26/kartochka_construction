@@ -4,7 +4,6 @@ import { twJoin } from 'tailwind-merge';
 
 interface CreateConstructionModalProps extends Omit<ModalProps, 'Footer'> {
 	onCancel: () => void;
-	onConfirm: () => void;
 	wrapperClassName?: string;
 }
 
