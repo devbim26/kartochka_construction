@@ -18,8 +18,7 @@ import { FloorPlanViewer } from './floor-plan-viewer.component';
 
 export const FloorPlans = memoize(() => {
 	const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
-	const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+	const navigate = useAppNavigate();
 
 	const handleUploadPdf = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
@@ -36,7 +35,8 @@ export const FloorPlans = memoize(() => {
 	const aboutBuildingData = useAppSelector((store) => store.constructorData);
 
 	const [search] = useSearchParams();
-	const navigate = useAppNavigate();
+	const reportId = search.get('reportId');
+
 	return (
 		<div className="flex flex-col gap-[36px]">
 			<div className="flex flex-col rounded-xl bg-white">

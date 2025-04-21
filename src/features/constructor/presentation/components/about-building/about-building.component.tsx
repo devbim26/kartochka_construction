@@ -71,7 +71,6 @@ export const AboutBuilding = memoize(() => {
 	const onSubmit = (data: AboutBuildingData) => {
 		dispatch(constructorSlice.actions.setAboutBuilding(data));
 		handleCreateReport(data);
-		navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`);
 	};
 
 	const handleCreateReport = (data: AboutBuildingData) => {
@@ -90,8 +89,13 @@ export const AboutBuilding = memoize(() => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					console.log(response.data);
 					toast.success('Отчет успешно создан');
+					if (response?.data?.id) {
+						const reportId = response.data.id;
+						navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
+							reportId,
+						});
+					}
 				}
 			});
 	};
