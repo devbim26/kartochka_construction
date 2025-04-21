@@ -6,6 +6,7 @@ import {
 	useAppDispatch,
 } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import { getReportById } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { CreateConstructionConfig } from '@features/constructor/utils';
@@ -20,6 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { AxiosResponse } from 'axios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
@@ -42,6 +44,35 @@ export const CreateConstructionForm = memoize(
 		const dispatch = useAppDispatch();
 		const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>([]);
 		const [length, width] = watch(['length', 'width']);
+		const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>([]);
+		const [search] = useSearchParams();
+		const reportId = search.get('reportId');
+
+		useEffect(() => {
+			if (reportId) {
+				from(getReportById({ id: reportId }))
+					.pipe(
+						catchError((error) => {
+							console.error(error);
+							return from([null]);
+						}),
+					)
+					.subscribe((response) => {
+						const requirement = response?.data?.requirements?.[0];
+						if (!requirement) {
+							return;
+						}
+						const firstRoom = requirement.firstPlacementRoom?.name || '';
+						const secondRoom = requirement.secondPlacementRoom?.name || '';
+						setValue('firstPlacementRoom', firstRoom);
+						setValue('secondPlacementRoom', secondRoom);
+						setRoomOptions([
+							{ label: firstRoom, value: firstRoom },
+							{ label: secondRoom, value: secondRoom },
+						]);
+					});
+			}
+		}, [reportId, setValue]);
 
 		useImperativeHandle(ref, () => ({
 			submit: () => {
@@ -172,23 +203,33 @@ export const CreateConstructionForm = memoize(
 								</label>
 							</div>
 							<div className="flex gap-x-[12px]">
-								<Input
-									{...register('firstPlacementRoom')}
-									wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
-									inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-									error={formState.errors.firstPlacementRoom?.message}
-									containerClassName="w-[226px]"
-									placeholder="помещение"
-									maxLength={50}
+								<Controller
+									control={control}
+									name="firstPlacementRoom"
+									render={({ field }) => (
+										<Select
+											options={roomOptions}
+											{...field}
+											value={field.value || ''}
+											placeholder="Выберите помещение"
+											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+											wrapperClassname="shadow-none ring-input-border-primary"
+										/>
+									)}
 								/>
-								<Input
-									{...register('secondPlacementRoom')}
-									wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
-									inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-									error={formState.errors.secondPlacementRoom?.message}
-									containerClassName="w-[226px]"
-									placeholder="помещение"
-									maxLength={50}
+								<Controller
+									control={control}
+									name="secondPlacementRoom"
+									render={({ field }) => (
+										<Select
+											options={roomOptions}
+											{...field}
+											value={field.value || ''}
+											placeholder="Выберите помещение"
+											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+											wrapperClassname="shadow-none ring-input-border-primary"
+										/>
+									)}
 								/>
 							</div>
 						</div>
