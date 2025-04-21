@@ -1,3 +1,4 @@
+import { ReportCategory } from '@features/constructor/types';
 import { z } from 'zod';
 
 export const AboutBuildingSchema = z.object({
@@ -12,7 +13,7 @@ export const AboutBuildingSchema = z.object({
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
 	comfortClass: z.string().min(1, 'Поле обязательно для заполнения'),
 	requirement: z.string().min(1, 'Поле обязательно для заполнения'),
-	isFloorPlan: z.boolean(),
+	isFloorPlan: z.nativeEnum(ReportCategory),
 	isBim: z.boolean(),
 });
 

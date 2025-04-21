@@ -10,9 +10,13 @@ import {
 } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
-import { convertToRequirementSelectValues } from '@features/constructor/converters';
+import {
+	convertToCreateReportInfoCommand,
+	convertToRequirementSelectValues,
+} from '@features/constructor/converters';
+import { createReport } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
-import type { AboutBuildingData } from '@features/constructor/types';
+import { ReportCategory, type AboutBuildingData } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
 import {
 	convertToClientRequirementTableData,
@@ -28,10 +32,11 @@ import {
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { AxiosResponse } from 'axios';
+import { AxiosError, type AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
 export const AboutBuilding = memoize(() => {
@@ -65,7 +70,30 @@ export const AboutBuilding = memoize(() => {
 
 	const onSubmit = (data: AboutBuildingData) => {
 		dispatch(constructorSlice.actions.setAboutBuilding(data));
+		handleCreateReport(data);
 		navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`);
+	};
+
+	const handleCreateReport = (data: AboutBuildingData) => {
+		from(
+			createReport({
+				data: convertToCreateReportInfoCommand(data),
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					console.log(response.data);
+					toast.success('Отчет успешно создан');
+				}
+			});
 	};
 
 	const handleGetRequirementData = () => {
@@ -287,8 +315,12 @@ export const AboutBuilding = memoize(() => {
 								name="isFloorPlan"
 								render={({ field }) => (
 									<Switch
-										onChange={(value) => field.onChange(value)}
-										wrapperClassName="w-[36px] h-[20px]"
+										onChange={(isEnabled) => {
+											const value = isEnabled
+												? ReportCategory.Floor
+												: ReportCategory.Single;
+											field.onChange(value);
+										}}
 									/>
 								)}
 							/>
