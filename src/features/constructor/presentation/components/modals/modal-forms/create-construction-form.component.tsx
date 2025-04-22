@@ -6,6 +6,7 @@ import {
 	useAppDispatch,
 } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import { getReportById } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { CreateConstructionConfig } from '@features/constructor/utils';
@@ -46,6 +47,7 @@ export const CreateConstructionForm = memoize(
 		const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>([]);
 		const [search] = useSearchParams();
 		const reportId = search.get('reportId');
+		console.log('id:', reportId);
 
 		useImperativeHandle(ref, () => ({
 			submit: () => {
@@ -55,6 +57,29 @@ export const CreateConstructionForm = memoize(
 				})();
 			},
 		}));
+
+		useEffect(() => {
+			if (!reportId) return;
+			from(getReportById({ id: reportId }))
+				.pipe(
+					catchError((error) => {
+						console.log(error);
+						return from([null]);
+					}),
+				)
+				.subscribe((response) => {
+					const requirement = response?.data?.requirements?.[0];
+					if (!requirement) return;
+					const firstRoom = requirement.firstPlacementRoom?.name || '';
+					const secondRoom = requirement.secondPlacementRoom?.name || '';
+					setValue('firstPlacementRoom', firstRoom);
+					setValue('secondPlacementRoom', secondRoom);
+					setRoomOptions([
+						{ label: firstRoom, value: firstRoom },
+						{ label: secondRoom, value: secondRoom },
+					]);
+				});
+		}, [reportId, setValue]);
 
 		useEffect(() => {
 			if (length && width) {
