@@ -94,6 +94,7 @@ export const AboutBuilding = memoize(() => {
 					toast.success('Отчет успешно создан');
 					if (response?.data?.id) {
 						const reportId = response.data.id;
+						console.log(reportId);
 						navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
 							reportId,
 						});

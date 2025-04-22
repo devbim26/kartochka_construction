@@ -75,7 +75,12 @@ export const FloorPlans = memoize(() => {
 									или
 								</p>
 								<Button
-									onClick={() => navigate(`?create=true&reportId=${reportId}`)}
+									onClick={() =>
+										navigate(``, {
+											create: 'true',
+											reportId: reportId!,
+										})
+									}
 									className="h-[40px] w-[190px] bg-white px-[16px] text-[16px] text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
 								>
 									Создать конструкцию

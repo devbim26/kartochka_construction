@@ -46,8 +46,6 @@ export const CreateConstructionForm = memoize(
 		const [length, width] = watch(['length', 'width']);
 		const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>([]);
 		const [search] = useSearchParams();
-		const reportId = search.get('reportId');
-		console.log('id:', reportId);
 
 		useImperativeHandle(ref, () => ({
 			submit: () => {
@@ -59,8 +57,8 @@ export const CreateConstructionForm = memoize(
 		}));
 
 		useEffect(() => {
-			if (!reportId) return;
-			from(getReportById({ id: reportId }))
+			if (!search.get('reportId')) return;
+			from(getReportById({ id: search.get('reportId')! }))
 				.pipe(
 					catchError((error) => {
 						console.log(error);
@@ -79,7 +77,7 @@ export const CreateConstructionForm = memoize(
 						{ label: secondRoom, value: secondRoom },
 					]);
 				});
-		}, [reportId, setValue]);
+		}, [search, setValue]);
 
 		useEffect(() => {
 			if (length && width) {
@@ -118,7 +116,7 @@ export const CreateConstructionForm = memoize(
 		useEffect(() => {
 			handleGetConstructionData();
 		}, []);
-
+		console.log(window.location.href);
 		return (
 			<div className="flex flex-col border-b">
 				<FormProvider {...form}>
