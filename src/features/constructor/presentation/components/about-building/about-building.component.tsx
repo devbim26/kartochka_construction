@@ -18,6 +18,7 @@ import { createReport } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
 import { ReportCategory, type AboutBuildingData } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
+import type { CategoryClass } from '@features/guidbooks';
 import {
 	convertToClientRequirementTableData,
 	Country,
@@ -25,7 +26,7 @@ import {
 	Guidebooks,
 	RuConstructionTypeSelectValues,
 } from '@features/guidbooks';
-import type { Requirement } from '@features/guidbooks/types';
+import type { BuildingType, Requirement } from '@features/guidbooks/types';
 import {
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
@@ -49,10 +50,11 @@ export const AboutBuilding = memoize(() => {
 	const navigate = useAppNavigate();
 	const [requirementData, setRequirementData] = useState<Array<Requirement>>([]);
 
-	const [selectedRegion, selectedPurpose, selectedType] = watch([
+	const [selectedRegion, selectedPurpose, selectedType, selectedClass] = watch([
 		'region',
 		'buildingPurpose',
 		'buildingType',
+		'comfortClass',
 	]);
 
 	const filteredRequirements = convertToRequirementSelectValues(
@@ -100,18 +102,22 @@ export const AboutBuilding = memoize(() => {
 			});
 	};
 
-	const handleGetRequirementData = () => {
+	const handleGetRequirementData = (
+		buildingType?: BuildingType,
+		countryType?: Country,
+		categoryClass?: CategoryClass,
+	) => {
 		from(
 			getGuidebooksPaginated({
 				data: {
-					countryType: null,
-					buildingType: null,
+					countryType: countryType || null,
+					buildingType: buildingType || null,
 					firstPlacementRoomName: null,
 					secondPlacementRoomName: null,
 					standartShortName: null,
 					standartFullName: null,
 					standartValidityPeriod: null,
-					class: null,
+					class: categoryClass || null,
 				},
 				guidebookType: Guidebooks.REQUIREMENT,
 				pagination: { pageNumber: 1, pageSize: 99999 },
@@ -136,8 +142,12 @@ export const AboutBuilding = memoize(() => {
 	};
 
 	useEffect(() => {
-		handleGetRequirementData();
-	}, []);
+		handleGetRequirementData(
+			selectedType as BuildingType,
+			selectedRegion as Country,
+			selectedClass as CategoryClass,
+		);
+	}, [selectedRegion, selectedType, selectedClass]);
 
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
