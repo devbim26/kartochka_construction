@@ -6,12 +6,12 @@ import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/conv
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
 	Guidebooks,
-	MaterialsAddAndEditData,
-	MaterialTypesSelectValuesEnum,
 	MaterialTypesSelectValuesMap,
-	UserMaterials,
+	type MaterialsAddAndEditData,
 	type MaterialsFilterData,
 	type MaterialTypeEnum,
+	type MaterialTypesSelectValuesEnum,
+	type UserMaterials,
 } from '@features/guidbooks/types';
 import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';

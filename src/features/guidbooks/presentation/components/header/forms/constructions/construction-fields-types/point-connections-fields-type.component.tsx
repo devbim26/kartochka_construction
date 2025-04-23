@@ -1,6 +1,6 @@
 import { Input } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { ConstructionFieldTypesProps } from '@features/guidbooks/types';
+import type { ConstructionFieldTypesProps } from '@features/guidbooks/types';
 import { twMerge } from 'tailwind-merge';
 
 export const PointConnectionsFieldsType = memoize(

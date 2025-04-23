@@ -12,9 +12,9 @@ import { CreateConstructionConfig } from '@features/constructor/utils';
 import { convertToClientConstructionsAddData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
-	ConstructionsAddData,
 	Guidebooks,
 	RuConstructionTypeSelectValues,
+	type ConstructionsAddData,
 } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { AxiosResponse } from 'axios';

@@ -12,7 +12,11 @@ import {
 	ZPanelMaterialType,
 } from '@features';
 import { ConstructionFieldsMap } from '@features/guidbooks/constants';
-import { ConstructionTypeProps, MaterialTypesSelectValuesEnum, UserMaterials } from '@features/guidbooks/types';
+import {
+	MaterialTypesSelectValuesEnum,
+	type ConstructionTypeProps,
+	type UserMaterials,
+} from '@features/guidbooks/types';
 
 import { useEffect, useState } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
@@ -194,7 +198,6 @@ export const HeavyMultiLayerWallSoundproofBothSideComponent = ({
 										materialTypesSelectValues={
 											MaterialTypesSelectValuesEnum.Soundproofing
 										}
-										
 									/>
 									{ConstructionFieldsMap({
 										currentForm: currentForm,

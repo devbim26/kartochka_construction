@@ -3,9 +3,9 @@ import { DeleteIcon } from '@core';
 import { ConstructionLayer } from '@features';
 import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import {
-	ConstructionTypeProps,
 	MaterialTypesSelectValuesEnum,
-	UserMaterials,
+	type ConstructionTypeProps,
+	type UserMaterials,
 } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';

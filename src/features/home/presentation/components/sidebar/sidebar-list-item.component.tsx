@@ -1,4 +1,4 @@
-import { SidebarItemProps } from '@features/home/types';
+import type { SidebarItemProps } from '@features/home/types';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 

@@ -67,4 +67,4 @@ const DesigningScreen = () => {
 	);
 };
 
-export default DesigningScreen
+export default DesigningScreen;

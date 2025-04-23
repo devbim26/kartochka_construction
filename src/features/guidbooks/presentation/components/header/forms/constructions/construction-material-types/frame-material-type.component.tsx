@@ -4,9 +4,9 @@ import { memoize } from '@core/utils/hoc/memo.utils';
 import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
-	ConstructionMaterialTypesProps,
 	Guidebooks,
 	MaterialTypeEnum,
+	type ConstructionMaterialTypesProps,
 	type MaterialsFilterData,
 } from '@features/guidbooks/types';
 import type { AxiosResponse } from 'axios';

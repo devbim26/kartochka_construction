@@ -14,7 +14,7 @@ import {
 	HeavySingleLayerWallSoundproofingOneSideComponent,
 } from '@features';
 import { ConstructionTypeEnum, MaterialTypeEnum } from '@features/guidbooks/types';
-import { JSX } from 'react';
+import type { JSX } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 
 interface ConstructionTypeMapProps {

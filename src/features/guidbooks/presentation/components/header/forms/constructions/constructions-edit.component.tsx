@@ -14,13 +14,13 @@ import {
 import { convertToClientIssuerData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
-	ConstructionTypeEnum,
 	Guidebooks,
 	RuConstructionTypesSelectValues,
 	RuCountryNamesSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	type ConstructionsEditData,
+	type ConstructionTypeEnum,
 	type Issuer,
 } from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';

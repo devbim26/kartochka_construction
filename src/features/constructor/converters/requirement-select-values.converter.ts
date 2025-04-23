@@ -1,4 +1,4 @@
-import { Requirement } from '@features/guidbooks/types';
+import type { Requirement } from '@features/guidbooks/types';
 
 export const convertToRequirementSelectValues = (data?: Array<Requirement>) => {
 	if (!data) return [];

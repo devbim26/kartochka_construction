@@ -14,10 +14,10 @@ import {
 } from '@features';
 import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import {
-	ConstructionTypeProps,
 	MaterialTypesSelectValuesEnum,
-	UserMaterials,
+	type ConstructionTypeProps,
 	type MaterialTypeEnum,
+	type UserMaterials,
 } from '@features/guidbooks/types';
 
 import { useEffect, useState } from 'react';
