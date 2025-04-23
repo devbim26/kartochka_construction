@@ -150,3 +150,5 @@ export const FloorPlans = memoize(() => {
 		</div>
 	);
 }, 'FloorPlans');
+
+export default FloorPlans;
