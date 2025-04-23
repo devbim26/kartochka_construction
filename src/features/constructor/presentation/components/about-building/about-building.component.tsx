@@ -21,16 +21,17 @@ import {
 	type AboutBuildingData,
 } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
-import type { CategoryClass } from '@features/guidbooks';
-import { Country, Guidebooks } from '@features/guidbooks';
 import { convertToClientRequirementTableData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
-import type { BuildingType, Requirement } from '@features/guidbooks/types';
+import type { BuildingType, CategoryClass, Requirement } from '@features/guidbooks/types';
 import {
+	Country,
+	Guidebooks,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';

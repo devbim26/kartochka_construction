@@ -1,5 +1,6 @@
 import { Button, DeleteIcon, DeleteModal } from '@core';
-import { memoize, useAppNavigate } from '@core/utils';
+import { useAppNavigate } from '@core/utils';
+import { memoize } from '@core/utils/hoc/memo.utils';
 import { getReportFloorById, getReportSingleById } from '@features/constructor/services';
 import * as pdfjs from 'pdfjs-dist';
 import { useEffect, useState } from 'react';
@@ -148,6 +149,4 @@ export const FloorPlans = memoize(() => {
 			<ConstructionSheets />
 		</div>
 	);
-};
-
-export default FloorPlansScreen;
+}, 'FloorPlans');
