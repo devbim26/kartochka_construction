@@ -1,12 +1,11 @@
 import { Input, Select } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
 import type { RequirementFilter } from '@features/guidbooks/types';
 import { RuCountryNamesMap, RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { RuBuildingTypeSelectValues } from '@features/guidbooks/types/building.types';
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
-export const RequirementsFilter = memoize(() => {
+export const RequirementsFilter = () => {
 	const form = useFormContext<RequirementFilter>();
 	const { formState, setValue, getValues } = form;
 
@@ -75,4 +74,4 @@ export const RequirementsFilter = memoize(() => {
 			/>
 		</>
 	);
-}, 'RequirementsFilter');
+};
