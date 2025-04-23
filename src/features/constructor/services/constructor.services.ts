@@ -11,6 +11,9 @@ type GetReportByIdParams = {
 export const createReport = async ({ data }: ReportCreateProps) => {
 	return await fetchApi.api.reportInfoCreate(data);
 };
-export const getReportById = async ({ id }: GetReportByIdParams) => {
+export const getReportSingleById = async ({ id }: GetReportByIdParams) => {
 	return await fetchApi.api.reportInfoSingleDetail(id);
+};
+export const getReportFloorById = async ({ id }: GetReportByIdParams) => {
+	return await fetchApi.api.reportInfoFloorDetail(id);
 };

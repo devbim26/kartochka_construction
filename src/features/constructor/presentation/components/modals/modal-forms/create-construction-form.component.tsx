@@ -6,7 +6,7 @@ import {
 	useAppDispatch,
 } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { getReportById } from '@features/constructor/services';
+import { getReportSingleById } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { CreateConstructionConfig } from '@features/constructor/utils';
@@ -58,7 +58,7 @@ export const CreateConstructionForm = memoize(
 
 		useEffect(() => {
 			if (!search.get('reportId')) return;
-			from(getReportById({ id: search.get('reportId')! }))
+			from(getReportSingleById({ id: search.get('reportId')! }))
 				.pipe(
 					catchError((error) => {
 						console.log(error);
