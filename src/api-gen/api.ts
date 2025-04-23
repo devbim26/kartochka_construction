@@ -60,6 +60,13 @@ export enum CategoryClass {
 	C = 'C',
 }
 
+export interface Construction {
+	/** @format uuid */
+	id?: string;
+	constructionPosition?: ConstructionPosition;
+	userMaterials?: UserMaterial[] | null;
+}
+
 export interface ConstructionBase {
 	constructions?: ConstructionTemplate[] | null;
 }
@@ -72,6 +79,36 @@ export enum ConstructionClass {
 export interface ConstructionDto {
 	constructionPosition?: ConstructionPosition;
 	userMaterials?: UserMaterialDto[] | null;
+}
+
+export interface ConstructionHeader {
+	/** @format uuid */
+	id?: string;
+	/** @format int64 */
+	publicId?: number;
+	name?: string | null;
+	description?: string | null;
+	priority?: Priority;
+	countries?: Country[] | null;
+	descriptionSource?: string | null;
+	notation?: string | null;
+	/** @format uuid */
+	issuerId?: string;
+	issuer?: Issuer;
+	/** @format double */
+	maxHeight?: number;
+	fireResistance?: string | null;
+	propertySource?: string | null;
+	rTotals?: RTotal[] | null;
+	index?: IndexType;
+	/** @format float */
+	indexValue?: number;
+	laboratoryTestSource?: string | null;
+	generalConstructionParametrs?: GeneralConstructionParametrs;
+	/** @format uuid */
+	generalConstructionParametrsId?: string;
+	constructionType?: ConstructionType;
+	isReportConstruction?: boolean;
 }
 
 export interface ConstructionHeaderDto {
@@ -100,6 +137,7 @@ export interface ConstructionHeaderDto {
 	rw?: number;
 	/** @format double */
 	computingIndexValue?: number;
+	isReportConstruction?: boolean;
 }
 
 export enum ConstructionPosition {
@@ -111,6 +149,17 @@ export enum ConstructionPosition {
 export interface ConstructionTemplate {
 	constructionPosition?: ConstructionPosition;
 	materialTypes?: MaterialType[] | null;
+}
+
+export interface ConstructionType {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	shortName?: string | null;
+	constructionTypeEnum?: ConstructionTypeEnum;
+	constructions?: Construction[] | null;
+	/** @format uuid */
+	constructionHeaderId?: string;
 }
 
 export interface ConstructionTypeDto {
@@ -139,6 +188,13 @@ export interface ConstructionTypeTemplate {
 	shortName?: string | null;
 	constructionTypeEnum?: ConstructionTypeEnum;
 	constructionBase?: ConstructionBase;
+}
+
+export interface Coordinates {
+	/** @format int32 */
+	x?: number;
+	/** @format int32 */
+	y?: number;
 }
 
 export interface Country {
@@ -222,6 +278,50 @@ export interface CreateConstructionTypeDto {
 	constructions?: CreateConstructionDto[] | null;
 }
 
+export interface CreateFloorInfoDto {
+	reportConstructionHeader?: CreateReportConstructionDto;
+	/** @format binary */
+	documentImage?: File | null;
+	coordinates?: Coordinates;
+	/** @format int32 */
+	page?: number;
+	/** @format binary */
+	floorDocument?: File | null;
+	floorNumber?: string | null;
+}
+
+export interface CreateGraphCommand {
+	/** @format uuid */
+	constructionHeaderId?: string;
+}
+
+export interface CreateReportConstructionDto {
+	/** @format uuid */
+	id?: string | null;
+	/** @format uuid */
+	constructionHeaderId?: string;
+	/** @format double */
+	square?: number;
+	/** @format uuid */
+	secondPlacementRoomId?: string;
+	/** @format uuid */
+	firstPlacementRoomId?: string;
+}
+
+export interface CreateReportInfoCommand {
+	buildingName?: string | null;
+	requirementIds?: string[] | null;
+	category?: ReportCategory;
+}
+
+export interface CreateReportInfoDto {
+	/** @format uuid */
+	id?: string;
+	buildingName?: string | null;
+	requirements?: Requirement[] | null;
+	category?: ReportCategory;
+}
+
 export interface CreateRequirementCommand {
 	/** @format uuid */
 	secondPlacementRoomId?: string;
@@ -270,9 +370,84 @@ export interface DeleteMaterialCommand {
 	id?: string;
 }
 
+export interface DeleteReportInfoCommand {
+	/** @format uuid */
+	id?: string;
+}
+
 export interface DeleteRequirementCommand {
 	/** @format uuid */
 	id?: string;
+}
+
+export interface Dot {
+	/** @format double */
+	r?: number;
+	/** @format double */
+	f?: number;
+}
+
+export interface DotR {
+	/** @format uuid */
+	id?: string;
+	dot?: Dot;
+	/** @format uuid */
+	generalConstructionParametrsId?: string;
+	generalConstructionParametrs?: GeneralConstructionParametrs;
+}
+
+export interface FinalizeReportInfoCommand {
+	/** @format uuid */
+	reportInfoId?: string;
+	customerName?: string | null;
+	objectDescription?: string | null;
+	creatorFullName?: string | null;
+	code?: string | null;
+	country?: string | null;
+	director?: string | null;
+	/** @format date */
+	date?: string;
+	logoUrl?: string | null;
+}
+
+export interface FloorConstructionInfo {
+	/** @format uuid */
+	id?: string;
+	/** @format uuid */
+	reportInfoId?: string;
+	reportInfo?: ReportInfo;
+	reportFloorInfos?: ReportFloorInfo[] | null;
+	floorNumber?: string | null;
+	floorDocumentUrl?: string | null;
+}
+
+export interface GeneralConstructionParametrs {
+	/** @format uuid */
+	id?: string;
+	/** @format double */
+	density?: number;
+	/** @format double */
+	thickness?: number;
+	/** @format double */
+	surfaceDencity?: number;
+	/** @format double */
+	equivalentSurfaceDensity?: number;
+	/** @format double */
+	delta?: number;
+	/** @format double */
+	c?: number;
+	/** @format double */
+	ctr?: number;
+	/** @format double */
+	computingRw?: number;
+	/** @format double */
+	labRw?: number;
+	dotRs?: DotR[] | null;
+	dotC?: Dot;
+	dotB?: Dot;
+	/** @format uuid */
+	constructionHeaderId?: string;
+	constructionHeader?: ConstructionHeader;
 }
 
 export interface GetArticlesWithPaginationParamsQuery {
@@ -299,6 +474,12 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	shortName?: string | null;
 	constructionType?: ConstructionTypeEnum;
 	countryType?: CountryType;
+	isReportConstruction?: boolean | null;
+}
+
+export interface GetConstructionHeadersByRequirementQuery {
+	/** @format uuid */
+	requirementId?: string;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -394,6 +575,41 @@ export interface IssuerDtoPaginatedList {
 	pageSize?: number;
 	hasPreviousPage?: boolean;
 	hasNextPage?: boolean;
+}
+
+export interface Material {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	shortName?: string | null;
+	description?: string | null;
+	/** @format float */
+	density?: number;
+	/** @format float */
+	thickness?: number;
+	materialType?: MaterialType;
+	/** @format uuid */
+	materialTypeId?: string;
+	type?: MaterialOriginType;
+	countries?: Country[] | null;
+	issuer?: Issuer;
+	/** @format uuid */
+	issuerId?: string | null;
+	imageUrl?: string | null;
+	/** @format float */
+	materialCoefficient?: number;
+	/** @format float */
+	velocity?: number;
+	/** @format float */
+	lossFactor?: number;
+	/** @format float */
+	youngModulus?: number;
+	/** @format float */
+	damping?: number;
+	/** @format float */
+	solid?: number;
+	/** @format int64 */
+	publicId?: number;
 }
 
 export interface MaterialDto {
@@ -601,6 +817,12 @@ export interface PasswordGrantFlow {
 	password: string | null;
 }
 
+export interface PlacementRoom {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+}
+
 export interface PlacementRoomDto {
 	/** @format uuid */
 	id?: string;
@@ -619,6 +841,160 @@ export enum Priority {
 	Eight = 'Eight',
 	Nine = 'Nine',
 	Ten = 'Ten',
+}
+
+export enum PurposeBuilding {
+	LargePanelBuilding = 'LargePanelBuilding',
+	FramePanelBuilding = 'FramePanelBuilding',
+}
+
+export interface RTotal {
+	/** @format uuid */
+	id?: string;
+	/** @format double */
+	value?: number;
+	/** @format int32 */
+	index?: number;
+	constructionHeader?: ConstructionHeader;
+	/** @format uuid */
+	constructionHeaderId?: string;
+}
+
+export enum ReportCategory {
+	Floor = 'Floor',
+	Single = 'Single',
+}
+
+export interface ReportConstruction {
+	/** @format uuid */
+	id?: string;
+	/** @format uuid */
+	constructionHeaderId?: string;
+	constructionHeader?: ConstructionHeader;
+	firstPlacementRoom?: PlacementRoom;
+	secondPlacementRoom?: PlacementRoom;
+	/** @format uuid */
+	secondPlacementRoomId?: string;
+	/** @format uuid */
+	firstPlacementRoomId?: string;
+	/** @format double */
+	square?: number;
+}
+
+export interface ReportConstructionDto {
+	/** @format uuid */
+	id?: string;
+	/** @format uuid */
+	constructionHeaderId?: string;
+	constructionHeader?: ConstructionHeaderDto;
+	/** @format double */
+	square?: number;
+	secondPlacementRoom?: PlacementRoomDto;
+	firstPlacementRoom?: PlacementRoomDto;
+}
+
+export interface ReportDocumentInfo {
+	/** @format uuid */
+	id?: string;
+	/** @format uuid */
+	reportInfoId?: string;
+	reportInfo?: ReportInfo;
+	reportId?: string | null;
+	customerName?: string | null;
+	objectDescription?: string | null;
+	creatorFullName?: string | null;
+	code?: string | null;
+	country?: string | null;
+	director?: string | null;
+	/** @format date */
+	date?: string;
+	logoUrl?: string | null;
+}
+
+export interface ReportDocumentInfoDto {
+	/** @format uuid */
+	reportInfoId?: string;
+	customerName?: string | null;
+	objectDescription?: string | null;
+	creatorFullName?: string | null;
+	code?: string | null;
+	country?: string | null;
+	director?: string | null;
+	/** @format date */
+	date?: string;
+	logoUrl?: string | null;
+}
+
+export interface ReportFloorInfo {
+	/** @format uuid */
+	id?: string;
+	/** @format uuid */
+	floorConstructionInfoId?: string;
+	floorConstructionInfo?: FloorConstructionInfo;
+	/** @format uuid */
+	reportConstructionHeaderId?: string;
+	reportConstructionHeader?: ReportConstruction;
+	documentImageUrl?: string | null;
+	coordinates?: Coordinates;
+	/** @format int32 */
+	page?: number;
+}
+
+export interface ReportInfo {
+	/** @format uuid */
+	id?: string;
+	buildingName?: string | null;
+	requirements?: Requirement[] | null;
+	category?: ReportCategory;
+	reportDocumentInfo?: ReportDocumentInfo;
+	status?: ReportInfoStatus;
+	purposeBuilding?: PurposeBuilding;
+}
+
+export interface ReportInfoFloorConstructionDto {
+	floorConstructionInfos?: FloorConstructionInfo[] | null;
+	buildingName?: string | null;
+	requirements?: RequirementDto[] | null;
+	category?: ReportCategory;
+	reportDocumentInfo?: ReportDocumentInfoDto;
+	status?: ReportInfoStatus;
+}
+
+export interface ReportInfoSingleConstructionDto {
+	/** @format uuid */
+	id?: string;
+	singleConstructionInfos?: SingleConstructionInfoDto[] | null;
+	buildingName?: string | null;
+	requirements?: RequirementDto[] | null;
+	category?: ReportCategory;
+	reportDocumentInfo?: ReportDocumentInfoDto;
+	status?: ReportInfoStatus;
+	purposeBuilding?: PurposeBuilding;
+}
+
+export enum ReportInfoStatus {
+	InProgress = 'InProgress',
+	Completed = 'Completed',
+}
+
+export interface Requirement {
+	/** @format uuid */
+	id?: string;
+	secondPlacementRoom?: PlacementRoom;
+	firstPlacementRoom?: PlacementRoom;
+	buildingType?: BuildingType;
+	standartShortName?: string | null;
+	standartFullName?: string | null;
+	country?: Country;
+	/** @format date */
+	standartValidityPeriod?: string;
+	class?: CategoryClass;
+	/** @format float */
+	noizeIsolationIndex?: number;
+	/** @format float */
+	noizeImpactIndex?: number | null;
+	notice?: string | null;
+	constructionClass?: ConstructionClass;
 }
 
 export interface RequirementDto {
@@ -659,6 +1035,10 @@ export interface SendSmsCommand {
 	phoneNumber: string | null;
 }
 
+export interface SingleConstructionInfoDto {
+	reportConstructionHeader?: ReportConstructionDto;
+}
+
 export enum SortOrder {
 	Asc = 'Asc',
 	Desc = 'Desc',
@@ -687,6 +1067,20 @@ export interface UpdateConstructionHeaderCommand {
 	constructionType?: CreateConstructionTypeDto;
 }
 
+export interface UpdateReportInfoWithFloorConstructionCommand {
+	/** @format uuid */
+	reportFloorInfoId?: string | null;
+	/** @format uuid */
+	reportInfoId?: string;
+	reportFloorInfo?: CreateFloorInfoDto;
+}
+
+export interface UpdateReportInfoWithSingleConstructionCommand {
+	/** @format uuid */
+	reportInfoId?: string;
+	reportConstruction?: CreateReportConstructionDto;
+}
+
 export interface UpdateRequirementCommand {
 	/** @format uuid */
 	id?: string;
@@ -707,6 +1101,17 @@ export interface UpdateRequirementCommand {
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
+}
+
+export interface UserMaterial {
+	/** @format uuid */
+	id?: string;
+	material?: Material;
+	/** @format uuid */
+	materialId?: string;
+	/** @format int32 */
+	positionId?: number;
+	materialTypeValue?: MaterialTypeValue[] | null;
 }
 
 export interface UserMaterialDto {
@@ -1211,6 +1616,41 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags Construction
+		 * @name ConstructionGetConstructionsByRequirementCreate
+		 * @request POST:/api/Construction/getConstructionsByRequirement
+		 */
+		constructionGetConstructionsByRequirementCreate: (
+			data: GetConstructionHeadersByRequirementQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/Construction/getConstructionsByRequirement`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Graph
+		 * @name GraphCreate
+		 * @request POST:/api/Graph
+		 */
+		graphCreate: (data: CreateGraphCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Graph`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags Issuer
 		 * @name IssuerDetail
 		 * @request GET:/api/Issuer/{id}
@@ -1515,6 +1955,69 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoCreate
+		 * @request POST:/api/ReportInfo
+		 */
+		reportInfoCreate: (data: CreateReportInfoCommand, params: RequestParams = {}) =>
+			this.request<CreateReportInfoDto, any>({
+				path: `/api/ReportInfo`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoDelete
+		 * @request DELETE:/api/ReportInfo
+		 */
+		reportInfoDelete: (data: DeleteReportInfoCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/ReportInfo`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoSingleDetail
+		 * @request GET:/api/ReportInfo/{id}/single
+		 */
+		reportInfoSingleDetail: (id: string, params: RequestParams = {}) =>
+			this.request<ReportInfoSingleConstructionDto, any>({
+				path: `/api/ReportInfo/${id}/single`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoFloorDetail
+		 * @request GET:/api/ReportInfo/{id}/floor
+		 */
+		reportInfoFloorDetail: (id: string, params: RequestParams = {}) =>
+			this.request<ReportInfoFloorConstructionDto, any>({
+				path: `/api/ReportInfo/${id}/floor`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags Requirement
 		 * @name RequirementDetail
 		 * @request GET:/api/Requirement/{id}
@@ -1624,6 +2127,65 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<void, any>({
 				path: `/api/Sms/approve`,
 				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+	};
+	single = {
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name SingleUpdate
+		 * @request PUT:/single
+		 */
+		singleUpdate: (
+			data: UpdateReportInfoWithSingleConstructionCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<ReportInfoSingleConstructionDto, any>({
+				path: `/single`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+	};
+	floor = {
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name FloorUpdate
+		 * @request PUT:/floor
+		 */
+		floorUpdate: (
+			data: UpdateReportInfoWithFloorConstructionCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<ReportInfoFloorConstructionDto, any>({
+				path: `/floor`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+	};
+	documentInfo = {
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name DocumentInfoUpdate
+		 * @request PUT:/documentInfo
+		 */
+		documentInfoUpdate: (data: FinalizeReportInfoCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/documentInfo`,
+				method: 'PUT',
 				body: data,
 				type: ContentType.Json,
 				...params,

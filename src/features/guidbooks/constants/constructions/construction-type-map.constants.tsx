@@ -14,6 +14,7 @@ import {
 	HeavySingleLayerWallSoundproofingOneSideComponent,
 } from '@features';
 import { ConstructionTypeEnum, MaterialTypeEnum } from '@features/guidbooks/types';
+import { JSX } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 
 interface ConstructionTypeMapProps {
@@ -27,7 +28,18 @@ export const ConstructionTypeMap = ({
 }: ConstructionTypeMapProps) => {
 	const { setValue } = currentForm;
 
-	const typeMap = {
+	const typeMap: Record<
+		ConstructionTypeEnum,
+		{
+			component: JSX.Element;
+			action: () => void;
+		}
+	> = {
+		//TODO
+		[ConstructionTypeEnum.HeavySingleWallFacing]: {
+			component: <></>,
+			action: () => {},
+		},
 		[ConstructionTypeEnum.HeavySingleLayerWall]: {
 			component: <HeavySingleLayerWallComponent currentForm={currentForm} />,
 			action: () => {

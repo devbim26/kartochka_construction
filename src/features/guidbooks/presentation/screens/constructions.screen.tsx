@@ -3,7 +3,6 @@ import {
 	DeleteIcon,
 	DeleteModal,
 	EditIcon,
-	memoize,
 	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
@@ -55,7 +54,7 @@ import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 
-const ConstructionsScreen = memoize(() => {
+const ConstructionsScreen = () => {
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const [singleMaterial, setSingleMaterial] = useState<ConstructionsEditData>();
@@ -364,6 +363,6 @@ const ConstructionsScreen = memoize(() => {
 			</DeleteModal>
 		</div>
 	);
-}, 'ConstructionsScreen');
+};
 
 export default ConstructionsScreen;

@@ -1,5 +1,5 @@
 import { Button, DeleteIcon, DeleteModal, useAppSelector } from '@core';
-import { memoize, useAppNavigate } from '@core/utils';
+import { useAppNavigate } from '@core/utils';
 import * as pdfjs from 'pdfjs-dist';
 import { useState } from 'react';
 import { FaPlus } from 'react-icons/fa6';
@@ -16,7 +16,7 @@ import {
 import { ConstructionSheets } from './constructions-sheet.component';
 import { FloorPlanViewer } from './floor-plan-viewer.component';
 
-export const FloorPlans = memoize(() => {
+const FloorPlansScreen = () => {
 	const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -147,4 +147,6 @@ export const FloorPlans = memoize(() => {
 			<ConstructionSheets />
 		</div>
 	);
-}, 'FloorPlans');
+};
+
+export default FloorPlansScreen;

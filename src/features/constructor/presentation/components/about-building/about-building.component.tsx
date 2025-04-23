@@ -8,23 +8,20 @@ import {
 	useAppDispatch,
 	useAppNavigate,
 } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { convertToRequirementSelectValues } from '@features/constructor/converters';
 import { constructorSlice } from '@features/constructor/store';
 import type { AboutBuildingData } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
-import {
-	convertToClientRequirementTableData,
-	Country,
-	getGuidebooksPaginated,
-	Guidebooks,
-	RuConstructionTypeSelectValues,
-} from '@features/guidbooks';
+import { convertToClientRequirementTableData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import type { Requirement } from '@features/guidbooks/types';
 import {
+	Country,
+	Guidebooks,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
+	RuConstructionTypeSelectValues,
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,7 +31,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
-export const AboutBuilding = memoize(() => {
+const AboutBuildingScreen = () => {
 	const form = useForm<AboutBuildingData>({
 		defaultValues: AboutBuildingConfig.defaultValues,
 		resolver: zodResolver(AboutBuildingConfig.schema),
@@ -322,4 +319,6 @@ export const AboutBuilding = memoize(() => {
 			</div>
 		</div>
 	);
-}, 'AboutBuildingForm');
+};
+
+export default AboutBuildingScreen;

@@ -31,6 +31,8 @@ export const ConstructionTypeShema = z.object({
 	constructions: z.array(subConstructionSchema).optional().nullable(),
 });
 
+export type ConstructionTypeSchemaType = z.infer<typeof ConstructionTypeShema>;
+
 export const ConstructionsAddSchema = z.object({
 	id: z.string().optional(),
 	name: z.string().optional().nullable(),

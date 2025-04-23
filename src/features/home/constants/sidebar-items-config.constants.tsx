@@ -25,6 +25,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 				label: 'Конструктор',
 				icon: RiPencilRulerLine,
 				path: DESIGNING_ROUTES.constructor.route,
+				isMutltiPathItem: true,
 			},
 		},
 		{

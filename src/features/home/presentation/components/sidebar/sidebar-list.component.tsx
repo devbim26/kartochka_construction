@@ -1,10 +1,9 @@
-import { memoize } from '@core/utils/hoc/memo.utils';
 import type { SidebarListProps } from '@features/home/types';
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { twMerge } from 'tailwind-merge';
 
-export const SidebarList = memoize((props: SidebarListProps) => {
+export const SidebarList = (props: SidebarListProps) => {
 	const [showSubItems, setShowSubItems] = useState<boolean>(
 		(props.currentPath || '').includes(props.path),
 	);
@@ -29,4 +28,4 @@ export const SidebarList = memoize((props: SidebarListProps) => {
 			<div className="flex flex-col">{showSubItems && props.children}</div>
 		</div>
 	);
-}, 'SidebarList');
+};

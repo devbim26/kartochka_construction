@@ -9,26 +9,25 @@ const constructionTypeEnumMap = createDataRecordConverter({
 		ServerConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 	[ClientConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]:
 		ServerConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
-	[ClientConstructionTypeEnum.HeavySingleLayerWallZPanelOneSide]:
+	[ClientConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide]:
 		ServerConstructionTypeEnum.HeavySingleLayerWallZPanelOneSide,
-	[ClientConstructionTypeEnum.HeavySingleLayerWallZPanelBothSide]:
+	[ClientConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]:
 		ServerConstructionTypeEnum.HeavySingleLayerWallZPanelBothSide,
-	[ClientConstructionTypeEnum.HeavyMultipleLayerWall]:
+	[ClientConstructionTypeEnum.HeavyMultiLayerWall]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWall,
-	[ClientConstructionTypeEnum.HeavyMultipleLayerWallFacingOneSide]:
+	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingOneSide,
-	[ClientConstructionTypeEnum.HeavyMultipleLayerWallFacingBothSide]:
+	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingBothSide,
-	[ClientConstructionTypeEnum.HeavyMultipleLayerWallZPanelOneSide]:
+	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallZPanelOneSide,
-	[ClientConstructionTypeEnum.HeavyMultipleLayerWallZPanelBothSide]:
+	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallZPanelBothSide,
-	[ClientConstructionTypeEnum.OneFramePartition]: ServerConstructionTypeEnum.OneFramePartition,
-	[ClientConstructionTypeEnum.TwoFramePartition]: ServerConstructionTypeEnum.TwoFramePartition,
+	[ClientConstructionTypeEnum.FramePartitionSingle]: ServerConstructionTypeEnum.OneFramePartition,
+	[ClientConstructionTypeEnum.FramePartitionDouble]: ServerConstructionTypeEnum.TwoFramePartition,
 	[ClientConstructionTypeEnum.HeavySingleWallFacing]:
 		ServerConstructionTypeEnum.HeavySingleWallFacing,
 });
-
 export const convertToServerConstructionTypeEnumData = (
 	type: ClientConstructionTypeEnum,
 ): ServerConstructionTypeEnum => {

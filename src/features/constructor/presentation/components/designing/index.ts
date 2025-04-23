@@ -1,1 +1,1 @@
-export * from './designing.component';
+export * from './disigning.lazy.component';

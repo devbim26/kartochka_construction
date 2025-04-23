@@ -12,7 +12,7 @@ import {
 } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
-import { DESIGNING_ROUTES } from '@features/home';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 

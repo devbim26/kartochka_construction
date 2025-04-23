@@ -5,7 +5,7 @@ import { AddConstructionConfig } from '@features/constructor/utils';
 import {
 	RuConstructionTypeSelectValues,
 	RuConstructionTypesSelectValues,
-} from '@features/guidbooks';
+} from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { forwardRef, useImperativeHandle } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';

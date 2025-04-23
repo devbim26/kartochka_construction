@@ -31,34 +31,38 @@ export interface UserMaterials {
 
 export enum ConstructionTypeEnum {
 	HeavySingleLayerWall = 'HeavySingleLayerWall',
-	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
+	HeavyMultiLayerWallFacingOneSide = 'HeavyMultiLayerWallFacingOneSide',
 	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
-	HeavySingleLayerWallZPanelOneSide = 'HeavySingleLayerWallZPanelOneSide',
-	HeavySingleLayerWallZPanelBothSide = 'HeavySingleLayerWallZPanelBothSide',
-	HeavyMultipleLayerWall = 'HeavyMultipleLayerWall',
-	HeavyMultipleLayerWallFacingOneSide = 'HeavyMultipleLayerWallFacingOneSide',
-	HeavyMultipleLayerWallFacingBothSide = 'HeavyMultipleLayerWallFacingBothSide',
-	HeavyMultipleLayerWallZPanelOneSide = 'HeavyMultipleLayerWallZPanelOneSide',
-	HeavyMultipleLayerWallZPanelBothSide = 'HeavyMultipleLayerWallZPanelBothSide',
-	OneFramePartition = 'OneFramePartition',
-	TwoFramePartition = 'TwoFramePartition',
+	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
+	HeavySingleLayerWallSoundproofingOneSide = 'HeavySingleLayerWallSoundproofingOneSide',
+	HeavySingleLayerWallSoundproofingBothSide = 'HeavySingleLayerWallSoundproofingBothSide',
+	HeavyMultiLayerWall = 'HeavyMultiLayerWall',
+	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLayerWallFacingBothSide',
+	HeavyMultiLayerWallSoundproofingOneSide = 'HeavyMultiLayerWallSoundproofingOneSide',
+	HeavyMultiLayerWallSoundproofingBothSide = 'HeavyMultiLayerWallSoundproofingBothSide',
+	FramePartitionSingle = 'FramePartitionSingle',
+	FramePartitionDouble = 'FramePartitionDouble',
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
 }
 
-export const RuConstructionTypesMap: Record<ConstructionTypeEnum, string> = {
+export const RuConstructionTypesMap = {
 	HeavySingleLayerWall: 'Тяжелая однослойная стена',
 	HeavySingleLayerWallFacingOneSide: 'Тяжелая однослойная стена + облицовка с одной стороны',
 	HeavySingleLayerWallFacingBothSide: 'Тяжелая однослойная стена + облицовка с двух сторон',
-	HeavySingleLayerWallZPanelOneSide: 'HeavySingleLayerWallZPanelOneSide',
-	HeavySingleLayerWallZPanelBothSide: 'HeavySingleLayerWallZPanelBothSide',
-	HeavyMultipleLayerWall: 'HeavyMultipleLayerWall',
-	HeavyMultipleLayerWallFacingOneSide: 'HeavyMultipleLayerWallFacingOneSide',
-	HeavyMultipleLayerWallFacingBothSide: 'HeavyMultipleLayerWallFacingBothSide',
-	HeavyMultipleLayerWallZPanelOneSide: 'HeavyMultipleLayerWallZPanelOneSide',
-	HeavyMultipleLayerWallZPanelBothSide: 'HeavyMultipleLayerWallZPanelBothSide',
-	OneFramePartition: 'OneFramePartition',
-	TwoFramePartition: 'TwoFramePartition',
-	HeavySingleWallFacing: 'HeavySingleWallFacing',
+	HeavySingleLayerWallSoundproofingOneSide:
+		'Тяжелая однослойная стена + звукоизоляционная панель с одной стороны',
+	HeavySingleLayerWallSoundproofingBothSide:
+		'Тяжелая однослойная стена + звукоизоляционная панель с двух сторон',
+	HeavyMultiLayerWall: 'Тяжелая многослойная стена',
+	HeavyMultiLayerWallFacingOneSide: 'Тяжелая многослойная стена + облицовка с одной стороны',
+	HeavyMultiLayerWallFacingBothSide: 'Тяжелая многослойная стена + облицовка с двух сторон',
+	HeavyMultiLayerWallSoundproofingOneSide:
+		'Тяжелая многослойная стена + звукоизоляционная панель с одной стороны',
+	HeavyMultiLayerWallSoundproofingBothSide:
+		'Тяжелая многослойная стена + звукоизоляционная панель с двух сторон',
+	FramePartitionSingle: 'Каркасная перегородка (1 каркас)',
+	FramePartitionDouble: 'Каркасная перегородка (2 каркаса)',
+	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
 };
 
 export const RuConstructionTypesSelectValues = [

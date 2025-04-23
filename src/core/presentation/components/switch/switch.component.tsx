@@ -1,4 +1,3 @@
-import { memoize } from '@core/utils';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -17,69 +16,66 @@ interface SwitchProps {
 	onChange: (isEnabled: boolean) => void;
 }
 
-export const Switch = memoize(
-	({
-		wrapperClassName,
-		handleClassName,
-		textClassName,
-		activeTextClassName = 'text-primary',
-		unactiveTextClassName = 'text-white',
-		onWrapperClassName = 'bg-primary',
-		offWrapperClassName = 'bg-gray-text',
-		onText,
-		offText,
-		onIcon,
-		offIcon,
-		onChange,
-	}: SwitchProps) => {
-		const [isEnabled, setIsEnabled] = useState(false);
+export const Switch = ({
+	wrapperClassName,
+	handleClassName,
+	textClassName,
+	activeTextClassName = 'text-primary',
+	unactiveTextClassName = 'text-white',
+	onWrapperClassName = 'bg-primary',
+	offWrapperClassName = 'bg-gray-text',
+	onText,
+	offText,
+	onIcon,
+	offIcon,
+	onChange,
+}: SwitchProps) => {
+	const [isEnabled, setIsEnabled] = useState(false);
 
-		const handleToggle = () => {
-			const newState = !isEnabled;
-			setIsEnabled(newState);
-			onChange(newState);
-		};
+	const handleToggle = () => {
+		const newState = !isEnabled;
+		setIsEnabled(newState);
+		onChange(newState);
+	};
 
-		return (
+	return (
+		<div
+			className={twMerge(
+				'relative flex h-[20px] w-[36px] cursor-pointer items-center rounded-full p-[2px] transition duration-300 ease-in-out',
+				isEnabled ? onWrapperClassName : offWrapperClassName,
+				wrapperClassName,
+			)}
+			onClick={handleToggle}
+		>
+			<span
+				className={twMerge(
+					'absolute right-0 z-50 flex w-1/2 items-center justify-center transition duration-300 ease-in-out',
+					textClassName,
+					onIcon && 'gap-[5px]',
+					isEnabled ? activeTextClassName : unactiveTextClassName,
+				)}
+			>
+				{onIcon}
+				{onText}
+			</span>
+			<span
+				className={twMerge(
+					'absolute z-50 flex w-1/2 items-center justify-center transition duration-300 ease-in-out',
+					textClassName,
+					offIcon && 'gap-[5px]',
+					!isEnabled ? activeTextClassName : unactiveTextClassName,
+				)}
+			>
+				{offIcon}
+				{offText}
+			</span>
 			<div
 				className={twMerge(
-					'relative flex h-[20px] w-[36px] cursor-pointer items-center rounded-full p-[2px] transition duration-300 ease-in-out',
-					isEnabled ? onWrapperClassName : offWrapperClassName,
-					wrapperClassName,
+					'flex h-full w-1/2 items-center justify-center rounded-full bg-white transition-transform duration-300 ease-in-out',
+					isEnabled ? 'translate-x-full' : 'translate-x-0',
+					handleClassName,
 				)}
-				onClick={handleToggle}
-			>
-				<span
-					className={twMerge(
-						'absolute right-0 z-50 flex w-1/2 items-center justify-center transition duration-300 ease-in-out',
-						textClassName,
-						onIcon && 'gap-[5px]',
-						isEnabled ? activeTextClassName : unactiveTextClassName,
-					)}
-				>
-					{onIcon}
-					{onText}
-				</span>
-				<span
-					className={twMerge(
-						'absolute z-50 flex w-1/2 items-center justify-center transition duration-300 ease-in-out',
-						textClassName,
-						offIcon && 'gap-[5px]',
-						!isEnabled ? activeTextClassName : unactiveTextClassName,
-					)}
-				>
-					{offIcon}
-					{offText}
-				</span>
-				<div
-					className={twMerge(
-						'flex h-full w-1/2 items-center justify-center rounded-full bg-white transition-transform duration-300 ease-in-out',
-						isEnabled ? 'translate-x-full' : 'translate-x-0',
-						handleClassName,
-					)}
-				></div>
-			</div>
-		);
-	},
-	'Switch',
-);
+			></div>
+		</div>
+	);
+};

@@ -1,9 +1,8 @@
-import { memoize } from '@core';
-import type { SidebarItemCommonProps } from '@features/home/types';
+import { SidebarItemProps } from '@features/home/types';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
-export const SidebarListItem = memoize((props: SidebarItemCommonProps) => {
+export const SidebarListItem = (props: SidebarItemProps) => {
 	return (
 		<Link to={props.path}>
 			<div
@@ -18,4 +17,4 @@ export const SidebarListItem = memoize((props: SidebarItemCommonProps) => {
 			</div>
 		</Link>
 	);
-}, 'SidebarListItem');
+};
