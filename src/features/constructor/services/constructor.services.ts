@@ -1,4 +1,8 @@
-import type { CreateReportInfoCommand } from '@api-gen';
+import type {
+	CreateReportInfoCommand,
+	UpdateReportInfoWithFloorConstructionCommand,
+	UpdateReportInfoWithSingleConstructionCommand,
+} from '@api-gen';
 import { fetchApi } from '@api-gen';
 
 type ReportCreateProps = {
@@ -6,6 +10,12 @@ type ReportCreateProps = {
 };
 type GetReportByIdParams = {
 	id: string;
+};
+type UpdateSingleReportProps = {
+	data: UpdateReportInfoWithSingleConstructionCommand;
+};
+type UpdateFloorReportProps = {
+	data: UpdateReportInfoWithFloorConstructionCommand;
 };
 
 export const createReport = async ({ data }: ReportCreateProps) => {
@@ -16,4 +26,10 @@ export const getReportSingleById = async ({ id }: GetReportByIdParams) => {
 };
 export const getReportFloorById = async ({ id }: GetReportByIdParams) => {
 	return await fetchApi.api.reportInfoFloorDetail(id);
+};
+export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {
+	return await fetchApi.single.singleUpdate(data);
+};
+export const updateReportFloor = async ({ data }: UpdateFloorReportProps) => {
+	return await fetchApi.floor.floorUpdate(data);
 };
