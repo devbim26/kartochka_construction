@@ -15,21 +15,23 @@ import { constructorSlice } from '@features/constructor/store';
 import type { AboutBuildingData } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
 import {
-	convertToClientRequirementData,
+	convertToClientRequirementTableData,
+	Country,
 	getGuidebooksPaginated,
 	Guidebooks,
 	RuConstructionTypeSelectValues,
 } from '@features/guidbooks';
-import type { FormRequirement } from '@features/guidbooks/types';
+import type { Requirement } from '@features/guidbooks/types';
 import {
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
-	RuCountryNamesMap,
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCallback, useEffect, useState } from 'react';
+import type { AxiosResponse } from 'axios';
+import { useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
 export const AboutBuilding = memoize(() => {
@@ -40,11 +42,13 @@ export const AboutBuilding = memoize(() => {
 	const { register, control, formState, watch } = form;
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
-	const [requirementData, setRequirementData] = useState<Array<FormRequirement>>([]);
+	const [requirementData, setRequirementData] = useState<Array<Requirement>>([]);
 
-	const selectedRegion = watch('region');
-	const selectedPurpose = watch('buildingPurpose');
-	const selectedType = watch('buildingType');
+	const [selectedRegion, selectedPurpose, selectedType] = watch([
+		'region',
+		'buildingPurpose',
+		'buildingType',
+	]);
 
 	const filteredRequirements = convertToRequirementSelectValues(
 		requirementData.filter(
@@ -64,9 +68,9 @@ export const AboutBuilding = memoize(() => {
 		navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`);
 	};
 
-	const handleGetRequirementData = useCallback(async () => {
-		try {
-			const response = await getGuidebooksPaginated({
+	const handleGetRequirementData = () => {
+		from(
+			getGuidebooksPaginated({
 				data: {
 					countryType: null,
 					buildingType: null,
@@ -79,18 +83,25 @@ export const AboutBuilding = memoize(() => {
 				},
 				guidebookType: Guidebooks.REQUIREMENT,
 				pagination: { pageNumber: 1, pageSize: 99999 },
-			});
-			console.log(response.data);
-			const resData = convertToPaginatedType(convertToClientRequirementData)(
-				response.data as any,
-			);
-			console.log(resData.items);
-
-			setRequirementData(resData.items);
-		} catch (error) {
-			console.log('Error:', error);
-		}
-	}, []);
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					const resData = convertToPaginatedType(convertToClientRequirementTableData)(
+						response.data,
+					);
+					return from([resData]);
+				}),
+				tap((resData) => {
+					setRequirementData(resData.items);
+				}),
+				catchError((error) => {
+					console.log('Error:', error);
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
 
 	useEffect(() => {
 		handleGetRequirementData();
@@ -120,23 +131,25 @@ export const AboutBuilding = memoize(() => {
 						/>
 						<Controller
 							control={control}
-							name={'region'}
+							name="region"
 							render={({ field }) => (
 								<Select
 									options={[
-										{
-											label: RuCountryNamesMap.None,
-											value: RuCountryNamesMap.None,
-										},
+										{ label: 'Нет', value: Country.None },
+										{ label: 'Беларусь', value: Country.Belarus },
+										{ label: 'Россия', value: Country.Russia },
 										...RuCountryNamesSelectValues.filter(
-											(reg) => reg.label !== RuCountryNamesMap.None,
+											(reg) =>
+												!['Беларусь', 'Россия', 'Нет'].includes(reg.label),
 										).sort((a, b) => a.label.localeCompare(b.label)),
 									]}
 									{...field}
 									value={field.value || ''}
-									label={formState.errors?.region?.message || 'Регион'}
+									onChange={(val) => field.onChange(val)}
+									label={formState.errors?.region?.message || 'Страна'}
 									error={formState.errors.region?.message}
 									isSearchable
+									highlightOnlyRussiaBelarus
 									labelClassName={twMerge(
 										'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 										formState.errors.region?.message ? 'text-error' : '',
@@ -166,22 +179,6 @@ export const AboutBuilding = memoize(() => {
 							<div className="flex gap-x-[12px]">
 								<Controller
 									control={control}
-									name="buildingPurpose"
-									render={({ field }) => (
-										<Select
-											options={RuConstructionTypeSelectValues}
-											{...field}
-											error={formState.errors.buildingPurpose?.message}
-											value={field.value || ''}
-											placeholder="Выберите назначение"
-											isSearchable
-											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-											wrapperClassname="shadow-none ring-input-border-primary"
-										/>
-									)}
-								/>
-								<Controller
-									control={control}
 									name="buildingType"
 									render={({ field }) => (
 										<Select
@@ -190,6 +187,22 @@ export const AboutBuilding = memoize(() => {
 											error={formState.errors.buildingType?.message}
 											value={field.value || ''}
 											placeholder="Выберите тип"
+											isSearchable
+											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+											wrapperClassname="shadow-none ring-input-border-primary"
+										/>
+									)}
+								/>
+								<Controller
+									control={control}
+									name="buildingPurpose"
+									render={({ field }) => (
+										<Select
+											options={RuConstructionTypeSelectValues}
+											{...field}
+											error={formState.errors.buildingPurpose?.message}
+											value={field.value || ''}
+											placeholder="Выберите назначение"
 											isSearchable
 											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 											wrapperClassname="shadow-none ring-input-border-primary"
