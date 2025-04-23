@@ -29,10 +29,11 @@
 	"scripts": {
 		"start": "npm run build && node test-build-server/index.js",
 		"dev": "cross-env NODE_ENV=development webpack serve --config webpack.config.js",
-		"build": " cross-env NODE_ENV=production webpack --config webpack.config.js",
+		"build": "cross-env NODE_ENV=production webpack --config webpack.config.js",
 		"format": "prettier --write ./src && eslint ./src",
-		"generate-api": "node ./tools/generate-api.js",
-		"eslint:debug": "eslint ./src --debug"
+		"generate:api": "node ./tools/generate-api.js",
+		"eslint:debug": "eslint ./src --debug",
+		"prod": "node ./tools/generate-api.js prettier --write ./src && eslint ./src cross-env NODE_ENV=production webpack --config webpack.config.js"
 	},
 	"browserslist": {
 		"production": [
@@ -72,6 +73,7 @@
 		"eslint-plugin-tailwindcss": "^3.18.0",
 		"express": "^4.21.2",
 		"file-loader": "^6.2.0",
+		"fork-ts-checker-webpack-plugin": "^9.1.0",
 		"globals": "^15.15.0",
 		"html-webpack-plugin": "^5.6.3",
 		"mini-css-extract-plugin": "^2.9.2",

@@ -148,4 +148,6 @@ export const FloorPlans = memoize(() => {
 			<ConstructionSheets />
 		</div>
 	);
-}, 'FloorPlans');
+};
+
+export default FloorPlansScreen;

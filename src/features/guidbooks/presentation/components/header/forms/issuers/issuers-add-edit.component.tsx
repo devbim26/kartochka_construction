@@ -1,11 +1,10 @@
 import { Button, CheckboxSelect, convertToBase64, FormElementLabel, Input } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
 import type { Issuer } from '@features/guidbooks/types';
 import { RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
-export const IssuersAddEdit = memoize(() => {
+export const IssuersAddEdit = () => {
 	const form = useFormContext<Issuer>();
 	const { setValue, register, control, formState, trigger, watch } = form;
 
@@ -129,4 +128,4 @@ export const IssuersAddEdit = memoize(() => {
 			</div>
 		</>
 	);
-}, 'IssuersAddEdit');
+};

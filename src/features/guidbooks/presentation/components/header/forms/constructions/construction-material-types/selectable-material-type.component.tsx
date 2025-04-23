@@ -1,20 +1,18 @@
 import { MaterialParametrs } from '@api-gen';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import type {
-	MaterialsAddAndEditData,
-	MaterialsFilterData,
-	MaterialTypeEnum,
-	MaterialTypesSelectValuesEnum,
-	UserMaterials,
-} from '@features';
+import { MaterialTypeValuesMap } from '@features/guidbooks/constants';
+import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
-	convertToClientMaterialsAddAndEditData,
-	getGuidebooksPaginated,
 	Guidebooks,
 	MaterialTypesSelectValuesMap,
-	MaterialTypeValuesMap,
-} from '@features';
+	type MaterialsAddAndEditData,
+	type MaterialsFilterData,
+	type MaterialTypeEnum,
+	type MaterialTypesSelectValuesEnum,
+	type UserMaterials,
+} from '@features/guidbooks/types';
 import type { AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';

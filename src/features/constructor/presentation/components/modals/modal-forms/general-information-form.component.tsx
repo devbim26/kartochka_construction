@@ -1,7 +1,6 @@
 import { FormElementLabel } from '@core';
-import { memoize } from '@core/utils';
 
-export const GeneralInformationForm = memoize(() => {
+export const GeneralInformationForm = () => {
 	return (
 		<div className="flex flex-row gap-[20px] border-b">
 			<div className="flex flex-col gap-[24px]">
@@ -147,4 +146,4 @@ export const GeneralInformationForm = memoize(() => {
 			</div>
 		</div>
 	);
-}, 'GeneralInformationForm');
+};

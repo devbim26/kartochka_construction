@@ -1,6 +1,5 @@
-import { Modal, type ModalProps } from '@core';
+import { Button, Modal, type ModalProps } from '@core';
 import { twJoin } from 'tailwind-merge';
-import { Button } from '..';
 
 interface DeleteModalProps extends Omit<ModalProps, 'Footer'> {
 	onCancel: () => void;

@@ -3,7 +3,7 @@ import type {
 	ConstructionsEditSchemaType,
 	ConstructionsFilterSchemaType,
 	ConstructionTypeSchemaType,
-} from '@features';
+} from '@features/guidbooks/utils';
 
 export type ConstructionsAddData = ConstructionsAddSchemaType;
 export type ConstructionsEditData = ConstructionsEditSchemaType;

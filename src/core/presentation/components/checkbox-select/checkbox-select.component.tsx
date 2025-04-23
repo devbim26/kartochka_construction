@@ -1,6 +1,4 @@
 import { Checkbox, DropdownSelectButton, Input, Popover, SearchIcon } from '@core';
-import type { Country } from '@features';
-import { RuCountryNamesMap } from '@features/guidbooks/types';
 import React, { useCallback, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -97,14 +95,14 @@ export const CheckboxSelect = React.forwardRef<HTMLDivElement, CheckboxSelectPro
 					buttonContent={
 						<DropdownSelectButton
 							displayText={
-								value.length === options.length
-									? 'Все'
+								multiple
+									? value.length === options.length
+										? 'Все'
+										: value.length === 1
+											? value[0]
+											: placeholder
 									: value.length
-										? Array.isArray(value)
-											? value
-													.map((v) => RuCountryNamesMap[v as Country])
-													.join(', ')
-											: RuCountryNamesMap[value as Country]
+										? value
 										: placeholder
 							}
 							className={twMerge(
@@ -116,6 +114,7 @@ export const CheckboxSelect = React.forwardRef<HTMLDivElement, CheckboxSelectPro
 								classNames?.popover?.buttonTextClassName,
 								value.length && 'text-input-value-black',
 							)}
+							title={label}
 						/>
 					}
 				>

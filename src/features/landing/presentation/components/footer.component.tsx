@@ -1,4 +1,5 @@
-import { Button, LogoIcon, LogoTextIcon } from '@core';
+import { APP_ROUTES, Button, LogoIcon, LogoTextIcon } from '@core';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useNavigate } from 'react-router-dom';
 import { EmailImage, PhoneImage } from '../images';
 
@@ -14,19 +15,25 @@ export const Footer = () => {
 				</div>
 				<div className="flex flex-col gap-[30px]">
 					<span
-						onClick={() => navigate('/main')}
+						onClick={() =>
+							navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`)
+						}
 						className="cursor-pointer font-montserrat text-[20px] leading-[24px]"
 					>
 						Главная
 					</span>
 					<span
-						onClick={() => navigate('/main')}
+						onClick={() =>
+							navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`)
+						}
 						className="cursor-pointer font-montserrat text-[20px] leading-[24px]"
 					>
 						О нас
 					</span>
 					<span
-						onClick={() => navigate('/main')}
+						onClick={() =>
+							navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`)
+						}
 						className="cursor-pointer font-montserrat text-[20px] leading-[24px]"
 					>
 						Контакты
@@ -34,13 +41,17 @@ export const Footer = () => {
 				</div>
 				<div className="flex flex-col gap-[30px]">
 					<span
-						onClick={() => navigate('/main')}
+						onClick={() =>
+							navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`)
+						}
 						className="cursor-pointer font-montserrat text-[20px] leading-[24px]"
 					>
 						Проектирование
 					</span>
 					<span
-						onClick={() => navigate('/main')}
+						onClick={() =>
+							navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`)
+						}
 						className="cursor-pointer font-montserrat text-[20px] leading-[24px]"
 					>
 						Подписки

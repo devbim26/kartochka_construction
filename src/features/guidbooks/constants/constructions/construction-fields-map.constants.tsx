@@ -3,7 +3,7 @@ import {
 	PointConnectionsFieldsType,
 	ThicknessDensityFieldsType,
 	WidthRacksStepFieldsType,
-} from '@features';
+} from '@features/guidbooks/presentation';
 import { MaterialTypeEnum } from '@features/guidbooks/types';
 import type { UseFormReturn } from 'react-hook-form';
 interface ConstructionFieldsMapProps {

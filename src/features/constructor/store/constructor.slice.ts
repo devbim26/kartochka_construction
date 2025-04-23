@@ -1,5 +1,5 @@
 import { createAsyncCases, type SliceInitialState } from '@core/utils/fetch/create-cases.util';
-import { getCurrentUser, logout, updateUser } from '@features/account';
+import { getCurrentUser, logout, updateUser } from '@features/account/services';
 import { createSlice } from '@reduxjs/toolkit';
 import type { AboutBuildingData, CreateConstructionData } from '../types';
 import { constructorReducer } from './constructor.reducer';

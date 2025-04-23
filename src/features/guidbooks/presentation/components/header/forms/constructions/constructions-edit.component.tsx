@@ -6,24 +6,28 @@ import {
 	Select,
 	Switch,
 } from '@core';
-import type { ConstructionsEditData, ConstructionTypeEnum, Issuer } from '@features';
 import {
 	ConstructionsEditFieldNames,
 	ConstructionTypeFieldNames,
 	ConstructionTypeMap,
-	convertToClientIssuerData,
-	FormSubTitle,
-	getGuidebooksPaginated,
+} from '@features/guidbooks/constants';
+import { convertToClientIssuerData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
+import {
 	Guidebooks,
 	RuConstructionTypesSelectValues,
 	RuCountryNamesSelectValues,
 	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
-} from '@features';
+	type ConstructionsEditData,
+	type ConstructionTypeEnum,
+	type Issuer,
+} from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
+import { FormSubTitle } from '../../form-sub-title.component';
 
 export const ConstructionsEdit = () => {
 	const form = useFormContext<ConstructionsEditData>();

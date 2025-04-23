@@ -4,7 +4,6 @@ import type {
 } from '@api-gen';
 import type { SelectOption } from '@core';
 import { convertToSelectValues, dateMask, Input, Select } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
 import { getFirstPlacementRoomVariant, getSecondRoomVariant } from '@features/guidbooks/services';
 import type { BuildingType } from '@features/guidbooks/types';
 import {
@@ -25,7 +24,7 @@ import { catchError, from, map } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
-export const RequirementsAddAndEdit = memoize(() => {
+export const RequirementsAddAndEdit = () => {
 	const form = useFormContext<FormRequirement>();
 	const { setValue, register, control, formState, watch } = form;
 	const dateRef = useMask(dateMask);
@@ -315,4 +314,4 @@ export const RequirementsAddAndEdit = memoize(() => {
 			/>
 		</>
 	);
-}, 'RequirementsAddAndEdit');
+};

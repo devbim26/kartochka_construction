@@ -1,11 +1,11 @@
 import { Input, Select } from '@core';
+import { convertToClientConstructionTypesList } from '@features/guidbooks/converters';
+import { getGuidebooksConstructionTypes } from '@features/guidbooks/services';
 import {
-	convertToClientConstructionTypesList,
-	getGuidebooksConstructionTypes,
 	RuCountryNamesSelectValues,
 	type ConstructionsFilterData,
 	type ConstructionTypeTemplate,
-} from '@features';
+} from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';

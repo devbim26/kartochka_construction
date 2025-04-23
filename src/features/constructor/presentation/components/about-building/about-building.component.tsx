@@ -8,7 +8,6 @@ import {
 	useAppDispatch,
 	useAppNavigate,
 } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import {
 	convertToCreateReportInfoCommand,
@@ -23,12 +22,9 @@ import {
 } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
 import type { CategoryClass } from '@features/guidbooks';
-import {
-	convertToClientRequirementTableData,
-	Country,
-	getGuidebooksPaginated,
-	Guidebooks,
-} from '@features/guidbooks';
+import { Country, Guidebooks } from '@features/guidbooks';
+import { convertToClientRequirementTableData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import type { BuildingType, Requirement } from '@features/guidbooks/types';
 import {
 	RuBuildingTypeSelectValues,
@@ -43,7 +39,7 @@ import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
-export const AboutBuilding = memoize(() => {
+const AboutBuildingScreen = () => {
 	const form = useForm<AboutBuildingData>({
 		defaultValues: AboutBuildingConfig.defaultValues,
 		resolver: zodResolver(AboutBuildingConfig.schema),
@@ -370,4 +366,6 @@ export const AboutBuilding = memoize(() => {
 			</div>
 		</div>
 	);
-}, 'AboutBuildingForm');
+};
+
+export default AboutBuildingScreen;

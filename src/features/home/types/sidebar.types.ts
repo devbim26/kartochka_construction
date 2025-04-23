@@ -1,17 +1,22 @@
 import type { IconType } from 'react-icons';
 
-export interface SidebarItemCommonProps {
-	icon?: IconType;
-	label: string;
+export interface SidebarItemProps {
 	id: string;
+	icon?: IconType;
+	currentPath?: string;
+	label: string;
+	path: string;
+	isMutltiPathItem?: boolean;
 }
 
-export interface SidebarItemProps extends SidebarItemCommonProps {
-	isSelected: boolean;
-	setId: (id: string) => void;
+export interface SidebarListProps extends SidebarItemProps {
+	children: React.ReactNode;
 }
 
-export const enum SidebarSessionStorageKeys {
-	HomeRoutesId = 'home_route_id',
-	NavbarSelectId = 'navbar_select_id',
+export interface SidebarItemsConfig {
+	items: {
+		params: SidebarItemProps;
+		childrens?: Array<SidebarItemProps>;
+	}[];
+	basePath: string;
 }

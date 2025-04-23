@@ -1,18 +1,17 @@
 import { Button, Input } from '@core';
-import type { DesigningData } from '@features';
-import { ConstructionTypeEnum, ConstructionTypeMap, DesigningConfig } from '@features';
+import { DesigningConfig, type DesigningData } from '@features';
+import { ConstructionTypeMap } from '@features/guidbooks/constants';
+import { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
-export const Designing = () => {
+const DesigningScreen = () => {
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
 		defaultValues: DesigningConfig.defaultValues,
 		mode: 'onSubmit',
 	});
-
-	const { formState } = form;
 
 	useEffect(() => {
 		ConstructionTypeMap({
@@ -67,3 +66,5 @@ export const Designing = () => {
 		</div>
 	);
 };
+
+export default DesigningScreen;
