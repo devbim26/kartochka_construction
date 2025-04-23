@@ -5,4 +5,5 @@ export * from './country.converter';
 export * from './index.converter';
 export * from './paginated-type.converter';
 export * from './priority.converter';
+export * from './purposeBuilding.converter';
 export * from './select-values.converter';

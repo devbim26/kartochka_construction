@@ -1,12 +1,13 @@
-import { Button, DeleteIcon, DeleteModal, useAppSelector } from '@core';
+import { Button, DeleteIcon, DeleteModal } from '@core';
 import { useAppNavigate } from '@core/utils';
+import { memoize } from '@core/utils/hoc/memo.utils';
+import { getReportFloorById, getReportSingleById } from '@features/constructor/services';
 import * as pdfjs from 'pdfjs-dist';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
+import { catchError, from } from 'rxjs';
 import {
-	AddConstructionForm,
-	AddConstructionModal,
 	CreateConstructionForm,
 	CreateConstructionModal,
 	EditConstructionModal,
@@ -16,10 +17,12 @@ import {
 import { ConstructionSheets } from './constructions-sheet.component';
 import { FloorPlanViewer } from './floor-plan-viewer.component';
 
-const FloorPlansScreen = () => {
-	const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
-	const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+export const FloorPlans = memoize(() => {
+	const navigate = useAppNavigate();
+	const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
+	const [search] = useSearchParams();
+	const reportId = search.get('reportId');
+	const [category, setCategory] = useState<string | null>(null);
 
 	const handleUploadPdf = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
@@ -31,21 +34,28 @@ const FloorPlansScreen = () => {
 		}
 	};
 
-	const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
+	useEffect(() => {
+		if (!reportId) return;
+		from(getReportSingleById({ id: reportId }))
+			.pipe(
+				catchError(() => {
+					return from(getReportFloorById({ id: reportId }));
+				}),
+			)
+			.subscribe((response) => {
+				const reportCategory = response?.data?.category;
+				if (reportCategory) {
+					setCategory(reportCategory);
+				}
+			});
+	}, [reportId]);
 
-	const aboutBuildingData = useAppSelector((store) => store.constructorData);
-
-	const [search] = useSearchParams();
-	const navigate = useAppNavigate();
 	return (
 		<div className="flex flex-col gap-[36px]">
 			<div className="flex flex-col rounded-xl bg-white">
 				<div className="flex flex-col gap-[18px] border-b px-[24px] py-[18px]">
 					<p className="font-sans text-lg font-semibold leading-4">Добавить уровень</p>
-					<Button
-						className="flex h-[28px] w-[100px] flex-row items-center bg-white px-[10px] py-[6px] font-sans font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-white"
-						onClick={() => setIsAddModalOpen(true)}
-					>
+					<Button className="flex h-[28px] w-[100px] flex-row items-center bg-white px-[10px] py-[6px] font-sans font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-white">
 						<FaPlus width={'16px'} height={'16px'} />
 						0.000
 						<DeleteIcon onClick={() => console.log(123)} withoutBg withoutBorder />
@@ -60,7 +70,7 @@ const FloorPlansScreen = () => {
 								<Button
 									className="h-[40px] w-[190px] px-[16px] text-[16px]"
 									onClick={() => document.getElementById('pdf-upload')?.click()}
-									//disabled={!aboutBuildingData?.data?.isFloorPlan}
+									disabled={category === 'Single'}
 								>
 									Загрузить план этажа
 								</Button>
@@ -75,7 +85,13 @@ const FloorPlansScreen = () => {
 									или
 								</p>
 								<Button
-									onClick={() => navigate('', { create: 'true' })}
+									onClick={() =>
+										navigate(``, {
+											create: 'true',
+											reportId: reportId!,
+										})
+									}
+									disabled={category === 'Floor'}
 									className="h-[40px] w-[190px] bg-white px-[16px] text-[16px] text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
 								>
 									Создать конструкцию
@@ -87,25 +103,11 @@ const FloorPlansScreen = () => {
 
 				<div className="flex py-[30px]"></div>
 
-				<AddConstructionModal
-					isOpen={!!search.get('add')}
-					onCancel={() => navigate('')}
-					onClose={() => navigate('')}
-					onConfirm={() => {
-						navigate('');
-					}}
-					headerTitle="Добавление конструкции"
-					className="!w-[1000px] md:!w-[900px]"
-				>
-					<AddConstructionForm />
-				</AddConstructionModal>
 				<CreateConstructionModal
 					isOpen={!!search.get('create')}
-					onCancel={() => navigate('')}
-					onClose={() => navigate('')}
-					onConfirm={() => {
-						navigate('');
-					}}
+					onCancel={() => window.history.back()}
+					onClose={() => window.history.back()}
+					onConfirm={() => window.history.back()}
 					headerTitle="Добавление конструкции"
 					className="!w-[1000px] md:!w-[900px]"
 				>
@@ -147,6 +149,6 @@ const FloorPlansScreen = () => {
 			<ConstructionSheets />
 		</div>
 	);
-};
+}, 'FloorPlans');
 
-export default FloorPlansScreen;
+export default FloorPlans;
