@@ -116,16 +116,19 @@ export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 										materialTypesSelectValues={
 											MaterialTypesSelectValuesEnum.Facing
 										}
+										currentForm={form}
 									/>
 									{ConstructionFieldsMap({
 										fieldIndex: facingIndices.threeIndex,
 										constructionIndex: 1,
 										materialType:
 											currentMaterialTypes.three as MaterialTypeEnum,
+										currentForm: form,
 									})}
 									<ThicknessDensityFieldsType
 										fieldIndex={facingIndices.threeIndex}
 										constructionIndex={1}
+										currentForm={form}
 									/>
 								</div>
 								<DeleteIcon
@@ -184,15 +187,18 @@ export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 										materialTypesSelectValues={
 											MaterialTypesSelectValuesEnum.Facing
 										}
+										currentForm={form}
 									/>
 									{ConstructionFieldsMap({
 										fieldIndex: facingIndices.twoIndex,
 										constructionIndex: 1,
 										materialType: currentMaterialTypes.two as MaterialTypeEnum,
+										currentForm: form,
 									})}
 									<ThicknessDensityFieldsType
 										fieldIndex={facingIndices.twoIndex}
 										constructionIndex={1}
+										currentForm={form}
 									/>
 								</div>
 								<DeleteIcon
@@ -217,10 +223,12 @@ export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 						<BoardMaterialType
 							fieldIndex={facingIndices.oneIndex}
 							constructionIndex={1}
+							currentForm={form}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={facingIndices.oneIndex}
 							constructionIndex={1}
+							currentForm={form}
 						/>
 					</div>
 				)}
@@ -229,10 +237,12 @@ export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 						<ZPanelMaterialType
 							fieldIndex={facingIndices.zeroIndex}
 							constructionIndex={1}
+							currentForm={form}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={facingIndices.zeroIndex}
 							constructionIndex={1}
+							currentForm={form}
 						/>
 					</div>
 				)}
@@ -269,10 +279,12 @@ export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 									<HeavyMaterialType
 										fieldIndex={baseConstructionIndices.zeroIndex}
 										constructionIndex={0}
+										currentForm={form}
 									/>
 									<ThicknessDensityFieldsType
 										fieldIndex={baseConstructionIndices.zeroIndex}
 										constructionIndex={0}
+										currentForm={form}
 									/>
 								</div>
 								<DeleteIcon
@@ -297,10 +309,12 @@ export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 						<HeavyMaterialType
 							fieldIndex={baseConstructionIndices.oneIndex}
 							constructionIndex={0}
+							currentForm={form}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={baseConstructionIndices.oneIndex}
 							constructionIndex={0}
+							currentForm={form}
 						/>
 					</div>
 				)}
@@ -309,10 +323,12 @@ export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 						<FillerMaterialType
 							fieldIndex={baseConstructionIndices.twoIndex}
 							constructionIndex={0}
+							currentForm={form}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={baseConstructionIndices.twoIndex}
 							constructionIndex={0}
+							currentForm={form}
 						/>
 					</div>
 				)}
@@ -321,10 +337,12 @@ export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 						<LinkMaterialType
 							fieldIndex={baseConstructionIndices.threeIndex}
 							constructionIndex={0}
+							currentForm={form}
 						/>
 						<PointConnectionsFieldsType
 							fieldIndex={baseConstructionIndices.threeIndex}
 							constructionIndex={0}
+							currentForm={form}
 						/>
 					</div>
 				)}
@@ -333,10 +351,12 @@ export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 						<HeavyMaterialType
 							fieldIndex={baseConstructionIndices.fourIndex}
 							constructionIndex={0}
+							currentForm={form}
 						/>
 						<ThicknessDensityFieldsType
 							fieldIndex={baseConstructionIndices.twoIndex}
 							constructionIndex={0}
+							currentForm={form}
 						/>
 					</div>
 				)}
@@ -371,10 +391,12 @@ export const HeavyMultiLayerWallSoundproofingLeftSide = () => {
 									<HeavyMaterialType
 										fieldIndex={baseConstructionIndices.fiveIndex}
 										constructionIndex={0}
+										currentForm={form}
 									/>
 									<ThicknessDensityFieldsType
 										fieldIndex={baseConstructionIndices.fiveIndex}
 										constructionIndex={0}
+										currentForm={form}
 									/>
 								</div>
 								<DeleteIcon

@@ -15,7 +15,7 @@
 			"router": ["./src/router"],
 			"router/*": ["./src/router/"]
 		},
-		"allowJs": true,
+		"allowJs": false,
 		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,

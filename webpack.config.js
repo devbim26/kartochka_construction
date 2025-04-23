@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const webpack = require('webpack');
 
 const runStatus = process.env.NODE_ENV;
@@ -36,7 +37,6 @@ module.exports = {
 					options: {
 						transpileOnly: false,
 						compilerOptions: {
-							noEmitOnError: true,
 							sourceMap: runStatus === 'development',
 						},
 					},
@@ -142,6 +142,7 @@ module.exports = {
 					return acc;
 				}, {}),
 		}),
+		new ForkTsCheckerWebpackPlugin(),
 	],
 	optimization: {
 		splitChunks: {
