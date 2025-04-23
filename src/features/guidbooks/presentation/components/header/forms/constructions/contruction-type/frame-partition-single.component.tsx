@@ -1,19 +1,21 @@
 import { DeleteIcon } from '@core';
-import type { ConstructionTypeProps, MaterialTypeEnum, UserMaterials } from '@features/guidbooks';
+import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import {
-	BoardMaterialType,
-	ConstructionFieldsMap,
-	ConstructionLayer,
-	FillerMaterialType,
-	FrameMaterialType,
 	MaterialTypesSelectValuesEnum,
-	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-	WidthRacksStepFieldsType,
-} from '@features/guidbooks';
-
+	type ConstructionTypeProps,
+	type MaterialTypeEnum,
+	type UserMaterials,
+} from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
+import { ThicknessDensityFieldsType, WidthRacksStepFieldsType } from '../construction-fields-types';
+import {
+	BoardMaterialType,
+	FillerMaterialType,
+	FrameMaterialType,
+	SelectableMaterialType,
+} from '../construction-material-types';
+import { ConstructionLayer } from '../constructions-layer.component';
 
 export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeProps) => {
 	const { watch, setValue } = currentForm;

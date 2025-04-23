@@ -1,8 +1,7 @@
-import { useSimpleTable, type SimpleTableProps } from '@core';
+import { Pagination, useSimpleTable, type SimpleTableProps } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { flexRender } from '@tanstack/react-table';
 import { twMerge } from 'tailwind-merge';
-import { Pagination } from '../../pagination';
 
 export const SimpleTable = memoize(
 	<T extends object>({

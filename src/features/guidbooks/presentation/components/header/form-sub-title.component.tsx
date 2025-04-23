@@ -1,4 +1,3 @@
-import { memoize } from '@core/utils/hoc/memo.utils';
 import { twMerge } from 'tailwind-merge';
 
 interface FormSubTitleProps {
@@ -6,7 +5,7 @@ interface FormSubTitleProps {
 	className?: string;
 }
 
-export const FormSubTitle = memoize(({ text, className }: FormSubTitleProps) => {
+export const FormSubTitle = ({ text, className }: FormSubTitleProps) => {
 	return (
 		<p
 			className={twMerge(
@@ -17,4 +16,4 @@ export const FormSubTitle = memoize(({ text, className }: FormSubTitleProps) => 
 			{text}
 		</p>
 	);
-}, 'FormSubTitle');
+};

@@ -42,6 +42,7 @@ export enum ConstructionTypeEnum {
 	HeavyMultiLayerWallSoundproofingBothSide = 'HeavyMultiLayerWallSoundproofingBothSide',
 	FramePartitionSingle = 'FramePartitionSingle',
 	FramePartitionDouble = 'FramePartitionDouble',
+	HeavySingleWallFacing = 'HeavySingleWallFacing',
 }
 
 export const RuConstructionTypesMap = {
@@ -61,6 +62,7 @@ export const RuConstructionTypesMap = {
 		'Тяжелая многослойная стена + звукоизоляционная панель с двух сторон',
 	FramePartitionSingle: 'Каркасная перегородка (1 каркас)',
 	FramePartitionDouble: 'Каркасная перегородка (2 каркаса)',
+	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
 };
 
 export const RuConstructionTypesSelectValues = [
@@ -72,41 +74,5 @@ export const RuConstructionTypesSelectValues = [
 	{
 		label: 'Тяжелая однослойная стена + облицовка с двух сторон',
 		value: ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
-	},
-	{
-		label: 'Тяжелая однослойная стена + звукоизоляционная панель с одной стороны',
-		value: ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide,
-	},
-	{
-		label: 'Тяжелая однослойная стена + звукоизоляционная панель с двух сторон',
-		value: ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide,
-	},
-	{
-		label: 'Тяжелая многослойная стена',
-		value: ConstructionTypeEnum.HeavyMultiLayerWall,
-	},
-	{
-		label: 'Тяжелая многослойная стена + облицовка с одной стороны',
-		value: ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide,
-	},
-	{
-		label: 'Тяжелая многослойная стена + облицовка с двух сторон',
-		value: ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide,
-	},
-	{
-		label: 'Тяжелая многослойная стена + звукоизоляционная панель с одной стороны',
-		value: ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide,
-	},
-	{
-		label: 'Тяжелая многослойная стена + звукоизоляционная панель с двух сторон',
-		value: ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide,
-	},
-	{
-		label: 'Каркасная перегородка (1 каркас)',
-		value: ConstructionTypeEnum.FramePartitionSingle,
-	},
-	{
-		label: 'Каркасная перегородка (2 каркаса)',
-		value: ConstructionTypeEnum.FramePartitionDouble,
 	},
 ];

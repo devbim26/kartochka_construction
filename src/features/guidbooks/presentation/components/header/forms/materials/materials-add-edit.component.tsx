@@ -1,19 +1,19 @@
 import { Button, CheckboxSelect, convertToBase64, FormElementLabel, Input, Select } from '@core';
 import { convertToPaginatedType, convertToSelectValues } from '@core/converters';
+import { convertToClientIssuerData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
-	FormSubTitle,
-	getGuidebooksPaginated,
 	Guidebooks,
 	RuCountryNamesSelectValues,
 	RuMaterialOriginTypesSelectValues,
 	RuMaterialTypesSelectValues,
 	type Issuer,
 	type MaterialsAddAndEditData,
-} from '@features';
-import { convertToClientIssuerData } from '@features/guidbooks/converters';
+} from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
+import { FormSubTitle } from '../../form-sub-title.component';
 
 export const MaterialsAddAndEdit = () => {
 	const form = useFormContext<MaterialsAddAndEditData>();

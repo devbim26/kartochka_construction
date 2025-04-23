@@ -10,7 +10,6 @@ export interface ModalProps extends PropsWithChildren<MotionProps> {
 	isOpen: boolean;
 	onClose: () => void;
 	Footer?: () => React.JSX.Element;
-	staticMode?: boolean;
 	className?: string;
 	contentClassName?: string;
 	HeaderButton?: React.JSX.Element;
@@ -22,7 +21,6 @@ export const Modal = ({
 	HeaderButton,
 	Footer,
 	onClose,
-	staticMode,
 	children,
 	className,
 	contentClassName,

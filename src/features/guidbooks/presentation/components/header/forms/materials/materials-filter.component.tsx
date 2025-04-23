@@ -1,5 +1,5 @@
 import { Input, Select } from '@core';
-import { RuMaterialTypesSelectValues, type MaterialsFilterData } from '@features';
+import { RuMaterialTypesSelectValues, type MaterialsFilterData } from '@features/guidbooks/types';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 

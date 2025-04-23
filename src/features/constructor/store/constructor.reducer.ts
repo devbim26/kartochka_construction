@@ -1,4 +1,4 @@
-import type { AUTH_ACTIONS } from '@features/auth';
+import type { AUTH_ACTIONS } from '@features/auth/constants';
 import type { AboutBuildingData, CreateConstructionData } from '../types';
 import type { ConstructorSliceState } from './constructor.slice';
 

@@ -9,7 +9,7 @@ import {
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
-import { getCurrentUser } from '@features/account';
+import { getCurrentUser } from '@features/account/services';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import { useEffect, useState } from 'react';

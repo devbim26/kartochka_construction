@@ -9,13 +9,13 @@ import { memoize } from '@core/utils/hoc/memo.utils';
 import { constructorSlice } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { CreateConstructionConfig } from '@features/constructor/utils';
-import type { ConstructionsAddData } from '@features/guidbooks';
+import { convertToClientConstructionsAddData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
-	convertToClientConstructionsAddData,
-	getGuidebooksPaginated,
 	Guidebooks,
 	RuConstructionTypeSelectValues,
-} from '@features/guidbooks';
+	type ConstructionsAddData,
+} from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { AxiosResponse } from 'axios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';

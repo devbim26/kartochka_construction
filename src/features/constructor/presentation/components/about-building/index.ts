@@ -1,1 +1,1 @@
-export * from './about-building.component';
+export * from './about-building.lazy.component';
