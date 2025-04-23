@@ -42,9 +42,9 @@ export const FloorPlans = memoize(() => {
 				}),
 			)
 			.subscribe((response) => {
-				const fetchedCategory = response?.data?.category;
-				if (fetchedCategory) {
-					setCategory(fetchedCategory);
+				const reportCategory = response?.data?.category;
+				if (reportCategory) {
+					setCategory(reportCategory);
 				}
 			});
 	}, [reportId]);
@@ -104,11 +104,9 @@ export const FloorPlans = memoize(() => {
 
 				<CreateConstructionModal
 					isOpen={!!search.get('create')}
-					onCancel={() => navigate('')}
-					onClose={() => navigate('')}
-					onConfirm={() => {
-						navigate('');
-					}}
+					onCancel={() => window.history.back()}
+					onClose={() => window.history.back()}
+					onConfirm={() => window.history.back()}
 					headerTitle="Добавление конструкции"
 					className="!w-[1000px] md:!w-[900px]"
 				>
