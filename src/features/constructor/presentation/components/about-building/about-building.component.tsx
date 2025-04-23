@@ -16,7 +16,11 @@ import {
 } from '@features/constructor/converters';
 import { createReport } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
-import { ReportCategory, type AboutBuildingData } from '@features/constructor/types';
+import {
+	ReportCategory,
+	RuPurposeBuildingSelectValues,
+	type AboutBuildingData,
+} from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
 import type { CategoryClass } from '@features/guidbooks';
 import {
@@ -24,7 +28,6 @@ import {
 	Country,
 	getGuidebooksPaginated,
 	Guidebooks,
-	RuConstructionTypeSelectValues,
 } from '@features/guidbooks';
 import type { BuildingType, Requirement } from '@features/guidbooks/types';
 import {
@@ -50,9 +53,8 @@ export const AboutBuilding = memoize(() => {
 	const navigate = useAppNavigate();
 	const [requirementData, setRequirementData] = useState<Array<Requirement>>([]);
 
-	const [selectedRegion, selectedPurpose, selectedType, selectedClass] = watch([
+	const [selectedRegion, selectedType, selectedClass] = watch([
 		'region',
-		'buildingPurpose',
 		'buildingType',
 		'comfortClass',
 	]);
@@ -61,7 +63,6 @@ export const AboutBuilding = memoize(() => {
 		requirementData.filter(
 			(req) =>
 				(!selectedRegion || req.countryType === selectedRegion) &&
-				(!selectedPurpose || req.constructionType === selectedPurpose) &&
 				(!selectedType || req.buildingType === selectedType),
 		),
 	);
@@ -197,7 +198,7 @@ export const AboutBuilding = memoize(() => {
 										'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 										formState.errors.region?.message ? 'text-error' : '',
 									)}
-									placeholder="Выберите регион"
+									placeholder="Выберите страну"
 									buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 									wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 								/>
@@ -241,7 +242,7 @@ export const AboutBuilding = memoize(() => {
 									name="buildingPurpose"
 									render={({ field }) => (
 										<Select
-											options={RuConstructionTypeSelectValues}
+											options={RuPurposeBuildingSelectValues}
 											{...field}
 											error={formState.errors.buildingPurpose?.message}
 											value={field.value || ''}
