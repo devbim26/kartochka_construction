@@ -1,5 +1,6 @@
 import { FormElementLabel } from '@core';
-import { GeneralInformationPhysical } from './general-information-physical.component';
+import { GeneralInformationPhysical } from './general-physical.component';
+import { GeneralInformationSoundproofing } from './general-soundproofing.component';
 
 export const GeneralInformationForm = () => {
 	return (
@@ -65,34 +66,12 @@ export const GeneralInformationForm = () => {
 					</p>
 				</div>
 			</div>
-			<div className="flex flex-col gap-[20px]">
+			<div className="flex flex-col gap-[10px]">
 				<FormElementLabel className="text-left font-sans font-semibold leading-6">
 					Соответствие нормам
 				</FormElementLabel>
 				<GeneralInformationPhysical />
-				<table className="w-[400px]">
-					<tr className="border-b-2 border-black">
-						<th className="w-[200px] text-left">Звукоизоляционные</th>
-						<th></th>
-						<th></th>
-					</tr>
-					<tr>
-						<td className="w-[200px] text-right">
-							<p className="mr-2 inline italic text-blue-500 underline">Расчёт</p>
-							<p className="inline">Rw, dB</p>
-						</td>
-						<td>45</td>
-						<td>450</td>
-					</tr>
-					<tr>
-						<td className="w-[200px] text-right">
-							<p className="mr-2 inline italic text-blue-500 underline">Лаб.тест</p>
-							<p className="inline">Rw, dB</p>
-						</td>
-						<td>45</td>
-						<td>450</td>
-					</tr>
-				</table>
+				<GeneralInformationSoundproofing />
 				<table className="w-[400px]">
 					<tr className="border-b-2 border-black">
 						<th className="w-[200px] text-left">Тепловая изоляция</th>
