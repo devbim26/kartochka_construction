@@ -1,5 +1,5 @@
 export type ThermalInsulationStandarts = {
-	label: 'Расчёт';
+	label: string;
 	insulation: string;
 	values: string;
 	requirements: string;
