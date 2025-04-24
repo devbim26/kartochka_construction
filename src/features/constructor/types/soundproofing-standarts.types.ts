@@ -1,5 +1,5 @@
 export type SoundproofingStandarts = {
-	label: 'Расчёт' | 'Лаб.тест';
+	label: string;
 	soundproofing: string;
 	values: string;
 	requirements: string;
