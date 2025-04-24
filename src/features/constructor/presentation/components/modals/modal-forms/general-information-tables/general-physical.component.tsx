@@ -1,4 +1,4 @@
-import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell, useAppNavigate } from '@core';
+import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell } from '@core';
 import type { PhysicalStandarts } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
@@ -22,7 +22,6 @@ const dataPhysical: PhysicalStandarts[] = [
 ];
 
 export const GeneralInformationPhysical = () => {
-	const navigate = useAppNavigate();
 	const columns = useMemo(() => {
 		const cols: ColumnDef<PhysicalStandarts>[] = [
 			{
@@ -66,13 +65,7 @@ export const GeneralInformationPhysical = () => {
 	}, []);
 	return (
 		<div className="flex-col">
-			<DesigningTable
-				data={dataPhysical}
-				columns={columns}
-				classNames={{
-					tableContainerClassName: 'w-[400px]',
-				}}
-			/>
+			<DesigningTable data={dataPhysical} columns={columns} />
 		</div>
 	);
 };

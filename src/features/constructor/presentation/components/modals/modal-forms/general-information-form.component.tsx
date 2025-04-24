@@ -1,10 +1,14 @@
 import { FormElementLabel } from '@core';
-import { GeneralInformationPhysical } from './general-physical.component';
-import { GeneralInformationSoundproofing } from './general-soundproofing.component';
+import {
+	GeneralInformationFireResistance,
+	GeneralInformationPhysical,
+	GeneralInformationSoundproofing,
+	GeneralInformationThermal,
+} from './general-information-tables';
 
 export const GeneralInformationForm = () => {
 	return (
-		<div className="flex flex-row gap-[20px] border-b">
+		<div className="flex flex-row gap-[10px] border-b">
 			<div className="flex flex-col gap-[24px]">
 				<FormElementLabel className="text-left font-sans font-semibold leading-6">
 					Общая информация
@@ -72,36 +76,8 @@ export const GeneralInformationForm = () => {
 				</FormElementLabel>
 				<GeneralInformationPhysical />
 				<GeneralInformationSoundproofing />
-				<table className="w-[400px]">
-					<tr className="border-b-2 border-black">
-						<th className="w-[200px] text-left">Тепловая изоляция</th>
-						<th></th>
-						<th></th>
-					</tr>
-					<tr>
-						<td className="w-[200px] text-right">
-							<p className="mr-2 inline italic text-blue-500 underline">Расчёт</p>
-							<p className="inline">R, м²·К/Вт</p>
-						</td>
-						<td>45</td>
-						<td>450</td>
-					</tr>
-				</table>
-				<table className="w-[400px]">
-					<tr className="border-t-2 border-black">
-						<th className="w-[200px] text-left">Огнестойкость</th>
-						<th></th>
-						<th></th>
-					</tr>
-					<tr>
-						<td className="w-[200px] text-right">
-							<p className="mr-2 inline italic">Справочно</p>
-							<p className="inline">EI</p>
-						</td>
-						<td>45</td>
-						<td>45</td>
-					</tr>
-				</table>
+				<GeneralInformationThermal />
+				<GeneralInformationFireResistance />
 			</div>
 		</div>
 	);

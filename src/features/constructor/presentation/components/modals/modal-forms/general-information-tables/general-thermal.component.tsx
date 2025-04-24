@@ -1,37 +1,31 @@
 import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell, useAppNavigate } from '@core';
-import type { SoundproofingStandarts } from '@features/constructor/types';
+import type { ThermalInsulationStandarts } from '@features/constructor/types/thermal-insulation.types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 
-const dataSoundproofing: SoundproofingStandarts[] = [
+const dataThermal: ThermalInsulationStandarts[] = [
 	{
 		label: 'Расчёт',
-		soundproofing: 'Rw, dB',
-		values: '45',
-		requirements: '450',
-	},
-	{
-		label: 'Лаб.тест',
-		soundproofing: 'Rw, dB',
-		values: '43',
-		requirements: '430',
+		insulation: 'R, м²·К/Вт',
+		values: '3,15',
+		requirements: '3,15',
 	},
 ];
 
-export const GeneralInformationSoundproofing = () => {
+export const GeneralInformationThermal = () => {
 	const navigate = useAppNavigate();
 	const columns = useMemo(() => {
-		const cols: ColumnDef<SoundproofingStandarts>[] = [
+		const cols: ColumnDef<ThermalInsulationStandarts>[] = [
 			{
 				accessorKey: 'soundproofing',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="Звукоизоляционные"
+						text="Тепловая изоляция"
 						textClassName="w-[200px] text-left"
 					/>
 				),
 				cell: (info) => {
-					const row = info.row.original as SoundproofingStandarts;
+					const row = info.row.original as ThermalInsulationStandarts;
 					return (
 						<SimpleTableCell
 							content={
@@ -39,7 +33,7 @@ export const GeneralInformationSoundproofing = () => {
 									<p className="relative left-[-10px] inline italic text-blue-500 underline">
 										{row.label}
 									</p>
-									<p className="inline">{row.soundproofing}</p>
+									<p className="inline">{row.insulation}</p>
 								</div>
 							}
 						/>
@@ -75,7 +69,7 @@ export const GeneralInformationSoundproofing = () => {
 	}, []);
 	return (
 		<div className="flex-col">
-			<DesigningTable data={dataSoundproofing} columns={columns} />
+			<DesigningTable data={dataThermal} columns={columns} />
 		</div>
 	);
 };
