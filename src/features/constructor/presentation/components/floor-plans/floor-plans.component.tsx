@@ -11,9 +11,10 @@ import {
 	CreateConstructionForm,
 	CreateConstructionModal,
 	EditConstructionModal,
-	GeneralInformationForm,
 	GeneralInformationModal,
 } from '../modals';
+import { GeneralInformationPhysical } from '../modals/modal-forms/general-information-physical.component';
+import { GeneralInformationSoundproofing } from '../modals/modal-forms/general-information-soundproofing.component';
 import { ConstructionSheets } from './constructions-sheet.component';
 import { FloorPlanViewer } from './floor-plan-viewer.component';
 
@@ -117,10 +118,11 @@ export const FloorPlans = memoize(() => {
 					isOpen={!!search.get('info')}
 					onCancel={() => navigate('')}
 					onClose={() => navigate('')}
-					headerTitle="Добавление конструкции"
+					headerTitle=""
 					className="!w-[1000px] md:!w-[900px]"
 				>
-					<GeneralInformationForm />
+					<GeneralInformationPhysical />
+					<GeneralInformationSoundproofing />
 				</GeneralInformationModal>
 				<EditConstructionModal
 					isOpen={!!search.get('edit')}
