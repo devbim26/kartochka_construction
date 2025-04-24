@@ -1,4 +1,5 @@
 import { FormElementLabel } from '@core';
+import { GeneralInformationPhysical } from './general-information-physical.component';
 
 export const GeneralInformationForm = () => {
 	return (
@@ -68,28 +69,7 @@ export const GeneralInformationForm = () => {
 				<FormElementLabel className="text-left font-sans font-semibold leading-6">
 					Соответствие нормам
 				</FormElementLabel>
-				<table className="w-[400px]">
-					<tr className="border-b-2 border-black">
-						<th className="w-[200px] text-left">Физические</th>
-						<th>Значения</th>
-						<th>Требования</th>
-					</tr>
-					<tr>
-						<td className="w-[200px] text-right">Толщина, мм</td>
-						<td>276</td>
-						<td>276</td>
-					</tr>
-					<tr>
-						<td className="w-[200px] text-right">Масса, кг/м²</td>
-						<td>451</td>
-						<td>451</td>
-					</tr>
-					<tr>
-						<td className="w-[200px] text-right">Высота, м</td>
-						<td>3</td>
-						<td>3</td>
-					</tr>
-				</table>
+				<GeneralInformationPhysical />
 				<table className="w-[400px]">
 					<tr className="border-b-2 border-black">
 						<th className="w-[200px] text-left">Звукоизоляционные</th>

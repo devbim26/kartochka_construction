@@ -1,10 +1,4 @@
-import {
-	DesigningTable,
-	FormElementLabel,
-	SimpleTableCell,
-	SimpleTableHeaderCell,
-	useAppNavigate,
-} from '@core';
+import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell, useAppNavigate } from '@core';
 import type { PhysicalStandarts } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
@@ -33,28 +27,52 @@ export const GeneralInformationPhysical = () => {
 		const cols: ColumnDef<PhysicalStandarts>[] = [
 			{
 				accessorKey: 'physical',
-				header: () => <SimpleTableHeaderCell text="Физические" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				header: () => (
+					<SimpleTableHeaderCell text="Физические" textClassName="w-[200px] text-left" />
+				),
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName="w-[200px]"
+					/>
+				),
 			},
 			{
 				accessorKey: 'values',
-				header: () => <SimpleTableHeaderCell text="Значения" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				header: () => (
+					<SimpleTableHeaderCell text="Значения" textClassName="w-[100px] text-right" />
+				),
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName="w-[100px]"
+					/>
+				),
 			},
 			{
 				accessorKey: 'requirements',
-				header: () => <SimpleTableHeaderCell text="Требования" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				header: () => (
+					<SimpleTableHeaderCell text="Требования" textClassName="w-[100px] text-right" />
+				),
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName="w-[100px]"
+					/>
+				),
 			},
 		];
 		return cols;
 	}, []);
 	return (
 		<div className="flex-col">
-			<FormElementLabel className="font-[18px] text-primary">
-				Соответствие нормам
-			</FormElementLabel>
-			<DesigningTable data={dataPhysical} columns={columns} />
+			<DesigningTable
+				data={dataPhysical}
+				columns={columns}
+				classNames={{
+					tableContainerClassName: 'w-[400px]',
+				}}
+			/>
 		</div>
 	);
 };
