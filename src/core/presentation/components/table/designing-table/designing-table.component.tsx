@@ -45,14 +45,14 @@ export const DesigningTable = memoize(
 		));
 
 		return (
-			<div className="flex w-full flex-col gap-[20px] rounded-xl bg-none pb-[30px]">
+			<div className="flex w-full flex-col gap-[10px] rounded-xl bg-none">
 				<div
 					className={twMerge(
 						'max-h-[490px] max-w-[87.17vw] overflow-auto',
 						classNames?.tableContainerClassName,
 					)}
 				>
-					<table className={twMerge('w-full', classNames?.tableClassName)}>
+					<table className={twMerge('w-full table-fixed', classNames?.tableClassName)}>
 						<thead>{headerRows}</thead>
 						<tbody>{contentRows}</tbody>
 					</table>

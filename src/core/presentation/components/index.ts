@@ -11,6 +11,5 @@ export * from './pagination';
 export * from './popover';
 export * from './select';
 export * from './separator';
-export * from './sub-select';
 export * from './switch';
 export * from './table';

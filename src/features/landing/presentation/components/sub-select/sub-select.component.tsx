@@ -1,17 +1,16 @@
+import { APP_ROUTES, Button, Switch } from '@core';
+import { LandingSections } from '@features/landing/constants';
+import { useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 import {
-	APP_ROUTES,
-	Button,
-	CheckMarkImage,
 	crossedPoints,
 	monthPrices,
 	points,
 	subscriptionDescriptions,
-	Switch,
 	titles,
 	yearPrices,
-} from '@core';
-import { useState } from 'react';
-import { twMerge } from 'tailwind-merge';
+} from './constants';
+import { CheckMarkImage } from './images';
 
 interface SubSelectProps {
 	wrapperClassName?: string;
@@ -28,7 +27,7 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 	return (
 		<div
 			className={twMerge('flex w-[73.18%] flex-col py-[50px]', wrapperClassName)}
-			id="subscription"
+			id={LandingSections.subscription.id}
 		>
 			{location.pathname.startsWith(`/${APP_ROUTES.landing.route}`) && (
 				<div className="mb-[34px] flex font-montserrat text-[20px] font-normal leading-[24px]">

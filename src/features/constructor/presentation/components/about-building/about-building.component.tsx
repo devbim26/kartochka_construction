@@ -8,33 +8,39 @@ import {
 	useAppDispatch,
 	useAppNavigate,
 } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
-import { convertToRequirementSelectValues } from '@features/constructor/converters';
+import {
+	convertToCreateReportInfoCommand,
+	convertToRequirementSelectValues,
+} from '@features/constructor/converters';
+import { createReport } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
-import type { AboutBuildingData } from '@features/constructor/types';
+import {
+	ReportCategory,
+	RuPurposeBuildingSelectValues,
+	type AboutBuildingData,
+} from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
+import { convertToClientRequirementTableData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
+import type { BuildingType, CategoryClass, Requirement } from '@features/guidbooks/types';
 import {
-	convertToClientRequirementTableData,
 	Country,
-	getGuidebooksPaginated,
 	Guidebooks,
-	RuConstructionTypeSelectValues,
-} from '@features/guidbooks';
-import type { Requirement } from '@features/guidbooks/types';
-import {
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { AxiosResponse } from 'axios';
+import { AxiosError, type AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
-export const AboutBuilding = memoize(() => {
+const AboutBuildingScreen = () => {
 	const form = useForm<AboutBuildingData>({
 		defaultValues: AboutBuildingConfig.defaultValues,
 		resolver: zodResolver(AboutBuildingConfig.schema),
@@ -44,17 +50,17 @@ export const AboutBuilding = memoize(() => {
 	const navigate = useAppNavigate();
 	const [requirementData, setRequirementData] = useState<Array<Requirement>>([]);
 
-	const [selectedRegion, selectedPurpose, selectedType] = watch([
+	const [selectedRegion, selectedType, selectedClass, reportType] = watch([
 		'region',
-		'buildingPurpose',
 		'buildingType',
+		'comfortClass',
+		'isFloorPlan',
 	]);
 
 	const filteredRequirements = convertToRequirementSelectValues(
 		requirementData.filter(
 			(req) =>
 				(!selectedRegion || req.countryType === selectedRegion) &&
-				(!selectedPurpose || req.constructionType === selectedPurpose) &&
 				(!selectedType || req.buildingType === selectedType),
 		),
 	);
@@ -65,21 +71,53 @@ export const AboutBuilding = memoize(() => {
 
 	const onSubmit = (data: AboutBuildingData) => {
 		dispatch(constructorSlice.actions.setAboutBuilding(data));
-		navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`);
+		handleCreateReport(data);
 	};
 
-	const handleGetRequirementData = () => {
+	const handleCreateReport = (data: AboutBuildingData) => {
+		from(
+			createReport({
+				data: convertToCreateReportInfoCommand(data),
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					toast.success('Отчет успешно создан');
+					if (response?.data?.id) {
+						const reportId = response.data.id;
+						navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
+							reportId,
+							reportType,
+						});
+					}
+				}
+			});
+	};
+
+	const handleGetRequirementData = (
+		buildingType?: BuildingType,
+		countryType?: Country,
+		categoryClass?: CategoryClass,
+	) => {
 		from(
 			getGuidebooksPaginated({
 				data: {
-					countryType: null,
-					buildingType: null,
+					countryType: countryType || null,
+					buildingType: buildingType || null,
 					firstPlacementRoomName: null,
 					secondPlacementRoomName: null,
 					standartShortName: null,
 					standartFullName: null,
 					standartValidityPeriod: null,
-					class: null,
+					class: categoryClass || null,
 				},
 				guidebookType: Guidebooks.REQUIREMENT,
 				pagination: { pageNumber: 1, pageSize: 99999 },
@@ -104,8 +142,12 @@ export const AboutBuilding = memoize(() => {
 	};
 
 	useEffect(() => {
-		handleGetRequirementData();
-	}, []);
+		handleGetRequirementData(
+			selectedType as BuildingType,
+			selectedRegion as Country,
+			selectedClass as CategoryClass,
+		);
+	}, [selectedRegion, selectedType, selectedClass]);
 
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
@@ -154,7 +196,7 @@ export const AboutBuilding = memoize(() => {
 										'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 										formState.errors.region?.message ? 'text-error' : '',
 									)}
-									placeholder="Выберите регион"
+									placeholder="Выберите страну"
 									buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 									wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 								/>
@@ -198,7 +240,7 @@ export const AboutBuilding = memoize(() => {
 									name="buildingPurpose"
 									render={({ field }) => (
 										<Select
-											options={RuConstructionTypeSelectValues}
+											options={RuPurposeBuildingSelectValues}
 											{...field}
 											error={formState.errors.buildingPurpose?.message}
 											value={field.value || ''}
@@ -287,8 +329,12 @@ export const AboutBuilding = memoize(() => {
 								name="isFloorPlan"
 								render={({ field }) => (
 									<Switch
-										onChange={(value) => field.onChange(value)}
-										wrapperClassName="w-[36px] h-[20px]"
+										onChange={(isEnabled) => {
+											const value = isEnabled
+												? ReportCategory.Floor
+												: ReportCategory.Single;
+											field.onChange(value);
+										}}
 									/>
 								)}
 							/>
@@ -322,4 +368,6 @@ export const AboutBuilding = memoize(() => {
 			</div>
 		</div>
 	);
-}, 'AboutBuildingForm');
+};
+
+export default AboutBuildingScreen;

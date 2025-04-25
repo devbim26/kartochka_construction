@@ -1,5 +1,6 @@
-import { useAppDispatch, useAppNavigate, useAppSelector } from '@core';
-import { ACCOUNT_FETCH_ROUTES, logout } from '@features/account';
+import { APP_ROUTES, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
+import { ACCOUNT_FETCH_ROUTES } from '@features/account/constants';
+import { logout } from '@features/account/services';
 import { useEffect } from 'react';
 import { ImExit } from 'react-icons/im';
 
@@ -10,7 +11,7 @@ export const LogoutHeader = () => {
 
 	useEffect(() => {
 		if (userData.fetch_data?.fetch_name === ACCOUNT_FETCH_ROUTES.logout.fetch_name) {
-			navigate('/landing');
+			navigate(APP_ROUTES.landing.route);
 		}
 	}, [userData.fetch_data]);
 

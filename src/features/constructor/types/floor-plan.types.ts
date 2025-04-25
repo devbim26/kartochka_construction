@@ -2,4 +2,8 @@ import type { FloorPlansSchemaType } from '../utils';
 
 type FloorPlansData = FloorPlansSchemaType;
 
-export { type FloorPlansData };
+type FloorPlanModalData = {
+	image: string;
+};
+
+export { type FloorPlansData, type FloorPlanModalData };

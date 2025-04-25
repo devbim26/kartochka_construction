@@ -1,22 +1,17 @@
-import { MaterialTypeEnum } from '@api-gen';
 import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import type {
-	ConstructionMaterialTypesProps,
-	MaterialsAddAndEditData,
-	MaterialsFilterData,
-} from '@features';
+import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
+import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
-	convertToClientMaterialsAddAndEditData,
-	getGuidebooksPaginated,
 	Guidebooks,
-} from '@features';
-
+	MaterialTypeEnum,
+	type ConstructionMaterialTypesProps,
+	type MaterialsAddAndEditData,
+	type MaterialsFilterData,
+} from '@features/guidbooks/types';
 import type { AxiosResponse } from 'axios';
-
 import { useEffect, useState } from 'react';
 import { Controller } from 'react-hook-form';
-
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 

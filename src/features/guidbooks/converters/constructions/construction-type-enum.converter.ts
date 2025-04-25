@@ -19,17 +19,15 @@ const constructionTypeEnumMap = createDataRecordConverter({
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingOneSide,
 	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingBothSide,
-	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofOneSide]:
+	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallZPanelOneSide,
-	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofBothSide]:
+	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallZPanelBothSide,
 	[ClientConstructionTypeEnum.FramePartitionSingle]: ServerConstructionTypeEnum.OneFramePartition,
 	[ClientConstructionTypeEnum.FramePartitionDouble]: ServerConstructionTypeEnum.TwoFramePartition,
-	//в работе
-	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingLeftSide]:
+	[ClientConstructionTypeEnum.HeavySingleWallFacing]:
 		ServerConstructionTypeEnum.HeavySingleWallFacing,
 });
-
 export const convertToServerConstructionTypeEnumData = (
 	type: ClientConstructionTypeEnum,
 ): ServerConstructionTypeEnum => {

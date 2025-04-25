@@ -1,4 +1,5 @@
 import type { EntityConfig } from '@core';
+import { ReportCategory } from '../types';
 import { AddConstructionSchema, CreateConstructionSchema } from './validation';
 import { AboutBuildingSchema } from './validation/about-building.validation';
 import { DesigningSchema } from './validation/designing.validation';
@@ -14,7 +15,7 @@ export const AboutBuildingConfig: EntityConfig = {
 		maxHeight: '',
 		comfortClass: '',
 		requirement: '',
-		isFloorPlan: false,
+		isFloorPlan: ReportCategory.Single,
 		isBim: false,
 	},
 };
