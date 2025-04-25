@@ -1,4 +1,4 @@
-import type { ReportFloorInfoDto } from '@api-gen';
+import type { ReportFloorInfoDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import { type SliceInitialState } from '@core/utils/fetch/create-cases.util';
 import { createSlice } from '@reduxjs/toolkit';
 import type { AboutBuildingData, CreateConstructionData, FloorPlanModalData } from '../types';
@@ -13,6 +13,7 @@ export interface ConstructorSliceState extends SliceInitialState {
 	reportInfo: ReportFloorInfoDto | null;
 	file: FloorPlanModalData | null;
 	constructionsSheet: ConstructionSheet[];
+	reportInfoFull: ReportInfoFloorConstructionDto | null;
 }
 
 const initialState: ConstructorSliceState = {
@@ -28,6 +29,7 @@ const initialState: ConstructorSliceState = {
 	reportInfo: null,
 	file: null,
 	constructionsSheet: [],
+	reportInfoFull: null,
 };
 
 export const constructorSlice = createSlice({
@@ -39,5 +41,6 @@ export const constructorSlice = createSlice({
 		setAboutBuilding: constructorReducer.setAboutBuilding,
 		setCreateConstructionData: constructorReducer.setCreateConstructionData,
 		setConstructionsSheet: constructorReducer.setConstructionSheets,
+		setInfoFull: constructorReducer.setInfoFull,
 	},
 });

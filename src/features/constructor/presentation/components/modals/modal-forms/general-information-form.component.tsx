@@ -1,4 +1,9 @@
-import { FormElementLabel } from '@core';
+import { FormElementLabel, useAppDispatch, useAppSelector } from '@core';
+import { getReportFloorById } from '@features/constructor/services';
+import { constructorSlice } from '@features/constructor/store';
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { catchError, from } from 'rxjs';
 import {
 	GeneralInformationFireResistance,
 	GeneralInformationPhysical,
@@ -7,6 +12,30 @@ import {
 } from './general-information-tables';
 
 export const GeneralInformationForm = () => {
+	const dispatch = useAppDispatch();
+	const [search] = useSearchParams();
+	const reportId = search.get('reportId');
+	const reportInfoFull = useAppSelector((state) => state.constructorData.reportInfoFull);
+
+	useEffect(() => {
+		if (!reportId) return;
+		from(getReportFloorById({ id: reportId }))
+			.pipe(
+				catchError((error) => {
+					return [];
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.data) {
+					dispatch(constructorSlice.actions.setInfoFull(response.data));
+				}
+			});
+	}, [reportId, dispatch]);
+
+	const info =
+		reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+			?.reportConstructionHeader;
+
 	return (
 		<div className="flex flex-row gap-[10px] border-b">
 			<div className="flex flex-col gap-[24px]">
@@ -18,7 +47,7 @@ export const GeneralInformationForm = () => {
 						Название
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						Ф2332
+						{info?.constructionHeader?.name ?? ''}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -26,7 +55,8 @@ export const GeneralInformationForm = () => {
 						Конструкция разделяет
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						Жил. комната/ жил. комната
+						{info?.firstPlacementRoom?.name ?? '—'} /{' '}
+						{info?.secondPlacementRoom?.name ?? '—'}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -50,7 +80,7 @@ export const GeneralInformationForm = () => {
 						Площадь, м2
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						2
+						{info?.square ?? '—'}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -58,7 +88,9 @@ export const GeneralInformationForm = () => {
 						Общая толщина, мм
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						123
+						{info?.constructionHeader?.constructionType?.constructions?.[0]?.userMaterials?.[0]?.materialTypeValue?.find(
+							(v) => v.materialParametrs === 'Thickness',
+						)?.value ?? '—'}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
