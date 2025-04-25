@@ -50,10 +50,11 @@ const AboutBuildingScreen = () => {
 	const navigate = useAppNavigate();
 	const [requirementData, setRequirementData] = useState<Array<Requirement>>([]);
 
-	const [selectedRegion, selectedType, selectedClass] = watch([
+	const [selectedRegion, selectedType, selectedClass, reportType] = watch([
 		'region',
 		'buildingType',
 		'comfortClass',
+		'isFloorPlan',
 	]);
 
 	const filteredRequirements = convertToRequirementSelectValues(
@@ -90,11 +91,11 @@ const AboutBuildingScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					toast.success('Отчет успешно создан');
-					console.log(response.data);
 					if (response?.data?.id) {
 						const reportId = response.data.id;
 						navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
 							reportId,
+							reportType,
 						});
 					}
 				}
