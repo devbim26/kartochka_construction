@@ -1,4 +1,4 @@
-import type { ReportFloorInfoDto } from '@api-gen';
+import type { ReportFloorInfoDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import type { AUTH_ACTIONS } from '@features/auth/constants';
 import type { AboutBuildingData, CreateConstructionData, FloorPlanModalData } from '../types';
 import type { ConstructionSheet } from '../types/constructions-sheet.types';
@@ -35,5 +35,11 @@ export const constructorReducer = {
 	},
 	setConstructionSheets: (state: ConstructorSliceState, action: Action) => {
 		state.constructionsSheet = action.payload as ConstructionSheet[];
+	},
+	setInfoFull: (
+		state: ConstructorSliceState,
+		action: { payload: ReportInfoFloorConstructionDto },
+	) => {
+		state.reportInfoFull = action.payload;
 	},
 };
