@@ -199,6 +199,7 @@ export const FloorPlans = memoize(() => {
 					onCancel={() => window.history.back()}
 					onClose={() => window.history.back()}
 					className="!w-[1000px] md:!w-[900px]"
+					headerTitle=""
 				>
 					<GeneralInformationForm />
 				</GeneralInformationModal>
