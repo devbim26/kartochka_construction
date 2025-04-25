@@ -1,6 +1,5 @@
 import type {
 	CreateReportInfoCommand,
-	UpdateReportInfoWithFloorConstructionCommand,
 	UpdateReportInfoWithSingleConstructionCommand,
 } from '@api-gen';
 import { fetchApi } from '@api-gen';
@@ -14,8 +13,30 @@ type GetReportByIdParams = {
 type UpdateSingleReportProps = {
 	data: UpdateReportInfoWithSingleConstructionCommand;
 };
+type FloorDocumentUpload = {
+	data: {
+		reportInfoId?: string;
+		floorConstructionInfoId?: string;
+		floorDocument?: File;
+		floorNumber?: string;
+	};
+};
 type UpdateFloorReportProps = {
-	data: UpdateReportInfoWithFloorConstructionCommand;
+	data: {
+		reportFloorInfoId?: string;
+		reportInfoId?: string;
+		'reportFloorInfo.reportConstructionHeader.id'?: string;
+		'reportFloorInfo.reportConstructionHeader.constructionHeaderId'?: string;
+		'reportFloorInfo.reportConstructionHeader.square'?: number;
+		'reportFloorInfo.reportConstructionHeader.secondPlacementRoomId'?: string;
+		'reportFloorInfo.reportConstructionHeader.firstPlacementRoomId'?: string;
+		'reportFloorInfo.documentImage'?: File;
+		'reportFloorInfo.coordinates.x'?: number;
+		'reportFloorInfo.coordinates.y'?: number;
+		'reportFloorInfo.page'?: number;
+		'reportFloorInfo.floorDocument'?: File;
+		'reportFloorInfo.floorNumber'?: string;
+	};
 };
 
 export const createReport = async ({ data }: ReportCreateProps) => {
@@ -32,4 +53,7 @@ export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {
 };
 export const updateReportFloor = async ({ data }: UpdateFloorReportProps) => {
 	return await fetchApi.floor.floorUpdate(data);
+};
+export const uploadDocument = async ({ data }: FloorDocumentUpload) => {
+	return await fetchApi.floor.floorDocumentUpdate(data);
 };
