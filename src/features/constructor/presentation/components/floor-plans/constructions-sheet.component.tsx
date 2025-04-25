@@ -9,12 +9,14 @@ import {
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	useAppSelector,
 } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const data: ConstructionSheet[] = [
 	{
@@ -27,6 +29,8 @@ const data: ConstructionSheet[] = [
 
 export const ConstructionSheets = () => {
 	const navigate = useAppNavigate();
+	const [search] = useSearchParams();
+	const constructions = useAppSelector((store) => store.constructorData).constructionsSheet;
 	const columns = useMemo(() => {
 		const cols: ColumnDef<ConstructionSheet>[] = [
 			{
@@ -40,7 +44,9 @@ export const ConstructionSheets = () => {
 				cell: (info) => (
 					<SimpleTableCell
 						content={
-							<div className="h-[150px] w-[200px] rounded-[18px] border-[3px] border-primary bg-white"></div>
+							<div className="h-[150px] w-[200px] rounded-[18px] border-[3px] border-primary bg-white">
+								<img src={info.getValue() as string} alt="floorPlanImage" />
+							</div>
 						}
 					/>
 				),
@@ -72,19 +78,31 @@ export const ConstructionSheets = () => {
 									<div className="flex justify-between">
 										<InfoIcon
 											onClick={() => {
-												navigate('', { info: 'true' });
+												navigate('', {
+													info: 'true',
+													reportId: search.get('reportId')!,
+													reportType: search.get('reportType')!,
+												});
 											}}
 										/>
 										<DeleteIcon
 											onClick={() => {
-												navigate('', { delete: 'true' });
+												navigate('', {
+													delete: 'true',
+													reportId: search.get('reportId')!,
+													reportType: search.get('reportType')!,
+												});
 											}}
 										/>
 									</div>
 									<div className="flex justify-between">
 										<EditIcon
 											onClick={() => {
-												navigate('', { edit: 'true' });
+												navigate('', {
+													edit: 'true',
+													reportId: search.get('reportId')!,
+													reportType: search.get('reportType')!,
+												});
 											}}
 										/>
 									</div>
@@ -132,7 +150,7 @@ export const ConstructionSheets = () => {
 			<FormElementLabel className="font-[18px] text-primary">
 				Ведомость конструкций
 			</FormElementLabel>
-			<DesigningTable data={data} columns={columns} />
+			<DesigningTable data={constructions || []} columns={columns} />
 		</div>
 	);
 };

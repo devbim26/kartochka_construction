@@ -1,8 +1,26 @@
-import { convertToPaginatedType, convertToSelectValues, Input, Select } from '@core';
+import type { ReportInfoFloorConstructionDto } from '@api-gen';
+import {
+	convertBase64ToFile,
+	convertToPaginatedType,
+	convertToSelectValues,
+	Input,
+	Select,
+	useAppDispatch,
+	useAppSelector,
+} from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { convertToUpdateReportCommand } from '@features/constructor/converters';
-import { getReportSingleById, updateReportSingle } from '@features/constructor/services';
+import {
+	getReportFloorById,
+	getReportSingleById,
+	updateReportFloor,
+	updateReportSingle,
+} from '@features/constructor/services';
+import { constructorSlice } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
+import { ReportCategory } from '@features/constructor/types';
+import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
+
 import { CreateConstructionConfig } from '@features/constructor/utils';
 import { convertToClientConstructionsAddData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
@@ -34,13 +52,23 @@ export const CreateConstructionForm = memoize(
 			defaultValues: CreateConstructionConfig.defaultValues,
 			resolver: zodResolver(CreateConstructionConfig.schema),
 		});
-
-		const { register, formState, control, setValue, watch, handleSubmit } = form;
+		const { register, formState, control, setValue, watch, handleSubmit, getValues } = form;
 		const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>([]);
-		const [length, width] = watch(['length', 'width']);
+		const [layerId, setLayerId] = useState<string>();
+		const [length, width, construction, area] = watch([
+			'length',
+			'width',
+			'construction',
+			'area',
+		]);
 		const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>([]);
 		const [search] = useSearchParams();
 		const reportId = search.get('reportId');
+		const reportType = search.get('reportType');
+
+		const dispatch = useAppDispatch();
+
+		const image = useAppSelector((store) => store.constructorData).file;
 
 		useImperativeHandle(ref, () => ({
 			submit: () => {
@@ -53,32 +81,78 @@ export const CreateConstructionForm = memoize(
 
 		useEffect(() => {
 			if (!search.get('reportId')) return;
-			from(getReportSingleById({ id: search.get('reportId')! }))
+			from(
+				reportType == ReportCategory.Floor
+					? getReportFloorById({ id: search.get('reportId')! })
+					: getReportSingleById({ id: search.get('reportId')! }),
+			)
 				.pipe(
 					catchError((error) => {
-						console.log(error);
 						return from([null]);
 					}),
 				)
 				.subscribe((response) => {
 					const requirement = response?.data?.requirements?.[0];
 					if (!requirement) return;
-					const firstRoom = requirement.firstPlacementRoom?.name || '';
-					const secondRoom = requirement.secondPlacementRoom?.name || '';
-					setValue('firstPlacementRoom', firstRoom);
-					setValue('secondPlacementRoom', secondRoom);
+					const firstRoom = requirement.firstPlacementRoom;
+					const secondRoom = requirement.secondPlacementRoom;
+					if (
+						reportType == ReportCategory.Floor &&
+						!!(response as AxiosResponse<ReportInfoFloorConstructionDto>).data
+							.floorConstructionInfos?.length
+					) {
+						setLayerId(
+							(response as AxiosResponse<ReportInfoFloorConstructionDto>)?.data
+								?.floorConstructionInfos?.[0]?.id,
+						);
+					}
+					setValue('firstPlacementRoom', firstRoom!.id!);
+					setValue('secondPlacementRoom', secondRoom!.id!);
 					setRoomOptions([
-						{ label: firstRoom, value: firstRoom },
-						{ label: secondRoom, value: secondRoom },
+						{ label: firstRoom!.name!, value: firstRoom!.id! },
+						{ label: secondRoom!.name!, value: secondRoom!.id! },
 					]);
 				});
-		}, [search, setValue]);
+		}, [reportId, reportType, setValue]);
 
 		const handleAddConstruction = (data: CreateConstructionData) => {
 			if (reportId) {
 				const command = convertToUpdateReportCommand(reportId, data);
-				console.log(command);
-				from(updateReportSingle({ data: command }))
+				from(
+					reportType == ReportCategory.Floor
+						? updateReportFloor({
+								data: {
+									reportFloorInfoId: layerId,
+									'reportFloorInfo.coordinates.x': +search
+										.get('x')!
+										.split('.')[0]!,
+									'reportFloorInfo.coordinates.y': +search
+										.get('y')!
+										.split('.')[0]!,
+									'reportFloorInfo.page': +search.get('page')!,
+									'reportFloorInfo.documentImage': convertBase64ToFile(
+										image!.image!,
+										'File',
+										'image/png',
+									),
+									'reportFloorInfo.floorDocument': convertBase64ToFile(
+										image!.image!,
+										'File',
+										'image/png',
+									),
+									'reportFloorInfo.reportConstructionHeader.constructionHeaderId':
+										construction,
+									'reportFloorInfo.reportConstructionHeader.square': +area,
+									'reportFloorInfo.reportConstructionHeader.firstPlacementRoomId':
+										getValues('firstPlacementRoom'),
+									'reportFloorInfo.reportConstructionHeader.secondPlacementRoomId':
+										getValues('secondPlacementRoom'),
+									'reportFloorInfo.floorNumber': '1',
+									reportInfoId: search.get('reportId')!,
+								},
+							})
+						: updateReportSingle({ data: command }),
+				)
 					.pipe(
 						catchError((error) => {
 							if (error instanceof AxiosError) {
@@ -90,6 +164,35 @@ export const CreateConstructionForm = memoize(
 					.subscribe((response) => {
 						if (response?.status === 200) {
 							toast.success('Конструкция успешно добавлена в отчёт');
+							if (reportType == ReportCategory.Floor)
+								from(getReportFloorById({ id: reportId! })).subscribe(
+									(response) => {
+										dispatch(
+											constructorSlice.actions.setInfo(
+												response.data.floorConstructionInfos?.[0]
+													.reportFloorInfos?.[0] || {},
+											),
+										);
+										dispatch(
+											constructorSlice.actions.setConstructionsSheet(
+												response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
+													(info) => ({
+														title:
+															info.reportConstructionHeader
+																?.constructionHeader?.name ||
+															'Нет названия',
+														floorPlanImage: info.documentImageUrl || '',
+														constructionInfoImage:
+															info.documentImageUrl || '',
+														square:
+															info.reportConstructionHeader?.square ||
+															'0',
+													}),
+												) as ConstructionSheet[],
+											),
+										);
+									},
+								);
 						}
 					});
 			} else {
@@ -134,7 +237,6 @@ export const CreateConstructionForm = memoize(
 		useEffect(() => {
 			handleGetConstructionData();
 		}, []);
-		console.log(window.location.href);
 		return (
 			<div className="flex flex-col border-b">
 				<FormProvider {...form}>
@@ -225,6 +327,7 @@ export const CreateConstructionForm = memoize(
 											options={roomOptions}
 											{...field}
 											value={field.value || ''}
+											disabled
 											placeholder="Выберите помещение"
 											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 											wrapperClassname="shadow-none ring-input-border-primary"
@@ -238,6 +341,7 @@ export const CreateConstructionForm = memoize(
 										<Select
 											options={roomOptions}
 											{...field}
+											disabled
 											value={field.value || ''}
 											placeholder="Выберите помещение"
 											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
