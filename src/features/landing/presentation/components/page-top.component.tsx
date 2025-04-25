@@ -1,7 +1,7 @@
 import { LandingGif } from '@assets';
 import { APP_ROUTES, Button, useAppSelector } from '@core';
-import { AUTH_ROUTES } from '@features/auth';
-import { DESIGNING_ROUTES } from '@features/home';
+import { AUTH_ROUTES } from '@features/auth/constants';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useNavigate } from 'react-router-dom';
 
 export const PageTop = () => {

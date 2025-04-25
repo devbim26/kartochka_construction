@@ -1,14 +1,19 @@
-import { createAsyncCases, type SliceInitialState } from '@core/utils/fetch/create-cases.util';
-import { getCurrentUser, logout, updateUser } from '@features/account';
+import type { ReportFloorInfoDto, ReportInfoFloorConstructionDto } from '@api-gen';
+import { type SliceInitialState } from '@core/utils/fetch/create-cases.util';
 import { createSlice } from '@reduxjs/toolkit';
-import type { AboutBuildingData, CreateConstructionData } from '../types';
+import type { AboutBuildingData, CreateConstructionData, FloorPlanModalData } from '../types';
+import type { ConstructionSheet } from '../types/constructions-sheet.types';
 import { constructorReducer } from './constructor.reducer';
 
-export type ConstructorDataState = AboutBuildingData;
+export type ConstructorDataState = AboutBuildingData | FloorPlanModalData;
 
 export interface ConstructorSliceState extends SliceInitialState {
 	data: ConstructorDataState | null;
 	createConstructionData: CreateConstructionData | null;
+	reportInfo: ReportFloorInfoDto | null;
+	file: FloorPlanModalData | null;
+	constructionsSheet: ConstructionSheet[];
+	reportInfoFull: ReportInfoFloorConstructionDto | null;
 }
 
 const initialState: ConstructorSliceState = {
@@ -21,18 +26,21 @@ const initialState: ConstructorSliceState = {
 	error: null,
 	data: null,
 	createConstructionData: null,
+	reportInfo: null,
+	file: null,
+	constructionsSheet: [],
+	reportInfoFull: null,
 };
 
 export const constructorSlice = createSlice({
 	name: 'responseData',
 	initialState: initialState,
 	reducers: {
+		setInfo: constructorReducer.setInfo,
+		setFile: constructorReducer.setFile,
 		setAboutBuilding: constructorReducer.setAboutBuilding,
 		setCreateConstructionData: constructorReducer.setCreateConstructionData,
-	},
-	extraReducers: (builder) => {
-		createAsyncCases(builder, getCurrentUser, (state: ConstructorSliceState, action) => {});
-		createAsyncCases(builder, updateUser, (state: ConstructorSliceState, action) => {});
-		createAsyncCases(builder, logout, (state: ConstructorSliceState, action) => {});
+		setConstructionsSheet: constructorReducer.setConstructionSheets,
+		setInfoFull: constructorReducer.setInfoFull,
 	},
 });

@@ -1,1 +1,1 @@
-export * from './floor-plans.component';
+export * from './floor-plan.lazy.component';

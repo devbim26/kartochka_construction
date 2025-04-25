@@ -1,32 +1,18 @@
-import { memoize } from '@core/utils/hoc/memo.utils';
+import type { SidebarListProps } from '@features/home/types';
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { twMerge } from 'tailwind-merge';
-import { SidebarSessionStorageKeys, type SidebarItemCommonProps } from '../../../types';
 
-interface SidebarListProps extends SidebarItemCommonProps {
-	children: React.ReactNode;
-}
-
-export const SidebarList = memoize((props: SidebarListProps) => {
-	const [showSubItems, setShowSubItems] = useState<boolean>(() => {
-		const idFromStorage = sessionStorage.getItem(SidebarSessionStorageKeys.NavbarSelectId);
-		return (idFromStorage && idFromStorage === props.id) || false;
-	});
-
-	const onClickHandle = () => {
-		sessionStorage.setItem(
-			SidebarSessionStorageKeys.NavbarSelectId,
-			!showSubItems ? props.id : '',
-		);
-		setShowSubItems(!showSubItems);
-	};
+export const SidebarList = (props: SidebarListProps) => {
+	const [showSubItems, setShowSubItems] = useState<boolean>(
+		(props.currentPath || '').includes(props.path),
+	);
 
 	return (
 		<div className="flex h-fit flex-col">
 			<div
 				className="flex w-full cursor-pointer flex-row items-center justify-between py-[14px] pl-[24px] pr-[13px]"
-				onClick={onClickHandle}
+				onClick={() => setShowSubItems(!showSubItems)}
 			>
 				<div className="flex flex-row items-center gap-[16px] text-sm font-normal leading-5 tracking-tight text-[#383838]">
 					{props.icon && <props.icon size={'20px'} />}
@@ -42,4 +28,4 @@ export const SidebarList = memoize((props: SidebarListProps) => {
 			<div className="flex flex-col">{showSubItems && props.children}</div>
 		</div>
 	);
-}, 'SidebarList');
+};

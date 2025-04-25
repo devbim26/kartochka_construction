@@ -6,13 +6,15 @@ import type {
 	MaterialsAddAndEditData,
 	MaterialsFilterData,
 	MaterialTypeEnum,
-} from '@features';
+} from '@features/guidbooks/types';
 import {
 	convertToClientMaterialOriginTypeData,
-	convertToClientMaterialTypeData,
 	convertToServerMaterialOriginTypeData,
+} from './material-origin-type.converter';
+import {
+	convertToClientMaterialTypeData,
 	convertToServerMaterialTypeData,
-} from '@features';
+} from './material-type.converter';
 
 export const convertToServerMaterialsFilterData = (
 	data: MaterialsFilterData,

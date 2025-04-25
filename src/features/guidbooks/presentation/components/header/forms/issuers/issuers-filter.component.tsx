@@ -1,10 +1,9 @@
 import { Input, Select } from '@core';
-import { memoize } from '@core/utils/hoc/memo.utils';
 import type { Issuer } from '@features/guidbooks/types';
 import { RuCountryNamesMap, RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { Controller, useFormContext } from 'react-hook-form';
 
-export const IssuersFilter = memoize(() => {
+export const IssuersFilter = () => {
 	const form = useFormContext<Issuer>();
 	const { register, control } = form;
 	return (
@@ -56,4 +55,4 @@ export const IssuersFilter = memoize(() => {
 			/>
 		</>
 	);
-}, 'IssuersFilter');
+};

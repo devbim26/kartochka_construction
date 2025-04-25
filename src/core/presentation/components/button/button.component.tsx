@@ -1,4 +1,3 @@
-import { memoize } from '@core/utils/hoc/memo.utils';
 import { type ComponentPropsWithoutRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 
@@ -20,24 +19,27 @@ const BUTTON_VARIANTS = {
 	// empty: 'text-primary bg-none',
 };
 
-export const Button = memoize(
-	({ children, className, variant = 'primary', buttonIcon = false, ...rest }: ButtonProps) => {
-		const buttonContent = children;
+export const Button = ({
+	children,
+	className,
+	variant = 'primary',
+	buttonIcon = false,
+	...rest
+}: ButtonProps) => {
+	const buttonContent = children;
 
-		return (
-			<button
-				disabled={rest.disabled}
-				className={twMerge(
-					`flex-center text-semibold gap-1 whitespace-nowrap rounded-lg font-sans text-[14px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50`,
-					BUTTON_VARIANTS[variant],
-					!buttonIcon ? 'py-1.5' : 'px-0',
-					className,
-				)}
-				{...rest}
-			>
-				{buttonContent}
-			</button>
-		);
-	},
-	'Button',
-);
+	return (
+		<button
+			disabled={rest.disabled}
+			className={twMerge(
+				`flex-center text-semibold gap-1 whitespace-nowrap rounded-lg font-sans text-[14px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50`,
+				BUTTON_VARIANTS[variant],
+				!buttonIcon ? 'py-1.5' : 'px-0',
+				className,
+			)}
+			{...rest}
+		>
+			{buttonContent}
+		</button>
+	);
+};

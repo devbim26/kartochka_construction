@@ -11,27 +11,33 @@ import {
 	useAppNavigate,
 	type PaginationState,
 } from '@core';
-import type { Country, MaterialsAddAndEditData, MaterialsFilterData } from '@features';
+import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '@features';
 import {
 	convertToClientMaterialsAddAndEditData,
 	convertToServerMaterialsAddData,
 	convertToServerMaterialsEditData,
 	convertToServerMaterialsFilterData,
+} from '@features/guidbooks/converters';
+import {
 	getGuidebooksCreate,
 	getGuidebooksDelete,
 	getGuidebooksDetail,
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
-	GuidbookPageHeaderWrapper,
+} from '@features/guidbooks/services';
+import {
 	Guidebooks,
-	MaterialsAddAndEdit,
-	MaterialsAddAndEditConfig,
-	MaterialsFilter,
-	MaterialsFilterConfig,
 	RuCountryNamesMap,
 	RuMaterialTypeEnum,
+	type Country,
+	type MaterialsAddAndEditData,
+	type MaterialsFilterData,
+} from '@features/guidbooks/types';
+import {
+	MaterialsAddAndEditConfig,
+	MaterialsFilterConfig,
 	useHeaderForm,
-} from '@features';
+} from '@features/guidbooks/utils';
 
 import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';

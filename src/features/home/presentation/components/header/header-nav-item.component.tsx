@@ -1,26 +1,37 @@
-import { memoize } from '@core/utils/hoc/memo.utils';
+import { APP_ROUTES, useAppNavigate } from '@core';
+import { LandingSections } from '@features/landing/constants';
+import { useMemo } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
 interface HeaderNavItemProps {
-	clickCallback: (id: string) => void;
-	isSelected: boolean;
-	text: string;
-	id: string;
+	navOptions: {
+		text: string;
+		id: string;
+	};
 }
 
-export const HeaderNavItem = memoize(
-	({ clickCallback, isSelected, text, id }: HeaderNavItemProps) => {
-		return (
-			<p
-				className={twMerge(
-					'cursor-pointer text-xl font-medium',
-					isSelected ? 'text-primary' : 'text-input-value-black',
-				)}
-				onClick={() => clickCallback(id)}
-			>
-				{text}
-			</p>
-		);
-	},
-	'memoize',
-);
+export const HeaderNavItem = ({ navOptions }: HeaderNavItemProps) => {
+	const { pathname } = useLocation();
+	const [search] = useSearchParams();
+	const navigate = useAppNavigate();
+	const currentId = search.get('sectionId');
+
+	const style = useMemo(() => {
+		return (pathname.startsWith(APP_ROUTES.designing.route) &&
+			navOptions.id === LandingSections.designing.id) ||
+			navOptions.id === currentId
+			? 'text-primary'
+			: 'text-input-value-black';
+	}, [currentId]);
+
+	const setSection = () => {
+		navigate(APP_ROUTES.landing.route, { sectionId: navOptions.id });
+	};
+
+	return (
+		<p className={twMerge('cursor-pointer text-xl font-medium', style)} onClick={setSection}>
+			{navOptions.text}
+		</p>
+	);
+};

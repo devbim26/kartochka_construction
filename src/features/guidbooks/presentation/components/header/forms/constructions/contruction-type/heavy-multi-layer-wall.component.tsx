@@ -1,19 +1,24 @@
 import { DeleteIcon } from '@core';
-import type { ConstructionTypeProps, MaterialTypeEnum, UserMaterials } from '@features';
+import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import {
-	ConstructionFieldsMap,
-	ConstructionLayer,
+	MaterialTypesSelectValuesEnum,
+	type ConstructionTypeProps,
+	type MaterialTypeEnum,
+	type UserMaterials,
+} from '@features/guidbooks/types';
+import { useEffect, useState } from 'react';
+import { AiOutlinePlusCircle } from 'react-icons/ai';
+import {
+	PointConnectionsFieldsType,
+	ThicknessDensityFieldsType,
+} from '../construction-fields-types';
+import {
 	FillerMaterialType,
 	HeavyMaterialType,
 	LinkMaterialType,
-	MaterialTypesSelectValuesEnum,
-	PointConnectionsFieldsType,
 	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-} from '@features';
-
-import { useEffect, useState } from 'react';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
+} from '../construction-material-types';
+import { ConstructionLayer } from '../constructions-layer.component';
 
 export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
 	const { watch, setValue } = currentForm;

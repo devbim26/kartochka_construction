@@ -1,4 +1,4 @@
-import { Button } from '..';
+import { Button } from '../button';
 import { Modal, type ModalProps } from './modal.component';
 
 interface ConfirmationModalProps extends Omit<ModalProps, 'Footer'> {

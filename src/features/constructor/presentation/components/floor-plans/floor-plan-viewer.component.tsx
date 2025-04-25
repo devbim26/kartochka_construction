@@ -1,8 +1,13 @@
-import { Button, ChevronIcon, useAppNavigate } from '@core';
+import { Button, ChevronIcon, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
+import { constructorSlice } from '@features/constructor/store';
+import { convertToClientConstructionTypeEnumData } from '@features/guidbooks/converters';
+import { RuConstructionTypesMap } from '@features/guidbooks/types';
 import * as pdfjs from 'pdfjs-dist';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { TbZoomReset } from 'react-icons/tb';
+import { useSearchParams } from 'react-router-dom';
+import { from } from 'rxjs';
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@5.1.91/build/pdf.worker.min.mjs`;
 
 type Props = {
@@ -15,13 +20,15 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 	const [pageNum, setPageNum] = useState(1);
 	const [numPages, setNumPages] = useState(0);
 	const [scale, setScale] = useState(1.5);
-	const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
 	const navigate = useAppNavigate();
-
+	const [search] = useSearchParams();
+	const dispatch = useAppDispatch();
 	useEffect(() => {
 		setNumPages(pdfFile.numPages);
 		setPageNum(1);
 	}, []);
+
+	const info = useAppSelector((store) => store.constructorData).reportInfo;
 
 	const renderPage = useCallback(
 		async (num: number) => {
@@ -68,12 +75,18 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 		guidebookConstructionName: string,
 		dividedRooms: string,
 	) => {
+		const maxTextLength = Math.max(
+			constructionName.length,
+			guidebookConstructionName.length,
+			dividedRooms.length,
+		);
+
 		if (!canvasRef.current) return;
 		const canvas = canvasRef.current;
 		const context = canvas.getContext('2d');
 		if (!context) return;
 
-		const boxWidth = 220;
+		const boxWidth = maxTextLength * 15;
 		const boxHeight = 70;
 		const padding = 10;
 		const arrowThickness = 2;
@@ -137,22 +150,47 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 
 	const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
 		event.preventDefault();
-		navigate('', { add: 'true' });
+
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 
 		const rect = canvas.getBoundingClientRect();
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
-
-		drawConstruction(x, y, 'Тяжелая однослойная стена', 'HZ11', 'жилье/жилье');
+		dispatch(constructorSlice.actions.setFile({ image: canvas.toDataURL('image/png') }));
+		navigate('', {
+			create: 'true',
+			reportId: search.get('reportId')!.toString(),
+			reportType: search.get('reportType')!.toString(),
+			x: (x / scale).toString(),
+			y: (y / scale).toString(),
+			page: pageNum.toString(),
+		});
 	};
 
 	useEffect(() => {
 		if (pdfFile) {
-			renderPage(pageNum);
+			from(renderPage(pageNum)).subscribe(() => {
+				if (info) {
+					if (info.page === pageNum)
+						drawConstruction(
+							info.coordinates!.x! * scale,
+							info.coordinates!.y! * scale,
+							RuConstructionTypesMap[
+								convertToClientConstructionTypeEnumData(
+									info.reportConstructionHeader!.constructionHeader!
+										.constructionType!.constructionTypeEnum!,
+								)
+							],
+							info.reportConstructionHeader?.constructionHeader?.name || '',
+							info.reportConstructionHeader?.firstPlacementRoom?.name +
+								'/' +
+								info.reportConstructionHeader?.secondPlacementRoom?.name,
+						);
+				}
+			});
 		}
-	}, [pdfFile, pageNum, scale]);
+	}, [pdfFile, pageNum, scale, info]);
 
 	const handlePrev = () => {
 		if (pageNum > 1) setPageNum(pageNum - 1);
