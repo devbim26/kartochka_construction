@@ -1,10 +1,19 @@
 import { Button, Input, useAppSelector } from '@core';
 import { DesigningConfig, type DesigningData } from '@features';
+import { RuMaterialParametrs } from '@features/constructor/types/material-parametrs.types';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
-import { RuConstructionTypesMap, type ConstructionTypeEnum } from '@features/guidbooks/types';
+import { convertToServerConstructionsEditData } from '@features/guidbooks/converters';
+import { getGuidebooksEdit } from '@features/guidbooks/services';
+import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
+import { Guidebooks, RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
+
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { catchError, from, switchMap } from 'rxjs';
+import { toast } from 'sonner';
 
 const DesigningScreen = () => {
 	const form = useForm<DesigningData>({
@@ -32,13 +41,20 @@ const DesigningScreen = () => {
 		? RuConstructionTypesMap[constructionType]
 		: '';
 	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
+	const constructionId = constructionHeader?.id;
 
 	const formatMaterial = (material: (typeof materials)[0]) => {
 		const values =
 			material.materialTypeValue
-				?.map((val) => `${val.materialParametrs}: ${val.value}`)
+				?.map((val) => {
+					const paramKey = val.materialParametrs as keyof typeof RuMaterialParametrs;
+					const russianParam = RuMaterialParametrs[paramKey] ?? val.materialParametrs;
+					return `${russianParam}: ${val.value}`;
+				})
 				.join(', ') || 'нет данных';
-		return `${material.materialType} (${values})`;
+		const typeKey = material.materialType as keyof typeof RuMaterialTypeEnum;
+		const russianMaterialType = RuMaterialTypeEnum[typeKey] ?? material.materialType;
+		return `${russianMaterialType} (${values})`;
 	};
 
 	useEffect(() => {
@@ -49,6 +65,35 @@ const DesigningScreen = () => {
 			}).action();
 		}
 	}, [constructionType]);
+
+	const handleUpdateConstruction = (data: DesigningData) => {
+		const currentConstructionData =
+			reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+				?.reportConstructionHeader;
+		const editData: ConstructionsEditData = {
+			...currentConstructionData,
+			...data,
+		};
+		from(
+			getGuidebooksEdit({
+				data: convertToServerConstructionsEditData(editData),
+				guidebookType: Guidebooks.CONSTRUCTION,
+			}),
+		)
+			.pipe(
+				switchMap((response: AxiosResponse) => {
+					toast.success('Конструкция успешно обновлена');
+					return from([response]);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
@@ -80,10 +125,7 @@ const DesigningScreen = () => {
 					}).component}
 				<Button
 					className="ml-auto h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
-					onClick={form.handleSubmit(
-						(data) => console.log(data),
-						(errors) => console.log(errors),
-					)}
+					onClick={form.handleSubmit(handleUpdateConstruction)}
 				>
 					Применить
 				</Button>
