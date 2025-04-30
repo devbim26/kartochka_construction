@@ -8,9 +8,10 @@ import { getGuidebooksEdit } from '@features/guidbooks/services';
 import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { Guidebooks, RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import FrequencyChart from './designing-chart.component';
 
 const DesigningScreen = () => {
 	const form = useForm<DesigningData>({
@@ -20,9 +21,22 @@ const DesigningScreen = () => {
 	});
 	const reportInfoFull = useAppSelector((state) => state.constructorData.reportInfoFull);
 
+	const [chartLabels, setChartLabels] = useState<number[]>([]);
+	const [chartData, setChartData] = useState<number[]>([]);
+
 	useEffect(() => {
 		if (reportInfoFull) {
-			console.log(reportInfoFull);
+			const constructionData =
+				reportInfoFull.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+					?.reportConstructionHeader?.constructionHeader;
+			if (constructionData) {
+				const frequencyLabels = [50, 80, 125, 200, 315, 500, 800, 1250, 2500, 3150, 5000];
+				const soundReductionData = constructionData.rTotal?.length
+					? constructionData.rTotal
+					: Array(frequencyLabels.length).fill(constructionData.rw || 0);
+				setChartLabels(frequencyLabels);
+				setChartData(soundReductionData);
+			}
 		}
 	}, [reportInfoFull]);
 
@@ -125,7 +139,9 @@ const DesigningScreen = () => {
 					Применить
 				</Button>
 			</div>
-			<div className="flex w-full gap-[72px] rounded-[20px] bg-white px-[25px] py-[27px]"></div>
+			<div className="flex w-full gap-[72px] rounded-[20px] bg-white px-[25px] py-[27px]">
+				<FrequencyChart labels={chartLabels} data={chartData} />
+			</div>
 		</div>
 	);
 };
