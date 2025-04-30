@@ -11,7 +11,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import FrequencyChart from './designing-chart.component';
+import { twMerge } from 'tailwind-merge';
+import DesigningChart from './designing-chart.component';
 
 const DesigningScreen = () => {
 	const form = useForm<DesigningData>({
@@ -23,6 +24,12 @@ const DesigningScreen = () => {
 
 	const [chartLabels, setChartLabels] = useState<number[]>([]);
 	const [chartData, setChartData] = useState<number[]>([]);
+
+	const rwValue =
+		reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]?.reportConstructionHeader
+			?.constructionHeader?.rw || 0;
+	const isRelevant = rwValue >= 55;
+	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
 
 	useEffect(() => {
 		if (reportInfoFull) {
@@ -140,7 +147,24 @@ const DesigningScreen = () => {
 				</Button>
 			</div>
 			<div className="flex w-full gap-[72px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				<FrequencyChart labels={chartLabels} data={chartData} />
+				<div className="flex flex-col">
+					<p className="text-[12px] italic">СП 275.1325800.2016</p>
+					<p className="text-[12px] italic">Защита от шума, Россия </p>
+					<p className="text-[25px] font-[600]">Rw = {rwValue} dB</p>
+					<p
+						className={twMerge(
+							'text-[20px] font-[600]',
+							isRelevant ? 'text-[#008C54]' : 'text-[#FF0000]',
+						)}
+					>
+						{relevantText}
+					</p>
+					<p className="text-[12px] italic">
+						СП 51.13330.2011 &quot;Защита от шума&quot;{' '}
+					</p>
+					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
+				</div>
+				<DesigningChart labels={chartLabels} data={chartData} />
 			</div>
 		</div>
 	);

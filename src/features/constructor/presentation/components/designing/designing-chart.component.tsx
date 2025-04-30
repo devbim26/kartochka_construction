@@ -21,12 +21,12 @@ ChartJS.register(
 	ChartDataLabels,
 );
 
-type FrequencyChartProps = {
+type DesigningChartProps = {
 	labels: number[];
 	data: number[];
 };
 
-const FrequencyChart = ({ labels, data }: FrequencyChartProps) => {
+const DesigningChart = ({ labels, data }: DesigningChartProps) => {
 	const chartData: ChartData<'line'> = {
 		labels: labels.map(String),
 		datasets: [
@@ -111,4 +111,4 @@ const FrequencyChart = ({ labels, data }: FrequencyChartProps) => {
 	);
 };
 
-export default FrequencyChart;
+export default DesigningChart;
