@@ -1,18 +1,15 @@
 import { Button, Input, useAppSelector } from '@core';
 import { DesigningConfig, type DesigningData } from '@features';
+import { convertFromDesigningToConstructionsEditData } from '@features/constructor/converters';
 import { RuMaterialParametrs } from '@features/constructor/types/material-parametrs.types';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
 import { convertToServerConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksEdit } from '@features/guidbooks/services';
-import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
+import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { Guidebooks, RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { AxiosResponse } from 'axios';
-import { AxiosError } from 'axios';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { catchError, from, switchMap } from 'rxjs';
 import { toast } from 'sonner';
 
 const DesigningScreen = () => {
@@ -41,15 +38,14 @@ const DesigningScreen = () => {
 		? RuConstructionTypesMap[constructionType]
 		: '';
 	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
-	const constructionId = constructionHeader?.id;
 
 	const formatMaterial = (material: (typeof materials)[0]) => {
 		const values =
 			material.materialTypeValue
 				?.map((val) => {
 					const paramKey = val.materialParametrs as keyof typeof RuMaterialParametrs;
-					const russianParam = RuMaterialParametrs[paramKey] ?? val.materialParametrs;
-					return `${russianParam}: ${val.value}`;
+					const ruParam = RuMaterialParametrs[paramKey] ?? val.materialParametrs;
+					return `${ruParam}: ${val.value}`;
 				})
 				.join(', ') || 'нет данных';
 		const typeKey = material.materialType as keyof typeof RuMaterialTypeEnum;
@@ -66,33 +62,32 @@ const DesigningScreen = () => {
 		}
 	}, [constructionType]);
 
-	const handleUpdateConstruction = (data: DesigningData) => {
-		const currentConstructionData =
+	const handleUpdateConstruction = (formData: DesigningData) => {
+		const constructionData =
 			reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
 				?.reportConstructionHeader;
-		const editData: ConstructionsEditData = {
-			...currentConstructionData,
-			...data,
+		if (!constructionData) {
+			toast.error('Данные не найдены');
+			return;
+		}
+		const dataToSend = {
+			command: 'UPDATE',
+			data: convertToServerConstructionsEditData(
+				convertFromDesigningToConstructionsEditData(formData, constructionData),
+			),
 		};
-		from(
-			getGuidebooksEdit({
-				data: convertToServerConstructionsEditData(editData),
-				guidebookType: Guidebooks.CONSTRUCTION,
-			}),
-		)
-			.pipe(
-				switchMap((response: AxiosResponse) => {
-					toast.success('Конструкция успешно обновлена');
-					return from([response]);
-				}),
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
-					}
-					return from([null]);
-				}),
-			)
-			.subscribe();
+		getGuidebooksEdit({
+			data: dataToSend,
+			guidebookType: Guidebooks.CONSTRUCTION,
+		})
+			.then((response) => {
+				if (response.status === 200) {
+					toast.success('Успешно сохранено');
+				}
+			})
+			.catch((error) => {
+				toast.error(error.response?.data?.message || 'Ошибка сохранения');
+			});
 	};
 
 	return (
