@@ -1,7 +1,7 @@
-import { Button, Input } from '@core';
+import { Button, Input, useAppSelector } from '@core';
 import { DesigningConfig, type DesigningData } from '@features';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
-import { ConstructionTypeEnum } from '@features/guidbooks/types';
+import { RuConstructionTypesMap, type ConstructionTypeEnum } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -12,15 +12,43 @@ const DesigningScreen = () => {
 		defaultValues: DesigningConfig.defaultValues,
 		mode: 'onSubmit',
 	});
+	const reportInfoFull = useAppSelector((state) => state.constructorData.reportInfoFull);
 
 	useEffect(() => {
-		ConstructionTypeMap({
-			currentConstruction: currentConstruction as ConstructionTypeEnum,
-			currentForm: form,
-		}).action();
-	}, []);
+		if (reportInfoFull) {
+			console.log(reportInfoFull);
+		}
+	}, [reportInfoFull]);
 
-	const currentConstruction = ConstructionTypeEnum.HeavySingleLayerWall;
+	const constructionHeader =
+		reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]?.reportConstructionHeader
+			?.constructionHeader;
+	console.log('constructionHeader:', constructionHeader);
+	const constructionType = constructionHeader?.constructionType?.constructionTypeEnum as
+		| ConstructionTypeEnum
+		| undefined;
+	console.log('constructionType:', constructionType);
+	const russianConstructionType = constructionType
+		? RuConstructionTypesMap[constructionType]
+		: '';
+	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
+
+	const formatMaterial = (material: (typeof materials)[0]) => {
+		const values =
+			material.materialTypeValue
+				?.map((val) => `${val.materialParametrs}: ${val.value}`)
+				.join(', ') || 'нет данных';
+		return `${material.materialType} (${values})`;
+	};
+
+	useEffect(() => {
+		if (constructionType) {
+			ConstructionTypeMap({
+				currentConstruction: constructionType,
+				currentForm: form,
+			}).action();
+		}
+	}, [constructionType]);
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
@@ -32,26 +60,24 @@ const DesigningScreen = () => {
 						labelClassName="font-sans text-[16px] font-[600] text-input-label-primary"
 						inputClassName="h-[30px] px-[12px] font-sans text-[14px] font-[400] w-[300px] rounded-[8px]"
 						wrapperClassName="flex-row items-center gap-[66px]"
-						value={'Тяжелая однослойная стена + облицовка'}
+						value={russianConstructionType}
 						disabled
 					/>
 					<div className="flex flex-col">
-						<p className="text-[20px]">- Красный пустотелый кирпич -200 mm</p>
-						<p className="text-[20px]">- Стальной каркас -50 mm</p>
-						<p className="text-[20px]">- Базальтовая вата -50 mm</p>
-						<p className="text-[20px]">- Воздушный промежуток -50 mm</p>
-						<p className="text-[20px]">- ГКЛ -13 mm</p>
-						<p className="text-[20px]">- ГКЛ -13 mm</p>
+						{materials.map((material, index) => (
+							<p key={index} className="text-[16px]">
+								- {formatMaterial(material)}
+							</p>
+						))}
 					</div>
 				</div>
 			</div>
 			<div className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				{
+				{constructionType &&
 					ConstructionTypeMap({
-						currentConstruction: currentConstruction as ConstructionTypeEnum,
+						currentConstruction: constructionType,
 						currentForm: form,
-					}).component
-				}
+					}).component}
 				<Button
 					className="ml-auto h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
 					onClick={form.handleSubmit(
