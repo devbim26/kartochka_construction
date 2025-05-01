@@ -1,5 +1,5 @@
 import { Button, Input, useAppSelector } from '@core';
-import { DesigningConfig, type DesigningData } from '@features';
+import { DesigningConfig, SoundReductionTable, type DesigningData } from '@features';
 import { convertFromDesigningToConstructionsEditData } from '@features/constructor/converters';
 import { RuMaterialParametrs } from '@features/constructor/types/material-parametrs.types';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
@@ -165,6 +165,11 @@ const DesigningScreen = () => {
 					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
 				</div>
 				<DesigningChart labels={chartLabels} data={chartData} />
+				<SoundReductionTable
+					frequencyLabels={chartLabels}
+					rTotal={chartData}
+					noPadding={true}
+				/>
 			</div>
 		</div>
 	);
