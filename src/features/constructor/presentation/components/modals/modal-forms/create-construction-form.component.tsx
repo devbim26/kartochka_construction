@@ -125,11 +125,6 @@ export const CreateConstructionForm = memoize(
 									'floorInfo.coordinates.x': +search.get('x')!.split('.')[0]!,
 									'floorInfo.coordinates.y': +search.get('y')!.split('.')[0]!,
 									'floorInfo.page': +search.get('page')!,
-									// 'reportFloorInfo.documentImage': convertBase64ToFile(
-									// 	image!.image!,
-									// 	'File',
-									// 	'image/png',
-									// ),
 									'floorInfo.reportConstructionHeader.constructionHeaderId':
 										construction,
 									'floorInfo.reportConstructionHeader.square': +area,

@@ -55,7 +55,7 @@ export const DesigningTable = memoize(
 						classNames?.tableContainerClassName,
 					)}
 				>
-					<table className={twMerge('w-full table-auto', classNames?.tableClassName)}>
+					<table className={twMerge('w-full table-fixed', classNames?.tableClassName)}>
 						<thead>{headerRows}</thead>
 						<tbody>{contentRows}</tbody>
 					</table>
