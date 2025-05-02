@@ -37,7 +37,10 @@ export const DesigningTable = memoize(
 				key={id}
 			>
 				{getVisibleCells().map((cell) => (
-					<td key={cell.id} className="w-fit p-0">
+					<td
+						key={cell.id}
+						className={twMerge('w-fit p-0', classNames?.contentCellClassName)}
+					>
 						{flexRender(cell.column.columnDef.cell, cell.getContext())}
 					</td>
 				))}

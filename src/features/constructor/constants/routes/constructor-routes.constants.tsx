@@ -15,4 +15,8 @@ export const CONSTRUCTOR_ROUTES = {
 		id: 'constructor-designing-page-id',
 		route: 'designing',
 	},
+	myConstructions: {
+		id: 'my-constructions-page-id',
+		route: 'my-constructions',
+	},
 };
