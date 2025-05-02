@@ -1,5 +1,6 @@
-import { Button, useAppNavigate } from '@core';
+import { APP_ROUTES, Button, useAppNavigate } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useLocation } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
@@ -20,7 +21,15 @@ export const DesigningHeader = () => {
 							? ''
 							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
 					)}
-					onClick={() => navigate(CONSTRUCTOR_ROUTES.designing.route)}
+					onClick={() =>
+						navigate(
+							APP_ROUTES.designing.route +
+								'/' +
+								DESIGNING_ROUTES.constructor.route +
+								'/' +
+								CONSTRUCTOR_ROUTES.designing.route,
+						)
+					}
 				>
 					Редактирование конструкции
 				</Button>
@@ -31,7 +40,15 @@ export const DesigningHeader = () => {
 							? ''
 							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
 					)}
-					onClick={() => navigate(CONSTRUCTOR_ROUTES.myConstructions.route)}
+					onClick={() =>
+						navigate(
+							APP_ROUTES.designing.route +
+								'/' +
+								DESIGNING_ROUTES.constructor.route +
+								'/' +
+								CONSTRUCTOR_ROUTES.myConstructions.route,
+						)
+					}
 				>
 					Мои конструкции
 				</Button>

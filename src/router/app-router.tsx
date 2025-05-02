@@ -9,6 +9,7 @@ import {
 	ConstructionsScreen,
 	ConstructorLayout,
 	CONSTRUCTOR_ROUTES,
+	DesigningScreen,
 	DevScreen,
 	FloorPlansScreen,
 	GuidbooksLauout,
@@ -57,6 +58,10 @@ export const AppRouter = () => {
 					/>
 					<Route
 						path={CONSTRUCTOR_ROUTES.designing.route}
+						element={<DesigningScreen />}
+					/>
+					<Route
+						path={CONSTRUCTOR_ROUTES.myConstructions.route}
 						element={<MyConstructions />}
 					/>
 				</Route>
