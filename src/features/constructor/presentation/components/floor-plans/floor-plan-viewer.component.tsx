@@ -1,5 +1,15 @@
-import { Button, ChevronIcon, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
+import {
+	Button,
+	ChevronIcon,
+	convertBase64ToFile,
+	useAppDispatch,
+	useAppNavigate,
+	useAppSelector,
+} from '@core';
+import { getReportFloorById, uploadImage } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
+import type { ConstructionSheet } from '@features/constructor/types';
+import { ReportCategory } from '@features/constructor/types';
 import { convertToClientConstructionTypeEnumData } from '@features/guidbooks/converters';
 import { RuConstructionTypesMap } from '@features/guidbooks/types';
 import * as pdfjs from 'pdfjs-dist';
@@ -68,85 +78,88 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 		[scale, pageNum, pdfFile],
 	);
 
-	const drawConstruction = (
-		x: number,
-		y: number,
-		constructionName: string,
-		guidebookConstructionName: string,
-		dividedRooms: string,
-	) => {
-		const maxTextLength = Math.max(
-			constructionName.length,
-			guidebookConstructionName.length,
-			dividedRooms.length,
-		);
+	const drawConstruction = useCallback(
+		(
+			x: number,
+			y: number,
+			constructionName: string,
+			guidebookConstructionName: string,
+			dividedRooms: string,
+		) => {
+			const maxTextLength = Math.max(
+				constructionName.length,
+				guidebookConstructionName.length,
+				dividedRooms.length,
+			);
 
-		if (!canvasRef.current) return;
-		const canvas = canvasRef.current;
-		const context = canvas.getContext('2d');
-		if (!context) return;
+			if (!canvasRef.current) return;
+			const canvas = canvasRef.current;
+			const context = canvas.getContext('2d');
+			if (!context) return;
 
-		const boxWidth = maxTextLength * 15;
-		const boxHeight = 70;
-		const padding = 10;
-		const arrowThickness = 2;
-		const dotSize = 2;
+			const boxWidth = maxTextLength * 13;
+			const boxHeight = 70;
+			const padding = 10;
+			const arrowThickness = 2;
+			const dotSize = 2;
 
-		let boxX = x + 180;
-		const boxY = y - 100;
+			let boxX = x + 50;
+			const boxY = y - 100;
 
-		if (boxX + boxWidth + padding > canvas.width) {
-			boxX = x - 50 - boxWidth;
-		}
+			if (boxX + boxWidth + padding > canvas.width) {
+				boxX = x - 50 - boxWidth;
+			}
 
-		context.fillStyle = '#2175F3';
-		context.beginPath();
-		context.arc(x, y, dotSize, 0, Math.PI * 2);
-		context.fill();
+			context.fillStyle = '#2175F3';
+			context.beginPath();
+			context.arc(x, y, dotSize, 0, Math.PI * 2);
+			context.fill();
 
-		context.strokeStyle = '#2175F3';
-		context.lineWidth = arrowThickness;
-		context.beginPath();
-		context.moveTo(x, y);
-		context.lineTo(boxX + 10, boxY + 45);
-		context.stroke();
+			context.strokeStyle = '#2175F3';
+			context.lineWidth = arrowThickness;
+			context.beginPath();
+			context.moveTo(x, y);
+			context.lineTo(boxX + 10, boxY + 45);
+			context.stroke();
 
-		context.fillStyle = 'white';
-		context.fillRect(boxX, boxY, boxWidth, boxHeight);
-		context.strokeStyle = '#2175F3';
-		context.lineWidth = 2;
-		context.strokeRect(boxX, boxY, boxWidth, boxHeight);
+			context.fillStyle = 'white';
+			context.fillRect(boxX, boxY, boxWidth, boxHeight);
+			context.strokeStyle = '#2175F3';
+			context.lineWidth = 2;
+			context.strokeRect(boxX, boxY, boxWidth, boxHeight);
 
-		context.fillStyle = 'black';
-		context.font = '300 16px Source Sans Pro';
-		context.textAlign = 'left';
-		context.textBaseline = 'middle';
-		context.fillText(constructionName, boxX + 10, boxY + 20);
+			context.fillStyle = 'black';
+			context.font = '300 16px Source Sans Pro';
+			context.textAlign = 'left';
+			context.textBaseline = 'middle';
+			context.fillText(constructionName, boxX + 10, boxY + 20);
 
-		context.fillStyle = 'black';
-		context.font = '600 16px Source Sans Pro';
-		context.textAlign = 'left';
-		context.textBaseline = 'middle';
-		context.fillText('Конструкция:', boxX + 10, boxY + 35);
+			context.fillStyle = 'black';
+			context.font = '600 16px Source Sans Pro';
+			context.textAlign = 'left';
+			context.textBaseline = 'middle';
+			context.fillText('Конструкция:', boxX + 10, boxY + 35);
 
-		context.fillStyle = '#2175F3';
-		context.font = '800 16px Source Sans Pro';
-		context.textAlign = 'left';
-		context.textBaseline = 'middle';
-		context.fillText(guidebookConstructionName, boxX + 110, boxY + 35);
+			context.fillStyle = '#2175F3';
+			context.font = '800 16px Source Sans Pro';
+			context.textAlign = 'left';
+			context.textBaseline = 'middle';
+			context.fillText(guidebookConstructionName, boxX + 110, boxY + 35);
 
-		context.fillStyle = 'black';
-		context.font = '600 16px Source Sans Pro';
-		context.textAlign = 'left';
-		context.textBaseline = 'middle';
-		context.fillText('разделяет:', boxX + 10, boxY + 50);
+			context.fillStyle = 'black';
+			context.font = '600 16px Source Sans Pro';
+			context.textAlign = 'left';
+			context.textBaseline = 'middle';
+			context.fillText('разделяет:', boxX + 10, boxY + 50);
 
-		context.fillStyle = 'black';
-		context.font = '800 16px Source Sans Pro';
-		context.textAlign = 'left';
-		context.textBaseline = 'middle';
-		context.fillText(dividedRooms, boxX + 90, boxY + 50);
-	};
+			context.fillStyle = 'black';
+			context.font = '800 16px Source Sans Pro';
+			context.textAlign = 'left';
+			context.textBaseline = 'middle';
+			context.fillText(dividedRooms, boxX + 90, boxY + 50);
+		},
+		[],
+	);
 
 	const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
 		event.preventDefault();
@@ -169,10 +182,12 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 	};
 
 	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
 		if (pdfFile) {
 			from(renderPage(pageNum)).subscribe(() => {
 				if (info) {
-					if (info.page === pageNum)
+					if (info.page === pageNum) {
 						drawConstruction(
 							info.coordinates!.x! * scale,
 							info.coordinates!.y! * scale,
@@ -187,6 +202,68 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 								'/' +
 								info.reportConstructionHeader?.secondPlacementRoom?.name,
 						);
+						const rectWidth = 800;
+						const rectHeight = 500;
+						const centerX = info.coordinates!.x! * scale;
+						const centerY = info.coordinates!.y! * scale;
+						const startX = centerX - rectWidth / 2;
+						const startY = centerY - rectHeight / 2;
+						const croppedCanvas = document.createElement('canvas');
+						croppedCanvas.width = rectWidth;
+						croppedCanvas.height = rectHeight;
+						const croppedCtx = croppedCanvas.getContext('2d');
+						croppedCtx!.drawImage(
+							canvas,
+							startX,
+							startY,
+							rectWidth,
+							rectHeight,
+							0,
+							0,
+							rectWidth,
+							rectHeight,
+						);
+
+						const imageFile = convertBase64ToFile(
+							croppedCanvas.toDataURL('image/png'),
+							'file',
+							'image/png',
+						);
+						from(
+							uploadImage({
+								data: {
+									reportFloorInfoId: info.id,
+									floorDocumentImage: imageFile,
+								},
+							}),
+						).subscribe((response) => {
+							if (response.status === 200) {
+								if (search.get('reportType') == ReportCategory.Floor)
+									from(
+										getReportFloorById({ id: search.get('reportId')! }),
+									).subscribe((response) => {
+										dispatch(
+											constructorSlice.actions.setConstructionsSheet(
+												response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
+													(info) => ({
+														title:
+															info.reportConstructionHeader
+																?.constructionHeader?.name ||
+															'Нет названия',
+														floorPlanImage: info.documentImageUrl || '',
+														constructionInfoImage:
+															info.documentImageUrl || '',
+														square:
+															info.reportConstructionHeader?.square ||
+															'0',
+													}),
+												) as ConstructionSheet[],
+											),
+										);
+									});
+							}
+						});
+					}
 				}
 			});
 		}

@@ -5,6 +5,7 @@ import {
 	AuthorizationScreen,
 	CodeConfirmPage,
 	CompanyRegistrationPage,
+	ConstructionPickScreen,
 	ConstructionsScreen,
 	ConstructorLayout,
 	CONSTRUCTOR_ROUTES,
@@ -22,6 +23,7 @@ import {
 	RequirementsScreen,
 } from '@features';
 import { AUTH_ROUTES } from '@features/auth/constants';
+import MyConstructions from '@features/constructor/presentation/components/designing/my-costructions.component';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
 import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants';
 import { Navigate, Route, Routes } from 'react-router-dom';
@@ -52,11 +54,15 @@ export const AppRouter = () => {
 					/>
 					<Route
 						path={CONSTRUCTOR_ROUTES.constructionSelect.route}
-						element={<DevScreen title="Выбор конструкции" />}
+						element={<ConstructionPickScreen />}
 					/>
 					<Route
 						path={CONSTRUCTOR_ROUTES.designing.route}
 						element={<DesigningScreen />}
+					/>
+					<Route
+						path={CONSTRUCTOR_ROUTES.myConstructions.route}
+						element={<MyConstructions />}
 					/>
 				</Route>
 				<Route path={DESIGNING_ROUTES.account.route} element={<AccountScreen />} />

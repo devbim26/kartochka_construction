@@ -1,6 +1,5 @@
 import type { ReportInfoFloorConstructionDto } from '@api-gen';
 import {
-	convertBase64ToFile,
 	convertToPaginatedType,
 	convertToSelectValues,
 	Input,
@@ -122,32 +121,18 @@ export const CreateConstructionForm = memoize(
 					reportType == ReportCategory.Floor
 						? updateReportFloor({
 								data: {
-									reportFloorInfoId: layerId,
-									'reportFloorInfo.coordinates.x': +search
-										.get('x')!
-										.split('.')[0]!,
-									'reportFloorInfo.coordinates.y': +search
-										.get('y')!
-										.split('.')[0]!,
-									'reportFloorInfo.page': +search.get('page')!,
-									'reportFloorInfo.documentImage': convertBase64ToFile(
-										image!.image!,
-										'File',
-										'image/png',
-									),
-									'reportFloorInfo.floorDocument': convertBase64ToFile(
-										image!.image!,
-										'File',
-										'image/png',
-									),
-									'reportFloorInfo.reportConstructionHeader.constructionHeaderId':
+									floorConstructionInfoId: layerId,
+									'floorInfo.coordinates.x': +search.get('x')!.split('.')[0]!,
+									'floorInfo.coordinates.y': +search.get('y')!.split('.')[0]!,
+									'floorInfo.page': +search.get('page')!,
+									'floorInfo.reportConstructionHeader.constructionHeaderId':
 										construction,
-									'reportFloorInfo.reportConstructionHeader.square': +area,
-									'reportFloorInfo.reportConstructionHeader.firstPlacementRoomId':
+									'floorInfo.reportConstructionHeader.square': +area,
+									'floorInfo.reportConstructionHeader.firstPlacementRoomId':
 										getValues('firstPlacementRoom'),
-									'reportFloorInfo.reportConstructionHeader.secondPlacementRoomId':
+									'floorInfo.reportConstructionHeader.secondPlacementRoomId':
 										getValues('secondPlacementRoom'),
-									'reportFloorInfo.floorNumber': '1',
+									'floorInfo.floorNumber': '1',
 									reportInfoId: search.get('reportId')!,
 								},
 							})

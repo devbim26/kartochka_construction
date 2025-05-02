@@ -1,30 +1,16 @@
-import { Button, Input, useAppSelector } from '@core';
-import {
-	DesigningConfig,
-	DesigningHeader,
-	SoundReductionTable,
-	type DesigningData,
-} from '@features';
-import { convertFromDesigningToConstructionsEditData } from '@features/constructor/converters';
+import { Button, ChevronIcon, useAppSelector } from '@core';
+import { SoundReductionTable } from '@features';
 import { RuMaterialParametrs } from '@features/constructor/types/material-parametrs.types';
-import { ConstructionTypeMap } from '@features/guidbooks/constants';
-import { convertToServerConstructionsEditData } from '@features/guidbooks/converters';
-import { getGuidebooksEdit } from '@features/guidbooks/services';
+import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
 import type { ConstructionTypeEnum } from '@features/guidbooks/types';
-import { Guidebooks, RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { RuMaterialTypeEnum } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
+import issuer from '../../../../../assets/issuer.png';
 import DesigningChart from './designing-chart.component';
+import { DesigningHeader } from './designing-header.component';
 
-const DesigningScreen = () => {
-	const form = useForm<DesigningData>({
-		resolver: zodResolver(DesigningConfig.schema),
-		defaultValues: DesigningConfig.defaultValues,
-		mode: 'onSubmit',
-	});
+const MyConstructions = () => {
 	const reportInfoFull = useAppSelector((state) => state.constructorData.reportInfoFull);
 
 	const [chartLabels, setChartLabels] = useState<number[]>([]);
@@ -55,12 +41,10 @@ const DesigningScreen = () => {
 	const constructionHeader =
 		reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]?.reportConstructionHeader
 			?.constructionHeader;
+	console.log(constructionHeader);
 	const constructionType = constructionHeader?.constructionType?.constructionTypeEnum as
 		| ConstructionTypeEnum
 		| undefined;
-	const russianConstructionType = constructionType
-		? RuConstructionTypesMap[constructionType]
-		: '';
 	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
 
 	const formatMaterial = (material: (typeof materials)[0]) => {
@@ -76,79 +60,43 @@ const DesigningScreen = () => {
 		const russianMaterialType = RuMaterialTypeEnum[typeKey] ?? material.materialType;
 		return `${russianMaterialType} (${values})`;
 	};
-
-	useEffect(() => {
-		if (constructionType) {
-			ConstructionTypeMap({
-				currentConstruction: constructionType,
-				currentForm: form,
-			}).action();
-		}
-	}, [constructionType]);
-
-	const handleUpdateConstruction = (formData: DesigningData) => {
-		const constructionData =
-			reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-				?.reportConstructionHeader;
-		if (!constructionData) {
-			toast.error('Данные не найдены');
-			return;
-		}
-		const dataToSend = {
-			command: 'UPDATE',
-			data: convertToServerConstructionsEditData(
-				convertFromDesigningToConstructionsEditData(formData, constructionData),
-			),
-		};
-		getGuidebooksEdit({
-			data: dataToSend,
-			guidebookType: Guidebooks.CONSTRUCTION,
-		})
-			.then((response) => {
-				if (response.status === 200) {
-					toast.success('Успешно сохранено');
-				}
-			})
-			.catch((error) => {
-				toast.error(error.response?.data?.message || 'Ошибка сохранения');
-			});
-	};
-
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
 			<DesigningHeader />
 			<div className="flex h-[428px] w-full flex-row gap-[72px] rounded-[20px] bg-white px-[44px] py-[34px]">
-				<img className="h-full w-[100px]" />
-				<div className="flex flex-col gap-[30px]">
-					<Input
-						label="Тип конструкции"
-						labelClassName="font-sans text-[16px] font-[600] text-input-label-primary"
-						inputClassName="h-[30px] px-[12px] font-sans text-[14px] font-[400] w-[300px] rounded-[8px]"
-						wrapperClassName="flex-row items-center gap-[66px]"
-						value={russianConstructionType}
-						disabled
-					/>
+				<div className="flex gap-[60px]">
 					<div className="flex flex-col">
-						{materials.map((material, index) => (
-							<p key={index} className="text-[16px]">
-								- {formatMaterial(material)}
-							</p>
-						))}
+						<Button className="h-[40px] w-[190px] px-[16px] text-[16px]">
+							Конструкция 1
+						</Button>
+					</div>
+					<div className="rounded-lg border border-blue-500 p-[20px]">
+						<FormSubTitle text="Конструкция 1" />
+						<div className="flex flex-col">
+							{materials.map((material, index) => (
+								<p key={index} className="text-[16px]">
+									- {formatMaterial(material)}
+								</p>
+							))}
+						</div>
+					</div>
+					<div className="flex flex-col">
+						<img
+							src={issuer}
+							alt="Превью изображения"
+							className="h-[66px] w-[140px] rounded-md object-cover"
+						/>
+						<p>www.acoustic.ru</p>
+						<div className="flex items-center gap-[20px]">
+							<Button variant="primary" className="p-[10px]">
+								<ChevronIcon className="rotate-90" fill="white" />
+							</Button>
+							<Button variant="primary" className="p-[10px]">
+								<ChevronIcon className="-rotate-90" fill="white" />
+							</Button>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				{constructionType &&
-					ConstructionTypeMap({
-						currentConstruction: constructionType,
-						currentForm: form,
-					}).component}
-				<Button
-					className="ml-auto h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
-					onClick={form.handleSubmit(handleUpdateConstruction)}
-				>
-					Применить
-				</Button>
 			</div>
 			<div className="flex w-full gap-[72px] rounded-[20px] bg-white px-[25px] py-[27px]">
 				<div className="flex flex-col">
@@ -179,4 +127,4 @@ const DesigningScreen = () => {
 	);
 };
 
-export default DesigningScreen;
+export default MyConstructions;
