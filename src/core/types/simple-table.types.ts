@@ -24,6 +24,7 @@ interface DesigningTableProps<T> {
 		headerRowClassName?: string;
 		headerCellClassName?: string;
 		tableContainerClassName?: string;
+		contentCellClassName?: string;
 	};
 }
 
