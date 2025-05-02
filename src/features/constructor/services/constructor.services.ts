@@ -21,21 +21,30 @@ type FloorDocumentUpload = {
 		floorNumber?: string;
 	};
 };
+
+type FloorDocumentImage = {
+	data: {
+		reportFloorInfoId?: string;
+		floorDocumentImage?: File;
+	};
+};
+
 type UpdateFloorReportProps = {
 	data: {
 		reportFloorInfoId?: string;
 		reportInfoId?: string;
-		'reportFloorInfo.reportConstructionHeader.id'?: string;
-		'reportFloorInfo.reportConstructionHeader.constructionHeaderId'?: string;
-		'reportFloorInfo.reportConstructionHeader.square'?: number;
-		'reportFloorInfo.reportConstructionHeader.secondPlacementRoomId'?: string;
-		'reportFloorInfo.reportConstructionHeader.firstPlacementRoomId'?: string;
-		'reportFloorInfo.documentImage'?: File;
-		'reportFloorInfo.coordinates.x'?: number;
-		'reportFloorInfo.coordinates.y'?: number;
-		'reportFloorInfo.page'?: number;
-		'reportFloorInfo.floorDocument'?: File;
-		'reportFloorInfo.floorNumber'?: string;
+		floorConstructionInfoId?: string;
+		'floorInfo.reportConstructionHeader.id'?: string;
+		'floorInfo.reportConstructionHeader.constructionHeaderId'?: string;
+		'floorInfo.reportConstructionHeader.square'?: number;
+		'floorInfo.reportConstructionHeader.secondPlacementRoomId'?: string;
+		'floorInfo.reportConstructionHeader.firstPlacementRoomId'?: string;
+		'floorInfo.documentImage'?: File;
+		'floorInfo.coordinates.x'?: number;
+		'floorInfo.coordinates.y'?: number;
+		'floorInfo.page'?: number;
+		'floorInfo.floorDocument'?: File;
+		'floorInfo.floorNumber'?: string;
 	};
 };
 
@@ -52,8 +61,11 @@ export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {
 	return await fetchApi.single.singleUpdate(data);
 };
 export const updateReportFloor = async ({ data }: UpdateFloorReportProps) => {
-	return await fetchApi.floor.floorUpdate(data);
+	return await fetchApi.floor.constructionUpdate(data);
 };
 export const uploadDocument = async ({ data }: FloorDocumentUpload) => {
-	return await fetchApi.floor.floorDocumentUpdate(data);
+	return await fetchApi.floor.documentUpdate(data);
+};
+export const uploadImage = async ({ data }: FloorDocumentImage) => {
+	return await fetchApi.floor.constructionImageUpdate(data);
 };

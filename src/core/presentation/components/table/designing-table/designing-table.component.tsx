@@ -37,7 +37,7 @@ export const DesigningTable = memoize(
 				key={id}
 			>
 				{getVisibleCells().map((cell) => (
-					<td key={cell.id} className="p-0">
+					<td key={cell.id} className="w-fit p-0">
 						{flexRender(cell.column.columnDef.cell, cell.getContext())}
 					</td>
 				))}
@@ -52,7 +52,7 @@ export const DesigningTable = memoize(
 						classNames?.tableContainerClassName,
 					)}
 				>
-					<table className={twMerge('w-full table-fixed', classNames?.tableClassName)}>
+					<table className={twMerge('w-full table-auto', classNames?.tableClassName)}>
 						<thead>{headerRows}</thead>
 						<tbody>{contentRows}</tbody>
 					</table>

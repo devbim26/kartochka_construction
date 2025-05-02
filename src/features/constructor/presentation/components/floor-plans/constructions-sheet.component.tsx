@@ -46,7 +46,7 @@ export const ConstructionSheets = () => {
 						content={
 							<div>
 								<img
-									className="h-[150px] w-[200px] rounded-[18px] border-[3px] border-primary bg-white"
+									className="h-[150px] w-[400px] rounded-[18px] border-[3px] border-primary bg-white"
 									src={info.getValue() as string}
 									alt="floorPlanImage"
 								/>
@@ -61,7 +61,7 @@ export const ConstructionSheets = () => {
 				cell: (info) => (
 					<SimpleTableCell
 						content={
-							<div className="h-[150px] w-[200px] rounded-[18px] border-[3px] border-primary bg-white"></div>
+							<div className="h-[150px] w-[500px] rounded-[18px] border-[3px] border-primary bg-white"></div>
 						}
 					/>
 				),
@@ -69,7 +69,11 @@ export const ConstructionSheets = () => {
 			{
 				accessorKey: 'square',
 				header: () => <SimpleTableHeaderCell text="Площадь, м²" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => (
+					<SimpleTableCell
+						content={<div className="w-fit">{info.getValue() as string}</div>}
+					/>
+				),
 			},
 			{
 				accessorKey: 'actions',
@@ -135,6 +139,10 @@ export const ConstructionSheets = () => {
 													DESIGNING_ROUTES.constructor.route +
 													'/' +
 													CONSTRUCTOR_ROUTES.constructionSelect.route,
+												{
+													reportId: search.get('reportId')!,
+													reportType: search.get('reportType')!,
+												},
 											)
 										}
 									>
@@ -154,7 +162,14 @@ export const ConstructionSheets = () => {
 			<FormElementLabel className="font-[18px] text-primary">
 				Ведомость конструкций
 			</FormElementLabel>
-			<DesigningTable data={constructions || []} columns={columns} />
+			<DesigningTable
+				classNames={{
+					headerCellClassName: 'w-[50px]',
+					contentRowClassName: 'max-w-[100px] w-fit',
+				}}
+				data={constructions || []}
+				columns={columns}
+			/>
 		</div>
 	);
 };

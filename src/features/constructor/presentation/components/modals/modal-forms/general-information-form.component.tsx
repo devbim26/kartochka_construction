@@ -30,7 +30,7 @@ export const GeneralInformationForm = () => {
 					dispatch(constructorSlice.actions.setInfoFull(response.data));
 				}
 			});
-	}, [reportId, dispatch]);
+	}, [reportId]);
 
 	const info =
 		reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
