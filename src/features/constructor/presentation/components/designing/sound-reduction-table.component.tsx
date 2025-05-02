@@ -90,7 +90,9 @@ export const SoundReductionTable = ({
 				data={tableData}
 				columns={columns}
 				classNames={{
-					tableClassName: 'border-separate',
+					tableClassName: 'border border-[#EDEFF2] border-collapse',
+					headerCellClassName: 'border border-[#EDEFF2]',
+					contentCellClassName: 'border border-[#EDEFF2]',
 				}}
 			/>
 		</div>
