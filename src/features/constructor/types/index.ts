@@ -1,7 +1,6 @@
 export * from './about-building-data.types';
 export * from './building-purpose.types';
 export * from './constructions-sheet.types';
-export * from './designing-table.types';
 export * from './designing.types';
 export * from './fire-resistance.types';
 export * from './floor-plan.types';
