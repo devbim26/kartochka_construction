@@ -46,7 +46,7 @@ export const ConstructionSheets = () => {
 						content={
 							<div>
 								<img
-									className="h-[150px] w-[400px] rounded-[18px] border-[3px] border-primary bg-white"
+									className="w-[400px] rounded-[18px] border-[3px] border-primary bg-white"
 									src={info.getValue() as string}
 									alt="floorPlanImage"
 								/>
@@ -61,7 +61,7 @@ export const ConstructionSheets = () => {
 				cell: (info) => (
 					<SimpleTableCell
 						content={
-							<div className="h-[150px] w-[500px] rounded-[18px] border-[3px] border-primary bg-white"></div>
+							<div className="h-[150px] w-[200px] rounded-[18px] border-[3px] border-primary bg-white"></div>
 						}
 					/>
 				),

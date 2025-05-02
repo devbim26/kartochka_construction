@@ -6,8 +6,10 @@ import {
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
-import { uploadImage } from '@features/constructor/services';
+import { getReportFloorById, uploadImage } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
+import type { ConstructionSheet } from '@features/constructor/types';
+import { ReportCategory } from '@features/constructor/types';
 import { convertToClientConstructionTypeEnumData } from '@features/guidbooks/converters';
 import { RuConstructionTypesMap } from '@features/guidbooks/types';
 import * as pdfjs from 'pdfjs-dist';
@@ -95,13 +97,13 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 			const context = canvas.getContext('2d');
 			if (!context) return;
 
-			const boxWidth = maxTextLength * 15;
+			const boxWidth = maxTextLength * 13;
 			const boxHeight = 70;
 			const padding = 10;
 			const arrowThickness = 2;
 			const dotSize = 2;
 
-			let boxX = x + 180;
+			let boxX = x + 50;
 			const boxY = y - 100;
 
 			if (boxX + boxWidth + padding > canvas.width) {
@@ -200,15 +202,66 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 								'/' +
 								info.reportConstructionHeader?.secondPlacementRoom?.name,
 						);
-						uploadImage({
-							data: {
-								reportFloorInfoId: info.id,
-								floorDocumentImage: convertBase64ToFile(
-									canvas.toDataURL('image/png'),
-									'file',
-									'123',
-								),
-							},
+						const rectWidth = 800;
+						const rectHeight = 500;
+						const centerX = info.coordinates!.x! * scale;
+						const centerY = info.coordinates!.y! * scale;
+						const startX = centerX - rectWidth / 2;
+						const startY = centerY - rectHeight / 2;
+						const croppedCanvas = document.createElement('canvas');
+						croppedCanvas.width = rectWidth;
+						croppedCanvas.height = rectHeight;
+						const croppedCtx = croppedCanvas.getContext('2d');
+						croppedCtx!.drawImage(
+							canvas,
+							startX,
+							startY,
+							rectWidth,
+							rectHeight,
+							0,
+							0,
+							rectWidth,
+							rectHeight,
+						);
+
+						const imageFile = convertBase64ToFile(
+							croppedCanvas.toDataURL('image/png'),
+							'file',
+							'image/png',
+						);
+						from(
+							uploadImage({
+								data: {
+									reportFloorInfoId: info.id,
+									floorDocumentImage: imageFile,
+								},
+							}),
+						).subscribe((response) => {
+							if (response.status === 200) {
+								if (search.get('reportType') == ReportCategory.Floor)
+									from(
+										getReportFloorById({ id: search.get('reportId')! }),
+									).subscribe((response) => {
+										dispatch(
+											constructorSlice.actions.setConstructionsSheet(
+												response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
+													(info) => ({
+														title:
+															info.reportConstructionHeader
+																?.constructionHeader?.name ||
+															'Нет названия',
+														floorPlanImage: info.documentImageUrl || '',
+														constructionInfoImage:
+															info.documentImageUrl || '',
+														square:
+															info.reportConstructionHeader?.square ||
+															'0',
+													}),
+												) as ConstructionSheet[],
+											),
+										);
+									});
+							}
 						});
 					}
 				}
