@@ -5,6 +5,7 @@ import {
 	AuthorizationScreen,
 	CodeConfirmPage,
 	CompanyRegistrationPage,
+	ConstructionPickScreen,
 	ConstructionsScreen,
 	ConstructorLayout,
 	CONSTRUCTOR_ROUTES,
@@ -52,7 +53,7 @@ export const AppRouter = () => {
 					/>
 					<Route
 						path={CONSTRUCTOR_ROUTES.constructionSelect.route}
-						element={<DevScreen title="Выбор конструкции" />}
+						element={<ConstructionPickScreen />}
 					/>
 					<Route
 						path={CONSTRUCTOR_ROUTES.designing.route}
