@@ -65,33 +65,26 @@ const DesigningScreen = () => {
 	const [chartLabels, setChartLabels] = useState<number[]>([]);
 	const [chartData, setChartData] = useState<number[]>([]);
 
-	const isFloorReport = (
-		report: ReportInfoFloorConstructionDto | ReportInfoSingleConstructionDto | undefined,
-	): report is ReportInfoFloorConstructionDto => {
-		return (report as ReportInfoFloorConstructionDto)?.floorConstructionInfos !== undefined;
-	};
-
-	const rwValue = isFloorReport(report)
-		? report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]?.reportConstructionHeader
-				?.constructionHeader?.rw || 0
-		: report?.singleConstructionInfos?.[0]?.reportConstructionHeader?.constructionHeader?.rw ||
-			0;
+	const rwValue =
+		reportType === ReportCategory.Floor
+			? (report as ReportInfoFloorConstructionDto)?.floorConstructionInfos?.[0]
+					?.reportFloorInfos?.[0]?.reportConstructionHeader?.constructionHeader?.rw || 0
+			: (report as ReportInfoSingleConstructionDto)?.singleConstructionInfos?.[0]
+					?.reportConstructionHeader?.constructionHeader?.rw || 0;
 
 	const isRelevant = rwValue >= 55;
 	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
 
-	const constructionHeader = report
-		? isFloorReport(report)
-			? report.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]?.reportConstructionHeader
-					?.constructionHeader
-			: report.singleConstructionInfos?.[0]?.reportConstructionHeader?.constructionHeader
-		: undefined;
+	const constructionHeader =
+		reportType === ReportCategory.Floor
+			? (report as ReportInfoFloorConstructionDto)?.floorConstructionInfos?.[0]
+					?.reportFloorInfos?.[0]?.reportConstructionHeader?.constructionHeader
+			: (report as ReportInfoSingleConstructionDto)?.singleConstructionInfos?.[0]
+					?.reportConstructionHeader?.constructionHeader;
 	const constructionType = constructionHeader?.constructionType?.constructionTypeEnum as
 		| ConstructionTypeEnum
 		| undefined;
-	const russianConstructionType = constructionType
-		? RuConstructionTypesMap[constructionType]
-		: '';
+	const ruConstructionType = constructionType ? RuConstructionTypesMap[constructionType] : '';
 	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
 
 	useEffect(() => {
@@ -109,7 +102,6 @@ const DesigningScreen = () => {
 		const materialType =
 			RuMaterialTypeEnum[material.materialType as keyof typeof RuMaterialTypeEnum] ??
 			material.materialType;
-
 		const materialParams =
 			material.materialTypeValue
 				?.map((val) => {
@@ -120,7 +112,6 @@ const DesigningScreen = () => {
 					return `${param}: ${val.value}`;
 				})
 				.join(', ') || 'нет данных';
-
 		return `${materialType} (${materialParams})`;
 	};
 
@@ -172,7 +163,7 @@ const DesigningScreen = () => {
 						labelClassName="font-sans text-[16px] font-[600] text-input-label-primary"
 						inputClassName="h-[30px] px-[12px] font-sans text-[14px] font-[400] w-[300px] rounded-[8px]"
 						wrapperClassName="flex-row items-center gap-[66px]"
-						value={russianConstructionType}
+						value={ruConstructionType}
 						disabled
 					/>
 					<div className="flex flex-col">
