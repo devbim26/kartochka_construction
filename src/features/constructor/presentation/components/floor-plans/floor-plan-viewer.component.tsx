@@ -246,6 +246,7 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 											constructorSlice.actions.setConstructionsSheet(
 												response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
 													(info) => ({
+														id: info.id,
 														title:
 															info.reportConstructionHeader
 																?.constructionHeader?.name ||

@@ -8,6 +8,7 @@ import {
 	InfoIcon,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
+	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
@@ -18,19 +19,32 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-const data: ConstructionSheet[] = [
-	{
-		title: 'Test',
-		floorPlanImage: '123',
-		constructionInfoImage: '123',
-		square: '10',
-	},
-];
+// const data: ConstructionSheet[] = [
+// 	{
+// 		title: 'Test',
+// 		floorPlanImage: '123',
+// 		constructionInfoImage: '123',
+// 		square: '10',
+// 	},
+// ];
 
 export const ConstructionSheets = () => {
+	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const constructions = useAppSelector((store) => store.constructorData).constructionsSheet;
+
+	const constructionsSheet = useAppSelector((state) => state.constructorData.constructionsSheet);
+	const constructionId = constructionsSheet[0]?.id;
+	console.log('айди', constructionId);
+
+	const handleDelete = () => {
+		if (!constructionId) return;
+		navigate(`?delete=true&constructionId=${constructionId}`, {
+			replace: 'true',
+		});
+	};
+
 	const columns = useMemo(() => {
 		const cols: ColumnDef<ConstructionSheet>[] = [
 			{
