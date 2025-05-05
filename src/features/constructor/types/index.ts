@@ -5,6 +5,7 @@ export * from './constructions-sheet.types';
 export * from './designing.types';
 export * from './fire-resistance.types';
 export * from './floor-plan.types';
+export * from './material-parametrs.types';
 export * from './modals.types';
 export * from './physical-standarts.types';
 export * from './report-category.types';

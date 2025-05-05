@@ -123,6 +123,10 @@ export const ConstructionSheets = () => {
 													DESIGNING_ROUTES.constructor.route +
 													'/' +
 													CONSTRUCTOR_ROUTES.designing.route,
+												{
+													reportId: search.get('reportId')!,
+													reportType: search.get('reportType')!,
+												},
 											)
 										}
 										className="p-[6px]"
