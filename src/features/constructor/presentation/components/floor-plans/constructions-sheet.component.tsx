@@ -34,17 +34,6 @@ export const ConstructionSheets = () => {
 	const [search] = useSearchParams();
 	const constructions = useAppSelector((store) => store.constructorData).constructionsSheet;
 
-	const constructionsSheet = useAppSelector((state) => state.constructorData.constructionsSheet);
-	const constructionId = constructionsSheet[0]?.id;
-	console.log('айди', constructionId);
-
-	const handleDelete = () => {
-		if (!constructionId) return;
-		navigate(`?delete=true&constructionId=${constructionId}`, {
-			replace: 'true',
-		});
-	};
-
 	const columns = useMemo(() => {
 		const cols: ColumnDef<ConstructionSheet>[] = [
 			{

@@ -1,89 +1,69 @@
-import type { ReportInfoFloorConstructionDto, ReportInfoSingleConstructionDto } from '@api-gen';
+import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import { Button, ChevronIcon } from '@core';
-import { ReportCategory, SoundReductionTable } from '@features';
-import { getReportFloorById, getReportSingleById } from '@features/constructor/services';
+import type { GraphDetailResponse } from '@features';
+import { SoundReductionTable } from '@features';
+import { getReportFloorById } from '@features/constructor/services';
 import { RuMaterialParametrs } from '@features/constructor/types/material-parametrs.types';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
-import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { RuMaterialTypeEnum } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from } from 'rxjs';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import issuer from '../../../../../assets/issuer.png';
-import DesigningChart from './designing-chart.component';
+import DesigningGraph from './designing-graph.component';
 import { DesigningHeader } from './designing-header.component';
 
 const MyConstructions = () => {
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
-	const reportType = search.get('reportType');
 	const [chartLabels, setChartLabels] = useState<number[]>([]);
-	const [chartData, setChartData] = useState<number[]>([]);
-	const [report, setReport] = useState<
-		ReportInfoFloorConstructionDto | ReportInfoSingleConstructionDto
-	>();
+	const [graphData, setGraphData] = useState<GraphDetailResponse | null>(null);
+	const [isRelevant, setIsRelevant] = useState<boolean>(false);
+	const [constructionHeaderId, setConstructionHeaderId] = useState<string | undefined>(undefined);
+	const [constructionHeader, setConstructionHeader] = useState<ConstructionHeaderDto | null>(
+		null,
+	);
 
 	useEffect(() => {
-		if (!reportId || !reportType) return;
-		if (reportType == ReportCategory.Floor) {
-			from(getReportFloorById({ id: reportId }))
-				.pipe(
-					catchError((error) => {
-						return [];
-					}),
-				)
-				.subscribe((response) => {
-					if (response?.data) {
-						setReport(response.data);
-					}
-				});
-		} else {
-			from(getReportSingleById({ id: reportId }))
-				.pipe(
-					catchError((error) => {
-						return [];
-					}),
-				)
-				.subscribe((response) => {
-					if (response?.data) {
-						setReport(response.data);
-					}
-				});
-		}
+		if (!reportId) return;
+		from(getReportFloorById({ id: reportId }))
+			.pipe(
+				catchError((error) => {
+					toast.error('Не удалось получить данные отчёта');
+					return [];
+				}),
+			)
+			.subscribe((response) => {
+				const report: ReportInfoFloorConstructionDto | undefined = response?.data;
+				const constructionHeaderId =
+					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+						?.reportConstructionHeader?.constructionHeaderId;
+				const constructionHeader =
+					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+						?.reportConstructionHeader?.constructionHeader;
+				if (constructionHeaderId) {
+					setConstructionHeaderId(constructionHeaderId);
+				} else {
+					toast.error('Не найден constructionHeaderId');
+				}
+				if (constructionHeader) {
+					setConstructionHeader(constructionHeader);
+				} else {
+					toast.error('Не найден constructionHeader');
+				}
+			});
 	}, [reportId]);
 
-	const rwValue =
-		reportType === ReportCategory.Floor
-			? (report as ReportInfoFloorConstructionDto)?.floorConstructionInfos?.[0]
-					?.reportFloorInfos?.[0]?.reportConstructionHeader?.constructionHeader?.rw || 0
-			: (report as ReportInfoSingleConstructionDto)?.singleConstructionInfos?.[0]
-					?.reportConstructionHeader?.constructionHeader?.rw || 0;
-
-	const isRelevant = rwValue >= 55;
-	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
-
-	const constructionHeader =
-		reportType === ReportCategory.Floor
-			? (report as ReportInfoFloorConstructionDto)?.floorConstructionInfos?.[0]
-					?.reportFloorInfos?.[0]?.reportConstructionHeader?.constructionHeader
-			: (report as ReportInfoSingleConstructionDto)?.singleConstructionInfos?.[0]
-					?.reportConstructionHeader?.constructionHeader;
-	const constructionType = constructionHeader?.constructionType?.constructionTypeEnum as
-		| ConstructionTypeEnum
-		| undefined;
-	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
-
 	useEffect(() => {
-		if (constructionHeader) {
-			const frequencyLabels = [50, 80, 125, 200, 315, 500, 800, 1250, 2500, 3150, 5000];
-			const soundReductionData = constructionHeader.rTotal?.length
-				? constructionHeader.rTotal
-				: Array(frequencyLabels.length).fill(constructionHeader.rw || 0);
-			setChartLabels(frequencyLabels);
-			setChartData(soundReductionData);
-		}
-	}, [constructionHeader]);
+		const rwValue = constructionHeader?.rw || 0;
+		const relevant = rwValue >= 55;
+		setIsRelevant(relevant);
+	}, [constructionHeader?.rw]);
+
+	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
+	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
 
 	const formatMaterial = (material: (typeof materials)[0]) => {
 		const materialType =
@@ -143,7 +123,7 @@ const MyConstructions = () => {
 				<div className="flex flex-col">
 					<p className="text-[12px] italic">СП 275.1325800.2016</p>
 					<p className="text-[12px] italic">Защита от шума, Россия </p>
-					<p className="text-[25px] font-[600]">Rw = {rwValue} dB</p>
+					<p className="text-[25px] font-[600]">Rw = {constructionHeader?.rw} dB</p>
 					<p
 						className={twMerge(
 							'text-[20px] font-[600]',
@@ -157,10 +137,11 @@ const MyConstructions = () => {
 					</p>
 					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
 				</div>
-				<DesigningChart labels={chartLabels} data={chartData} />
+				<DesigningGraph constructionHeaderId={constructionHeaderId || ''} />
 				<SoundReductionTable
 					frequencyLabels={chartLabels}
-					rTotal={chartData}
+					rLab={graphData?.dotRs?.map((dot) => dot.r) || []}
+					rInSitu={graphData?.deviationDots?.map((dot) => dot.r) || []}
 					noPadding={true}
 				/>
 			</div>

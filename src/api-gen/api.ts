@@ -230,11 +230,6 @@ export interface CreateConstructionTypeDto {
 	constructions?: CreateConstructionDto[] | null;
 }
 
-export interface CreateGraphCommand {
-	/** @format uuid */
-	constructionHeaderId?: string;
-}
-
 export interface CreateReportConstructionDto {
 	/** @format uuid */
 	id?: string | null;
@@ -341,6 +336,20 @@ export interface DocumentReportFlagsDto {
 	takeUsedLiteratureList?: boolean;
 	takeSupplementSoundInsulationProtocolsWithCalculation?: boolean;
 	takeSupplementThermalInsulationProtocolsWithCalculation?: boolean;
+}
+
+export interface Dot {
+	/** @format double */
+	r?: number;
+	/** @format double */
+	f?: number;
+}
+
+export interface DotDto {
+	/** @format double */
+	r?: number;
+	/** @format double */
+	f?: number;
 }
 
 export interface EnclosingStructuresSoundInsulationCalculationFlagsDto {
@@ -471,6 +480,23 @@ export interface GetRequirementsWithPaginationParamsQuery {
 	/** @format date */
 	standartValidityPeriod?: string | null;
 	class?: CategoryClass;
+}
+
+export interface GraphParametrsDto {
+	/** @format double */
+	delta?: number;
+	/** @format double */
+	c?: number;
+	/** @format double */
+	ctr?: number;
+	/** @format double */
+	computingRw?: number;
+	/** @format double */
+	labRw?: number;
+	dotRs?: DotDto[] | null;
+	deviationDots?: DotDto[] | null;
+	dotC?: Dot;
+	dotB?: Dot;
 }
 
 export enum IndexType {
@@ -1482,15 +1508,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags Graph
-		 * @name GraphCreate
-		 * @request POST:/api/Graph
+		 * @name GraphDetail
+		 * @request GET:/api/Graph/{constructionHeaderId}
 		 */
-		graphCreate: (data: CreateGraphCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
-				path: `/api/Graph`,
-				method: 'POST',
-				body: data,
-				type: ContentType.Json,
+		graphDetail: (constructionHeaderId: string, params: RequestParams = {}) =>
+			this.request<GraphParametrsDto, any>({
+				path: `/api/Graph/${constructionHeaderId}`,
+				method: 'GET',
+				format: 'json',
 				...params,
 			}),
 
@@ -1865,12 +1890,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags ReportInfo
-		 * @name ReportInfoReportсonstructionDetail
-		 * @request GET:/api/ReportInfo/{id}/reportСonstruction
+		 * @name ReportInfoReportConstructionDetail
+		 * @request GET:/api/ReportInfo/{id}/reportConstruction
 		 */
-		reportInfoReportсonstructionDetail: (id: string, params: RequestParams = {}) =>
+		reportInfoReportConstructionDetail: (id: string, params: RequestParams = {}) =>
 			this.request<ReportConstructionDto, any>({
-				path: `/api/ReportInfo/${id}/reportСonstruction`,
+				path: `/api/ReportInfo/${id}/reportConstruction`,
 				method: 'GET',
 				format: 'json',
 				...params,

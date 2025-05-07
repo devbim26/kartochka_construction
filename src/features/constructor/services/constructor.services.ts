@@ -47,6 +47,9 @@ type UpdateFloorReportProps = {
 		'floorInfo.floorNumber'?: string;
 	};
 };
+type GetGraphParams = {
+	constructionHeaderId: string;
+};
 
 export const createReport = async ({ data }: ReportCreateProps) => {
 	return await fetchApi.api.reportInfoCreate(data);
@@ -68,4 +71,7 @@ export const uploadDocument = async ({ data }: FloorDocumentUpload) => {
 };
 export const uploadImage = async ({ data }: FloorDocumentImage) => {
 	return await fetchApi.floor.constructionImageUpdate(data);
+};
+export const graphDetail = async ({ constructionHeaderId }: GetGraphParams) => {
+	return await fetchApi.api.graphDetail(constructionHeaderId);
 };

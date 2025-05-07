@@ -1,14 +1,13 @@
-import type { ReportInfoFloorConstructionDto, ReportInfoSingleConstructionDto } from '@api-gen';
+import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import { Button, Input } from '@core';
+import type { DesigningData, GraphDetailResponse } from '@features';
 import {
 	DesigningConfig,
 	DesigningHeader,
-	ReportCategory,
 	RuMaterialParametrs,
 	SoundReductionTable,
-	type DesigningData,
 } from '@features';
-import { getReportFloorById, getReportSingleById } from '@features/constructor/services';
+import { getReportFloorById } from '@features/constructor/services';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
 import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
@@ -17,16 +16,20 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from } from 'rxjs';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
-import DesigningChart from './designing-chart.component';
+import DesigningGraph from './designing-graph.component';
 
 const DesigningScreen = () => {
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
-	const reportType = search.get('reportType');
-	const [report, setReport] = useState<
-		ReportInfoFloorConstructionDto | ReportInfoSingleConstructionDto
-	>();
+	const [graphData, setGraphData] = useState<GraphDetailResponse | null>(null);
+	const [chartLabels, setChartLabels] = useState<number[]>([]);
+	const [constructionHeaderId, setConstructionHeaderId] = useState<string | undefined>(undefined);
+	const [constructionHeader, setConstructionHeader] = useState<ConstructionHeaderDto | null>(
+		null,
+	);
+	const [isRelevant, setIsRelevant] = useState<boolean>(false);
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
 		defaultValues: DesigningConfig.defaultValues,
@@ -34,53 +37,43 @@ const DesigningScreen = () => {
 	});
 
 	useEffect(() => {
-		if (!reportId || !reportType) return;
-		if (reportType == ReportCategory.Floor) {
-			from(getReportFloorById({ id: reportId }))
-				.pipe(
-					catchError((error) => {
-						return [];
-					}),
-				)
-				.subscribe((response) => {
-					if (response?.data) {
-						setReport(response.data);
-					}
-				});
-		} else {
-			from(getReportSingleById({ id: reportId }))
-				.pipe(
-					catchError((error) => {
-						return [];
-					}),
-				)
-				.subscribe((response) => {
-					if (response?.data) {
-						setReport(response.data);
-					}
-				});
-		}
+		if (!reportId) return;
+		from(getReportFloorById({ id: reportId }))
+			.pipe(
+				catchError((error) => {
+					toast.error('Не удалось получить данные отчёта');
+					return [];
+				}),
+			)
+			.subscribe((response) => {
+				const report: ReportInfoFloorConstructionDto | undefined = response?.data;
+				const constructionHeaderId =
+					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+						?.reportConstructionHeader?.constructionHeaderId;
+				const constructionHeader =
+					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+						?.reportConstructionHeader?.constructionHeader;
+				if (constructionHeaderId) {
+					setConstructionHeaderId(constructionHeaderId);
+				} else {
+					toast.error('Не найден constructionHeaderId');
+				}
+				if (constructionHeader) {
+					setConstructionHeader(constructionHeader);
+				} else {
+					toast.error('Не найден constructionHeader');
+				}
+			});
 	}, [reportId]);
 
-	const [chartLabels, setChartLabels] = useState<number[]>([]);
-	const [chartData, setChartData] = useState<number[]>([]);
+	useEffect(() => {
+		const rwValue = constructionHeader?.rw || 0;
+		const relevant = rwValue >= 55;
+		setIsRelevant(relevant);
+	}, [constructionHeader?.rw]);
 
-	const rwValue =
-		reportType === ReportCategory.Floor
-			? (report as ReportInfoFloorConstructionDto)?.floorConstructionInfos?.[0]
-					?.reportFloorInfos?.[0]?.reportConstructionHeader?.constructionHeader?.rw || 0
-			: (report as ReportInfoSingleConstructionDto)?.singleConstructionInfos?.[0]
-					?.reportConstructionHeader?.constructionHeader?.rw || 0;
-
-	const isRelevant = rwValue >= 55;
 	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
 
-	const constructionHeader =
-		reportType === ReportCategory.Floor
-			? (report as ReportInfoFloorConstructionDto)?.floorConstructionInfos?.[0]
-					?.reportFloorInfos?.[0]?.reportConstructionHeader?.constructionHeader
-			: (report as ReportInfoSingleConstructionDto)?.singleConstructionInfos?.[0]
-					?.reportConstructionHeader?.constructionHeader;
 	const constructionType = constructionHeader?.constructionType?.constructionTypeEnum as
 		| ConstructionTypeEnum
 		| undefined;
@@ -88,15 +81,13 @@ const DesigningScreen = () => {
 	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
 
 	useEffect(() => {
-		if (constructionHeader) {
-			const frequencyLabels = [50, 80, 125, 200, 315, 500, 800, 1250, 2500, 3150, 5000];
-			const soundReductionData = constructionHeader.rTotal?.length
-				? constructionHeader.rTotal
-				: Array(frequencyLabels.length).fill(constructionHeader.rw || 0);
-			setChartLabels(frequencyLabels);
-			setChartData(soundReductionData);
+		if (constructionType) {
+			ConstructionTypeMap({
+				currentConstruction: constructionType,
+				currentForm: form,
+			}).action();
 		}
-	}, [constructionHeader]);
+	}, [constructionType]);
 
 	const formatMaterial = (material: (typeof materials)[0]) => {
 		const materialType =
@@ -114,43 +105,6 @@ const DesigningScreen = () => {
 				.join(', ') || 'нет данных';
 		return `${materialType} (${materialParams})`;
 	};
-
-	useEffect(() => {
-		if (constructionType) {
-			ConstructionTypeMap({
-				currentConstruction: constructionType,
-				currentForm: form,
-			}).action();
-		}
-	}, [constructionType]);
-
-	// const handleUpdateConstruction = (formData: DesigningData) => {
-	// 	const constructionData =
-	// 		reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-	// 			?.reportConstructionHeader;
-	// 	if (!constructionData) {
-	// 		toast.error('Данные не найдены');
-	// 		return;
-	// 	}
-	// 	const dataToSend = {
-	// 		command: 'UPDATE',
-	// 		data: convertToServerConstructionsEditData(
-	// 			convertFromDesigningToConstructionsEditData(formData, constructionData),
-	// 		),
-	// 	};
-	// 	getGuidebooksEdit({
-	// 		data: dataToSend,
-	// 		guidebookType: Guidebooks.CONSTRUCTION,
-	// 	})
-	// 		.then((response) => {
-	// 			if (response.status === 200) {
-	// 				toast.success('Успешно сохранено');
-	// 			}
-	// 		})
-	// 		.catch((error) => {
-	// 			toast.error(error.response?.data?.message || 'Ошибка сохранения');
-	// 		});
-	// };
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
@@ -189,7 +143,7 @@ const DesigningScreen = () => {
 				<div className="flex flex-col">
 					<p className="text-[12px] italic">СП 275.1325800.2016</p>
 					<p className="text-[12px] italic">Защита от шума, Россия </p>
-					<p className="text-[25px] font-[600]">Rw = {rwValue} dB</p>
+					<p className="text-[25px] font-[600]">Rw = {constructionHeader?.rw} dB</p>
 					<p
 						className={twMerge(
 							'text-[20px] font-[600]',
@@ -203,10 +157,11 @@ const DesigningScreen = () => {
 					</p>
 					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
 				</div>
-				<DesigningChart labels={chartLabels} data={chartData} />
+				<DesigningGraph constructionHeaderId={constructionHeaderId || ''} />
 				<SoundReductionTable
 					frequencyLabels={chartLabels}
-					rTotal={chartData}
+					rLab={graphData?.dotRs?.map((dot) => dot.r) || []}
+					rInSitu={graphData?.deviationDots?.map((dot) => dot.r) || []}
 					noPadding={true}
 				/>
 			</div>
