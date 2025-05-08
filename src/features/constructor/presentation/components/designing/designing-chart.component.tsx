@@ -21,45 +21,72 @@ ChartJS.register(
 	ChartDataLabels,
 );
 
-type DesigningChartProps = {
-	labels: number[];
-	data: number[];
+type GraphDataSeries = {
+	label: string;
+	data: { x: number; y: number }[];
 };
 
-const DesigningChart = ({ labels, data }: DesigningChartProps) => {
+type DesigningChartProps = {
+	graphSeries: GraphDataSeries[];
+};
+
+const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 	const chartData: ChartData<'line'> = {
-		labels: labels.map(String),
-		datasets: [
-			{
-				data: data,
-				borderColor: '#0AACE8',
-				backgroundColor: 'rgba(10, 172, 232, 0.2)',
+		labels: graphSeries[0]?.data.map((point) => String(point.x)) ?? [],
+		datasets: graphSeries.map((series) => {
+			const isInSitu = series.label.toLowerCase().includes('in situ');
+
+			const baseColor = isInSitu ? '#000000' : '#3b82f6';
+			const backgroundColor = isInSitu ? 'rgba(0, 0, 0, 0.1)' : 'rgba(59, 130, 246, 0.2)';
+			const borderDash = isInSitu ? [5, 5] : undefined;
+
+			return {
+				label: series.label,
+				data: series.data.map((point) => point.y),
+				borderColor: baseColor,
+				backgroundColor,
 				borderWidth: 3,
-				pointBackgroundColor: '#0AACE8',
-				pointRadius: 5,
-				pointHoverRadius: 8,
+				pointBackgroundColor: baseColor,
+				pointRadius: 0,
+				pointHoverRadius: 5,
 				tension: 0.3,
-				fill: true,
-			},
-		],
+				fill: !isInSitu,
+				borderDash,
+			};
+		}),
 	};
+
+	const allValues = graphSeries.flatMap((s) => s.data.map((p) => p.y));
+	const maxY = Math.max(...allValues, 0);
 
 	const options: ChartOptions<'line'> = {
 		responsive: true,
 		maintainAspectRatio: false,
 		plugins: {
 			legend: {
-				display: false,
+				display: true,
+				position: 'bottom',
+				align: 'start',
+				labels: {
+					boxWidth: 20,
+					padding: 16,
+					font: {
+						size: 12,
+					},
+				},
 			},
 			tooltip: {
 				callbacks: {
-					label: (context) => `${context.raw}`,
+					label: (context) => {
+						const value = context.raw as number;
+						return `Rw: ${value}`;
+					},
 				},
 			},
 			datalabels: {
 				anchor: 'end',
 				align: 'top',
-				color: '#0AACE8',
+				color: (ctx) => ctx.dataset.borderColor as string,
 				font: {
 					weight: 'bold',
 					size: 10,
@@ -92,7 +119,7 @@ const DesigningChart = ({ labels, data }: DesigningChartProps) => {
 					},
 				},
 				min: 0,
-				max: Math.max(...data) + 10,
+				max: maxY + 10,
 				ticks: {
 					stepSize: 5,
 				},

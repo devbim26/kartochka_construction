@@ -1,12 +1,13 @@
 import { APP_ROUTES, Button, useAppNavigate } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
 export const DesigningHeader = () => {
 	const navigate = useAppNavigate();
 	const location = useLocation();
+	const [search] = useSearchParams();
 
 	const isActive = (route: string) => location.pathname.endsWith(route);
 
@@ -28,6 +29,10 @@ export const DesigningHeader = () => {
 								DESIGNING_ROUTES.constructor.route +
 								'/' +
 								CONSTRUCTOR_ROUTES.designing.route,
+							{
+								reportId: search.get('reportId')!,
+								reportType: search.get('reportType')!,
+							},
 						)
 					}
 				>
@@ -47,6 +52,10 @@ export const DesigningHeader = () => {
 								DESIGNING_ROUTES.constructor.route +
 								'/' +
 								CONSTRUCTOR_ROUTES.myConstructions.route,
+							{
+								reportId: search.get('reportId')!,
+								reportType: search.get('reportType')!,
+							},
 						)
 					}
 				>
