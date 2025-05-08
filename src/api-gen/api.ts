@@ -230,11 +230,6 @@ export interface CreateConstructionTypeDto {
 	constructions?: CreateConstructionDto[] | null;
 }
 
-export interface CreateGraphCommand {
-	/** @format uuid */
-	constructionHeaderId?: string;
-}
-
 export interface CreateReportConstructionDto {
 	/** @format uuid */
 	id?: string | null;
@@ -343,31 +338,28 @@ export interface DocumentReportFlagsDto {
 	takeSupplementThermalInsulationProtocolsWithCalculation?: boolean;
 }
 
+export interface Dot {
+	/** @format double */
+	r?: number;
+	/** @format double */
+	f?: number;
+}
+
+export interface DotDto {
+	/** @format double */
+	r?: number;
+	/** @format double */
+	f?: number;
+}
+
 export interface EnclosingStructuresSoundInsulationCalculationFlagsDto {
-	takeRoomCharacteristic?: boolean;
-	takeWallMaterialsVolumesCalculation?: boolean;
-	takeFloorMaterialsVolumesCalculation?: boolean;
+	takeEnclosingStructuresSoundInsulationCalculation?: boolean;
 	baseReportInfoFlags?: SoundInsulationFloorReportInfoFlagsDto[] | null;
 }
 
 export interface EnclosingStructuresThermalInsulationCalculationFlagsDto {
 	takeDetailedCalculatingMethod?: boolean;
 	baseReportInfoFlags?: ThermalInsulationFloorReportInfoFlagsDto[] | null;
-}
-
-export interface FinalizeReportInfoCommand {
-	/** @format uuid */
-	reportInfoId?: string;
-	customerName?: string | null;
-	objectDescription?: string | null;
-	creatorFullName?: string | null;
-	code?: string | null;
-	country?: string | null;
-	director?: string | null;
-	/** @format date */
-	date?: string;
-	logoUrl?: string | null;
-	floorDocumentFlags?: DocumentReportFlagsDto;
 }
 
 export interface FloorConstructionInfoDto {
@@ -471,6 +463,23 @@ export interface GetRequirementsWithPaginationParamsQuery {
 	/** @format date */
 	standartValidityPeriod?: string | null;
 	class?: CategoryClass;
+}
+
+export interface GraphParametrsDto {
+	/** @format double */
+	delta?: number;
+	/** @format double */
+	c?: number;
+	/** @format double */
+	ctr?: number;
+	/** @format double */
+	computingRw?: number;
+	/** @format double */
+	labRw?: number;
+	dotRs?: DotDto[] | null;
+	deviationDots?: DotDto[] | null;
+	dotC?: Dot;
+	dotB?: Dot;
 }
 
 export enum IndexType {
@@ -1482,15 +1491,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags Graph
-		 * @name GraphCreate
-		 * @request POST:/api/Graph
+		 * @name GraphDetail
+		 * @request GET:/api/Graph/{constructionHeaderId}
 		 */
-		graphCreate: (data: CreateGraphCommand, params: RequestParams = {}) =>
-			this.request<void, any>({
-				path: `/api/Graph`,
-				method: 'POST',
-				body: data,
-				type: ContentType.Json,
+		graphDetail: (constructionHeaderId: string, params: RequestParams = {}) =>
+			this.request<GraphParametrsDto, any>({
+				path: `/api/Graph/${constructionHeaderId}`,
+				method: 'GET',
+				format: 'json',
 				...params,
 			}),
 
@@ -1865,12 +1873,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags ReportInfo
-		 * @name ReportInfoReportсonstructionDetail
-		 * @request GET:/api/ReportInfo/{id}/reportСonstruction
+		 * @name ReportInfoReportConstructionDetail
+		 * @request GET:/api/ReportInfo/{id}/reportConstruction
 		 */
-		reportInfoReportсonstructionDetail: (id: string, params: RequestParams = {}) =>
+		reportInfoReportConstructionDetail: (id: string, params: RequestParams = {}) =>
 			this.request<ReportConstructionDto, any>({
-				path: `/api/ReportInfo/${id}/reportСonstruction`,
+				path: `/api/ReportInfo/${id}/reportConstruction`,
 				method: 'GET',
 				format: 'json',
 				...params,
@@ -2007,6 +2015,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				type: ContentType.Json,
 				...params,
 			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags SvgConstruction
+		 * @name SvgConstructionDetail
+		 * @request GET:/api/SvgConstruction/{id}
+		 */
+		svgConstructionDetail: (id: string, params: RequestParams = {}) =>
+			this.request<RequirementDto, any>({
+				path: `/api/SvgConstruction/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
 	};
 	single = {
 		/**
@@ -2134,12 +2157,44 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name DocumentInfoUpdate
 		 * @request PUT:/documentInfo
 		 */
-		documentInfoUpdate: (data: FinalizeReportInfoCommand, params: RequestParams = {}) =>
+		documentInfoUpdate: (
+			data: {
+				/** @format uuid */
+				reportInfoId?: string;
+				reportNumber?: string;
+				reportName?: string;
+				customerName?: string;
+				objectDescription?: string;
+				creatorFullName?: string;
+				code?: string;
+				country?: string;
+				director?: string;
+				/** @format date */
+				date?: string;
+				/** @format binary */
+				logo?: File;
+				'floorDocumentFlags.takeTitleList'?: boolean;
+				'floorDocumentFlags.takeContent'?: boolean;
+				'floorDocumentFlags.takeIntroduction'?: boolean;
+				'floorDocumentFlags.generalCharacteristics.takeRoomCharacteristic'?: boolean;
+				'floorDocumentFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation'?: boolean;
+				'floorDocumentFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation'?: boolean;
+				'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation'?: boolean;
+				'floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags'?: SoundInsulationFloorReportInfoFlagsDto[];
+				'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod'?: boolean;
+				'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags'?: ThermalInsulationFloorReportInfoFlagsDto[];
+				'floorDocumentFlags.takeConclusion'?: boolean;
+				'floorDocumentFlags.takeUsedLiteratureList'?: boolean;
+				'floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation'?: boolean;
+				'floorDocumentFlags.takeSupplementThermalInsulationProtocolsWithCalculation'?: boolean;
+			},
+			params: RequestParams = {},
+		) =>
 			this.request<void, any>({
 				path: `/documentInfo`,
 				method: 'PUT',
 				body: data,
-				type: ContentType.Json,
+				type: ContentType.FormData,
 				...params,
 			}),
 	};
