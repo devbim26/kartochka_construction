@@ -1,13 +1,13 @@
 import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import { Button, Input } from '@core';
-import type { DesigningData, GraphDetailResponse } from '@features';
+import type { DesigningData, Dot, GraphDetailResponse } from '@features';
 import {
 	DesigningConfig,
 	DesigningHeader,
 	RuMaterialParametrs,
 	SoundReductionTable,
 } from '@features';
-import { getReportFloorById } from '@features/constructor/services';
+import { getReportFloorById, graphDetail } from '@features/constructor/services';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
 import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
@@ -24,7 +24,6 @@ const DesigningScreen = () => {
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
 	const [graphData, setGraphData] = useState<GraphDetailResponse | null>(null);
-	const [chartLabels, setChartLabels] = useState<number[]>([]);
 	const [constructionHeaderId, setConstructionHeaderId] = useState<string | undefined>(undefined);
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionHeaderDto | null>(
 		null,
@@ -67,9 +66,63 @@ const DesigningScreen = () => {
 	}, [reportId]);
 
 	useEffect(() => {
+		if (!constructionHeaderId) return;
+		from(graphDetail({ constructionHeaderId }))
+			.pipe(
+				catchError((error) => {
+					toast.error('Не удалось загрузить данные графика');
+					return [];
+				}),
+			)
+			.subscribe((response) => {
+				console.log(response.data);
+				const data = response?.data;
+				if (data) {
+					const mappedData: GraphDetailResponse = {
+						delta: data.delta,
+						c: data.c,
+						ctr: data.ctr,
+						computingRw: data.computingRw,
+						labRw: data.labRw,
+						dotRs: (data.dotRs || [])
+							.filter(
+								(dot): dot is Dot =>
+									typeof dot.r === 'number' && typeof dot.f === 'number',
+							)
+							.map((dot) => ({ r: dot.r, f: dot.f })),
+						deviationDots: (data.deviationDots || [])
+							.filter(
+								(dot): dot is Dot =>
+									typeof dot.r === 'number' && typeof dot.f === 'number',
+							)
+							.map((dot) => ({ r: dot.r, f: dot.f })),
+						laboratoryDots: (data.laboratoryDots || [])
+							.filter(
+								(dot): dot is Dot =>
+									typeof dot.r === 'number' && typeof dot.f === 'number',
+							)
+							.map((dot) => ({ r: dot.r, f: dot.f })),
+						dotC:
+							data.dotC &&
+							typeof data.dotC.r === 'number' &&
+							typeof data.dotC.f === 'number'
+								? { r: data.dotC.r, f: data.dotC.f }
+								: undefined,
+						dotB:
+							data.dotB &&
+							typeof data.dotB.r === 'number' &&
+							typeof data.dotB.f === 'number'
+								? { r: data.dotB.r, f: data.dotB.f }
+								: undefined,
+					};
+					setGraphData(mappedData);
+				}
+			});
+	}, [constructionHeaderId]);
+
+	useEffect(() => {
 		const rwValue = constructionHeader?.rw || 0;
-		const relevant = rwValue >= 55;
-		setIsRelevant(relevant);
+		setIsRelevant(rwValue >= 55);
 	}, [constructionHeader?.rw]);
 
 	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
@@ -105,6 +158,12 @@ const DesigningScreen = () => {
 				.join(', ') || 'нет данных';
 		return `${materialType} (${materialParams})`;
 	};
+
+	console.log('dotRs.length', graphData?.dotRs?.length);
+	console.log(
+		'frequencyLabels',
+		graphData?.dotRs?.map((dot) => dot.f),
+	);
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
@@ -159,9 +218,9 @@ const DesigningScreen = () => {
 				</div>
 				<DesigningGraph constructionHeaderId={constructionHeaderId || ''} />
 				<SoundReductionTable
-					frequencyLabels={chartLabels}
-					rLab={graphData?.dotRs?.map((dot) => dot.r) || []}
-					rInSitu={graphData?.deviationDots?.map((dot) => dot.r) || []}
+					frequencyLabels={graphData?.dotRs?.map((dot) => dot.f) || []}
+					rLab={graphData?.laboratoryDots?.map((dot) => dot.r) || []}
+					rInSitu={graphData?.dotRs?.map((dot) => dot.r) || []}
 					noPadding={true}
 				/>
 			</div>

@@ -9,23 +9,31 @@ interface SoundReductionData {
 }
 
 interface SoundReductionTableProps {
-	frequencyLabels: number[];
-	rLab: number[];
-	rInSitu: number[];
+	frequencyLabels?: number[];
+	rLab?: number[];
+	rInSitu?: number[];
 	noPadding?: boolean;
 }
 
 export const SoundReductionTable = ({
-	frequencyLabels,
-	rLab,
-	rInSitu,
+	frequencyLabels = [],
+	rLab = [],
+	rInSitu = [],
 	noPadding = false,
 }: SoundReductionTableProps) => {
 	const tableData = useMemo(() => {
-		return frequencyLabels.map((freq, index) => ({
-			frequency: freq.toString(),
-			rLab: rLab[index]?.toString() || '0',
-			rInSitu: rInSitu[index]?.toString() || '0',
+		const rawData = frequencyLabels.map((f, index) => ({
+			frequency: f,
+			rLab: rLab[index] ?? 0,
+			rInSitu: rInSitu[index] ?? 0,
+		}));
+
+		const sortedData = rawData.sort((a, b) => a.frequency - b.frequency);
+
+		return sortedData.map((row) => ({
+			frequency: row.frequency.toString(),
+			rLab: row.rLab.toString(),
+			rInSitu: row.rInSitu.toString(),
 		}));
 	}, [frequencyLabels, rLab, rInSitu]);
 
