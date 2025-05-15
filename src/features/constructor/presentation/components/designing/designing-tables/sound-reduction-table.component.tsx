@@ -8,34 +8,71 @@ interface SoundReductionData {
 	rInSitu: string;
 }
 
-interface SoundReductionTableProps {
+interface CombinedSoundReductionTableProps {
 	frequencyLabels?: number[];
 	rLab?: number[];
 	rInSitu?: number[];
+	labRw: number;
+	computingRw: number;
+	delta: number;
+	c: number;
+	ctr: number;
 	noPadding?: boolean;
 }
 
-export const SoundReductionTable = ({
+export const CombinedSoundReductionTable = ({
 	frequencyLabels = [],
 	rLab = [],
 	rInSitu = [],
+	labRw,
+	computingRw,
+	delta,
+	c,
+	ctr,
 	noPadding = false,
-}: SoundReductionTableProps) => {
+}: CombinedSoundReductionTableProps) => {
 	const tableData = useMemo(() => {
+		console.log(
+			'labRw:',
+			labRw,
+			'computingRw:',
+			computingRw,
+			'delta:',
+			delta,
+			'c:',
+			c,
+			'ctr:',
+			ctr,
+		);
 		const rawData = frequencyLabels.map((f, index) => ({
-			frequency: f,
-			rLab: rLab[index] ?? 0,
-			rInSitu: rInSitu[index] ?? 0,
+			frequency: f.toString(),
+			rLab: (rLab[index] ?? 0).toString(),
+			rInSitu: (rInSitu[index] ?? 0).toString(),
 		}));
 
-		const sortedData = rawData.sort((a, b) => a.frequency - b.frequency);
+		const sortedData = rawData.sort((a, b) => Number(a.frequency) - Number(b.frequency));
 
-		return sortedData.map((row) => ({
-			frequency: row.frequency.toString(),
-			rLab: row.rLab.toString(),
-			rInSitu: row.rInSitu.toString(),
-		}));
-	}, [frequencyLabels, rLab, rInSitu]);
+		const finalData: SoundReductionData[] = [
+			...sortedData,
+			{
+				frequency: 'Rw',
+				rLab: labRw.toString(),
+				rInSitu: computingRw.toString(),
+			},
+			{
+				frequency: 'Ctr',
+				rLab: `(${delta}, ${ctr})`,
+				rInSitu: `(${delta}, ${ctr})`,
+			},
+			{
+				frequency: 'C₅₀–₅₀₀₀',
+				rLab: `(${delta}, ${c})`,
+				rInSitu: `(${delta}, ${c})`,
+			},
+		];
+
+		return finalData;
+	}, [frequencyLabels, rLab, rInSitu, labRw, computingRw, delta, c, ctr]);
 
 	const columns = useMemo<ColumnDef<SoundReductionData>[]>(
 		() => [
@@ -44,14 +81,14 @@ export const SoundReductionTable = ({
 				header: () => (
 					<SimpleTableHeaderCell
 						text="Freq, Hz"
-						textClassName="w-[50px] border-r border-[#EDEFF2]"
+						textClassName="w-[60px] border-r border-[#EDEFF2]"
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[50px] border-r border-[#EDEFF2]"
+						contentClassName="w-[60px] border-r border-[#EDEFF2]"
 						noPadding={noPadding}
 					/>
 				),
@@ -61,14 +98,14 @@ export const SoundReductionTable = ({
 				header: () => (
 					<SimpleTableHeaderCell
 						text="R (lab), dB"
-						textClassName="w-[50px] border-r border-[#EDEFF2]"
+						textClassName="w-[80px] border-r border-[#EDEFF2]"
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[50px] border-r border-[#EDEFF2]"
+						contentClassName="w-[80px] border-r border-[#EDEFF2]"
 						noPadding={noPadding}
 					/>
 				),
@@ -78,14 +115,14 @@ export const SoundReductionTable = ({
 				header: () => (
 					<SimpleTableHeaderCell
 						text="R' (in situ), dB"
-						textClassName="w-[50px]"
+						textClassName="w-[90px]"
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[50px]"
+						contentClassName="w-[90px]"
 						noPadding={noPadding}
 					/>
 				),
@@ -93,6 +130,8 @@ export const SoundReductionTable = ({
 		],
 		[noPadding],
 	);
+
+	console.log(tableData);
 
 	return (
 		<div className="flex-col">

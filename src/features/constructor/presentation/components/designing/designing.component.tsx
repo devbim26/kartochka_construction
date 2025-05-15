@@ -2,10 +2,10 @@ import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api
 import { Button, Input } from '@core';
 import type { DesigningData, Dot, GraphDetailResponse } from '@features';
 import {
+	CombinedSoundReductionTable,
 	DesigningConfig,
 	DesigningHeader,
 	RuMaterialParametrs,
-	SoundReductionTable,
 } from '@features';
 import { getReportFloorById, graphDetail } from '@features/constructor/services';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
@@ -67,6 +67,7 @@ const DesigningScreen = () => {
 
 	useEffect(() => {
 		if (!constructionHeaderId) return;
+
 		from(graphDetail({ constructionHeaderId }))
 			.pipe(
 				catchError((error) => {
@@ -74,49 +75,32 @@ const DesigningScreen = () => {
 					return [];
 				}),
 			)
-			.subscribe((response) => {
-				console.log(response.data);
-				const data = response?.data;
-				if (data) {
-					const mappedData: GraphDetailResponse = {
-						delta: data.delta,
-						c: data.c,
-						ctr: data.ctr,
-						computingRw: data.computingRw,
-						labRw: data.labRw,
-						dotRs: (data.dotRs || [])
-							.filter(
-								(dot): dot is Dot =>
-									typeof dot.r === 'number' && typeof dot.f === 'number',
-							)
-							.map((dot) => ({ r: dot.r, f: dot.f })),
-						deviationDots: (data.deviationDots || [])
-							.filter(
-								(dot): dot is Dot =>
-									typeof dot.r === 'number' && typeof dot.f === 'number',
-							)
-							.map((dot) => ({ r: dot.r, f: dot.f })),
-						laboratoryDots: (data.laboratoryDots || [])
-							.filter(
-								(dot): dot is Dot =>
-									typeof dot.r === 'number' && typeof dot.f === 'number',
-							)
-							.map((dot) => ({ r: dot.r, f: dot.f })),
-						dotC:
-							data.dotC &&
-							typeof data.dotC.r === 'number' &&
-							typeof data.dotC.f === 'number'
-								? { r: data.dotC.r, f: data.dotC.f }
-								: undefined,
-						dotB:
-							data.dotB &&
-							typeof data.dotB.r === 'number' &&
-							typeof data.dotB.f === 'number'
-								? { r: data.dotB.r, f: data.dotB.f }
-								: undefined,
-					};
-					setGraphData(mappedData);
-				}
+			.subscribe(({ data }) => {
+				if (!data) return;
+				setGraphData({
+					...data,
+					dotRs: (data.dotRs || []).filter(
+						(dot): dot is Dot => typeof dot.r === 'number' && typeof dot.f === 'number',
+					),
+					laboratoryDots: (data.laboratoryDots || []).filter(
+						(dot): dot is Dot => typeof dot.r === 'number' && typeof dot.f === 'number',
+					),
+					deviationDots: (data.deviationDots || []).filter(
+						(dot): dot is Dot => typeof dot.r === 'number' && typeof dot.f === 'number',
+					),
+					dotC:
+						data.dotC &&
+						typeof data.dotC.r === 'number' &&
+						typeof data.dotC.f === 'number'
+							? { r: data.dotC.r, f: data.dotC.f }
+							: undefined,
+					dotB:
+						data.dotB &&
+						typeof data.dotB.r === 'number' &&
+						typeof data.dotB.f === 'number'
+							? { r: data.dotB.r, f: data.dotB.f }
+							: undefined,
+				});
 			});
 	}, [constructionHeaderId]);
 
@@ -158,12 +142,6 @@ const DesigningScreen = () => {
 				.join(', ') || 'нет данных';
 		return `${materialType} (${materialParams})`;
 	};
-
-	console.log('dotRs.length', graphData?.dotRs?.length);
-	console.log(
-		'frequencyLabels',
-		graphData?.dotRs?.map((dot) => dot.f),
-	);
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
@@ -217,10 +195,15 @@ const DesigningScreen = () => {
 					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
 				</div>
 				<DesigningGraph constructionHeaderId={constructionHeaderId || ''} />
-				<SoundReductionTable
+				<CombinedSoundReductionTable
 					frequencyLabels={graphData?.dotRs?.map((dot) => dot.f) || []}
 					rLab={graphData?.laboratoryDots?.map((dot) => dot.r) || []}
 					rInSitu={graphData?.dotRs?.map((dot) => dot.r) || []}
+					labRw={graphData?.labRw || 0}
+					computingRw={graphData?.computingRw || 0}
+					delta={graphData?.delta || 0}
+					c={graphData?.c || 0}
+					ctr={graphData?.ctr || 0}
 					noPadding={true}
 				/>
 			</div>
