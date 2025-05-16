@@ -251,7 +251,7 @@ export const DocumentFlags = () => {
 														)}
 													/>
 												</div>
-												<div className="flex w-full items-center justify-start gap-[10px]">
+												<div className="flex w-full items-center justify-start gap-[10px] pl-[80px]">
 													<FormElementLabel className="w-[350px]">
 														2.1.{baseIndex + 1}.{index + 1}.1 Расчет
 														звукоизоляции
@@ -271,10 +271,10 @@ export const DocumentFlags = () => {
 														)}
 													/>
 												</div>
-												<div className="flex w-full items-center justify-start gap-[10px]">
+												<div className="flex w-full items-center justify-start gap-[10px] pl-[80px]">
 													<FormElementLabel className="w-[350px]">
-														2.1.{baseIndex + 1}.{index + 1}.2 2.1.1.1.2
-														Анализ лабораторных данных
+														2.1.{baseIndex + 1}.{index + 1}.2 Анализ
+														лабораторных данных
 													</FormElementLabel>
 													<Controller
 														control={control}

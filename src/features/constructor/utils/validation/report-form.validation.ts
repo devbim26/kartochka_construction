@@ -46,11 +46,17 @@ export const FloorDocumentsFlags = z.object({
 export const FormReportSchema = z.object({
 	reportInfoId: z.string(),
 	customerName: z.string().min(1, 'Поле обязательно для заполнения'),
+	projectName: z.string().min(1, 'Поле обязательно для заполнения'),
 	objectDescription: z.string().min(1, 'Поле обязательно для заполнения'),
 	creatorFullName: z.string().min(1, 'Поле обязательно для заполнения'),
 	code: z.string().min(1, 'Поле обязательно для заполнения'),
 	country: z.string().min(1, 'Поле обязательно для заполнения'),
 	director: z.string().min(1, 'Поле обязательно для заполнения'),
+	logo: z
+		.any()
+		.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),
+	logoValue: z.string().min(1, 'Поле обязательно для заполнения'),
+	commonProjectName: z.string().min(1, 'Поле обязательно для заполнения'),
 	date: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
