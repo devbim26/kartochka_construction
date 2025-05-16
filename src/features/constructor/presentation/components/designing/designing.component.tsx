@@ -80,24 +80,20 @@ const DesigningScreen = () => {
 				setGraphData({
 					...data,
 					dotRs: (data.dotRs || []).filter(
-						(dot): dot is Dot => typeof dot.r === 'number' && typeof dot.f === 'number',
-					),
+						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+					) as Dot[],
 					laboratoryDots: (data.laboratoryDots || []).filter(
-						(dot): dot is Dot => typeof dot.r === 'number' && typeof dot.f === 'number',
-					),
+						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+					) as Dot[],
 					deviationDots: (data.deviationDots || []).filter(
-						(dot): dot is Dot => typeof dot.r === 'number' && typeof dot.f === 'number',
-					),
+						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+					) as Dot[],
 					dotC:
-						data.dotC &&
-						typeof data.dotC.r === 'number' &&
-						typeof data.dotC.f === 'number'
+						data.dotC?.r != null && data.dotC.f != null
 							? { r: data.dotC.r, f: data.dotC.f }
 							: undefined,
 					dotB:
-						data.dotB &&
-						typeof data.dotB.r === 'number' &&
-						typeof data.dotB.f === 'number'
+						data.dotB?.r != null && data.dotB.f != null
 							? { r: data.dotB.r, f: data.dotB.f }
 							: undefined,
 				});

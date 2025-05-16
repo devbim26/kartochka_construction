@@ -32,18 +32,6 @@ export const CombinedSoundReductionTable = ({
 	noPadding = false,
 }: CombinedSoundReductionTableProps) => {
 	const tableData = useMemo(() => {
-		console.log(
-			'labRw:',
-			labRw,
-			'computingRw:',
-			computingRw,
-			'delta:',
-			delta,
-			'c:',
-			c,
-			'ctr:',
-			ctr,
-		);
 		const rawData = frequencyLabels.map((f, index) => ({
 			frequency: f.toString(),
 			rLab: (rLab[index] ?? 0).toString(),
@@ -56,18 +44,18 @@ export const CombinedSoundReductionTable = ({
 			...sortedData,
 			{
 				frequency: 'Rw',
-				rLab: labRw.toString(),
-				rInSitu: computingRw.toString(),
+				rLab: (labRw ?? 0).toString(),
+				rInSitu: (computingRw ?? 0).toString(),
 			},
 			{
 				frequency: 'Ctr',
-				rLab: `(${delta}, ${ctr})`,
-				rInSitu: `(${delta}, ${ctr})`,
+				rLab: `(${delta ?? 0}, ${ctr ?? 0})`,
+				rInSitu: `(${delta ?? 0}, ${ctr ?? 0})`,
 			},
 			{
-				frequency: 'C₅₀–₅₀₀₀',
-				rLab: `(${delta}, ${c})`,
-				rInSitu: `(${delta}, ${c})`,
+				frequency: 'C50-5000',
+				rLab: `(${delta ?? 0}, ${c ?? 0})`,
+				rInSitu: `(${delta ?? 0}, ${c ?? 0})`,
 			},
 		];
 
@@ -88,7 +76,11 @@ export const CombinedSoundReductionTable = ({
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[60px] border-r border-[#EDEFF2]"
+						contentClassName={`w-[60px] border-r border-[#EDEFF2] ${
+							info.row.original.frequency === 'Rw'
+								? 'bg-[#CCCCCC] text-[#FF0000]'
+								: ''
+						}`}
 						noPadding={noPadding}
 					/>
 				),
@@ -105,7 +97,11 @@ export const CombinedSoundReductionTable = ({
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[80px] border-r border-[#EDEFF2]"
+						contentClassName={`w-[80px] border-r border-[#EDEFF2] ${
+							info.row.original.frequency === 'Rw'
+								? 'bg-[#CCCCCC] text-[#FF0000]'
+								: ''
+						}`}
 						noPadding={noPadding}
 					/>
 				),
@@ -122,7 +118,11 @@ export const CombinedSoundReductionTable = ({
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[90px]"
+						contentClassName={`w-[90px] ${
+							info.row.original.frequency === 'Rw'
+								? 'bg-[#CCCCCC] text-[#FF0000]'
+								: ''
+						}`}
 						noPadding={noPadding}
 					/>
 				),
@@ -130,8 +130,6 @@ export const CombinedSoundReductionTable = ({
 		],
 		[noPadding],
 	);
-
-	console.log(tableData);
 
 	return (
 		<div className="flex-col">
