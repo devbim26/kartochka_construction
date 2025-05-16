@@ -1,13 +1,13 @@
 import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import { Button, Input } from '@core';
-import type { DesigningData, GraphDetailResponse } from '@features';
+import type { DesigningData, Dot, GraphDetailResponse } from '@features';
 import {
+	CombinedSoundReductionTable,
 	DesigningConfig,
 	DesigningHeader,
 	RuMaterialParametrs,
-	SoundReductionTable,
 } from '@features';
-import { getReportFloorById } from '@features/constructor/services';
+import { getReportFloorById, graphDetail } from '@features/constructor/services';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
 import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
@@ -24,7 +24,6 @@ const DesigningScreen = () => {
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
 	const [graphData, setGraphData] = useState<GraphDetailResponse | null>(null);
-	const [chartLabels, setChartLabels] = useState<number[]>([]);
 	const [constructionHeaderId, setConstructionHeaderId] = useState<string | undefined>(undefined);
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionHeaderDto | null>(
 		null,
@@ -67,9 +66,43 @@ const DesigningScreen = () => {
 	}, [reportId]);
 
 	useEffect(() => {
+		if (!constructionHeaderId) return;
+
+		from(graphDetail({ constructionHeaderId }))
+			.pipe(
+				catchError((error) => {
+					toast.error('Не удалось загрузить данные графика');
+					return [];
+				}),
+			)
+			.subscribe(({ data }) => {
+				if (!data) return;
+				setGraphData({
+					...data,
+					dotRs: (data.dotRs || []).filter(
+						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+					) as Dot[],
+					laboratoryDots: (data.laboratoryDots || []).filter(
+						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+					) as Dot[],
+					deviationDots: (data.deviationDots || []).filter(
+						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+					) as Dot[],
+					dotC:
+						data.dotC?.r != null && data.dotC.f != null
+							? { r: data.dotC.r, f: data.dotC.f }
+							: undefined,
+					dotB:
+						data.dotB?.r != null && data.dotB.f != null
+							? { r: data.dotB.r, f: data.dotB.f }
+							: undefined,
+				});
+			});
+	}, [constructionHeaderId]);
+
+	useEffect(() => {
 		const rwValue = constructionHeader?.rw || 0;
-		const relevant = rwValue >= 55;
-		setIsRelevant(relevant);
+		setIsRelevant(rwValue >= 55);
 	}, [constructionHeader?.rw]);
 
 	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
@@ -158,10 +191,15 @@ const DesigningScreen = () => {
 					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
 				</div>
 				<DesigningGraph constructionHeaderId={constructionHeaderId || ''} />
-				<SoundReductionTable
-					frequencyLabels={chartLabels}
-					rLab={graphData?.dotRs?.map((dot) => dot.r) || []}
-					rInSitu={graphData?.deviationDots?.map((dot) => dot.r) || []}
+				<CombinedSoundReductionTable
+					frequencyLabels={graphData?.dotRs?.map((dot) => dot.f) || []}
+					rLab={graphData?.laboratoryDots?.map((dot) => dot.r) || []}
+					rInSitu={graphData?.dotRs?.map((dot) => dot.r) || []}
+					labRw={graphData?.labRw || 0}
+					computingRw={graphData?.computingRw || 0}
+					delta={graphData?.delta || 0}
+					c={graphData?.c || 0}
+					ctr={graphData?.ctr || 0}
 					noPadding={true}
 				/>
 			</div>

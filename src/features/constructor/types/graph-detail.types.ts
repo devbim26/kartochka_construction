@@ -7,6 +7,7 @@ export type GraphDetailResponse = {
 	computingRw?: number;
 	labRw?: number;
 	dotRs?: Dot[] | null;
+	laboratoryDots?: Dot[] | null;
 	deviationDots?: Dot[] | null;
 	dotC?: Dot;
 	dotB?: Dot;

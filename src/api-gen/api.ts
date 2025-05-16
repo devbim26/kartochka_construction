@@ -376,6 +376,33 @@ export interface GeneralCharacteristicFlagsDto {
 	takeFloorMaterialsVolumesCalculation?: boolean;
 }
 
+export interface GetAlternativeConstructionHeadersQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	/** @format uuid */
+	requirementId?: string;
+	/** @format double */
+	minThickness?: number | null;
+	/** @format double */
+	maxThickness?: number | null;
+	/** @format double */
+	minHeight?: number | null;
+	/** @format double */
+	maxHeight?: number | null;
+	/** @format double */
+	minComputingRw?: number | null;
+	/** @format double */
+	maxComputingRw?: number | null;
+	/** @format double */
+	minLabRw?: number | null;
+	/** @format double */
+	maxLabRw?: number | null;
+}
+
 export interface GetArticlesWithPaginationParamsQuery {
 	/** @format int32 */
 	pageNumber?: number;
@@ -401,11 +428,6 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	constructionType?: ConstructionTypeEnum;
 	countryType?: CountryType;
 	isReportConstruction?: boolean | null;
-}
-
-export interface GetConstructionHeadersByRequirementQuery {
-	/** @format uuid */
-	requirementId?: string;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -477,6 +499,7 @@ export interface GraphParametrsDto {
 	/** @format double */
 	labRw?: number;
 	dotRs?: DotDto[] | null;
+	laboratoryDots?: DotDto[] | null;
 	deviationDots?: DotDto[] | null;
 	dotC?: Dot;
 	dotB?: Dot;
@@ -1472,15 +1495,15 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags Construction
-		 * @name ConstructionGetConstructionsByRequirementCreate
-		 * @request POST:/api/Construction/getConstructionsByRequirement
+		 * @name ConstructionAlternativeConstructionsCreate
+		 * @request POST:/api/Construction/alternativeConstructions
 		 */
-		constructionGetConstructionsByRequirementCreate: (
-			data: GetConstructionHeadersByRequirementQuery,
+		constructionAlternativeConstructionsCreate: (
+			data: GetAlternativeConstructionHeadersQuery,
 			params: RequestParams = {},
 		) =>
 			this.request<void, any>({
-				path: `/api/Construction/getConstructionsByRequirement`,
+				path: `/api/Construction/alternativeConstructions`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,

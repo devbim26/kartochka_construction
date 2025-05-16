@@ -1,7 +1,6 @@
 import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import { Button, ChevronIcon } from '@core';
 import type { GraphDetailResponse } from '@features';
-import { SoundReductionTable } from '@features';
 import { getReportFloorById } from '@features/constructor/services';
 import { RuMaterialParametrs } from '@features/constructor/types/material-parametrs.types';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
@@ -138,12 +137,6 @@ const MyConstructions = () => {
 					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
 				</div>
 				<DesigningGraph constructionHeaderId={constructionHeaderId || ''} />
-				<SoundReductionTable
-					frequencyLabels={chartLabels}
-					rLab={graphData?.dotRs?.map((dot) => dot.r) || []}
-					rInSitu={graphData?.deviationDots?.map((dot) => dot.r) || []}
-					noPadding={true}
-				/>
 			</div>
 		</div>
 	);

@@ -2,82 +2,92 @@ import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell } from '@core';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 
-interface SoundReductionData {
-	frequency: string;
-	rLab: string;
-	rInSitu: string;
+interface RwResultData {
+	label: string;
+	lab: string;
+	computed: string;
 }
 
-interface SoundReductionTableProps {
-	frequencyLabels: number[];
-	rLab: number[];
-	rInSitu: number[];
+interface RwResultTableProps {
+	labRw: number;
+	computingRw: number;
+	delta: number;
+	c: number;
+	ctr: number;
 	noPadding?: boolean;
 }
 
-export const SoundReductionTable = ({
-	frequencyLabels,
-	rLab,
-	rInSitu,
+export const RwResultTable = ({
+	labRw,
+	computingRw,
+	delta,
+	c,
+	ctr,
 	noPadding = false,
-}: SoundReductionTableProps) => {
-	const tableData = useMemo(() => {
-		return frequencyLabels.map((freq, index) => ({
-			frequency: freq.toString(),
-			rLab: rLab[index]?.toString() || '0',
-			rInSitu: rInSitu[index]?.toString() || '0',
-		}));
-	}, [frequencyLabels, rLab, rInSitu]);
+}: RwResultTableProps) => {
+	const tableData = useMemo<RwResultData[]>(() => {
+		return [
+			{
+				label: 'Rw',
+				lab: labRw.toString(),
+				computed: computingRw.toString(),
+			},
+			{
+				label: 'Ctr',
+				lab: `(${delta}, ${ctr})`,
+				computed: `(${delta}, ${ctr})`,
+			},
+			{
+				label: 'C₅₀₋₅₀₀₀',
+				lab: `(${delta}, ${c})`,
+				computed: `(${delta}, ${c})`,
+			},
+		];
+	}, [labRw, computingRw, delta, c, ctr]);
 
-	const columns = useMemo<ColumnDef<SoundReductionData>[]>(
+	const columns = useMemo<ColumnDef<RwResultData>[]>(
 		() => [
 			{
-				accessorKey: 'frequency',
-				header: () => (
-					<SimpleTableHeaderCell
-						text="Freq, Hz"
-						textClassName="w-[50px] border-r border-[#EDEFF2]"
-						noPadding={noPadding}
-					/>
-				),
+				accessorKey: 'label',
+				header: () => null,
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[50px] border-r border-[#EDEFF2]"
+						contentClassName="w-[100px] border-r border-[#EDEFF2]"
 						noPadding={noPadding}
 					/>
 				),
 			},
 			{
-				accessorKey: 'rLab',
+				accessorKey: 'lab',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="R (lab), dB"
-						textClassName="w-[50px] border-r border-[#EDEFF2]"
+						text="labRw"
+						textClassName="w-[100px] border-r border-[#EDEFF2] font-bold"
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[50px] border-r border-[#EDEFF2]"
+						contentClassName="w-[100px] border-r border-[#EDEFF2]"
 						noPadding={noPadding}
 					/>
 				),
 			},
 			{
-				accessorKey: 'rInSitu',
+				accessorKey: 'computed',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="R' (in situ), dB"
-						textClassName="w-[50px]"
+						text="computingRw"
+						textClassName="w-[100px] font-bold"
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[50px]"
+						contentClassName="w-[100px]"
 						noPadding={noPadding}
 					/>
 				),

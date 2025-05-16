@@ -8,45 +8,6 @@ export const DesigningTable = memoize(
 	<T extends object>({ data, columns, classNames }: DesigningTableProps<T>) => {
 		const { getHeaderGroups, getRowModel } = useSimpleTable<T>(columns, data);
 
-		const headerRows = getHeaderGroups().map((headerGroup) => (
-			<tr
-				key={headerGroup.id}
-				className={twMerge(
-					'sticky top-0 z-10 border-b border-b-black bg-none p-0',
-					classNames?.headerRowClassName,
-				)}
-			>
-				{headerGroup.headers.map(({ column: { columnDef }, id, colSpan, getContext }) => (
-					<th
-						key={id}
-						colSpan={colSpan}
-						className={twMerge('group p-0', classNames?.headerCellClassName)}
-					>
-						{flexRender(columnDef.header, getContext())}
-					</th>
-				))}
-			</tr>
-		));
-
-		const contentRows = getRowModel().rows.map(({ id, getVisibleCells }) => (
-			<tr
-				className={twMerge(
-					'border-b-[1px] border-[#EDEFF2] p-0 hover:bg-[#C9DEFF]',
-					classNames?.contentRowClassName,
-				)}
-				key={id}
-			>
-				{getVisibleCells().map((cell) => (
-					<td
-						key={cell.id}
-						className={twMerge('w-fit p-0', classNames?.contentCellClassName)}
-					>
-						{flexRender(cell.column.columnDef.cell, cell.getContext())}
-					</td>
-				))}
-			</tr>
-		));
-
 		return (
 			<div className="flex w-full flex-col gap-[10px] rounded-xl bg-none">
 				<div
@@ -55,9 +16,65 @@ export const DesigningTable = memoize(
 						classNames?.tableContainerClassName,
 					)}
 				>
-					<table className={twMerge('w-full table-fixed', classNames?.tableClassName)}>
-						<thead>{headerRows}</thead>
-						<tbody>{contentRows}</tbody>
+					<table
+						className={twMerge(
+							'w-full border-collapse border border-[#EDEFF2]',
+							classNames?.tableClassName,
+						)}
+					>
+						<thead>
+							{getHeaderGroups().map((headerGroup) => (
+								<tr
+									key={headerGroup.id}
+									className={twMerge(
+										'border border-[#EDEFF2]',
+										classNames?.headerRowClassName,
+									)}
+								>
+									{headerGroup.headers.map((header) => (
+										<th
+											key={header.id}
+											colSpan={header.colSpan}
+											className={twMerge(
+												'border border-[#EDEFF2] p-0',
+												classNames?.headerCellClassName,
+											)}
+										>
+											{flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
+										</th>
+									))}
+								</tr>
+							))}
+						</thead>
+						<tbody>
+							{getRowModel().rows.map((row) => (
+								<tr
+									key={row.id}
+									className={twMerge(
+										'border border-[#EDEFF2] hover:bg-[#C9DEFF]',
+										classNames?.contentRowClassName,
+									)}
+								>
+									{row.getVisibleCells().map((cell) => (
+										<td
+											key={cell.id}
+											className={twMerge(
+												'border border-[#EDEFF2] p-0',
+												classNames?.contentCellClassName,
+											)}
+										>
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext(),
+											)}
+										</td>
+									))}
+								</tr>
+							))}
+						</tbody>
 					</table>
 				</div>
 			</div>
