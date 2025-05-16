@@ -353,30 +353,13 @@ export interface DotDto {
 }
 
 export interface EnclosingStructuresSoundInsulationCalculationFlagsDto {
-	takeRoomCharacteristic?: boolean;
-	takeWallMaterialsVolumesCalculation?: boolean;
-	takeFloorMaterialsVolumesCalculation?: boolean;
+	takeEnclosingStructuresSoundInsulationCalculation?: boolean;
 	baseReportInfoFlags?: SoundInsulationFloorReportInfoFlagsDto[] | null;
 }
 
 export interface EnclosingStructuresThermalInsulationCalculationFlagsDto {
 	takeDetailedCalculatingMethod?: boolean;
 	baseReportInfoFlags?: ThermalInsulationFloorReportInfoFlagsDto[] | null;
-}
-
-export interface FinalizeReportInfoCommand {
-	/** @format uuid */
-	reportInfoId?: string;
-	customerName?: string | null;
-	objectDescription?: string | null;
-	creatorFullName?: string | null;
-	code?: string | null;
-	country?: string | null;
-	director?: string | null;
-	/** @format date */
-	date?: string;
-	logoUrl?: string | null;
-	floorDocumentFlags?: DocumentReportFlagsDto;
 }
 
 export interface FloorConstructionInfoDto {
@@ -2032,6 +2015,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				type: ContentType.Json,
 				...params,
 			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags SvgConstruction
+		 * @name SvgConstructionDetail
+		 * @request GET:/api/SvgConstruction/{id}
+		 */
+		svgConstructionDetail: (id: string, params: RequestParams = {}) =>
+			this.request<RequirementDto, any>({
+				path: `/api/SvgConstruction/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
 	};
 	single = {
 		/**
@@ -2159,12 +2157,44 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name DocumentInfoUpdate
 		 * @request PUT:/documentInfo
 		 */
-		documentInfoUpdate: (data: FinalizeReportInfoCommand, params: RequestParams = {}) =>
+		documentInfoUpdate: (
+			data: {
+				/** @format uuid */
+				reportInfoId?: string;
+				reportNumber?: string;
+				reportName?: string;
+				customerName?: string;
+				objectDescription?: string;
+				creatorFullName?: string;
+				code?: string;
+				country?: string;
+				director?: string;
+				/** @format date */
+				date?: string;
+				/** @format binary */
+				logo?: File;
+				'floorDocumentFlags.takeTitleList'?: boolean;
+				'floorDocumentFlags.takeContent'?: boolean;
+				'floorDocumentFlags.takeIntroduction'?: boolean;
+				'floorDocumentFlags.generalCharacteristics.takeRoomCharacteristic'?: boolean;
+				'floorDocumentFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation'?: boolean;
+				'floorDocumentFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation'?: boolean;
+				'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation'?: boolean;
+				'floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags'?: SoundInsulationFloorReportInfoFlagsDto[];
+				'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod'?: boolean;
+				'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags'?: ThermalInsulationFloorReportInfoFlagsDto[];
+				'floorDocumentFlags.takeConclusion'?: boolean;
+				'floorDocumentFlags.takeUsedLiteratureList'?: boolean;
+				'floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation'?: boolean;
+				'floorDocumentFlags.takeSupplementThermalInsulationProtocolsWithCalculation'?: boolean;
+			},
+			params: RequestParams = {},
+		) =>
 			this.request<void, any>({
 				path: `/documentInfo`,
 				method: 'PUT',
 				body: data,
-				type: ContentType.Json,
+				type: ContentType.FormData,
 				...params,
 			}),
 	};

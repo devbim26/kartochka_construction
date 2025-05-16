@@ -72,6 +72,10 @@ export const uploadDocument = async ({ data }: FloorDocumentUpload) => {
 export const uploadImage = async ({ data }: FloorDocumentImage) => {
 	return await fetchApi.floor.constructionImageUpdate(data);
 };
+
+export const getReportFormInfo = async (id: string) => {
+	return await fetchApi.api.reportInfoReportInfoFlagsDetail(id);
+};
 export const graphDetail = async ({ constructionHeaderId }: GetGraphParams) => {
 	return await fetchApi.api.graphDetail(constructionHeaderId);
 };

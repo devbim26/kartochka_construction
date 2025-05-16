@@ -20,6 +20,7 @@ import {
 	MainScreen,
 	MaterialsScreen,
 	NotFoundScreen,
+	ReportFormScreen,
 	RequirementsScreen,
 } from '@features';
 import { AUTH_ROUTES } from '@features/auth/constants';
@@ -63,6 +64,10 @@ export const AppRouter = () => {
 					<Route
 						path={CONSTRUCTOR_ROUTES.myConstructions.route}
 						element={<MyConstructions />}
+					/>
+					<Route
+						path={CONSTRUCTOR_ROUTES.reportForm.route}
+						element={<ReportFormScreen />}
 					/>
 				</Route>
 				<Route path={DESIGNING_ROUTES.account.route} element={<AccountScreen />} />

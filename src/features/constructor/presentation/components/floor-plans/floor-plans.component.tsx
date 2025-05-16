@@ -1,7 +1,8 @@
 import type { ReportFloorInfoDto } from '@api-gen';
-import { Button, DeleteIcon, DeleteModal } from '@core';
+import { APP_ROUTES, Button, DeleteIcon, DeleteModal } from '@core';
 import { useAppDispatch, useAppNavigate } from '@core/utils';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import {
 	getReportFloorById,
 	getReportSingleById,
@@ -9,6 +10,7 @@ import {
 } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
 import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import { AxiosError } from 'axios';
 import * as pdfjs from 'pdfjs-dist';
 import { useEffect, useState } from 'react';
@@ -229,6 +231,25 @@ export const FloorPlans = memoize(() => {
 				</DeleteModal>
 			</div>
 			<ConstructionSheets />
+			<Button
+				onClick={() =>
+					navigate(
+						APP_ROUTES.designing.route +
+							'/' +
+							DESIGNING_ROUTES.constructor.route +
+							'/' +
+							CONSTRUCTOR_ROUTES.reportForm.route,
+						{
+							reportId: search.get('reportId')!,
+							reportType: search.get('reportType')!,
+						},
+					)
+				}
+				variant="primary"
+				className="self-end"
+			>
+				Сформировать отчет
+			</Button>
 		</div>
 	);
 }, 'FloorPlans');
