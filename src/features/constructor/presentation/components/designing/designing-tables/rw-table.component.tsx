@@ -1,6 +1,7 @@
-import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell } from '@core';
+import { SimpleTableCell, SimpleTableHeaderCell } from '@core';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
+import { DesigningRwTable } from './designing-rw-table.component';
 
 interface RwResultData {
 	label: string;
@@ -53,7 +54,7 @@ export const RwResultTable = ({
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[100px] border-r border-[#EDEFF2]"
+						contentClassName="w-[100px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
@@ -63,14 +64,14 @@ export const RwResultTable = ({
 				header: () => (
 					<SimpleTableHeaderCell
 						text="labRw"
-						textClassName="w-[100px] border-r border-[#EDEFF2] font-bold"
+						textClassName="w-[100px] border-r border-[#EDEFF2] font-bold text-center"
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[100px] border-r border-[#EDEFF2]"
+						contentClassName="w-[100px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
@@ -80,14 +81,14 @@ export const RwResultTable = ({
 				header: () => (
 					<SimpleTableHeaderCell
 						text="computingRw"
-						textClassName="w-[100px] font-bold"
+						textClassName="w-[100px] font-bold text-center"
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[100px]"
+						contentClassName="w-[100px] text-center"
 						noPadding={noPadding}
 					/>
 				),
@@ -98,7 +99,7 @@ export const RwResultTable = ({
 
 	return (
 		<div className="flex-col">
-			<DesigningTable
+			<DesigningRwTable
 				data={tableData}
 				columns={columns}
 				classNames={{

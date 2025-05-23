@@ -1,6 +1,7 @@
-import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell } from '@core';
+import { SimpleTableCell, SimpleTableHeaderCell } from '@core';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
+import { DesigningRwTable } from './designing-rw-table.component';
 
 interface SoundReductionData {
 	frequency: string;
@@ -69,14 +70,14 @@ export const CombinedSoundReductionTable = ({
 				header: () => (
 					<SimpleTableHeaderCell
 						text="Freq, Hz"
-						textClassName="w-[60px] border-r border-[#EDEFF2]"
+						textClassName="w-[60px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName={`w-[60px] border-r border-[#EDEFF2] ${
+						contentClassName={`w-[60px] border-r border-[#EDEFF2] text-center ${
 							info.row.original.frequency === 'Rw'
 								? 'bg-[#CCCCCC] text-[#FF0000]'
 								: ''
@@ -90,14 +91,14 @@ export const CombinedSoundReductionTable = ({
 				header: () => (
 					<SimpleTableHeaderCell
 						text="R (lab), dB"
-						textClassName="w-[80px] border-r border-[#EDEFF2]"
+						textClassName="w-[80px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName={`w-[80px] border-r border-[#EDEFF2] ${
+						contentClassName={`w-[80px] border-r border-[#EDEFF2] text-center ${
 							info.row.original.frequency === 'Rw'
 								? 'bg-[#CCCCCC] text-[#FF0000]'
 								: ''
@@ -111,14 +112,14 @@ export const CombinedSoundReductionTable = ({
 				header: () => (
 					<SimpleTableHeaderCell
 						text="R' (in situ), dB"
-						textClassName="w-[90px]"
+						textClassName="w-[90px] text-center"
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName={`w-[90px] ${
+						contentClassName={`w-[90px] text-center ${
 							info.row.original.frequency === 'Rw'
 								? 'bg-[#CCCCCC] text-[#FF0000]'
 								: ''
@@ -133,7 +134,7 @@ export const CombinedSoundReductionTable = ({
 
 	return (
 		<div className="flex-col">
-			<DesigningTable
+			<DesigningRwTable
 				data={tableData}
 				columns={columns}
 				classNames={{

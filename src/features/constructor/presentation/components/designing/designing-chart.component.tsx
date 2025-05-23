@@ -47,7 +47,7 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 				backgroundColor,
 				borderWidth: 3,
 				pointBackgroundColor: baseColor,
-				pointRadius: 0,
+				pointRadius: 3,
 				pointHoverRadius: 5,
 				tension: 0.3,
 				fill: !isInSitu,
