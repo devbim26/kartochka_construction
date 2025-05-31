@@ -136,7 +136,7 @@ const MyConstructions = () => {
 					</p>
 					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
 				</div>
-				<DesigningGraph constructionHeaderId={constructionHeaderId || ''} />
+				<DesigningGraph graphData={graphData} />
 			</div>
 		</div>
 	);

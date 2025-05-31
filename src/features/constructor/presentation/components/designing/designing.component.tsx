@@ -1,11 +1,14 @@
 import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
-import { Button, Input } from '@core';
+import { Button, Input, useAppDispatch, useAppSelector } from '@core';
+import ConstructorLoader from '@core/presentation/components/loaders/constructor-loader.component';
 import type { DesigningData, Dot, GraphDetailResponse } from '@features';
 import {
 	CombinedSoundReductionTable,
 	DesigningConfig,
 	DesigningHeader,
 	RuMaterialParametrs,
+	startLoading,
+	stopLoading,
 } from '@features';
 import { getReportFloorById, graphDetail } from '@features/constructor/services';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
@@ -21,6 +24,7 @@ import { twMerge } from 'tailwind-merge';
 import DesigningGraph from './designing-graph.component';
 
 const DesigningScreen = () => {
+	const dispatch = useAppDispatch();
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
 	const [graphData, setGraphData] = useState<GraphDetailResponse | null>(null);
@@ -29,6 +33,7 @@ const DesigningScreen = () => {
 		null,
 	);
 	const [isRelevant, setIsRelevant] = useState<boolean>(false);
+	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
 		defaultValues: DesigningConfig.defaultValues,
@@ -37,46 +42,54 @@ const DesigningScreen = () => {
 
 	useEffect(() => {
 		if (!reportId) return;
+		dispatch(startLoading());
 		from(getReportFloorById({ id: reportId }))
 			.pipe(
 				catchError((error) => {
 					toast.error('Не удалось получить данные отчёта');
+					dispatch(stopLoading());
 					return [];
 				}),
 			)
 			.subscribe((response) => {
 				const report: ReportInfoFloorConstructionDto | undefined = response?.data;
-				const constructionHeaderId =
+				const newHeaderId =
 					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
 						?.reportConstructionHeader?.constructionHeaderId;
-				const constructionHeader =
+				const newHeader =
 					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
 						?.reportConstructionHeader?.constructionHeader;
-				if (constructionHeaderId) {
-					setConstructionHeaderId(constructionHeaderId);
-				} else {
-					toast.error('Не найден constructionHeaderId');
+				if (newHeaderId && newHeaderId !== constructionHeaderId) {
+					setConstructionHeaderId(newHeaderId);
 				}
-				if (constructionHeader) {
-					setConstructionHeader(constructionHeader);
+				if (newHeader) {
+					setConstructionHeader(newHeader);
 				} else {
 					toast.error('Не найден constructionHeader');
 				}
+				if (!newHeaderId) {
+					toast.error('Не найден constructionHeaderId');
+				}
+				dispatch(stopLoading());
 			});
 	}, [reportId]);
 
 	useEffect(() => {
-		if (!constructionHeaderId) return;
-
+		if (!constructionHeaderId || graphData) return;
+		dispatch(startLoading());
 		from(graphDetail({ constructionHeaderId }))
 			.pipe(
 				catchError((error) => {
 					toast.error('Не удалось загрузить данные графика');
+					dispatch(stopLoading());
 					return [];
 				}),
 			)
 			.subscribe(({ data }) => {
-				if (!data) return;
+				if (!data) {
+					dispatch(stopLoading());
+					return;
+				}
 				setGraphData({
 					...data,
 					dotRs: (data.dotRs || []).filter(
@@ -97,6 +110,7 @@ const DesigningScreen = () => {
 							? { r: data.dotB.r, f: data.dotB.f }
 							: undefined,
 				});
+				dispatch(stopLoading());
 			});
 	}, [constructionHeaderId]);
 
@@ -138,6 +152,14 @@ const DesigningScreen = () => {
 				.join(', ') || 'нет данных';
 		return `${materialType} (${materialParams})`;
 	};
+
+	if (isLoading) {
+		return (
+			<div className="flex size-full items-center justify-center">
+				<ConstructorLoader />
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
@@ -190,7 +212,7 @@ const DesigningScreen = () => {
 					</p>
 					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
 				</div>
-				<DesigningGraph constructionHeaderId={constructionHeaderId || ''} />
+				<DesigningGraph graphData={graphData} />
 				<CombinedSoundReductionTable
 					frequencyLabels={graphData?.dotRs?.map((dot) => dot.f) || []}
 					rLab={graphData?.laboratoryDots?.map((dot) => dot.r) || []}

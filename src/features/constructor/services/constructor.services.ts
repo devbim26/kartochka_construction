@@ -3,6 +3,7 @@ import type {
 	UpdateReportInfoWithSingleConstructionCommand,
 } from '@api-gen';
 import { fetchApi } from '@api-gen';
+import { withConstructorLoader } from '../utils';
 
 type ReportCreateProps = {
 	data: CreateReportInfoCommand;
@@ -52,30 +53,29 @@ type GetGraphParams = {
 };
 
 export const createReport = async ({ data }: ReportCreateProps) => {
-	return await fetchApi.api.reportInfoCreate(data);
+	return await withConstructorLoader(() => fetchApi.api.reportInfoCreate(data));
 };
 export const getReportSingleById = async ({ id }: GetReportByIdParams) => {
-	return await fetchApi.api.reportInfoSingleDetail(id);
+	return await withConstructorLoader(() => fetchApi.api.reportInfoSingleDetail(id));
 };
 export const getReportFloorById = async ({ id }: GetReportByIdParams) => {
-	return await fetchApi.api.reportInfoFloorDetail(id);
+	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorDetail(id));
 };
 export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {
-	return await fetchApi.single.singleUpdate(data);
+	return await withConstructorLoader(() => fetchApi.single.singleUpdate(data));
 };
 export const updateReportFloor = async ({ data }: UpdateFloorReportProps) => {
-	return await fetchApi.floor.constructionUpdate(data);
+	return await withConstructorLoader(() => fetchApi.floor.constructionUpdate(data));
 };
 export const uploadDocument = async ({ data }: FloorDocumentUpload) => {
-	return await fetchApi.floor.documentUpdate(data);
+	return await withConstructorLoader(() => fetchApi.floor.documentUpdate(data));
 };
 export const uploadImage = async ({ data }: FloorDocumentImage) => {
-	return await fetchApi.floor.constructionImageUpdate(data);
+	return await withConstructorLoader(() => fetchApi.floor.constructionImageUpdate(data));
 };
-
 export const getReportFormInfo = async (id: string) => {
-	return await fetchApi.api.reportInfoReportInfoFlagsDetail(id);
+	return await withConstructorLoader(() => fetchApi.api.reportInfoReportInfoFlagsDetail(id));
 };
 export const graphDetail = async ({ constructionHeaderId }: GetGraphParams) => {
-	return await fetchApi.api.graphDetail(constructionHeaderId);
+	return await withConstructorLoader(() => fetchApi.api.graphDetail(constructionHeaderId));
 };
