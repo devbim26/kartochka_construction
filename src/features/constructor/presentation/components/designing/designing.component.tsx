@@ -10,7 +10,11 @@ import {
 	startLoading,
 	stopLoading,
 } from '@features';
-import { getReportFloorById, graphDetail } from '@features/constructor/services';
+import {
+	getReportFloorById,
+	graphDetail,
+	svgConstructionDetail,
+} from '@features/constructor/services';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
 import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
@@ -34,6 +38,8 @@ const DesigningScreen = () => {
 	);
 	const [isRelevant, setIsRelevant] = useState<boolean>(false);
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
+	const [svgUrl, setSvgUrl] = useState<string | null>(null);
+
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
 		defaultValues: DesigningConfig.defaultValues,
@@ -128,6 +134,24 @@ const DesigningScreen = () => {
 	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
 
 	useEffect(() => {
+		if (!constructionHeaderId) return;
+		from(svgConstructionDetail(constructionHeaderId))
+			.pipe(
+				catchError((error) => {
+					toast.error('Не удалось получить картинку');
+					return [];
+				}),
+			)
+			.subscribe((response) => {
+				if (response.status === 200 && typeof response.data === 'string') {
+					setSvgUrl(response.data);
+				} else {
+					toast.error('Неверный формат');
+				}
+			});
+	}, [constructionHeaderId]);
+
+	useEffect(() => {
 		if (constructionType) {
 			ConstructionTypeMap({
 				currentConstruction: constructionType,
@@ -165,7 +189,11 @@ const DesigningScreen = () => {
 		<div className="flex w-full flex-col gap-[30px]">
 			<DesigningHeader />
 			<div className="flex h-[428px] w-full flex-row gap-[72px] rounded-[20px] bg-white px-[44px] py-[34px]">
-				<img className="h-full w-[100px]" />
+				<img
+					className="h-full w-[100px]"
+					src={svgUrl ?? undefined}
+					alt="SVG Construction"
+				/>
 				<div className="flex flex-col gap-[30px]">
 					<Input
 						label="Тип конструкции"
