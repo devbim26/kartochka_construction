@@ -14,6 +14,7 @@ import {
 	FloorPlansScreen,
 	GuidbooksLauout,
 	HomeScreen,
+	IFCModelScreen,
 	IssuersScreen,
 	LandingScreen,
 	LoginPage,
@@ -69,6 +70,7 @@ export const AppRouter = () => {
 						path={CONSTRUCTOR_ROUTES.reportForm.route}
 						element={<ReportFormScreen />}
 					/>
+					<Route path={CONSTRUCTOR_ROUTES.ifcModel.route} element={<IFCModelScreen />} />
 				</Route>
 				<Route path={DESIGNING_ROUTES.account.route} element={<AccountScreen />} />
 				<Route

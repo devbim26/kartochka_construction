@@ -23,4 +23,8 @@ export const CONSTRUCTOR_ROUTES = {
 		id: 'report-form-page-id',
 		route: 'report-form',
 	},
+	ifcModel: {
+		id: 'constructor-ifc-model',
+		route: 'ifc-model'
+	}
 };
