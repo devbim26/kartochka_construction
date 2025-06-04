@@ -6,6 +6,7 @@ import {
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
+import ConstructorLoader from '@core/presentation/components/loaders/constructor-loader.component';
 import { getReportFloorById, uploadImage } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
 import type { ConstructionSheet } from '@features/constructor/types';
@@ -33,6 +34,7 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const dispatch = useAppDispatch();
+	const [isRendering, setIsRendering] = useState(false);
 	useEffect(() => {
 		setNumPages(pdfFile.numPages);
 		setPageNum(1);
@@ -62,6 +64,8 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 			canvas.width = viewport.width;
 			canvas.height = viewport.height;
 
+			setIsRendering(true);
+
 			renderTaskRef.current = page.render({
 				canvasContext: context,
 				viewport: viewport,
@@ -71,6 +75,8 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 				await renderTaskRef.current.promise;
 			} catch (error) {
 				console.warn('Ошибка выполнения рендера:', error);
+			} finally {
+				setIsRendering(false);
 			}
 
 			renderTaskRef.current = null;
@@ -281,7 +287,12 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 	return (
 		<div className="flex items-center justify-center rounded-[20px] py-[30px]">
 			<div className="flex w-fit flex-col gap-[18px] rounded-[20px] bg-white">
-				<div className="h-[600px] w-[1600px] overflow-auto border border-input-label-primary">
+				<div className="relative h-[600px] w-[1600px] overflow-auto border border-input-label-primary">
+					{isRendering && (
+						<div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+							<ConstructorLoader />
+						</div>
+					)}
 					<canvas ref={canvasRef} onContextMenu={handleCanvasRightClick} />
 				</div>
 				{pdfFile && (
