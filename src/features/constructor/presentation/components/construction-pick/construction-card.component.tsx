@@ -12,6 +12,7 @@ import {
 
 type Props = {
 	construction: ReportConstructionDto;
+	constructionHeaderId: string | undefined;
 };
 
 export const ConstructionCard = ({ construction }: Props) => {
