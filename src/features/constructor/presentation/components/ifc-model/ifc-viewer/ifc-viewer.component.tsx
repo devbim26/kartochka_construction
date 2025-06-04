@@ -1,11 +1,11 @@
-import { use3dScene } from '@features/constructor/utils';
+import { useIFCViewer } from '@features/constructor/utils';
 import { useRef } from 'react';
 import { uiControlPanelConstructor } from './ifc-viewer-ui-constructors';
 
 export const IFCViewer = () => {
 	const sceneContainerRef = useRef<HTMLDivElement>(null);
 	const panelRef = useRef<HTMLDivElement>(null);
-	use3dScene(sceneContainerRef, panelRef, {
+	useIFCViewer(sceneContainerRef, panelRef, {
 		uiControlPanelConstructor: uiControlPanelConstructor,
 	});
 

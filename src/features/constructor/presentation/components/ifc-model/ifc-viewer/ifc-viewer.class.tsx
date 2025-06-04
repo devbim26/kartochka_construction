@@ -1,34 +1,69 @@
-import { IFCViewerOptions } from '@features/constructor/types';
+import { IFCViewerOptions, UiControlPanelConstructor } from '@features/constructor/types';
 import {
+	Clipper,
 	Components,
+	Grids,
+	Raycasters,
 	SimpleCamera,
 	SimpleGrid,
 	SimpleRaycaster,
 	SimpleRenderer,
 	SimpleScene,
 	SimpleWorld,
+	Worlds,
 } from '@thatopen/components';
+import { Manager } from '@thatopen/ui';
 import { RefObject } from 'react';
 import Stats from 'stats.js';
-import { Mesh } from 'three';
+import {
+	BoxGeometry,
+	Mesh,
+	MeshLambertMaterial,
+	MeshStandardMaterial,
+	Object3DEventMap,
+} from 'three';
+
+type OnMouseMoveHandler = (event: MouseEvent) => void;
+type OnDoubleClickHandler = (event: MouseEvent) => void;
+type RenderEventHandler = (data: unknown) => void;
 
 export class IFCViewer {
+	//Core
 	private _currentWorld: SimpleWorld<SimpleScene, SimpleCamera, SimpleRenderer> | null = null;
 	private _components: Components | null = null;
 	private _statsPanel: Stats | null = null;
 	private _currentGrid: SimpleGrid | null = null;
+
+	//Custer
 	private _currentRayCaster: SimpleRaycaster | null = null;
 	private _previousSelection: Mesh | null = null;
-	private _sceneContainerRef: RefObject<HTMLDivElement> | null = null;
-	private _panelContainerRef: RefObject<HTMLDivElement> | null = null;
+
+	//DOM
+	private _sceneContainerRef: RefObject<HTMLDivElement | null> | null = null;
+	private _panelContainerRef: RefObject<HTMLDivElement | null> | null = null;
+
+	//Clipper
+	private _currentClipper: Clipper | null = null;
+
+	//Handlers
+	private _onMouseMoveHandlerRef: OnMouseMoveHandler | null = null;
+	private _onDoubleClickHandlerRef: OnDoubleClickHandler | null = null;
+	private _onBeforeUpdateHandlerRef: RenderEventHandler | null = null;
+	private _onAfterUpdateHandlerRef: RenderEventHandler | null = null;
+
+	//TEST
+	private _cubeData: {
+		_cube: Mesh<BoxGeometry, MeshLambertMaterial, Object3DEventMap>;
+		_material: MeshLambertMaterial;
+	} | null = null;
 
 	get currentWorld(): SimpleWorld<SimpleScene, SimpleCamera, SimpleRenderer> | null {
 		return this._currentWorld;
 	}
 
 	constructor(
-		sceneContainer: RefObject<HTMLDivElement>,
-		panelContainer: RefObject<HTMLDivElement>,
+		sceneContainer: RefObject<HTMLDivElement | null>,
+		panelContainer: RefObject<HTMLDivElement | null>,
 		options?: IFCViewerOptions,
 	) {
 		this._sceneContainerRef = sceneContainer;
@@ -37,18 +72,150 @@ export class IFCViewer {
 	}
 
 	destroy() {
+		//handlers
+		this._sceneContainerRef?.current!.removeEventListener(
+			'mousemove',
+			this._onMouseMoveHandlerRef!,
+		);
+		this._sceneContainerRef?.current!.removeEventListener(
+			'dblclick',
+			this._onDoubleClickHandlerRef!,
+		);
+
+		//scene
 		if (!!this._components) {
 			this._components.dispose();
 		}
 	}
 
-	private initialize(options?: IFCViewerOptions) {}
+	private initialize(options?: IFCViewerOptions) {
+		try {
+			this.setupWorld();
+			this.setupCube();
+			this.setupRayCaster();
+			this.setupClipper();
+			this.setupStatsPanel();
+			if (options?.uiControlPanelConstructor)
+				this.setupUIPanel(options.uiControlPanelConstructor);
+		} catch (e) {
+			console.error(e);
+		}
+	}
 
-	private setupWorld() {}
+	private setupWorld() {
+		//World
+		this._components = new Components();
+		const worlds = this._components.get(Worlds);
+		this._currentWorld = worlds.create<SimpleScene, SimpleCamera, SimpleRenderer>();
+		this._currentWorld.scene = new SimpleScene(this._components);
+		this._currentWorld.renderer = new SimpleRenderer(
+			this._components,
+			this._sceneContainerRef?.current!,
+		);
+		this._currentWorld.camera = new SimpleCamera(this._components);
+		this._components.init();
+		this._currentWorld.scene.three.background = null;
 
-	private setupRayCaster() {}
+		//Grid
+		const grids = this._components.get(Grids);
+		this._currentGrid = grids.create(this._currentWorld);
 
-	private setupStatsPanel() {}
+		this._currentWorld.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
+		this._currentWorld!.scene.setup();
+	}
 
-	private setupUIPanel() {}
+	//FOR TEST
+	private setupCube() {
+		const material = new MeshLambertMaterial({ color: '#6528D7' });
+		const geometry = new BoxGeometry();
+		const cube = new Mesh(geometry, material);
+		cube.position.set(0, 1.5, 0);
+		this._currentWorld!.scene.three.add(cube);
+		this._currentWorld!.meshes.add(cube);
+		this._cubeData = {
+			_material: material,
+			_cube: cube,
+		};
+	}
+
+	//Use features
+	private setupRayCaster() {
+		const casters = this._components!.get(Raycasters);
+		this._currentRayCaster = casters.get(this.currentWorld!);
+		this._onMouseMoveHandlerRef = this.onMouseMoveHandler.bind(this);
+		this._sceneContainerRef?.current!.addEventListener(
+			'mousemove',
+			this._onMouseMoveHandlerRef,
+		);
+	}
+
+	private setupClipper() {
+		this._currentClipper = this._components!.get(Clipper);
+		this._currentClipper!.enabled = true;
+		this._onDoubleClickHandlerRef = this.onDoubleClickHandler.bind(this);
+		this._sceneContainerRef?.current!.addEventListener(
+			'dblclick',
+			this._onDoubleClickHandlerRef,
+		);
+	}
+
+	//Info/controls
+	private setupStatsPanel() {
+		if (!!process.env.REACT_APP_MODE && process.env.REACT_APP_MODE === 'development') {
+			this._statsPanel = new Stats();
+			this._statsPanel.showPanel(2);
+			this._sceneContainerRef?.current!.append(this._statsPanel.dom);
+			this._onBeforeUpdateHandlerRef = this.onBeforeUpdateHandler.bind(this);
+			this._onAfterUpdateHandlerRef = this.onAfterUpdateHandler.bind(this);
+			this._currentWorld?.renderer!.onBeforeUpdate.add(this._onBeforeUpdateHandlerRef);
+			this._currentWorld?.renderer!.onAfterUpdate.add(this._onAfterUpdateHandlerRef);
+			this._statsPanel.dom.style.cssText =
+				'position: absolute; top: 10px; left: 10px; z-index: unset;';
+		}
+	}
+
+	private setupUIPanel(uiControlPanelConstructor: UiControlPanelConstructor) {
+		Manager.init();
+		const uiPanel = uiControlPanelConstructor({
+			world: this._currentWorld!,
+			clipper: this._currentClipper!,
+			grid: this._currentGrid!,
+		});
+		this._panelContainerRef?.current!.append(uiPanel);
+	}
+
+	//Scene handlers
+	private onMouseMoveHandler() {
+		try {
+			const result = this._currentRayCaster!.castRay([this._cubeData!._cube]);
+			if (!!this._previousSelection) {
+				this._previousSelection.material = this._cubeData!._material;
+			}
+			if (!result || !(result.object instanceof Mesh)) {
+				return;
+			}
+			result.object.material = new MeshStandardMaterial({ color: '#BCF124' });
+			this._previousSelection = result.object;
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	private onDoubleClickHandler() {
+		try {
+			if (this._currentClipper!.enabled) {
+				this._currentClipper!.create(this._currentWorld!);
+			}
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
+	private onBeforeUpdateHandler() {
+		this._statsPanel!.begin();
+	}
+
+	private onAfterUpdateHandler() {
+		this._statsPanel!.end();
+	}
 }

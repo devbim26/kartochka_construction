@@ -1,4 +1,5 @@
 import {
+	Clipper,
 	SimpleCamera,
 	SimpleGrid,
 	SimpleRenderer,
@@ -7,9 +8,20 @@ import {
 } from '@thatopen/components';
 import { PanelSection } from '@thatopen/ui';
 
+export interface IIFCViewer {
+	destroy(): void;
+}
+
+export interface UiControlPanelConstructorSceneItems {
+	world: SimpleWorld<SimpleScene, SimpleCamera, SimpleRenderer>;
+	grid: SimpleGrid;
+	clipper: Clipper;
+}
+
+export type UiControlPanelConstructor = (
+	sceneItems: UiControlPanelConstructorSceneItems,
+) => PanelSection;
+
 export interface IFCViewerOptions {
-	uiControlPanelConstructor: (
-		world: SimpleWorld<SimpleScene, SimpleCamera, SimpleRenderer>,
-		grid: SimpleGrid,
-	) => PanelSection;
+	uiControlPanelConstructor: UiControlPanelConstructor;
 }

@@ -1,1 +1,1 @@
-export * from './use-3d-scene.hook'
+export * from './use-ifc-viewer.hook'
