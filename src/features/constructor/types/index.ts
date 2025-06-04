@@ -7,6 +7,7 @@ export * from './dot.types';
 export * from './fire-resistance.types';
 export * from './floor-plan.types';
 export * from './graph-detail.types';
+export * from './ifc-viewer.types';
 export * from './material-parametrs.types';
 export * from './modals.types';
 export * from './physical-standarts.types';
