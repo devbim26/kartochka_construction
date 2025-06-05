@@ -21,33 +21,33 @@ export const uiControlPanelConstructor = (
 	return Component.create<PanelSection>(() => {
 		return html`
 			<bim-panel
-				label="Control panel"
+				label="Панель управления"
 				class="options-menu"
 				style="max-height: 600px; overflow-y: auto; color: #2175f3"
 			>
-				<bim-panel-section collapsed label="IFC File">
+				<bim-panel-section collapsed label="Импорт">
 					<bim-button
-						label="Load IFC"
+						label="Импорт модели"
 						@click="${() => {
 							callbacks.loadIfcFileHandler();
 						}}"
 					>
 					</bim-button>
 					<bim-button
-						label="Delete model"
+						label="Удалить модель"
 						@click="${() => {
 							callbacks.disposeFragmentsHandler();
 						}}"
 					>
 					</bim-button>
 				</bim-panel-section>
-				<bim-panel-section collapsed label="Commands">
-					<bim-label>Double click: Create clipping plane</bim-label>
-					<bim-label>Delete key: Delete clipping plane</bim-label>
+				<bim-panel-section collapsed label="Команды">
+					<bim-label>Двойной клик: Создание плоскости сечения</bim-label>
+					<bim-label>Клавиша 'Del': Удаление плоскости сечения</bim-label>
 				</bim-panel-section>
-				<bim-panel-section collapsed label="Clipper">
+				<bim-panel-section collapsed label="Полоскость сечения">
 					<bim-checkbox
-						label="Clipper enabled"
+						label="Вкл"
 						checked
 						@change="${({ target }: { target: Checkbox }) => {
 							sceneItems.clipper.enabled = target.value;
@@ -57,7 +57,7 @@ export const uiControlPanelConstructor = (
 					</bim-checkbox>
 
 					<bim-checkbox
-						label="Clipper visible"
+						label="Видимоть"
 						checked
 						@change="${({ target }: { target: Checkbox }) => {
 							sceneItems.clipper.visible = target.value;
@@ -66,7 +66,7 @@ export const uiControlPanelConstructor = (
 					</bim-checkbox>
 
 					<bim-color-input
-						label="Planes Color"
+						label="Цвет"
 						color="#202932"
 						@input="${({ target }: { target: ColorInput }) => {
 							sceneItems.clipper.material.color.set(target.color);
@@ -77,7 +77,7 @@ export const uiControlPanelConstructor = (
 					<bim-number-input
 						slider
 						step="0.01"
-						label="Planes opacity"
+						label="Прозрачность"
 						value="0.2"
 						min="0.1"
 						max="1"
@@ -90,7 +90,7 @@ export const uiControlPanelConstructor = (
 					<bim-number-input
 						slider
 						step="0.1"
-						label="Planes size"
+						label="Размер плоскости"
 						value="5"
 						min="2"
 						max="10"
@@ -101,17 +101,17 @@ export const uiControlPanelConstructor = (
 					</bim-number-input>
 
 					<bim-button
-						label="Delete all"
+						label="Удалить все"
 						@click="${() => {
 							sceneItems.clipper.deleteAll();
 						}}"
 					>
 					</bim-button>
 				</bim-panel-section>
-				<bim-panel-section collapsed label="Camera">
+				<bim-panel-section collapsed label="Камера">
 					<bim-dropdown
 						required
-						label="Navigation mode"
+						label="Режим"
 						@change="${({ target }: { target: Dropdown }) => {
 							const selected = target.value[0] as NavModeID;
 
@@ -131,7 +131,7 @@ export const uiControlPanelConstructor = (
 					</bim-dropdown>
 					<bim-dropdown
 						required
-						label="Camera projection"
+						label="Проекция камеры"
 						@change="${({ target }: { target: Dropdown }) => {
 							const selected = target.value[0] as CameraProjection;
 							const isOrtho = selected === 'Orthographic';
@@ -147,7 +147,7 @@ export const uiControlPanelConstructor = (
 						<bim-option label="Orthographic"></bim-option>
 					</bim-dropdown>
 					<bim-checkbox
-						label="Allow user input"
+						label="Разрешить взаимодействие"
 						checked
 						@change="${({ target }: { target: Checkbox }) => {
 							sceneItems.world.camera.setUserInput(target.checked);
@@ -155,11 +155,11 @@ export const uiControlPanelConstructor = (
 					>
 					</bim-checkbox>
 				</bim-panel-section>
-				<bim-panel-section collapsed label="Scene">
+				<bim-panel-section collapsed label="Сцена">
 					<bim-number-input
 						slider
 						step="0.1"
-						label="Directional lights intensity"
+						label="Интенсивность направленного света"
 						value="1.5"
 						min="0.1"
 						max="10"
@@ -171,7 +171,7 @@ export const uiControlPanelConstructor = (
 					<bim-number-input
 						slider
 						step="0.1"
-						label="Ambient light intensity"
+						label="Интенсивность окружающего света"
 						value="1"
 						min="0.1"
 						max="5"
@@ -181,9 +181,9 @@ export const uiControlPanelConstructor = (
 					>
 					</bim-number-input>
 				</bim-panel-section>
-				<bim-panel-section collapsed label="Grid">
+				<bim-panel-section collapsed label="Сетка">
 					<bim-checkbox
-						label="Grid visible"
+						label="Видимость сетки"
 						checked
 						@change="${({ target }: { target: Checkbox }) => {
 							sceneItems.grid.config.visible = target.value;
@@ -191,7 +191,7 @@ export const uiControlPanelConstructor = (
 					>
 					</bim-checkbox>
 					<bim-color-input
-						label="Grid Color"
+						label="Цвет сетки"
 						color="#bbbbbb"
 						@input="${({ target }: { target: ColorInput }) => {
 							sceneItems.grid.config.color = new Color(target.color);
@@ -201,7 +201,7 @@ export const uiControlPanelConstructor = (
 					<bim-number-input
 						slider
 						step="0.1"
-						label="Grid primary size"
+						label="Основной размер сетки"
 						value="1"
 						min="0"
 						max="10"
@@ -213,7 +213,7 @@ export const uiControlPanelConstructor = (
 					<bim-number-input
 						slider
 						step="0.1"
-						label="Grid secondary size"
+						label="Доп. размер сетки"
 						value="10"
 						min="0"
 						max="20"

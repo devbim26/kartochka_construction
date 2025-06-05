@@ -22,7 +22,7 @@ export const IFCViewer = () => {
 	);
 
 	return (
-		<div className="relative flex flex-1">
+		<div className="relative flex flex-1 rounded-[20px] border-[1px] border-[#EDEFF2] p-[14px]">
 			<div
 				className="absolute left-10 top-[70px] z-10"
 				ref={modalInfroPanelContainerRef}
