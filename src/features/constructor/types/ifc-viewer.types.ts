@@ -6,6 +6,7 @@ import {
 	SimpleScene,
 	SimpleWorld,
 } from '@thatopen/components';
+import { ClipEdges } from '@thatopen/components-front';
 import { PanelSection } from '@thatopen/ui';
 
 export interface IIFCViewer {
@@ -16,6 +17,7 @@ export interface UiControlPanelConstructorSceneItems {
 	world: SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer>;
 	grid: SimpleGrid;
 	clipper: Clipper;
+	edges: ClipEdges;
 }
 
 export interface UiControlPanelConstructorCallbacks {

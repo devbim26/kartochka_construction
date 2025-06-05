@@ -34,7 +34,7 @@ export const uiControlPanelConstructor = (
 					>
 					</bim-button>
 					<bim-button
-						label="Dispose fragments"
+						label="Delete model"
 						@click="${() => {
 							callbacks.disposeFragmentsHandler();
 						}}"
@@ -42,33 +42,38 @@ export const uiControlPanelConstructor = (
 					</bim-button>
 				</bim-panel-section>
 				<bim-panel-section collapsed label="Commands">
-					<bim-label>Double click: Create / delete clipping plane</bim-label>
+					<bim-label>Double click: Create clipping plane</bim-label>
+					<bim-label>Delete key: Delete clipping plane</bim-label>
 				</bim-panel-section>
 				<bim-panel-section collapsed label="Clipper">
 					<bim-checkbox
 						label="Clipper enabled"
 						checked
 						@change="${({ target }: { target: Checkbox }) => {
-							sceneItems.clipper.config.enabled = target.value;
+							sceneItems.clipper.enabled = target.value;
+							sceneItems.edges.visible = target.value;
 						}}"
 					>
 					</bim-checkbox>
+
 					<bim-checkbox
 						label="Clipper visible"
 						checked
 						@change="${({ target }: { target: Checkbox }) => {
-							sceneItems.clipper.config.visible = target.value;
+							sceneItems.clipper.visible = target.value;
 						}}"
 					>
 					</bim-checkbox>
+
 					<bim-color-input
 						label="Planes Color"
 						color="#202932"
 						@input="${({ target }: { target: ColorInput }) => {
-							sceneItems.clipper.config.color = new Color(target.color);
+							sceneItems.clipper.material.color.set(target.color);
 						}}"
 					>
 					</bim-color-input>
+
 					<bim-number-input
 						slider
 						step="0.01"
@@ -77,10 +82,11 @@ export const uiControlPanelConstructor = (
 						min="0.1"
 						max="1"
 						@change="${({ target }: { target: NumberInput }) => {
-							sceneItems.clipper.config.opacity = target.value;
+							sceneItems.clipper.material.opacity = target.value;
 						}}"
 					>
 					</bim-number-input>
+
 					<bim-number-input
 						slider
 						step="0.1"
@@ -89,10 +95,11 @@ export const uiControlPanelConstructor = (
 						min="2"
 						max="10"
 						@change="${({ target }: { target: NumberInput }) => {
-							sceneItems.clipper.config.size = target.value;
+							sceneItems.clipper.size = target.value;
 						}}"
 					>
 					</bim-number-input>
+
 					<bim-button
 						label="Delete all"
 						@click="${() => {

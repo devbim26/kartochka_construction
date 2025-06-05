@@ -12,19 +12,29 @@ import {
 	IfcLoader,
 	MeshCullerRenderer,
 	OrthoPerspectiveCamera,
+	Raycasters,
 	SimpleGrid,
 	SimpleRaycaster,
-	SimpleRenderer,
 	SimpleScene,
 	SimpleWorld,
 	Worlds,
 } from '@thatopen/components';
+import { ClipEdges, EdgesPlane, PostproductionRenderer } from '@thatopen/components-front';
 import { Manager } from '@thatopen/ui';
 import { RefObject } from 'react';
 import Stats from 'stats.js';
-import { Box3, InstancedMesh, Mesh, Object3D, OrthographicCamera, PerspectiveCamera } from 'three';
+import {
+	Box3,
+	InstancedMesh,
+	LineBasicMaterial,
+	Mesh,
+	MeshBasicMaterial,
+	Object3D,
+	OrthographicCamera,
+	PerspectiveCamera,
+} from 'three';
 
-type OnMouseMoveHandler = (event: MouseEvent) => void;
+type OnKeyDownHandler = (event: KeyboardEvent) => void;
 type OnDoubleClickHandler = (event: MouseEvent) => void;
 type RenderEventHandler = (data: unknown) => void;
 type ProjectionOnChanged =
@@ -36,8 +46,11 @@ type VoidAsyncFunc = () => Promise<any>;
 
 export class IFCViewer {
 	//Core
-	private _currentWorld: SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer> | null =
-		null;
+	private _currentWorld: SimpleWorld<
+		SimpleScene,
+		OrthoPerspectiveCamera,
+		PostproductionRenderer
+	> | null = null;
 	private _components: Components | null = null;
 	private _statsPanel: Stats | null = null;
 	private _currentGrid: SimpleGrid | null = null;
@@ -46,19 +59,17 @@ export class IFCViewer {
 	private _currentFragmentsManager: FragmentsManager | null = null;
 	private _cullers: Cullers | null = null;
 
-	//Custer
+	//Custers
 	private _currentRayCaster: SimpleRaycaster | null = null;
-	private _previousSelection: Mesh | null = null;
+	private _currentClipper: Clipper | null = null;
+	private _edges: ClipEdges | null = null;
 
 	//DOM
 	private _sceneContainerRef: RefObject<HTMLDivElement | null> | null = null;
 	private _panelContainerRef: RefObject<HTMLDivElement | null> | null = null;
 
-	//Clipper
-	private _currentClipper: Clipper | null = null;
-
 	//Handlers
-	private _onMouseMoveHandlerRef: OnMouseMoveHandler | null = null;
+	private _onKeyDownHandlerRef: OnKeyDownHandler | null = null;
 	private _onDoubleClickHandlerRef: OnDoubleClickHandler | null = null;
 	private _onBeforeUpdateHandlerRef: RenderEventHandler | null = null;
 	private _onAfterUpdateHandlerRef: RenderEventHandler | null = null;
@@ -70,7 +81,11 @@ export class IFCViewer {
 	//state
 	private _state: IFCViewerState = {};
 
-	get currentWorld(): SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer> | null {
+	get currentWorld(): SimpleWorld<
+		SimpleScene,
+		OrthoPerspectiveCamera,
+		PostproductionRenderer
+	> | null {
 		return this._currentWorld;
 	}
 
@@ -86,10 +101,10 @@ export class IFCViewer {
 
 	destroy() {
 		if (this._sceneContainerRef?.current) {
-			if (this._onMouseMoveHandlerRef) {
+			if (this._onKeyDownHandlerRef) {
 				this._sceneContainerRef.current.removeEventListener(
-					'mousemove',
-					this._onMouseMoveHandlerRef,
+					'keydown',
+					this._onKeyDownHandlerRef,
 				);
 			}
 			if (this._onDoubleClickHandlerRef) {
@@ -143,10 +158,9 @@ export class IFCViewer {
 		this._currentFragmentsManager = null;
 		this._cullers = null;
 		this._currentRayCaster = null;
-		this._previousSelection = null;
 		this._currentClipper = null;
 
-		this._onMouseMoveHandlerRef = null;
+		this._onKeyDownHandlerRef = null;
 		this._onDoubleClickHandlerRef = null;
 		this._onBeforeUpdateHandlerRef = null;
 		this._onAfterUpdateHandlerRef = null;
@@ -160,41 +174,61 @@ export class IFCViewer {
 		try {
 			await this.setupWorld();
 			await this.setupIfcLoader();
-			//this.setupRayCaster();
-			//this.setupClipper();
+			this.setupCasters();
 			this.setupStatsPanel();
 			if (options?.uiControlPanelConstructor)
 				this.setupUIPanel(options.uiControlPanelConstructor);
+			this.setupSceneContainerHandlers();
 		} catch (e) {
 			console.error(e);
 		}
+	}
+
+	private setupSceneContainerHandlers() {
+		this._onDoubleClickHandlerRef = this.onDoubleClickHandler.bind(this);
+		this._sceneContainerRef?.current!.addEventListener(
+			'dblclick',
+			this._onDoubleClickHandlerRef,
+		);
+
+		this._onKeyDownHandlerRef = this.onKeyDownHandler.bind(this);
+		this._sceneContainerRef?.current!.addEventListener('keydown', this._onKeyDownHandlerRef);
 	}
 
 	private async setupWorld() {
 		//World
 		this._components = new Components();
 		const worlds = this._components.get(Worlds);
-		this._currentWorld = worlds.create<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer>();
+		this._currentWorld = worlds.create<
+			SimpleScene,
+			OrthoPerspectiveCamera,
+			PostproductionRenderer
+		>();
 		this._currentWorld.scene = new SimpleScene(this._components);
-		this._currentWorld.renderer = new SimpleRenderer(
+		this._currentWorld.scene.three.background = null;
+
+		this._currentWorld.renderer = new PostproductionRenderer(
 			this._components,
 			this._sceneContainerRef?.current!,
 		);
+
 		this._currentWorld.camera = new OrthoPerspectiveCamera(this._components);
 		this._projectionOnChangedRef = this.projectionOnChanged.bind(this);
 		this._currentWorld.camera.projection.onChanged.add(this._projectionOnChangedRef);
+		this._currentWorld.renderer.postproduction.enabled = true;
+		this._currentWorld.renderer.postproduction.customEffects.outlineEnabled = true;
+
 		this._components.init();
-		this._currentWorld.scene.three.background = null;
 
 		this._currentWorld!.scene.setup();
 
 		//Grid
 		const grids = this._components.get(Grids);
 		this._currentGrid = grids.create(this._currentWorld);
-
-		//Culler
-		this.setupCuller();
-		this._currentCuller!.needsUpdate = true;
+		this._currentGrid.config.color.setHex(0x666666);
+		this._currentWorld.renderer.postproduction.customEffects.excludedMeshes.push(
+			this._currentGrid.three,
+		);
 
 		//End
 		await this._currentWorld.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
@@ -207,7 +241,10 @@ export class IFCViewer {
 		this._currentFragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
 	}
 
-	private setupCuller() {
+	private setupCuller(model?: Object3D) {
+		if (this._currentCuller) {
+			this._currentCuller.dispose();
+		}
 		if (!this._cullers) {
 			this._cullers = this._components!.get(Cullers);
 		}
@@ -220,6 +257,14 @@ export class IFCViewer {
 			'controlend',
 			this._cameraControlendHandlerRef,
 		);
+		if (!!model) {
+			model.traverse((child) => {
+				if (child instanceof Mesh || child instanceof InstancedMesh) {
+					this._currentCuller!.add(child);
+				}
+			});
+		}
+		this._currentCuller!.needsUpdate = true;
 	}
 
 	private alignModelToGround(model: Object3D): void {
@@ -228,26 +273,44 @@ export class IFCViewer {
 		model.position.y -= yOffset;
 	}
 
-	// //Use features
-	// private setupRayCaster() {
-	// 	const casters = this._components!.get(Raycasters);
-	// 	this._currentRayCaster = casters.get(this.currentWorld!);
-	// 	this._onMouseMoveHandlerRef = this.onMouseMoveHandler.bind(this);
-	// 	this._sceneContainerRef?.current!.addEventListener(
-	// 		'mousemove',
-	// 		this._onMouseMoveHandlerRef,
-	// 	);
-	// }
+	//Use features
+	private setupCasters() {
+		const casters = this._components!.get(Raycasters);
+		this._currentRayCaster = casters.get(this._currentWorld!);
 
-	// private setupClipper() {
-	// 	this._currentClipper = this._components!.get(Clipper);
-	// 	this._currentClipper!.enabled = true;
-	// 	this._onDoubleClickHandlerRef = this.onDoubleClickHandler.bind(this);
-	// 	this._sceneContainerRef?.current!.addEventListener(
-	// 		'dblclick',
-	// 		this._onDoubleClickHandlerRef,
-	// 	);
-	// }
+		this._currentClipper = this._components!.get(Clipper);
+		this._currentClipper.enabled = true;
+
+		this._edges = this._components!.get(ClipEdges);
+		this._currentClipper.Type = EdgesPlane;
+	}
+
+	private setupClipperStyles(model: Object3D) {
+		const allMeshes = new Set<Mesh | InstancedMesh>();
+		model.traverse((child) => {
+			if (child instanceof Mesh || child instanceof InstancedMesh) {
+				allMeshes.add(child);
+			}
+		});
+
+		const salmonFill = new MeshBasicMaterial({ color: 'salmon', side: 2 });
+		const redLine = new LineBasicMaterial({ color: 'red' });
+		const redOutline = new MeshBasicMaterial({
+			color: 'red',
+			opacity: 0.5,
+			side: 2,
+			transparent: true,
+		});
+
+		this._edges!.styles.create(
+			'Blue lines',
+			allMeshes,
+			this._currentWorld!,
+			redLine,
+			salmonFill,
+			redOutline,
+		);
+	}
 
 	//Info/controls
 	private setupStatsPanel() {
@@ -273,6 +336,7 @@ export class IFCViewer {
 				world: this._currentWorld!,
 				clipper: this._currentClipper!,
 				grid: this._currentGrid!,
+				edges: this._edges!,
 			},
 			{
 				loadIfcFileHandler: this._loadIfcFileHandlerRef,
@@ -283,31 +347,19 @@ export class IFCViewer {
 	}
 
 	//Scene handlers
-	// private onMouseMoveHandler() {
-	// 	try {
-	// 		const result = this._currentRayCaster!.castRay([this._cubeData!._cube]);
-	// 		if (!!this._previousSelection) {
-	// 			this._previousSelection.material = this._cubeData!._material;
-	// 		}
-	// 		if (!result || !(result.object instanceof Mesh)) {
-	// 			return;
-	// 		}
-	// 		result.object.material = new MeshStandardMaterial({ color: '#BCF124' });
-	// 		this._previousSelection = result.object;
-	// 	} catch (e) {
-	// 		console.error(e);
-	// 	}
-	// }
+	private onKeyDownHandler(event: KeyboardEvent) {
+		if (event.code === 'Delete' || event.code === 'Backspace') {
+			if (this._currentClipper && this._currentClipper.enabled) {
+				this._currentClipper.delete(this._currentWorld!);
+			}
+		}
+	}
 
-	// private onDoubleClickHandler() {
-	// 	try {
-	// 		if (this._currentClipper!.enabled) {
-	// 			this._currentClipper!.create(this._currentWorld!);
-	// 		}
-	// 	} catch (e) {
-	// 		console.error(e);
-	// 	}
-	// }
+	private onDoubleClickHandler() {
+		if (this._currentClipper && this._currentClipper.enabled) {
+			this._currentClipper.create(this._currentWorld!);
+		}
+	}
 
 	private onBeforeUpdateHandler() {
 		this._statsPanel!.begin();
@@ -346,15 +398,9 @@ export class IFCViewer {
 				const model = await this._currentFragmentIfcLoader!.load(buffer);
 				model.name = file.name;
 				this.alignModelToGround(model);
+				this.setupClipperStyles(model);
 				this._currentWorld!.scene.three.add(model);
-				this._currentCuller!.dispose();
 				this.setupCuller();
-				model.traverse((child) => {
-					if (child instanceof Mesh || child instanceof InstancedMesh) {
-						this._currentCuller!.add(child);
-					}
-				});
-				this._currentCuller!.needsUpdate = true;
 
 				document.body.removeChild(input);
 				input.removeEventListener('change', handleFileLoad);
