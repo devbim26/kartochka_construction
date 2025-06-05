@@ -12,6 +12,7 @@
 		"@thatopen/components-front": "^2.4.11",
 		"@thatopen/fragments": "^3.0.7",
 		"@thatopen/ui": "^2.4.5",
+		"@thatopen/ui-obc": "^2.4.4",
 		"axios": "^1.7.9",
 		"chart.js": "^4.4.9",
 		"chartjs-plugin-datalabels": "^2.2.0",

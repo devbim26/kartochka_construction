@@ -1,6 +1,8 @@
 import {
+	IFCViewerContainers,
 	IFCViewerOptions,
 	IFCViewerState,
+	ModelInfoPanelConstructor,
 	UiControlPanelConstructor,
 } from '@features/constructor/types';
 import {
@@ -10,21 +12,24 @@ import {
 	FragmentsManager,
 	Grids,
 	IfcLoader,
+	IfcRelationsIndexer,
 	MeshCullerRenderer,
 	OrthoPerspectiveCamera,
 	Raycasters,
 	SimpleGrid,
 	SimpleRaycaster,
+	SimpleRenderer,
 	SimpleScene,
 	SimpleWorld,
 	Worlds,
 } from '@thatopen/components';
-import { ClipEdges, EdgesPlane, PostproductionRenderer } from '@thatopen/components-front';
-import { Manager } from '@thatopen/ui';
+import { ClipEdges, EdgesPlane, Highlighter } from '@thatopen/components-front';
+import { FragmentsGroup } from '@thatopen/fragments';
+import { Manager, Table, TableCellValue, TableRowData } from '@thatopen/ui';
+import { tables } from '@thatopen/ui-obc';
 import { RefObject } from 'react';
 import Stats from 'stats.js';
 import {
-	Box3,
 	InstancedMesh,
 	LineBasicMaterial,
 	Mesh,
@@ -43,14 +48,12 @@ type ProjectionOnChanged =
 
 type VoidFunc = () => void;
 type VoidAsyncFunc = () => Promise<any>;
+type OnFragmentsLoadedHandler = (model: FragmentsGroup) => Promise<any>;
 
 export class IFCViewer {
 	//Core
-	private _currentWorld: SimpleWorld<
-		SimpleScene,
-		OrthoPerspectiveCamera,
-		PostproductionRenderer
-	> | null = null;
+	private _currentWorld: SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer> | null =
+		null;
 	private _components: Components | null = null;
 	private _statsPanel: Stats | null = null;
 	private _currentGrid: SimpleGrid | null = null;
@@ -58,6 +61,9 @@ export class IFCViewer {
 	private _currentFragmentIfcLoader: IfcLoader | null = null;
 	private _currentFragmentsManager: FragmentsManager | null = null;
 	private _cullers: Cullers | null = null;
+	private _currentIfcRelationsIndexer: IfcRelationsIndexer | null = null;
+	private _currentRelationsTree: Table<TableRowData<Record<string, TableCellValue>>> | null =
+		null;
 
 	//Custers
 	private _currentRayCaster: SimpleRaycaster | null = null;
@@ -66,7 +72,8 @@ export class IFCViewer {
 
 	//DOM
 	private _sceneContainerRef: RefObject<HTMLDivElement | null> | null = null;
-	private _panelContainerRef: RefObject<HTMLDivElement | null> | null = null;
+	private _controlPanelContainerRef: RefObject<HTMLDivElement | null> | null = null;
+	private _modalInfroPanelContainerRef: RefObject<HTMLDivElement | null> | null = null;
 
 	//Handlers
 	private _onKeyDownHandlerRef: OnKeyDownHandler | null = null;
@@ -77,25 +84,18 @@ export class IFCViewer {
 	private _cameraControlendHandlerRef: VoidFunc | null = null;
 	private _loadIfcFileHandlerRef: VoidAsyncFunc | null = null;
 	private _disposeFragmentsHandlerRef: VoidFunc | null = null;
+	private _onResizeHandlerRef: VoidFunc | null = null;
+	private _onFragmentsLoadedHandlerRef: OnFragmentsLoadedHandler | null = null;
 
 	//state
 	private _state: IFCViewerState = {};
 
-	get currentWorld(): SimpleWorld<
-		SimpleScene,
-		OrthoPerspectiveCamera,
-		PostproductionRenderer
-	> | null {
+	get currentWorld(): SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer> | null {
 		return this._currentWorld;
 	}
 
-	constructor(
-		sceneContainer: RefObject<HTMLDivElement | null>,
-		panelContainer: RefObject<HTMLDivElement | null>,
-		options?: IFCViewerOptions,
-	) {
-		this._sceneContainerRef = sceneContainer;
-		this._panelContainerRef = panelContainer;
+	constructor(conatiners: IFCViewerContainers, options: IFCViewerOptions) {
+		this.setContainers(conatiners);
 		this.initialize(options);
 	}
 
@@ -138,10 +138,10 @@ export class IFCViewer {
 			this._statsPanel = null;
 		}
 
-		if (this._panelContainerRef?.current) {
-			while (this._panelContainerRef.current.firstChild) {
-				this._panelContainerRef.current.removeChild(
-					this._panelContainerRef.current.firstChild,
+		if (this._controlPanelContainerRef?.current) {
+			while (this._controlPanelContainerRef.current.firstChild) {
+				this._controlPanelContainerRef.current.removeChild(
+					this._controlPanelContainerRef.current.firstChild,
 				);
 			}
 		}
@@ -170,14 +170,19 @@ export class IFCViewer {
 		this._disposeFragmentsHandlerRef = null;
 	}
 
-	private async initialize(options?: IFCViewerOptions) {
+	private setContainers(conatiners: IFCViewerContainers) {
+		this._sceneContainerRef = conatiners.sceneContainer;
+		this._controlPanelContainerRef = conatiners.controlPanelContainer;
+		this._modalInfroPanelContainerRef = conatiners.modalInfroPanelContainer;
+	}
+
+	private async initialize(options: IFCViewerOptions) {
 		try {
 			await this.setupWorld();
 			await this.setupIfcLoader();
 			this.setupCasters();
 			this.setupStatsPanel();
-			if (options?.uiControlPanelConstructor)
-				this.setupUIPanel(options.uiControlPanelConstructor);
+			this.setupUI(options.ui);
 			this.setupSceneContainerHandlers();
 		} catch (e) {
 			console.error(e);
@@ -193,21 +198,20 @@ export class IFCViewer {
 
 		this._onKeyDownHandlerRef = this.onKeyDownHandler.bind(this);
 		this._sceneContainerRef?.current!.addEventListener('keydown', this._onKeyDownHandlerRef);
+
+		this._onResizeHandlerRef = this.onResizeHandler.bind(this);
+		this._sceneContainerRef?.current!.addEventListener('resize', this._onResizeHandlerRef);
 	}
 
 	private async setupWorld() {
 		//World
 		this._components = new Components();
 		const worlds = this._components.get(Worlds);
-		this._currentWorld = worlds.create<
-			SimpleScene,
-			OrthoPerspectiveCamera,
-			PostproductionRenderer
-		>();
+		this._currentWorld = worlds.create<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer>();
 		this._currentWorld.scene = new SimpleScene(this._components);
 		this._currentWorld.scene.three.background = null;
 
-		this._currentWorld.renderer = new PostproductionRenderer(
+		this._currentWorld.renderer = new SimpleRenderer(
 			this._components,
 			this._sceneContainerRef?.current!,
 		);
@@ -215,8 +219,6 @@ export class IFCViewer {
 		this._currentWorld.camera = new OrthoPerspectiveCamera(this._components);
 		this._projectionOnChangedRef = this.projectionOnChanged.bind(this);
 		this._currentWorld.camera.projection.onChanged.add(this._projectionOnChangedRef);
-		this._currentWorld.renderer.postproduction.enabled = true;
-		this._currentWorld.renderer.postproduction.customEffects.outlineEnabled = true;
 
 		this._components.init();
 
@@ -225,10 +227,6 @@ export class IFCViewer {
 		//Grid
 		const grids = this._components.get(Grids);
 		this._currentGrid = grids.create(this._currentWorld);
-		this._currentGrid.config.color.setHex(0x666666);
-		this._currentWorld.renderer.postproduction.customEffects.excludedMeshes.push(
-			this._currentGrid.three,
-		);
 
 		//End
 		await this._currentWorld.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
@@ -239,6 +237,24 @@ export class IFCViewer {
 		this._currentFragmentIfcLoader = this._components!.get(IfcLoader);
 		await this._currentFragmentIfcLoader.setup();
 		this._currentFragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
+
+		const highlighter = this._components!.get(Highlighter);
+		highlighter.setup({ world: this._currentWorld! });
+		highlighter.zoomToSelection = true;
+
+		this._currentIfcRelationsIndexer = this._components!.get(IfcRelationsIndexer);
+
+		this._onFragmentsLoadedHandlerRef = this.onFragmentsLoadedHandler.bind(this);
+		this._currentFragmentsManager.onFragmentsLoaded.add(this._onFragmentsLoadedHandlerRef);
+
+		const [relationsTree] = tables.relationsTree({
+			components: this._components!,
+			models: [],
+		});
+
+		relationsTree.preserveStructureOnFilter = true;
+
+		this._currentRelationsTree = relationsTree;
 	}
 
 	private setupCuller(model?: Object3D) {
@@ -265,12 +281,6 @@ export class IFCViewer {
 			});
 		}
 		this._currentCuller!.needsUpdate = true;
-	}
-
-	private alignModelToGround(model: Object3D): void {
-		const box = new Box3().setFromObject(model);
-		const yOffset = box.min.y;
-		model.position.y -= yOffset;
 	}
 
 	//Use features
@@ -327,8 +337,7 @@ export class IFCViewer {
 		}
 	}
 
-	private setupUIPanel(uiControlPanelConstructor: UiControlPanelConstructor) {
-		Manager.init();
+	private setupControlPanel(uiControlPanelConstructor: UiControlPanelConstructor) {
 		this._loadIfcFileHandlerRef = this.loadIfcFileHandler.bind(this);
 		this._disposeFragmentsHandlerRef = this.disposeFragmentsHandler.bind(this);
 		const uiPanel = uiControlPanelConstructor(
@@ -343,7 +352,21 @@ export class IFCViewer {
 				disposeFragmentsHandler: this._disposeFragmentsHandlerRef,
 			},
 		);
-		this._panelContainerRef?.current!.append(uiPanel);
+		this._controlPanelContainerRef?.current!.append(uiPanel);
+	}
+
+	private setupIFCModelInfoPanel(modelInfoPanelConstructor: ModelInfoPanelConstructor) {
+		const panel = modelInfoPanelConstructor({
+			components: this._components!,
+			relationsTree: this._currentRelationsTree!,
+		});
+		this._modalInfroPanelContainerRef?.current!.append(panel);
+	}
+
+	private setupUI(uiOptions: IFCViewerOptions['ui']) {
+		Manager.init();
+		this.setupControlPanel(uiOptions.uiControlPanelConstructor);
+		this.setupIFCModelInfoPanel(uiOptions.modelInfoPanelConstructor);
 	}
 
 	//Scene handlers
@@ -359,6 +382,11 @@ export class IFCViewer {
 		if (this._currentClipper && this._currentClipper.enabled) {
 			this._currentClipper.create(this._currentWorld!);
 		}
+	}
+
+	private onResizeHandler() {
+		this._currentWorld?.renderer!.resize();
+		this._currentWorld?.camera!.updateAspect();
 	}
 
 	private onBeforeUpdateHandler() {
@@ -397,7 +425,6 @@ export class IFCViewer {
 				const buffer = new Uint8Array(reader.result as ArrayBuffer);
 				const model = await this._currentFragmentIfcLoader!.load(buffer);
 				model.name = file.name;
-				this.alignModelToGround(model);
 				this.setupClipperStyles(model);
 				this._currentWorld!.scene.three.add(model);
 				this.setupCuller();
@@ -415,5 +442,10 @@ export class IFCViewer {
 
 	private disposeFragmentsHandler() {
 		this._currentFragmentsManager!.dispose();
+	}
+
+	private async onFragmentsLoadedHandler(model: FragmentsGroup) {
+		if (this._currentWorld!.scene) this._currentWorld!.scene.three.add(model);
+		if (model.hasProperties) await this._currentIfcRelationsIndexer!.process(model);
 	}
 }

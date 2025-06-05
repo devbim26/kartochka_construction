@@ -1,5 +1,6 @@
 import {
 	Clipper,
+	Components,
 	OrthoPerspectiveCamera,
 	SimpleGrid,
 	SimpleRenderer,
@@ -7,7 +8,8 @@ import {
 	SimpleWorld,
 } from '@thatopen/components';
 import { ClipEdges } from '@thatopen/components-front';
-import { PanelSection } from '@thatopen/ui';
+import { PanelSection, Table, TableCellValue, TableRowData } from '@thatopen/ui';
+import { RefObject } from 'react';
 
 export interface IIFCViewer {
 	destroy(): void;
@@ -18,6 +20,11 @@ export interface UiControlPanelConstructorSceneItems {
 	grid: SimpleGrid;
 	clipper: Clipper;
 	edges: ClipEdges;
+}
+
+export interface ModelInfoPanelConstructorViewerItems {
+	components: Components;
+	relationsTree: Table<TableRowData<Record<string, TableCellValue>>>;
 }
 
 export interface UiControlPanelConstructorCallbacks {
@@ -32,6 +39,19 @@ export type UiControlPanelConstructor = (
 	callbacks: UiControlPanelConstructorCallbacks,
 ) => PanelSection;
 
+export type ModelInfoPanelConstructor = (
+	viewerItems: ModelInfoPanelConstructorViewerItems,
+) => HTMLElement;
+
 export interface IFCViewerOptions {
-	uiControlPanelConstructor: UiControlPanelConstructor;
+	ui: {
+		uiControlPanelConstructor: UiControlPanelConstructor;
+		modelInfoPanelConstructor: ModelInfoPanelConstructor;
+	};
+}
+
+export interface IFCViewerContainers {
+	sceneContainer: RefObject<HTMLDivElement | null>;
+	controlPanelContainer: RefObject<HTMLDivElement | null>;
+	modalInfroPanelContainer: RefObject<HTMLDivElement | null>;
 }
