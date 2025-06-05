@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import type { ReportInfoFloorConstructionDto, ReportInfoSingleConstructionDto } from '@api-gen';
 import { Switch, useAppDispatch, useAppSelector } from '@core';
-import ConstructorLoader from '@core/presentation/components/loaders/constructor-loader.component';
+import Loader from '@core/presentation/components/loaders/loader.component';
 import {
 	getReportFloorById,
 	getReportSingleById,
@@ -86,7 +86,6 @@ const ContructionPick = () => {
 						?.reportConstructionHeader?.constructionHeaderId;
 				if (newHeaderId && newHeaderId !== constructionHeaderId) {
 					setConstructionHeaderId(newHeaderId);
-					console.log('newheaderid:', newHeaderId);
 				}
 				if (!newHeaderId) {
 					toast.error('Не найден constructionHeaderId');
@@ -116,7 +115,7 @@ const ContructionPick = () => {
 	if (isLoading) {
 		return (
 			<div className="flex size-full items-center justify-center">
-				<ConstructorLoader />
+				<Loader />
 			</div>
 		);
 	}

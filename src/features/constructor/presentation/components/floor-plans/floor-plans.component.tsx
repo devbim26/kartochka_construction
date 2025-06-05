@@ -1,5 +1,5 @@
 import { APP_ROUTES, Button, DeleteIcon, DeleteModal } from '@core';
-import ConstructorLoader from '@core/presentation/components/loaders/constructor-loader.component';
+import Loader from '@core/presentation/components/loaders/loader.component';
 import { useAppDispatch, useAppNavigate, useAppSelector } from '@core/utils';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
@@ -138,7 +138,7 @@ export const FloorPlans = memoize(() => {
 		<div className="relative">
 			{isLoading && (
 				<div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/60">
-					<ConstructorLoader />
+					<Loader />
 				</div>
 			)}
 			{

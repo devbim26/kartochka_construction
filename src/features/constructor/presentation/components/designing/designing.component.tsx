@@ -1,6 +1,6 @@
 import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import { Button, Input, useAppDispatch, useAppSelector } from '@core';
-import ConstructorLoader from '@core/presentation/components/loaders/constructor-loader.component';
+import Loader from '@core/presentation/components/loaders/loader.component';
 import type { DesigningData, Dot, GraphDetailResponse } from '@features';
 import {
 	CombinedSoundReductionTable,
@@ -180,7 +180,7 @@ const DesigningScreen = () => {
 	if (isLoading) {
 		return (
 			<div className="flex size-full items-center justify-center">
-				<ConstructorLoader />
+				<Loader />
 			</div>
 		);
 	}

@@ -6,7 +6,7 @@ import {
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
-import ConstructorLoader from '@core/presentation/components/loaders/constructor-loader.component';
+import Loader from '@core/presentation/components/loaders/loader.component';
 import { getReportFloorById, uploadImage } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
 import type { ConstructionSheet } from '@features/constructor/types';
@@ -290,7 +290,7 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 				<div className="relative h-[600px] w-[1600px] overflow-auto border border-input-label-primary">
 					{isRendering && (
 						<div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
-							<ConstructorLoader />
+							<Loader />
 						</div>
 					)}
 					<canvas ref={canvasRef} onContextMenu={handleCanvasRightClick} />

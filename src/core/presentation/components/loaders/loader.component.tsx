@@ -1,4 +1,4 @@
-const ConstructorLoader = () => {
+const Loader = () => {
 	return (
 		<div className="flex items-center justify-center">
 			<svg
@@ -25,4 +25,4 @@ const ConstructorLoader = () => {
 	);
 };
 
-export default ConstructorLoader;
+export default Loader;
