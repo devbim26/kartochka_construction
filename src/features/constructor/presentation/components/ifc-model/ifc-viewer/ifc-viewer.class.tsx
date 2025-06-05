@@ -22,7 +22,7 @@ import {
 import { Manager } from '@thatopen/ui';
 import { RefObject } from 'react';
 import Stats from 'stats.js';
-import { Mesh, OrthographicCamera, PerspectiveCamera } from 'three';
+import { Box3, InstancedMesh, Mesh, Object3D, OrthographicCamera, PerspectiveCamera } from 'three';
 
 type OnMouseMoveHandler = (event: MouseEvent) => void;
 type OnDoubleClickHandler = (event: MouseEvent) => void;
@@ -44,6 +44,7 @@ export class IFCViewer {
 	private _currentCuller: MeshCullerRenderer | null = null;
 	private _currentFragmentIfcLoader: IfcLoader | null = null;
 	private _currentFragmentsManager: FragmentsManager | null = null;
+	private _cullers: Cullers | null = null;
 
 	//Custer
 	private _currentRayCaster: SimpleRaycaster | null = null;
@@ -84,20 +85,75 @@ export class IFCViewer {
 	}
 
 	destroy() {
-		//handlers
-		// this._sceneContainerRef?.current!.removeEventListener(
-		// 	'mousemove',
-		// 	this._onMouseMoveHandlerRef!,
-		// );
-		// this._sceneContainerRef?.current!.removeEventListener(
-		// 	'dblclick',
-		// 	this._onDoubleClickHandlerRef!,
-		// );
-
-		//scene
-		if (!!this._components) {
-			this._components.dispose();
+		if (this._sceneContainerRef?.current) {
+			if (this._onMouseMoveHandlerRef) {
+				this._sceneContainerRef.current.removeEventListener(
+					'mousemove',
+					this._onMouseMoveHandlerRef,
+				);
+			}
+			if (this._onDoubleClickHandlerRef) {
+				this._sceneContainerRef.current.removeEventListener(
+					'dblclick',
+					this._onDoubleClickHandlerRef,
+				);
+			}
 		}
+
+		if (this._currentWorld?.camera?.controls && this._cameraControlendHandlerRef) {
+			this._currentWorld.camera.controls.removeEventListener(
+				'controlend',
+				this._cameraControlendHandlerRef,
+			);
+		}
+
+		if (this._currentWorld?.renderer) {
+			if (this._onBeforeUpdateHandlerRef) {
+				this._currentWorld.renderer.onBeforeUpdate.remove(this._onBeforeUpdateHandlerRef);
+			}
+			if (this._onAfterUpdateHandlerRef) {
+				this._currentWorld.renderer.onAfterUpdate.remove(this._onAfterUpdateHandlerRef);
+			}
+		}
+
+		if (this._statsPanel) {
+			if (this._statsPanel.dom.parentNode) {
+				this._statsPanel.dom.parentNode.removeChild(this._statsPanel.dom);
+			}
+			this._statsPanel = null;
+		}
+
+		if (this._panelContainerRef?.current) {
+			while (this._panelContainerRef.current.firstChild) {
+				this._panelContainerRef.current.removeChild(
+					this._panelContainerRef.current.firstChild,
+				);
+			}
+		}
+
+		if (this._components) {
+			this._components.dispose();
+			this._components = null;
+		}
+
+		this._currentWorld = null;
+		this._currentGrid = null;
+		this._currentCuller = null;
+		this._currentFragmentIfcLoader = null;
+		this._currentFragmentsManager = null;
+		this._cullers = null;
+		this._currentRayCaster = null;
+		this._previousSelection = null;
+		this._currentClipper = null;
+
+		this._onMouseMoveHandlerRef = null;
+		this._onDoubleClickHandlerRef = null;
+		this._onBeforeUpdateHandlerRef = null;
+		this._onAfterUpdateHandlerRef = null;
+		this._projectionOnChangedRef = null;
+		this._cameraControlendHandlerRef = null;
+		this._loadIfcFileHandlerRef = null;
+		this._disposeFragmentsHandlerRef = null;
 	}
 
 	private async initialize(options?: IFCViewerOptions) {
@@ -137,14 +193,8 @@ export class IFCViewer {
 		this._currentGrid = grids.create(this._currentWorld);
 
 		//Culler
-		const cullers = this._components.get(Cullers);
-		this._currentCuller = cullers.create(this._currentWorld);
-		this._currentCuller.needsUpdate = true;
-		this._cameraControlendHandlerRef = this.cameraControlendHandler.bind(this);
-		this._currentWorld.camera.controls.addEventListener(
-			'controlend',
-			this._cameraControlendHandlerRef,
-		);
+		this.setupCuller();
+		this._currentCuller!.needsUpdate = true;
 
 		//End
 		await this._currentWorld.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
@@ -155,6 +205,27 @@ export class IFCViewer {
 		this._currentFragmentIfcLoader = this._components!.get(IfcLoader);
 		await this._currentFragmentIfcLoader.setup();
 		this._currentFragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
+	}
+
+	private setupCuller() {
+		if (!this._cullers) {
+			this._cullers = this._components!.get(Cullers);
+		}
+		this._currentCuller = this._cullers.create(this._currentWorld!);
+		this._currentCuller.needsUpdate = true;
+		if (!this._cameraControlendHandlerRef) {
+			this._cameraControlendHandlerRef = this.cameraControlendHandler.bind(this);
+		}
+		this._currentWorld!.camera.controls.addEventListener(
+			'controlend',
+			this._cameraControlendHandlerRef,
+		);
+	}
+
+	private alignModelToGround(model: Object3D): void {
+		const box = new Box3().setFromObject(model);
+		const yOffset = box.min.y;
+		model.position.y -= yOffset;
 	}
 
 	// //Use features
@@ -274,7 +345,16 @@ export class IFCViewer {
 				const buffer = new Uint8Array(reader.result as ArrayBuffer);
 				const model = await this._currentFragmentIfcLoader!.load(buffer);
 				model.name = file.name;
+				this.alignModelToGround(model);
 				this._currentWorld!.scene.three.add(model);
+				this._currentCuller!.dispose();
+				this.setupCuller();
+				model.traverse((child) => {
+					if (child instanceof Mesh || child instanceof InstancedMesh) {
+						this._currentCuller!.add(child);
+					}
+				});
+				this._currentCuller!.needsUpdate = true;
 
 				document.body.removeChild(input);
 				input.removeEventListener('change', handleFileLoad);
