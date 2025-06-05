@@ -18,8 +18,16 @@ export interface UiControlPanelConstructorSceneItems {
 	clipper: Clipper;
 }
 
+export interface UiControlPanelConstructorCallbacks {
+	loadIfcFileHandler: () => void;
+	disposeFragmentsHandler: () => void;
+}
+
+export interface IFCViewerState {}
+
 export type UiControlPanelConstructor = (
 	sceneItems: UiControlPanelConstructorSceneItems,
+	callbacks: UiControlPanelConstructorCallbacks,
 ) => PanelSection;
 
 export interface IFCViewerOptions {

@@ -1,12 +1,17 @@
-import { IFCViewerOptions, UiControlPanelConstructor } from '@features/constructor/types';
+import {
+	IFCViewerOptions,
+	IFCViewerState,
+	UiControlPanelConstructor,
+} from '@features/constructor/types';
 import {
 	Clipper,
 	Components,
 	Cullers,
+	FragmentsManager,
 	Grids,
+	IfcLoader,
 	MeshCullerRenderer,
 	OrthoPerspectiveCamera,
-	Raycasters,
 	SimpleGrid,
 	SimpleRaycaster,
 	SimpleRenderer,
@@ -17,15 +22,7 @@ import {
 import { Manager } from '@thatopen/ui';
 import { RefObject } from 'react';
 import Stats from 'stats.js';
-import {
-	BoxGeometry,
-	Mesh,
-	MeshLambertMaterial,
-	MeshStandardMaterial,
-	Object3DEventMap,
-	OrthographicCamera,
-	PerspectiveCamera,
-} from 'three';
+import { Mesh, OrthographicCamera, PerspectiveCamera } from 'three';
 
 type OnMouseMoveHandler = (event: MouseEvent) => void;
 type OnDoubleClickHandler = (event: MouseEvent) => void;
@@ -35,6 +32,7 @@ type ProjectionOnChanged =
 	| ((data: PerspectiveCamera) => void);
 
 type VoidFunc = () => void;
+type VoidAsyncFunc = () => Promise<any>;
 
 export class IFCViewer {
 	//Core
@@ -44,6 +42,8 @@ export class IFCViewer {
 	private _statsPanel: Stats | null = null;
 	private _currentGrid: SimpleGrid | null = null;
 	private _currentCuller: MeshCullerRenderer | null = null;
+	private _currentFragmentIfcLoader: IfcLoader | null = null;
+	private _currentFragmentsManager: FragmentsManager | null = null;
 
 	//Custer
 	private _currentRayCaster: SimpleRaycaster | null = null;
@@ -63,12 +63,11 @@ export class IFCViewer {
 	private _onAfterUpdateHandlerRef: RenderEventHandler | null = null;
 	private _projectionOnChangedRef: ProjectionOnChanged | null = null;
 	private _cameraControlendHandlerRef: VoidFunc | null = null;
+	private _loadIfcFileHandlerRef: VoidAsyncFunc | null = null;
+	private _disposeFragmentsHandlerRef: VoidFunc | null = null;
 
-	//TEST
-	private _cubeData: {
-		_cube: Mesh<BoxGeometry, MeshLambertMaterial, Object3DEventMap>;
-		_material: MeshLambertMaterial;
-	} | null = null;
+	//state
+	private _state: IFCViewerState = {};
 
 	get currentWorld(): SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer> | null {
 		return this._currentWorld;
@@ -86,10 +85,10 @@ export class IFCViewer {
 
 	destroy() {
 		//handlers
-		this._sceneContainerRef?.current!.removeEventListener(
-			'mousemove',
-			this._onMouseMoveHandlerRef!,
-		);
+		// this._sceneContainerRef?.current!.removeEventListener(
+		// 	'mousemove',
+		// 	this._onMouseMoveHandlerRef!,
+		// );
 		// this._sceneContainerRef?.current!.removeEventListener(
 		// 	'dblclick',
 		// 	this._onDoubleClickHandlerRef!,
@@ -104,8 +103,8 @@ export class IFCViewer {
 	private async initialize(options?: IFCViewerOptions) {
 		try {
 			await this.setupWorld();
-			this.setupCube();
-			this.setupRayCaster();
+			await this.setupIfcLoader();
+			//this.setupRayCaster();
 			//this.setupClipper();
 			this.setupStatsPanel();
 			if (options?.uiControlPanelConstructor)
@@ -131,6 +130,8 @@ export class IFCViewer {
 		this._components.init();
 		this._currentWorld.scene.three.background = null;
 
+		this._currentWorld!.scene.setup();
+
 		//Grid
 		const grids = this._components.get(Grids);
 		this._currentGrid = grids.create(this._currentWorld);
@@ -147,33 +148,25 @@ export class IFCViewer {
 
 		//End
 		await this._currentWorld.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
-		this._currentWorld!.scene.setup();
 	}
 
-	//FOR TEST
-	private setupCube() {
-		const material = new MeshLambertMaterial({ color: '#6528D7' });
-		const geometry = new BoxGeometry();
-		const cube = new Mesh(geometry, material);
-		cube.position.set(0, 1.5, 0);
-		this._currentWorld!.scene.three.add(cube);
-		this._currentWorld!.meshes.add(cube);
-		this._cubeData = {
-			_material: material,
-			_cube: cube,
-		};
+	private async setupIfcLoader() {
+		this._currentFragmentsManager = this._components!.get(FragmentsManager);
+		this._currentFragmentIfcLoader = this._components!.get(IfcLoader);
+		await this._currentFragmentIfcLoader.setup();
+		this._currentFragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
 	}
 
-	//Use features
-	private setupRayCaster() {
-		const casters = this._components!.get(Raycasters);
-		this._currentRayCaster = casters.get(this.currentWorld!);
-		this._onMouseMoveHandlerRef = this.onMouseMoveHandler.bind(this);
-		this._sceneContainerRef?.current!.addEventListener(
-			'mousemove',
-			this._onMouseMoveHandlerRef,
-		);
-	}
+	// //Use features
+	// private setupRayCaster() {
+	// 	const casters = this._components!.get(Raycasters);
+	// 	this._currentRayCaster = casters.get(this.currentWorld!);
+	// 	this._onMouseMoveHandlerRef = this.onMouseMoveHandler.bind(this);
+	// 	this._sceneContainerRef?.current!.addEventListener(
+	// 		'mousemove',
+	// 		this._onMouseMoveHandlerRef,
+	// 	);
+	// }
 
 	// private setupClipper() {
 	// 	this._currentClipper = this._components!.get(Clipper);
@@ -202,30 +195,38 @@ export class IFCViewer {
 
 	private setupUIPanel(uiControlPanelConstructor: UiControlPanelConstructor) {
 		Manager.init();
-		const uiPanel = uiControlPanelConstructor({
-			world: this._currentWorld!,
-			clipper: this._currentClipper!,
-			grid: this._currentGrid!,
-		});
+		this._loadIfcFileHandlerRef = this.loadIfcFileHandler.bind(this);
+		this._disposeFragmentsHandlerRef = this.disposeFragmentsHandler.bind(this);
+		const uiPanel = uiControlPanelConstructor(
+			{
+				world: this._currentWorld!,
+				clipper: this._currentClipper!,
+				grid: this._currentGrid!,
+			},
+			{
+				loadIfcFileHandler: this._loadIfcFileHandlerRef,
+				disposeFragmentsHandler: this._disposeFragmentsHandlerRef,
+			},
+		);
 		this._panelContainerRef?.current!.append(uiPanel);
 	}
 
 	//Scene handlers
-	private onMouseMoveHandler() {
-		try {
-			const result = this._currentRayCaster!.castRay([this._cubeData!._cube]);
-			if (!!this._previousSelection) {
-				this._previousSelection.material = this._cubeData!._material;
-			}
-			if (!result || !(result.object instanceof Mesh)) {
-				return;
-			}
-			result.object.material = new MeshStandardMaterial({ color: '#BCF124' });
-			this._previousSelection = result.object;
-		} catch (e) {
-			console.error(e);
-		}
-	}
+	// private onMouseMoveHandler() {
+	// 	try {
+	// 		const result = this._currentRayCaster!.castRay([this._cubeData!._cube]);
+	// 		if (!!this._previousSelection) {
+	// 			this._previousSelection.material = this._cubeData!._material;
+	// 		}
+	// 		if (!result || !(result.object instanceof Mesh)) {
+	// 			return;
+	// 		}
+	// 		result.object.material = new MeshStandardMaterial({ color: '#BCF124' });
+	// 		this._previousSelection = result.object;
+	// 	} catch (e) {
+	// 		console.error(e);
+	// 	}
+	// }
 
 	// private onDoubleClickHandler() {
 	// 	try {
@@ -254,5 +255,39 @@ export class IFCViewer {
 
 	private cameraControlendHandler() {
 		this._currentCuller!.needsUpdate = true;
+	}
+
+	private async loadIfcFileHandler() {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.ifc';
+		input.style.display = 'none';
+
+		const handleFileLoad = async (event: Event) => {
+			const file = (event.target as HTMLInputElement).files?.[0];
+			if (!file) return;
+
+			const reader = new FileReader();
+			reader.readAsArrayBuffer(file);
+
+			reader.onload = async () => {
+				const buffer = new Uint8Array(reader.result as ArrayBuffer);
+				const model = await this._currentFragmentIfcLoader!.load(buffer);
+				model.name = file.name;
+				this._currentWorld!.scene.three.add(model);
+
+				document.body.removeChild(input);
+				input.removeEventListener('change', handleFileLoad);
+			};
+		};
+
+		input.addEventListener('change', handleFileLoad);
+
+		document.body.appendChild(input);
+		input.click();
+	}
+
+	private disposeFragmentsHandler() {
+		this._currentFragmentsManager!.dispose();
 	}
 }

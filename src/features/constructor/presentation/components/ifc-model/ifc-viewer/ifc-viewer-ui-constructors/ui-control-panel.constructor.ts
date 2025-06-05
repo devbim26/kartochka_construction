@@ -1,4 +1,7 @@
-import { UiControlPanelConstructorSceneItems } from '@features/constructor/types';
+import {
+	UiControlPanelConstructorCallbacks,
+	UiControlPanelConstructorSceneItems,
+} from '@features/constructor/types';
 import { CameraProjection, NavModeID } from '@thatopen/components';
 import {
 	Checkbox,
@@ -11,7 +14,10 @@ import {
 } from '@thatopen/ui';
 import { Color } from 'three';
 
-export const uiControlPanelConstructor = (sceneItems: UiControlPanelConstructorSceneItems) => {
+export const uiControlPanelConstructor = (
+	sceneItems: UiControlPanelConstructorSceneItems,
+	callbacks: UiControlPanelConstructorCallbacks,
+) => {
 	return Component.create<PanelSection>(() => {
 		return html`
 			<bim-panel
@@ -19,6 +25,22 @@ export const uiControlPanelConstructor = (sceneItems: UiControlPanelConstructorS
 				class="options-menu"
 				style="max-height: 600px; overflow-y: auto; color: #2175f3"
 			>
+				<bim-panel-section collapsed label="IFC File">
+					<bim-button
+						label="Load IFC"
+						@click="${() => {
+							callbacks.loadIfcFileHandler();
+						}}"
+					>
+					</bim-button>
+					<bim-button
+						label="Dispose fragments"
+						@click="${() => {
+							callbacks.disposeFragmentsHandler();
+						}}"
+					>
+					</bim-button>
+				</bim-panel-section>
 				<bim-panel-section collapsed label="Commands">
 					<bim-label>Double click: Create / delete clipping plane</bim-label>
 				</bim-panel-section>
