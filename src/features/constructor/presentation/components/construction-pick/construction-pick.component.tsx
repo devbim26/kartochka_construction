@@ -2,7 +2,11 @@
 import type { ReportInfoFloorConstructionDto, ReportInfoSingleConstructionDto } from '@api-gen';
 import { Switch, useAppDispatch, useAppSelector } from '@core';
 import ConstructorLoader from '@core/presentation/components/loaders/constructor-loader.component';
-import { getReportFloorById, getReportSingleById } from '@features/constructor/services';
+import {
+	getReportFloorById,
+	getReportSingleById,
+	svgConstructionDetail,
+} from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
 import type { ConstructionSelectRestrictions } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
@@ -26,6 +30,7 @@ const ContructionPick = () => {
 	const reportType = search.get('reportType');
 	const dispatch = useAppDispatch();
 	const [constructionHeaderId, setConstructionHeaderId] = useState<string | undefined>(undefined);
+	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 
 	const form = useForm<ConstructionSelectRestrictions>();
 
@@ -81,6 +86,7 @@ const ContructionPick = () => {
 						?.reportConstructionHeader?.constructionHeaderId;
 				if (newHeaderId && newHeaderId !== constructionHeaderId) {
 					setConstructionHeaderId(newHeaderId);
+					console.log('newheaderid:', newHeaderId);
 				}
 				if (!newHeaderId) {
 					toast.error('Не найден constructionHeaderId');
@@ -88,6 +94,24 @@ const ContructionPick = () => {
 				dispatch(stopLoading());
 			});
 	}, [reportId]);
+
+	useEffect(() => {
+		if (!constructionHeaderId || svgUrl) return;
+		from(svgConstructionDetail(constructionHeaderId))
+			.pipe(
+				catchError((error) => {
+					toast.error('Не удалось получить картинку');
+					return [];
+				}),
+			)
+			.subscribe((response) => {
+				if (response.status === 200 && typeof response.data === 'string') {
+					setSvgUrl(response.data);
+				} else {
+					toast.error('Неверный формат');
+				}
+			});
+	}, [constructionHeaderId, svgUrl]);
 
 	if (isLoading) {
 		return (
@@ -133,7 +157,7 @@ const ContructionPick = () => {
 							(report as ReportInfoFloorConstructionDto).floorConstructionInfos?.[0]
 								.reportFloorInfos?.[0].reportConstructionHeader!
 						}
-						constructionHeaderId={constructionHeaderId}
+						svgUrl={svgUrl}
 					/>
 				) : (
 					<ConstructionCard
@@ -141,7 +165,7 @@ const ContructionPick = () => {
 							(report as ReportInfoSingleConstructionDto).singleConstructionInfos?.[0]
 								.reportConstructionHeader!
 						}
-						constructionHeaderId={constructionHeaderId}
+						svgUrl={svgUrl}
 					/>
 				))}
 			<div className="flex gap-[30px]">
