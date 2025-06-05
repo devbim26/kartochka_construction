@@ -3,8 +3,8 @@ import {
 	Clipper,
 	Components,
 	Grids,
+	OrthoPerspectiveCamera,
 	Raycasters,
-	SimpleCamera,
 	SimpleGrid,
 	SimpleRaycaster,
 	SimpleRenderer,
@@ -21,15 +21,21 @@ import {
 	MeshLambertMaterial,
 	MeshStandardMaterial,
 	Object3DEventMap,
+	OrthographicCamera,
+	PerspectiveCamera,
 } from 'three';
 
 type OnMouseMoveHandler = (event: MouseEvent) => void;
 type OnDoubleClickHandler = (event: MouseEvent) => void;
 type RenderEventHandler = (data: unknown) => void;
+type ProjectionOnChanged =
+	| ((data: OrthographicCamera) => void)
+	| ((data: PerspectiveCamera) => void);
 
 export class IFCViewer {
 	//Core
-	private _currentWorld: SimpleWorld<SimpleScene, SimpleCamera, SimpleRenderer> | null = null;
+	private _currentWorld: SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer> | null =
+		null;
 	private _components: Components | null = null;
 	private _statsPanel: Stats | null = null;
 	private _currentGrid: SimpleGrid | null = null;
@@ -50,6 +56,7 @@ export class IFCViewer {
 	private _onDoubleClickHandlerRef: OnDoubleClickHandler | null = null;
 	private _onBeforeUpdateHandlerRef: RenderEventHandler | null = null;
 	private _onAfterUpdateHandlerRef: RenderEventHandler | null = null;
+	private _projectionOnChangedRef: ProjectionOnChanged | null = null;
 
 	//TEST
 	private _cubeData: {
@@ -57,7 +64,7 @@ export class IFCViewer {
 		_material: MeshLambertMaterial;
 	} | null = null;
 
-	get currentWorld(): SimpleWorld<SimpleScene, SimpleCamera, SimpleRenderer> | null {
+	get currentWorld(): SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer> | null {
 		return this._currentWorld;
 	}
 
@@ -77,10 +84,10 @@ export class IFCViewer {
 			'mousemove',
 			this._onMouseMoveHandlerRef!,
 		);
-		this._sceneContainerRef?.current!.removeEventListener(
-			'dblclick',
-			this._onDoubleClickHandlerRef!,
-		);
+		// this._sceneContainerRef?.current!.removeEventListener(
+		// 	'dblclick',
+		// 	this._onDoubleClickHandlerRef!,
+		// );
 
 		//scene
 		if (!!this._components) {
@@ -88,12 +95,12 @@ export class IFCViewer {
 		}
 	}
 
-	private initialize(options?: IFCViewerOptions) {
+	private async initialize(options?: IFCViewerOptions) {
 		try {
-			this.setupWorld();
+			await this.setupWorld();
 			this.setupCube();
 			this.setupRayCaster();
-			this.setupClipper();
+			//this.setupClipper();
 			this.setupStatsPanel();
 			if (options?.uiControlPanelConstructor)
 				this.setupUIPanel(options.uiControlPanelConstructor);
@@ -102,17 +109,19 @@ export class IFCViewer {
 		}
 	}
 
-	private setupWorld() {
+	private async setupWorld() {
 		//World
 		this._components = new Components();
 		const worlds = this._components.get(Worlds);
-		this._currentWorld = worlds.create<SimpleScene, SimpleCamera, SimpleRenderer>();
+		this._currentWorld = worlds.create<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer>();
 		this._currentWorld.scene = new SimpleScene(this._components);
 		this._currentWorld.renderer = new SimpleRenderer(
 			this._components,
 			this._sceneContainerRef?.current!,
 		);
-		this._currentWorld.camera = new SimpleCamera(this._components);
+		this._currentWorld.camera = new OrthoPerspectiveCamera(this._components);
+		this._projectionOnChangedRef = this.projectionOnChanged.bind(this);
+		this._currentWorld.camera.projection.onChanged.add(this._projectionOnChangedRef);
 		this._components.init();
 		this._currentWorld.scene.three.background = null;
 
@@ -120,7 +129,7 @@ export class IFCViewer {
 		const grids = this._components.get(Grids);
 		this._currentGrid = grids.create(this._currentWorld);
 
-		this._currentWorld.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
+		await this._currentWorld.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
 		this._currentWorld!.scene.setup();
 	}
 
@@ -149,15 +158,15 @@ export class IFCViewer {
 		);
 	}
 
-	private setupClipper() {
-		this._currentClipper = this._components!.get(Clipper);
-		this._currentClipper!.enabled = true;
-		this._onDoubleClickHandlerRef = this.onDoubleClickHandler.bind(this);
-		this._sceneContainerRef?.current!.addEventListener(
-			'dblclick',
-			this._onDoubleClickHandlerRef,
-		);
-	}
+	// private setupClipper() {
+	// 	this._currentClipper = this._components!.get(Clipper);
+	// 	this._currentClipper!.enabled = true;
+	// 	this._onDoubleClickHandlerRef = this.onDoubleClickHandler.bind(this);
+	// 	this._sceneContainerRef?.current!.addEventListener(
+	// 		'dblclick',
+	// 		this._onDoubleClickHandlerRef,
+	// 	);
+	// }
 
 	//Info/controls
 	private setupStatsPanel() {
@@ -201,15 +210,15 @@ export class IFCViewer {
 		}
 	}
 
-	private onDoubleClickHandler() {
-		try {
-			if (this._currentClipper!.enabled) {
-				this._currentClipper!.create(this._currentWorld!);
-			}
-		} catch (e) {
-			console.error(e);
-		}
-	}
+	// private onDoubleClickHandler() {
+	// 	try {
+	// 		if (this._currentClipper!.enabled) {
+	// 			this._currentClipper!.create(this._currentWorld!);
+	// 		}
+	// 	} catch (e) {
+	// 		console.error(e);
+	// 	}
+	// }
 
 	private onBeforeUpdateHandler() {
 		this._statsPanel!.begin();
@@ -217,5 +226,12 @@ export class IFCViewer {
 
 	private onAfterUpdateHandler() {
 		this._statsPanel!.end();
+	}
+
+	private projectionOnChanged() {
+		if (this._currentGrid) {
+			const projection = this._currentWorld!.camera.projection.current;
+			this._currentGrid.fade = projection === 'Perspective';
+		}
 	}
 }

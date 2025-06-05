@@ -1,6 +1,6 @@
 import {
 	Clipper,
-	SimpleCamera,
+	OrthoPerspectiveCamera,
 	SimpleGrid,
 	SimpleRenderer,
 	SimpleScene,
@@ -13,7 +13,7 @@ export interface IIFCViewer {
 }
 
 export interface UiControlPanelConstructorSceneItems {
-	world: SimpleWorld<SimpleScene, SimpleCamera, SimpleRenderer>;
+	world: SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer>;
 	grid: SimpleGrid;
 	clipper: Clipper;
 }

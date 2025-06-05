@@ -1,11 +1,24 @@
 import { UiControlPanelConstructorSceneItems } from '@features/constructor/types';
-import { Checkbox, ColorInput, Component, html, NumberInput, PanelSection } from '@thatopen/ui';
+import { CameraProjection, NavModeID } from '@thatopen/components';
+import {
+	Checkbox,
+	ColorInput,
+	Component,
+	Dropdown,
+	html,
+	NumberInput,
+	PanelSection,
+} from '@thatopen/ui';
 import { Color } from 'three';
 
 export const uiControlPanelConstructor = (sceneItems: UiControlPanelConstructorSceneItems) => {
 	return Component.create<PanelSection>(() => {
 		return html`
-			<bim-panel label="Control panel" class="options-menu">
+			<bim-panel
+				label="Control panel"
+				class="options-menu"
+				style="max-height: 600px; overflow-y: auto; color: #2175f3"
+			>
 				<bim-panel-section collapsed label="Commands">
 					<bim-label>Double click: Create / delete clipping plane</bim-label>
 				</bim-panel-section>
@@ -18,7 +31,6 @@ export const uiControlPanelConstructor = (sceneItems: UiControlPanelConstructorS
 						}}"
 					>
 					</bim-checkbox>
-
 					<bim-checkbox
 						label="Clipper visible"
 						checked
@@ -35,7 +47,6 @@ export const uiControlPanelConstructor = (sceneItems: UiControlPanelConstructorS
 						}}"
 					>
 					</bim-color-input>
-
 					<bim-number-input
 						slider
 						step="0.01"
@@ -48,7 +59,6 @@ export const uiControlPanelConstructor = (sceneItems: UiControlPanelConstructorS
 						}}"
 					>
 					</bim-number-input>
-
 					<bim-number-input
 						slider
 						step="0.1"
@@ -61,7 +71,6 @@ export const uiControlPanelConstructor = (sceneItems: UiControlPanelConstructorS
 						}}"
 					>
 					</bim-number-input>
-
 					<bim-button
 						label="Delete all"
 						@click="${() => {
@@ -69,6 +78,53 @@ export const uiControlPanelConstructor = (sceneItems: UiControlPanelConstructorS
 						}}"
 					>
 					</bim-button>
+				</bim-panel-section>
+				<bim-panel-section collapsed label="Camera">
+					<bim-dropdown
+						required
+						label="Navigation mode"
+						@change="${({ target }: { target: Dropdown }) => {
+							const selected = target.value[0] as NavModeID;
+
+							const { current } = sceneItems.world.camera.projection;
+							const isOrtho = current === 'Orthographic';
+							const isFirstPerson = selected === 'FirstPerson';
+							if (isOrtho && isFirstPerson) {
+								target.value[0] = sceneItems.world.camera.mode.id;
+								return;
+							}
+							sceneItems.world.camera.set(selected);
+						}}"
+					>
+						<bim-option checked label="Orbit"></bim-option>
+						<bim-option label="FirstPerson"></bim-option>
+						<bim-option label="Plan"></bim-option>
+					</bim-dropdown>
+					<bim-dropdown
+						required
+						label="Camera projection"
+						@change="${({ target }: { target: Dropdown }) => {
+							const selected = target.value[0] as CameraProjection;
+							const isOrtho = selected === 'Orthographic';
+							const isFirstPerson = sceneItems.world.camera.mode.id === 'FirstPerson';
+							if (isOrtho && isFirstPerson) {
+								target.value[0] = sceneItems.world.camera.projection.current;
+								return;
+							}
+							sceneItems.world.camera.projection.set(selected);
+						}}"
+					>
+						<bim-option checked label="Perspective"></bim-option>
+						<bim-option label="Orthographic"></bim-option>
+					</bim-dropdown>
+					<bim-checkbox
+						label="Allow user input"
+						checked
+						@change="${({ target }: { target: Checkbox }) => {
+							sceneItems.world.camera.setUserInput(target.checked);
+						}}"
+					>
+					</bim-checkbox>
 				</bim-panel-section>
 				<bim-panel-section collapsed label="Scene">
 					<bim-number-input
@@ -83,7 +139,6 @@ export const uiControlPanelConstructor = (sceneItems: UiControlPanelConstructorS
 						}}"
 					>
 					</bim-number-input>
-
 					<bim-number-input
 						slider
 						step="0.1"
