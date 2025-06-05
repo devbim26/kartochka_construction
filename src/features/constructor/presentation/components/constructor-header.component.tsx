@@ -47,6 +47,28 @@ export const ConstructorHeader = () => {
 				>
 					Выбор конструкции
 				</Button>
+				{isActive(CONSTRUCTOR_ROUTES.designing.route) && (
+					<Button
+						className={twMerge(
+							'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
+							'',
+						)}
+						onClick={() => navigate(CONSTRUCTOR_ROUTES.designing.route)}
+					>
+						Проектирование
+					</Button>
+				)}
+				{isActive(CONSTRUCTOR_ROUTES.constructionSelect.route) && (
+					<Button
+						className={twMerge(
+							'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
+							'',
+						)}
+						onClick={() => navigate(CONSTRUCTOR_ROUTES.constructionSelect.route)}
+					>
+						Выбор конструкции
+					</Button>
+				)}
 				<Button
 					className={twMerge(
 						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
