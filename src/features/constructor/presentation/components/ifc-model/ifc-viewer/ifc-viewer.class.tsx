@@ -2,7 +2,9 @@ import { IFCViewerOptions, UiControlPanelConstructor } from '@features/construct
 import {
 	Clipper,
 	Components,
+	Cullers,
 	Grids,
+	MeshCullerRenderer,
 	OrthoPerspectiveCamera,
 	Raycasters,
 	SimpleGrid,
@@ -32,6 +34,8 @@ type ProjectionOnChanged =
 	| ((data: OrthographicCamera) => void)
 	| ((data: PerspectiveCamera) => void);
 
+type VoidFunc = () => void;
+
 export class IFCViewer {
 	//Core
 	private _currentWorld: SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer> | null =
@@ -39,6 +43,7 @@ export class IFCViewer {
 	private _components: Components | null = null;
 	private _statsPanel: Stats | null = null;
 	private _currentGrid: SimpleGrid | null = null;
+	private _currentCuller: MeshCullerRenderer | null = null;
 
 	//Custer
 	private _currentRayCaster: SimpleRaycaster | null = null;
@@ -57,6 +62,7 @@ export class IFCViewer {
 	private _onBeforeUpdateHandlerRef: RenderEventHandler | null = null;
 	private _onAfterUpdateHandlerRef: RenderEventHandler | null = null;
 	private _projectionOnChangedRef: ProjectionOnChanged | null = null;
+	private _cameraControlendHandlerRef: VoidFunc | null = null;
 
 	//TEST
 	private _cubeData: {
@@ -129,6 +135,17 @@ export class IFCViewer {
 		const grids = this._components.get(Grids);
 		this._currentGrid = grids.create(this._currentWorld);
 
+		//Culler
+		const cullers = this._components.get(Cullers);
+		this._currentCuller = cullers.create(this._currentWorld);
+		this._currentCuller.needsUpdate = true;
+		this._cameraControlendHandlerRef = this.cameraControlendHandler.bind(this);
+		this._currentWorld.camera.controls.addEventListener(
+			'controlend',
+			this._cameraControlendHandlerRef,
+		);
+
+		//End
 		await this._currentWorld.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
 		this._currentWorld!.scene.setup();
 	}
@@ -233,5 +250,9 @@ export class IFCViewer {
 			const projection = this._currentWorld!.camera.projection.current;
 			this._currentGrid.fade = projection === 'Perspective';
 		}
+	}
+
+	private cameraControlendHandler() {
+		this._currentCuller!.needsUpdate = true;
 	}
 }
