@@ -132,7 +132,7 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 	};
 
 	return (
-		<div style={{ height: '500px', width: '100%' }}>
+		<div className="h-[500px] w-full">
 			<Line data={chartData} options={options} />
 		</div>
 	);
