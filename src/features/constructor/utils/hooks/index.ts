@@ -1,1 +1,1 @@
-export * from './use-ifc-viewer.hook'
+export * from './use-ifc-viewer.hook';

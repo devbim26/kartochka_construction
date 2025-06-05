@@ -1,4 +1,4 @@
-import {
+import type {
 	IFCViewerContainers,
 	IFCViewerOptions,
 	IFCViewerState,
@@ -13,30 +13,30 @@ import {
 	Grids,
 	IfcLoader,
 	IfcRelationsIndexer,
-	MeshCullerRenderer,
 	OrthoPerspectiveCamera,
 	Raycasters,
-	SimpleGrid,
-	SimpleRaycaster,
 	SimpleRenderer,
 	SimpleScene,
-	SimpleWorld,
 	Worlds,
+	type MeshCullerRenderer,
+	type SimpleGrid,
+	type SimpleRaycaster,
+	type SimpleWorld,
 } from '@thatopen/components';
 import { ClipEdges, EdgesPlane, Highlighter } from '@thatopen/components-front';
-import { FragmentsGroup } from '@thatopen/fragments';
-import { Manager, Table, TableCellValue, TableRowData } from '@thatopen/ui';
+import type { FragmentsGroup } from '@thatopen/fragments';
+import { Manager, type Table, type TableCellValue, type TableRowData } from '@thatopen/ui';
 import { tables } from '@thatopen/ui-obc';
-import { RefObject } from 'react';
+import type { RefObject } from 'react';
 import Stats from 'stats.js';
 import {
 	InstancedMesh,
 	LineBasicMaterial,
 	Mesh,
 	MeshBasicMaterial,
-	Object3D,
-	OrthographicCamera,
-	PerspectiveCamera,
+	type Object3D,
+	type OrthographicCamera,
+	type PerspectiveCamera,
 } from 'three';
 
 type OnKeyDownHandler = (event: KeyboardEvent) => void;
@@ -88,7 +88,9 @@ export class IFCViewer {
 	private _onFragmentsLoadedHandlerRef: OnFragmentsLoadedHandler | null = null;
 
 	//state
-	private _state: IFCViewerState = {};
+	private _state: IFCViewerState = {
+		stub: false,
+	};
 
 	get currentWorld(): SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer> | null {
 		return this._currentWorld;
@@ -213,7 +215,7 @@ export class IFCViewer {
 
 		this._currentWorld.renderer = new SimpleRenderer(
 			this._components,
-			this._sceneContainerRef?.current!,
+			this._sceneContainerRef!.current!,
 		);
 
 		this._currentWorld.camera = new OrthoPerspectiveCamera(this._components);

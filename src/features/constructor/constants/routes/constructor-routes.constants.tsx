@@ -25,6 +25,6 @@ export const CONSTRUCTOR_ROUTES = {
 	},
 	ifcModel: {
 		id: 'constructor-ifc-model',
-		route: 'ifc-model'
-	}
+		route: 'ifc-model',
+	},
 };

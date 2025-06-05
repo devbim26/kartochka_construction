@@ -1,5 +1,5 @@
-import { ModelInfoPanelConstructorViewerItems } from '@features/constructor/types';
-import { Component, html, TextInput } from '@thatopen/ui';
+import type { ModelInfoPanelConstructorViewerItems } from '@features/constructor/types';
+import { Component, html, type TextInput } from '@thatopen/ui';
 
 export const modelInfoPanelConstructor = (viewerItems: ModelInfoPanelConstructorViewerItems) => {
 	return Component.create(() => {

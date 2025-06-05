@@ -1,4 +1,4 @@
-import {
+import type {
 	Clipper,
 	Components,
 	OrthoPerspectiveCamera,
@@ -7,9 +7,9 @@ import {
 	SimpleScene,
 	SimpleWorld,
 } from '@thatopen/components';
-import { ClipEdges } from '@thatopen/components-front';
-import { PanelSection, Table, TableCellValue, TableRowData } from '@thatopen/ui';
-import { RefObject } from 'react';
+import type { ClipEdges } from '@thatopen/components-front';
+import type { PanelSection, Table, TableCellValue, TableRowData } from '@thatopen/ui';
+import type { RefObject } from 'react';
 
 export interface IIFCViewer {
 	destroy(): void;
@@ -32,7 +32,9 @@ export interface UiControlPanelConstructorCallbacks {
 	disposeFragmentsHandler: () => void;
 }
 
-export interface IFCViewerState {}
+export interface IFCViewerState {
+	stub: boolean;
+}
 
 export type UiControlPanelConstructor = (
 	sceneItems: UiControlPanelConstructorSceneItems,

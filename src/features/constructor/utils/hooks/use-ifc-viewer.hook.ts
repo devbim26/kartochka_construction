@@ -1,6 +1,6 @@
 import { IFCViewer } from '@features/constructor/presentation/components/ifc-model/ifc-viewer/ifc-viewer.class';
-import { IFCViewerContainers, IFCViewerOptions } from '@features/constructor/types';
-import { RefObject, useLayoutEffect, useRef } from 'react';
+import type { IFCViewerContainers, IFCViewerOptions } from '@features/constructor/types';
+import { useLayoutEffect, useRef, type RefObject } from 'react';
 
 export const useIFCViewer = (conatiners: IFCViewerContainers, options: IFCViewerOptions) => {
 	const currentViewer = useRef<IFCViewer>(null);

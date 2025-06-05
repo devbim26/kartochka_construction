@@ -1,16 +1,16 @@
-import {
+import type {
 	UiControlPanelConstructorCallbacks,
 	UiControlPanelConstructorSceneItems,
 } from '@features/constructor/types';
-import { CameraProjection, NavModeID } from '@thatopen/components';
+import type { CameraProjection, NavModeID } from '@thatopen/components';
 import {
-	Checkbox,
-	ColorInput,
 	Component,
-	Dropdown,
 	html,
-	NumberInput,
-	PanelSection,
+	type Checkbox,
+	type ColorInput,
+	type Dropdown,
+	type NumberInput,
+	type PanelSection,
 } from '@thatopen/ui';
 import { Color } from 'three';
 
