@@ -31,7 +31,7 @@ import { FormSubTitle } from '../../form-sub-title.component';
 
 export const ConstructionsEdit = () => {
 	const form = useFormContext<ConstructionsEditData>();
-	const { formState, control, watch, setValue, register, trigger } = form;
+	const { formState, control, watch, setValue, register } = form;
 	const [displayChars, setDisplayChars] = useState(false);
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionTypeObject.constructionTypeEnum');

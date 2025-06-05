@@ -1,9 +1,7 @@
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { ConstructorHeader } from '../components';
 
 export const ConstructorLayout = () => {
-	const navigate = useNavigate();
-
 	// useLayoutEffect(() => {
 	// 	navigate(
 	// 		`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`,
