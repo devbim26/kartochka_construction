@@ -47,6 +47,39 @@ export const ConstructorHeader = () => {
 				>
 					Выбор конструкции
 				</Button>
+				{isActive(CONSTRUCTOR_ROUTES.designing.route) && (
+					<Button
+						className={twMerge(
+							'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
+							'',
+						)}
+						onClick={() => navigate(CONSTRUCTOR_ROUTES.designing.route)}
+					>
+						Проектирование
+					</Button>
+				)}
+				{isActive(CONSTRUCTOR_ROUTES.constructionSelect.route) && (
+					<Button
+						className={twMerge(
+							'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
+							'',
+						)}
+						onClick={() => navigate(CONSTRUCTOR_ROUTES.constructionSelect.route)}
+					>
+						Выбор конструкции
+					</Button>
+				)}
+				<Button
+					className={twMerge(
+						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
+						isActive(CONSTRUCTOR_ROUTES.ifcModel.route)
+							? ''
+							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
+					)}
+					onClick={() => navigate(CONSTRUCTOR_ROUTES.ifcModel.route)}
+				>
+					IFC модель
+				</Button>
 			</div>
 		</div>
 	);

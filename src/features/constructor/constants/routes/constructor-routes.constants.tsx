@@ -19,4 +19,12 @@ export const CONSTRUCTOR_ROUTES = {
 		id: 'my-constructions-page-id',
 		route: 'my-constructions',
 	},
+	reportForm: {
+		id: 'report-form-page-id',
+		route: 'report-form',
+	},
+	ifcModel: {
+		id: 'constructor-ifc-model',
+		route: 'ifc-model',
+	},
 };
