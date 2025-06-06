@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
 export const DocumentFlags = () => {
-	const { setValue, control, watch, getValues, register } =
-		useFormContext<FormReportSchemaType>();
+	const { setValue, control, watch } = useFormContext<FormReportSchemaType>();
 	const [showGeneralInfo, setShowGeneralInfo] = useState(true);
 	const [showSoundInfo, setShowSoundInfo] = useState(true);
 

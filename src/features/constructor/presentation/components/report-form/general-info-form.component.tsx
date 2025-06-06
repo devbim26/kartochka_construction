@@ -4,8 +4,7 @@ import { useMask } from '@react-input/mask';
 import { useFormContext } from 'react-hook-form';
 
 export const GeneralInfoForm = () => {
-	const { setValue, control, watch, getValues, register } =
-		useFormContext<FormReportSchemaType>();
+	const { setValue, watch, register } = useFormContext<FormReportSchemaType>();
 	const dateRef = useMask(dateMask);
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
