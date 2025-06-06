@@ -4,11 +4,13 @@ import { useAppDispatch, useAppNavigate, useAppSelector } from '@core/utils';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import {
+	deleteConstruction,
 	getReportFloorById,
 	getReportSingleById,
 	uploadDocument,
 } from '@features/constructor/services';
 import { constructorSlice, startLoading, stopLoading } from '@features/constructor/store';
+import { ReportCategory } from '@features/constructor/types';
 import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { AxiosError } from 'axios';
@@ -33,9 +35,11 @@ export const FloorPlans = memoize(() => {
 	const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
+	const reportType = search.get('reportType');
 	const [category, setCategory] = useState<string | null>(null);
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
+	const constructionId = search.get('constructionId');
 
 	const handleUploadPdf = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
@@ -92,6 +96,9 @@ export const FloorPlans = memoize(() => {
 											response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
 												(info) => ({
 													id: info.id,
+													constructionId:
+														info.reportConstructionHeader
+															?.constructionHeaderId,
 													title:
 														info.reportConstructionHeader
 															?.constructionHeader?.name ||
@@ -102,6 +109,10 @@ export const FloorPlans = memoize(() => {
 													square:
 														info.reportConstructionHeader?.square ||
 														'0',
+													materials:
+														info.reportConstructionHeader
+															?.constructionHeader?.constructionType
+															?.constructions,
 												}),
 											) as ConstructionSheet[],
 										),
@@ -118,21 +129,119 @@ export const FloorPlans = memoize(() => {
 		}
 	};
 
-	useEffect(() => {
-		if (!reportId) return;
-		from(getReportSingleById({ id: reportId }))
+	const getReports = (reportId: string, reportType: ReportCategory) => {
+		reportType === ReportCategory.Single
+			? from(getReportSingleById({ id: reportId }))
+					.pipe(
+						catchError((error) => {
+							if (error instanceof AxiosError) {
+								toast.error(error.response?.data);
+							}
+							dispatch(stopLoading());
+							return from([null]);
+						}),
+					)
+					.subscribe((response) => {
+						const reportCategory = response?.data?.category;
+						if (reportCategory) {
+							setCategory(reportCategory);
+						}
+						if (!!response!.data.singleConstructionInfos?.length) {
+							dispatch(
+								constructorSlice.actions.setInfo(
+									response!.data.singleConstructionInfos?.[0]
+										.reportConstructionHeader || {},
+								),
+							);
+							dispatch(
+								constructorSlice.actions.setConstructionsSheet(
+									response!.data.singleConstructionInfos?.[0]
+										.reportConstructionHeader || {},
+								),
+							);
+						}
+					})
+			: from(getReportFloorById({ id: reportId }))
+					.pipe(
+						catchError((error) => {
+							if (error instanceof AxiosError) {
+								toast.error(error.response?.data);
+							}
+							dispatch(stopLoading());
+							return from([null]);
+						}),
+					)
+					.subscribe(async (response) => {
+						const reportCategory = response?.data?.category;
+						if (reportCategory) {
+							setCategory(reportCategory);
+						}
+						const fileUrl =
+							response?.data?.floorConstructionInfos?.[0]?.floorDocumentUrl;
+						if (fileUrl) {
+							const fileResponse = await fetch(fileUrl);
+
+							const blob = await fileResponse.blob();
+							const arrayBuffer = await blob.arrayBuffer();
+							from(pdfjs.getDocument({ data: arrayBuffer }).promise).subscribe(
+								(result) => setPdfDoc(result),
+							);
+						}
+						if (!!response?.data.floorConstructionInfos?.length) {
+							dispatch(
+								constructorSlice.actions.setInfo(
+									response!.data.floorConstructionInfos?.[0]
+										.reportFloorInfos?.[0] || {},
+								),
+							);
+							dispatch(
+								constructorSlice.actions.setConstructionsSheet(
+									response!.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
+										(info) => ({
+											id: info.id,
+											constructionId:
+												info.reportConstructionHeader?.constructionHeaderId,
+											title:
+												info.reportConstructionHeader?.constructionHeader
+													?.name || 'Нет названия',
+											floorPlanImage: info.documentImageUrl || '',
+											constructionInfoImage: info.documentImageUrl || '',
+											square: info.reportConstructionHeader?.square || '0',
+											materials:
+												info.reportConstructionHeader?.constructionHeader
+													?.constructionType?.constructions,
+										}),
+									) as ConstructionSheet[],
+								),
+							);
+						}
+					});
+	};
+
+	const deleteConstructionHandle = (id: string) => {
+		from(deleteConstruction(id))
 			.pipe(
-				catchError(() => {
-					return from(getReportFloorById({ id: reportId }));
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					dispatch(stopLoading());
+					return from([null]);
 				}),
 			)
 			.subscribe((response) => {
-				const reportCategory = response?.data?.category;
-				if (reportCategory) {
-					setCategory(reportCategory);
+				if (response?.status === 200) {
+					toast.success('Успешное удаление');
+					if (!reportId) return;
+					getReports(reportId, reportType as ReportCategory);
 				}
 			});
-	}, [reportId]);
+	};
+
+	useEffect(() => {
+		if (!reportId) return;
+		getReports(reportId, reportType as ReportCategory);
+	}, [reportId, reportType]);
 
 	return (
 		<div className="relative">
@@ -241,7 +350,8 @@ export const FloorPlans = memoize(() => {
 							onCancel={() => window.history.back()}
 							onClose={() => window.history.back()}
 							onConfirm={() => {
-								navigate('');
+								deleteConstructionHandle(constructionId || '');
+								window.history.back();
 							}}
 							headerTitle="Подтвердите действие"
 						>

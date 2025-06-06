@@ -133,9 +133,8 @@ const DesigningScreen = () => {
 	const ruConstructionType = constructionType ? RuConstructionTypesMap[constructionType] : '';
 	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
 
-	useEffect(() => {
-		if (!constructionHeaderId) return;
-		from(svgConstructionDetail(constructionHeaderId))
+	const handleGetConstructionImage = (id: string) => {
+		from(svgConstructionDetail(id))
 			.pipe(
 				catchError((error) => {
 					toast.error('Не удалось получить картинку');
@@ -149,6 +148,11 @@ const DesigningScreen = () => {
 					toast.error('Неверный формат');
 				}
 			});
+	};
+
+	useEffect(() => {
+		if (!constructionHeaderId) return;
+		handleGetConstructionImage(constructionHeaderId);
 	}, [constructionHeaderId]);
 
 	useEffect(() => {

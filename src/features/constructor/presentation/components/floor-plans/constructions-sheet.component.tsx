@@ -18,15 +18,7 @@ import { DESIGNING_ROUTES } from '@features/home/constants';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-
-// const data: ConstructionSheet[] = [
-// 	{
-// 		title: 'Test',
-// 		floorPlanImage: '123',
-// 		constructionInfoImage: '123',
-// 		square: '10',
-// 	},
-// ];
+import { ConstructionImage } from './construction-info-image.component';
 
 export const ConstructionSheets = () => {
 	const dispatch = useAppDispatch();
@@ -39,7 +31,12 @@ export const ConstructionSheets = () => {
 			{
 				accessorKey: 'title',
 				header: () => <SimpleTableHeaderCell text="Название" />,
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => (
+					<SimpleTableCell
+						contentClassName="max-w-[150px]"
+						content={<div className="max-w-[150px]">{info.getValue() as string}</div>}
+					/>
+				),
 			},
 			{
 				accessorKey: 'floorPlanImage',
@@ -47,13 +44,17 @@ export const ConstructionSheets = () => {
 				cell: (info) => (
 					<SimpleTableCell
 						content={
-							<div>
-								<img
-									className="w-[400px] rounded-[18px] border-[3px] border-primary bg-white"
-									src={info.getValue() as string}
-									alt="floorPlanImage"
-								/>
-							</div>
+							info.getValue() ? (
+								<div className="size-[400px]">
+									<img
+										className="size-[400px] rounded-[18px] border-[3px] border-primary bg-white object-fill"
+										src={info.getValue() as string}
+										alt="floorPlanImage"
+									/>
+								</div>
+							) : (
+								<div className="size-[400px] rounded-[18px] border-[3px] border-primary bg-white"></div>
+							)
 						}
 					/>
 				),
@@ -64,7 +65,10 @@ export const ConstructionSheets = () => {
 				cell: (info) => (
 					<SimpleTableCell
 						content={
-							<div className="h-[150px] w-[200px] rounded-[18px] border-[3px] border-primary bg-white"></div>
+							<ConstructionImage
+								id={info.row.original.constructionId}
+								materials={info.row.original.materials}
+							/>
 						}
 					/>
 				),
@@ -100,7 +104,8 @@ export const ConstructionSheets = () => {
 											onClick={() => {
 												navigate('', {
 													delete: 'true',
-													reportId: search.get('reportId')!,
+													constructionId:
+														info.row.original.constructionId,
 													reportType: search.get('reportType')!,
 												});
 											}}

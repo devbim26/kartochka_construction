@@ -82,3 +82,6 @@ export const graphDetail = async ({ constructionHeaderId }: GetGraphParams) => {
 export const svgConstructionDetail = async (id: string) => {
 	return await withConstructorLoader(() => fetchApi.api.svgConstructionDetail(id));
 };
+export const deleteConstruction = async (id: string) => {
+	return await withConstructorLoader(() => fetchApi.api.constructionDelete({ id: id }));
+};
