@@ -168,11 +168,18 @@ export const CreateConstructionForm = memoize(
 																?.constructionHeader?.name ||
 															'Нет названия',
 														floorPlanImage: info.documentImageUrl || '',
+														constructionId:
+															info.reportConstructionHeader
+																?.constructionHeaderId,
 														constructionInfoImage:
 															info.documentImageUrl || '',
 														square:
 															info.reportConstructionHeader?.square ||
 															'0',
+														materials:
+															info.reportConstructionHeader
+																?.constructionHeader
+																?.constructionType?.constructions,
 													}),
 												) as ConstructionSheet[],
 											),

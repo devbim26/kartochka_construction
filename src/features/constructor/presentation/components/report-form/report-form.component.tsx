@@ -32,7 +32,6 @@ const ReportFromComponent = () => {
 						'floorDocumentsFlags',
 						convertToClientReportFormFlags(response.data),
 					);
-				console.log(form.getValues());
 			});
 	}, [reportId]);
 
