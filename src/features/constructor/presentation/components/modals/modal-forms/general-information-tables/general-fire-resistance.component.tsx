@@ -1,4 +1,4 @@
-import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell, useAppNavigate } from '@core';
+import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell } from '@core';
 import type { FireResistanceStandart } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
@@ -13,8 +13,6 @@ const dataFireResistance: FireResistanceStandart[] = [
 ];
 
 export const GeneralInformationFireResistance = () => {
-	const navigate = useAppNavigate();
-
 	const columns = useMemo(() => {
 		const cols: ColumnDef<FireResistanceStandart>[] = [
 			{

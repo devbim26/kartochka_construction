@@ -1,4 +1,4 @@
-import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell, useAppNavigate } from '@core';
+import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell } from '@core';
 import type { ThermalInsulationStandarts } from '@features/constructor/types/thermal-insulation.types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
@@ -13,7 +13,6 @@ const dataThermal: ThermalInsulationStandarts[] = [
 ];
 
 export const GeneralInformationThermal = () => {
-	const navigate = useAppNavigate();
 	const columns = useMemo(() => {
 		const cols: ColumnDef<ThermalInsulationStandarts>[] = [
 			{

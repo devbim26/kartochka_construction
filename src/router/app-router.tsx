@@ -14,12 +14,14 @@ import {
 	FloorPlansScreen,
 	GuidbooksLauout,
 	HomeScreen,
+	IFCModelScreen,
 	IssuersScreen,
 	LandingScreen,
 	LoginPage,
 	MainScreen,
 	MaterialsScreen,
 	NotFoundScreen,
+	ReportFormScreen,
 	RequirementsScreen,
 } from '@features';
 import { AUTH_ROUTES } from '@features/auth/constants';
@@ -64,6 +66,11 @@ export const AppRouter = () => {
 						path={CONSTRUCTOR_ROUTES.myConstructions.route}
 						element={<MyConstructions />}
 					/>
+					<Route
+						path={CONSTRUCTOR_ROUTES.reportForm.route}
+						element={<ReportFormScreen />}
+					/>
+					<Route path={CONSTRUCTOR_ROUTES.ifcModel.route} element={<IFCModelScreen />} />
 				</Route>
 				<Route path={DESIGNING_ROUTES.account.route} element={<AccountScreen />} />
 				<Route

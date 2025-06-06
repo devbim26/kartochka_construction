@@ -1,65 +1,137 @@
-import { Button, ChevronIcon, useAppSelector } from '@core';
-import { SoundReductionTable } from '@features';
+import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
+import { Button, ChevronIcon, useAppDispatch, useAppSelector } from '@core';
+import type { Dot, GraphDetailResponse } from '@features';
+import { startLoading, stopLoading } from '@features';
+
+import Loader from '@core/presentation/components/loaders/loader.component';
+import { getReportFloorById, graphDetail } from '@features/constructor/services';
 import { RuMaterialParametrs } from '@features/constructor/types/material-parametrs.types';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
-import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { RuMaterialTypeEnum } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { catchError, from } from 'rxjs';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import issuer from '../../../../../assets/issuer.png';
-import DesigningChart from './designing-chart.component';
+import DesigningGraph from './designing-graph.component';
 import { DesigningHeader } from './designing-header.component';
 
 const MyConstructions = () => {
-	const reportInfoFull = useAppSelector((state) => state.constructorData.reportInfoFull);
-
-	const [chartLabels, setChartLabels] = useState<number[]>([]);
-	const [chartData, setChartData] = useState<number[]>([]);
-
-	const rwValue =
-		reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]?.reportConstructionHeader
-			?.constructionHeader?.rw || 0;
-	const isRelevant = rwValue >= 55;
-	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
+	const [search] = useSearchParams();
+	const reportId = search.get('reportId');
+	const [graphData, setGraphData] = useState<GraphDetailResponse | null>(null);
+	const [isRelevant, setIsRelevant] = useState<boolean>(false);
+	const [constructionHeaderId, setConstructionHeaderId] = useState<string | undefined>(undefined);
+	const [constructionHeader, setConstructionHeader] = useState<ConstructionHeaderDto | null>(
+		null,
+	);
+	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
+	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		if (reportInfoFull) {
-			const constructionData =
-				reportInfoFull.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-					?.reportConstructionHeader?.constructionHeader;
-			if (constructionData) {
-				const frequencyLabels = [50, 80, 125, 200, 315, 500, 800, 1250, 2500, 3150, 5000];
-				const soundReductionData = constructionData.rTotal?.length
-					? constructionData.rTotal
-					: Array(frequencyLabels.length).fill(constructionData.rw || 0);
-				setChartLabels(frequencyLabels);
-				setChartData(soundReductionData);
-			}
-		}
-	}, [reportInfoFull]);
+		if (!reportId) return;
+		from(getReportFloorById({ id: reportId }))
+			.pipe(
+				catchError((error) => {
+					toast.error('Не удалось получить данные отчёта');
+					return [];
+				}),
+			)
+			.subscribe((response) => {
+				const report: ReportInfoFloorConstructionDto | undefined = response?.data;
+				const constructionHeaderId =
+					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+						?.reportConstructionHeader?.constructionHeaderId;
+				const constructionHeader =
+					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+						?.reportConstructionHeader?.constructionHeader;
+				if (constructionHeaderId) {
+					setConstructionHeaderId(constructionHeaderId);
+				} else {
+					toast.error('Не найден constructionHeaderId');
+				}
+				if (constructionHeader) {
+					setConstructionHeader(constructionHeader);
+				} else {
+					toast.error('Не найден constructionHeader');
+				}
+			});
+	}, [reportId]);
 
-	const constructionHeader =
-		reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]?.reportConstructionHeader
-			?.constructionHeader;
-	console.log(constructionHeader);
-	const constructionType = constructionHeader?.constructionType?.constructionTypeEnum as
-		| ConstructionTypeEnum
-		| undefined;
+	useEffect(() => {
+		const rwValue = constructionHeader?.rw || 0;
+		const relevant = rwValue >= 55;
+		setIsRelevant(relevant);
+	}, [constructionHeader?.rw]);
+
+	useEffect(() => {
+		if (!constructionHeaderId || graphData) return;
+		dispatch(startLoading());
+		from(graphDetail({ constructionHeaderId }))
+			.pipe(
+				catchError((error) => {
+					toast.error('Не удалось загрузить данные графика');
+					dispatch(stopLoading());
+					return [];
+				}),
+			)
+			.subscribe(({ data }) => {
+				if (!data) {
+					dispatch(stopLoading());
+					return;
+				}
+				setGraphData({
+					...data,
+					dotRs: (data.dotRs || []).filter(
+						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+					) as Dot[],
+					laboratoryDots: (data.laboratoryDots || []).filter(
+						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+					) as Dot[],
+					deviationDots: (data.deviationDots || []).filter(
+						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+					) as Dot[],
+					dotC:
+						data.dotC?.r != null && data.dotC.f != null
+							? { r: data.dotC.r, f: data.dotC.f }
+							: undefined,
+					dotB:
+						data.dotB?.r != null && data.dotB.f != null
+							? { r: data.dotB.r, f: data.dotB.f }
+							: undefined,
+				});
+				dispatch(stopLoading());
+			});
+	}, [constructionHeaderId]);
+
+	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
 	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
 
 	const formatMaterial = (material: (typeof materials)[0]) => {
-		const values =
+		const materialType =
+			RuMaterialTypeEnum[material.materialType as keyof typeof RuMaterialTypeEnum] ??
+			material.materialType;
+		const materialParams =
 			material.materialTypeValue
 				?.map((val) => {
-					const paramKey = val.materialParametrs as keyof typeof RuMaterialParametrs;
-					const ruParam = RuMaterialParametrs[paramKey] ?? val.materialParametrs;
-					return `${ruParam}: ${val.value}`;
+					const param =
+						RuMaterialParametrs[
+							val.materialParametrs as keyof typeof RuMaterialParametrs
+						] ?? val.materialParametrs;
+					return `${param}: ${val.value}`;
 				})
 				.join(', ') || 'нет данных';
-		const typeKey = material.materialType as keyof typeof RuMaterialTypeEnum;
-		const russianMaterialType = RuMaterialTypeEnum[typeKey] ?? material.materialType;
-		return `${russianMaterialType} (${values})`;
+		return `${materialType} (${materialParams})`;
 	};
+
+	if (isLoading) {
+		return (
+			<div className="flex size-full items-center justify-center">
+				<Loader />
+			</div>
+		);
+	}
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
 			<DesigningHeader />
@@ -102,7 +174,7 @@ const MyConstructions = () => {
 				<div className="flex flex-col">
 					<p className="text-[12px] italic">СП 275.1325800.2016</p>
 					<p className="text-[12px] italic">Защита от шума, Россия </p>
-					<p className="text-[25px] font-[600]">Rw = {rwValue} dB</p>
+					<p className="text-[25px] font-[600]">Rw = {constructionHeader?.rw} dB</p>
 					<p
 						className={twMerge(
 							'text-[20px] font-[600]',
@@ -116,12 +188,7 @@ const MyConstructions = () => {
 					</p>
 					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
 				</div>
-				<DesigningChart labels={chartLabels} data={chartData} />
-				<SoundReductionTable
-					frequencyLabels={chartLabels}
-					rTotal={chartData}
-					noPadding={true}
-				/>
+				<DesigningGraph graphData={graphData} />
 			</div>
 		</div>
 	);

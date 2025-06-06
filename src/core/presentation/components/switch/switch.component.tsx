@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface SwitchProps {
@@ -14,6 +14,7 @@ interface SwitchProps {
 	onText?: string;
 	offText?: string;
 	onChange: (isEnabled: boolean) => void;
+	isEnabledProp?: boolean;
 }
 
 export const Switch = ({
@@ -29,8 +30,13 @@ export const Switch = ({
 	onIcon,
 	offIcon,
 	onChange,
+	isEnabledProp = false,
 }: SwitchProps) => {
-	const [isEnabled, setIsEnabled] = useState(false);
+	const [isEnabled, setIsEnabled] = useState(isEnabledProp);
+
+	useEffect(() => {
+		setIsEnabled(isEnabledProp);
+	}, [isEnabledProp]);
 
 	const handleToggle = () => {
 		const newState = !isEnabled;

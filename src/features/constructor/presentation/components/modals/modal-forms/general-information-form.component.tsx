@@ -21,7 +21,7 @@ export const GeneralInformationForm = () => {
 		if (!reportId) return;
 		from(getReportFloorById({ id: reportId }))
 			.pipe(
-				catchError((error) => {
+				catchError(() => {
 					return [];
 				}),
 			)

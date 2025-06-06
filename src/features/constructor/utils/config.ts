@@ -1,6 +1,6 @@
 import type { EntityConfig } from '@core';
 import { ReportCategory } from '../types';
-import { AddConstructionSchema, CreateConstructionSchema } from './validation';
+import { AddConstructionSchema, CreateConstructionSchema, FormReportSchema } from './validation';
 import { AboutBuildingSchema } from './validation/about-building.validation';
 import { DesigningSchema } from './validation/designing.validation';
 import { FloorPlansSchema } from './validation/floor-plans.validation';
@@ -56,5 +56,21 @@ export const DesigningConfig: EntityConfig = {
 	schema: DesigningSchema,
 	defaultValues: {
 		constructionTypeObject: {},
+	},
+};
+
+export const FormReportConfig: EntityConfig = {
+	schema: FormReportSchema,
+	defaultValues: {
+		reportInfoId: '',
+		customerName: '',
+		objectDescription: '',
+		creatorFullName: '',
+		code: '',
+		country: '',
+		director: '',
+		date: '',
+		//logoUrl: z.string().min(1, 'Поле обязательно для заполнения'),
+		floorDocumentsFlags: {},
 	},
 };
