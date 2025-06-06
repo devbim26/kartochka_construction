@@ -9,11 +9,11 @@ export const modelInfoPanelConstructor = (viewerItems: ModelInfoPanelConstructor
 		};
 
 		return html`
-			<bim-panel label="Инфо">
-				<bim-panel-section label="Иерархия модели">
+			<bim-panel>
+				<bim-panel-section id="model-info-panel-content" label="Дерево элементов">
 					<bim-text-input
-						@input=${onSearch}
-						placeholder="Search..."
+						@input="${onSearch}"
+						placeholder="Поиск..."
 						debounce="200"
 					></bim-text-input>
 					<bim-panel-section style="max-height: 400px; overflow-y: auto; color: #2175f3">
