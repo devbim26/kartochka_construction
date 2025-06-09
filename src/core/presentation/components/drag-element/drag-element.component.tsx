@@ -1,4 +1,5 @@
-import { RefObject, useRef, useState } from 'react';
+import { useDragElementContext } from '@core/utils';
+import { RefObject, useMemo, useRef } from 'react';
 
 interface DragElementCoord {
 	x: number;
@@ -7,7 +8,12 @@ interface DragElementCoord {
 
 interface DragElementProps {
 	parentRef: RefObject<HTMLElement | null>;
-	initialState: DragElementCoord;
+	initialState: {
+		top?: number;
+		left?: number;
+		right?: number;
+		bottom?: number;
+	};
 	zIndex?: number;
 	containerClassName?: string;
 	children: React.JSX.Element | React.ReactNode;
@@ -22,17 +28,43 @@ export const DragElement = ({
 	children,
 	styles,
 }: DragElementProps) => {
+	const currentDragElementId = useRef<string>(crypto.randomUUID());
 	const currentWrapper = useRef<HTMLDivElement>(null);
 	const offset = useRef<DragElementCoord>({ x: 0, y: 0 });
 	const isDragging = useRef<boolean>(false);
-	const timeout = useRef<NodeJS.Timeout>(null);
-	const [dragEnabled, setDragEnabled] = useState(false);
+	const parentRectCache = useRef<DOMRect | null>(null);
+	const { draggableElementId, setDraggableElementId } = useDragElementContext();
+
+	const initialCoords: DragElementCoord = useMemo(() => {
+		console.log(parentRef.current);
+		if (!parentRef.current || !currentWrapper.current) return { x: 0, y: 0 };
+		const parentRect = parentRef.current.getBoundingClientRect();
+		const elementRect = currentWrapper.current.getBoundingClientRect();
+		let x = 0;
+		let y = 0;
+		if (initialState.left !== undefined) {
+			x = initialState.left;
+		} else if (initialState.right !== undefined) {
+			x = parentRect.width - elementRect.width - initialState.right;
+		}
+
+		if (initialState.top !== undefined) {
+			y = initialState.top;
+		} else if (initialState.bottom !== undefined) {
+			y = parentRect.height - elementRect.height - initialState.bottom;
+		}
+		return { x, y };
+	}, []);
 
 	const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-		if (e.button !== 0 || !dragEnabled) return;
+		if (e.button !== 0 || draggableElementId !== currentDragElementId.current!) return;
 		e.stopPropagation();
 		e.preventDefault();
 		if (!currentWrapper.current || !parentRef.current) return;
+
+		e.currentTarget.setPointerCapture(e.pointerId);
+
+		parentRectCache.current = parentRef.current.getBoundingClientRect();
 
 		const elementRect = currentWrapper.current.getBoundingClientRect();
 		offset.current = {
@@ -55,13 +87,9 @@ export const DragElement = ({
 
 		newX = Math.max(0, Math.min(newX, parentRect.width - elementRect.width));
 		newY = Math.max(0, Math.min(newY, parentRect.height - elementRect.height));
-
-		if (timeout.current) {
-			clearTimeout(timeout.current);
-		}
-		timeout.current = setTimeout(
-			() => (currentWrapper.current!.style.transform = `translate(${newX}px, ${newY}px)`),
-			0,
+		requestAnimationFrame(
+			() =>
+				(currentWrapper.current!.style.transform = `translate3d(${newX}px, ${newY}px, 0)`),
 		);
 	};
 
@@ -69,18 +97,23 @@ export const DragElement = ({
 		e.stopPropagation();
 		e.preventDefault();
 		isDragging.current = false;
+		parentRectCache.current = null;
 	};
 
 	const onMouseWheelClick = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation();
 		e.preventDefault();
 		if (e.button !== 1) return;
-		setDragEnabled((prev) => !prev);
+		setDraggableElementId(
+			draggableElementId === currentDragElementId.current!
+				? ''
+				: currentDragElementId.current!,
+		);
 	};
 
 	return (
 		<div
-			title={`${dragEnabled ? 'Закрепить' : 'Переместить'}: СКМ`}
+			title={`${draggableElementId === currentDragElementId.current! ? 'Закрепить' : 'Переместить'}: СКМ`}
 			ref={currentWrapper}
 			onMouseDownCapture={onMouseWheelClick}
 			onPointerDown={onPointerDown}
@@ -89,10 +122,14 @@ export const DragElement = ({
 			style={{
 				...styles,
 				position: 'absolute',
-				transform: `translate(${initialState.x}px, ${initialState.y}px)`,
-				zIndex: dragEnabled ? 50 : zIndex,
-				cursor: dragEnabled ? 'move' : 'default',
-				border: dragEnabled ? '2px solid #2175f3' : undefined,
+				willChange: 'transform',
+				transform: `translate3d(${initialCoords.x}px, ${initialCoords.y}px, 0)`,
+				zIndex: draggableElementId === currentDragElementId.current! ? 50 : zIndex,
+				cursor: draggableElementId === currentDragElementId.current! ? 'move' : 'default',
+				border:
+					draggableElementId === currentDragElementId.current!
+						? '2px solid #2175f3'
+						: undefined,
 				display: 'flex',
 				flexDirection: 'column',
 			}}

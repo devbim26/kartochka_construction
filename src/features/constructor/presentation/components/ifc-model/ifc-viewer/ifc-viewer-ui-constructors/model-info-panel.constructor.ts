@@ -10,7 +10,7 @@ export const modelInfoPanelConstructor = (viewerItems: ModelInfoPanelConstructor
 
 		return html`
 			<bim-panel>
-				<bim-panel-section id="model-info-panel-content" label="Дерево элементов">
+				<bim-panel-section id="model-info-panel-content" label="Дерево элементов" collapsed>
 					<bim-text-input
 						@input="${onSearch}"
 						placeholder="Поиск..."
