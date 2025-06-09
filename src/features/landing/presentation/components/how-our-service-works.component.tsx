@@ -33,7 +33,7 @@ export const HowOurServiceWorks = () => {
 					Как работает наш сервис
 				</div>
 
-				<div className="xs:flex-row xs:flex-nowrap xs:items-start xs:justify-center flex flex-col items-center justify-center gap-10">
+				<div className="flex flex-col items-center justify-center gap-10 xs:flex-row xs:flex-nowrap xs:items-center xs:justify-center">
 					<div className="w-[320px] shrink-0">
 						<div className="font-montserrat text-xl font-medium leading-snug sm:text-2xl">
 							Этапы проектирования
@@ -79,6 +79,7 @@ export const HowOurServiceWorks = () => {
 						<div
 							className={twMerge(
 								'flex min-h-[260px] w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-200',
+								'md:h-[408px]',
 								isHover ? 'opacity-0' : 'opacity-100',
 							)}
 						>
@@ -88,7 +89,7 @@ export const HowOurServiceWorks = () => {
 								</div>
 								<div className="shrink-0">{numberImages[selectedStep]}</div>
 							</div>
-							<div className="whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed sm:text-base">
+							<div className="mt-6 whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed sm:text-base">
 								{stepDescriptions[selectedStep]}
 							</div>
 						</div>
@@ -96,12 +97,13 @@ export const HowOurServiceWorks = () => {
 						<div
 							className={twMerge(
 								'absolute left-0 top-0 flex h-full w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-700 ease-in-out',
+								'md:h-[408px]',
 								isHover ? 'opacity-100' : 'opacity-0',
 							)}
 						>
 							<div
 								className={twMerge(
-									'whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed transition-opacity delay-700 duration-300 ease-in-out sm:text-base',
+									'mt-6 whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed transition-opacity delay-700 duration-300 ease-in-out sm:text-base',
 									isHover ? 'opacity-100' : 'invisible opacity-0',
 								)}
 							>
