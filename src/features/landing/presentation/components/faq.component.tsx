@@ -15,35 +15,35 @@ export const FAQ = () => {
 	};
 
 	return (
-		<div className="flex w-full justify-center bg-background-primary">
-			<div className="flex w-[73.18%] flex-col py-[50px]">
-				<div className="mb-[30px] flex font-montserrat text-[20px] font-normal leading-[24px]">
+		<div className="flex w-full justify-center bg-background-primary px-4 sm:px-6 lg:px-10">
+			<div className="flex w-full max-w-screen-xl flex-col py-[40px] sm:py-[50px]">
+				<div className="mb-[20px] font-montserrat text-[18px] font-normal leading-[22px] sm:mb-[30px] sm:text-[20px] sm:leading-[24px]">
 					Часто задаваемые вопросы
 				</div>
-				<div className="flex flex-col gap-[15px]">
+				<div className="flex flex-col gap-[10px] sm:gap-[15px]">
 					{questions.map((question, index) => (
 						<div
 							key={index}
 							className={twMerge(
-								'flex cursor-pointer flex-row justify-between gap-[10px] overflow-hidden rounded-[20px] bg-white py-[23px] pl-[20px] pr-[45px] transition-all duration-300 ease-in-out',
-								selectedQuestions.includes(index) ? 'max-h-[100%]' : 'max-h-[64px]',
+								'flex cursor-pointer flex-col justify-between gap-[10px] overflow-hidden rounded-[16px] bg-white px-[16px] py-[20px] transition-all duration-300 ease-in-out sm:flex-row sm:rounded-[20px] sm:py-[23px] sm:pl-[20px] sm:pr-[45px]',
+								selectedQuestions.includes(index) ? 'max-h-full' : 'max-h-[64px]',
 							)}
 							onClick={() => handleQuestionClick(index)}
 						>
-							<div className="flex flex-col gap-[40px]">
-								<div className="font-montserrat text-[20px] font-semibold leading-[24px]">
+							<div className="flex flex-col gap-[20px] sm:gap-[40px]">
+								<div className="font-montserrat text-[18px] font-semibold leading-[22px] sm:text-[20px] sm:leading-[24px]">
 									{question}
 								</div>
 								<div
 									key={index}
-									className="whitespace-pre-wrap font-montserrat text-[20px] font-normal leading-[24px]"
+									className="whitespace-pre-wrap font-montserrat text-[16px] font-normal leading-[22px] sm:text-[20px] sm:leading-[24px]"
 								>
 									<span
 										dangerouslySetInnerHTML={{ __html: descriptions[index] }}
 									/>
 								</div>
 							</div>
-							<div className="flex flex-col justify-start">
+							<div className="mt-2 flex sm:mt-0 sm:flex-col sm:justify-start">
 								<Chevron
 									color={selectedQuestions.includes(index) ? 'grey' : 'primary'}
 									direction={selectedQuestions.includes(index) ? 'down' : 'right'}

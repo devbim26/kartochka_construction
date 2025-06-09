@@ -4,33 +4,35 @@ import { LandingSections } from '@features/landing/constants';
 export const AboutUsComponent = () => {
 	return (
 		<div
-			className="flex w-[73.18%] flex-col bg-white py-[50px]"
+			className="w-full bg-white px-4 py-8 sm:px-6 md:px-8 xl:px-20"
 			id={LandingSections.aboutUs.id}
 		>
-			<div className="mb-[20px] flex font-montserrat text-[20px] font-normal leading-[24px]">
-				О нас
-			</div>
-			<div className="flex flex-row gap-[82px]">
-				<div className="flex flex-col">
-					<div className="mb-[13px] flex font-montserrat text-[40px] font-semibold leading-[49px]">
-						«ТрансАкустик» объединяет экспертов
-					</div>
-					<div className="flex font-montserrat text-[20px] leading-[24px]">
-						с многолетним опытом и глубокой экспертизой в области теоретических
-						исследований и практического применения строительных решений на реальных
-						объектах. Все наши решения подтверждены аккредитованными лабораториями, что
-						гарантирует высокое качество и эффективное управление бюджетом
-					</div>
+			<div className="mx-auto max-w-screen-xl">
+				<div className="mb-5 font-montserrat text-base leading-snug sm:text-lg md:text-xl">
+					О нас
 				</div>
-				<div className="flex flex-col items-center">
-					<div className="mb-[23px] flex flex-row items-center gap-[12px]">
-						<LogoIcon className="h-[67px] w-[65px]" />
-						<LogoTextIcon className="h-[88px] w-[232px]" />
+				<div className="flex flex-col gap-10 lg:flex-row lg:gap-[82px]">
+					<div className="flex flex-1 flex-col">
+						<div className="mb-4 font-montserrat text-2xl font-semibold leading-snug sm:text-3xl md:text-4xl">
+							«ТрансАкустик» объединяет экспертов
+						</div>
+						<div className="font-montserrat text-base leading-relaxed sm:text-lg md:text-xl">
+							с многолетним опытом и глубокой экспертизой в области теоретических
+							исследований и практического применения строительных решений на реальных
+							объектах. Все наши решения подтверждены аккредитованными лабораториями,
+							что гарантирует высокое качество и эффективное управление бюджетом
+						</div>
 					</div>
-					<LogoBelniis className="mb-[11px]" />
-					<div className="flex text-center font-montserrat text-[14px] leading-[12px]">
-						&quot;Республиканский научно-исследовательский институт в отрасли
-						строительства. Беларусь&quot;
+					<div className="flex shrink-0 flex-col items-center">
+						<div className="mb-6 flex flex-row items-center gap-3">
+							<LogoIcon className="size-12 sm:h-[67px] sm:w-[65px]" />
+							<LogoTextIcon className="h-10 w-40 sm:h-[88px] sm:w-[232px]" />
+						</div>
+						<LogoBelniis className="mb-3 w-40 sm:w-auto" />
+						<div className="text-center font-montserrat text-xs leading-tight sm:text-sm">
+							&quot;Республиканский научно-исследовательский институт в отрасли
+							строительства. Беларусь&quot;
+						</div>
 					</div>
 				</div>
 			</div>
