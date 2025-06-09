@@ -29,11 +29,12 @@ export const HowOurServiceWorks = () => {
 	return (
 		<div className="flex w-full justify-center bg-background-primary">
 			<div className="w-full max-w-screen-xl px-4 py-12 sm:px-6 md:px-8 xl:px-20">
-				<div className="mb-8 font-montserrat text-lg font-normal leading-snug sm:text-xl">
+				<div className="mb-8 text-center font-montserrat text-lg font-normal leading-snug sm:text-xl">
 					Как работает наш сервис
 				</div>
-				<div className="flex flex-col gap-8 lg:flex-row lg:gap-[30px]">
-					<div className="flex w-full flex-col lg:w-1/2">
+
+				<div className="xs:flex-row xs:flex-nowrap xs:items-start xs:justify-center flex flex-col items-center justify-center gap-10">
+					<div className="w-[320px] shrink-0">
 						<div className="font-montserrat text-xl font-medium leading-snug sm:text-2xl">
 							Этапы проектирования
 						</div>
@@ -62,9 +63,10 @@ export const HowOurServiceWorks = () => {
 							))}
 						</div>
 					</div>
+
 					<div
 						className={twMerge(
-							'relative flex w-full lg:w-1/2',
+							'relative flex w-[299px] sm:w-[299px] md:w-[479px] lg:w-[555px] xl:w-[839px]',
 							isHover !== null
 								? isHover
 									? 'animate-turnOverTo'
@@ -76,29 +78,24 @@ export const HowOurServiceWorks = () => {
 					>
 						<div
 							className={twMerge(
-								'absolute inset-0 flex w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-200',
+								'flex min-h-[260px] w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-200',
 								isHover ? 'opacity-0' : 'opacity-100',
 							)}
 						>
-							<div
-								className={twMerge(
-									'transition-opacity delay-100 duration-100 ease-in-out',
-								)}
-							>
-								<div className="flex flex-row items-start justify-between gap-4 sm:gap-6">
-									<div className="font-montserrat text-base font-semibold leading-snug sm:text-lg">
-										{steps[selectedStep]}
-									</div>
-									<div className="shrink-0">{numberImages[selectedStep]}</div>
+							<div className="flex flex-row items-start justify-between gap-4 sm:gap-6">
+								<div className="font-montserrat text-base font-semibold leading-snug sm:text-lg">
+									{steps[selectedStep]}
 								</div>
-								<div className="whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed sm:text-base">
-									{stepDescriptions[selectedStep]}
-								</div>
+								<div className="shrink-0">{numberImages[selectedStep]}</div>
+							</div>
+							<div className="whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed sm:text-base">
+								{stepDescriptions[selectedStep]}
 							</div>
 						</div>
+
 						<div
 							className={twMerge(
-								'absolute inset-0 flex w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-700 ease-in-out',
+								'absolute left-0 top-0 flex h-full w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-700 ease-in-out',
 								isHover ? 'opacity-100' : 'opacity-0',
 							)}
 						>
