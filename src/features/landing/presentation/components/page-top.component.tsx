@@ -19,12 +19,12 @@ export const PageTop = () => {
 	return (
 		<div className="flex w-full flex-col items-center bg-white">
 			<div className="mb-[15px] w-[90%] max-w-[600px]">
-				<span className="text-center font-montserrat text-[35px] font-bold leading-[43px]">
+				<span className="block text-center font-montserrat text-[24px] font-bold leading-[1.2] sm:text-[28px] md:text-[35px] lg:text-[35px] xl:text-[46px]">
 					Комплексные решения в строительстве
 				</span>
 			</div>
 			<div className="mb-4 flex w-full max-w-md px-4 sm:px-0">
-				<span className="text-center font-montserrat text-[20px] leading-[24px]">
+				<span className="block text-center font-montserrat text-[14px] leading-[1.2] sm:text-[16px] md:text-[20px] lg:text-[20px] xl:text-[24px]">
 					Автоматизация подбора конструкций и выполнение рутинных расчетов
 				</span>
 			</div>

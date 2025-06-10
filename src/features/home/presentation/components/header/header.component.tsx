@@ -11,7 +11,7 @@ export const HomeHeader = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	const toggleMenu = () => {
-		setIsMenuOpen(!isMenuOpen);
+		setIsMenuOpen((prev) => !prev);
 	};
 
 	return (
@@ -20,7 +20,7 @@ export const HomeHeader = () => {
 				<div className="flex flex-row items-center gap-4">
 					<button
 						onClick={toggleMenu}
-						className="hidden p-2 text-primary hover:text-[#1a60cc] focus:outline-none xs:block"
+						className="block p-2 text-primary hover:text-[#1a60cc] focus:outline-none sm:hidden"
 					>
 						<ImMenu className="size-6" />
 					</button>
@@ -31,30 +31,33 @@ export const HomeHeader = () => {
 					</div>
 				</div>
 
-				<div className="flex xs:hidden">
-					{(pathname.startsWith(`/${DESIGNING_ROUTES.main.route}`) ||
-						pathname.startsWith(`/`)) && <HeaderNav />}
-					{pathname.startsWith('/') && <LogoutHeader />}
-				</div>
+				{pathname.startsWith(`/${DESIGNING_ROUTES.main.route}`) || pathname === '/' ? (
+					<div className="hidden items-center gap-6 sm:flex">
+						<HeaderNav />
+					</div>
+				) : null}
 
 				{pathname.startsWith('/') && (
-					<div className="hidden xs:flex">
-						<LogoutHeader mobile />
+					<div className="hidden sm:flex">
+						<LogoutHeader />
 					</div>
 				)}
 			</header>
-
 			<div
-				className={`fixed inset-0 z-50 hidden transition-all duration-300 ease-in-out xs:block ${isMenuOpen ? 'bg-black bg-opacity-50' : 'pointer-events-none bg-transparent'}`}
+				className={`fixed inset-0 z-50 transition-all duration-300 ease-in-out sm:hidden ${
+					isMenuOpen ? 'bg-black bg-opacity-50' : 'pointer-events-none bg-transparent'
+				}`}
 			>
 				<div
-					className={`fixed left-0 top-0 h-full w-1/2 bg-white shadow-xl transition-all duration-300 ease-in-out ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+					className={`fixed left-0 top-0 h-full w-3/4 bg-white shadow-xl transition-all duration-300 ease-in-out ${
+						isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+					}`}
 				>
 					<div className="flex h-full flex-col p-4">
 						<div className="mb-4 flex items-center justify-between">
 							<div className="flex flex-row items-center gap-[12px]">
-								<LogoIcon className="h-[32px] w-[31px]" />{' '}
-								<LogoTextIcon className="h-[48px] w-[130px]" />{' '}
+								<LogoIcon className="h-[32px] w-[31px]" />
+								<LogoTextIcon className="h-[48px] w-[130px]" />
 							</div>
 							<button
 								onClick={toggleMenu}
@@ -63,12 +66,16 @@ export const HomeHeader = () => {
 								✕
 							</button>
 						</div>
+
 						<div className="flex-1">
 							<HeaderNav mobile onItemClick={() => setIsMenuOpen(false)} />
 						</div>
-						<div className="mt-4">
-							<LogoutHeader mobile />
-						</div>
+
+						{pathname.startsWith('/') && (
+							<div className="mt-4">
+								<LogoutHeader mobile />
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
