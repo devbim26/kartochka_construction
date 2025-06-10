@@ -64,6 +64,7 @@ export class IFCViewer {
 	private _currentIfcRelationsIndexer: IfcRelationsIndexer | null = null;
 	private _currentRelationsTree: Table<TableRowData<Record<string, TableCellValue>>> | null =
 		null;
+	private _inited: boolean = false;
 
 	//Custers
 	private _currentRayCaster: SimpleRaycaster | null = null;
@@ -96,9 +97,14 @@ export class IFCViewer {
 		return this._currentWorld;
 	}
 
+	get inited(): boolean {
+		return this._inited;
+	}
+
 	constructor(conatiners: IFCViewerContainers, options: IFCViewerOptions) {
 		this.setContainers(conatiners);
 		this.initialize(options);
+		this._inited = true;
 	}
 
 	destroy() {
