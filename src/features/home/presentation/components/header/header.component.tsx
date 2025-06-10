@@ -17,7 +17,6 @@ export const HomeHeader = () => {
 		<>
 			<header className="flex w-full flex-row items-center justify-between border-b border-solid border-[#EDEFF2] bg-white px-[25px] pb-[6px] xs:px-[15px]">
 				<div className="flex flex-row items-center gap-4">
-					{/* Бургер-кнопка видна только на мобильных устройствах */}
 					<button
 						onClick={toggleMenu}
 						className="block p-2 text-primary hover:text-[#1a60cc] focus:outline-none sm:hidden"
@@ -44,7 +43,7 @@ export const HomeHeader = () => {
 
 			<div
 				className={`fixed inset-0 z-50 transition-all duration-300 ease-in-out sm:hidden ${
-					isMenuOpen ? 'bg-black bg-opacity-50' : 'pointer-events-none bg-transparent'
+					isMenuOpen ? 'bg-black/50' : 'pointer-events-none bg-transparent'
 				}`}
 			>
 				<div

@@ -13,11 +13,12 @@ export const AboutUsComponent = () => {
 						<div className="mx-auto mb-5 font-montserrat text-base leading-snug xs:text-lg sm:text-xl md:text-2xl">
 							О нас
 						</div>
+
 						<div className="mb-4 font-montserrat text-[24px] font-semibold leading-snug sm:text-[28px] md:text-[40px] xl:text-[50px]">
 							«ТрансАкустик» объединяет экспертов
 						</div>
 
-						<div className="text-justify font-montserrat text-base leading-relaxed xs:text-lg sm:text-xl md:text-[22px]">
+						<div className="text-justify font-montserrat text-[18px] leading-relaxed md:text-[20px] xl:text-[24px]">
 							с многолетним опытом и глубокой экспертизой в области теоретических
 							исследований и практического применения строительных решений на реальных
 							объектах. Все наши решения подтверждены аккредитованными лабораториями,

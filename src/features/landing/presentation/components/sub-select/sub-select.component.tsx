@@ -113,9 +113,8 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 					<div
 						className={twMerge(
 							subContainerClassName,
-							'flex w-[313px] flex-col rounded-2xl border border-gray-border px-4 pb-4 pt-10',
+							'flex h-[791px] w-[315px] flex-col rounded-2xl border border-gray-border px-4 pb-4 pt-10',
 						)}
-						style={{ width: 313 }}
 					>
 						<div className="mx-4 border-b-2 border-gray-border pb-2 font-montserrat text-xl font-bold text-primary">
 							{titles[currentIndex]}
