@@ -34,7 +34,7 @@ export const HowOurServiceWorks = () => {
 				</div>
 
 				<div className="flex flex-col items-center justify-center gap-10 xs:flex-row xs:flex-nowrap xs:items-center xs:justify-center">
-					<div className="w-[320px] shrink-0">
+					<div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
 						<div className="font-montserrat text-xl font-medium leading-snug sm:text-2xl">
 							Этапы проектирования
 						</div>

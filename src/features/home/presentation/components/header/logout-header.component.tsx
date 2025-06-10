@@ -4,7 +4,7 @@ import { logout } from '@features/account/services';
 import { useEffect } from 'react';
 import { ImExit } from 'react-icons/im';
 
-export const LogoutHeader = () => {
+export const LogoutHeader = ({ mobile = false }: { mobile?: boolean }) => {
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
 	const userData = useAppSelector((store) => store.userData);
@@ -20,14 +20,18 @@ export const LogoutHeader = () => {
 	};
 
 	return (
-		<div className="flex flex-row items-center gap-[21px]">
+		<div
+			className={`flex ${mobile ? 'mt-4 flex-col gap-4' : 'flex-row items-center gap-[21px]'}`}
+		>
 			{userData.data ? (
 				<>
 					<p className="text-sm font-normal leading-5 tracking-tight text-[#14181F]">
 						{userData.data.companyName}
 					</p>
 					<div
-						className="relative size-[32px] cursor-pointer rounded-lg border border-solid border-[#EDEFF2]"
+						className={`relative size-[32px] cursor-pointer rounded-lg border border-solid border-[#EDEFF2] ${
+							mobile ? 'self-start' : ''
+						}`}
 						onClick={logoutHandler}
 					>
 						<ImExit className="absolute left-[6px] top-[6px] size-[20px]" />
