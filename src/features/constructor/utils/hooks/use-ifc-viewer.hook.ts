@@ -1,4 +1,4 @@
-import { IFCViewer } from '@features/constructor/presentation/components/ifc-model/ifc-viewer/ifc-viewer.class';
+import { IFCViewer } from '@features/constructor/presentation/components/ifc-model/ifc-viewer';
 import type { IFCViewerContainers, IFCViewerOptions } from '@features/constructor/types';
 import { useLayoutEffect, useRef, type RefObject } from 'react';
 

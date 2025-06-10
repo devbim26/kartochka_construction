@@ -1,7 +1,5 @@
 import type {
-	IFCViewerContainers,
-	IFCViewerOptions,
-	IFCViewerState,
+	IFCViewerConstructorArgs,
 	ModelInfoPanelConstructor,
 	UiControlPanelConstructor,
 } from '@features/constructor/types';
@@ -88,11 +86,6 @@ export class IFCViewer {
 	private _onResizeHandlerRef: VoidFunc | null = null;
 	private _onFragmentsLoadedHandlerRef: OnFragmentsLoadedHandler | null = null;
 
-	//state
-	private _state: IFCViewerState = {
-		stub: false,
-	};
-
 	get currentWorld(): SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer> | null {
 		return this._currentWorld;
 	}
@@ -101,9 +94,9 @@ export class IFCViewer {
 		return this._inited;
 	}
 
-	constructor(conatiners: IFCViewerContainers, options: IFCViewerOptions) {
-		this.setContainers(conatiners);
-		this.initialize(options);
+	constructor(args: IFCViewerConstructorArgs) {
+		// this.setContainers(conatiners);
+		// this.initialize(options);
 		this._inited = true;
 	}
 

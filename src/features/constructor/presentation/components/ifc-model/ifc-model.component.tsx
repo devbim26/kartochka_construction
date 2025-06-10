@@ -1,9 +1,9 @@
-import { IFCViewer } from './ifc-viewer';
+import { IFCViewerComponent } from './ifc-viewer';
 
 const IFCModel = () => {
 	return (
 		<div className="flex flex-1">
-			<IFCViewer />
+			<IFCViewerComponent />
 		</div>
 	);
 };

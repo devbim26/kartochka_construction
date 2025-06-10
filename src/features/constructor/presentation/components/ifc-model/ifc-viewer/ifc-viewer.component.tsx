@@ -3,7 +3,7 @@ import { useIFCViewer } from '@features/constructor/utils';
 import { useRef } from 'react';
 import { modelInfoPanelConstructor, uiControlPanelConstructor } from './ifc-viewer-ui-constructors';
 
-export const IFCViewer = () => {
+export const IFCViewerComponent = () => {
 	const ifcViewerRef = useRef<HTMLDivElement>(null);
 	const sceneContainerRef = useRef<HTMLDivElement>(null);
 	const controlPanelRef = useRef<HTMLDivElement>(null);
