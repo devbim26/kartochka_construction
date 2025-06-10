@@ -2,7 +2,6 @@ import { LogoIcon, LogoTextIcon } from '@core';
 import { useState } from 'react';
 import { ImMenu } from 'react-icons/im';
 import { useLocation } from 'react-router-dom';
-import { DESIGNING_ROUTES } from '../../../constants/home-routes.constants';
 import { HeaderNav } from './header-nav.component';
 import { LogoutHeader } from './logout-header.component';
 
@@ -18,6 +17,7 @@ export const HomeHeader = () => {
 		<>
 			<header className="flex w-full flex-row items-center justify-between border-b border-solid border-[#EDEFF2] bg-white px-[25px] pb-[6px] xs:px-[15px]">
 				<div className="flex flex-row items-center gap-4">
+					{/* Бургер-кнопка видна только на мобильных устройствах */}
 					<button
 						onClick={toggleMenu}
 						className="block p-2 text-primary hover:text-[#1a60cc] focus:outline-none sm:hidden"
@@ -31,11 +31,9 @@ export const HomeHeader = () => {
 					</div>
 				</div>
 
-				{pathname.startsWith(`/${DESIGNING_ROUTES.main.route}`) || pathname === '/' ? (
-					<div className="hidden items-center gap-6 sm:flex">
-						<HeaderNav />
-					</div>
-				) : null}
+				<div className="hidden items-center gap-6 sm:flex">
+					<HeaderNav />
+				</div>
 
 				{pathname.startsWith('/') && (
 					<div className="hidden sm:flex">
@@ -43,6 +41,7 @@ export const HomeHeader = () => {
 					</div>
 				)}
 			</header>
+
 			<div
 				className={`fixed inset-0 z-50 transition-all duration-300 ease-in-out sm:hidden ${
 					isMenuOpen ? 'bg-black bg-opacity-50' : 'pointer-events-none bg-transparent'
