@@ -43,7 +43,7 @@ export const IFCViewer = () => {
 				</DragElement>
 				<DragElement
 					initialState={{
-						right: 30,
+						right: 270,
 						top: 70,
 					}}
 					parentRef={ifcViewerRef}

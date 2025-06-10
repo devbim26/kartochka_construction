@@ -1,5 +1,5 @@
 import { useDragElementContext } from '@core/utils';
-import { RefObject, useMemo, useRef } from 'react';
+import { RefObject, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 interface DragElementCoord {
 	x: number;
@@ -33,11 +33,11 @@ export const DragElement = ({
 	const offset = useRef<DragElementCoord>({ x: 0, y: 0 });
 	const isDragging = useRef<boolean>(false);
 	const parentRectCache = useRef<DOMRect | null>(null);
+	const [inited, setInited] = useState<boolean>(false);
 	const { draggableElementId, setDraggableElementId } = useDragElementContext();
 
 	const initialCoords: DragElementCoord = useMemo(() => {
-		console.log(parentRef.current);
-		if (!parentRef.current || !currentWrapper.current) return { x: 0, y: 0 };
+		if (!parentRef.current || !currentWrapper.current || !inited) return { x: 0, y: 0 };
 		const parentRect = parentRef.current.getBoundingClientRect();
 		const elementRect = currentWrapper.current.getBoundingClientRect();
 		let x = 0;
@@ -54,7 +54,7 @@ export const DragElement = ({
 			y = parentRect.height - elementRect.height - initialState.bottom;
 		}
 		return { x, y };
-	}, []);
+	}, [inited]);
 
 	const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
 		if (e.button !== 0 || draggableElementId !== currentDragElementId.current!) return;
@@ -74,6 +74,10 @@ export const DragElement = ({
 
 		isDragging.current = true;
 	};
+
+	useLayoutEffect(() => {
+		setInited(true);
+	}, []);
 
 	const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
 		if (!isDragging.current || !currentWrapper.current || !parentRef.current) return;
