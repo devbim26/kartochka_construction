@@ -10,22 +10,24 @@ export class IFCViewerCullers {
 	private _currentCuller: MeshCullerRenderer | null = null;
 	private _cullers: Cullers | null = null;
 
+	//external
+	private _ifcViewerCoreInstance: IFCViewerCore | null = null;
+
 	constructor(args: IFCViewerCullersConstructorArgs) {
-		this.setupCullers(args.ifcViewerCoreInstance);
+		this._ifcViewerCoreInstance = args.ifcViewerCoreInstance;
+		this.setupCullers();
 	}
 
 	destroy() {}
 
-	private setupCullers(
-		ifcViewerCoreInstance: IFCViewerCullersConstructorArgs['ifcViewerCoreInstance'],
-	) {
+	private setupCullers() {
 		if (this._currentCuller) {
 			this._currentCuller.dispose();
 		}
 		if (!this._cullers) {
-			this._cullers = ifcViewerCoreInstance.components!.get(Cullers);
+			this._cullers = this._ifcViewerCoreInstance!.components!.get(Cullers);
 		}
-		this._currentCuller = this._cullers.create(ifcViewerCoreInstance.currentWorld!);
+		this._currentCuller = this._cullers.create(this._ifcViewerCoreInstance!.currentWorld!);
 		this._currentCuller.needsUpdate = true;
 		// if (!this._cameraControlendHandlerRef) {
 		// 	this._cameraControlendHandlerRef = this.cameraControlendHandler.bind(this);
@@ -37,8 +39,8 @@ export class IFCViewerCullers {
 		this._currentCuller!.needsUpdate = true;
 	}
 
-	setupCullerByModel(model: Object3D, ifcViewerCoreInstance: IFCViewerCore) {
-		this.setupCullers(ifcViewerCoreInstance);
+	setupCullerByModel(model: Object3D) {
+		this.setupCullers();
 		if (!!model) {
 			model.traverse((child) => {
 				if (child instanceof Mesh || child instanceof InstancedMesh) {

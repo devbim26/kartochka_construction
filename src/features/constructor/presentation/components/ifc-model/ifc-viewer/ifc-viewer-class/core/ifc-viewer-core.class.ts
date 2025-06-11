@@ -1,4 +1,4 @@
-import { IFCViewerConstructorArgs, IFCViewerWorld } from '@features/constructor/types';
+import { IFCViewerWorld } from '@features/constructor/types';
 import {
 	Components,
 	Grids,
@@ -9,13 +9,14 @@ import {
 	Worlds,
 } from '@thatopen/components';
 import { OrthographicCamera, PerspectiveCamera } from 'three';
+import { IFCViewerUIContainers } from './ifc-viewer-ui.class';
 
 type ProjectionOnChanged =
 	| ((data: OrthographicCamera) => void)
 	| ((data: PerspectiveCamera) => void);
 
 interface IFCViewerCoreConstructorArgs {
-	sceneContainer: IFCViewerConstructorArgs['containers']['sceneContainer'];
+	sceneContainer: IFCViewerUIContainers['sceneContainer'];
 }
 
 export class IFCViewerCore {

@@ -1,4 +1,3 @@
-import { IFCViewerWorld } from '@features/constructor/types';
 import { Clipper, Raycasters, SimpleRaycaster } from '@thatopen/components';
 import { ClipEdges, EdgesPlane } from '@thatopen/components-front';
 import { InstancedMesh, LineBasicMaterial, Mesh, MeshBasicMaterial, Object3D } from 'three';
@@ -14,36 +13,34 @@ export class IFCViewerCasters {
 	private _currentClipper: Clipper | null = null;
 	private _edges: ClipEdges | null = null;
 
+	//external
+	private _ifcViewerCoreInstance: IFCViewerCore | null = null;
+
 	constructor(args: IFCViewerCastersConstrucrorArgs) {
-		this.setupCasters(args.ifcViewerCoreInstance);
-		this.setupClipper(args.ifcViewerCoreInstance);
-		this.setupEdges(args.ifcViewerCoreInstance);
+		this._ifcViewerCoreInstance = args.ifcViewerCoreInstance;
+		this.setupCasters();
+		this.setupClipper();
+		this.setupEdges();
 	}
 
 	destroy() {}
 
-	private setupCasters(
-		ifcViewerCoreInstance: IFCViewerCastersConstrucrorArgs['ifcViewerCoreInstance'],
-	) {
-		const casters = ifcViewerCoreInstance.components!.get(Raycasters);
-		this._currentRayCaster = casters.get(ifcViewerCoreInstance.currentWorld!);
+	private setupCasters() {
+		const casters = this._ifcViewerCoreInstance!.components!.get(Raycasters);
+		this._currentRayCaster = casters.get(this._ifcViewerCoreInstance!.currentWorld!);
 	}
 
-	private setupClipper(
-		ifcViewerCoreInstance: IFCViewerCastersConstrucrorArgs['ifcViewerCoreInstance'],
-	) {
-		this._currentClipper = ifcViewerCoreInstance.components!.get(Clipper);
+	private setupClipper() {
+		this._currentClipper = this._ifcViewerCoreInstance!.components!.get(Clipper);
 		this._currentClipper.enabled = true;
 	}
 
-	private setupEdges(
-		ifcViewerCoreInstance: IFCViewerCastersConstrucrorArgs['ifcViewerCoreInstance'],
-	) {
-		this._edges = ifcViewerCoreInstance.components!.get(ClipEdges);
+	private setupEdges() {
+		this._edges = this._ifcViewerCoreInstance!.components!.get(ClipEdges);
 		this._currentClipper!.Type = EdgesPlane;
 	}
 
-	setClipperStylesOnModel(model: Object3D, currentWorld: IFCViewerWorld) {
+	setClipperStylesOnModel(model: Object3D) {
 		const allMeshes = new Set<Mesh | InstancedMesh>();
 		model.traverse((child) => {
 			if (child instanceof Mesh || child instanceof InstancedMesh) {
@@ -63,7 +60,7 @@ export class IFCViewerCasters {
 		this._edges!.styles.create(
 			'Blue lines',
 			allMeshes,
-			currentWorld,
+			this._ifcViewerCoreInstance!.currentWorld!,
 			redLine,
 			salmonFill,
 			redOutline,

@@ -41,20 +41,3 @@ export type ModelInfoPanelConstructor = (
 	viewerItems: ModelInfoPanelConstructorViewerItems,
 ) => HTMLElement;
 
-interface IFCViewerOptions {
-	ui: {
-		uiControlPanelConstructor: UiControlPanelConstructor;
-		modelInfoPanelConstructor: ModelInfoPanelConstructor;
-	};
-}
-
-interface IFCViewerContainers {
-	sceneContainer: RefObject<HTMLDivElement | null>;
-	controlPanelContainer: RefObject<HTMLDivElement | null>;
-	modalInfroPanelContainer: RefObject<HTMLDivElement | null>;
-}
-
-export interface IFCViewerConstructorArgs {
-	containers: IFCViewerContainers;
-	options: IFCViewerOptions;
-}

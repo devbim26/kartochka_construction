@@ -22,30 +22,40 @@ export class IFCViewerModelManager {
 
 	private _onFragmentsLoadedHandlerRef: OnFragmentsLoadedHandler | null = null;
 
+	get currentFragmentIfcLoader(): IfcLoader | null {
+		return this._currentFragmentIfcLoader;
+	}
+
+	get currentFragmentsManager(): FragmentsManager | null {
+		return this._currentFragmentsManager;
+	}
+
 	constructor(args: IFCViewerModelManagerConstructorArgs) {
 		this._ifcViewerCoreInstance = args.ifcViewerCoreInstance;
-		this.setupIfcLoader(args.components);
+		this.setupIfcLoader();
 	}
 
 	destroy() {}
 
-	private async setupIfcLoader(components: IFCViewerModelManagerConstructorArgs['components']) {
-		this._currentFragmentsManager = components.get(FragmentsManager);
-		this._currentFragmentIfcLoader = components.get(IfcLoader);
+	private async setupIfcLoader() {
+		this._currentFragmentsManager =
+			this._ifcViewerCoreInstance!.components!.get(FragmentsManager);
+		this._currentFragmentIfcLoader = this._ifcViewerCoreInstance!.components!.get(IfcLoader);
 		await this._currentFragmentIfcLoader.setup();
 		this._currentFragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
 
-		const highlighter = components.get(Highlighter);
-		highlighter.setup({ world: this._currentWorldInstance });
+		const highlighter = this._ifcViewerCoreInstance!.components!.get(Highlighter);
+		highlighter.setup({ world: this._ifcViewerCoreInstance!.currentWorld });
 		highlighter.zoomToSelection = true;
 
-		this._currentIfcRelationsIndexer = components.get(IfcRelationsIndexer);
+		this._currentIfcRelationsIndexer =
+			this._ifcViewerCoreInstance!.components!.get(IfcRelationsIndexer);
 
 		this._onFragmentsLoadedHandlerRef = this.onFragmentsLoadedHandler.bind(this);
 		this._currentFragmentsManager.onFragmentsLoaded.add(this._onFragmentsLoadedHandlerRef);
 
 		const [relationsTree] = tables.relationsTree({
-			components: components,
+			components: this._ifcViewerCoreInstance!.components!,
 			models: [],
 		});
 
@@ -55,7 +65,8 @@ export class IFCViewerModelManager {
 	}
 
 	private async onFragmentsLoadedHandler(model: FragmentsGroup) {
-		if (!!this._currentWorldInstance?.scene) this._currentWorldInstance!.scene.three.add(model);
+		if (!!this._ifcViewerCoreInstance!.currentWorld?.scene)
+			this._ifcViewerCoreInstance!.currentWorld.scene.three.add(model);
 		if (model.hasProperties) await this._currentIfcRelationsIndexer!.process(model);
 	}
 }

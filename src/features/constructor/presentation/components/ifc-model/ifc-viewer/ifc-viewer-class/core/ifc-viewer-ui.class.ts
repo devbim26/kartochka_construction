@@ -1,10 +1,23 @@
-import { IFCViewerConstructorArgs, IFCViewerWorld } from '@features/constructor/types';
-import { Clipper } from '@thatopen/components';
+import { ModelInfoPanelConstructor, UiControlPanelConstructor } from '@features/constructor/types';
 import { Manager } from '@thatopen/ui';
 import { RefObject } from 'react';
+import { IFCViewerCore } from './ifc-viewer-core.class';
 
-interface IFCViewerUIConstructorArgs extends IFCViewerConstructorArgs {
-	currentWorld: IFCViewerWorld;
+export interface IFCViewerUIContainers {
+	sceneContainer: RefObject<HTMLDivElement | null>;
+	controlPanelContainer: RefObject<HTMLDivElement | null>;
+	modalInfroPanelContainer: RefObject<HTMLDivElement | null>;
+}
+
+export interface IFCViewerUIDOMConstructors {
+	uiControlPanelConstructor: UiControlPanelConstructor;
+	modelInfoPanelConstructor: ModelInfoPanelConstructor;
+}
+
+interface IFCViewerUIConstructorArgs {
+	ifcViewerCoreInstance: IFCViewerCore;
+	containers: IFCViewerUIContainers;
+	uiConstructors: IFCViewerUIDOMConstructors;
 }
 
 type RenderEventHandler = (data: unknown) => void;
@@ -18,8 +31,7 @@ export class IFCViewerUI {
 	private _statsPanel: Stats | null = null;
 
 	//external
-	private _currentWorldInstance: IFCViewerWorld | null = null;
-	private _currentClipperInstance: Clipper | null = null;
+	private _ifcViewerCoreInstance: IFCViewerCore | null = null;
 
 	private _onBeforeUpdateHandlerRef: RenderEventHandler | null = null;
 	private _onAfterUpdateHandlerRef: RenderEventHandler | null = null;
@@ -27,8 +39,10 @@ export class IFCViewerUI {
 	private _disposeFragmentsHandlerRef: VoidFunc | null = null;
 
 	constructor(args: IFCViewerUIConstructorArgs) {
+		this._ifcViewerCoreInstance = args.ifcViewerCoreInstance;
 		this.setContainers(args.containers);
-		this.setupStatsPanel(args.currentWorld);
+		this.setupStatsPanel();
+		this.setupUI(args.uiConstructors);
 	}
 
 	destroy() {}
@@ -39,35 +53,39 @@ export class IFCViewerUI {
 		this._modalInfroPanelContainerRef = containers.modalInfroPanelContainer;
 	}
 
-	private setupStatsPanel(currentWorld: IFCViewerUIConstructorArgs['currentWorld']) {
+	private setupStatsPanel() {
 		if (!!process.env.REACT_APP_MODE && process.env.REACT_APP_MODE === 'development') {
 			this._statsPanel = new Stats();
 			this._statsPanel.showPanel(2);
 			this._sceneContainerRef?.current!.append(this._statsPanel.dom);
 			this._onBeforeUpdateHandlerRef = this.onBeforeUpdateHandler.bind(this);
 			this._onAfterUpdateHandlerRef = this.onAfterUpdateHandler.bind(this);
-			currentWorld.renderer!.onBeforeUpdate.add(this._onBeforeUpdateHandlerRef);
-			currentWorld.renderer!.onAfterUpdate.add(this._onAfterUpdateHandlerRef);
+			this._ifcViewerCoreInstance?.currentWorld!.renderer!.onBeforeUpdate.add(
+				this._onBeforeUpdateHandlerRef,
+			);
+			this._ifcViewerCoreInstance?.currentWorld!.renderer!.onAfterUpdate.add(
+				this._onAfterUpdateHandlerRef,
+			);
 			this._statsPanel.dom.style.cssText =
 				'position: absolute; top: 10px; left: 10px; z-index: unset;';
 		}
 	}
 
-	private setupUI(ui: IFCViewerUIConstructorArgs['options']['ui']) {
+	private setupUI(uiDOMConstructors: IFCViewerUIDOMConstructors) {
 		Manager.init();
-		this.setupControlPanel(ui.uiControlPanelConstructor);
-		this.setupIFCModelInfoPanel(ui.modelInfoPanelConstructor);
+		this.setupControlPanel(uiDOMConstructors.uiControlPanelConstructor);
+		this.setupIFCModelInfoPanel(uiDOMConstructors.modelInfoPanelConstructor);
 	}
 
 	private setupControlPanel(
-		constructor: IFCViewerUIConstructorArgs['options']['ui']['uiControlPanelConstructor'],
+		constructor: IFCViewerUIDOMConstructors['uiControlPanelConstructor'],
 	) {
-		this._loadIfcFileHandlerRef = this.loadIfcFileHandler.bind(this);
-		this._disposeFragmentsHandlerRef = this.disposeFragmentsHandler.bind(this);
+		// this._loadIfcFileHandlerRef = this.loadIfcFileHandler.bind(this);
+		// this._disposeFragmentsHandlerRef = this.disposeFragmentsHandler.bind(this);
 	}
 
 	private setupIFCModelInfoPanel(
-		constructor: IFCViewerUIConstructorArgs['options']['ui']['modelInfoPanelConstructor'],
+		constructor: IFCViewerUIDOMConstructors['modelInfoPanelConstructor'],
 	) {}
 
 	private onBeforeUpdateHandler() {
