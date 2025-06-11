@@ -1,4 +1,4 @@
-import { IFCViewerComponent } from './ifc-viewer';
+import { IFCViewerComponent } from './ifc-viewer.component';
 
 const IFCModel = () => {
 	return (

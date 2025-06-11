@@ -1,27 +1,29 @@
 import { DragElement, DragElementContextWrapper } from '@core';
-import { useIFCViewer } from '@features/constructor/utils';
+import { uiControlPanelConstructor, useIFCViewer } from '@features/constructor/utils';
+import { treeInfoPanelConstructor } from '@features/constructor/utils/classes/ifc-viewer/ifc-viewer-ui-constructors/tree-info-panel.constructor';
 import { useRef } from 'react';
-import { modelInfoPanelConstructor, uiControlPanelConstructor } from './ifc-viewer-ui-constructors';
 
 export const IFCViewerComponent = () => {
 	const ifcViewerRef = useRef<HTMLDivElement>(null);
 	const sceneContainerRef = useRef<HTMLDivElement>(null);
 	const controlPanelRef = useRef<HTMLDivElement>(null);
-	const modalInfroPanelContainerRef = useRef<HTMLDivElement>(null);
+	const treeInfoPanelContainerRef = useRef<HTMLDivElement>(null);
 
-	const { currentViewer } = useIFCViewer(
-		{
-			controlPanelContainer: controlPanelRef,
-			sceneContainer: sceneContainerRef,
-			modalInfroPanelContainer: modalInfroPanelContainerRef,
-		},
-		{
+	useIFCViewer({
+		viewerProps: {
 			ui: {
-				uiControlPanelConstructor: uiControlPanelConstructor,
-				modelInfoPanelConstructor: modelInfoPanelConstructor,
+				constructors: {
+					treeInfoPanelConstructor,
+					uiControlPanelConstructor,
+				},
 			},
 		},
-	);
+		containers: {
+			sceneContainer: sceneContainerRef,
+			controlPanelContainer: controlPanelRef,
+			treeInfoPanelContainer: treeInfoPanelContainerRef,
+		},
+	});
 
 	return (
 		<div
@@ -39,7 +41,7 @@ export const IFCViewerComponent = () => {
 						borderRadius: '1rem',
 					}}
 				>
-					<div ref={modalInfroPanelContainerRef}></div>
+					<div ref={treeInfoPanelContainerRef}></div>
 				</DragElement>
 				<DragElement
 					initialState={{

@@ -1,8 +1,6 @@
-import type {
-	UiControlPanelConstructorCallbacks,
-	UiControlPanelConstructorSceneItems,
-} from '@features/constructor/types';
-import type { CameraProjection, NavModeID } from '@thatopen/components';
+import { IFCViewerWorld } from '@features/constructor/types';
+import type { CameraProjection, Clipper, NavModeID, SimpleGrid } from '@thatopen/components';
+import { ClipEdges } from '@thatopen/components-front';
 import {
 	Component,
 	html,
@@ -14,10 +12,20 @@ import {
 } from '@thatopen/ui';
 import { Color } from 'three';
 
-export const uiControlPanelConstructor = (
-	sceneItems: UiControlPanelConstructorSceneItems,
-	callbacks: UiControlPanelConstructorCallbacks,
-) => {
+export interface UIControlPanelConstructorProps {
+	sceneItems: {
+		world: IFCViewerWorld;
+		grid: SimpleGrid;
+		clipper: Clipper;
+		edges: ClipEdges;
+	};
+	callbacks: {
+		loadIfcFileHandler: () => void;
+		disposeFragmentsHandler: () => void;
+	};
+}
+
+export const uiControlPanelConstructor = (props: UIControlPanelConstructorProps) => {
 	return Component.create<PanelSection>(() => {
 		return html`
 			<bim-panel>
@@ -29,14 +37,14 @@ export const uiControlPanelConstructor = (
 						<bim-button
 							label="Импорт модели"
 							@click="${() => {
-								callbacks.loadIfcFileHandler();
+								props.callbacks.loadIfcFileHandler();
 							}}"
 						>
 						</bim-button>
 						<bim-button
 							label="Удалить модель"
 							@click="${() => {
-								callbacks.disposeFragmentsHandler();
+								props.callbacks.disposeFragmentsHandler();
 							}}"
 						>
 						</bim-button>
@@ -50,8 +58,8 @@ export const uiControlPanelConstructor = (
 							label="Вкл"
 							checked
 							@change="${({ target }: { target: Checkbox }) => {
-								sceneItems.clipper.enabled = target.value;
-								sceneItems.edges.visible = target.value;
+								props.sceneItems.clipper.enabled = target.value;
+								props.sceneItems.edges.visible = target.value;
 							}}"
 						>
 						</bim-checkbox>
@@ -60,7 +68,7 @@ export const uiControlPanelConstructor = (
 							label="Видимоть"
 							checked
 							@change="${({ target }: { target: Checkbox }) => {
-								sceneItems.clipper.visible = target.value;
+								props.sceneItems.clipper.visible = target.value;
 							}}"
 						>
 						</bim-checkbox>
@@ -69,7 +77,7 @@ export const uiControlPanelConstructor = (
 							label="Цвет"
 							color="#202932"
 							@input="${({ target }: { target: ColorInput }) => {
-								sceneItems.clipper.material.color.set(target.color);
+								props.sceneItems.clipper.material.color.set(target.color);
 							}}"
 						>
 						</bim-color-input>
@@ -82,7 +90,7 @@ export const uiControlPanelConstructor = (
 							min="0.1"
 							max="1"
 							@change="${({ target }: { target: NumberInput }) => {
-								sceneItems.clipper.material.opacity = target.value;
+								props.sceneItems.clipper.material.opacity = target.value;
 							}}"
 						>
 						</bim-number-input>
@@ -95,7 +103,7 @@ export const uiControlPanelConstructor = (
 							min="2"
 							max="10"
 							@change="${({ target }: { target: NumberInput }) => {
-								sceneItems.clipper.size = target.value;
+								props.sceneItems.clipper.size = target.value;
 							}}"
 						>
 						</bim-number-input>
@@ -103,7 +111,7 @@ export const uiControlPanelConstructor = (
 						<bim-button
 							label="Удалить все"
 							@click="${() => {
-								sceneItems.clipper.deleteAll();
+								props.sceneItems.clipper.deleteAll();
 							}}"
 						>
 						</bim-button>
@@ -115,14 +123,14 @@ export const uiControlPanelConstructor = (
 							@change="${({ target }: { target: Dropdown }) => {
 								const selected = target.value[0] as NavModeID;
 
-								const { current } = sceneItems.world.camera.projection;
+								const { current } = props.sceneItems.world.camera.projection;
 								const isOrtho = current === 'Orthographic';
 								const isFirstPerson = selected === 'FirstPerson';
 								if (isOrtho && isFirstPerson) {
-									target.value[0] = sceneItems.world.camera.mode.id;
+									target.value[0] = props.sceneItems.world.camera.mode.id;
 									return;
 								}
-								sceneItems.world.camera.set(selected);
+								props.sceneItems.world.camera.set(selected);
 							}}"
 						>
 							<bim-option checked label="Orbit"></bim-option>
@@ -136,12 +144,13 @@ export const uiControlPanelConstructor = (
 								const selected = target.value[0] as CameraProjection;
 								const isOrtho = selected === 'Orthographic';
 								const isFirstPerson =
-									sceneItems.world.camera.mode.id === 'FirstPerson';
+									props.sceneItems.world.camera.mode.id === 'FirstPerson';
 								if (isOrtho && isFirstPerson) {
-									target.value[0] = sceneItems.world.camera.projection.current;
+									target.value[0] =
+										props.sceneItems.world.camera.projection.current;
 									return;
 								}
-								sceneItems.world.camera.projection.set(selected);
+								props.sceneItems.world.camera.projection.set(selected);
 							}}"
 						>
 							<bim-option checked label="Perspective"></bim-option>
@@ -151,7 +160,7 @@ export const uiControlPanelConstructor = (
 							label="Разрешить взаимодействие"
 							checked
 							@change="${({ target }: { target: Checkbox }) => {
-								sceneItems.world.camera.setUserInput(target.checked);
+								props.sceneItems.world.camera.setUserInput(target.checked);
 							}}"
 						>
 						</bim-checkbox>
@@ -165,7 +174,7 @@ export const uiControlPanelConstructor = (
 							min="0.1"
 							max="10"
 							@change="${({ target }: { target: NumberInput }) => {
-								sceneItems.world.scene.config.directionalLight.intensity =
+								props.sceneItems.world.scene.config.directionalLight.intensity =
 									target.value;
 							}}"
 						>
@@ -178,7 +187,8 @@ export const uiControlPanelConstructor = (
 							min="0.1"
 							max="5"
 							@change="${({ target }: { target: NumberInput }) => {
-								sceneItems.world.scene.config.ambientLight.intensity = target.value;
+								props.sceneItems.world.scene.config.ambientLight.intensity =
+									target.value;
 							}}"
 						>
 						</bim-number-input>
@@ -188,7 +198,7 @@ export const uiControlPanelConstructor = (
 							label="Видимость сетки"
 							checked
 							@change="${({ target }: { target: Checkbox }) => {
-								sceneItems.grid.config.visible = target.value;
+								props.sceneItems.grid.config.visible = target.value;
 							}}"
 						>
 						</bim-checkbox>
@@ -196,7 +206,7 @@ export const uiControlPanelConstructor = (
 							label="Цвет сетки"
 							color="#bbbbbb"
 							@input="${({ target }: { target: ColorInput }) => {
-								sceneItems.grid.config.color = new Color(target.color);
+								props.sceneItems.grid.config.color = new Color(target.color);
 							}}"
 						>
 						</bim-color-input>
@@ -208,7 +218,7 @@ export const uiControlPanelConstructor = (
 							min="0"
 							max="10"
 							@change="${({ target }: { target: NumberInput }) => {
-								sceneItems.grid.config.primarySize = target.value;
+								props.sceneItems.grid.config.primarySize = target.value;
 							}}"
 						>
 						</bim-number-input>
@@ -220,7 +230,7 @@ export const uiControlPanelConstructor = (
 							min="0"
 							max="20"
 							@change="${({ target }: { target: NumberInput }) => {
-								sceneItems.grid.config.secondarySize = target.value;
+								props.sceneItems.grid.config.secondarySize = target.value;
 							}}"
 						>
 						</bim-number-input>
@@ -230,3 +240,5 @@ export const uiControlPanelConstructor = (
 		`;
 	});
 };
+
+export type UiControlPanelConstructor = typeof uiControlPanelConstructor;
