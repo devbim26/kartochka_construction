@@ -9,6 +9,7 @@ import {
 	Worlds,
 } from '@thatopen/components';
 import { RefObject } from 'react';
+import { Mesh, Object3D } from 'three';
 import { IFCViewerBase } from './ifc-viewer-base.class';
 
 interface IFCViewerCoreConstructorArgs {
@@ -42,14 +43,10 @@ export class IFCViewerCore extends IFCViewerBase<IFCViewerCoreState, IFCViewerCo
 		const currentWorld = worlds.create<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer>();
 		currentWorld.scene = new SimpleScene(components);
 		currentWorld.scene.three.background = null;
-
 		currentWorld.renderer = new SimpleRenderer(components, props.sceneContainer.current!);
-
 		currentWorld.camera = new OrthoPerspectiveCamera(components);
 
 		components.init();
-
-		currentWorld.scene.setup();
 
 		const grids = components.get(Grids);
 		const currentGrid = grids.create(currentWorld);
@@ -66,5 +63,16 @@ export class IFCViewerCore extends IFCViewerBase<IFCViewerCoreState, IFCViewerCo
 
 	destroy() {
 		this.baseDestroy();
+	}
+
+	setupWorldOnModel(model: Object3D) {
+		this.state.currentWorld!.scene.three.add(model);
+		this.state.currentWorld!.meshes.clear();
+		model.traverse((child) => {
+			if (child instanceof Mesh) {
+				debugger;
+				this.state.currentWorld!.meshes.add(child);
+			}
+		});
 	}
 }

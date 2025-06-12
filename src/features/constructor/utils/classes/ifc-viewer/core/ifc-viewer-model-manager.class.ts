@@ -69,4 +69,9 @@ export class IFCViewerModelManager extends IFCViewerBase<
 	destroy() {
 		this.baseDestroy();
 	}
+
+	async getFragments(fileData: ArrayBuffer, fileName: string) {
+		const buffer = new Uint8Array(fileData);
+		const fragments = await this.state.fragmentIfcLoader!.load(buffer);
+	}
 }

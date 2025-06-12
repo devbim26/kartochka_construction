@@ -16,7 +16,6 @@ import {
 	IFCViewerCore,
 	IFCViewerCoreState,
 	IFCViewerCullers,
-	IFCViewerCullersState,
 	IFCViewerModelManager,
 	IFCViewerModelManagerState,
 	IFCViewerStats,
@@ -101,16 +100,16 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			{ casters: null, rayCaster: null, clipper: null, edges: null } as IFCViewerCastersState,
 		);
 
-		const cullers = await IFCViewerBase.create(
-			IFCViewerCullers,
-			{
-				ifcViewerCoreInstance: core,
-			},
-			{
-				culler: null,
-				cullers: null,
-			} as IFCViewerCullersState,
-		);
+		// const cullers = await IFCViewerBase.create(
+		// 	IFCViewerCullers,
+		// 	{
+		// 		ifcViewerCoreInstance: core,
+		// 	},
+		// 	{
+		// 		culler: null,
+		// 		cullers: null,
+		// 	} as IFCViewerCullersState,
+		// );
 
 		let stats: IFCViewerState['stats'] = null;
 
@@ -126,6 +125,8 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 
 		this.setupHandlers(core, modelManager);
 
+		core.currentWorld!.scene.setup();
+
 		const ui = await IFCViewerBase.create(
 			IFCViewerUI,
 			{
@@ -133,10 +134,10 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 				constructorProps: {
 					uiControlPanelConstructorProps: {
 						sceneItems: {
-							world: this.state.core?.currentWorld!,
-							grid: this.state.core?.currentGrid!,
-							clipper: this.state.casters?.clipper!,
-							edges: this.state.casters?.edges!,
+							world: core.currentWorld!,
+							grid: core.currentGrid!,
+							clipper: casters.clipper!,
+							edges: casters.edges!,
 						},
 						callbacks: {
 							loadIfcFileHandler: this._loadIfcFileHandlerRef!,
@@ -144,8 +145,8 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 						},
 					},
 					treeInfoPanelConstructorProps: {
-						components: this.state.core?.components!,
-						relationsTree: this.state.modelManager?.relationsTree!,
+						components: core.components!,
+						relationsTree: modelManager?.relationsTree!,
 					},
 				},
 				containers: this.state.containers!.panels,
@@ -157,9 +158,9 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			core,
 			modelManager,
 			casters,
-			cullers,
 			stats,
 			ui,
+			//cullers
 		}));
 	}
 
@@ -245,7 +246,11 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 
 	private onDoubleClickHandler() {
 		if (this.state.casters?.clipper!.enabled) {
-			this.state.casters.clipper.create(this.state.core?.currentWorld!);
+			try {
+				this.state.casters.clipper.create(this.state.core?.currentWorld!);
+			} catch (e) {
+				console.error(e);
+			}
 		}
 	}
 
@@ -268,7 +273,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 	}
 
 	private cameraControlendHandler() {
-		this.state.cullers!.culler!.needsUpdate = true;
+		//this.state.cullers!.culler!.needsUpdate = true;
 	}
 
 	private async loadIfcFileHandler() {
@@ -289,12 +294,15 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			reader.readAsArrayBuffer(file);
 
 			reader.onload = async () => {
-				const buffer = new Uint8Array(reader.result as ArrayBuffer);
-				const model = await this.state.modelManager!.fragmentIfcLoader!.load(buffer);
-				model.name = file.name;
-				this.state.casters?.setClipperStylesOnModel(model, this.state.core!.currentWorld!);
-				this.state.core!.currentWorld!.scene.three.add(model);
-				this.state.cullers!.prepareCuller(model);
+				const fragments = await this.state.modelManager?.getFragments(
+					reader.result as ArrayBuffer,
+					file.name,
+				);
+				this.state.casters?.setClipperStylesOnModel(
+					fragments!,
+					this.state.core!.currentWorld!,
+				);
+				//this.state.cullers!.prepareCuller(model);
 
 				document.body.removeChild(input);
 				input.removeEventListener('change', handleFileLoad);

@@ -1,7 +1,7 @@
 import { IFCViewerWorld } from '@features/constructor/types';
 import { Clipper, Raycasters, SimpleRaycaster } from '@thatopen/components';
 import { ClipEdges, EdgesPlane } from '@thatopen/components-front';
-import { InstancedMesh, LineBasicMaterial, Mesh, MeshBasicMaterial, Object3D } from 'three';
+import { Mesh, Object3D } from 'three';
 import { IFCViewerBase } from './ifc-viewer-base.class';
 import { IFCViewerCore } from './ifc-viewer-core.class';
 
@@ -34,6 +34,7 @@ export class IFCViewerCasters extends IFCViewerBase<
 
 		const clipper = props.ifcViewerCoreInstance.components!.get(Clipper);
 		clipper.enabled = true;
+		clipper.visible = true;
 
 		const edges = props.ifcViewerCoreInstance.components!.get(ClipEdges);
 		clipper.Type = EdgesPlane;
@@ -51,29 +52,11 @@ export class IFCViewerCasters extends IFCViewerBase<
 	}
 
 	setClipperStylesOnModel(model: Object3D, world: IFCViewerWorld) {
-		const allMeshes = new Set<Mesh | InstancedMesh>();
+		world.meshes.clear();
 		model.traverse((child) => {
-			if (child instanceof Mesh || child instanceof InstancedMesh) {
-				allMeshes.add(child);
+			if (child instanceof Mesh) {
+				world.meshes.add(child);
 			}
 		});
-
-		const salmonFill = new MeshBasicMaterial({ color: 'salmon', side: 2 });
-		const redLine = new LineBasicMaterial({ color: 'red' });
-		const redOutline = new MeshBasicMaterial({
-			color: 'red',
-			opacity: 0.5,
-			side: 2,
-			transparent: true,
-		});
-
-		this.state.edges!.styles.create(
-			'Blue lines',
-			allMeshes,
-			world,
-			redLine,
-			salmonFill,
-			redOutline,
-		);
 	}
 }
