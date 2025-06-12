@@ -15,7 +15,7 @@ export const HomeHeader = () => {
 
 	return (
 		<>
-			<header className="flex w-full flex-row items-center justify-between border-b border-solid border-[#EDEFF2] bg-white px-[25px] pb-[6px] xs:px-[15px]">
+			<header className="xs:px-[15px] flex w-full flex-row items-center justify-between border-b border-solid border-[#EDEFF2] bg-white px-[25px] pb-[6px]">
 				<div className="flex flex-row items-center gap-4">
 					<button
 						onClick={toggleMenu}
@@ -25,8 +25,8 @@ export const HomeHeader = () => {
 					</button>
 
 					<div className="flex flex-row items-center gap-[12px]">
-						<LogoIcon className="h-[40px] w-[39px] xs:h-[30px] xs:w-[29px]" />
-						<LogoTextIcon className="h-[64px] w-[170px] xs:h-[44px] xs:w-[120px]" />
+						<LogoIcon className="xs:h-[30px] xs:w-[29px] h-[40px] w-[39px]" />
+						<LogoTextIcon className="xs:h-[44px] xs:w-[120px] h-[64px] w-[170px]" />
 					</div>
 				</div>
 
@@ -45,9 +45,11 @@ export const HomeHeader = () => {
 				className={`fixed inset-0 z-50 transition-all duration-300 ease-in-out sm:hidden ${
 					isMenuOpen ? 'bg-black/50' : 'pointer-events-none bg-transparent'
 				}`}
+				onClick={toggleMenu}
 			>
 				<div
-					className={`fixed left-0 top-0 h-full w-3/4 bg-white shadow-xl transition-all duration-300 ease-in-out ${
+					onClick={(e) => e.stopPropagation()}
+					className={`fixed left-0 top-0 h-full w-3/4 max-w-xs bg-white shadow-xl transition-transform duration-300 ease-in-out ${
 						isMenuOpen ? 'translate-x-0' : '-translate-x-full'
 					}`}
 				>
@@ -66,12 +68,12 @@ export const HomeHeader = () => {
 						</div>
 
 						<div className="flex-1">
-							<HeaderNav mobile onItemClick={() => setIsMenuOpen(false)} />
+							<HeaderNav onItemClick={() => setIsMenuOpen(false)} />
 						</div>
 
 						{pathname.startsWith('/') && (
-							<div className="mt-4">
-								<LogoutHeader mobile />
+							<div className="mt-auto pt-4">
+								<LogoutHeader />
 							</div>
 						)}
 					</div>
