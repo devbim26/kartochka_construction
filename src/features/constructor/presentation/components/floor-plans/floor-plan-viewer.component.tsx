@@ -208,8 +208,8 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 								'/' +
 								info.reportConstructionHeader?.secondPlacementRoom?.name,
 						);
-						const rectWidth = 800;
-						const rectHeight = 500;
+						const rectWidth = 900;
+						const rectHeight = 400;
 						const centerX = info.coordinates!.x! * scale;
 						const centerY = info.coordinates!.y! * scale;
 						const startX = centerX - rectWidth / 2;
