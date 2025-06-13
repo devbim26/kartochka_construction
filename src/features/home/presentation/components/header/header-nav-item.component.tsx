@@ -9,28 +9,36 @@ interface HeaderNavItemProps {
 		text: string;
 		id: string;
 	};
+	onItemClick?: () => void;
 }
 
-export const HeaderNavItem = ({ navOptions }: HeaderNavItemProps) => {
+export const HeaderNavItem = ({ navOptions, onItemClick }: HeaderNavItemProps) => {
 	const { pathname } = useLocation();
 	const [search] = useSearchParams();
 	const navigate = useAppNavigate();
 	const currentId = search.get('sectionId');
 
 	const style = useMemo(() => {
-		return (pathname.startsWith(APP_ROUTES.designing.route) &&
-			navOptions.id === LandingSections.designing.id) ||
-			navOptions.id === currentId
-			? 'text-primary'
-			: 'text-input-value-black';
-	}, [currentId]);
+		const isActive =
+			(pathname.startsWith(APP_ROUTES.designing.route) &&
+				navOptions.id === LandingSections.designing.id) ||
+			navOptions.id === currentId;
+
+		return twMerge(
+			'cursor-pointer font-medium transition-colors duration-200',
+			'rounded-lg px-4 py-3 text-2xl hover:bg-gray-100',
+			'sm:rounded-none sm:p-0 sm:text-xl sm:hover:bg-transparent',
+			isActive ? 'text-primary' : 'text-input-value-black',
+		);
+	}, [currentId, pathname, navOptions.id]);
 
 	const setSection = () => {
 		navigate(APP_ROUTES.landing.route, { sectionId: navOptions.id });
+		if (onItemClick) onItemClick();
 	};
 
 	return (
-		<p className={twMerge('cursor-pointer text-xl font-medium', style)} onClick={setSection}>
+		<p className={style} onClick={setSection}>
 			{navOptions.text}
 		</p>
 	);
