@@ -58,8 +58,6 @@ export const DragElement = ({
 
 	const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
 		if (e.button !== 0 || draggableElementId !== currentDragElementId.current!) return;
-		e.stopPropagation();
-		e.preventDefault();
 		if (!currentWrapper.current || !parentRef.current) return;
 
 		e.currentTarget.setPointerCapture(e.pointerId);
@@ -81,8 +79,6 @@ export const DragElement = ({
 
 	const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
 		if (!isDragging.current || !currentWrapper.current || !parentRef.current) return;
-		e.stopPropagation();
-		e.preventDefault();
 		const parentRect = parentRef.current.getBoundingClientRect();
 		const elementRect = currentWrapper.current.getBoundingClientRect();
 
@@ -98,15 +94,11 @@ export const DragElement = ({
 	};
 
 	const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-		e.stopPropagation();
-		e.preventDefault();
 		isDragging.current = false;
 		parentRectCache.current = null;
 	};
 
 	const onMouseWheelClick = (e: React.MouseEvent<HTMLDivElement>) => {
-		e.stopPropagation();
-		e.preventDefault();
 		if (e.button !== 1) return;
 		setDraggableElementId(
 			draggableElementId === currentDragElementId.current!
