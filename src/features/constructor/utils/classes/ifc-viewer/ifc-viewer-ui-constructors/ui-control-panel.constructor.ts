@@ -1,6 +1,6 @@
-import { IFCViewerWorld } from '@features/constructor/types';
+import type { IFCViewerWorld } from '@features/constructor/types';
 import type { CameraProjection, Clipper, NavModeID, SimpleGrid } from '@thatopen/components';
-import { ClipEdges } from '@thatopen/components-front';
+import type { ClipEdges } from '@thatopen/components-front';
 import {
 	Component,
 	html,

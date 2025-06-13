@@ -4,9 +4,9 @@ import type {
 	SimpleScene,
 	SimpleWorld,
 } from '@thatopen/components';
-import { FragmentsGroup } from '@thatopen/fragments';
+import type { FragmentsGroup } from '@thatopen/fragments';
 import type { Table, TableCellValue, TableRowData } from '@thatopen/ui';
-import { OrthographicCamera, PerspectiveCamera } from 'three';
+import type { OrthographicCamera, PerspectiveCamera } from 'three';
 
 export type IFCViewerRelationsTree = Table<TableRowData<Record<string, TableCellValue>>>;
 export type IFCViewerWorld = SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer>;

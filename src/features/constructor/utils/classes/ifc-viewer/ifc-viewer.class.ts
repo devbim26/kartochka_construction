@@ -1,4 +1,4 @@
-import {
+import type {
 	IFCViewerOnDoubleClickHandler,
 	IFCViewerOnKeyDownHandler,
 	IFCViewerProjectionOnChanged,
@@ -6,20 +6,20 @@ import {
 	IFCViewerVoidAsyncFunc,
 	IFCViewerVoidFunc,
 } from '@features/constructor/types';
-import { RefObject } from 'react';
+import type { RefObject } from 'react';
 import {
 	IFCViewerBase,
 	IFCViewerCasters,
-	IFCViewerCastersState,
 	IFCViewerCore,
-	IFCViewerCoreState,
 	IFCViewerModelManager,
-	IFCViewerModelManagerState,
 	IFCViewerStats,
-	IFCViewerStatsState,
 	IFCViewerUI,
-	IFCViewerUIConstructorArgs,
-	IFCViewerUIState,
+	type IFCViewerCastersState,
+	type IFCViewerCoreState,
+	type IFCViewerModelManagerState,
+	type IFCViewerStatsState,
+	type IFCViewerUIConstructorArgs,
+	type IFCViewerUIState,
 } from './core';
 
 interface IFCViewerContainers {
@@ -129,7 +129,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 					},
 					treeInfoPanelConstructorProps: {
 						components: core.components!,
-						relationsTree: modelManager?.relationsTree!,
+						relationsTree: modelManager.relationsTree!,
 					},
 				},
 				containers: this.state.containers!.panels,
@@ -205,12 +205,12 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 
 	private onKeyDownHandler(event: KeyboardEvent) {
 		if (event.code === 'Delete') {
-			this.state.casters?.deleteClipperPlane(this.state.core?.currentWorld!);
+			this.state.casters?.deleteClipperPlane(this.state.core!.currentWorld!);
 		}
 	}
 
 	private onDoubleClickHandler() {
-		this.state.casters?.addClipperPlane(this.state.core?.currentWorld!);
+		this.state.casters?.addClipperPlane(this.state.core!.currentWorld!);
 	}
 
 	private onResizeHandler() {
@@ -251,7 +251,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			reader.onload = async () => {
 				this.state.modelManager?.loadModel(
 					reader.result as ArrayBuffer,
-					this.state.core?.currentWorld!,
+					this.state.core!.currentWorld!,
 					file.name,
 				);
 				document.body.removeChild(input);
@@ -266,6 +266,6 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 	}
 
 	private disposeFragmentsHandler() {
-		this.state.modelManager?.disposeModel(this.state.core?.components!);
+		this.state.modelManager?.disposeModel(this.state.core!.components!);
 	}
 }

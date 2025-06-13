@@ -1,5 +1,5 @@
-import { IFCViewerRelationsTree } from '@features/constructor/types';
-import { Components } from '@thatopen/components';
+import type { IFCViewerRelationsTree } from '@features/constructor/types';
+import type { Components } from '@thatopen/components';
 import { Component, html, type TextInput } from '@thatopen/ui';
 
 export interface TreeInfoPanelConstructorProps {

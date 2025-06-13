@@ -1,6 +1,6 @@
 import { Manager } from '@thatopen/ui';
-import { RefObject } from 'react';
-import {
+import type { RefObject } from 'react';
+import type {
 	TreeInfoPanelConstructor,
 	TreeInfoPanelConstructorProps,
 	UiControlPanelConstructor,

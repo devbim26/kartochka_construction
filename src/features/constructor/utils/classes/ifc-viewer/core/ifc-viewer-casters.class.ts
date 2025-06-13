@@ -1,8 +1,8 @@
-import { IFCViewerWorld } from '@features/constructor/types';
-import { Clipper, Raycasters, SimpleRaycaster } from '@thatopen/components';
+import type { IFCViewerWorld } from '@features/constructor/types';
+import { Clipper, Raycasters, type SimpleRaycaster } from '@thatopen/components';
 import { ClipEdges, EdgesPlane } from '@thatopen/components-front';
 import { IFCViewerBase } from './ifc-viewer-base.class';
-import { IFCViewerCore } from './ifc-viewer-core.class';
+import type { IFCViewerCore } from './ifc-viewer-core.class';
 
 interface IFCViewerCastersConstrucrorArgs {
 	ifcViewerCoreInstance: IFCViewerCore;

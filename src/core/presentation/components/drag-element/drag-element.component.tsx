@@ -1,5 +1,5 @@
 import { useDragElementContext } from '@core/utils';
-import { RefObject, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
 
 interface DragElementCoord {
 	x: number;

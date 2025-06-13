@@ -1,14 +1,14 @@
-import { IFCViewerWorld } from '@features/constructor/types';
+import type { IFCViewerWorld } from '@features/constructor/types';
 import {
 	Components,
 	Grids,
 	OrthoPerspectiveCamera,
-	SimpleGrid,
 	SimpleRenderer,
 	SimpleScene,
 	Worlds,
+	type SimpleGrid,
 } from '@thatopen/components';
-import { RefObject } from 'react';
+import type { RefObject } from 'react';
 import { IFCViewerBase } from './ifc-viewer-base.class';
 
 interface IFCViewerCoreConstructorArgs {

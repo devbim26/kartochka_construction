@@ -1,10 +1,15 @@
-import { IFCViewerRelationsTree, IFCViewerWorld } from '@features/constructor/types';
-import { Components, FragmentsManager, IfcLoader, IfcRelationsIndexer } from '@thatopen/components';
+import type { IFCViewerRelationsTree, IFCViewerWorld } from '@features/constructor/types';
+import {
+	FragmentsManager,
+	IfcLoader,
+	IfcRelationsIndexer,
+	type Components,
+} from '@thatopen/components';
 import { Highlighter } from '@thatopen/components-front';
 import { tables } from '@thatopen/ui-obc';
 import { Mesh } from 'three';
 import { IFCViewerBase } from './ifc-viewer-base.class';
-import { IFCViewerCore } from './ifc-viewer-core.class';
+import type { IFCViewerCore } from './ifc-viewer-core.class';
 
 interface IFCViewerModelManagerConstructorArgs {
 	ifcViewerCoreInstance: IFCViewerCore;

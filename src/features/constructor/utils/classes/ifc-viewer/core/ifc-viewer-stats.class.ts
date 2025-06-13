@@ -1,4 +1,4 @@
-import { RefObject } from 'react';
+import type { RefObject } from 'react';
 import Stats from 'stats.js';
 import { IFCViewerBase } from './ifc-viewer-base.class';
 

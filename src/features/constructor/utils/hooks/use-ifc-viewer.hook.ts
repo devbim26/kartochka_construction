@@ -1,5 +1,10 @@
 import { useLayoutEffect, useRef, type RefObject } from 'react';
-import { IFCViewer, IFCViewerBase, IFCViewerConstructorArgs, IFCViewerState } from '../classes';
+import {
+	IFCViewer,
+	IFCViewerBase,
+	type IFCViewerConstructorArgs,
+	type IFCViewerState,
+} from '../classes';
 
 const IFCIFCViewerDefState: IFCViewerState = {
 	core: null,
