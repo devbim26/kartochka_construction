@@ -4,7 +4,6 @@ import { IFCViewer, IFCViewerBase, IFCViewerConstructorArgs, IFCViewerState } fr
 const IFCIFCViewerDefState: IFCViewerState = {
 	core: null,
 	casters: null,
-	cullers: null,
 	modelManager: null,
 	ui: null,
 	stats: null,

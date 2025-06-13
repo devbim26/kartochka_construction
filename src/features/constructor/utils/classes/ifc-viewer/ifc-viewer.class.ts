@@ -1,13 +1,11 @@
 import {
 	IFCViewerOnDoubleClickHandler,
-	IFCViewerOnFragmentsLoadedHandler,
 	IFCViewerOnKeyDownHandler,
 	IFCViewerProjectionOnChanged,
 	IFCViewerRenderEventHandler,
 	IFCViewerVoidAsyncFunc,
 	IFCViewerVoidFunc,
 } from '@features/constructor/types';
-import { FragmentsGroup } from '@thatopen/fragments';
 import { RefObject } from 'react';
 import {
 	IFCViewerBase,
@@ -15,7 +13,6 @@ import {
 	IFCViewerCastersState,
 	IFCViewerCore,
 	IFCViewerCoreState,
-	IFCViewerCullers,
 	IFCViewerModelManager,
 	IFCViewerModelManagerState,
 	IFCViewerStats,
@@ -36,7 +33,6 @@ interface IFCViewerContainers {
 export interface IFCViewerState {
 	core: IFCViewerCore | null;
 	casters: IFCViewerCasters | null;
-	cullers: IFCViewerCullers | null;
 	modelManager: IFCViewerModelManager | null;
 	ui: IFCViewerUI | null;
 	stats: IFCViewerStats | null;
@@ -56,10 +52,8 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 	private _onBeforeUpdateHandlerRef: IFCViewerRenderEventHandler | null = null;
 	private _onAfterUpdateHandlerRef: IFCViewerRenderEventHandler | null = null;
 	private _projectionOnChangedRef: IFCViewerProjectionOnChanged | null = null;
-	private _cameraControlendHandlerRef: IFCViewerVoidFunc | null = null;
 	private _loadIfcFileHandlerRef: IFCViewerVoidAsyncFunc | null = null;
 	private _disposeFragmentsHandlerRef: IFCViewerVoidFunc | null = null;
-	private _onFragmentsLoadedHandlerRef: IFCViewerOnFragmentsLoadedHandler | null = null;
 
 	get inited(): boolean {
 		return this.baseState.inited;
@@ -99,17 +93,6 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			},
 			{ casters: null, rayCaster: null, clipper: null, edges: null } as IFCViewerCastersState,
 		);
-
-		// const cullers = await IFCViewerBase.create(
-		// 	IFCViewerCullers,
-		// 	{
-		// 		ifcViewerCoreInstance: core,
-		// 	},
-		// 	{
-		// 		culler: null,
-		// 		cullers: null,
-		// 	} as IFCViewerCullersState,
-		// );
 
 		let stats: IFCViewerState['stats'] = null;
 
@@ -160,7 +143,6 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			casters,
 			stats,
 			ui,
-			//cullers
 		}));
 	}
 
@@ -192,14 +174,6 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 		this.state.core?.currentWorld?.camera.projection.onChanged.remove(
 			this._projectionOnChangedRef!,
 		);
-		this.state.core?.currentWorld?.camera.controls.removeEventListener(
-			'controlend',
-			this._cameraControlendHandlerRef!,
-		);
-
-		this.state.modelManager?.fragmentsManager?.onFragmentsLoaded.remove(
-			this._onFragmentsLoadedHandlerRef!,
-		);
 	}
 
 	private setupHandlers(core: IFCViewerCore, modelManager: IFCViewerModelManager) {
@@ -225,33 +199,18 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 		this._projectionOnChangedRef = this.projectionOnChanged.bind(this);
 		core.currentWorld!.camera.projection.onChanged.add(this._projectionOnChangedRef);
 
-		this._cameraControlendHandlerRef = this.cameraControlendHandler.bind(this);
-		core.currentWorld!.camera.controls.addEventListener(
-			'controlend',
-			this._cameraControlendHandlerRef,
-		);
-
 		this._loadIfcFileHandlerRef = this.loadIfcFileHandler.bind(this);
 		this._disposeFragmentsHandlerRef = this.disposeFragmentsHandler.bind(this);
-
-		this._onFragmentsLoadedHandlerRef = this.onFragmentsLoadedHandler.bind(this);
-		modelManager.fragmentsManager!.onFragmentsLoaded.add(this._onFragmentsLoadedHandlerRef);
 	}
 
 	private onKeyDownHandler(event: KeyboardEvent) {
-		if (event.code === 'Delete' && this.state.casters?.clipper!.enabled) {
-			this.state.casters.clipper.delete(this.state.core?.currentWorld!);
+		if (event.code === 'Delete') {
+			this.state.casters?.deleteClipperPlane(this.state.core?.currentWorld!);
 		}
 	}
 
 	private onDoubleClickHandler() {
-		if (this.state.casters?.clipper!.enabled) {
-			try {
-				this.state.casters.clipper.create(this.state.core?.currentWorld!);
-			} catch (e) {
-				console.error(e);
-			}
-		}
+		this.state.casters?.addClipperPlane(this.state.core?.currentWorld!);
 	}
 
 	private onResizeHandler() {
@@ -272,10 +231,6 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			this.state.core!.currentWorld!.camera.projection.current === 'Perspective';
 	}
 
-	private cameraControlendHandler() {
-		//this.state.cullers!.culler!.needsUpdate = true;
-	}
-
 	private async loadIfcFileHandler() {
 		const input = document.createElement('input');
 		input.type = 'file';
@@ -294,16 +249,11 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			reader.readAsArrayBuffer(file);
 
 			reader.onload = async () => {
-				const fragments = await this.state.modelManager?.getFragments(
+				this.state.modelManager?.loadModel(
 					reader.result as ArrayBuffer,
+					this.state.core?.currentWorld!,
 					file.name,
 				);
-				this.state.casters?.setClipperStylesOnModel(
-					fragments!,
-					this.state.core!.currentWorld!,
-				);
-				//this.state.cullers!.prepareCuller(model);
-
 				document.body.removeChild(input);
 				input.removeEventListener('change', handleFileLoad);
 			};
@@ -316,11 +266,6 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 	}
 
 	private disposeFragmentsHandler() {
-		this.state.modelManager?.fragmentsManager?.dispose();
-	}
-
-	private async onFragmentsLoadedHandler(model: FragmentsGroup) {
-		this.state.core!.currentWorld!.scene.three.add(model);
-		if (model.hasProperties) await this.state.modelManager?.ifcRelationsIndexer?.process(model);
+		this.state.modelManager?.disposeModel(this.state.core?.components!);
 	}
 }

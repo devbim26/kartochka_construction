@@ -1,7 +1,6 @@
 import { IFCViewerWorld } from '@features/constructor/types';
 import { Clipper, Raycasters, SimpleRaycaster } from '@thatopen/components';
 import { ClipEdges, EdgesPlane } from '@thatopen/components-front';
-import { Mesh, Object3D } from 'three';
 import { IFCViewerBase } from './ifc-viewer-base.class';
 import { IFCViewerCore } from './ifc-viewer-core.class';
 
@@ -51,12 +50,15 @@ export class IFCViewerCasters extends IFCViewerBase<
 		this.baseDestroy();
 	}
 
-	setClipperStylesOnModel(model: Object3D, world: IFCViewerWorld) {
-		world.meshes.clear();
-		model.traverse((child) => {
-			if (child instanceof Mesh) {
-				world.meshes.add(child);
-			}
-		});
+	addClipperPlane(world: IFCViewerWorld) {
+		if (this.state.clipper && this.state.clipper.enabled) {
+			this.state.clipper.create(world);
+		}
+	}
+
+	deleteClipperPlane(world: IFCViewerWorld) {
+		if (!!this.state.clipper?.enabled) {
+			this.state.clipper!.delete(world);
+		}
 	}
 }
