@@ -51,8 +51,6 @@ export abstract class IFCViewerBase<T extends object, K extends object> {
 			if (!!item && typeof item.destroy === 'function') {
 				item.destroy();
 			}
-			destroyedState[keyName as keyof T] =
-				this.baseState.cachedInitialState[keyName as keyof T];
 			if (!!item && typeof item.dispose === 'function') {
 				item.dispose();
 			}

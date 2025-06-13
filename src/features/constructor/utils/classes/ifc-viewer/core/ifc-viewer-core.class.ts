@@ -16,10 +16,10 @@ interface IFCViewerCoreConstructorArgs {
 }
 
 export interface IFCViewerCoreState {
-	currentWorld: IFCViewerWorld | null;
-	components: Components | null;
-	worlds: Worlds | null;
 	currentGrid: SimpleGrid | null;
+	currentWorld: IFCViewerWorld | null;
+	worlds: Worlds | null;
+	components: Components | null;
 }
 
 export class IFCViewerCore extends IFCViewerBase<IFCViewerCoreState, IFCViewerCoreConstructorArgs> {

@@ -9,8 +9,8 @@ interface IFCViewerClipperConstrucrorArgs {
 
 export interface IFCViewerClipperState {
 	currentClipper: Clipper | null;
-	casters: Raycasters | null;
 	caster: SimpleRaycaster | null;
+	casters: Raycasters | null;
 }
 
 export class IFCViewerClipper extends IFCViewerBase<

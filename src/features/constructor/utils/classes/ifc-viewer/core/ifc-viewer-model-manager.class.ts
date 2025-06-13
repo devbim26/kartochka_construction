@@ -12,10 +12,10 @@ interface IFCViewerModelManagerConstructorArgs {
 }
 
 export interface IFCViewerModelManagerState {
+	relationsTree: IFCViewerRelationsTree | null;
 	fragmentIfcLoader: IfcLoader | null;
 	fragmentsManager: FragmentsManager | null;
 	ifcRelationsIndexer: IfcRelationsIndexer | null;
-	relationsTree: IFCViewerRelationsTree | null;
 }
 
 export class IFCViewerModelManager extends IFCViewerBase<
