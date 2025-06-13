@@ -12,7 +12,7 @@ export const DesigningTable = memoize(
 			<tr
 				key={headerGroup.id}
 				className={twMerge(
-					'sticky top-0 z-10 border-b border-b-black bg-none p-0',
+					'sticky top-0 z-10 border-b border-b-black bg-white p-0',
 					classNames?.headerRowClassName,
 				)}
 			>
@@ -55,7 +55,7 @@ export const DesigningTable = memoize(
 						classNames?.tableContainerClassName,
 					)}
 				>
-					<table className={twMerge('w-full table-fixed', classNames?.tableClassName)}>
+					<table className={twMerge('w-full', classNames?.tableClassName)}>
 						<thead>{headerRows}</thead>
 						<tbody>{contentRows}</tbody>
 					</table>
