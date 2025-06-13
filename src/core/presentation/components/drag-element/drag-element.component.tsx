@@ -1,28 +1,78 @@
 import { useDragElementContext } from '@core/utils';
-import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 
 interface DragElementCoord {
 	x: number;
 	y: number;
 }
 
+interface InitialPosition {
+	top?: number;
+	left?: number;
+	right?: number;
+	bottom?: number;
+}
+
 interface DragElementProps {
 	parentRef: RefObject<HTMLElement | null>;
-	initialState: {
-		top?: number;
-		left?: number;
-		right?: number;
-		bottom?: number;
-	};
+	initialPosition: InitialPosition;
 	zIndex?: number;
 	containerClassName?: string;
 	children: React.JSX.Element | React.ReactNode;
 	styles?: React.HTMLAttributes<HTMLDivElement>['style'];
 }
 
+const calcInitialCoords = (
+	parentRect: DOMRect,
+	elementRect: DOMRect,
+	initialPosition: InitialPosition,
+): DragElementCoord => {
+	let x = 0;
+	let y = 0;
+	if (initialPosition.left !== undefined) {
+		x = initialPosition.left;
+	} else if (initialPosition.right !== undefined) {
+		x = parentRect.width - elementRect.width - initialPosition.right;
+	}
+
+	if (initialPosition.top !== undefined) {
+		y = initialPosition.top;
+	} else if (initialPosition.bottom !== undefined) {
+		y = parentRect.height - elementRect.height - initialPosition.bottom;
+	}
+	return { x, y };
+};
+
+const caclCoordsBySize = (
+	parentRect: DOMRect,
+	elementRect: DOMRect,
+	transformStyle: string,
+): DragElementCoord | null => {
+	const transform = transformStyle.match(/translate3d\((.*?)px, (.*?)px, (.*?)px\)/);
+	let newX = transform ? parseFloat(transform[1]) : 0;
+	let newY = transform ? parseFloat(transform[2]) : 0;
+	const exceedsRight = newX + elementRect.width > parentRect.width;
+	const exceedsBottom = newY + elementRect.height > parentRect.height;
+	const exceedsLeft = newX < 0;
+	const exceedsTop = newY < 0;
+	if (exceedsRight) {
+		newX = parentRect.width - elementRect.width;
+	}
+	if (exceedsBottom) {
+		newY = parentRect.height - elementRect.height;
+	}
+	if (exceedsLeft) {
+		newX = 0;
+	}
+	if (exceedsTop) {
+		newY = 0;
+	}
+	return exceedsRight || exceedsBottom || exceedsLeft || exceedsTop ? { x: newX, y: newY } : null;
+};
+
 export const DragElement = ({
 	parentRef,
-	initialState,
+	initialPosition,
 	zIndex = 10,
 	containerClassName,
 	children,
@@ -38,22 +88,11 @@ export const DragElement = ({
 
 	const initialCoords: DragElementCoord = useMemo(() => {
 		if (!parentRef.current || !currentWrapper.current || !inited) return { x: 0, y: 0 };
-		const parentRect = parentRef.current.getBoundingClientRect();
-		const elementRect = currentWrapper.current.getBoundingClientRect();
-		let x = 0;
-		let y = 0;
-		if (initialState.left !== undefined) {
-			x = initialState.left;
-		} else if (initialState.right !== undefined) {
-			x = parentRect.width - elementRect.width - initialState.right;
-		}
-
-		if (initialState.top !== undefined) {
-			y = initialState.top;
-		} else if (initialState.bottom !== undefined) {
-			y = parentRect.height - elementRect.height - initialState.bottom;
-		}
-		return { x, y };
+		return calcInitialCoords(
+			parentRef.current.getBoundingClientRect(),
+			currentWrapper.current.getBoundingClientRect(),
+			initialPosition,
+		);
 	}, [inited]);
 
 	const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -73,9 +112,28 @@ export const DragElement = ({
 		isDragging.current = true;
 	};
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		setInited(true);
 	}, []);
+
+	useEffect(() => {
+		if (!currentWrapper.current || !inited) return;
+		const observer = new ResizeObserver(() => {
+			if (!currentWrapper.current || !parentRef.current) return;
+			const newCoords = caclCoordsBySize(
+				parentRef.current.getBoundingClientRect(),
+				currentWrapper.current.getBoundingClientRect(),
+				currentWrapper.current.style.transform,
+			);
+			if (!!newCoords) {
+				requestAnimationFrame(() => {
+					currentWrapper.current!.style.transform = `translate3d(${newCoords.x}px, ${newCoords.y}px, 0)`;
+				});
+			}
+		});
+		observer.observe(currentWrapper.current);
+		return () => observer.disconnect();
+	}, [inited]);
 
 	const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
 		if (!isDragging.current || !currentWrapper.current || !parentRef.current) return;

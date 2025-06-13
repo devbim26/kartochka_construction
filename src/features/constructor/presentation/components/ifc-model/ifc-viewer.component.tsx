@@ -26,13 +26,10 @@ export const IFCViewerComponent = () => {
 	});
 
 	return (
-		<div
-			className="relative flex flex-1 rounded-[20px] border border-[#EDEFF2] p-[14px]"
-			ref={ifcViewerRef}
-		>
+		<div className="relative flex flex-1" ref={ifcViewerRef}>
 			<DragElementContextWrapper>
 				<DragElement
-					initialState={{
+					initialPosition={{
 						left: 30,
 						top: 70,
 					}}
@@ -44,7 +41,7 @@ export const IFCViewerComponent = () => {
 					<div ref={treeInfoPanelContainerRef}></div>
 				</DragElement>
 				<DragElement
-					initialState={{
+					initialPosition={{
 						right: 270,
 						top: 70,
 					}}
