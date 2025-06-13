@@ -6,7 +6,7 @@ export const DesigningSchema = z.object({
 		constructions: z
 			.array(
 				z.object({
-					contructionPosition: z.string().min(1, 'Поле обязательно для заполнения'),
+					constructionPosition: z.string().min(1, 'Поле обязательно для заполнения'),
 					userMaterials: z
 						.array(
 							z.object({
