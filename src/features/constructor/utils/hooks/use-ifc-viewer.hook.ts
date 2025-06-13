@@ -8,7 +8,7 @@ import {
 
 const IFCIFCViewerDefState: IFCViewerState = {
 	core: null,
-	casters: null,
+	clipper: null,
 	modelManager: null,
 	ui: null,
 	stats: null,

@@ -9,12 +9,12 @@ import type {
 import type { RefObject } from 'react';
 import {
 	IFCViewerBase,
-	IFCViewerCasters,
+	IFCViewerClipper,
+	IFCViewerClipperState,
 	IFCViewerCore,
 	IFCViewerModelManager,
 	IFCViewerStats,
 	IFCViewerUI,
-	type IFCViewerCastersState,
 	type IFCViewerCoreState,
 	type IFCViewerModelManagerState,
 	type IFCViewerStatsState,
@@ -32,7 +32,7 @@ interface IFCViewerContainers {
 
 export interface IFCViewerState {
 	core: IFCViewerCore | null;
-	casters: IFCViewerCasters | null;
+	clipper: IFCViewerClipper | null;
 	modelManager: IFCViewerModelManager | null;
 	ui: IFCViewerUI | null;
 	stats: IFCViewerStats | null;
@@ -86,12 +86,12 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			} as IFCViewerModelManagerState,
 		);
 
-		const casters = await IFCViewerBase.create(
-			IFCViewerCasters,
+		const clipper = await IFCViewerBase.create(
+			IFCViewerClipper,
 			{
 				ifcViewerCoreInstance: core,
 			},
-			{ casters: null, rayCaster: null, clipper: null, edges: null } as IFCViewerCastersState,
+			{ currentClipper: null, caster: null, casters: null } as IFCViewerClipperState,
 		);
 
 		let stats: IFCViewerState['stats'] = null;
@@ -119,8 +119,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 						sceneItems: {
 							world: core.currentWorld!,
 							grid: core.currentGrid!,
-							clipper: casters.clipper!,
-							edges: casters.edges!,
+							clipper: clipper.currentClipper!,
 						},
 						callbacks: {
 							loadIfcFileHandler: this._loadIfcFileHandlerRef!,
@@ -140,7 +139,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 		this.changeState(() => ({
 			core,
 			modelManager,
-			casters,
+			clipper,
 			stats,
 			ui,
 		}));
@@ -154,14 +153,14 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 	private destoyHandlers() {
 		const containers = this.state.containers!;
 
-		containers.sceneContainer.current?.removeEventListener(
-			'keydown',
-			this._onKeyDownHandlerRef!,
-		);
-		containers.sceneContainer.current?.removeEventListener(
-			'dblclick',
-			this._onDoubleClickHandlerRef!,
-		);
+		// containers.sceneContainer.current?.removeEventListener(
+		// 	'keydown',
+		// 	this._onKeyDownHandlerRef!,
+		// );
+		// containers.sceneContainer.current?.removeEventListener(
+		// 	'dblclick',
+		// 	this._onDoubleClickHandlerRef!,
+		// );
 		containers.sceneContainer.current?.removeEventListener('resize', this._onResizeHandlerRef!);
 
 		this.state.core?.currentWorld?.renderer?.onBeforeUpdate.remove(
@@ -180,13 +179,13 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 		const containers = this.state.containers!;
 
 		this._onKeyDownHandlerRef = this.onKeyDownHandler.bind(this);
-		containers.sceneContainer.current?.addEventListener('keydown', this._onKeyDownHandlerRef);
+		//containers.sceneContainer.current?.addEventListener('keydown', this._onKeyDownHandlerRef);
 
 		this._onDoubleClickHandlerRef = this.onDoubleClickHandler.bind(this);
-		containers.sceneContainer.current?.addEventListener(
-			'dblclick',
-			this._onDoubleClickHandlerRef,
-		);
+		// containers.sceneContainer.current?.addEventListener(
+		// 	'dblclick',
+		// 	this._onDoubleClickHandlerRef,
+		// );
 
 		this._onResizeHandlerRef = this.onResizeHandler.bind(this);
 		containers.sceneContainer.current?.addEventListener('resize', this._onResizeHandlerRef);
@@ -205,12 +204,12 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 
 	private onKeyDownHandler(event: KeyboardEvent) {
 		if (event.code === 'Delete') {
-			this.state.casters?.deleteClipperPlane(this.state.core!.currentWorld!);
+			this.state.clipper?.deleteClipperPlane(this.state.core!.currentWorld!);
 		}
 	}
 
 	private onDoubleClickHandler() {
-		this.state.casters?.addClipperPlane(this.state.core!.currentWorld!);
+		this.state.clipper?.addClipperPlane(this.state.core!);
 	}
 
 	private onResizeHandler() {
@@ -249,11 +248,12 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			reader.readAsArrayBuffer(file);
 
 			reader.onload = async () => {
-				this.state.modelManager?.loadModel(
+				await this.state.modelManager?.loadModel(
 					reader.result as ArrayBuffer,
 					this.state.core!.currentWorld!,
 					file.name,
 				);
+
 				document.body.removeChild(input);
 				input.removeEventListener('change', handleFileLoad);
 			};
@@ -266,6 +266,6 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 	}
 
 	private disposeFragmentsHandler() {
-		this.state.modelManager?.disposeModel(this.state.core!.components!);
+		this.state.modelManager?.disposeModel(this.state.core!, this.state.clipper!);
 	}
 }

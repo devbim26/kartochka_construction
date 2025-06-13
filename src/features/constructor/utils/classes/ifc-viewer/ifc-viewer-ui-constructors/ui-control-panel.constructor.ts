@@ -1,6 +1,5 @@
 import type { IFCViewerWorld } from '@features/constructor/types';
 import type { CameraProjection, Clipper, NavModeID, SimpleGrid } from '@thatopen/components';
-import type { ClipEdges } from '@thatopen/components-front';
 import {
 	Component,
 	html,
@@ -17,7 +16,6 @@ export interface UIControlPanelConstructorProps {
 		world: IFCViewerWorld;
 		grid: SimpleGrid;
 		clipper: Clipper;
-		edges: ClipEdges;
 	};
 	callbacks: {
 		loadIfcFileHandler: () => void;
@@ -45,73 +43,6 @@ export const uiControlPanelConstructor = (props: UIControlPanelConstructorProps)
 							label="Удалить модель"
 							@click="${() => {
 								props.callbacks.disposeFragmentsHandler();
-							}}"
-						>
-						</bim-button>
-					</bim-panel-section>
-					<bim-panel-section collapsed label="Команды">
-						<bim-label>Двойной клик: Создание плоскости сечения</bim-label>
-						<bim-label>Клавиша 'Del': Удаление плоскости сечения</bim-label>
-					</bim-panel-section>
-					<bim-panel-section collapsed label="Полоскость сечения">
-						<bim-checkbox
-							label="Вкл"
-							checked
-							@change="${({ target }: { target: Checkbox }) => {
-								props.sceneItems.clipper.enabled = target.value;
-								props.sceneItems.edges.visible = target.value;
-							}}"
-						>
-						</bim-checkbox>
-
-						<bim-checkbox
-							label="Видимоть"
-							checked
-							@change="${({ target }: { target: Checkbox }) => {
-								props.sceneItems.clipper.visible = target.value;
-							}}"
-						>
-						</bim-checkbox>
-
-						<bim-color-input
-							label="Цвет"
-							color="#202932"
-							@input="${({ target }: { target: ColorInput }) => {
-								props.sceneItems.clipper.material.color.set(target.color);
-							}}"
-						>
-						</bim-color-input>
-
-						<bim-number-input
-							slider
-							step="0.01"
-							label="Прозрачность"
-							value="0.2"
-							min="0.1"
-							max="1"
-							@change="${({ target }: { target: NumberInput }) => {
-								props.sceneItems.clipper.material.opacity = target.value;
-							}}"
-						>
-						</bim-number-input>
-
-						<bim-number-input
-							slider
-							step="0.1"
-							label="Размер плоскости"
-							value="5"
-							min="2"
-							max="10"
-							@change="${({ target }: { target: NumberInput }) => {
-								props.sceneItems.clipper.size = target.value;
-							}}"
-						>
-						</bim-number-input>
-
-						<bim-button
-							label="Удалить все"
-							@click="${() => {
-								props.sceneItems.clipper.deleteAll();
 							}}"
 						>
 						</bim-button>

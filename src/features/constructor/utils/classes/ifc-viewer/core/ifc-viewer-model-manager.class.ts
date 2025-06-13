@@ -1,14 +1,10 @@
 import type { IFCViewerRelationsTree, IFCViewerWorld } from '@features/constructor/types';
-import {
-	FragmentsManager,
-	IfcLoader,
-	IfcRelationsIndexer,
-	type Components,
-} from '@thatopen/components';
+import { FragmentsManager, IfcLoader, IfcRelationsIndexer } from '@thatopen/components';
 import { Highlighter } from '@thatopen/components-front';
 import { tables } from '@thatopen/ui-obc';
 import { Mesh } from 'three';
 import { IFCViewerBase } from './ifc-viewer-base.class';
+import { IFCViewerClipper } from './ifc-viewer-clipper.class';
 import type { IFCViewerCore } from './ifc-viewer-core.class';
 
 interface IFCViewerModelManagerConstructorArgs {
@@ -45,7 +41,6 @@ export class IFCViewerModelManager extends IFCViewerBase<
 	protected async init(props: IFCViewerModelManagerConstructorArgs) {
 		const fragmentsManager = props.ifcViewerCoreInstance.components!.get(FragmentsManager);
 		const fragmentIfcLoader = props.ifcViewerCoreInstance.components!.get(IfcLoader);
-		fragmentIfcLoader.settings.webIfc.COORDINATE_TO_ORIGIN = true;
 		await fragmentIfcLoader.setup();
 
 		const highlighter = props.ifcViewerCoreInstance.components!.get(Highlighter);
@@ -88,11 +83,12 @@ export class IFCViewerModelManager extends IFCViewerBase<
 		if (model.hasProperties) await this.state.ifcRelationsIndexer?.process(model);
 	}
 
-	disposeModel(components: Components) {
+	disposeModel(core: IFCViewerCore, clipper: IFCViewerClipper) {
+		clipper.currentClipper?.deleteAll();
 		this.state.fragmentsManager?.dispose();
 		this.ifcRelationsIndexer?.dispose();
 		const [tree] = tables.relationsTree({
-			components,
+			components: core.components!,
 			models: [],
 		});
 		tree.preserveStructureOnFilter = true;
