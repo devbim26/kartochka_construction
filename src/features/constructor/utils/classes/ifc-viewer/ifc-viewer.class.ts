@@ -83,6 +83,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 				fragmentsManager: null,
 				ifcRelationsIndexer: null,
 				relationsTree: null,
+				updateRelationsTree: null,
 			} as IFCViewerModelManagerState,
 		);
 
@@ -250,7 +251,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			reader.onload = async () => {
 				await this.state.modelManager?.loadModel(
 					reader.result as ArrayBuffer,
-					this.state.core!.currentWorld!,
+					this.state.core!,
 					file.name,
 				);
 
@@ -266,6 +267,6 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 	}
 
 	private disposeFragmentsHandler() {
-		this.state.modelManager?.disposeModel(this.state.core!, this.state.clipper!);
+		this.state.modelManager?.disposeModel(this.state.core!);
 	}
 }

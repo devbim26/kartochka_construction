@@ -58,7 +58,13 @@ export abstract class IFCViewerBase<T extends object, K extends object> {
 				const item = this.state[keyName] as any;
 				if (!!item && 'destroy' in item && typeof item.destroy === 'function')
 					item.destroy();
-				if (!!item && 'dispose' in item && typeof item.dispose === 'function')
+				if (
+					!!item &&
+					'dispose' in item &&
+					typeof item.dispose === 'function' &&
+					'isDisposeable' in item &&
+					!!item.isDisposeable
+				)
 					item.dispose();
 				destroyedState[keyName as keyof T] =
 					this.baseState.cachedInitialState[keyName as keyof T];

@@ -64,8 +64,7 @@ export class IFCViewerCore extends IFCViewerBase<IFCViewerCoreState, IFCViewerCo
 
 	destroy() {
 		this.baseDestroy({
-			direction: ['currentWorld', 'worlds', 'components'],
-			skip: ['currentGrid'],
+			direction: ['currentGrid', 'currentWorld', 'worlds', 'components'],
 		});
 	}
 }

@@ -1,10 +1,11 @@
-import type { IFCViewerRelationsTree, IFCViewerWorld } from '@features/constructor/types';
+import type { IFCViewerRelationsTree } from '@features/constructor/types';
 import { FragmentsManager, IfcLoader, IfcRelationsIndexer } from '@thatopen/components';
 import { Highlighter } from '@thatopen/components-front';
+import { UpdateFunction } from '@thatopen/ui';
 import { tables } from '@thatopen/ui-obc';
+import { RelationsTreeUIState } from '@thatopen/ui-obc/dist/components/tables/RelationsTree/src/template';
 import { Mesh } from 'three';
 import { IFCViewerBase } from './ifc-viewer-base.class';
-import { IFCViewerClipper } from './ifc-viewer-clipper.class';
 import type { IFCViewerCore } from './ifc-viewer-core.class';
 
 interface IFCViewerModelManagerConstructorArgs {
@@ -13,6 +14,7 @@ interface IFCViewerModelManagerConstructorArgs {
 
 export interface IFCViewerModelManagerState {
 	relationsTree: IFCViewerRelationsTree | null;
+	updateRelationsTree: UpdateFunction<RelationsTreeUIState> | null;
 	fragmentIfcLoader: IfcLoader | null;
 	fragmentsManager: FragmentsManager | null;
 	ifcRelationsIndexer: IfcRelationsIndexer | null;
@@ -50,20 +52,22 @@ export class IFCViewerModelManager extends IFCViewerBase<
 		const ifcRelationsIndexer =
 			props.ifcViewerCoreInstance.components!.get(IfcRelationsIndexer);
 
-		const [tree] = tables.relationsTree({
+		const [tree, updateTree] = tables.relationsTree({
 			components: props.ifcViewerCoreInstance.components!,
+			models: [],
+		});
+		updateTree({
 			models: [],
 		});
 
 		tree.preserveStructureOnFilter = true;
 
-		const relationsTree = tree;
-
 		this.changeState(() => ({
 			fragmentIfcLoader,
 			fragmentsManager,
 			ifcRelationsIndexer,
-			relationsTree,
+			relationsTree: tree,
+			updateRelationsTree: updateTree,
 		}));
 	}
 
@@ -78,27 +82,29 @@ export class IFCViewerModelManager extends IFCViewerBase<
 		});
 	}
 
-	async loadModel(buffer: ArrayBuffer, world: IFCViewerWorld, filename: string) {
+	async loadModel(buffer: ArrayBuffer, core: IFCViewerCore, filename: string) {
 		this.state.fragmentsManager?.dispose();
-		world.meshes.clear();
+		this.state.ifcRelationsIndexer?.dispose();
+		core.currentWorld!.meshes.clear();
 		const model = await this.state.fragmentIfcLoader!.load(new Uint8Array(buffer));
 		model.name = filename;
-		world.scene.three.add(model);
+		core.currentWorld!.scene.three.add(model);
 		model.traverse((item) => {
-			if (item instanceof Mesh) world.meshes.add(item);
+			if (item instanceof Mesh) core.currentWorld!.meshes.add(item);
 		});
-		if (model.hasProperties) await this.state.ifcRelationsIndexer?.process(model);
+		if (model.hasProperties) {
+			await this.state.ifcRelationsIndexer!.process(model);
+			this.state.updateRelationsTree!({
+				models: [model],
+			});
+		}
 	}
 
-	disposeModel(core: IFCViewerCore, clipper: IFCViewerClipper) {
-		clipper.currentClipper?.deleteAll();
+	disposeModel(core: IFCViewerCore) {
 		this.state.fragmentsManager?.dispose();
-		this.ifcRelationsIndexer?.dispose();
-		const [tree] = tables.relationsTree({
-			components: core.components!,
+		this.state.ifcRelationsIndexer?.dispose();
+		this.state.updateRelationsTree!({
 			models: [],
 		});
-		tree.preserveStructureOnFilter = true;
-		this.changeState(() => ({ relationsTree: tree }));
 	}
 }
