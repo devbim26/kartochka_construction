@@ -62,16 +62,18 @@ export const getReportFloorById = async ({ id }: GetReportByIdParams) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorDetail(id));
 };
 export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {
-	return await withConstructorLoader(() => fetchApi.single.singleUpdate(data));
+	return await withConstructorLoader(() => fetchApi.api.reportInfoSingleUpdate(data));
 };
 export const updateReportFloor = async ({ data }: UpdateFloorReportProps) => {
-	return await withConstructorLoader(() => fetchApi.floor.constructionUpdate(data));
+	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorConstructionUpdate(data));
 };
 export const uploadDocument = async ({ data }: FloorDocumentUpload) => {
-	return await withConstructorLoader(() => fetchApi.floor.documentUpdate(data));
+	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorDocumentUpdate(data));
 };
 export const uploadImage = async ({ data }: FloorDocumentImage) => {
-	return await withConstructorLoader(() => fetchApi.floor.constructionImageUpdate(data));
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoFloorConstructionImageUpdate(data),
+	);
 };
 export const getReportFormInfo = async (id: string) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoReportInfoFlagsDetail(id));

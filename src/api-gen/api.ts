@@ -257,6 +257,11 @@ export interface CreateReportInfoDto {
 	category?: ReportCategory;
 }
 
+export interface CreateReportReceivingCommand {
+	/** @format uuid */
+	reportInfoId?: string;
+}
+
 export interface CreateRequirementCommand {
 	/** @format uuid */
 	secondPlacementRoomId?: string;
@@ -311,6 +316,11 @@ export interface DeleteMaterialCommand {
 }
 
 export interface DeleteReportConstructionCommand {
+	/** @format uuid */
+	id?: string;
+}
+
+export interface DeleteReportFloorInfoCommand {
 	/** @format uuid */
 	id?: string;
 }
@@ -390,6 +400,10 @@ export interface GetAlternativeConstructionHeadersQuery {
 	/** @format double */
 	maxThickness?: number | null;
 	/** @format double */
+	minMass?: number | null;
+	/** @format double */
+	maxMass?: number | null;
+	/** @format double */
 	minHeight?: number | null;
 	/** @format double */
 	maxHeight?: number | null;
@@ -401,6 +415,10 @@ export interface GetAlternativeConstructionHeadersQuery {
 	minLabRw?: number | null;
 	/** @format double */
 	maxLabRw?: number | null;
+	/** @format double */
+	minFireResistanceLimit?: number | null;
+	/** @format double */
+	maxFireResistanceLimit?: number | null;
 }
 
 export interface GetArticlesWithPaginationParamsQuery {
@@ -1925,6 +1943,243 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoSingleUpdate
+		 * @request PUT:/api/ReportInfo/single
+		 */
+		reportInfoSingleUpdate: (
+			data: UpdateReportInfoWithSingleConstructionCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<ReportInfoSingleConstructionDto, any>({
+				path: `/api/ReportInfo/single`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoFloorDocumentUpdate
+		 * @request PUT:/api/ReportInfo/floor/document
+		 */
+		reportInfoFloorDocumentUpdate: (
+			data: {
+				/** @format uuid */
+				reportInfoId?: string;
+				/** @format uuid */
+				floorConstructionInfoId?: string;
+				/** @format binary */
+				floorDocument?: File;
+				floorNumber?: string;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<FloorConstructionInfoDto, any>({
+				path: `/api/ReportInfo/floor/document`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoFloorConstructionUpdate
+		 * @request PUT:/api/ReportInfo/floor/construction
+		 */
+		reportInfoFloorConstructionUpdate: (
+			data: {
+				/** @format uuid */
+				reportInfoId?: string;
+				/** @format uuid */
+				floorConstructionInfoId?: string;
+				/** @format uuid */
+				reportFloorInfoId?: string;
+				/** @format uuid */
+				'floorInfo.reportConstructionHeader.id'?: string;
+				/** @format uuid */
+				'floorInfo.reportConstructionHeader.constructionHeaderId'?: string;
+				/** @format double */
+				'floorInfo.reportConstructionHeader.square'?: number;
+				/** @format uuid */
+				'floorInfo.reportConstructionHeader.secondPlacementRoomId'?: string;
+				/** @format uuid */
+				'floorInfo.reportConstructionHeader.firstPlacementRoomId'?: string;
+				/** @format int32 */
+				'floorInfo.coordinates.x'?: number;
+				/** @format int32 */
+				'floorInfo.coordinates.y'?: number;
+				/** @format int32 */
+				'floorInfo.page'?: number;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<FloorConstructionInfoDto, any>({
+				path: `/api/ReportInfo/floor/construction`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoFloorConstructionImageUpdate
+		 * @request PUT:/api/ReportInfo/floor/construction/image
+		 */
+		reportInfoFloorConstructionImageUpdate: (
+			data: {
+				/** @format binary */
+				floorDocumentImage?: File;
+				/** @format uuid */
+				reportFloorInfoId?: string;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<FloorConstructionInfoDto, any>({
+				path: `/api/ReportInfo/floor/construction/image`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoDocumentInfoUpdate
+		 * @request PUT:/api/ReportInfo/documentInfo
+		 */
+		reportInfoDocumentInfoUpdate: (
+			data: {
+				/** @format uuid */
+				reportInfoId?: string;
+				reportNumber?: string;
+				reportName?: string;
+				customerName?: string;
+				objectDescription?: string;
+				creatorFullName?: string;
+				code?: string;
+				country?: string;
+				director?: string;
+				/** @format date */
+				date?: string;
+				/** @format binary */
+				logo?: File;
+				'floorDocumentFlags.takeTitleList'?: boolean;
+				'floorDocumentFlags.takeContent'?: boolean;
+				'floorDocumentFlags.takeIntroduction'?: boolean;
+				'floorDocumentFlags.generalCharacteristics.takeRoomCharacteristic'?: boolean;
+				'floorDocumentFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation'?: boolean;
+				'floorDocumentFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation'?: boolean;
+				'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation'?: boolean;
+				'floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags'?: SoundInsulationFloorReportInfoFlagsDto[];
+				'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod'?: boolean;
+				'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags'?: ThermalInsulationFloorReportInfoFlagsDto[];
+				'floorDocumentFlags.takeConclusion'?: boolean;
+				'floorDocumentFlags.takeUsedLiteratureList'?: boolean;
+				'floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation'?: boolean;
+				'floorDocumentFlags.takeSupplementThermalInsulationProtocolsWithCalculation'?: boolean;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportInfo/documentInfo`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoFloorConstructionDelete
+		 * @request DELETE:/api/ReportInfo/floorConstruction
+		 */
+		reportInfoFloorConstructionDelete: (
+			data: DeleteFloorConstructionCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportInfo/floorConstruction`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoReportFloorInfoDelete
+		 * @request DELETE:/api/ReportInfo/reportFloorInfo
+		 */
+		reportInfoReportFloorInfoDelete: (
+			data: DeleteReportFloorInfoCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportInfo/reportFloorInfo`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoReportConstructionDelete
+		 * @request DELETE:/api/ReportInfo/reportConstruction
+		 */
+		reportInfoReportConstructionDelete: (
+			data: DeleteReportConstructionCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportInfo/reportConstruction`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportReceiving
+		 * @name ReportReceivingCreate
+		 * @request POST:/api/ReportReceiving
+		 */
+		reportReceivingCreate: (data: CreateReportReceivingCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/ReportReceiving`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags Requirement
 		 * @name RequirementDetail
 		 * @request GET:/api/Requirement/{id}
@@ -2047,217 +2302,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/SvgConstruction/{id}
 		 */
 		svgConstructionDetail: (id: string, params: RequestParams = {}) =>
-			this.request<RequirementDto, any>({
+			this.request<string, any>({
 				path: `/api/SvgConstruction/${id}`,
 				method: 'GET',
 				format: 'json',
-				...params,
-			}),
-	};
-	single = {
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name SingleUpdate
-		 * @request PUT:/single
-		 */
-		singleUpdate: (
-			data: UpdateReportInfoWithSingleConstructionCommand,
-			params: RequestParams = {},
-		) =>
-			this.request<ReportInfoSingleConstructionDto, any>({
-				path: `/single`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.Json,
-				format: 'json',
-				...params,
-			}),
-	};
-	floor = {
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name DocumentUpdate
-		 * @request PUT:/floor/document
-		 */
-		documentUpdate: (
-			data: {
-				/** @format uuid */
-				reportInfoId?: string;
-				/** @format uuid */
-				floorConstructionInfoId?: string;
-				/** @format binary */
-				floorDocument?: File;
-				floorNumber?: string;
-			},
-			params: RequestParams = {},
-		) =>
-			this.request<FloorConstructionInfoDto, any>({
-				path: `/floor/document`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.FormData,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ConstructionUpdate
-		 * @request PUT:/floor/construction
-		 */
-		constructionUpdate: (
-			data: {
-				/** @format uuid */
-				reportInfoId?: string;
-				/** @format uuid */
-				floorConstructionInfoId?: string;
-				/** @format uuid */
-				reportFloorInfoId?: string;
-				/** @format uuid */
-				'floorInfo.reportConstructionHeader.id'?: string;
-				/** @format uuid */
-				'floorInfo.reportConstructionHeader.constructionHeaderId'?: string;
-				/** @format double */
-				'floorInfo.reportConstructionHeader.square'?: number;
-				/** @format uuid */
-				'floorInfo.reportConstructionHeader.secondPlacementRoomId'?: string;
-				/** @format uuid */
-				'floorInfo.reportConstructionHeader.firstPlacementRoomId'?: string;
-				/** @format int32 */
-				'floorInfo.coordinates.x'?: number;
-				/** @format int32 */
-				'floorInfo.coordinates.y'?: number;
-				/** @format int32 */
-				'floorInfo.page'?: number;
-			},
-			params: RequestParams = {},
-		) =>
-			this.request<FloorConstructionInfoDto, any>({
-				path: `/floor/construction`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.FormData,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ConstructionImageUpdate
-		 * @request PUT:/floor/construction/image
-		 */
-		constructionImageUpdate: (
-			data: {
-				/** @format binary */
-				floorDocumentImage?: File;
-				/** @format uuid */
-				reportFloorInfoId?: string;
-			},
-			params: RequestParams = {},
-		) =>
-			this.request<FloorConstructionInfoDto, any>({
-				path: `/floor/construction/image`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.FormData,
-				format: 'json',
-				...params,
-			}),
-	};
-	documentInfo = {
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name DocumentInfoUpdate
-		 * @request PUT:/documentInfo
-		 */
-		documentInfoUpdate: (
-			data: {
-				/** @format uuid */
-				reportInfoId?: string;
-				reportNumber?: string;
-				reportName?: string;
-				customerName?: string;
-				objectDescription?: string;
-				creatorFullName?: string;
-				code?: string;
-				country?: string;
-				director?: string;
-				/** @format date */
-				date?: string;
-				/** @format binary */
-				logo?: File;
-				'floorDocumentFlags.takeTitleList'?: boolean;
-				'floorDocumentFlags.takeContent'?: boolean;
-				'floorDocumentFlags.takeIntroduction'?: boolean;
-				'floorDocumentFlags.generalCharacteristics.takeRoomCharacteristic'?: boolean;
-				'floorDocumentFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation'?: boolean;
-				'floorDocumentFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation'?: boolean;
-				'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation'?: boolean;
-				'floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags'?: SoundInsulationFloorReportInfoFlagsDto[];
-				'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod'?: boolean;
-				'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags'?: ThermalInsulationFloorReportInfoFlagsDto[];
-				'floorDocumentFlags.takeConclusion'?: boolean;
-				'floorDocumentFlags.takeUsedLiteratureList'?: boolean;
-				'floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation'?: boolean;
-				'floorDocumentFlags.takeSupplementThermalInsulationProtocolsWithCalculation'?: boolean;
-			},
-			params: RequestParams = {},
-		) =>
-			this.request<void, any>({
-				path: `/documentInfo`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.FormData,
-				...params,
-			}),
-	};
-	floorConstruction = {
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name FloorConstructionDelete
-		 * @request DELETE:/floorConstruction
-		 */
-		floorConstructionDelete: (
-			data: DeleteFloorConstructionCommand,
-			params: RequestParams = {},
-		) =>
-			this.request<void, any>({
-				path: `/floorConstruction`,
-				method: 'DELETE',
-				body: data,
-				type: ContentType.Json,
-				...params,
-			}),
-	};
-	reportConstruction = {
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportConstructionDelete
-		 * @request DELETE:/reportConstruction
-		 */
-		reportConstructionDelete: (
-			data: DeleteReportConstructionCommand,
-			params: RequestParams = {},
-		) =>
-			this.request<void, any>({
-				path: `/reportConstruction`,
-				method: 'DELETE',
-				body: data,
-				type: ContentType.Json,
 				...params,
 			}),
 	};
