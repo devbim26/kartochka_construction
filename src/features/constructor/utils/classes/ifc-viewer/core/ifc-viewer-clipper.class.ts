@@ -36,7 +36,9 @@ export class IFCViewerClipper extends IFCViewerBase<
 	}
 
 	destroy() {
-		this.baseDestroy();
+		this.baseDestroy({
+			direction: ['currentClipper', 'caster', 'casters'],
+		});
 	}
 
 	addClipperPlane(core: IFCViewerCore) {

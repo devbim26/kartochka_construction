@@ -44,19 +44,37 @@ export abstract class IFCViewerBase<T extends object, K extends object> {
 		Object.assign(this.state, callback({ ...this.state }));
 	}
 
-	protected baseDestroy() {
+	protected baseDestroy(destroyOptions?: { direction: (keyof T)[]; skip?: (keyof T)[] }) {
 		const destroyedState = { ...this.state };
 
-		Object.entries(this.state).forEach(([keyName, item]) => {
-			if (!!item && typeof item.destroy === 'function') {
-				item.destroy();
+		if (destroyOptions) {
+			if (destroyOptions.skip) {
+				destroyOptions.skip.forEach((keyName) => {
+					destroyedState[keyName as keyof T] =
+						this.baseState.cachedInitialState[keyName as keyof T];
+				});
 			}
-			if (!!item && typeof item.dispose === 'function') {
-				item.dispose();
-			}
-			destroyedState[keyName as keyof T] =
-				this.baseState.cachedInitialState[keyName as keyof T];
-		});
+			destroyOptions.direction.forEach((keyName) => {
+				const item = this.state[keyName] as any;
+				if (!!item && 'destroy' in item && typeof item.destroy === 'function')
+					item.destroy();
+				if (!!item && 'dispose' in item && typeof item.dispose === 'function')
+					item.dispose();
+				destroyedState[keyName as keyof T] =
+					this.baseState.cachedInitialState[keyName as keyof T];
+			});
+		} else {
+			Object.entries(this.state).forEach(([keyName, item]) => {
+				if (!!item && typeof item.destroy === 'function') {
+					item.destroy();
+				}
+				if (!!item && typeof item.dispose === 'function') {
+					item.dispose();
+				}
+				destroyedState[keyName as keyof T] =
+					this.baseState.cachedInitialState[keyName as keyof T];
+			});
+		}
 
 		this._changeBaseState(() => ({
 			inited: false,

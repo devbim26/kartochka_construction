@@ -108,8 +108,6 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 
 		this.setupHandlers(core, modelManager);
 
-		core.currentWorld!.scene.setup();
-
 		const ui = await IFCViewerBase.create(
 			IFCViewerUI,
 			{
@@ -147,7 +145,9 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 
 	destroy() {
 		this.destoyHandlers();
-		this.baseDestroy();
+		this.baseDestroy({
+			direction: ['ui', 'stats', 'clipper', 'modelManager', 'core'],
+		});
 	}
 
 	private destoyHandlers() {

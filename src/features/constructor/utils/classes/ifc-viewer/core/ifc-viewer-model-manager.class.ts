@@ -68,7 +68,14 @@ export class IFCViewerModelManager extends IFCViewerBase<
 	}
 
 	destroy() {
-		this.baseDestroy();
+		this.baseDestroy({
+			direction: [
+				'relationsTree',
+				'ifcRelationsIndexer',
+				'fragmentIfcLoader',
+				'fragmentsManager',
+			],
+		});
 	}
 
 	async loadModel(buffer: ArrayBuffer, world: IFCViewerWorld, filename: string) {

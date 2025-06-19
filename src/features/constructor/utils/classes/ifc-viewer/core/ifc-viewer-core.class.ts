@@ -52,6 +52,8 @@ export class IFCViewerCore extends IFCViewerBase<IFCViewerCoreState, IFCViewerCo
 
 		await currentWorld.camera.controls.setLookAt(10, 10, 10, 0, 0, 0);
 
+		currentWorld!.scene.setup();
+
 		this.changeState(() => ({
 			components: components,
 			currentWorld: currentWorld,
@@ -61,6 +63,9 @@ export class IFCViewerCore extends IFCViewerBase<IFCViewerCoreState, IFCViewerCo
 	}
 
 	destroy() {
-		this.baseDestroy();
+		this.baseDestroy({
+			direction: ['currentWorld', 'worlds', 'components'],
+			skip: ['currentGrid'],
+		});
 	}
 }
