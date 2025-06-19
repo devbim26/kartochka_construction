@@ -16,17 +16,22 @@ import {
 	svgConstructionDetail,
 } from '@features/constructor/services';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
-import type { ConstructionTypeEnum } from '@features/guidbooks/types';
-import { RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
+import {
+	convertToClientConstructionsEditData,
+	convertToServerConstructionsEditData,
+} from '@features/guidbooks/converters';
+import { getGuidebooksEdit } from '@features/guidbooks/services';
+import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
+import { Guidebooks, RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { AxiosError } from 'axios';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import DesigningGraph from './designing-graph.component';
-
 const DesigningScreen = () => {
 	const dispatch = useAppDispatch();
 	const [search] = useSearchParams();
@@ -39,7 +44,8 @@ const DesigningScreen = () => {
 	const [isRelevant, setIsRelevant] = useState<boolean>(false);
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
-
+	const [refreshConstructionData, setRefreshConstructionData] = useState(0);
+	const [isDataReadyForForm, setIsDataReadyForForm] = useState(false);
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
 		defaultValues: DesigningConfig.defaultValues,
@@ -49,6 +55,7 @@ const DesigningScreen = () => {
 	useEffect(() => {
 		if (!reportId) return;
 		dispatch(startLoading());
+		setIsDataReadyForForm(false);
 		from(getReportFloorById({ id: reportId }))
 			.pipe(
 				catchError((error) => {
@@ -59,26 +66,32 @@ const DesigningScreen = () => {
 			)
 			.subscribe((response) => {
 				const report: ReportInfoFloorConstructionDto | undefined = response?.data;
-				const newHeaderId =
+				const reportConstructionHeader =
 					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-						?.reportConstructionHeader?.constructionHeaderId;
-				const newHeader =
-					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-						?.reportConstructionHeader?.constructionHeader;
-				if (newHeaderId && newHeaderId !== constructionHeaderId) {
-					setConstructionHeaderId(newHeaderId);
+						?.reportConstructionHeader;
+				const header = reportConstructionHeader?.constructionHeader;
+				const headerId = reportConstructionHeader?.constructionHeaderId;
+				if (headerId && headerId !== constructionHeaderId) {
+					setConstructionHeaderId(headerId);
 				}
-				if (newHeader) {
-					setConstructionHeader(newHeader);
+				if (header) {
+					setConstructionHeader(header);
+					try {
+						const dataForForm = convertToClientConstructionsEditData(header);
+						form.reset(dataForForm);
+						setIsDataReadyForForm(true);
+					} catch (error) {
+						toast.error('Ошибка при заполнении формы');
+					}
 				} else {
 					toast.error('Не найден constructionHeader');
 				}
-				if (!newHeaderId) {
+				if (!headerId) {
 					toast.error('Не найден constructionHeaderId');
 				}
 				dispatch(stopLoading());
 			});
-	}, [reportId]);
+	}, [reportId, refreshConstructionData, dispatch, form]);
 
 	useEffect(() => {
 		if (!constructionHeaderId || graphData) return;
@@ -155,15 +168,6 @@ const DesigningScreen = () => {
 		handleGetConstructionImage(constructionHeaderId);
 	}, [constructionHeaderId]);
 
-	useEffect(() => {
-		if (constructionType) {
-			ConstructionTypeMap({
-				currentConstruction: constructionType,
-				currentForm: form,
-			}).action();
-		}
-	}, [constructionType]);
-
 	const formatMaterial = (material: (typeof materials)[0]) => {
 		const materialType =
 			RuMaterialTypeEnum[material.materialType as keyof typeof RuMaterialTypeEnum] ??
@@ -180,6 +184,31 @@ const DesigningScreen = () => {
 				.join(', ') || 'нет данных';
 		return `${materialType} (${materialParams})`;
 	};
+
+	const onEditHandle = useCallback(() => {
+		const formData = form.getValues() as ConstructionsEditData;
+		const dataForServer = convertToServerConstructionsEditData(formData);
+		from(
+			getGuidebooksEdit({
+				data: dataForServer,
+				guidebookType: Guidebooks.CONSTRUCTION,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					toast.success('Параметры конструкции успешно обновлены');
+					setRefreshConstructionData((prev) => prev + 1);
+				}
+			});
+	}, [form]);
 
 	if (isLoading) {
 		return (
@@ -208,21 +237,31 @@ const DesigningScreen = () => {
 						disabled
 					/>
 					<div className="flex flex-col">
-						{materials.map((material, index) => (
-							<p key={index} className="text-[16px]">
-								- {formatMaterial(material)}
-							</p>
-						))}
+						{constructionHeader?.constructionType?.constructions?.map(
+							(layer, layerIndex) => (
+								<div key={layerIndex}>
+									{layer.userMaterials?.map((material, materialIndex) => (
+										<p key={materialIndex} className="pl-4 text-[16px]">
+											- {formatMaterial(material)}
+										</p>
+									))}
+								</div>
+							),
+						)}
 					</div>
 				</div>
 			</div>
 			<div className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				{constructionType &&
+				{isDataReadyForForm &&
+					constructionType &&
 					ConstructionTypeMap({
 						currentConstruction: constructionType,
 						currentForm: form,
 					}).component}
-				<Button className="ml-auto h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none">
+				<Button
+					onClick={onEditHandle}
+					className="ml-auto h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
+				>
 					Применить
 				</Button>
 			</div>
@@ -260,5 +299,4 @@ const DesigningScreen = () => {
 		</div>
 	);
 };
-
 export default DesigningScreen;

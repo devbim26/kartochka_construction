@@ -17,5 +17,5 @@ RUN chmod +x /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-EXPOSE 443
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

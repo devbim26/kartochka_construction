@@ -1,4 +1,4 @@
-import { APP_ROUTES, Button, Switch } from '@core';
+import { APP_ROUTES, Button, ChevronIcon, Switch } from '@core';
 import { LandingSections } from '@features/landing/constants';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
@@ -19,72 +19,78 @@ interface SubSelectProps {
 
 export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelectProps) => {
 	const [isPerMonth, setIsPerMonth] = useState(true);
+	const [currentIndex, setCurrentIndex] = useState(0);
 
-	const handleToggle = () => {
-		setIsPerMonth(!isPerMonth);
-	};
+	const handleToggle = () => setIsPerMonth((prev) => !prev);
+	const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + titles.length) % titles.length);
+	const handleNext = () => setCurrentIndex((prev) => (prev + 1) % titles.length);
 
 	return (
 		<div
-			className={twMerge('flex w-[73.18%] flex-col py-[50px]', wrapperClassName)}
+			className={twMerge(
+				'mx-auto w-full max-w-[1440px] px-4 py-12 sm:px-6 md:px-8',
+				wrapperClassName,
+			)}
 			id={LandingSections.subscription.id}
 		>
 			{location.pathname.startsWith(`/${APP_ROUTES.landing.route}`) && (
-				<div className="mb-[34px] flex font-montserrat text-[20px] font-normal leading-[24px]">
+				<div className="mb-6 font-montserrat text-base font-normal leading-snug sm:text-lg">
 					Подписки
 				</div>
 			)}
+
 			<div className="flex flex-col items-center text-center">
 				<Switch
 					onText="год"
 					offText="месяц"
-					wrapperClassName="mb-[12px] h-[30px] w-[180px] p-[3px] bg-primary"
-					textClassName="font-semibold font-montserrat text-[16px] leading-[20px]"
+					wrapperClassName="mb-3 h-[30px] w-[180px] p-[3px] bg-primary"
+					textClassName="font-semibold font-montserrat text-sm sm:text-base leading-5"
 					unactiveTextClassName="text-white"
 					activeTextClassName="text-primary"
 					onChange={handleToggle}
 				/>
-				<div className="mb-[12px] font-montserrat text-[12px] font-normal">
+				<div className="mb-3 font-montserrat text-xs font-normal sm:text-sm">
 					При покупке на год первые 3 месяца бесплатно
 				</div>
-				<div className="flex w-fit gap-[10px]">
+
+				<div className="hidden w-full gap-4 sm:grid sm:grid-cols-3">
 					{titles.map((title, index) => (
 						<div
 							key={index}
 							className={twMerge(
 								subContainerClassName,
-								'flex flex-1 flex-col rounded-[20px] border border-gray-border px-[16px] pb-[16px] pt-[41px]',
+								'flex flex-col rounded-2xl border border-gray-border px-4 pb-4 pt-10 sm:px-6',
 							)}
 						>
-							<div className="mx-[17px] border-b-2 border-b-gray-border pb-[9px] font-montserrat text-[25px] font-bold leading-[30px] text-primary">
+							<div className="mx-4 border-b-2 border-gray-border pb-2 font-montserrat text-xl font-bold text-primary sm:text-2xl">
 								{title}
 							</div>
-							<div className="mb-[25px] font-montserrat text-[16px] font-medium leading-[145%]">
+							<div className="mb-6 font-montserrat text-sm font-medium leading-[145%] sm:text-base">
 								{subscriptionDescriptions[index]}
 							</div>
-							<div className="mb-[18px] font-montserrat text-[20px] font-medium leading-[24px] text-primary">
+							<div className="mb-4 font-montserrat text-lg font-medium text-primary sm:text-xl">
 								{isPerMonth ? monthPrices[index] : yearPrices[index]}
 							</div>
-							<Button className="mb-[14px] h-[40px] w-full">
-								<p className="font-sans text-base font-semibold leading-5 text-white">
+							<Button className="mb-4 h-10 w-full">
+								<p className="font-sans text-sm font-semibold leading-5 text-white sm:text-base">
 									Оформить подписку
 								</p>
 							</Button>
 							<div className="flex flex-col">
-								{points[index].map((point, index) => (
-									<div key={index} className="mb-[10px] flex flex-row gap-[10px]">
-										<span className="flex items-center">
+								{points[index].map((point, i) => (
+									<div key={i} className="mb-2 flex items-start gap-2">
+										<span className="shrink-0 pt-1">
 											<CheckMarkImage />
 										</span>
-										<span className="flex text-start font-montserrat text-[18px] leading-[145%]">
+										<span className="text-start font-montserrat text-sm leading-[145%] sm:text-base">
 											{point}
 										</span>
 									</div>
 								))}
-								{crossedPoints[index].map((point, index) => (
+								{crossedPoints[index].map((point, i) => (
 									<div
-										key={index}
-										className="mb-[10px] ml-[26px] flex flex-row gap-[10px] text-start font-montserrat text-[18px] font-semibold leading-[145%] text-gray-text line-through"
+										key={i}
+										className="mb-2 ml-6 text-start font-montserrat text-sm font-semibold leading-[145%] text-gray-text line-through sm:text-base"
 									>
 										{point}
 									</div>
@@ -92,6 +98,68 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 							</div>
 						</div>
 					))}
+				</div>
+
+				<div className="mt-6 flex w-full items-center justify-center gap-4 sm:hidden">
+					<Button
+						onClick={handlePrev}
+						variant="primary"
+						className="shrink-0 p-[10px]"
+						aria-label="Предыдущая подписка"
+					>
+						<ChevronIcon className="rotate-90" fill="white" />
+					</Button>
+
+					<div
+						className={twMerge(
+							subContainerClassName,
+							'flex h-[791px] w-[315px] flex-col rounded-2xl border border-gray-border px-4 pb-4 pt-10',
+						)}
+					>
+						<div className="mx-4 border-b-2 border-gray-border pb-2 font-montserrat text-xl font-bold text-primary">
+							{titles[currentIndex]}
+						</div>
+						<div className="mb-6 font-montserrat text-sm font-medium leading-[145%]">
+							{subscriptionDescriptions[currentIndex]}
+						</div>
+						<div className="mb-4 font-montserrat text-lg font-medium text-primary">
+							{isPerMonth ? monthPrices[currentIndex] : yearPrices[currentIndex]}
+						</div>
+						<Button className="mb-4 h-10 w-full">
+							<p className="font-sans text-sm font-semibold leading-5 text-white">
+								Оформить подписку
+							</p>
+						</Button>
+						<div className="flex flex-col">
+							{points[currentIndex].map((point, i) => (
+								<div key={i} className="mb-2 flex items-start gap-2">
+									<span className="shrink-0 pt-1">
+										<CheckMarkImage />
+									</span>
+									<span className="text-start font-montserrat text-sm leading-[145%]">
+										{point}
+									</span>
+								</div>
+							))}
+							{crossedPoints[currentIndex].map((point, i) => (
+								<div
+									key={i}
+									className="mb-2 ml-6 text-start font-montserrat text-sm font-semibold leading-[145%] text-gray-text line-through"
+								>
+									{point}
+								</div>
+							))}
+						</div>
+					</div>
+
+					<Button
+						onClick={handleNext}
+						variant="primary"
+						className="shrink-0 p-[10px]"
+						aria-label="Следующая подписка"
+					>
+						<ChevronIcon className="-rotate-90" fill="white" />
+					</Button>
 				</div>
 			</div>
 		</div>
