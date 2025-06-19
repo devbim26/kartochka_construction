@@ -10,11 +10,11 @@ import type { RefObject } from 'react';
 import {
 	IFCViewerBase,
 	IFCViewerClipper,
-	IFCViewerClipperState,
 	IFCViewerCore,
 	IFCViewerModelManager,
 	IFCViewerStats,
 	IFCViewerUI,
+	type IFCViewerClipperState,
 	type IFCViewerCoreState,
 	type IFCViewerModelManagerState,
 	type IFCViewerStatsState,
@@ -127,7 +127,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 					},
 					treeInfoPanelConstructorProps: {
 						components: core.components!,
-						relationsTree: modelManager.relationsTree!,
+						relationsTree: modelManager.relationsTree!.tree!,
 					},
 				},
 				containers: this.state.containers!.panels,

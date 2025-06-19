@@ -45,15 +45,15 @@ export const ConstructionSheets = () => {
 					<SimpleTableCell
 						content={
 							info.getValue() ? (
-								<div className="w-[450px] h-[400px]">
+								<div className="h-[400px] w-[450px]">
 									<img
-										className="w-[450px] h-[400px] rounded-[18px] border-[3px] border-primary bg-white object-scale-down"
+										className="h-[400px] w-[450px] rounded-[18px] border-[3px] border-primary bg-white object-scale-down"
 										src={info.getValue() as string}
 										alt="floorPlanImage"
 									/>
 								</div>
 							) : (
-								<div className="w-[450px] h-[400px] rounded-[18px] border-[3px] border-primary bg-white"></div>
+								<div className="h-[400px] w-[450px] rounded-[18px] border-[3px] border-primary bg-white"></div>
 							)
 						}
 					/>

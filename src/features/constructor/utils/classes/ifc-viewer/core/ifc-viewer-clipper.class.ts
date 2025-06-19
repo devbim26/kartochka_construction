@@ -1,5 +1,5 @@
 import type { IFCViewerWorld } from '@features/constructor/types';
-import { Clipper, Raycasters, SimpleRaycaster } from '@thatopen/components';
+import { Clipper, Raycasters, type SimpleRaycaster } from '@thatopen/components';
 import { IFCViewerBase } from './ifc-viewer-base.class';
 import type { IFCViewerCore } from './ifc-viewer-core.class';
 

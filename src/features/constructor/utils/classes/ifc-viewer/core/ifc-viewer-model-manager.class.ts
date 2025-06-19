@@ -1,9 +1,9 @@
 import type { IFCViewerRelationsTree } from '@features/constructor/types';
 import { FragmentsManager, IfcLoader, IfcRelationsIndexer } from '@thatopen/components';
 import { Highlighter } from '@thatopen/components-front';
-import { UpdateFunction } from '@thatopen/ui';
+import type { UpdateFunction } from '@thatopen/ui';
 import { tables } from '@thatopen/ui-obc';
-import { RelationsTreeUIState } from '@thatopen/ui-obc/dist/components/tables/RelationsTree/src/template';
+import type { RelationsTreeUIState } from '@thatopen/ui-obc/dist/components/tables/RelationsTree/src/template';
 import { Mesh } from 'three';
 import { IFCViewerBase } from './ifc-viewer-base.class';
 import type { IFCViewerCore } from './ifc-viewer-core.class';
@@ -13,8 +13,10 @@ interface IFCViewerModelManagerConstructorArgs {
 }
 
 export interface IFCViewerModelManagerState {
-	relationsTree: IFCViewerRelationsTree | null;
-	updateRelationsTree: UpdateFunction<RelationsTreeUIState> | null;
+	relationsTree: {
+		tree: IFCViewerRelationsTree;
+		updateTree: UpdateFunction<RelationsTreeUIState>;
+	} | null;
 	fragmentIfcLoader: IfcLoader | null;
 	fragmentsManager: FragmentsManager | null;
 	ifcRelationsIndexer: IfcRelationsIndexer | null;
@@ -56,9 +58,6 @@ export class IFCViewerModelManager extends IFCViewerBase<
 			components: props.ifcViewerCoreInstance.components!,
 			models: [],
 		});
-		updateTree({
-			models: [],
-		});
 
 		tree.preserveStructureOnFilter = true;
 
@@ -66,8 +65,10 @@ export class IFCViewerModelManager extends IFCViewerBase<
 			fragmentIfcLoader,
 			fragmentsManager,
 			ifcRelationsIndexer,
-			relationsTree: tree,
-			updateRelationsTree: updateTree,
+			relationsTree: {
+				tree,
+				updateTree,
+			},
 		}));
 	}
 
@@ -94,7 +95,7 @@ export class IFCViewerModelManager extends IFCViewerBase<
 		});
 		if (model.hasProperties) {
 			await this.state.ifcRelationsIndexer!.process(model);
-			this.state.updateRelationsTree!({
+			this.state.relationsTree!.updateTree({
 				models: [model],
 			});
 		}
@@ -103,7 +104,7 @@ export class IFCViewerModelManager extends IFCViewerBase<
 	disposeModel(core: IFCViewerCore) {
 		this.state.fragmentsManager?.dispose();
 		this.state.ifcRelationsIndexer?.dispose();
-		this.state.updateRelationsTree!({
+		this.state.relationsTree!.updateTree({
 			models: [],
 		});
 	}
