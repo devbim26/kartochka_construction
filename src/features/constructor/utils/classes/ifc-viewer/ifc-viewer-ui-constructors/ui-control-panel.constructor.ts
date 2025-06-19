@@ -3,11 +3,11 @@ import type { CameraProjection, Clipper, NavModeID, SimpleGrid } from '@thatopen
 import {
 	Component,
 	html,
+	Panel,
 	type Checkbox,
 	type ColorInput,
 	type Dropdown,
 	type NumberInput,
-	type PanelSection,
 } from '@thatopen/ui';
 import { Color } from 'three';
 
@@ -24,7 +24,7 @@ export interface UIControlPanelConstructorProps {
 }
 
 export const uiControlPanelConstructor = (props: UIControlPanelConstructorProps) => {
-	return Component.create<PanelSection>(() => {
+	return Component.create<Panel>(() => {
 		return html`
 			<bim-panel>
 				<bim-panel-section

@@ -37,6 +37,7 @@ export interface IFCViewerState {
 	ui: IFCViewerUI | null;
 	stats: IFCViewerStats | null;
 	containers: IFCViewerContainers | null;
+	constructors: IFCViewerUIConstructorArgs['constructors'] | null;
 }
 
 export interface IFCViewerConstructorArgs {
@@ -83,7 +84,9 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 				fragmentsManager: null,
 				ifcRelationsIndexer: null,
 				relationsTree: null,
-				updateRelationsTree: null,
+				classificationsTree: null,
+				propertiesTable: null,
+				highlighter: null,
 			} as IFCViewerModelManagerState,
 		);
 
@@ -128,11 +131,13 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 					treeInfoPanelConstructorProps: {
 						components: core.components!,
 						relationsTree: modelManager.relationsTree!.tree!,
+						classificationsTree: modelManager.classificationsTree!.tree!,
+						propertiesTable: null,
 					},
 				},
 				containers: this.state.containers!.panels,
 			},
-			{ stub: null } as IFCViewerUIState,
+			{ treeInfoPanel: null, containers: null, controlPanel: null } as IFCViewerUIState,
 		);
 
 		this.changeState(() => ({
@@ -254,6 +259,45 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 					this.state.core!,
 					file.name,
 				);
+				this.state.ui?.destroy();
+
+				const ui = await IFCViewerBase.create(
+					IFCViewerUI,
+					{
+						constructors: this.state.constructors!,
+						constructorProps: {
+							uiControlPanelConstructorProps: {
+								sceneItems: {
+									world: this.state.core!.currentWorld!,
+									grid: this.state.core!.currentGrid!,
+									clipper: this.state.clipper!.currentClipper!,
+								},
+								callbacks: {
+									loadIfcFileHandler: this._loadIfcFileHandlerRef!,
+									disposeFragmentsHandler: this._disposeFragmentsHandlerRef!,
+								},
+							},
+							treeInfoPanelConstructorProps: {
+								components: this.state.core!.components!,
+								relationsTree: this.state.modelManager!.relationsTree!.tree!,
+								classificationsTree:
+									this.state.modelManager!.classificationsTree!.tree!,
+								propertiesTable:
+									this.state.modelManager!.propertiesTable?.table || null,
+							},
+						},
+						containers: this.state.containers!.panels,
+					},
+					{
+						treeInfoPanel: null,
+						containers: null,
+						controlPanel: null,
+					} as IFCViewerUIState,
+				);
+
+				this.changeState(() => ({
+					ui,
+				}));
 
 				document.body.removeChild(input);
 				input.removeEventListener('change', handleFileLoad);

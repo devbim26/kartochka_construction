@@ -13,6 +13,7 @@ const IFCIFCViewerDefState: IFCViewerState = {
 	ui: null,
 	stats: null,
 	containers: null,
+	constructors: null,
 };
 
 export const useIFCViewer = (props: {
@@ -39,6 +40,7 @@ export const useIFCViewer = (props: {
 						treeInfoPanelContainer: props.containers.treeInfoPanelContainer,
 					},
 				},
+				constructors: props.viewerProps.ui.constructors,
 			} as IFCViewerState).then((res) => (currentViewer.current = res));
 		}
 		return () => {

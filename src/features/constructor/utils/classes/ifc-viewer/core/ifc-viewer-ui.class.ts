@@ -1,4 +1,4 @@
-import { Manager } from '@thatopen/ui';
+import { Manager, Panel } from '@thatopen/ui';
 import type { RefObject } from 'react';
 import type {
 	TreeInfoPanelConstructor,
@@ -9,7 +9,12 @@ import type {
 import { IFCViewerBase } from './ifc-viewer-base.class';
 
 export interface IFCViewerUIState {
-	stub: boolean | null;
+	controlPanel: Panel | null;
+	treeInfoPanel: Panel | null;
+	containers: {
+		controlPanelContainer: RefObject<HTMLDivElement | null>;
+		treeInfoPanelContainer: RefObject<HTMLDivElement | null>;
+	} | null;
 }
 
 export interface IFCViewerUIConstructorArgs {
@@ -39,9 +44,19 @@ export class IFCViewerUI extends IFCViewerBase<IFCViewerUIState, IFCViewerUICons
 			props.constructorProps.treeInfoPanelConstructorProps,
 		);
 		props.containers.treeInfoPanelContainer.current?.append(treeInfoPanel);
+
+		this.changeState(() => ({
+			containers: props.containers,
+			controlPanel,
+			treeInfoPanel,
+		}));
 	}
 
 	destroy() {
+		this.state.containers?.treeInfoPanelContainer.current?.removeChild(
+			this.state.treeInfoPanel!,
+		);
+		this.state.containers?.controlPanelContainer.current?.removeChild(this.state.controlPanel!);
 		this.baseDestroy();
 	}
 }
