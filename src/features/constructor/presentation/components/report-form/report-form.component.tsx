@@ -1,6 +1,6 @@
 import { Button } from '@core';
 import { convertToClientReportFormFlags } from '@features/constructor/converters';
-import { formReport, getReportFormInfo } from '@features/constructor/services';
+import { formReport, getReportFormInfo, reportReceive } from '@features/constructor/services';
 import type { FormReportSchemaType } from '@features/constructor/utils';
 import { FormReportConfig } from '@features/constructor/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -49,14 +49,22 @@ const ReportFromComponent = () => {
 				)
 				.subscribe((response) => {
 					if (response.status === 200)
-						from(formReport({ ...form.getValues(), reportInfoId: reportId }))
+						from(reportReceive(reportId))
 							.pipe(
 								catchError(() => {
-									return [];
+									return [null];
 								}),
 							)
 							.subscribe((response) => {
-								if (response.status === 200) console.log(response.data);
+								if (response?.status === 200 && response.data) {
+									const link = document.createElement('a');
+									link.href = response.data;
+									link.download = '';
+									link.target = '_blank';
+									document.body.appendChild(link);
+									link.click();
+									document.body.removeChild(link);
+								}
 							});
 				});
 		} else {
