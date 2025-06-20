@@ -33,22 +33,19 @@ export const ConstructionImage = ({
 		if (!id) return;
 		handleGetConstructionImage(id);
 	}, []);
+
+	console.log(materials);
+
 	return svgUrl ? (
-		<div className="flex size-[400px] flex-col gap-[10px]">
-			<img
-				className="size-[400px] rounded-[18px] border-[3px] border-primary bg-white object-fill"
-				src={svgUrl}
-				alt="constructionImage"
-			/>
-			<div className="flex flex-col">
-				{materials.map((material, index) =>
-					material.constructions?.map((construction, id) =>
-						construction?.userMaterials?.map((material) => (
-							<p key={`${index}-${id}`} className="text-[16px]">
-								- {formatMaterial(material as UserMaterials)}
-							</p>
-						)),
-					),
+		<div className="flex h-[400px] w-[500px] items-center gap-[10px] rounded-[18px] border-[3px] border-primary bg-white p-2">
+			<img className="h-[390px] w-[200px] object-fill" src={svgUrl} alt="constructionImage" />
+			<div className="flex w-fit flex-col">
+				{materials.map((construction: any, index) =>
+					construction.userMaterials?.map((material: any, materialIndex: any) => (
+						<p key={`${index}-${materialIndex}`} className="text-[16px]">
+							- {formatMaterial(material as UserMaterials)}
+						</p>
+					)),
 				)}
 			</div>
 		</div>

@@ -70,7 +70,6 @@ export const FormReportSchema = z.object({
 				date.getDate() === day
 			);
 		}, 'Дата указана некорректно'),
-	//logoUrl: z.string().min(1, 'Поле обязательно для заполнения'),
 	floorDocumentsFlags: FloorDocumentsFlags,
 });
 

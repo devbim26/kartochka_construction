@@ -8,17 +8,19 @@ import {
 } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { getReportFloorById, uploadImage } from '@features/constructor/services';
-import { constructorSlice } from '@features/constructor/store';
+import { constructorSlice, stopLoading } from '@features/constructor/store';
 import type { ConstructionSheet } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
 import { convertToClientConstructionTypeEnumData } from '@features/guidbooks/converters';
 import { RuConstructionTypesMap } from '@features/guidbooks/types';
+import { AxiosError } from 'axios';
 import * as pdfjs from 'pdfjs-dist';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { TbZoomReset } from 'react-icons/tb';
 import { useSearchParams } from 'react-router-dom';
-import { from } from 'rxjs';
+import { catchError, from } from 'rxjs';
+import { toast } from 'sonner';
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@5.1.91/build/pdf.worker.min.mjs`;
 
 type Props = {
@@ -186,7 +188,6 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 			page: pageNum.toString(),
 		});
 	};
-
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
@@ -235,48 +236,62 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 							'file',
 							'image/png',
 						);
-						from(
-							uploadImage({
-								data: {
-									reportFloorInfoId: info.id,
-									floorDocumentImage: imageFile,
-								},
-							}),
-						).subscribe((response) => {
-							if (response.status === 200) {
-								if (search.get('reportType') == ReportCategory.Floor)
-									from(
-										getReportFloorById({ id: search.get('reportId')! }),
-									).subscribe((response) => {
-										dispatch(
-											constructorSlice.actions.setConstructionsSheet(
-												response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
-													(info) => ({
-														id: info.id,
-														title:
-															info.reportConstructionHeader
-																?.constructionHeader?.name ||
-															'Нет названия',
-														floorPlanImage: info.documentImageUrl || '',
-														constructionId:
-															info.reportConstructionHeader
-																?.constructionHeaderId,
-														constructionInfoImage:
-															info.documentImageUrl || '',
-														square:
-															info.reportConstructionHeader?.square ||
-															'0',
-														materials:
-															info.reportConstructionHeader
-																?.constructionHeader
-																?.constructionType?.constructions,
-													}),
-												) as ConstructionSheet[],
-											),
-										);
-									});
-							}
-						});
+						if (info) {
+							from(
+								uploadImage({
+									data: {
+										reportFloorInfoId: info.id,
+										floorDocumentImage: imageFile,
+									},
+								}),
+							)
+								.pipe(
+									catchError((error) => {
+										if (error instanceof AxiosError) {
+											toast.error(error.response?.data);
+										}
+										dispatch(stopLoading());
+										return from([null]);
+									}),
+								)
+								.subscribe((response) => {
+									if (response?.status === 200) {
+										if (search.get('reportType') == ReportCategory.Floor)
+											from(
+												getReportFloorById({ id: search.get('reportId')! }),
+											).subscribe((response) => {
+												dispatch(
+													constructorSlice.actions.setConstructionsSheet(
+														response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
+															(info) => ({
+																id: info.id,
+																title:
+																	info.reportConstructionHeader
+																		?.constructionHeader
+																		?.name || 'Нет названия',
+																floorPlanImage:
+																	info.documentImageUrl || '',
+																constructionId:
+																	info.reportConstructionHeader
+																		?.constructionHeaderId,
+																constructionInfoImage:
+																	info.documentImageUrl || '',
+																square:
+																	info.reportConstructionHeader
+																		?.square || '0',
+																materials:
+																	info.reportConstructionHeader
+																		?.constructionHeader
+																		?.constructionType
+																		?.constructions,
+															}),
+														) as ConstructionSheet[],
+													),
+												);
+											});
+									}
+								});
+						}
 					}
 				}
 			});

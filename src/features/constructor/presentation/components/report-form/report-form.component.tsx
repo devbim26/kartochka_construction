@@ -1,6 +1,6 @@
 import { Button } from '@core';
 import { convertToClientReportFormFlags } from '@features/constructor/converters';
-import { getReportFormInfo } from '@features/constructor/services';
+import { formReport, getReportFormInfo } from '@features/constructor/services';
 import type { FormReportSchemaType } from '@features/constructor/utils';
 import { FormReportConfig } from '@features/constructor/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from } from 'rxjs';
+import { toast } from 'sonner';
 import { DocumentFlags } from './document-flags.component';
 import { GeneralInfoForm } from './general-info-form.component';
 
@@ -20,6 +21,7 @@ const ReportFromComponent = () => {
 	});
 	useEffect(() => {
 		if (!reportId) return;
+		form.setValue('reportInfoId', reportId);
 		from(getReportFormInfo(reportId))
 			.pipe(
 				catchError(() => {
@@ -35,6 +37,33 @@ const ReportFromComponent = () => {
 			});
 	}, [reportId]);
 
+	const handleDownloadReport = () => {
+		console.log(123);
+		if (!Object.keys(form.formState.errors).length) {
+			if (!reportId) return;
+			from(formReport({ ...form.getValues(), reportInfoId: reportId }))
+				.pipe(
+					catchError(() => {
+						return [];
+					}),
+				)
+				.subscribe((response) => {
+					if (response.status === 200)
+						from(formReport({ ...form.getValues(), reportInfoId: reportId }))
+							.pipe(
+								catchError(() => {
+									return [];
+								}),
+							)
+							.subscribe((response) => {
+								if (response.status === 200) console.log(response.data);
+							});
+				});
+		} else {
+			toast.error('Заполните форму');
+		}
+	};
+
 	return (
 		<FormProvider {...form}>
 			<div className="flex size-full flex-col items-center gap-[50px] rounded-lg bg-white p-[50px]">
@@ -42,7 +71,7 @@ const ReportFromComponent = () => {
 				<GeneralInfoForm />
 				<DocumentFlags />
 				<div className="flex w-full items-center justify-end gap-[50px]">
-					<Button>Скачать</Button>
+					<Button onClick={handleDownloadReport}>Скачать</Button>
 					<Button>Сохранить</Button>
 				</div>
 			</div>

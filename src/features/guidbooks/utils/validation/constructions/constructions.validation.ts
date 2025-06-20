@@ -26,6 +26,8 @@ export const subConstructionSchema = z.object({
 	userMaterials: z.array(UserMaterial).optional().nullable(),
 });
 
+export type SubConstructionTypeSchemaType = z.infer<typeof subConstructionSchema>;
+
 export const ConstructionTypeShema = z.object({
 	constructionTypeEnum: z.string().min(1, 'Поле обязательно для заполнения'),
 	constructions: z.array(subConstructionSchema).optional().nullable(),
