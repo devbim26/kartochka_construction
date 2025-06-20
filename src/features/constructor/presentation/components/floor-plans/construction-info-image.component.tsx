@@ -34,8 +34,6 @@ export const ConstructionImage = ({
 		handleGetConstructionImage(id);
 	}, []);
 
-	console.log(materials);
-
 	return svgUrl ? (
 		<div className="flex h-[400px] w-[500px] items-center gap-[10px] rounded-[18px] border-[3px] border-primary bg-white p-2">
 			<img className="h-[390px] w-[200px] object-fill" src={svgUrl} alt="constructionImage" />

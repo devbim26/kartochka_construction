@@ -70,7 +70,7 @@ export const ConstructorHeader = () => {
 							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
 					)}
 					onClick={() => navigate(CONSTRUCTOR_ROUTES.ifcModel.route)}
-					disabled={!isActive(CONSTRUCTOR_ROUTES.ifcModel.route)}
+					//disabled={!isActive(CONSTRUCTOR_ROUTES.ifcModel.route)}
 				>
 					IFC модель
 				</Button>

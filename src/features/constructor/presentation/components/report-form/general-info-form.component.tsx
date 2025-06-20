@@ -73,7 +73,7 @@ export const GeneralInfoForm = () => {
 							wrapperClassName="flex-row items-center gap-[10px]"
 							inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							{...register('projectName')}
-							type={'number'}
+							type={'text'}
 							placeholder="Введите название проекта"
 							max={50}
 						/>
@@ -123,6 +123,7 @@ export const GeneralInfoForm = () => {
 					<Input
 						wrapperClassName="flex-row items-center gap-[10px]"
 						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+						{...register('commonProjectName')}
 						value={watch('commonProjectName')}
 						type={'text'}
 						placeholder="Введите название проекта"
