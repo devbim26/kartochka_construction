@@ -3,11 +3,11 @@ import type { CameraProjection, Clipper, NavModeID, SimpleGrid } from '@thatopen
 import {
 	Component,
 	html,
-	Panel,
 	type Checkbox,
 	type ColorInput,
 	type Dropdown,
 	type NumberInput,
+	type Panel,
 } from '@thatopen/ui';
 import { Color } from 'three';
 

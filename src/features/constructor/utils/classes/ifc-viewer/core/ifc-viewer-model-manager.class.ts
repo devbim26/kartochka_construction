@@ -1,11 +1,11 @@
 import type { IFCDataTable } from '@features/constructor/types';
 import { Classifier, FragmentsManager, IfcLoader, IfcRelationsIndexer } from '@thatopen/components';
 import { Highlighter } from '@thatopen/components-front';
-import { FragmentIdMap } from '@thatopen/fragments';
+import type { FragmentIdMap } from '@thatopen/fragments';
 import type { UpdateFunction } from '@thatopen/ui';
 import { tables } from '@thatopen/ui-obc';
-import { ClassificationTreeUIState } from '@thatopen/ui-obc/dist/components/tables/ClassificationsTree/src/template';
-import { ElementPropertiesUI } from '@thatopen/ui-obc/dist/components/tables/ElementProperties/src/template';
+import type { ClassificationTreeUIState } from '@thatopen/ui-obc/dist/components/tables/ClassificationsTree/src/template';
+import type { ElementPropertiesUI } from '@thatopen/ui-obc/dist/components/tables/ElementProperties/src/template';
 import type { RelationsTreeUIState } from '@thatopen/ui-obc/dist/components/tables/RelationsTree/src/template';
 import { Mesh } from 'three';
 import { IFCViewerBase } from './ifc-viewer-base.class';

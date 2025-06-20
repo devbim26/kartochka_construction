@@ -1,5 +1,5 @@
 import type { IFCDataTable } from '@features/constructor/types';
-import { Component, html, Panel, type TextInput } from '@thatopen/ui';
+import { Component, html, type Panel, type TextInput } from '@thatopen/ui';
 
 export interface TreeInfoPanelConstructorProps {
 	relationsTree: IFCDataTable;

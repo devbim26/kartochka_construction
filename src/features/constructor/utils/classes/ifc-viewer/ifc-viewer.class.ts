@@ -6,7 +6,7 @@ import type {
 	IFCViewerVoidAsyncFunc,
 	IFCViewerVoidFunc,
 } from '@features/constructor/types';
-import { RefObject } from 'react';
+import type { RefObject } from 'react';
 import {
 	IFCViewerBase,
 	IFCViewerClipper,
@@ -14,12 +14,12 @@ import {
 	IFCViewerModelManager,
 	IFCViewerStats,
 	IFCViewerUI,
-	IFCViewerUIStateEntityArgs,
 	type IFCViewerClipperState,
 	type IFCViewerCoreState,
 	type IFCViewerModelManagerState,
 	type IFCViewerStatsState,
 	type IFCViewerUIState,
+	type IFCViewerUIStateEntityArgs,
 } from './core';
 
 export interface IFCViewerState {
@@ -259,7 +259,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 					this.state.core!,
 					file.name,
 				);
-				
+
 				this.state.ui!.resetupPanel('propertiesPanel', {
 					propertiesTable: this.state.modelManager!.propertiesTable!.table,
 				});

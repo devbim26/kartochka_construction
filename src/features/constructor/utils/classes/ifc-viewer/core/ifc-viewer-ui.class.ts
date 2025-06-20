@@ -1,4 +1,4 @@
-import { Manager, Panel } from '@thatopen/ui';
+import { Manager, type Panel } from '@thatopen/ui';
 import type { RefObject } from 'react';
 import type {
 	IFCModelProperiesPanelConstructorProps,

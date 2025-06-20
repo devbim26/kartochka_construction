@@ -1,5 +1,5 @@
-import { IFCDataTable } from '@features/constructor/types';
-import { Component, html, Panel } from '@thatopen/ui';
+import type { IFCDataTable } from '@features/constructor/types';
+import { Component, html, type Panel } from '@thatopen/ui';
 
 export interface IFCModelProperiesPanelConstructorProps {
 	propertiesTable: IFCDataTable;
