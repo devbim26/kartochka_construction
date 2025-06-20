@@ -38,7 +38,7 @@
 		"zod": "^3.24.1"
 	},
 	"scripts": {
-		"start": "npm run build && node test-build-server/index.js",
+		"start": "node test-build-server/index.js",
 		"dev": "cross-env NODE_ENV=development webpack serve --config webpack.config.js",
 		"build": "cross-env NODE_ENV=production webpack --config webpack.config.js",
 		"format": "prettier --write ./src && eslint ./src",
