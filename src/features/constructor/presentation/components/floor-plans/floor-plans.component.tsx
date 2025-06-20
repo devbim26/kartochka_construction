@@ -130,6 +130,7 @@ export const FloorPlans = memoize(() => {
 	};
 
 	const getReports = (reportId: string, reportType: ReportCategory) => {
+		dispatch(startLoading());
 		reportType === ReportCategory.Single
 			? from(getReportSingleById({ id: reportId }))
 					.pipe(
@@ -214,6 +215,7 @@ export const FloorPlans = memoize(() => {
 									) as ConstructionSheet[],
 								),
 							);
+						} else {
 						}
 					});
 	};
@@ -230,11 +232,11 @@ export const FloorPlans = memoize(() => {
 				}),
 			)
 			.subscribe((response) => {
+				if (!reportId) return;
 				if (response?.status === 200) {
 					toast.success('Успешное удаление');
-					if (!reportId) return;
-					getReports(reportId, reportType as ReportCategory);
 				}
+				getReports(reportId, reportType as ReportCategory);
 			});
 	};
 

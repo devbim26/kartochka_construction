@@ -3,6 +3,8 @@ import type {
 	UpdateReportInfoWithSingleConstructionCommand,
 } from '@api-gen';
 import { fetchApi } from '@api-gen';
+import { convertToServerReportFormFlags } from '../converters';
+import type { FormReportSchemaType } from '../utils';
 import { withConstructorLoader } from '../utils';
 
 type ReportCreateProps = {
@@ -86,4 +88,14 @@ export const svgConstructionDetail = async (id: string) => {
 };
 export const deleteConstruction = async (id: string) => {
 	return await withConstructorLoader(() => fetchApi.api.constructionDelete({ id: id }));
+};
+export const formReport = async (data: FormReportSchemaType) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoDocumentInfoUpdate(convertToServerReportFormFlags(data)),
+	);
+};
+export const reportReceive = async (id: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportReceivingCreate({ reportInfoId: id }),
+	);
 };

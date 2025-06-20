@@ -22,6 +22,7 @@ export const ConstructorHeader = () => {
 							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
 					)}
 					onClick={() => navigate(CONSTRUCTOR_ROUTES.aboutBuilding.route)}
+					disabled={!isActive(CONSTRUCTOR_ROUTES.aboutBuilding.route)}
 				>
 					<FaPlus width={'16px'} height={'16px'} />О здании
 				</Button>
@@ -33,8 +34,21 @@ export const ConstructorHeader = () => {
 							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
 					)}
 					onClick={() => navigate(CONSTRUCTOR_ROUTES.floorPlans.route)}
+					disabled={!isActive(CONSTRUCTOR_ROUTES.floorPlans.route)}
 				>
 					Поэтажные планы
+				</Button>
+				<Button
+					className={twMerge(
+						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
+						isActive(CONSTRUCTOR_ROUTES.designing.route)
+							? ''
+							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
+					)}
+					onClick={() => navigate(CONSTRUCTOR_ROUTES.designing.route)}
+					disabled={!isActive(CONSTRUCTOR_ROUTES.designing.route)}
+				>
+					Проектирование
 				</Button>
 				<Button
 					className={twMerge(
@@ -44,31 +58,10 @@ export const ConstructorHeader = () => {
 							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
 					)}
 					onClick={() => navigate(CONSTRUCTOR_ROUTES.constructionSelect.route)}
+					disabled={!isActive(CONSTRUCTOR_ROUTES.constructionSelect.route)}
 				>
 					Выбор конструкции
 				</Button>
-				{isActive(CONSTRUCTOR_ROUTES.designing.route) && (
-					<Button
-						className={twMerge(
-							'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
-							'',
-						)}
-						onClick={() => navigate(CONSTRUCTOR_ROUTES.designing.route)}
-					>
-						Проектирование
-					</Button>
-				)}
-				{isActive(CONSTRUCTOR_ROUTES.constructionSelect.route) && (
-					<Button
-						className={twMerge(
-							'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
-							'',
-						)}
-						onClick={() => navigate(CONSTRUCTOR_ROUTES.constructionSelect.route)}
-					>
-						Выбор конструкции
-					</Button>
-				)}
 				<Button
 					className={twMerge(
 						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
@@ -77,6 +70,7 @@ export const ConstructorHeader = () => {
 							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
 					)}
 					onClick={() => navigate(CONSTRUCTOR_ROUTES.ifcModel.route)}
+					//disabled={!isActive(CONSTRUCTOR_ROUTES.ifcModel.route)}
 				>
 					IFC модель
 				</Button>
