@@ -56,9 +56,9 @@ const ReportFromComponent = () => {
 								}),
 							)
 							.subscribe((response) => {
-								if (response?.status === 200 && response.data) {
+								if (response?.status === 200) {
 									const link = document.createElement('a');
-									link.href = response.data;
+									link.href = response.data!;
 									link.download = '';
 									link.target = '_blank';
 									document.body.appendChild(link);
