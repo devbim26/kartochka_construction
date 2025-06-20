@@ -1,14 +1,27 @@
-import { IFCViewer } from '@features/constructor/presentation/components/ifc-model/ifc-viewer/ifc-viewer.class';
-import type { IFCViewerContainers, IFCViewerOptions } from '@features/constructor/types';
-import { useLayoutEffect, useRef, type RefObject } from 'react';
+import { useLayoutEffect, useRef } from 'react';
+import {
+	IFCViewer,
+	IFCViewerBase,
+	type IFCViewerConstructorArgs,
+	type IFCViewerState,
+} from '../classes';
 
-export const useIFCViewer = (conatiners: IFCViewerContainers, options: IFCViewerOptions) => {
+const IFCIFCViewerDefState: IFCViewerState = {
+	core: null,
+	clipper: null,
+	modelManager: null,
+	ui: null,
+	stats: null,
+};
+
+export const useIFCViewer = (props: IFCViewerConstructorArgs) => {
 	const currentViewer = useRef<IFCViewer>(null);
 
 	useLayoutEffect(() => {
-		const isExists = Object.values(conatiners).every((c) => !!(c as RefObject<any>).current);
-		if (isExists) {
-			currentViewer.current = new IFCViewer(conatiners, options);
+		if (props.sceneContainer.current) {
+			IFCViewerBase.create(IFCViewer, props, IFCIFCViewerDefState).then(
+				(res) => (currentViewer.current = res),
+			);
 		}
 		return () => {
 			if (currentViewer.current) {

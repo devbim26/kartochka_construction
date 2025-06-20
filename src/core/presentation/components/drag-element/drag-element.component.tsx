@@ -1,0 +1,195 @@
+import { useDragElementContext } from '@core/utils';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+
+interface DragElementCoord {
+	x: number;
+	y: number;
+}
+
+interface InitialPosition {
+	top?: number;
+	left?: number;
+	right?: number;
+	bottom?: number;
+}
+
+interface DragElementProps {
+	parentRef: RefObject<HTMLElement | null>;
+	initialPosition: InitialPosition;
+	zIndex?: number;
+	containerClassName?: string;
+	children: React.JSX.Element | React.ReactNode;
+	styles?: React.HTMLAttributes<HTMLDivElement>['style'];
+}
+
+const calcInitialCoords = (
+	parentRect: DOMRect,
+	elementRect: DOMRect,
+	initialPosition: InitialPosition,
+): DragElementCoord => {
+	let x = 0;
+	let y = 0;
+	if (initialPosition.left !== undefined) {
+		x = initialPosition.left;
+	} else if (initialPosition.right !== undefined) {
+		x = parentRect.width - elementRect.width - initialPosition.right;
+	}
+
+	if (initialPosition.top !== undefined) {
+		y = initialPosition.top;
+	} else if (initialPosition.bottom !== undefined) {
+		y = parentRect.height - elementRect.height - initialPosition.bottom;
+	}
+	return { x, y };
+};
+
+const caclCoordsBySize = (
+	parentRect: DOMRect,
+	elementRect: DOMRect,
+	transformStyle: string,
+): DragElementCoord | null => {
+	const transform = transformStyle.match(/translate3d\((.*?)px, (.*?)px, (.*?)px\)/);
+	let newX = transform ? parseFloat(transform[1]) : 0;
+	let newY = transform ? parseFloat(transform[2]) : 0;
+	const exceedsRight = newX + elementRect.width > parentRect.width;
+	const exceedsBottom = newY + elementRect.height > parentRect.height;
+	const exceedsLeft = newX < 0;
+	const exceedsTop = newY < 0;
+	if (exceedsRight) {
+		newX = parentRect.width - elementRect.width;
+	}
+	if (exceedsBottom) {
+		newY = parentRect.height - elementRect.height;
+	}
+	if (exceedsLeft) {
+		newX = 0;
+	}
+	if (exceedsTop) {
+		newY = 0;
+	}
+	return exceedsRight || exceedsBottom || exceedsLeft || exceedsTop ? { x: newX, y: newY } : null;
+};
+
+export const DragElement = ({
+	parentRef,
+	initialPosition,
+	zIndex = 10,
+	containerClassName,
+	children,
+	styles,
+}: DragElementProps) => {
+	const currentDragElementId = useRef<string>(crypto.randomUUID());
+	const currentWrapper = useRef<HTMLDivElement>(null);
+	const offset = useRef<DragElementCoord>({ x: 0, y: 0 });
+	const isDragging = useRef<boolean>(false);
+	const parentRectCache = useRef<DOMRect | null>(null);
+	const [inited, setInited] = useState<boolean>(false);
+	const { draggableElementId, setDraggableElementId } = useDragElementContext();
+
+	const initialCoords: DragElementCoord = useMemo(() => {
+		if (!parentRef.current || !currentWrapper.current || !inited) return { x: 0, y: 0 };
+		return calcInitialCoords(
+			parentRef.current.getBoundingClientRect(),
+			currentWrapper.current.getBoundingClientRect(),
+			initialPosition,
+		);
+	}, [inited]);
+
+	const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+		if (e.button !== 0 || draggableElementId !== currentDragElementId.current!) return;
+		if (!currentWrapper.current || !parentRef.current) return;
+
+		e.currentTarget.setPointerCapture(e.pointerId);
+
+		parentRectCache.current = parentRef.current.getBoundingClientRect();
+
+		const elementRect = currentWrapper.current.getBoundingClientRect();
+		offset.current = {
+			x: e.clientX - elementRect.left,
+			y: e.clientY - elementRect.top,
+		};
+
+		isDragging.current = true;
+	};
+
+	useEffect(() => {
+		setInited(true);
+	}, []);
+
+	useEffect(() => {
+		if (!currentWrapper.current || !inited) return;
+		const observer = new ResizeObserver(() => {
+			if (!currentWrapper.current || !parentRef.current) return;
+			const newCoords = caclCoordsBySize(
+				parentRef.current.getBoundingClientRect(),
+				currentWrapper.current.getBoundingClientRect(),
+				currentWrapper.current.style.transform,
+			);
+			if (!!newCoords) {
+				requestAnimationFrame(() => {
+					currentWrapper.current!.style.transform = `translate3d(${newCoords.x}px, ${newCoords.y}px, 0)`;
+				});
+			}
+		});
+		observer.observe(currentWrapper.current);
+		return () => observer.disconnect();
+	}, [inited]);
+
+	const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+		if (!isDragging.current || !currentWrapper.current || !parentRef.current) return;
+		const parentRect = parentRef.current.getBoundingClientRect();
+		const elementRect = currentWrapper.current.getBoundingClientRect();
+
+		let newX = e.clientX - offset.current.x - parentRect.left;
+		let newY = e.clientY - offset.current.y - parentRect.top;
+
+		newX = Math.max(0, Math.min(newX, parentRect.width - elementRect.width));
+		newY = Math.max(0, Math.min(newY, parentRect.height - elementRect.height));
+		requestAnimationFrame(
+			() =>
+				(currentWrapper.current!.style.transform = `translate3d(${newX}px, ${newY}px, 0)`),
+		);
+	};
+
+	const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+		isDragging.current = false;
+		parentRectCache.current = null;
+	};
+
+	const onMouseWheelClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (e.button !== 1) return;
+		setDraggableElementId(
+			draggableElementId === currentDragElementId.current!
+				? ''
+				: currentDragElementId.current!,
+		);
+	};
+
+	return (
+		<div
+			title={`${draggableElementId === currentDragElementId.current! ? 'Закрепить' : 'Переместить'}: СКМ`}
+			ref={currentWrapper}
+			onMouseDownCapture={onMouseWheelClick}
+			onPointerDown={onPointerDown}
+			onPointerMove={onPointerMove}
+			onPointerUp={onPointerUp}
+			style={{
+				...styles,
+				position: 'absolute',
+				willChange: 'transform',
+				transform: `translate3d(${initialCoords.x}px, ${initialCoords.y}px, 0)`,
+				zIndex: draggableElementId === currentDragElementId.current! ? 50 : zIndex,
+				cursor: draggableElementId === currentDragElementId.current! ? 'move' : 'default',
+				border:
+					draggableElementId === currentDragElementId.current!
+						? '2px solid #2175f3'
+						: undefined,
+				display: 'flex',
+				flexDirection: 'column',
+			}}
+			className={containerClassName}
+		>
+			{children}
+		</div>
+	);
+};

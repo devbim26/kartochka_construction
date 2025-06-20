@@ -1,3 +1,4 @@
+export * from './classes';
 export * from './config';
 export * from './formatMaterial';
 export * from './hooks';

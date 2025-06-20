@@ -15,7 +15,7 @@ export const HomeHeader = () => {
 
 	return (
 		<>
-			<header className="xs:px-[15px] flex w-full flex-row items-center justify-between border-b border-solid border-[#EDEFF2] bg-white px-[25px] pb-[6px]">
+			<header className="flex w-full flex-row items-center justify-between border-b border-solid border-[#EDEFF2] bg-white px-[25px] pb-[6px] xs:px-[15px]">
 				<div className="flex flex-row items-center gap-4">
 					<button
 						onClick={toggleMenu}
@@ -25,8 +25,8 @@ export const HomeHeader = () => {
 					</button>
 
 					<div className="flex flex-row items-center gap-[12px]">
-						<LogoIcon className="xs:h-[30px] xs:w-[29px] h-[40px] w-[39px]" />
-						<LogoTextIcon className="xs:h-[44px] xs:w-[120px] h-[64px] w-[170px]" />
+						<LogoIcon className="h-[40px] w-[39px] xs:h-[30px] xs:w-[29px]" />
+						<LogoTextIcon className="h-[64px] w-[170px] xs:h-[44px] xs:w-[120px]" />
 					</div>
 				</div>
 
