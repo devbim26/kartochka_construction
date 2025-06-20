@@ -1,12 +1,9 @@
 import type { IFCDataTable } from '@features/constructor/types';
-import type { Components } from '@thatopen/components';
 import { Component, html, Panel, type TextInput } from '@thatopen/ui';
 
 export interface TreeInfoPanelConstructorProps {
-	components: Components;
 	relationsTree: IFCDataTable;
 	classificationsTree: IFCDataTable;
-	propertiesTable: IFCDataTable | null;
 }
 
 export const treeInfoPanelConstructor = (props: TreeInfoPanelConstructorProps) => {
@@ -18,7 +15,11 @@ export const treeInfoPanelConstructor = (props: TreeInfoPanelConstructorProps) =
 
 		return html`
 			<bim-panel>
-				<bim-panel-section label="Элементы модели" collapsed>
+				<bim-panel-section
+					label="Элементы модели"
+					collapsed
+					style="max-height: 600px; overflow-y: auto; color: #2175f3"
+				>
 					<bim-panel-section label="Дерево элементов" collapsed>
 						<bim-text-input
 							@input="${onSearch}"
@@ -37,9 +38,6 @@ export const treeInfoPanelConstructor = (props: TreeInfoPanelConstructorProps) =
 						style="max-height: 400px; overflow-y: auto; color: #2175f3;"
 					>
 						${props.classificationsTree}
-					</bim-panel-section>
-					<bim-panel-section label="Свойства" collapsed>
-						${props.propertiesTable}
 					</bim-panel-section>
 				</bim-panel-section>
 			</bim-panel>

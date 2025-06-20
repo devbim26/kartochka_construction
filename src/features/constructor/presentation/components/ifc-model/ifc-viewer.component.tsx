@@ -1,6 +1,10 @@
 import { DragElement, DragElementContextWrapper } from '@core';
-import { uiControlPanelConstructor, useIFCViewer } from '@features/constructor/utils';
-import { treeInfoPanelConstructor } from '@features/constructor/utils/classes/ifc-viewer/ifc-viewer-ui-constructors/tree-info-panel.constructor';
+import {
+	ifcModelProperiesPanelConstructor,
+	treeInfoPanelConstructor,
+	uiControlPanelConstructor,
+	useIFCViewer,
+} from '@features/constructor/utils';
 import { useRef } from 'react';
 
 export const IFCViewerComponent = () => {
@@ -8,20 +12,23 @@ export const IFCViewerComponent = () => {
 	const sceneContainerRef = useRef<HTMLDivElement>(null);
 	const controlPanelRef = useRef<HTMLDivElement>(null);
 	const treeInfoPanelContainerRef = useRef<HTMLDivElement>(null);
+	const propertiesPanelContainerRef = useRef<HTMLDivElement>(null);
 
 	useIFCViewer({
-		viewerProps: {
-			ui: {
-				constructors: {
-					treeInfoPanelConstructor,
-					uiControlPanelConstructor,
-				},
+		sceneContainer: sceneContainerRef,
+		ui: {
+			controlPanel: {
+				constructor: uiControlPanelConstructor,
+				container: controlPanelRef,
 			},
-		},
-		containers: {
-			sceneContainer: sceneContainerRef,
-			controlPanelContainer: controlPanelRef,
-			treeInfoPanelContainer: treeInfoPanelContainerRef,
+			treeInfoPanel: {
+				constructor: treeInfoPanelConstructor,
+				container: treeInfoPanelContainerRef,
+			},
+			propertiesPanel: {
+				constructor: ifcModelProperiesPanelConstructor,
+				container: propertiesPanelContainerRef,
+			},
 		},
 	});
 
@@ -51,6 +58,18 @@ export const IFCViewerComponent = () => {
 					}}
 				>
 					<div ref={controlPanelRef}></div>
+				</DragElement>
+				<DragElement
+					parentRef={ifcViewerRef}
+					initialPosition={{
+						bottom: 270,
+						left: 400,
+					}}
+					styles={{
+						borderRadius: '1rem',
+					}}
+				>
+					<div ref={propertiesPanelContainerRef}></div>
 				</DragElement>
 			</DragElementContextWrapper>
 			<div className="relative z-0 flex flex-1" ref={sceneContainerRef}></div>
