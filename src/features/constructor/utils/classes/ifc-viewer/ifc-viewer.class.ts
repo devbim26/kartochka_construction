@@ -18,17 +18,9 @@ import {
 	type IFCViewerCoreState,
 	type IFCViewerModelManagerState,
 	type IFCViewerStatsState,
-	type IFCViewerUIConstructorArgs,
 	type IFCViewerUIState,
+	type IFCViewerUIStateEntityArgs,
 } from './core';
-
-interface IFCViewerContainers {
-	sceneContainer: RefObject<HTMLDivElement | null>;
-	panels: {
-		controlPanelContainer: RefObject<HTMLDivElement | null>;
-		treeInfoPanelContainer: RefObject<HTMLDivElement | null>;
-	};
-}
 
 export interface IFCViewerState {
 	core: IFCViewerCore | null;
@@ -36,13 +28,15 @@ export interface IFCViewerState {
 	modelManager: IFCViewerModelManager | null;
 	ui: IFCViewerUI | null;
 	stats: IFCViewerStats | null;
-	containers: IFCViewerContainers | null;
 }
 
 export interface IFCViewerConstructorArgs {
 	ui: {
-		constructors: IFCViewerUIConstructorArgs['constructors'];
+		treeInfoPanel: IFCViewerUIStateEntityArgs<'treeInfoPanel'>;
+		controlPanel: IFCViewerUIStateEntityArgs<'controlPanel'>;
+		propertiesPanel: IFCViewerUIStateEntityArgs<'propertiesPanel'>;
 	};
+	sceneContainer: RefObject<HTMLDivElement | null>;
 }
 
 export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructorArgs> {
@@ -63,7 +57,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 		const core = await IFCViewerBase.create(
 			IFCViewerCore,
 			{
-				sceneContainer: this.state.containers!.sceneContainer,
+				sceneContainer: props.sceneContainer,
 			},
 			{
 				currentWorld: null,
@@ -83,7 +77,9 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 				fragmentsManager: null,
 				ifcRelationsIndexer: null,
 				relationsTree: null,
-				updateRelationsTree: null,
+				classificationsTree: null,
+				propertiesTable: null,
+				highlighter: null,
 			} as IFCViewerModelManagerState,
 		);
 
@@ -101,20 +97,20 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 			stats = await IFCViewerBase.create(
 				IFCViewerStats,
 				{
-					sceneContainer: this.state.containers!.sceneContainer,
+					sceneContainer: props.sceneContainer,
 				},
 				{ statsPanel: null } as IFCViewerStatsState,
 			);
 		}
 
-		this.setupHandlers(core, modelManager);
+		this.setupHandlers(core, props.sceneContainer);
 
 		const ui = await IFCViewerBase.create(
 			IFCViewerUI,
 			{
-				constructors: props.ui.constructors,
-				constructorProps: {
-					uiControlPanelConstructorProps: {
+				controlPanel: {
+					data: props.ui.controlPanel,
+					props: {
 						sceneItems: {
 							world: core.currentWorld!,
 							grid: core.currentGrid!,
@@ -125,14 +121,24 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 							disposeFragmentsHandler: this._disposeFragmentsHandlerRef!,
 						},
 					},
-					treeInfoPanelConstructorProps: {
-						components: core.components!,
+				},
+				treeInfoPanel: {
+					data: props.ui.treeInfoPanel,
+					props: {
 						relationsTree: modelManager.relationsTree!.tree!,
+						classificationsTree: modelManager.classificationsTree!.tree!,
 					},
 				},
-				containers: this.state.containers!.panels,
+				propertiesPanel: {
+					data: props.ui.propertiesPanel,
+				},
 			},
-			{ stub: null } as IFCViewerUIState,
+			{
+				sceneContainer: props.sceneContainer,
+				controlPanel: null,
+				treeInfoPanel: null,
+				propertiesPanel: null,
+			} as IFCViewerUIState,
 		);
 
 		this.changeState(() => ({
@@ -152,8 +158,6 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 	}
 
 	private destoyHandlers() {
-		const containers = this.state.containers!;
-
 		// containers.sceneContainer.current?.removeEventListener(
 		// 	'keydown',
 		// 	this._onKeyDownHandlerRef!,
@@ -162,7 +166,10 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 		// 	'dblclick',
 		// 	this._onDoubleClickHandlerRef!,
 		// );
-		containers.sceneContainer.current?.removeEventListener('resize', this._onResizeHandlerRef!);
+		this.state.ui!.sceneContainer!.current?.removeEventListener(
+			'resize',
+			this._onResizeHandlerRef!,
+		);
 
 		this.state.core?.currentWorld?.renderer?.onBeforeUpdate.remove(
 			this._onBeforeUpdateHandlerRef!,
@@ -176,9 +183,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 		);
 	}
 
-	private setupHandlers(core: IFCViewerCore, modelManager: IFCViewerModelManager) {
-		const containers = this.state.containers!;
-
+	private setupHandlers(core: IFCViewerCore, sceneContainer: RefObject<HTMLDivElement | null>) {
 		this._onKeyDownHandlerRef = this.onKeyDownHandler.bind(this);
 		//containers.sceneContainer.current?.addEventListener('keydown', this._onKeyDownHandlerRef);
 
@@ -189,7 +194,7 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 		// );
 
 		this._onResizeHandlerRef = this.onResizeHandler.bind(this);
-		containers.sceneContainer.current?.addEventListener('resize', this._onResizeHandlerRef);
+		sceneContainer.current?.addEventListener('resize', this._onResizeHandlerRef);
 
 		this._onBeforeUpdateHandlerRef = this.onBeforeUpdateHandler.bind(this);
 		this._onAfterUpdateHandlerRef = this.onAfterUpdateHandler.bind(this);
@@ -254,6 +259,10 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 					this.state.core!,
 					file.name,
 				);
+
+				this.state.ui!.resetupPanel('propertiesPanel', {
+					propertiesTable: this.state.modelManager!.propertiesTable!.table,
+				});
 
 				document.body.removeChild(input);
 				input.removeEventListener('change', handleFileLoad);

@@ -8,7 +8,8 @@ import type { FragmentsGroup } from '@thatopen/fragments';
 import type { Table, TableCellValue, TableRowData } from '@thatopen/ui';
 import type { OrthographicCamera, PerspectiveCamera } from 'three';
 
-export type IFCViewerRelationsTree = Table<TableRowData<Record<string, TableCellValue>>>;
+export type IFCDataTable = Table<TableRowData<Record<string, TableCellValue>>>;
+
 export type IFCViewerWorld = SimpleWorld<SimpleScene, OrthoPerspectiveCamera, SimpleRenderer>;
 
 export type IFCViewerOnKeyDownHandler = (event: KeyboardEvent) => void;

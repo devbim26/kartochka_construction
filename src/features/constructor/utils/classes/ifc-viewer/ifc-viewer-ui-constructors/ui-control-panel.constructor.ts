@@ -7,7 +7,7 @@ import {
 	type ColorInput,
 	type Dropdown,
 	type NumberInput,
-	type PanelSection,
+	type Panel,
 } from '@thatopen/ui';
 import { Color } from 'three';
 
@@ -24,7 +24,7 @@ export interface UIControlPanelConstructorProps {
 }
 
 export const uiControlPanelConstructor = (props: UIControlPanelConstructorProps) => {
-	return Component.create<PanelSection>(() => {
+	return Component.create<Panel>(() => {
 		return html`
 			<bim-panel>
 				<bim-panel-section

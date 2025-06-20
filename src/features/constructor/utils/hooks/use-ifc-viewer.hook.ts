@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type RefObject } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import {
 	IFCViewer,
 	IFCViewerBase,
@@ -12,34 +12,16 @@ const IFCIFCViewerDefState: IFCViewerState = {
 	modelManager: null,
 	ui: null,
 	stats: null,
-	containers: null,
 };
 
-export const useIFCViewer = (props: {
-	viewerProps: IFCViewerConstructorArgs;
-	containers: {
-		sceneContainer: RefObject<HTMLDivElement | null>;
-		controlPanelContainer: RefObject<HTMLDivElement | null>;
-		treeInfoPanelContainer: RefObject<HTMLDivElement | null>;
-	};
-}) => {
+export const useIFCViewer = (props: IFCViewerConstructorArgs) => {
 	const currentViewer = useRef<IFCViewer>(null);
 
 	useLayoutEffect(() => {
-		const isExists = Object.values(props.containers).every(
-			(c) => !!(c as RefObject<any>).current,
-		);
-		if (isExists) {
-			IFCViewerBase.create(IFCViewer, props.viewerProps, {
-				...IFCIFCViewerDefState,
-				containers: {
-					sceneContainer: props.containers.sceneContainer,
-					panels: {
-						controlPanelContainer: props.containers.controlPanelContainer,
-						treeInfoPanelContainer: props.containers.treeInfoPanelContainer,
-					},
-				},
-			} as IFCViewerState).then((res) => (currentViewer.current = res));
+		if (props.sceneContainer.current) {
+			IFCViewerBase.create(IFCViewer, props, IFCIFCViewerDefState).then(
+				(res) => (currentViewer.current = res),
+			);
 		}
 		return () => {
 			if (currentViewer.current) {
