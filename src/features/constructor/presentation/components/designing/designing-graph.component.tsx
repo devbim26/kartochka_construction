@@ -10,11 +10,22 @@ const DesigningGraph = ({ graphData }: GraphProps) => {
 		.map((dot) => ({ x: dot.f ?? 0, y: dot.r ?? 0 }))
 		.sort((a, b) => a.x - b.x);
 
-	const inSituData = (graphData?.deviationDots ?? [])
-		.map((dot) => ({ x: dot.f ?? 0, y: dot.r ?? 0 }))
-		.sort((a, b) => a.x - b.x);
+	const deviationDots = graphData?.deviationDots ?? [];
 
-	const defaultFrequencyLabels = [50, 80, 125, 200, 315, 500, 800, 1250, 2500, 3150, 5000];
+	const inSituData = labData.map(({ x: currentFrequency }) => {
+		const matchingDeviationDot = deviationDots.find((dot) => dot.f === currentFrequency);
+
+		const yValue =
+			currentFrequency >= 100 && matchingDeviationDot ? (matchingDeviationDot.r ?? 0) : null;
+		return {
+			x: currentFrequency,
+			y: yValue,
+		};
+	});
+
+	const defaultFrequencyLabels = [
+		50, 63, 80, 100, 125, 160, 200, 315, 500, 800, 1250, 2500, 3150, 5000,
+	];
 
 	const graphSeries = graphData
 		? [
@@ -27,8 +38,11 @@ const DesigningGraph = ({ graphData }: GraphProps) => {
 					data: defaultFrequencyLabels.map((f) => ({ x: f, y: 0 })),
 				},
 				{
-					label: 'Deviations',
-					data: defaultFrequencyLabels.map((f) => ({ x: f, y: 0 })),
+					label: 'Deviations (in situ)',
+					data: defaultFrequencyLabels.map((f) => ({
+						x: f,
+						y: f < 100 ? null : 0,
+					})),
 				},
 			];
 

@@ -23,7 +23,7 @@ ChartJS.register(
 
 type GraphDataSeries = {
 	label: string;
-	data: { x: number; y: number }[];
+	data: { x: number; y: number | null }[];
 };
 
 type DesigningChartProps = {
@@ -52,12 +52,15 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 				tension: 0.3,
 				fill: !isInSitu,
 				borderDash,
+				spanGaps: true,
 			};
 		}),
 	};
 
-	const allValues = graphSeries.flatMap((s) => s.data.map((p) => p.y));
-	const maxY = Math.max(...allValues, 0);
+	const allValues = graphSeries
+		.flatMap((s) => s.data.map((p) => p.y))
+		.filter((y): y is number => y !== null);
+	const maxY = allValues.length > 0 ? Math.max(...allValues) : 0;
 
 	const options: ChartOptions<'line'> = {
 		responsive: true,
@@ -78,12 +81,19 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 			tooltip: {
 				callbacks: {
 					label: (context) => {
-						const value = context.raw as number;
+						const value = context.raw as number | null;
+						if (value === null) {
+							return '';
+						}
 						return `Rw: ${value}`;
 					},
 				},
 			},
 			datalabels: {
+				display: (context) => {
+					const value = context.dataset.data[context.dataIndex];
+					return value !== null;
+				},
 				anchor: 'end',
 				align: 'top',
 				color: (ctx) => ctx.dataset.borderColor as string,
@@ -119,7 +129,7 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 					},
 				},
 				min: 0,
-				max: maxY + 10,
+				max: maxY > 0 ? maxY + 10 : 50,
 				ticks: {
 					stepSize: 5,
 				},
