@@ -28,10 +28,11 @@ import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from } from 'rxjs';
+import { catchError, finalize, from } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import DesigningGraph from './designing-graph.component';
+
 const DesigningScreen = () => {
 	const dispatch = useAppDispatch();
 	const [search] = useSearchParams();
@@ -45,7 +46,7 @@ const DesigningScreen = () => {
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [refreshConstructionData, setRefreshConstructionData] = useState(0);
-	const [isDataReadyForForm, setIsDataReadyForForm] = useState(false);
+
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
 		defaultValues: DesigningConfig.defaultValues,
@@ -55,13 +56,15 @@ const DesigningScreen = () => {
 	useEffect(() => {
 		if (!reportId) return;
 		dispatch(startLoading());
-		setIsDataReadyForForm(false);
-		from(getReportFloorById({ id: reportId }))
+
+		const subscription = from(getReportFloorById({ id: reportId }))
 			.pipe(
 				catchError((error) => {
 					toast.error('Не удалось получить данные отчёта');
-					dispatch(stopLoading());
 					return [];
+				}),
+				finalize(() => {
+					dispatch(stopLoading());
 				}),
 			)
 			.subscribe((response) => {
@@ -71,27 +74,25 @@ const DesigningScreen = () => {
 						?.reportConstructionHeader;
 				const header = reportConstructionHeader?.constructionHeader;
 				const headerId = reportConstructionHeader?.constructionHeaderId;
-				if (headerId && headerId !== constructionHeaderId) {
+				if (headerId) {
 					setConstructionHeaderId(headerId);
-				}
-				if (header) {
-					setConstructionHeader(header);
-					try {
-						const dataForForm = convertToClientConstructionsEditData(header);
-						form.reset(dataForForm);
-						setIsDataReadyForForm(true);
-					} catch (error) {
-						toast.error('Ошибка при заполнении формы');
-					}
 				} else {
-					toast.error('Не найден constructionHeader');
-				}
-				if (!headerId) {
 					toast.error('Не найден constructionHeaderId');
 				}
-				dispatch(stopLoading());
+				setConstructionHeader(header || null);
 			});
-	}, [reportId, refreshConstructionData, dispatch, form]);
+		return () => subscription.unsubscribe();
+	}, [reportId, refreshConstructionData, dispatch]);
+
+	useEffect(() => {
+		if (!constructionHeader) return;
+		try {
+			const dataForForm = convertToClientConstructionsEditData(constructionHeader);
+			form.reset(dataForForm);
+		} catch (error) {
+			toast.error('Ошибка при заполнении формы');
+		}
+	}, [constructionHeader, form]);
 
 	useEffect(() => {
 		if (!constructionHeaderId || graphData) return;
@@ -100,15 +101,14 @@ const DesigningScreen = () => {
 			.pipe(
 				catchError((error) => {
 					toast.error('Не удалось загрузить данные графика');
-					dispatch(stopLoading());
 					return [];
+				}),
+				finalize(() => {
+					dispatch(stopLoading());
 				}),
 			)
 			.subscribe(({ data }) => {
-				if (!data) {
-					dispatch(stopLoading());
-					return;
-				}
+				if (!data) return;
 				setGraphData({
 					...data,
 					dotRs: (data.dotRs || []).filter(
@@ -129,9 +129,8 @@ const DesigningScreen = () => {
 							? { r: data.dotB.r, f: data.dotB.f }
 							: undefined,
 				});
-				dispatch(stopLoading());
 			});
-	}, [constructionHeaderId]);
+	}, [constructionHeaderId, graphData, dispatch]);
 
 	useEffect(() => {
 		const rwValue = constructionHeader?.rw || 0;
@@ -146,7 +145,7 @@ const DesigningScreen = () => {
 	const ruConstructionType = constructionType ? RuConstructionTypesMap[constructionType] : '';
 	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
 
-	const handleGetConstructionImage = (id: string) => {
+	const handleGetConstructionImage = useCallback((id: string) => {
 		from(svgConstructionDetail(id))
 			.pipe(
 				catchError((error) => {
@@ -161,12 +160,12 @@ const DesigningScreen = () => {
 					toast.error('Неверный формат');
 				}
 			});
-	};
+	}, []);
 
 	useEffect(() => {
 		if (!constructionHeaderId) return;
 		handleGetConstructionImage(constructionHeaderId);
-	}, [constructionHeaderId]);
+	}, [constructionHeaderId, handleGetConstructionImage]);
 
 	const formatMaterial = (material: (typeof materials)[0]) => {
 		const materialType =
@@ -210,7 +209,7 @@ const DesigningScreen = () => {
 			});
 	}, [form]);
 
-	if (isLoading) {
+	if (isLoading || !constructionHeader) {
 		return (
 			<div className="flex size-full items-center justify-center">
 				<Loader />
@@ -251,9 +250,11 @@ const DesigningScreen = () => {
 					</div>
 				</div>
 			</div>
-			<div className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				{isDataReadyForForm &&
-					constructionType &&
+			<div
+				key={refreshConstructionData}
+				className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]"
+			>
+				{constructionType &&
 					ConstructionTypeMap({
 						currentConstruction: constructionType,
 						currentForm: form,
