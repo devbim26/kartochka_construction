@@ -16,6 +16,7 @@
 		"axios": "^1.7.9",
 		"chart.js": "^4.4.9",
 		"chartjs-plugin-datalabels": "^2.2.0",
+		"chartjs-plugin-zoom": "^2.2.0",
 		"framer-motion": "^12.4.1",
 		"pdfjs-dist": "^5.1.91",
 		"react": "^19.0.0",
