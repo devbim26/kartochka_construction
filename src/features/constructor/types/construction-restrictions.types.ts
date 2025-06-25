@@ -11,4 +11,5 @@ export type ConstructionSelectRestrictions = {
 	maxLabIndex: number;
 	maxFireresistance: number;
 	minFireresistance: number;
+	requirementId: string;
 };

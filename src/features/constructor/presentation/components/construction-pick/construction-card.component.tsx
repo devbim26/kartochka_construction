@@ -1,7 +1,8 @@
 import type { ReportConstructionDto } from '@api-gen';
 import { FormElementLabel } from '@core';
+import { formatMaterial } from '@features/constructor/utils';
 import { convertToClientConstructionType } from '@features/guidbooks/converters';
-import type { ConstructionTypeEnum } from '@features/guidbooks/types';
+import type { ConstructionTypeEnum, UserMaterials } from '@features/guidbooks/types';
 import { RuConstructionTypesMap } from '@features/guidbooks/types';
 import issuer from '../../../../../assets/issuer.png';
 import {
@@ -38,9 +39,27 @@ export const ConstructionCard = ({ construction, svgUrl }: Props) => {
 						/>
 						<p className="text-center">www.acoustic.ru</p>
 					</div>
-					{svgUrl && (
-						<img className="h-full w-[100px]" src={svgUrl} alt="SVG Construction" />
-					)}
+					<div className="flex size-fit">
+						{svgUrl && (
+							<img className="h-full w-[200px]" src={svgUrl} alt="SVG Construction" />
+						)}
+						<div className="flex w-fit flex-col">
+							{construction?.constructionHeader?.constructionType?.constructions?.map(
+								(construction: any, index) =>
+									construction.userMaterials?.map(
+										(material: any, materialIndex: any) => (
+											<p
+												key={`${index}-${materialIndex}`}
+												className="text-[16px]"
+											>
+												- {formatMaterial(material as UserMaterials)}
+											</p>
+										),
+									),
+							)}
+						</div>
+					</div>
+
 					<p className="text-primary">Стоимость</p>
 					<p className="text-[22px]">2500 RUB/м²</p>
 					<p className="font-sans text-[14px] italic">(ориентировочная)</p>

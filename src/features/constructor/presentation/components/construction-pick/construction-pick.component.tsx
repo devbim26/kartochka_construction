@@ -34,6 +34,8 @@ const ContructionPick = () => {
 
 	const form = useForm<ConstructionSelectRestrictions>();
 
+	//useEffect(()=> {if(report) form.setValue('requirementId', report.requirements[0]!.id!)}, [report])
+
 	useEffect(() => {
 		if (!reportId || !reportType) return;
 		dispatch(startLoading());
@@ -174,9 +176,12 @@ const ContructionPick = () => {
 				<Switch onChange={() => setShowAlternate(!showAlternate)} />
 			</div>
 			{showAlternate && (
-				<FormProvider {...form}>
-					<ConstructionFilters />
-				</FormProvider>
+				<>
+					<FormProvider {...form}>
+						<ConstructionFilters onSubmit={() => {}} />
+					</FormProvider>
+					<div className="flex gap-[10px]"></div>
+				</>
 			)}
 		</div>
 	);
