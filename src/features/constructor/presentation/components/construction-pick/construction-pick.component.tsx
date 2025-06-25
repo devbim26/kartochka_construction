@@ -96,7 +96,6 @@ const ContructionPick = () => {
 			});
 	}, [reportId]);
 
-
 	useEffect(() => {
 		if (!constructionHeaderId || svgUrl) return;
 		from(svgConstructionDetail(constructionHeaderId))
@@ -178,12 +177,10 @@ const ContructionPick = () => {
 			</div>
 			{showAlternate && (
 				<>
-				<FormProvider {...form}>
-					<ConstructionFilters onSubmit={()=> {}}/>
-				</FormProvider>
-				<div className='flex gap-[10px]'>
-					
-				</div>
+					<FormProvider {...form}>
+						<ConstructionFilters onSubmit={() => {}} />
+					</FormProvider>
+					<div className="flex gap-[10px]"></div>
 				</>
 			)}
 		</div>

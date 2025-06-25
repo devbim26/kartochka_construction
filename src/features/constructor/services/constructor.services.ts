@@ -1,12 +1,12 @@
-import type {
+import {
 	CreateReportInfoCommand,
+	fetchApi,
 	UpdateReportInfoWithSingleConstructionCommand,
 } from '@api-gen';
-import { fetchApi } from '@api-gen';
 import { convertToServerReportFormFlags } from '../converters';
+import { ConstructionSelectRestrictions } from '../types';
 import type { FormReportSchemaType } from '../utils';
 import { withConstructorLoader } from '../utils';
-import { ConstructionSelectRestrictions } from '../types';
 
 type ReportCreateProps = {
 	data: CreateReportInfoCommand;

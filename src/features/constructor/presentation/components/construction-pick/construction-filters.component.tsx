@@ -4,13 +4,11 @@ import { useFormContext } from 'react-hook-form';
 import { IoOptionsSharp } from 'react-icons/io5';
 
 type Props = {
-	onSubmit: () => void
-}
+	onSubmit: () => void;
+};
 
-export const ConstructionFilters = ({onSubmit}: Props) => {
+export const ConstructionFilters = ({ onSubmit }: Props) => {
 	const { register } = useFormContext<ConstructionSelectRestrictions>();
-
-
 
 	return (
 		<div className="flex h-fit w-full flex-col rounded-xl bg-white pt-[18px]">
