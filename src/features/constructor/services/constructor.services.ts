@@ -6,6 +6,7 @@ import { fetchApi } from '@api-gen';
 import { convertToServerReportFormFlags } from '../converters';
 import type { FormReportSchemaType } from '../utils';
 import { withConstructorLoader } from '../utils';
+import { ConstructionSelectRestrictions } from '../types';
 
 type ReportCreateProps = {
 	data: CreateReportInfoCommand;
@@ -92,6 +93,11 @@ export const deleteConstruction = async (id: string) => {
 export const formReport = async (data: FormReportSchemaType) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.reportInfoDocumentInfoUpdate(convertToServerReportFormFlags(data)),
+	);
+};
+export const getAlternateConstructions = async (data: ConstructionSelectRestrictions) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.constructionAlternativeConstructionsCreate(data),
 	);
 };
 export const reportReceive = async (id: string) => {

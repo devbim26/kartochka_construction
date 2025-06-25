@@ -3,8 +3,15 @@ import type { ConstructionSelectRestrictions } from '@features/constructor/types
 import { useFormContext } from 'react-hook-form';
 import { IoOptionsSharp } from 'react-icons/io5';
 
-export const ConstructionFilters = () => {
+type Props = {
+	onSubmit: () => void
+}
+
+export const ConstructionFilters = ({onSubmit}: Props) => {
 	const { register } = useFormContext<ConstructionSelectRestrictions>();
+
+
+
 	return (
 		<div className="flex h-fit w-full flex-col rounded-xl bg-white pt-[18px]">
 			<div className="flex items-center justify-between border-b px-[24px] pb-[18px]">
@@ -136,6 +143,7 @@ export const ConstructionFilters = () => {
 					className={
 						'h-[40px] w-[100px] self-end bg-white px-[16px] font-sans text-sm font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-primary enabled:hover:text-white'
 					}
+					onClick={onSubmit}
 				>
 					Применить
 				</Button>

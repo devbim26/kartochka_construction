@@ -1,11 +1,11 @@
 import { svgConstructionDetail } from '@features/constructor/services';
 import { formatMaterial } from '@features/constructor/utils';
 import type { ConstructionType, UserMaterials } from '@features/guidbooks/types';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { catchError, from } from 'rxjs';
 import { toast } from 'sonner';
 
-export const ConstructionImage = ({
+export const ConstructionImage = useMemo(() => ({
 	id,
 	materials,
 }: {
@@ -50,4 +50,4 @@ export const ConstructionImage = ({
 	) : (
 		<div className="size-[400px] rounded-[18px] border-[3px] border-primary bg-white"></div>
 	);
-};
+}, []);
