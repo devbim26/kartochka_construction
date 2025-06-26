@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import type { ReportInfoFloorConstructionDto, ReportInfoSingleConstructionDto } from '@api-gen';
 import { Switch, useAppDispatch, useAppSelector } from '@core';
-import Loader from '@core/presentation/components/loaders/loader.component';
 import {
+	getAlternateConstructions,
 	getReportFloorById,
 	getReportSingleById,
 	svgConstructionDetail,
@@ -10,12 +10,15 @@ import {
 import { startLoading, stopLoading } from '@features/constructor/store';
 import type { ConstructionSelectRestrictions } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
+import type { ConstructionType } from '@features/guidbooks/types';
 import { RuCountryNamesMap } from '@features/guidbooks/types';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from } from 'rxjs';
 import { toast } from 'sonner';
+import { AlternateConstructionList } from './alternate-constructions-list.component';
 import { ConstructionCard } from './construction-card.component';
 import { ConstructionFilters } from './construction-filters.component';
 
@@ -26,15 +29,14 @@ const ContructionPick = () => {
 	const [report, setReport] = useState<
 		ReportInfoFloorConstructionDto | ReportInfoSingleConstructionDto
 	>();
+	const [pageNumber, setPageNumber] = useState(0);
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const reportType = search.get('reportType');
 	const dispatch = useAppDispatch();
 	const [constructionHeaderId, setConstructionHeaderId] = useState<string | undefined>(undefined);
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
-
+	const [alternateConstructions, setAlternateConstructions] = useState<ConstructionType[]>();
 	const form = useForm<ConstructionSelectRestrictions>();
-
-	//useEffect(()=> {if(report) form.setValue('requirementId', report.requirements[0]!.id!)}, [report])
 
 	useEffect(() => {
 		if (!reportId || !reportType) return;
@@ -114,13 +116,36 @@ const ContructionPick = () => {
 			});
 	}, [constructionHeaderId, svgUrl]);
 
-	if (isLoading) {
-		return (
-			<div className="flex size-full items-center justify-center">
-				<Loader />
-			</div>
-		);
-	}
+	const handleAlternateConstructions = (data: ConstructionSelectRestrictions) => {
+		if (!report) return;
+		from(
+			getAlternateConstructions({
+				...data,
+				pageSize: 2,
+				requirementId: report?.requirements?.[0].id!,
+				pageNumber: pageNumber,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return [];
+				}),
+			)
+			.subscribe((response) => {
+				if (response.status === 200) {
+					setAlternateConstructions((response.data as any).items as any);
+				} else {
+					toast.error('Неверный формат');
+				}
+			});
+	};
+
+	useEffect(() => {
+		if (report && showAlternate) handleAlternateConstructions(form.getValues());
+	}, [report, showAlternate]);
 
 	return (
 		<div className="flex flex-col gap-[30px]">
@@ -175,13 +200,18 @@ const ContructionPick = () => {
 				</p>
 				<Switch onChange={() => setShowAlternate(!showAlternate)} />
 			</div>
+
 			{showAlternate && (
-				<>
+				<div className="flex flex-col gap-[30px]">
 					<FormProvider {...form}>
-						<ConstructionFilters onSubmit={() => {}} />
+						<ConstructionFilters
+							onSubmit={() => handleAlternateConstructions(form.getValues())}
+						/>
 					</FormProvider>
-					<div className="flex gap-[10px]"></div>
-				</>
+					<AlternateConstructionList
+						alternateConstructions={alternateConstructions || []}
+					/>
+				</div>
 			)}
 		</div>
 	);
