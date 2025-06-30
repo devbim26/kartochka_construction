@@ -28,6 +28,7 @@ import { AUTH_ROUTES } from '@features/auth/constants';
 import MyConstructions from '@features/constructor/presentation/components/designing/my-costructions.component';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
 import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants';
+import NewsScreen from '@features/news/presentation/screens/news.screen';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
@@ -81,7 +82,7 @@ export const AppRouter = () => {
 					path={DESIGNING_ROUTES.subscribes_constructor.route}
 					element={<DevScreen title="Конструктор подписок" />}
 				/>
-				<Route path={DESIGNING_ROUTES.news.route} element={<DevScreen title="Новости" />} />
+				<Route path={DESIGNING_ROUTES.news.route} element={<NewsScreen />} />
 				<Route
 					path={DESIGNING_ROUTES.reports.route}
 					element={<DevScreen title="Отчеты" />}
