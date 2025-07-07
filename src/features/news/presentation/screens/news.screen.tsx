@@ -33,7 +33,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
-import { NewsAddEdit, NewsFilter, PageHeaderWrapper } from '../components';
+import { NewsAddEdit, NewsFilter, NewsPageHeaderWrapper } from '../components';
 
 const NewsScreen = () => {
 	const navigate = useAppNavigate();
@@ -132,11 +132,11 @@ const NewsScreen = () => {
 	};
 
 	const handleDeleteTableData = (id: string) => {
-		from(deleteArticle({ id, data: {} }))
+		from(deleteArticle({ id, data: { articleId: id } }))
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка удаления новости');
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -180,7 +180,7 @@ const NewsScreen = () => {
 				tap((data) => setSingleArticle(data!)),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка получения новости');
+						toast.error(error.response?.data);
 					}
 					return from([null]);
 				}),
@@ -263,7 +263,7 @@ const NewsScreen = () => {
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
-			<PageHeaderWrapper
+			<NewsPageHeaderWrapper
 				onSave={search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
 					pageTitle: 'Новости',

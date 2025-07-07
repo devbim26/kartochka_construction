@@ -7,7 +7,7 @@ import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
 
-interface PageHeaderWrapperProps {
+interface NewsPageHeaderWrapperProps {
 	titles: HeaderFormTitles;
 	onSave: () => void;
 	forms: {
@@ -18,8 +18,8 @@ interface PageHeaderWrapperProps {
 	formElements: HeaderFormElements<any>;
 }
 
-export const PageHeaderWrapper = memoize(
-	({ titles, forms, formElements, onSave }: PageHeaderWrapperProps) => {
+export const NewsPageHeaderWrapper = memoize(
+	({ titles, forms, formElements, onSave }: NewsPageHeaderWrapperProps) => {
 		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
 		const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
@@ -41,33 +41,50 @@ export const PageHeaderWrapper = memoize(
 		}, [navigate]);
 
 		useEffect(() => {
-			if (search.get('add')) {
-				setCurrentHeaderFormType(HeaderFormTypes.add);
-			} else if (search.get('edit')) {
-				setCurrentHeaderFormType(HeaderFormTypes.edit);
-			} else {
-				setCurrentHeaderFormType(HeaderFormTypes.filter);
-			}
-		}, [search]);
+			search.get('add')
+				? setCurrentHeaderFormType(HeaderFormTypes.add)
+				: search.get('edit')
+					? setCurrentHeaderFormType(HeaderFormTypes.edit)
+					: setCurrentHeaderFormType(HeaderFormTypes.filter);
+		}, [search.get('add'), search.get('edit')]);
 
 		useEffect(() => {
-			switch (currentHeaderFormType) {
-				case HeaderFormTypes.add:
-					setCurrentForm(forms.addForm);
-					break;
-				case HeaderFormTypes.edit:
-					setCurrentForm(forms.editForm);
-					break;
-				default:
-					setCurrentForm(forms.filterForm);
-					break;
-			}
+			if (currentHeaderFormType === HeaderFormTypes.add) setCurrentForm(forms.addForm);
+			else if (currentHeaderFormType === HeaderFormTypes.filter)
+				setCurrentForm(forms.filterForm);
+			else if (currentHeaderFormType === HeaderFormTypes.edit) setCurrentForm(forms.editForm);
 			currentForm.reset();
-		}, [currentHeaderFormType, forms.addForm, forms.editForm, forms.filterForm]);
+		}, [currentHeaderFormType]);
 
 		const submitHandle = useCallback(() => {
 			currentForm.handleSubmit(() => onSave())();
 		}, [currentForm, onSave]);
+
+		const formComponent = useMemo(() => {
+			return (
+				<FormProvider {...currentForm}>
+					{currentHeaderFormType == HeaderFormTypes.filter ? (
+						<formElements.filter
+							control={currentForm.control}
+							setValue={currentForm.setValue}
+							formState={currentForm.formState}
+						/>
+					) : currentHeaderFormType == HeaderFormTypes.edit ? (
+						<formElements.edit
+							control={currentForm.control}
+							setValue={currentForm.setValue}
+							formState={currentForm.formState}
+						/>
+					) : (
+						<formElements.add
+							control={currentForm.control}
+							setValue={currentForm.setValue}
+							formState={currentForm.formState}
+						/>
+					)}
+				</FormProvider>
+			);
+		}, [currentForm, currentHeaderFormType, formElements]);
 
 		const subTitle = useMemo(() => {
 			switch (currentHeaderFormType) {
@@ -79,25 +96,6 @@ export const PageHeaderWrapper = memoize(
 					return '';
 			}
 		}, [currentHeaderFormType, titles]);
-
-		const formComponent = useMemo(() => {
-			const FormComponent =
-				currentHeaderFormType === HeaderFormTypes.add
-					? formElements.add
-					: currentHeaderFormType === HeaderFormTypes.edit
-						? formElements.edit
-						: formElements.filter;
-
-			return (
-				<FormProvider {...currentForm}>
-					<FormComponent
-						control={currentForm.control}
-						setValue={currentForm.setValue}
-						formState={currentForm.formState}
-					/>
-				</FormProvider>
-			);
-		}, [currentForm, currentHeaderFormType, formElements]);
 
 		return (
 			<div className="flex w-full flex-col gap-[14px]">
@@ -159,5 +157,5 @@ export const PageHeaderWrapper = memoize(
 			</div>
 		);
 	},
-	'PageHeaderWrapper',
+	'NewsPageHeaderWrapper',
 );

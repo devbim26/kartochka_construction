@@ -230,6 +230,11 @@ export interface CreateConstructionTypeDto {
 	constructions?: CreateConstructionDto[] | null;
 }
 
+export interface CreateFloorReportReceivingCommand {
+	/** @format uuid */
+	reportInfoId?: string;
+}
+
 export interface CreateReportConstructionDto {
 	/** @format uuid */
 	id?: string | null;
@@ -257,11 +262,6 @@ export interface CreateReportInfoDto {
 	category?: ReportCategory;
 }
 
-export interface CreateReportReceivingCommand {
-	/** @format uuid */
-	reportInfoId?: string;
-}
-
 export interface CreateRequirementCommand {
 	/** @format uuid */
 	secondPlacementRoomId?: string;
@@ -280,6 +280,11 @@ export interface CreateRequirementCommand {
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
+}
+
+export interface CreateSingleReportReceivingCommand {
+	/** @format uuid */
+	reportInfoId?: string;
 }
 
 export interface CreateUserMaterialDto {
@@ -667,6 +672,8 @@ export interface NamedEntity {
 }
 
 export interface PaginatedArticleDto {
+	/** @format uuid */
+	id?: string;
 	title?: string | null;
 	bodyText?: string | null;
 	/** @format date */
@@ -1520,11 +1527,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: GetAlternativeConstructionHeadersQuery,
 			params: RequestParams = {},
 		) =>
-			this.request<void, any>({
+			this.request<PaginatedConstructionHeaderDtoPaginatedList, any>({
 				path: `/api/Construction/alternativeConstructions`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -2060,6 +2068,31 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags ReportInfo
+		 * @name ReportInfoFloorScreenshotUpdate
+		 * @request PUT:/api/ReportInfo/floor/screenshot
+		 */
+		reportInfoFloorScreenshotUpdate: (
+			data: {
+				/** @format binary */
+				floorScreenshot?: File;
+				/** @format uuid */
+				floorConstructionInfoId?: string;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<FloorConstructionInfoDto, any>({
+				path: `/api/ReportInfo/floor/screenshot`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
 		 * @name ReportInfoDocumentInfoUpdate
 		 * @request PUT:/api/ReportInfo/documentInfo
 		 */
@@ -2165,12 +2198,34 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags ReportReceiving
-		 * @name ReportReceivingCreate
-		 * @request POST:/api/ReportReceiving
+		 * @name ReportReceivingSingleCreate
+		 * @request POST:/api/ReportReceiving/single
 		 */
-		reportReceivingCreate: (data: CreateReportReceivingCommand, params: RequestParams = {}) =>
+		reportReceivingSingleCreate: (
+			data: CreateSingleReportReceivingCommand,
+			params: RequestParams = {},
+		) =>
 			this.request<void, any>({
-				path: `/api/ReportReceiving`,
+				path: `/api/ReportReceiving/single`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportReceiving
+		 * @name ReportReceivingFloorCreate
+		 * @request POST:/api/ReportReceiving/floor
+		 */
+		reportReceivingFloorCreate: (
+			data: CreateFloorReportReceivingCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportReceiving/floor`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
