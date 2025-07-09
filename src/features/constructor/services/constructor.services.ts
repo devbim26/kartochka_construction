@@ -105,8 +105,8 @@ export const getAlternateConstructions = async (data: AlternateConstructionsType
 		),
 	);
 };
-export const reportReceive = async (id: string) => {
-	return await withConstructorLoader(() =>
-		fetchApi.api.reportReceivingCreate({ reportInfoId: id }),
-	);
-};
+// export const reportReceive = async (id: string) => {
+// 	return await withConstructorLoader(() =>
+// 		fetchApi.api.reportReceivingCreate({ reportInfoId: id }),
+// 	);
+// };
