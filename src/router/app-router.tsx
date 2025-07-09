@@ -16,6 +16,7 @@ import {
 	HomeScreen,
 	IFCModelScreen,
 	IssuersScreen,
+	LandingContent,
 	LandingScreen,
 	LoginPage,
 	MainScreen,
@@ -28,6 +29,7 @@ import { AUTH_ROUTES } from '@features/auth/constants';
 import MyConstructions from '@features/constructor/presentation/components/designing/my-costructions.component';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
 import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants';
+import { ArticlePage } from '@features/news/presentation/components/article-page.component';
 import NewsScreen from '@features/news/presentation/screens/news.screen';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
@@ -35,7 +37,12 @@ export const AppRouter = () => {
 	return (
 		<Routes>
 			<Route path="/" element={<Navigate to={APP_ROUTES.landing.route} replace />} />
-			<Route path={APP_ROUTES.landing.route} element={<LandingScreen />} />
+			<Route path={APP_ROUTES.landing.route} element={<LandingScreen />}>
+				<Route index element={<LandingContent />} />
+			</Route>
+			<Route path="/news/:articleId" element={<LandingScreen />}>
+				<Route index element={<ArticlePage />} />
+			</Route>
 			<Route path={APP_ROUTES.auth.route} element={<AuthorizationScreen />}>
 				<Route path={AUTH_ROUTES.login.route} element={<LoginPage />} />
 				<Route path={AUTH_ROUTES.code_approve.route} element={<CodeConfirmPage />} />
