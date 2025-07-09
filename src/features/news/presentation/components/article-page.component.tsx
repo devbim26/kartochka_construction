@@ -90,7 +90,7 @@ export const ArticlePage = () => {
 				className="prose max-w-none"
 				dangerouslySetInnerHTML={{ __html: article.bodyText || '' }}
 			/>
-			<p className="mt-12 text-right text-sm text-gray-400">
+			<p className="mt-12 text-left text-sm text-gray-400">
 				{formatDate(article.publishDate)}
 			</p>
 		</div>
