@@ -16,8 +16,8 @@ export const NewsCard = ({ article }: NewsCardProps) => {
 			className="block cursor-pointer overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow hover:shadow-lg"
 		>
 			<img
-				src={article.imageUrl || 'картинка новости'}
-				alt={article.title || 'Изображение новости'}
+				src={article.imageUrl || ''}
+				alt={article.title || ''}
 				className="h-[240px] w-full object-cover"
 			/>
 			<div className="p-4">

@@ -79,11 +79,13 @@ export const ArticlePage = () => {
 		<div className="mx-auto max-w-4xl px-4 py-12">
 			<p className="mb-4 text-sm uppercase text-gray-500">Новости</p>
 			<h1 className="mb-8 text-4xl font-bold text-gray-900">{article.title}</h1>
-			<img
-				src={article.imageUrl || ''}
-				alt={article.title || ''}
-				className="mb-8 w-full rounded-lg object-cover"
-			/>
+			<div className="mb-8 flex">
+				<img
+					src={article.imageUrl || ''}
+					alt={article.title || ''}
+					className="max-h-[400px] w-auto max-w-full rounded-lg object-contain"
+				/>
+			</div>
 			<div
 				className="prose max-w-none"
 				dangerouslySetInnerHTML={{ __html: article.bodyText || '' }}
