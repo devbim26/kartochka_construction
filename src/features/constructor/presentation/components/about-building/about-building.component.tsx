@@ -74,7 +74,7 @@ const AboutBuildingScreen = () => {
 	const handleSubmit = () => {
 		if (!!search.get('edit')) {
 			//TODO: Эндпоинт на обновление
-			navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports);
+			navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route);
 		} else {
 			form.handleSubmit(onSubmit)();
 		}
@@ -193,7 +193,7 @@ const AboutBuildingScreen = () => {
 							maxLength={50}
 						/>
 						{name && (
-							<p className="text-gray-additionalText text-[14px]">
+							<p className="text-[14px] text-gray-additionalText">
 								Введенное название будет использоваться для определения Объекта в
 								отчете
 							</p>
@@ -244,7 +244,7 @@ const AboutBuildingScreen = () => {
 							)}
 						/>
 						{selectedRegion && selectedRegion !== Country.None && (
-							<p className="text-gray-additionalText text-[14px]">
+							<p className="text-[14px] text-gray-additionalText">
 								Расчет и определение допустимых значений будет произведен в
 								соответствии с ТНПА {country2title[selectedRegion as Country]}
 							</p>
@@ -492,7 +492,7 @@ const AboutBuildingScreen = () => {
 							<Button
 								type={'submit'}
 								onClick={handleSubmit}
-								className="h-[40px] w-[76px] px-[16px]"
+								className="h-[40px] w-fit px-[16px]"
 							>
 								<p className="font-sans text-sm font-semibold leading-4">
 									{!!search.get('edit') ? 'Сохранить' : 'Далее'}
