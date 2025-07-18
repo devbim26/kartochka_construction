@@ -9,8 +9,8 @@ export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
 const BUTTON_VARIANTS = {
 	primary: 'px-[30px] py-[11px] shadow-sm text-white bg-primary enabled:hover:bg-primary/90',
 	secondary: 'text-primary px-[13px] py-[6px] group-hover:bg-primary',
-	// outline:
-	// 'esm:px-4 px-2 shadow-sm text-primary bg-white-flash enabled:hover:bg-white-flash/70 border border-primary',
+	outline:
+		'esm:px-4 px-2 shadow-sm text-primary bg-[#EDF2FA] enabled:hover:bg-primary/20 border border-primary',
 	// delete: 'esm:px-4 px-2 shadow-sm text-error bg-linen enabled:hover:bg-linen/70 border border-error',
 	// neutral: 'text-primary bg-none enabled:hover:text-primary',
 	inactive:
