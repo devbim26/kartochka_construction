@@ -15,3 +15,5 @@ const reportStatusMap = createDataRecordConverter({
 // export const convertToClientReportStatus = (reportStatus: ReportStatus): ClientRepostStatus => {
 // 	return reportStatusMap.toClient[reportStatus];
 // };
+
+//TODO: РУсская буква С
