@@ -1,5 +1,6 @@
 import { CurrentSub } from '@core';
 import { SubSelect } from '@features/landing';
+import { ReportScreen } from '@features/reports';
 import { MainHeader, News } from '../components';
 
 const MainScreen = () => {
@@ -10,6 +11,7 @@ const MainScreen = () => {
 				<News />
 				<CurrentSub />
 			</div>
+			<ReportScreen />
 			<SubSelect wrapperClassName="w-full p-0" subContainerClassName="bg-white" />
 		</div>
 	);

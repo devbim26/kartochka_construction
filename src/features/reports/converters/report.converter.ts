@@ -1,6 +1,7 @@
 import type { GetReportWithPaginationQuery, ReportDto } from '@api-gen';
 import type { Report, ReportFilter } from '../types';
-import { ReportStatus } from '../types';
+import { convertToClientReporCategory } from './report-category.converter';
+import { convertToClientReportStatus } from './report-status.converter';
 
 export const reportToClientConverter = (data: ReportDto): Report => {
 	return {
@@ -8,8 +9,9 @@ export const reportToClientConverter = (data: ReportDto): Report => {
 		name: data.name || '',
 		client: data.client || '',
 		lastUpdated: data.lastUpdated || '',
-		status: ReportStatus.Confirmed,
+		status: convertToClientReportStatus(data.status!),
 		fileUrl: data.fileUrl || '',
+		reportCategory: convertToClientReporCategory(data.reportCategory!),
 	};
 };
 
