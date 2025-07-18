@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const AboutBuildingSchema = z.object({
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
+	commonDescription: z.string().nullable().optional(),
 	buildingPurpose: z.string().min(1, 'Поле обязательно для заполнения'),
 	buildingType: z.string().min(1, 'Поле обязательно для заполнения'),
 	maxHeight: z
