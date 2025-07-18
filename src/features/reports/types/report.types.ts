@@ -1,4 +1,5 @@
 import type { SortOrder } from '@core';
+import type { ReportCategory } from '@features/constructor';
 import type { ReportStatus } from './report-status.types';
 
 export type Report = {
@@ -8,6 +9,7 @@ export type Report = {
 	lastUpdated: string;
 	status: ReportStatus;
 	fileUrl: string;
+	reportCategory: ReportCategory;
 };
 
 export type ReportFilter = {

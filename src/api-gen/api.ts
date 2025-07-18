@@ -250,6 +250,7 @@ export interface CreateReportConstructionDto {
 
 export interface CreateReportInfoCommand {
 	buildingName?: string | null;
+	description?: string | null;
 	requirementIds?: string[] | null;
 	country?: CountryType;
 	category?: ReportCategory;
@@ -259,6 +260,7 @@ export interface CreateReportInfoDto {
 	/** @format uuid */
 	id?: string;
 	buildingName?: string | null;
+	description?: string | null;
 	requirements?: Requirement[] | null;
 	category?: ReportCategory;
 }
@@ -872,6 +874,9 @@ export interface ReportDto {
 	lastUpdated?: string;
 	status?: ReportStatus;
 	fileUrl?: string | null;
+	reportCategory?: ReportCategory;
+	/** @format uuid */
+	reportInfoId?: string;
 }
 
 export interface ReportDtoPaginatedList {
@@ -906,6 +911,7 @@ export interface ReportInfoFloorConstructionDto {
 	reportDocumentInfo?: ReportDocumentInfoDto;
 	country?: CountryType;
 	status?: ReportInfoStatus;
+	description?: string | null;
 }
 
 export interface ReportInfoSingleConstructionDto {
@@ -927,7 +933,7 @@ export enum ReportInfoStatus {
 
 export enum ReportStatus {
 	None = 'None',
-	ValueСonsideration = 'Сonsideration',
+	Consideration = 'Consideration',
 	Confirmed = 'Confirmed',
 }
 
@@ -1063,6 +1069,7 @@ export interface UpdateReportInfoBaseFieldsCommand {
 	/** @format uuid */
 	reportInfoId?: string;
 	buildingName?: string | null;
+	description?: string | null;
 }
 
 export interface UpdateReportInfoWithSingleConstructionCommand {

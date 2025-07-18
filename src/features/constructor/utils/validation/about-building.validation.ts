@@ -2,6 +2,7 @@ import { ReportCategory } from '@features/constructor/types';
 import { z } from 'zod';
 
 export const AboutBuildingSchema = z.object({
+	reportInfoId: z.string().optional(),
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	region: z.string().min(1, 'Поле обязательно для заполнения'),
 	commonDescription: z.string().nullable().optional(),

@@ -61,7 +61,7 @@ const ReportFromComponent = () => {
 				.subscribe((response) => {
 					if (response.status === 200)
 						from(
-							search.get('ReportType') === ReportCategory.Floor
+							search.get('reportType') == ReportCategory.Floor
 								? reportReceiveFloor(reportId)
 								: reportReceiveSingle(reportId),
 						)

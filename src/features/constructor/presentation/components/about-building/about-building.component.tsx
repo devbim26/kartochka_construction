@@ -12,10 +12,18 @@ import {
 } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import {
+	convertToClientReportInfo,
 	convertToCreateReportInfoCommand,
 	convertToRequirementSelectValues,
 } from '@features/constructor/converters';
-import { createReport } from '@features/constructor/services';
+import {
+	createReport,
+	getReportFloorById,
+	getReportSingleById,
+	reportReceiveFloor,
+	reportReceiveSingle,
+	updateReport,
+} from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
 import {
 	ReportCategory,
@@ -63,6 +71,8 @@ const AboutBuildingScreen = () => {
 		'name',
 	]);
 
+	const reportId = search.get('reportId');
+
 	const filteredRequirements = convertToRequirementSelectValues(
 		requirementData.filter(
 			(req) =>
@@ -72,26 +82,49 @@ const AboutBuildingScreen = () => {
 	);
 
 	const handleSubmit = () => {
-		if (!!search.get('edit')) {
-			//TODO: Эндпоинт на обновление
-			navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route);
-		} else {
-			form.handleSubmit(onSubmit)();
-		}
+		form.handleSubmit(onSubmit)();
 	};
 
 	const onSubmit = (data: AboutBuildingData) => {
-		dispatch(constructorSlice.actions.setAboutBuilding(data));
-		handleCreateReport(data);
-		//TODO: Перекинуть сабмит сюда
+		if (!!search.get('edit')) {
+			handleUpdateReport(data);
+		} else {
+			dispatch(constructorSlice.actions.setAboutBuilding(data));
+			handleCreateReport(data);
+		}
+	};
+
+	const handleGetReport = (id: string) => {
+		from(
+			search.get('reportType') == ReportCategory.Floor
+				? getReportFloorById({ id: id })
+				: getReportSingleById({ id: id }),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					toast.success('Успещное полчеие отчета');
+					const data = convertToClientReportInfo(response.data);
+					if (data)
+						form.reset({
+							...data,
+							reportInfoId: search.get('reportId')!,
+							isFloorPlan: search.get('reportType') as ReportCategory,
+						});
+				}
+			});
 	};
 
 	useEffect(() => {
-		if (!!search.get('edit')) {
-			form.reset({
-				name: 'Тест редактирования пока нет поинта',
-				commonDescription: 'Тест редактирования пока нет поинта',
-			});
+		if (!!search.get('edit') && !!search.get('reportType')) {
+			handleGetReport(reportId!);
 		}
 	}, [search]);
 
@@ -119,6 +152,54 @@ const AboutBuildingScreen = () => {
 							reportType,
 						});
 					}
+				}
+			});
+	};
+
+	const handleUpdateReport = (data: AboutBuildingData) => {
+		from(
+			updateReport({
+				reportInfoId: data.reportInfoId,
+				commonDescription: data.commonDescription || '',
+				name: data.name || '',
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					toast.success('Отчет успешно отредактирован');
+					if (response.status === 200)
+						from(
+							search.get('reportType') == ReportCategory.Floor
+								? reportReceiveFloor(reportId!)
+								: reportReceiveSingle(reportId!),
+						)
+							.pipe(
+								catchError(() => {
+									return [null];
+								}),
+							)
+							.subscribe((response) => {
+								if (response?.status === 200) {
+									const link = document.createElement('a');
+									link.href = response.data!;
+									document.body.appendChild(link);
+									link.click();
+									document.body.removeChild(link);
+								}
+								navigate(
+									APP_ROUTES.designing.route +
+										'/' +
+										DESIGNING_ROUTES.reports.route,
+								);
+							});
 				}
 			});
 	};

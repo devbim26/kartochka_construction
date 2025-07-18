@@ -6,8 +6,9 @@ import { fetchApi } from '@api-gen';
 import {
 	convertAlternateConstructionsCommand,
 	convertToServerReportFormFlags,
+	convertToUpdateReportInfoCommand,
 } from '../converters';
-import type { AlternateConstructionsType } from '../types';
+import type { AlternateConstructionsType, ReportInfoUpdate } from '../types';
 import type { FormReportSchemaType } from '../utils';
 import { withConstructorLoader } from '../utils';
 
@@ -60,6 +61,13 @@ type GetGraphParams = {
 
 export const createReport = async ({ data }: ReportCreateProps) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoCreate(data));
+};
+export const updateReport = async (data: ReportInfoUpdate) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoReportInfoBaseInformationUpdate(
+			convertToUpdateReportInfoCommand(data),
+		),
+	);
 };
 export const getReportSingleById = async ({ id }: GetReportByIdParams) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoSingleDetail(id));
