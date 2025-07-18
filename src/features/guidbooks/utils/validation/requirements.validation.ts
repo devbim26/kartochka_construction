@@ -39,7 +39,7 @@ const RequirementsFormSchema = z
 			.min(1, 'Поле обязательно для заполнения')
 			.refine((value) => !value.includes('_'), 'Неверный формат даты')
 			.refine((value) => {
-				const [day, month, year] = value.split('-').map(Number);
+				const [year, month, day] = value.split('-').map(Number);
 				const date = new Date(year, month - 1, day);
 				return (
 					date.getFullYear() === year &&

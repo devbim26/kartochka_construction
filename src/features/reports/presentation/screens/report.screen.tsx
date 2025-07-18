@@ -111,7 +111,7 @@ export const ReportScreen = () => {
 		<div className="flex w-full flex-col gap-[40px]">
 			<FormProvider {...form}>
 				<ReportHeader />
-			</FormProvider>
+			</FormProvider>{' '}
 			<SimpleTable
 				data={tableData}
 				columns={[
