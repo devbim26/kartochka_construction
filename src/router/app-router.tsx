@@ -31,6 +31,7 @@ import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
 import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants';
 import { ArticlePage } from '@features/news/presentation/components/article-page.component';
 import NewsScreen from '@features/news/presentation/screens/news.screen';
+import { ReportScreen } from '@features/reports';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
@@ -90,10 +91,7 @@ export const AppRouter = () => {
 					element={<DevScreen title="Конструктор подписок" />}
 				/>
 				<Route path={DESIGNING_ROUTES.news.route} element={<NewsScreen />} />
-				<Route
-					path={DESIGNING_ROUTES.reports.route}
-					element={<DevScreen title="Отчеты" />}
-				/>
+				<Route path={DESIGNING_ROUTES.reports.route} element={<ReportScreen />} />
 				<Route path={DESIGNING_ROUTES.guidbooks.route} element={<GuidbooksLauout />}>
 					<Route path={GUIDBOOKS_ROUTES.materials.route} element={<MaterialsScreen />} />
 					<Route

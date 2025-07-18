@@ -97,7 +97,7 @@ export interface ConstructionHeaderDto {
 	laboratoryIndexValue?: number;
 	constructionType?: ConstructionTypeDto;
 	/** @format double */
-	rw?: number;
+	rw?: number | null;
 	/** @format double */
 	computingIndexValue?: number;
 	isReportConstruction?: boolean;
@@ -251,6 +251,7 @@ export interface CreateReportConstructionDto {
 export interface CreateReportInfoCommand {
 	buildingName?: string | null;
 	requirementIds?: string[] | null;
+	country?: CountryType;
 	category?: ReportCategory;
 }
 
@@ -318,6 +319,11 @@ export interface DeleteIssuerCommand {
 export interface DeleteMaterialCommand {
 	/** @format uuid */
 	id?: string;
+}
+
+export interface DeleteReportCommand {
+	/** @format uuid */
+	reportId?: string;
 }
 
 export interface DeleteReportConstructionCommand {
@@ -492,6 +498,17 @@ export interface GetPlacementRoomVariantByAllParametersQuery {
 	placementRoomId?: string;
 }
 
+export interface GetReportWithPaginationQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	name?: string | null;
+	client?: string | null;
+}
+
 export interface GetRequirementsWithPaginationParamsQuery {
 	/** @format int32 */
 	pageNumber?: number;
@@ -594,6 +611,10 @@ export interface MaterialDto {
 	damping?: number;
 	/** @format float */
 	solid?: number;
+	/** @format float */
+	edin?: number;
+	/** @format float */
+	velocityLongitudinal?: number;
 }
 
 export enum MaterialOriginType {
@@ -606,8 +627,11 @@ export enum MaterialParametrs {
 	Thickness = 'Thickness',
 	Density = 'Density',
 	ConnectionNumber = 'ConnectionNumber',
+	ConnectionType = 'ConnectionType',
 	RackStep = 'RackStep',
 	Width = 'Width',
+	Length = 'Length',
+	Square = 'Square',
 }
 
 export interface MaterialType {
@@ -752,6 +776,10 @@ export interface PaginatedMaterialDto {
 	damping?: number;
 	/** @format float */
 	solid?: number;
+	/** @format float */
+	edin?: number;
+	/** @format float */
+	velocityLongitudinal?: number;
 }
 
 export interface PaginatedMaterialDtoPaginatedList {
@@ -835,6 +863,31 @@ export interface ReportDocumentInfoDto {
 	logoUrl?: string | null;
 }
 
+export interface ReportDto {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	client?: string | null;
+	/** @format date */
+	lastUpdated?: string;
+	status?: ReportStatus;
+	fileUrl?: string | null;
+}
+
+export interface ReportDtoPaginatedList {
+	items?: ReportDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
+}
+
 export interface ReportFloorInfoDto {
 	/** @format uuid */
 	id?: string;
@@ -851,6 +904,7 @@ export interface ReportInfoFloorConstructionDto {
 	requirements?: RequirementDto[] | null;
 	category?: ReportCategory;
 	reportDocumentInfo?: ReportDocumentInfoDto;
+	country?: CountryType;
 	status?: ReportInfoStatus;
 }
 
@@ -869,6 +923,12 @@ export interface ReportInfoSingleConstructionDto {
 export enum ReportInfoStatus {
 	InProgress = 'InProgress',
 	Completed = 'Completed',
+}
+
+export enum ReportStatus {
+	None = 'None',
+	ValueСonsideration = 'Сonsideration',
+	Confirmed = 'Confirmed',
 }
 
 export interface Requirement {
@@ -987,6 +1047,22 @@ export interface UpdateConstructionHeaderCommand {
 	/** @format float */
 	indexValue?: number;
 	constructionType?: CreateConstructionTypeDto;
+}
+
+export interface UpdateReportCommand {
+	/** @format uuid */
+	reportId?: string;
+	name?: string | null;
+	client?: string | null;
+	/** @format date */
+	lastUpdated?: string;
+	status?: ReportStatus;
+}
+
+export interface UpdateReportInfoBaseFieldsCommand {
+	/** @format uuid */
+	reportInfoId?: string;
+	buildingName?: string | null;
 }
 
 export interface UpdateReportInfoWithSingleConstructionCommand {
@@ -1726,6 +1802,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				damping?: number;
 				/** @format float */
 				solid?: number;
+				/** @format float */
+				edin?: number;
+				/** @format float */
+				velocityLongitudinal?: number;
 			},
 			params: RequestParams = {},
 		) =>
@@ -1787,6 +1867,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				damping?: number;
 				/** @format float */
 				solid?: number;
+				/** @format float */
+				edin?: number;
+				/** @format float */
+				velocityLongitudinal?: number;
 				editFile?: boolean;
 				/** @format binary */
 				formFile?: File;
@@ -1850,6 +1934,59 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<void, any>({
 				path: `/api/PlacementRoomVariants/get-second-room`,
 				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Report
+		 * @name ReportGetPaginatedCreate
+		 * @request POST:/api/Report/get-paginated
+		 */
+		reportGetPaginatedCreate: (
+			data: GetReportWithPaginationQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<ReportDtoPaginatedList, any>({
+				path: `/api/Report/get-paginated`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Report
+		 * @name ReportUpdate
+		 * @request PUT:/api/Report
+		 */
+		reportUpdate: (data: UpdateReportCommand, params: RequestParams = {}) =>
+			this.request<ReportDto, any>({
+				path: `/api/Report`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Report
+		 * @name ReportDelete
+		 * @request DELETE:/api/Report
+		 */
+		reportDelete: (data: DeleteReportCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Report`,
+				method: 'DELETE',
 				body: data,
 				type: ContentType.Json,
 				...params,
@@ -2134,6 +2271,26 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				method: 'PUT',
 				body: data,
 				type: ContentType.FormData,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoReportInfoBaseInformationUpdate
+		 * @request PUT:/api/ReportInfo/reportInfo/baseInformation
+		 */
+		reportInfoReportInfoBaseInformationUpdate: (
+			data: UpdateReportInfoBaseFieldsCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<ReportDto, any>({
+				path: `/api/ReportInfo/reportInfo/baseInformation`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 

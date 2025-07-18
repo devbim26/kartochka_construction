@@ -1,4 +1,4 @@
-import { RiEdit2Line } from 'react-icons/ri';
+import { HiDownload } from 'react-icons/hi';
 import { twMerge } from 'tailwind-merge';
 
 type Props = {
@@ -6,7 +6,7 @@ type Props = {
 	onClick: () => void;
 };
 
-export const EditIcon = ({ className, onClick }: Props) => {
+export const DownloadIcon = ({ className, onClick }: Props) => {
 	return (
 		<div
 			onClick={onClick}
@@ -15,7 +15,7 @@ export const EditIcon = ({ className, onClick }: Props) => {
 				className,
 			)}
 		>
-			<RiEdit2Line className="size-[20px] text-primary" />
+			<HiDownload className="size-[20px] text-primary" />
 		</div>
 	);
 };
