@@ -1,10 +1,12 @@
 import {
+	APP_ROUTES,
 	Button,
 	convertToPaginatedType,
 	FormElementLabel,
 	Input,
 	Select,
 	Switch,
+	TextArea,
 	useAppDispatch,
 	useAppNavigate,
 } from '@core';
@@ -26,16 +28,19 @@ import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import type { BuildingType, CategoryClass, Requirement } from '@features/guidbooks/types';
 import {
 	Country,
+	country2title,
 	Guidebooks,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
@@ -49,12 +54,13 @@ const AboutBuildingScreen = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
 	const [requirementData, setRequirementData] = useState<Array<Requirement>>([]);
-
-	const [selectedRegion, selectedType, selectedClass, reportType] = watch([
+	const [search] = useSearchParams();
+	const [selectedRegion, selectedType, selectedClass, reportType, name] = watch([
 		'region',
 		'buildingType',
 		'comfortClass',
 		'isFloorPlan',
+		'name',
 	]);
 
 	const filteredRequirements = convertToRequirementSelectValues(
@@ -66,13 +72,28 @@ const AboutBuildingScreen = () => {
 	);
 
 	const handleSubmit = () => {
-		form.handleSubmit(onSubmit)();
+		if (!!search.get('edit')) {
+			//TODO: Эндпоинт на обновление
+			navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports);
+		} else {
+			form.handleSubmit(onSubmit)();
+		}
 	};
 
 	const onSubmit = (data: AboutBuildingData) => {
 		dispatch(constructorSlice.actions.setAboutBuilding(data));
 		handleCreateReport(data);
+		//TODO: Перекинуть сабмит сюда
 	};
+
+	useEffect(() => {
+		if (!!search.get('edit')) {
+			form.reset({
+				name: 'Тест редактирования пока нет поинта',
+				commonDescription: 'Тест редактирования пока нет поинта',
+			});
+		}
+	}, [search]);
 
 	const handleCreateReport = (data: AboutBuildingData) => {
 		from(
@@ -167,9 +188,26 @@ const AboutBuildingScreen = () => {
 							inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.name?.message}
 							containerClassName="w-[226px]"
-							label={formState.errors?.name?.message || 'Название'}
+							label={formState.errors?.name?.message || 'Название*'}
 							placeholder="Введите название"
 							maxLength={50}
+						/>
+						{name && (
+							<p className="text-gray-additionalText text-[14px]">
+								Введенное название будет использоваться для определения Объекта в
+								отчете
+							</p>
+						)}
+						<TextArea
+							{...register('commonDescription')}
+							labelClassName={
+								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]'
+							}
+							wrapperClassName="flex-row items-center gap-[50px]"
+							inputClassName="w-full py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+							containerClassName="w-[700px]"
+							label={'Общее описание'}
+							placeholder="Введите описание"
 						/>
 						<Controller
 							control={control}
@@ -185,10 +223,13 @@ const AboutBuildingScreen = () => {
 												!['Беларусь', 'Россия', 'Нет'].includes(reg.label),
 										).sort((a, b) => a.label.localeCompare(b.label)),
 									]}
+									disabled={!!search.get('edit')}
 									{...field}
 									value={field.value || ''}
-									onChange={(val) => field.onChange(val)}
-									label={formState.errors?.region?.message || 'Страна'}
+									onChange={(val) => {
+										field.onChange(val), form.setValue('requirement', '');
+									}}
+									label={formState.errors?.region?.message || 'Страна*'}
 									error={formState.errors.region?.message}
 									isSearchable
 									highlightOnlyRussiaBelarus
@@ -202,6 +243,12 @@ const AboutBuildingScreen = () => {
 								/>
 							)}
 						/>
+						{selectedRegion && selectedRegion !== Country.None && (
+							<p className="text-gray-additionalText text-[14px]">
+								Расчет и определение допустимых значений будет произведен в
+								соответствии с ТНПА {country2title[selectedRegion as Country]}
+							</p>
+						)}
 						<div className="flex items-center gap-x-[50px]">
 							<div className="w-[145px]">
 								<label
@@ -215,7 +262,7 @@ const AboutBuildingScreen = () => {
 									{formState.errors.buildingPurpose ||
 									formState.errors.buildingType
 										? 'Поле обязательно для заполнения'
-										: 'Тип здания'}
+										: 'Тип здания*'}
 								</label>
 							</div>
 							<div className="flex gap-x-[12px]">
@@ -225,9 +272,13 @@ const AboutBuildingScreen = () => {
 									render={({ field }) => (
 										<Select
 											options={RuBuildingTypeSelectValues}
-											{...field}
+											onChange={(value) => {
+												form.setValue('requirement', ''),
+													form.setValue('buildingType', value as string);
+											}}
 											error={formState.errors.buildingType?.message}
 											value={field.value || ''}
+											disabled={!!search.get('edit')}
 											placeholder="Выберите тип"
 											isSearchable
 											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
@@ -244,6 +295,7 @@ const AboutBuildingScreen = () => {
 											{...field}
 											error={formState.errors.buildingPurpose?.message}
 											value={field.value || ''}
+											disabled={!!search.get('edit')}
 											placeholder="Выберите назначение"
 											isSearchable
 											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
@@ -264,6 +316,7 @@ const AboutBuildingScreen = () => {
 							inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.maxHeight?.message}
 							containerClassName="w-[226px]"
+							disabled={!!search.get('edit')}
 							label={
 								formState.errors?.maxHeight?.message ||
 								'Наибольшая допустимая высота здания, м'
@@ -278,13 +331,17 @@ const AboutBuildingScreen = () => {
 							render={({ field }) => (
 								<Select
 									options={RuCategoryClassSelectValues}
-									{...field}
+									onChange={(value) => {
+										form.setValue('requirement', ''),
+											form.setValue('comfortClass', value as string);
+									}}
 									value={field.value || ''}
 									label={
 										formState.errors?.comfortClass?.message ||
 										'Класс комфортности'
 									}
 									isSearchable
+									disabled={!!search.get('edit')}
 									error={formState.errors.comfortClass?.message}
 									labelClassName={twMerge(
 										'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
@@ -296,28 +353,103 @@ const AboutBuildingScreen = () => {
 								/>
 							)}
 						/>
-						<Controller
-							control={control}
-							name={'requirement'}
-							render={({ field }) => (
-								<Select
-									{...field}
-									options={filteredRequirements ?? []}
-									value={field.value || ''}
-									label={formState.errors?.requirement?.message || 'Требование'}
-									isSearchable
-									error={formState.errors.requirement?.message}
-									labelClassName={twMerge(
-										'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
-										formState.errors.requirement?.message ? 'text-error' : '',
-									)}
-									placeholder="Выберите требование"
-									buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-									wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
-								/>
-							)}
-						/>
-						<FormElementLabel className="font-sans text-lg font-semibold leading-6">
+						<FormElementLabel className="font-sans text-lg font-semibold leading-4 text-primary">
+							Требования
+						</FormElementLabel>
+						<div className="flex gap-[12px]">
+							<Controller
+								control={control}
+								name={'requirement'}
+								render={({ field }) => (
+									<Select
+										{...field}
+										options={filteredRequirements ?? []}
+										value={field.value || ''}
+										label={
+											formState.errors?.requirement?.message ||
+											'Звукоизоляция*'
+										}
+										isSearchable
+										disabled={!!search.get('edit')}
+										error={formState.errors.requirement?.message}
+										labelClassName={twMerge(
+											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
+											formState.errors.requirement?.message
+												? 'text-error'
+												: '',
+										)}
+										placeholder="Выберите требование"
+										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
+									/>
+								)}
+							/>
+							<Controller
+								control={control}
+								name={'requirement'}
+								render={({ field }) => (
+									<Select
+										{...field}
+										options={filteredRequirements ?? []}
+										value={field.value || ''}
+										isSearchable
+										disabled={!!search.get('edit')}
+										error={formState.errors.requirement?.message}
+										placeholder="Выберите требование"
+										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
+									/>
+								)}
+							/>
+						</div>
+						<div className="flex gap-[12px]">
+							<Controller
+								control={control}
+								name={'requirement'}
+								render={({ field }) => (
+									<Select
+										{...field}
+										options={filteredRequirements ?? []}
+										value={field.value || ''}
+										label={
+											formState.errors?.requirement?.message ||
+											'Теплоизоляция*'
+										}
+										isSearchable
+										disabled={!!search.get('edit')}
+										error={formState.errors.requirement?.message}
+										labelClassName={twMerge(
+											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
+											formState.errors.requirement?.message
+												? 'text-error'
+												: '',
+										)}
+										placeholder="Выберите требование"
+										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
+									/>
+								)}
+							/>
+							<Controller
+								control={control}
+								name={'requirement'}
+								render={({ field }) => (
+									<Select
+										disabled={!!search.get('edit')}
+										{...field}
+										options={filteredRequirements ?? []}
+										value={field.value || ''}
+										isSearchable
+										error={formState.errors.requirement?.message}
+										placeholder="Выберите требование"
+										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
+									/>
+								)}
+							/>
+						</div>
+
+						<FormElementLabel className="font-sans text-lg font-semibold leading-4 text-primary">
 							Ввод информации о конструкциях здания
 						</FormElementLabel>
 						<div className="flex items-center gap-x-[70px]">
@@ -329,6 +461,7 @@ const AboutBuildingScreen = () => {
 								name="isFloorPlan"
 								render={({ field }) => (
 									<Switch
+										disabled={!!search.get('edit')}
 										onChange={(isEnabled) => {
 											const value = isEnabled
 												? ReportCategory.Floor
@@ -348,6 +481,7 @@ const AboutBuildingScreen = () => {
 								name="isBim"
 								render={({ field }) => (
 									<Switch
+										disabled={!!search.get('edit')}
 										onChange={(value) => field.onChange(value)}
 										wrapperClassName="w-[36px] h-[20px]"
 									/>
@@ -360,7 +494,9 @@ const AboutBuildingScreen = () => {
 								onClick={handleSubmit}
 								className="h-[40px] w-[76px] px-[16px]"
 							>
-								<p className="font-sans text-sm font-semibold leading-4">Далее</p>
+								<p className="font-sans text-sm font-semibold leading-4">
+									{!!search.get('edit') ? 'Сохранить' : 'Далее'}
+								</p>
 							</Button>
 						</div>
 					</div>

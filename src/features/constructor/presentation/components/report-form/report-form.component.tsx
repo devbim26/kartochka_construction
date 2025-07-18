@@ -1,8 +1,14 @@
 import { Button, useAppDispatch, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { convertToClientReportFormFlags } from '@features/constructor/converters';
-import { getReportFormInfo } from '@features/constructor/services';
+import {
+	formReport,
+	getReportFormInfo,
+	reportReceiveFloor,
+	reportReceiveSingle,
+} from '@features/constructor/services';
 import { stopLoading } from '@features/constructor/store';
+import { ReportCategory } from '@features/constructor/types';
 import type { FormReportSchemaType } from '@features/constructor/utils';
 import { FormReportConfig } from '@features/constructor/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +16,7 @@ import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from } from 'rxjs';
+import { toast } from 'sonner';
 import { DocumentFlags } from './document-flags.component';
 import { GeneralInfoForm } from './general-info-form.component';
 
@@ -42,38 +49,42 @@ const ReportFromComponent = () => {
 			});
 	}, [reportId]);
 
-	// const handleDownloadReport = () => {
-	// 	if (!Object.keys(form.formState.errors).length) {
-	// 		if (!reportId) return;
-	// 		from(formReport({ ...form.getValues(), reportInfoId: reportId }))
-	// 			.pipe(
-	// 				catchError(() => {
-	// 					return [];
-	// 				}),
-	// 			)
-	// 			.subscribe((response) => {
-	// 				if (response.status === 200)
-	// 					from(reportReceive(reportId))
-	// 						.pipe(
-	// 							catchError(() => {
-	// 								return [null];
-	// 							}),
-	// 						)
-	// 						.subscribe((response) => {
-	// 							if (response?.status === 200) {
-	// 								const link = document.createElement('a');
-	// 								link.href = response.data!;
-	// 								document.body.appendChild(link);
-	// 								link.click();
-	// 								document.body.removeChild(link);
-	// 							}
-	// 							dispatch(stopLoading());
-	// 						});
-	// 			});
-	// 	} else {
-	// 		toast.error('Заполните форму');
-	// 	}
-	// };
+	const handleDownloadReport = () => {
+		if (!Object.keys(form.formState.errors).length) {
+			if (!reportId) return;
+			from(formReport({ ...form.getValues(), reportInfoId: reportId }))
+				.pipe(
+					catchError(() => {
+						return [];
+					}),
+				)
+				.subscribe((response) => {
+					if (response.status === 200)
+						from(
+							search.get('ReportType') === ReportCategory.Floor
+								? reportReceiveFloor(reportId)
+								: reportReceiveSingle(reportId),
+						)
+							.pipe(
+								catchError(() => {
+									return [null];
+								}),
+							)
+							.subscribe((response) => {
+								if (response?.status === 200) {
+									const link = document.createElement('a');
+									link.href = response.data!;
+									document.body.appendChild(link);
+									link.click();
+									document.body.removeChild(link);
+								}
+								dispatch(stopLoading());
+							});
+				});
+		} else {
+			toast.error('Заполните форму');
+		}
+	};
 
 	return (
 		<FormProvider {...form}>
@@ -88,9 +99,9 @@ const ReportFromComponent = () => {
 					<GeneralInfoForm />
 					<DocumentFlags />
 					<div className="flex w-full items-center justify-end gap-[50px]">
-						{/* <Button onClick={() => form.handleSubmit(handleDownloadReport)()}>
+						<Button onClick={() => form.handleSubmit(handleDownloadReport)()}>
 							Скачать
-						</Button> */}
+						</Button>
 						<Button>Сохранить</Button>
 					</div>
 				</div>

@@ -34,6 +34,7 @@ module.exports = {
 					navBg: '#F9F9F9',
 					border: '#EDEFF2',
 					text: '#BFBFBF',
+					additionalText: '#C8C8C8',
 				},
 				input: {
 					border: {
@@ -67,7 +68,7 @@ module.exports = {
 			md: '1200px',
 			lg: '1440px',
 			xl: '1920px',
-		}
+		},
 	},
 	plugins: [
 		require('tailwindcss'),

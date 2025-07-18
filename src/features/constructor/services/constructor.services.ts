@@ -105,8 +105,14 @@ export const getAlternateConstructions = async (data: AlternateConstructionsType
 		),
 	);
 };
-// export const reportReceive = async (id: string) => {
-// 	return await withConstructorLoader(() =>
-// 		fetchApi.api.reportReceivingCreate({ reportInfoId: id }),
-// 	);
-// };
+export const reportReceiveFloor = async (id: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportReceivingFloorCreate({ reportInfoId: id }),
+	);
+};
+
+export const reportReceiveSingle = async (id: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportReceivingSingleCreate({ reportInfoId: id }),
+	);
+};

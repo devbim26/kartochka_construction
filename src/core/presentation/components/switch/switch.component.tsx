@@ -15,6 +15,7 @@ interface SwitchProps {
 	offText?: string;
 	onChange: (isEnabled: boolean) => void;
 	isEnabledProp?: boolean;
+	disabled?: boolean;
 }
 
 export const Switch = ({
@@ -30,6 +31,7 @@ export const Switch = ({
 	onIcon,
 	offIcon,
 	onChange,
+	disabled,
 	isEnabledProp = false,
 }: SwitchProps) => {
 	const [isEnabled, setIsEnabled] = useState(isEnabledProp);
@@ -39,6 +41,7 @@ export const Switch = ({
 	}, [isEnabledProp]);
 
 	const handleToggle = () => {
+		if (disabled) return;
 		const newState = !isEnabled;
 		setIsEnabled(newState);
 		onChange(newState);
@@ -49,6 +52,7 @@ export const Switch = ({
 			className={twMerge(
 				'relative flex h-[20px] w-[36px] cursor-pointer items-center rounded-full p-[2px] transition duration-300 ease-in-out',
 				isEnabled ? onWrapperClassName : offWrapperClassName,
+				disabled && 'opacity-50',
 				wrapperClassName,
 			)}
 			onClick={handleToggle}
