@@ -10,6 +10,7 @@ type PayloadType =
 	| FloorPlanModalData
 	| ReportFloorInfoDto
 	| ConstructionSheet[]
+	| string
 	| null;
 
 interface Action {
@@ -23,6 +24,9 @@ export const constructorReducer = {
 	},
 	setInfo: (state: ConstructorSliceState, action: Action) => {
 		state.reportInfo = action.payload as ReportFloorInfoDto;
+	},
+	setFloorConstructionInfoId: (state: ConstructorSliceState, action: Action) => {
+		state.id = action.payload as string;
 	},
 	setAboutBuilding: (state: ConstructorSliceState, action: Action) => {
 		//state.data = action.payload;

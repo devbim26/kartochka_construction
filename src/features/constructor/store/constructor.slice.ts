@@ -14,6 +14,7 @@ export interface ConstructorSliceState extends SliceInitialState {
 	file: FloorPlanModalData | null;
 	constructionsSheet: ConstructionSheet[];
 	reportInfoFull: ReportInfoFloorConstructionDto | null;
+	id: string;
 }
 
 const initialState: ConstructorSliceState = {
@@ -30,6 +31,7 @@ const initialState: ConstructorSliceState = {
 	file: null,
 	constructionsSheet: [],
 	reportInfoFull: null,
+	id: '',
 };
 
 export const constructorSlice = createSlice({
@@ -37,6 +39,7 @@ export const constructorSlice = createSlice({
 	initialState: initialState,
 	reducers: {
 		setInfo: constructorReducer.setInfo,
+		setFloorConstructionInfoId: constructorReducer.setFloorConstructionInfoId,
 		setFile: constructorReducer.setFile,
 		setAboutBuilding: constructorReducer.setAboutBuilding,
 		setCreateConstructionData: constructorReducer.setCreateConstructionData,

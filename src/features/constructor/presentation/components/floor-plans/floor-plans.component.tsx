@@ -67,6 +67,9 @@ export const FloorPlans = memoize(() => {
 				)
 				.subscribe((response) => {
 					if (response?.status === 200) {
+						dispatch(
+							constructorSlice.actions.setFloorConstructionInfoId(response.data),
+						);
 						toast.success('Файл успешно загружен');
 						from(getReportFloorById({ id: reportId! }))
 							.pipe(
@@ -91,6 +94,7 @@ export const FloorPlans = memoize(() => {
 												.reportFloorInfos?.[0] || {},
 										),
 									);
+
 									dispatch(
 										constructorSlice.actions.setConstructionsSheet(
 											response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(

@@ -37,6 +37,13 @@ type FloorDocumentImage = {
 	};
 };
 
+type FloorDocumentScreenshot = {
+	data: {
+		floorConstructionInfoId?: string;
+		floorScreenshot?: File;
+	};
+};
+
 type UpdateFloorReportProps = {
 	data: {
 		reportFloorInfoId?: string;
@@ -88,6 +95,9 @@ export const uploadImage = async ({ data }: FloorDocumentImage) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.reportInfoFloorConstructionImageUpdate(data),
 	);
+};
+export const uploadScreenshot = async ({ data }: FloorDocumentScreenshot) => {
+	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorScreenshotUpdate(data));
 };
 export const getReportFormInfo = async (id: string) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoReportInfoFlagsDetail(id));
