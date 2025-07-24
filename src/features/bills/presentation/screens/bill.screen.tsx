@@ -1,52 +1,56 @@
 import type { PaginationState } from '@core';
 import {
-	APP_ROUTES,
 	convertToPaginatedType,
 	DeleteIcon,
 	DownloadIcon,
-	EditIcon,
 	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
 } from '@core';
-import { CONSTRUCTOR_ROUTES } from '@features/constructor';
-import { DESIGNING_ROUTES } from '@features/home/constants';
-import { reportToClientConverter } from '@features/reports/converters';
-import { deleteReport, getPaginatedReports } from '@features/reports/services';
-import type { Report, ReportFilter } from '@features/reports/types';
-import { reportColumns } from '@features/reports/utils';
+import { convertBillToClient } from '@features/bills/converters';
+import { getPaginatedBills } from '@features/bills/services';
+import type { Bill, BillFilter } from '@features/bills/types';
+import { billColumns } from '@features/bills/utils';
+import { deleteReport } from '@features/reports/services';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
-import { ReportHeader, ReportListActionModal } from '../components';
+import { BillHeader, BillListActionModal } from '../components';
 
-export const ReportScreen = () => {
-	const form = useForm<ReportFilter>({ defaultValues: { name: '', client: '' } });
+export const BillScreen = () => {
+	const form = useForm<BillFilter>({
+		defaultValues: { number: '', date: '', clientName: '', billType: undefined },
+	});
 	const { watch, getValues } = form;
-	const [client, name] = watch(['client', 'name']);
+	const [number, date, clientName, billType] = watch([
+		'number',
+		'date',
+		'clientName',
+		'billType',
+	]);
 	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
-	const [tableData, setTableData] = useState<Array<Report>>([]);
+	const [tableData, setTableData] = useState<Array<Bill>>([]);
 	const [search] = useSearchParams();
 	const navigate = useAppNavigate();
 
 	const handleGetTableData = (
-		data: ReportFilter,
+		data: BillFilter,
 		pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>,
 	) => {
 		from(
-			getPaginatedReports({
+			getPaginatedBills({
 				data,
 				pagination,
 			}),
 		)
 			.pipe(
 				switchMap((response) => {
-					const res = convertToPaginatedType(reportToClientConverter)({
+					const res = convertToPaginatedType(convertBillToClient)({
 						items: response.data.items ?? [],
 						pageNumber: response.data.pageNumber ?? 1,
 						totalPages: response.data.totalPages ?? 0,
@@ -63,7 +67,7 @@ export const ReportScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка загрузки отчетов');
+						toast.error(error.response?.data?.message || 'Ошибка загрузки счетов');
 					}
 					return from([null]);
 				}),
@@ -105,17 +109,17 @@ export const ReportScreen = () => {
 
 	useEffect(() => {
 		handleGetTableData(getValues(), paginationState);
-	}, [client, name]);
+	}, [number, date, clientName, billType]);
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<FormProvider {...form}>
-				<ReportHeader />
+				<BillHeader />
 			</FormProvider>{' '}
 			<SimpleTable
 				data={tableData}
 				columns={[
-					...reportColumns,
+					...billColumns,
 					{
 						id: 'actions',
 						accessorKey: 'id',
@@ -132,14 +136,7 @@ export const ReportScreen = () => {
 												});
 											}}
 										/>
-										<EditIcon
-											onClick={() => {
-												navigate('', {
-													id: info.row.original.id,
-													edit: 'true',
-												});
-											}}
-										/>
+
 										<DeleteIcon
 											onClick={() => {
 												navigate('', {
@@ -159,30 +156,14 @@ export const ReportScreen = () => {
 					handleGetTableData(getValues(), newState);
 				}}
 			/>
-			<ReportListActionModal
-				onConfirm={() =>
-					navigate(
-						APP_ROUTES.designing.route +
-							'/' +
-							DESIGNING_ROUTES.constructor.route +
-							'/' +
-							CONSTRUCTOR_ROUTES.aboutBuilding.route,
-						{ reportId: search.get('id')!, edit: 'true' },
-					)
-				}
-				confirmTitle="Редактировать"
-				headerTitle="Редактировать отчет?"
-				onClose={() => navigate('')}
-				isOpen={!!search.get('id') && !!search.get('edit')}
-			/>
-			<ReportListActionModal
+			<BillListActionModal
 				onConfirm={() => handleDeleteTableData(search.get('id')!)}
 				confirmTitle="Удалить"
 				headerTitle="Удалить отчет?"
 				onClose={() => navigate('')}
 				isOpen={!!search.get('id') && !!search.get('delete')}
 			/>
-			<ReportListActionModal
+			<BillListActionModal
 				onConfirm={handleDownloadFile}
 				confirmTitle="Скачать"
 				headerTitle="Скачать отчет?"

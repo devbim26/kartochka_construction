@@ -26,12 +26,14 @@ import {
 	RequirementsScreen,
 } from '@features';
 import { AUTH_ROUTES } from '@features/auth/constants';
+import { BillScreen } from '@features/bills';
 import MyConstructions from '@features/constructor/presentation/components/designing/my-costructions.component';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
 import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants';
 import { ArticlePage } from '@features/news/presentation/components/article-page.component';
 import NewsScreen from '@features/news/presentation/screens/news.screen';
 import { ReportScreen } from '@features/reports';
+import SubscriptionScreen from '@features/subscriptions/presentation/screens/subscription.screen';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
@@ -82,13 +84,10 @@ export const AppRouter = () => {
 					<Route path={CONSTRUCTOR_ROUTES.ifcModel.route} element={<IFCModelScreen />} />
 				</Route>
 				<Route path={DESIGNING_ROUTES.account.route} element={<AccountScreen />} />
-				<Route
-					path={DESIGNING_ROUTES.accounts.route}
-					element={<DevScreen title="Счета" />}
-				/>
+				<Route path={DESIGNING_ROUTES.accounts.route} element={<BillScreen />} />
 				<Route
 					path={DESIGNING_ROUTES.subscribes_constructor.route}
-					element={<DevScreen title="Конструктор подписок" />}
+					element={<SubscriptionScreen />}
 				/>
 				<Route path={DESIGNING_ROUTES.news.route} element={<NewsScreen />} />
 				<Route path={DESIGNING_ROUTES.reports.route} element={<ReportScreen />} />
