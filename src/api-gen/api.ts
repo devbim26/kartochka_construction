@@ -2892,5 +2892,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				format: 'json',
 				...params,
 			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags User
+		 * @name UserActiveUserSubscriptionList
+		 * @request GET:/api/User/active-userSubscription
+		 */
+		userActiveUserSubscriptionList: (params: RequestParams = {}) =>
+			this.request<PaginatedUserDto, any>({
+				path: `/api/User/active-userSubscription`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
 	};
 }
