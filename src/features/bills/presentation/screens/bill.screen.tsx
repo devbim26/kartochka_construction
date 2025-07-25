@@ -168,14 +168,14 @@ export const BillScreen = () => {
 			<BillListActionModal
 				onConfirm={() => handleDeleteTableData(search.get('id')!)}
 				confirmTitle="Удалить"
-				headerTitle="Удалить отчет?"
+				headerTitle="Удалить cчет?"
 				onClose={() => navigate('')}
 				isOpen={!!search.get('id') && !!search.get('delete')}
 			/>
 			<BillListActionModal
 				onConfirm={() => handleDeleteTableData(search.get('id')!)}
 				confirmTitle="Редактировать"
-				headerTitle="Редактировать отчет?"
+				headerTitle="Редактировать cчет?"
 				hasSubmitButton={false}
 				onClose={() => navigate('')}
 				isOpen={!!search.get('id') && !!search.get('edit') && !!search.get('status')}
@@ -186,7 +186,7 @@ export const BillScreen = () => {
 			<BillListActionModal
 				onConfirm={handleDownloadFile}
 				confirmTitle="Скачать"
-				headerTitle="Скачать отчет?"
+				headerTitle="Скачать cчет?"
 				onClose={() => navigate('')}
 				isOpen={!!search.get('id') && !!search.get('download')}
 			/>

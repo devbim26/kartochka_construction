@@ -17,7 +17,6 @@ interface SubSelectProps {
 
 export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelectProps) => {
 	const [isPerMonth, setIsPerMonth] = useState(true);
-	const [currentIndex, setCurrentIndex] = useState(0);
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
 
 	const handleGetTableData = () => {
