@@ -27,5 +27,6 @@ export const convertBillToServer = (data: UpdateBill): UpdateBillCommand => {
 	return {
 		id: data.id!,
 		billType: convertToServerBillType(data.billType!),
+		userId: data.userId!,
 	};
 };

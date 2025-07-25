@@ -3,6 +3,7 @@ import {
 	convertToPaginatedType,
 	DeleteIcon,
 	DownloadIcon,
+	EditIcon,
 	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
@@ -10,17 +11,16 @@ import {
 	useAppNavigate,
 } from '@core';
 import { convertBillToClient } from '@features/bills/converters';
-import { getPaginatedBills } from '@features/bills/services';
+import { deleteBill, getPaginatedBills } from '@features/bills/services';
 import type { Bill, BillFilter } from '@features/bills/types';
 import { billColumns } from '@features/bills/utils';
-import { deleteReport } from '@features/reports/services';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
-import { BillHeader, BillListActionModal } from '../components';
+import { BillHeader, BillListActionModal, BillStatusChange } from '../components';
 
 export const BillScreen = () => {
 	const form = useForm<BillFilter>({
@@ -76,7 +76,7 @@ export const BillScreen = () => {
 	};
 
 	const handleDeleteTableData = (id: string) => {
-		from(deleteReport(id))
+		from(deleteBill(id))
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -88,28 +88,28 @@ export const BillScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(getValues(), paginationState);
-					toast.success('Отчет успешно удален');
+					toast.success('Счет успешно удален');
 					navigate('');
 				}
 			});
 	};
 
 	const handleDownloadFile = () => {
-		const report = tableData.find((report) => report.id === search.get('id'));
-		if (report) {
+		const bill = tableData.find((bill) => bill.id === search.get('id'));
+		if (bill) {
 			const link = document.createElement('a');
-			link.href = report.fileUrl;
+			link.href = bill.fileUrl;
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
 		} else {
-			toast.error('Отчет не найден');
+			toast.error('Счет не найден');
 		}
 	};
 
 	useEffect(() => {
 		handleGetTableData(getValues(), paginationState);
-	}, [number, date, clientName, billType]);
+	}, [number, date, clientName, billType, search]);
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
@@ -136,7 +136,16 @@ export const BillScreen = () => {
 												});
 											}}
 										/>
-
+										<EditIcon
+											onClick={() => {
+												navigate('', {
+													id: info.row.original.id,
+													edit: 'true',
+													status: info.row.original.billType,
+													userId: info.row.original.userId,
+												});
+											}}
+										/>
 										<DeleteIcon
 											onClick={() => {
 												navigate('', {
@@ -163,6 +172,17 @@ export const BillScreen = () => {
 				onClose={() => navigate('')}
 				isOpen={!!search.get('id') && !!search.get('delete')}
 			/>
+			<BillListActionModal
+				onConfirm={() => handleDeleteTableData(search.get('id')!)}
+				confirmTitle="Редактировать"
+				headerTitle="Редактировать отчет?"
+				hasSubmitButton={false}
+				onClose={() => navigate('')}
+				isOpen={!!search.get('id') && !!search.get('edit') && !!search.get('status')}
+				contentClassName="visible items-center"
+			>
+				<BillStatusChange />
+			</BillListActionModal>
 			<BillListActionModal
 				onConfirm={handleDownloadFile}
 				confirmTitle="Скачать"

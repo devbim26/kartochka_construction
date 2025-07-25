@@ -6,9 +6,16 @@ interface Props extends Omit<ModalProps, 'Footer'> {
 	onConfirm: () => void;
 	confirmTitle: string;
 	onClose: () => void;
+	hasSubmitButton?: boolean;
 }
 
-export const BillListActionModal = ({ onConfirm, confirmTitle, children, ...props }: Props) => {
+export const BillListActionModal = ({
+	onConfirm,
+	confirmTitle,
+	hasSubmitButton = true,
+	children,
+	...props
+}: Props) => {
 	return (
 		<Modal
 			className="max-w-fit"
@@ -21,12 +28,14 @@ export const BillListActionModal = ({ onConfirm, confirmTitle, children, ...prop
 					>
 						<p className="font-sans text-sm font-semibold">Отмена</p>
 					</Button>
-					<Button
-						onClick={onConfirm}
-						className="flex h-[40px] w-fit flex-row items-center px-4 py-1.5"
-					>
-						<p className="font-sans text-sm font-semibold">{confirmTitle}</p>
-					</Button>
+					{hasSubmitButton && (
+						<Button
+							onClick={onConfirm}
+							className="flex h-[40px] w-fit flex-row items-center px-4 py-1.5"
+						>
+							<p className="font-sans text-sm font-semibold">{confirmTitle}</p>
+						</Button>
+					)}
 				</div>
 			)}
 			contentClassName={twJoin('text-center', props.contentClassName ?? 'hidden')}

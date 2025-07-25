@@ -58,21 +58,20 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка создания подписки');
+						toast.error(error.response?.data || 'Ошибка оформления подписки');
 					}
 					return from([null]);
 				}),
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					toast.success('Подписка успешно добавлена');
+					toast.success('Подписка успешно оформлена');
 				}
 			});
 	};
 
 	useLayoutEffect(() => {
 		handleGetTableData();
-		fetchApi.api.userActiveUserSubscriptionList(); //TODO: Нормальные запросы сделать
 	}, []);
 
 	const handleToggle = () => setIsPerMonth((prev) => !prev);

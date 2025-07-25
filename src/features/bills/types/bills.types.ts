@@ -11,6 +11,7 @@ export type Bill = {
 export type UpdateBill = {
 	id: string;
 	billType: BillTypeEnum;
+	userId: string;
 };
 
 export type BillFilter = {

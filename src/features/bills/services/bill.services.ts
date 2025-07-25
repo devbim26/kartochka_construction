@@ -16,7 +16,7 @@ export const createBill = async (id: string) => {
 };
 
 export const updateBill = async (data: UpdateBill) => {
-	return await fetchApi.api.subscriptionUpdate(convertBillToServer(data));
+	return await fetchApi.api.billUpdate(convertBillToServer(data));
 };
 
 type PaginatedProps = {
