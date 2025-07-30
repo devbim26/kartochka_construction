@@ -1,16 +1,14 @@
-import { APP_ROUTES, Button, ChevronIcon, Switch } from '@core';
+import { fetchApi } from '@api-gen';
+import { APP_ROUTES, Carousel, CarouselSlide, convertToPaginatedType, Switch } from '@core';
 import { LandingSections } from '@features/landing/constants';
-import { useState } from 'react';
+import type { Subscription } from '@features/subscriptions';
+import { convertSubscriptionToClient, getPaginatedSubscriptions } from '@features/subscriptions';
+import { AxiosError } from 'axios';
+import { useLayoutEffect, useState } from 'react';
+import { catchError, from, switchMap, tap } from 'rxjs';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
-import {
-	crossedPoints,
-	monthPrices,
-	points,
-	subscriptionDescriptions,
-	titles,
-	yearPrices,
-} from './constants';
-import { CheckMarkImage } from './images';
+import { SubscriptionCard } from './subscription-card.component';
 
 interface SubSelectProps {
 	wrapperClassName?: string;
@@ -19,11 +17,63 @@ interface SubSelectProps {
 
 export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelectProps) => {
 	const [isPerMonth, setIsPerMonth] = useState(true);
-	const [currentIndex, setCurrentIndex] = useState(0);
+	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
+
+	const handleGetTableData = () => {
+		from(
+			getPaginatedSubscriptions({
+				data: { description: '', name: '', numberOfReports: '', price: '' },
+				pagination: { pageNumber: 1, pageSize: 999999 },
+			}),
+		)
+			.pipe(
+				switchMap((response) => {
+					const res = convertToPaginatedType(convertSubscriptionToClient)({
+						items: response.data.items ?? [],
+						pageNumber: response.data.pageNumber ?? 1,
+						totalPages: response.data.totalPages ?? 0,
+						totalCount: response.data.totalCount ?? 0,
+						pageSize: response.data.pageSize ?? 10,
+						hasPreviousPage: false,
+						hasNextPage: false,
+					});
+					return from([res]);
+				}),
+				tap((res) => {
+					setSubscriptions(res.items);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data?.message || 'Ошибка загрузки подписок');
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
+
+	const handleSubscribe = (id: string) => {
+		from(fetchApi.api.billCreate({ subscriptionId: id }))
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || 'Ошибка оформления подписки');
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					toast.success('Подписка успешно оформлена');
+				}
+			});
+	};
+
+	useLayoutEffect(() => {
+		handleGetTableData();
+	}, []);
 
 	const handleToggle = () => setIsPerMonth((prev) => !prev);
-	const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + titles.length) % titles.length);
-	const handleNext = () => setCurrentIndex((prev) => (prev + 1) % titles.length);
 
 	return (
 		<div
@@ -53,114 +103,18 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 					При покупке на год первые 3 месяца бесплатно
 				</div>
 
-				<div className="hidden w-full gap-4 sm:grid sm:grid-cols-3">
-					{titles.map((title, index) => (
-						<div
-							key={index}
-							className={twMerge(
-								subContainerClassName,
-								'flex flex-col rounded-2xl border border-gray-border px-4 pb-4 pt-10 sm:px-6',
-							)}
-						>
-							<div className="mx-4 border-b-2 border-gray-border pb-2 font-montserrat text-xl font-bold text-primary sm:text-2xl">
-								{title}
-							</div>
-							<div className="mb-6 font-montserrat text-sm font-medium leading-[145%] sm:text-base">
-								{subscriptionDescriptions[index]}
-							</div>
-							<div className="mb-4 font-montserrat text-lg font-medium text-primary sm:text-xl">
-								{isPerMonth ? monthPrices[index] : yearPrices[index]}
-							</div>
-							<Button className="mb-4 h-10 w-full">
-								<p className="font-sans text-sm font-semibold leading-5 text-white sm:text-base">
-									Оформить подписку
-								</p>
-							</Button>
-							<div className="flex flex-col">
-								{points[index].map((point, i) => (
-									<div key={i} className="mb-2 flex items-start gap-2">
-										<span className="shrink-0 pt-1">
-											<CheckMarkImage />
-										</span>
-										<span className="text-start font-montserrat text-sm leading-[145%] sm:text-base">
-											{point}
-										</span>
-									</div>
-								))}
-								{crossedPoints[index].map((point, i) => (
-									<div
-										key={i}
-										className="mb-2 ml-6 text-start font-montserrat text-sm font-semibold leading-[145%] text-gray-text line-through sm:text-base"
-									>
-										{point}
-									</div>
-								))}
-							</div>
-						</div>
+				<Carousel
+					options={{
+						align: 'start',
+						loop: true,
+					}}
+				>
+					{subscriptions.map((sub) => (
+						<CarouselSlide key={sub.id} className="basis-1/3 px-3">
+							<SubscriptionCard onClick={handleSubscribe} subscription={sub} />
+						</CarouselSlide>
 					))}
-				</div>
-
-				<div className="mt-6 flex w-full items-center justify-center gap-4 sm:hidden">
-					<Button
-						onClick={handlePrev}
-						variant="primary"
-						className="shrink-0 p-[10px]"
-						aria-label="Предыдущая подписка"
-					>
-						<ChevronIcon className="rotate-90" fill="white" />
-					</Button>
-
-					<div
-						className={twMerge(
-							subContainerClassName,
-							'flex h-[791px] w-[315px] flex-col rounded-2xl border border-gray-border px-4 pb-4 pt-10',
-						)}
-					>
-						<div className="mx-4 border-b-2 border-gray-border pb-2 font-montserrat text-xl font-bold text-primary">
-							{titles[currentIndex]}
-						</div>
-						<div className="mb-6 font-montserrat text-sm font-medium leading-[145%]">
-							{subscriptionDescriptions[currentIndex]}
-						</div>
-						<div className="mb-4 font-montserrat text-lg font-medium text-primary">
-							{isPerMonth ? monthPrices[currentIndex] : yearPrices[currentIndex]}
-						</div>
-						<Button className="mb-4 h-10 w-full">
-							<p className="font-sans text-sm font-semibold leading-5 text-white">
-								Оформить подписку
-							</p>
-						</Button>
-						<div className="flex flex-col">
-							{points[currentIndex].map((point, i) => (
-								<div key={i} className="mb-2 flex items-start gap-2">
-									<span className="shrink-0 pt-1">
-										<CheckMarkImage />
-									</span>
-									<span className="text-start font-montserrat text-sm leading-[145%]">
-										{point}
-									</span>
-								</div>
-							))}
-							{crossedPoints[currentIndex].map((point, i) => (
-								<div
-									key={i}
-									className="mb-2 ml-6 text-start font-montserrat text-sm font-semibold leading-[145%] text-gray-text line-through"
-								>
-									{point}
-								</div>
-							))}
-						</div>
-					</div>
-
-					<Button
-						onClick={handleNext}
-						variant="primary"
-						className="shrink-0 p-[10px]"
-						aria-label="Следующая подписка"
-					>
-						<ChevronIcon className="-rotate-90" fill="white" />
-					</Button>
-				</div>
+				</Carousel>
 			</div>
 		</div>
 	);

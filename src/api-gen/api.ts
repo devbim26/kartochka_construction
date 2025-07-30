@@ -44,6 +44,39 @@ export interface ArticleDto {
 	imageUrl?: string | null;
 }
 
+export interface BillDto {
+	/** @format uuid */
+	id?: string;
+	/** @format int64 */
+	number?: number;
+	/** @format date */
+	date?: string;
+	clientName?: string | null;
+	billType?: BillTypeEnum;
+	fileUrl?: string | null;
+	/** @format uuid */
+	userId?: string;
+}
+
+export interface BillDtoPaginatedList {
+	items?: BillDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
+}
+
+export enum BillTypeEnum {
+	UnPaid = 'UnPaid',
+	Paid = 'Paid',
+}
+
 export enum BuildingType {
 	ResidentialBuildings = 'ResidentialBuildings',
 	Hotel = 'Hotel',
@@ -201,6 +234,11 @@ export enum CountryType {
 	Ukrain = 'Ukrain',
 }
 
+export interface CreateBillCommand {
+	/** @format uuid */
+	subscriptionId?: string;
+}
+
 export interface CreateConstructionDto {
 	constructionPosition?: ConstructionPosition;
 	userMaterials?: CreateUserMaterialDto[] | null;
@@ -290,6 +328,15 @@ export interface CreateSingleReportReceivingCommand {
 	reportInfoId?: string;
 }
 
+export interface CreateSubscriptionCommand {
+	name?: string | null;
+	description?: string | null;
+	/** @format double */
+	price?: number;
+	/** @format int32 */
+	numberOfReports?: number;
+}
+
 export interface CreateUserMaterialDto {
 	/** @format uuid */
 	materialId?: string;
@@ -301,6 +348,11 @@ export interface CreateUserMaterialDto {
 export interface DeleteArticleCommand {
 	/** @format uuid */
 	articleId?: string;
+}
+
+export interface DeleteBillCommand {
+	/** @format uuid */
+	id?: string;
 }
 
 export interface DeleteConstructionHeaderCommand {
@@ -344,6 +396,11 @@ export interface DeleteReportInfoCommand {
 }
 
 export interface DeleteRequirementCommand {
+	/** @format uuid */
+	id?: string;
+}
+
+export interface DeleteSubscriptionCommand {
 	/** @format uuid */
 	id?: string;
 }
@@ -446,6 +503,21 @@ export interface GetArticlesWithPaginationParamsQuery {
 	publishDate?: string | null;
 }
 
+export interface GetBillWithPaginationParamsQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	/** @format int64 */
+	number?: number | null;
+	/** @format date */
+	date?: string | null;
+	clientName?: string | null;
+	billType?: BillTypeEnum;
+}
+
 export interface GetConstructionHeaderWithPaginationQuery {
 	/** @format int32 */
 	pageNumber?: number;
@@ -527,6 +599,34 @@ export interface GetRequirementsWithPaginationParamsQuery {
 	/** @format date */
 	standartValidityPeriod?: string | null;
 	class?: CategoryClass;
+}
+
+export interface GetSubscriptionsWithPaginationParamsQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	name?: string | null;
+	/** @format double */
+	price?: number | null;
+	/** @format int32 */
+	numberOfReports?: number | null;
+}
+
+export interface GetUsersWithPaginationParamsQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	/** @format uuid */
+	roleId?: string | null;
+	roleName?: string | null;
+	directorFullName?: string | null;
+	companyName?: string | null;
 }
 
 export interface GraphParametrsDto {
@@ -798,6 +898,27 @@ export interface PaginatedMaterialDtoPaginatedList {
 	hasNextPage?: boolean;
 }
 
+export interface PaginatedUserDto {
+	/** @format uuid */
+	id?: string;
+	phoneNumber?: string | null;
+	companyName?: string | null;
+	bankIdNumber?: string | null;
+	payersRegistrationNumber?: string | null;
+	paymentAccount?: string | null;
+	directorFullName?: string | null;
+	bankAddress?: string | null;
+	companyAddress?: string | null;
+	companyDescription?: string | null;
+	additionalPhoneNumbers?: AdditionalPhoneNumber[] | null;
+	logoUrl?: string | null;
+	/** @format uuid */
+	roleId?: string;
+	role?: UserRole;
+	/** @format uuid */
+	userSubscriptionId?: string;
+}
+
 export interface PasswordGrantFlow {
 	phoneNumber: string | null;
 	password: string | null;
@@ -1019,6 +1140,31 @@ export interface SoundInsulationNamedConstructionFlagsDto {
 	takeLaboratoryDataAnalisys?: boolean;
 }
 
+export interface SubscriptionDto {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	description?: string | null;
+	/** @format double */
+	price?: number;
+	/** @format int32 */
+	numberOfReports?: number;
+}
+
+export interface SubscriptionDtoPaginatedList {
+	items?: SubscriptionDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
+}
+
 export interface ThermalInsulationFloorReportInfoFlagsDto {
 	namedConstructionFlags?: ThermalInsulationNamedConstructionFlagsDto[] | null;
 	floorNumber?: string | null;
@@ -1030,6 +1176,18 @@ export interface ThermalInsulationNamedConstructionFlagsDto {
 	reportConstructionId?: string;
 	constructionName?: string | null;
 	takeConstruction?: boolean;
+}
+
+export interface UpdateBillCommand {
+	/** @format uuid */
+	id?: string;
+	/** @format int64 */
+	number?: number;
+	/** @format date */
+	date?: string;
+	/** @format uuid */
+	userId?: string;
+	billType?: BillTypeEnum;
 }
 
 export interface UpdateConstructionHeaderCommand {
@@ -1100,6 +1258,17 @@ export interface UpdateRequirementCommand {
 	constructionClass?: ConstructionClass;
 }
 
+export interface UpdateSubscriptionCommand {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	description?: string | null;
+	/** @format double */
+	price?: number;
+	/** @format int32 */
+	numberOfReports?: number;
+}
+
 export interface UserMaterialDto {
 	/** @format uuid */
 	materialId?: string;
@@ -1107,6 +1276,12 @@ export interface UserMaterialDto {
 	/** @format int32 */
 	positionId?: number;
 	materialTypeValue?: MaterialTypeValueDto[] | null;
+}
+
+export interface UserRole {
+	/** @format uuid */
+	id?: string;
+	name: string | null;
 }
 
 import type {
@@ -1496,6 +1671,91 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<void, any>({
 				path: `/api/Auth/logout`,
 				method: 'POST',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Bill
+		 * @name BillDetail
+		 * @request GET:/api/Bill/{id}
+		 */
+		billDetail: (id: string, params: RequestParams = {}) =>
+			this.request<BillDto, any>({
+				path: `/api/Bill/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Bill
+		 * @name BillGetPaginatedCreate
+		 * @request POST:/api/Bill/get-paginated
+		 */
+		billGetPaginatedCreate: (
+			data: GetBillWithPaginationParamsQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<BillDtoPaginatedList, any>({
+				path: `/api/Bill/get-paginated`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Bill
+		 * @name BillCreate
+		 * @request POST:/api/Bill
+		 */
+		billCreate: (data: CreateBillCommand, params: RequestParams = {}) =>
+			this.request<BillDto, any>({
+				path: `/api/Bill`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Bill
+		 * @name BillDelete
+		 * @request DELETE:/api/Bill
+		 */
+		billDelete: (data: DeleteBillCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Bill`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Bill
+		 * @name BillUpdate
+		 * @request PUT:/api/Bill
+		 */
+		billUpdate: (data: UpdateBillCommand, params: RequestParams = {}) =>
+			this.request<BillDto, any>({
+				path: `/api/Bill`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -2516,6 +2776,91 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags Subscription
+		 * @name SubscriptionDetail
+		 * @request GET:/api/Subscription/{id}
+		 */
+		subscriptionDetail: (id: string, params: RequestParams = {}) =>
+			this.request<SubscriptionDto, any>({
+				path: `/api/Subscription/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Subscription
+		 * @name SubscriptionGetPaginatedCreate
+		 * @request POST:/api/Subscription/getPaginated
+		 */
+		subscriptionGetPaginatedCreate: (
+			data: GetSubscriptionsWithPaginationParamsQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<SubscriptionDtoPaginatedList, any>({
+				path: `/api/Subscription/getPaginated`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Subscription
+		 * @name SubscriptionCreate
+		 * @request POST:/api/Subscription
+		 */
+		subscriptionCreate: (data: CreateSubscriptionCommand, params: RequestParams = {}) =>
+			this.request<SubscriptionDto, any>({
+				path: `/api/Subscription`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Subscription
+		 * @name SubscriptionDelete
+		 * @request DELETE:/api/Subscription
+		 */
+		subscriptionDelete: (data: DeleteSubscriptionCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Subscription`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Subscription
+		 * @name SubscriptionUpdate
+		 * @request PUT:/api/Subscription
+		 */
+		subscriptionUpdate: (data: UpdateSubscriptionCommand, params: RequestParams = {}) =>
+			this.request<SubscriptionDto, any>({
+				path: `/api/Subscription`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags SvgConstruction
 		 * @name SvgConstructionDetail
 		 * @request GET:/api/SvgConstruction/{id}
@@ -2523,6 +2868,41 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		svgConstructionDetail: (id: string, params: RequestParams = {}) =>
 			this.request<string, any>({
 				path: `/api/SvgConstruction/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags User
+		 * @name UserGetPaginatedCreate
+		 * @request POST:/api/User/get-paginated
+		 */
+		userGetPaginatedCreate: (
+			data: GetUsersWithPaginationParamsQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<PaginatedUserDto, any>({
+				path: `/api/User/get-paginated`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags User
+		 * @name UserActiveUserSubscriptionList
+		 * @request GET:/api/User/active-userSubscription
+		 */
+		userActiveUserSubscriptionList: (params: RequestParams = {}) =>
+			this.request<PaginatedUserDto, any>({
+				path: `/api/User/active-userSubscription`,
 				method: 'GET',
 				format: 'json',
 				...params,

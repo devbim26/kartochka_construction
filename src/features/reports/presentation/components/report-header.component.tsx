@@ -11,14 +11,19 @@ const ReportHeaderComponent = () => {
 		<div className="flex w-full flex-col gap-[14px]">
 			<div className="flex w-full items-center justify-between">
 				<p className="font-sans text-lg font-semibold leading-6">Отчеты</p>
-				<Button
-					variant="primary"
-					onClick={() =>
-						navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route)
-					}
-				>
-					Все отчеты
-				</Button>
+				{window.location.pathname ===
+					APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.main.route && (
+					<Button
+						variant="primary"
+						onClick={() =>
+							navigate(
+								APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route,
+							)
+						}
+					>
+						Все отчеты
+					</Button>
+				)}
 			</div>
 			{window.location.pathname ===
 				APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route && (
