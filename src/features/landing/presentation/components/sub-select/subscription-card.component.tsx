@@ -30,7 +30,7 @@ export const SubscriptionCard = ({ subscription, onClick }: Props) => {
 				</p>
 			</Button>
 			<div className="flex flex-col">
-				<div key={crypto.randomUUID()} className="mb-2 flex items-start gap-2">
+				<div className="mb-2 flex items-start gap-2">
 					<span className="shrink-0 pt-1">
 						<CheckMarkImage />
 					</span>
