@@ -3,7 +3,6 @@ export * from './carousel';
 export * from './checkbox';
 export * from './checkbox-select';
 export * from './chevron';
-export * from './current-sub';
 export * from './drag-element';
 export * from './forms';
 export * from './inputs';

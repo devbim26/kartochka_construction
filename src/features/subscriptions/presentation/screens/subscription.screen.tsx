@@ -194,9 +194,9 @@ const SubscriptionScreen = () => {
 			<SubscriptionPageHeaderWrapper
 				onSave={search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
-					pageTitle: 'Конструктор подписок',
-					editTitle: 'Редактировать подписку',
-					addTitle: 'Добавить подписку',
+					pageTitle: 'Конструктор пакетов',
+					editTitle: 'Редактировать пакет',
+					addTitle: 'Добавить пакет',
 				}}
 				forms={form}
 				formElements={{
@@ -254,7 +254,7 @@ const SubscriptionScreen = () => {
 				}}
 				headerTitle="Подтвердите действие"
 			>
-				Вы уверены, что хотите удалить подписку?
+				Вы уверены, что хотите удалить пакет?
 			</DeleteModal>
 		</div>
 	);

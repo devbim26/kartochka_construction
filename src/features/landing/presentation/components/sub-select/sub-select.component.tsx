@@ -1,5 +1,5 @@
-import { fetchApi } from '@api-gen';
-import { APP_ROUTES, Carousel, CarouselSlide, convertToPaginatedType, Switch } from '@core';
+import { APP_ROUTES, Carousel, CarouselSlide, convertToPaginatedType, useAppNavigate } from '@core';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import { LandingSections } from '@features/landing/constants';
 import type { Subscription } from '@features/subscriptions';
 import { convertSubscriptionToClient, getPaginatedSubscriptions } from '@features/subscriptions';
@@ -18,6 +18,8 @@ interface SubSelectProps {
 export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelectProps) => {
 	const [isPerMonth, setIsPerMonth] = useState(true);
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
+
+	const navigate = useAppNavigate();
 
 	const handleGetTableData = () => {
 		from(
@@ -53,20 +55,10 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 	};
 
 	const handleSubscribe = (id: string) => {
-		from(fetchApi.api.billCreate({ subscriptionId: id }))
-			.pipe(
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || 'Ошибка оформления подписки');
-					}
-					return from([null]);
-				}),
-			)
-			.subscribe((response) => {
-				if (response?.status === 200) {
-					toast.success('Подписка успешно оформлена');
-				}
-			});
+		navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.main.route, {
+			subId: id,
+			subModal: 'true',
+		});
 	};
 
 	useLayoutEffect(() => {
@@ -85,12 +77,12 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 		>
 			{location.pathname.startsWith(`/${APP_ROUTES.landing.route}`) && (
 				<div className="mb-6 font-montserrat text-base font-normal leading-snug sm:text-lg">
-					Подписки
+					Пакеты
 				</div>
 			)}
 
 			<div className="flex flex-col items-center text-center">
-				<Switch
+				{/* <Switch
 					onText="год"
 					offText="месяц"
 					wrapperClassName="mb-3 h-[30px] w-[180px] p-[3px] bg-primary"
@@ -101,12 +93,13 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 				/>
 				<div className="mb-3 font-montserrat text-xs font-normal sm:text-sm">
 					При покупке на год первые 3 месяца бесплатно
-				</div>
+				</div> */}
 
 				<Carousel
 					options={{
 						align: 'start',
 						loop: true,
+						active: true,
 					}}
 				>
 					{subscriptions.map((sub) => (

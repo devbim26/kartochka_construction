@@ -9,7 +9,7 @@ export const LandingSections: {
 	},
 	subscription: {
 		id: 'subscription_section_id',
-		text: 'Подписка',
+		text: 'Пакеты',
 	},
 	contacts: {
 		id: 'contacts_section_id',

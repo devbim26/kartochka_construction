@@ -39,7 +39,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 		{
 			params: {
 				id: DESIGNING_ROUTES.subscribes_constructor.id,
-				label: 'Конструктор подписок',
+				label: 'Конструктор пакетов',
 				icon: BiSolidCalendarEdit,
 				path: DESIGNING_ROUTES.subscribes_constructor.route,
 			},

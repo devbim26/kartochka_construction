@@ -1,5 +1,5 @@
 import { fetchApi } from '@api-gen';
-import { Button, convertToPaginatedType, SubImage } from '@core';
+import { Button, convertToPaginatedType } from '@core';
 import {
 	convertSubscriptionToClient,
 	getPaginatedSubscriptions,
@@ -9,6 +9,7 @@ import { AxiosError } from 'axios';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
+import { SubImage } from './images';
 
 export const CurrentSub = () => {
 	const [subscription, setSubscription] = useState<Subscription>();
@@ -39,7 +40,7 @@ export const CurrentSub = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка загрузки подписок');
+						toast.error(error.response?.data?.message || 'Ошибка загрузки пакетов');
 					}
 					return from([null]);
 				}),
@@ -78,26 +79,20 @@ export const CurrentSub = () => {
 	return (
 		<div className="flex w-1/2 flex-col gap-[26px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]">
 			<div className="flex flex-row items-center justify-between">
-				<p className="font-sans text-2xl font-semibold leading-4">Подписка</p>
-				<Button className="border-2 border-primary bg-white px-[16px] py-[4px] font-semibold text-primary enabled:hover:bg-primary enabled:hover:text-white">
-					<p className="font-sans text-sm font-semibold leading-4">Улучшить до PRO</p>
-				</Button>
+				<p className="font-sans text-2xl font-semibold leading-4">Пакет услуг</p>
 			</div>
 			{subscription ? (
 				<div className="flex flex-row justify-between">
 					<div className="flex flex-col justify-between">
 						<div className="flex flex-col gap-[25px]">
 							<div className="flex flex-row">
-								<p className="mr-[5px] font-sans text-xl font-normal leading-4">
-									подписка
-								</p>
 								<p className="font-sans text-xl font-semibold leading-4 text-primary">
 									{subscription.name}
 								</p>
 							</div>
 							<div className="flex flex-row">
 								<p className="mr-[5px] font-sans text-lg font-normal leading-4">
-									цоличество скачиваний: {subscription.numberOfReports}
+									количество скачиваний: {subscription.numberOfReports}
 								</p>
 							</div>
 							<div className="flex flex-row">
@@ -108,14 +103,17 @@ export const CurrentSub = () => {
 						</div>
 						<Button className="w-min px-[16px]">
 							<p className="font-sans text-sm font-semibold leading-4">
-								Продлить подписку
+								Изменить пакет
 							</p>
 						</Button>
 					</div>
 					<SubImage />
 				</div>
 			) : (
-				<></>
+				<div className="flex flex-row justify-between">
+					<div className="flex flex-col justify-between">Нет активного пакета</div>
+					<SubImage />
+				</div>
 			)}
 		</div>
 	);

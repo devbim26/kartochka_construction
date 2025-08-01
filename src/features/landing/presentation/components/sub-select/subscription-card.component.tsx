@@ -22,11 +22,11 @@ export const SubscriptionCard = ({ subscription, onClick }: Props) => {
 				{subscription.description}
 			</div>
 			<div className="mb-4 font-montserrat text-lg font-medium text-primary sm:text-xl">
-				{subscription.price}
+				{!!+subscription.price ? subscription.price : 'Бесплатно'}
 			</div>
 			<Button onClick={() => onClick(subscription.id!)} className="mb-4 h-10 w-full">
 				<p className="font-sans text-sm font-semibold leading-5 text-white sm:text-base">
-					Оформить подписку
+					Оформить пакет
 				</p>
 			</Button>
 			<div className="flex flex-col">

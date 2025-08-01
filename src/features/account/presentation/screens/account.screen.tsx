@@ -1,4 +1,4 @@
-import { CurrentSub } from '@core';
+import { CurrentSub } from '@features/main';
 import { AccountForm, AccountHeader } from '../components';
 
 const AccountScreen = () => {
