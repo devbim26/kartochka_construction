@@ -1020,15 +1020,6 @@ export const ConstructionTypeMap = ({
 									{ materialParameters: MaterialParametrs.Density, value: '' },
 								],
 							},
-							{
-								positionId: '8',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
 						],
 					},
 				]);
