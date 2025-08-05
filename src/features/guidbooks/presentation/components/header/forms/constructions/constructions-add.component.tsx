@@ -61,7 +61,9 @@ export const ConstructionsAdd = () => {
 	useEffect(() => {
 		handleGetIssuerData();
 	}, []);
-
+	//TODO: DELETE AFTER ALL CONSTRUCTIONS WORKING
+	console.log(formState.errors);
+	console.log(form.getValues());
 	return (
 		<div className="flex w-full flex-col gap-[16px] px-[25px]">
 			<Switch

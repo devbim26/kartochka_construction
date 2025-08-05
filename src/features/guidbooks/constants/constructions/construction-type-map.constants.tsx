@@ -102,24 +102,6 @@ export const ConstructionTypeMap = ({
 							{
 								positionId: '1',
 								materialId: '',
-								materialType: MaterialTypeEnum.Frame,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
 								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{
@@ -128,6 +110,25 @@ export const ConstructionTypeMap = ({
 									},
 								],
 							},
+							{
+								positionId: '2',
+								materialId: '',
+								materialType: MaterialTypeEnum.Frame,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '3',
+								materialId: '',
+								materialType: MaterialTypeEnum.Filler,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+
 							{
 								positionId: '4',
 								materialId: '',
@@ -154,7 +155,7 @@ export const ConstructionTypeMap = ({
 						contructionPosition: ConstructionPosition.Left,
 						userMaterials: [
 							{
-								positionId: '0',
+								positionId: '4',
 								materialId: '',
 								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
@@ -163,16 +164,7 @@ export const ConstructionTypeMap = ({
 								],
 							},
 							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '2',
+								positionId: '3',
 								materialId: '',
 								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
@@ -181,9 +173,18 @@ export const ConstructionTypeMap = ({
 								],
 							},
 							{
-								positionId: '3',
+								positionId: '2',
 								materialId: '',
 								materialType: MaterialTypeEnum.Frame,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Width, value: '' },
+									{ materialParameters: MaterialParametrs.RackStep, value: '' },
+								],
+							},
+							{
+								positionId: '1',
+								materialId: '',
+								materialType: MaterialTypeEnum.Link,
 								materialTypeValue: [
 									{
 										materialParameters: MaterialParametrs.ConnectionNumber,
@@ -192,7 +193,7 @@ export const ConstructionTypeMap = ({
 								],
 							},
 							{
-								positionId: '4',
+								positionId: '0',
 								materialId: '',
 								materialType: MaterialTypeEnum.AirGap,
 								materialTypeValue: [
@@ -231,6 +232,17 @@ export const ConstructionTypeMap = ({
 							{
 								positionId: '1',
 								materialId: '',
+								materialType: MaterialTypeEnum.Link,
+								materialTypeValue: [
+									{
+										materialParameters: MaterialParametrs.ConnectionNumber,
+										value: '',
+									},
+								],
+							},
+							{
+								positionId: '2',
+								materialId: '',
 								materialType: MaterialTypeEnum.Frame,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Width, value: '' },
@@ -238,23 +250,12 @@ export const ConstructionTypeMap = ({
 								],
 							},
 							{
-								positionId: '2',
+								positionId: '3',
 								materialId: '',
 								materialType: MaterialTypeEnum.Filler,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
 									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
 								],
 							},
 							{
