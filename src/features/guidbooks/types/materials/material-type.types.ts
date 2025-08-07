@@ -58,6 +58,8 @@ export enum MaterialTypesSelectValuesEnum {
 	// Additional = 'Additional',
 	FramePartition = 'Frame Partition',
 	AirGapFiller = 'AirGapFiller',
+	Glass = 'Glass',
+	MultiGlass = 'MultiGlass',
 }
 
 export const MaterialTypesSelectValuesMap = {
@@ -67,6 +69,11 @@ export const MaterialTypesSelectValuesMap = {
 		{ label: 'Плиты', value: MaterialTypeEnum.Board },
 		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
 		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	],
+	[MaterialTypesSelectValuesEnum.Glass]: [{ label: 'Стекло', value: MaterialTypeEnum.Glazing }],
+	[MaterialTypesSelectValuesEnum.MultiGlass]: [
+		{ label: 'Стекло', value: MaterialTypeEnum.Glazing },
+		{ label: 'Воздушные зазоры', value: MaterialTypeEnum.AirGap },
 	],
 	[MaterialTypesSelectValuesEnum.Soundproofing]: [
 		{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },

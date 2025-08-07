@@ -27,7 +27,6 @@ import {
 } from '@features';
 import { AUTH_ROUTES } from '@features/auth/constants';
 import { BillScreen } from '@features/bills';
-import MyConstructions from '@features/constructor/presentation/components/designing/my-costructions.component';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
 import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants';
 import { ArticlePage } from '@features/news/presentation/components/article-page.component';
@@ -75,7 +74,7 @@ export const AppRouter = () => {
 					/>
 					<Route
 						path={CONSTRUCTOR_ROUTES.myConstructions.route}
-						element={<MyConstructions />}
+						element={<DevScreen title="Мои конструкции" />}
 					/>
 					<Route
 						path={CONSTRUCTOR_ROUTES.reportForm.route}
