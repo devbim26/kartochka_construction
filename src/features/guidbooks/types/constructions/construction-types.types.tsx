@@ -43,6 +43,8 @@ export enum ConstructionTypeEnum {
 	FramePartitionSingle = 'FramePartitionSingle',
 	FramePartitionDouble = 'FramePartitionDouble',
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
+	OneGlassFrame = 'OneGlassFrame',
+	TwoGlassFrame = 'TwoGlassFrame',
 }
 
 export const RuConstructionTypesMap = {
@@ -63,6 +65,8 @@ export const RuConstructionTypesMap = {
 	FramePartitionSingle: 'Каркасная перегородка (1 каркас)',
 	FramePartitionDouble: 'Каркасная перегородка (2 каркаса)',
 	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
+	OneGlassFrame: 'Одно стекло',
+	TwoGlassFrame: 'Многослойное стекло',
 };
 
 export const RuConstructionTypesSelectValues = [
@@ -86,5 +90,13 @@ export const RuConstructionTypesSelectValues = [
 	{
 		label: 'Каркасная перегородка (2 каркаса)',
 		value: ConstructionTypeEnum.FramePartitionDouble,
+	},
+	{
+		label: 'Одно стекло',
+		value: ConstructionTypeEnum.OneGlassFrame,
+	},
+	{
+		label: 'Многослойное стекло',
+		value: ConstructionTypeEnum.TwoGlassFrame,
 	},
 ];

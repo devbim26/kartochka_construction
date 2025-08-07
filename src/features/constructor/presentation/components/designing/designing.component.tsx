@@ -1,7 +1,7 @@
 import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import { Button, Input, useAppDispatch, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
-import type { DesigningData, Dot, GraphDetailResponse } from '@features';
+import type { DesigningData, GraphDetailResponse } from '@features';
 import {
 	CombinedSoundReductionTable,
 	DesigningConfig,
@@ -10,11 +10,7 @@ import {
 	startLoading,
 	stopLoading,
 } from '@features';
-import {
-	getReportFloorById,
-	graphDetail,
-	svgConstructionDetail,
-} from '@features/constructor/services';
+import { getReportFloorById, svgConstructionDetail } from '@features/constructor/services';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
 import {
 	convertToClientConstructionsEditData,
@@ -97,39 +93,40 @@ const DesigningScreen = () => {
 	useEffect(() => {
 		if (!constructionHeaderId || graphData) return;
 		dispatch(startLoading());
-		from(graphDetail({ constructionHeaderId }))
-			.pipe(
-				catchError((error) => {
-					toast.error('Не удалось загрузить данные графика');
-					return [];
-				}),
-				finalize(() => {
-					dispatch(stopLoading());
-				}),
-			)
-			.subscribe(({ data }) => {
-				if (!data) return;
-				setGraphData({
-					...data,
-					dotRs: (data.dotRs || []).filter(
-						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
-					) as Dot[],
-					laboratoryDots: (data.laboratoryDots || []).filter(
-						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
-					) as Dot[],
-					deviationDots: (data.deviationDots || []).filter(
-						(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
-					) as Dot[],
-					dotC:
-						data.dotC?.r != null && data.dotC.f != null
-							? { r: data.dotC.r, f: data.dotC.f }
-							: undefined,
-					dotB:
-						data.dotB?.r != null && data.dotB.f != null
-							? { r: data.dotB.r, f: data.dotB.f }
-							: undefined,
-				});
-			});
+		//TODO: fix
+		// from(graphDetail({ constructionHeaderId }))
+		// 	.pipe(
+		// 		catchError((error) => {
+		// 			toast.error('Не удалось загрузить данные графика');
+		// 			return [];
+		// 		}),
+		// 		finalize(() => {
+		// 			dispatch(stopLoading());
+		// 		}),
+		// 	)
+		// 	.subscribe(({ data }) => {
+		// 		if (!data) return;
+		// 		setGraphData({
+		// 			...data,
+		// 			dotRs: (data.dotRs || []).filter(
+		// 				(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+		// 			) as Dot[],
+		// 			laboratoryDots: (data.laboratoryDots || []).filter(
+		// 				(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+		// 			) as Dot[],
+		// 			deviationDots: (data.deviationDots || []).filter(
+		// 				(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
+		// 			) as Dot[],
+		// 			dotC:
+		// 				data.dotC?.r != null && data.dotC.f != null
+		// 					? { r: data.dotC.r, f: data.dotC.f }
+		// 					: undefined,
+		// 			dotB:
+		// 				data.dotB?.r != null && data.dotB.f != null
+		// 					? { r: data.dotB.r, f: data.dotB.f }
+		// 					: undefined,
+		// 		});
+		// 	});
 	}, [constructionHeaderId, graphData, dispatch]);
 
 	useEffect(() => {

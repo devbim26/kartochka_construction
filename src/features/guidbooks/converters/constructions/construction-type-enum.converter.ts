@@ -27,6 +27,8 @@ const constructionTypeEnumMap = createDataRecordConverter({
 	[ClientConstructionTypeEnum.FramePartitionDouble]: ServerConstructionTypeEnum.TwoFramePartition,
 	[ClientConstructionTypeEnum.HeavySingleWallFacing]:
 		ServerConstructionTypeEnum.HeavySingleWallFacing,
+	[ClientConstructionTypeEnum.OneGlassFrame]: ServerConstructionTypeEnum.OneGlassFrame,
+	[ClientConstructionTypeEnum.TwoGlassFrame]: ServerConstructionTypeEnum.TwoGlassFrame,
 });
 export const convertToServerConstructionTypeEnumData = (
 	type: ClientConstructionTypeEnum,

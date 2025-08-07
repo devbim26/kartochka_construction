@@ -84,7 +84,13 @@ export const ConstructionFieldsMap = ({
 			/>
 		),
 		[MaterialTypeEnum.FoamMaterials]: <></>,
-		[MaterialTypeEnum.Glazing]: <></>,
+		[MaterialTypeEnum.Glazing]: (
+			<ThicknessDensityFieldsType
+				fieldIndex={fieldIndex}
+				constructionIndex={constructionIndex}
+				currentForm={currentForm}
+			/>
+		),
 		[MaterialTypeEnum.GypsumBondedbBoards]: <></>,
 		[MaterialTypeEnum.WoodBasedBoard]: <></>,
 		[MaterialTypeEnum.Metal]: <></>,
@@ -186,7 +192,16 @@ export const MaterialTypeValuesMap = {
 		},
 	],
 	[MaterialTypeEnum.FoamMaterials]: [],
-	[MaterialTypeEnum.Glazing]: [],
+	[MaterialTypeEnum.Glazing]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
 	[MaterialTypeEnum.GypsumBondedbBoards]: [],
 	[MaterialTypeEnum.WoodBasedBoard]: [],
 	[MaterialTypeEnum.Metal]: [],

@@ -166,6 +166,8 @@ export enum ConstructionTypeEnum {
 	OneFramePartition = 'OneFramePartition',
 	TwoFramePartition = 'TwoFramePartition',
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
+	OneGlassFrame = 'OneGlassFrame',
+	TwoGlassFrame = 'TwoGlassFrame',
 }
 
 export interface ConstructionTypeTemplate {
@@ -335,6 +337,7 @@ export interface CreateSubscriptionCommand {
 	price?: number;
 	/** @format int32 */
 	numberOfReports?: number;
+	shortDescriptions?: ShortDescriptionDto[] | null;
 }
 
 export interface CreateUserMaterialDto {
@@ -419,13 +422,6 @@ export interface DocumentReportFlagsDto {
 }
 
 export interface Dot {
-	/** @format double */
-	r?: number;
-	/** @format double */
-	f?: number;
-}
-
-export interface DotDto {
 	/** @format double */
 	r?: number;
 	/** @format double */
@@ -630,21 +626,8 @@ export interface GetUsersWithPaginationParamsQuery {
 }
 
 export interface GraphParametrsDto {
-	/** @format double */
-	delta?: number;
-	/** @format double */
-	c?: number;
-	/** @format double */
-	ctr?: number;
-	/** @format double */
-	computingRw?: number;
-	/** @format double */
-	labRw?: number;
-	dotRs?: DotDto[] | null;
-	laboratoryDots?: DotDto[] | null;
-	deviationDots?: DotDto[] | null;
-	dotC?: Dot;
-	dotB?: Dot;
+	name?: string | null;
+	namedDots?: NamedDotDto[] | null;
 }
 
 export enum IndexType {
@@ -715,6 +698,14 @@ export interface MaterialDto {
 	solid?: number;
 	/** @format float */
 	edin?: number;
+	/** @format float */
+	fb?: number;
+	/** @format float */
+	fc?: number;
+	/** @format float */
+	rb?: number;
+	/** @format float */
+	rc?: number;
 	/** @format float */
 	velocityLongitudinal?: number;
 }
@@ -789,6 +780,11 @@ export interface MaterialTypeValueDto {
 	/** @format double */
 	value?: number;
 	materialParametrs?: MaterialParametrs;
+}
+
+export interface NamedDotDto {
+	name?: string | null;
+	dot?: Dot;
 }
 
 export interface NamedEntity {
@@ -880,6 +876,14 @@ export interface PaginatedMaterialDto {
 	solid?: number;
 	/** @format float */
 	edin?: number;
+	/** @format float */
+	fb?: number;
+	/** @format float */
+	fc?: number;
+	/** @format float */
+	rb?: number;
+	/** @format float */
+	rc?: number;
 	/** @format float */
 	velocityLongitudinal?: number;
 }
@@ -1116,6 +1120,11 @@ export interface SendSmsCommand {
 	phoneNumber: string | null;
 }
 
+export interface ShortDescriptionDto {
+	name?: string | null;
+	dashed?: boolean;
+}
+
 export interface SingleConstructionInfoDto {
 	reportConstructionHeader?: ReportConstructionDto;
 }
@@ -1149,6 +1158,7 @@ export interface SubscriptionDto {
 	price?: number;
 	/** @format int32 */
 	numberOfReports?: number;
+	shortDescriptions?: ShortDescriptionDto[] | null;
 }
 
 export interface SubscriptionDtoPaginatedList {
@@ -1267,6 +1277,7 @@ export interface UpdateSubscriptionCommand {
 	price?: number;
 	/** @format int32 */
 	numberOfReports?: number;
+	shortDescriptions?: ShortDescriptionDto[] | null;
 }
 
 export interface UserMaterialDto {
@@ -1887,7 +1898,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/Graph/{constructionHeaderId}
 		 */
 		graphDetail: (constructionHeaderId: string, params: RequestParams = {}) =>
-			this.request<GraphParametrsDto, any>({
+			this.request<GraphParametrsDto[], any>({
 				path: `/api/Graph/${constructionHeaderId}`,
 				method: 'GET',
 				format: 'json',
@@ -2072,6 +2083,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				/** @format float */
 				edin?: number;
 				/** @format float */
+				fb?: number;
+				/** @format float */
+				fc?: number;
+				/** @format float */
+				rb?: number;
+				/** @format float */
+				rc?: number;
+				/** @format float */
 				velocityLongitudinal?: number;
 			},
 			params: RequestParams = {},
@@ -2138,6 +2157,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				edin?: number;
 				/** @format float */
 				velocityLongitudinal?: number;
+				/** @format float */
+				fb?: number;
+				/** @format float */
+				fc?: number;
+				/** @format float */
+				rb?: number;
+				/** @format float */
+				rc?: number;
 				editFile?: boolean;
 				/** @format binary */
 				formFile?: File;

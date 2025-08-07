@@ -10,3 +10,5 @@ export * from './heavy-single-layer-wall-facing-one-side.component';
 export * from './heavy-single-layer-wall-soundproofing-both-side.component';
 export * from './heavy-single-layer-wall-soundproofing-one-side.component';
 export * from './heavy-single-layer-wall.component';
+export * from './one-glass-frame.component';
+export * from './two-glass-frame.component';

@@ -12,6 +12,8 @@ import {
 	HeavySingleLayerWallFacingOneSideComponent,
 	HeavySingleLayerWallSoundproofingBothSideComponent,
 	HeavySingleLayerWallSoundproofingOneSideComponent,
+	OneGlassFrameComponent,
+	TwoGlassFrameComponent,
 } from '@features';
 import { ConstructionTypeEnum, MaterialTypeEnum } from '@features/guidbooks/types';
 import type { JSX } from 'react';
@@ -36,6 +38,56 @@ export const ConstructionTypeMap = ({
 		}
 	> = {
 		//TODO
+		[ConstructionTypeEnum.OneGlassFrame]: {
+			component: <OneGlassFrameComponent currentForm={currentForm} />,
+			action: () => {
+				setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.OneGlassFrame,
+				);
+				setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '2',
+								materialId: '',
+								materialType: MaterialTypeEnum.Glazing,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
+		[ConstructionTypeEnum.TwoGlassFrame]: {
+			component: <TwoGlassFrameComponent currentForm={currentForm} />,
+			action: () => {
+				setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.TwoGlassFrame,
+				);
+				setValue('constructionTypeObject.constructions', [
+					{
+						contructionPosition: ConstructionPosition.Left,
+						userMaterials: [
+							{
+								positionId: '2',
+								materialId: '',
+								materialType: MaterialTypeEnum.Glazing,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+									{ materialParameters: MaterialParametrs.Density, value: '' },
+								],
+							},
+						],
+					},
+				]);
+			},
+		},
 		[ConstructionTypeEnum.HeavySingleWallFacing]: {
 			component: <></>,
 			action: () => {},
