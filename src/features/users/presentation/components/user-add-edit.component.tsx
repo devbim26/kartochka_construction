@@ -5,19 +5,11 @@ import {
 	FormElementLabel,
 	Input,
 	phoneNumberMask,
-	useAppDispatch,
-	useAppNavigate,
-	useAppSelector,
 } from '@core';
-import { ACCOUNT_FETCH_ROUTES, ButtonTitles, FormTitles } from '@features/account/constants';
-import { getCurrentUser, updateUser } from '@features/account/services';
 import type { AccountData } from '@features/account/types';
-import { AccountDataConfig } from '@features/account/utils';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
-import { useEffect } from 'react';
 import type { FieldErrors } from 'react-hook-form';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { TiDeleteOutline } from 'react-icons/ti';
 import { useSearchParams } from 'react-router-dom';
@@ -43,7 +35,6 @@ const PhoneInput = ({
 	return (
 		<Input
 			ref={phoneRef}
-			disabled={isViewMode}
 			placeholder="+375(__)___-__-__"
 			onChange={(e) => setValue(`phoneNumbers.${index}.number`, e.target.value)}
 			value={currentValue}
@@ -88,40 +79,12 @@ export const PhoneNumbersList = ({ isViewMode }: { isViewMode: boolean }) => {
 	);
 };
 
-export const AccountForm = () => {
+export const UserAddEdit = () => {
 	const accountRef = useMask(accountMask);
-	const userData = useAppSelector((store) => store.userData);
-	const form = useForm<AccountData>({
-		resolver: zodResolver(AccountDataConfig.schema),
-		defaultValues: AccountDataConfig.defaultValues,
-	});
-
-	useEffect(() => {
-		if (userData.fetch_data?.fetch_name === ACCOUNT_FETCH_ROUTES.update.fetch_name) {
-			dispatch(getCurrentUser());
-		}
-	}, [userData.fetch_data]);
-
-	useEffect(() => {
-		dispatch(getCurrentUser());
-	}, []);
-	const navigate = useAppNavigate();
-	const dispatch = useAppDispatch();
+	const form = useFormContext<AccountData>();
+	const phoneRef = useMask(phoneNumberMask);
 	const [search] = useSearchParams();
-	const { setValue, watch, formState, trigger, reset } = form;
-
-	const onSubmit = () => {
-		dispatch(
-			updateUser({
-				...form.getValues(),
-			}),
-		);
-		navigate('');
-	};
-
-	useEffect(() => {
-		userData.data ? reset({ ...(userData.data as AccountData) }) : reset();
-	}, [userData.data]);
+	const { setValue, watch, formState, trigger } = form;
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
@@ -138,16 +101,13 @@ export const AccountForm = () => {
 	const phoneNumbers = watch('phoneNumbers');
 	const logo = watch('companyLogo');
 
+	console.log(watch('paymentAccount'));
+
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
-			<div className="flex border-b px-[24px] py-[18px]">
-				<p className="font-sans text-lg font-semibold leading-4">
-					{!search.get('edit') ? FormTitles.default : FormTitles.edit}
-				</p>
-			</div>
-			<div className="flex flex-col border-b px-[24px] py-[11px]">
-				<FormProvider {...form}>
-					<div className="flex flex-col gap-[20px]">
+			<div className="flex flex-col px-[24px] py-[11px]">
+				<div className="flex flex-col gap-[20px]">
+					<div className="flex gap-[20px]">
 						<Input
 							label={formState.errors.companyName?.message || 'Название'}
 							labelClassName={twMerge(
@@ -159,13 +119,13 @@ export const AccountForm = () => {
 							error={formState.errors.companyName?.message}
 							{...form.register('companyName')}
 							maxLength={50}
-							disabled={!search.get('edit')}
 							type={'text'}
 							placeholder="Введите название компании"
 							max={50}
 						/>
 						<div className="flex flex-wrap gap-[8px] text-[14px] placeholder:text-input-label-primary">
 							<Input
+								ref={phoneRef}
 								label={
 									formState.errors.mainPhoneNumber?.message || 'Номера телефонов'
 								}
@@ -176,13 +136,11 @@ export const AccountForm = () => {
 								wrapperClassName="flex-row items-center gap-[10px]"
 								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 								error={formState.errors.mainPhoneNumber?.message}
-								disabled
 								value={watch('mainPhoneNumber')}
+								placeholder="+375(__)___-__-__"
 								iconPos="right"
-								iconClassName={twMerge(
-									!search.get('edit') ? 'invisible' : 'visible',
-									'size-[25px] text-primary right-[2px]',
-								)}
+								iconClassName={twMerge('size-[25px] text-primary right-[2px]')}
+								onChange={(e) => setValue('mainPhoneNumber', e.target.value)}
 								Icon={phoneNumbers.length < 3 ? AiOutlinePlusCircle : undefined}
 								onIconClick={() => {
 									const updatedPhoneNumbers = [
@@ -198,15 +156,38 @@ export const AccountForm = () => {
 								)}
 							</div>
 						</div>
+					</div>
+					<div className="flex flex-wrap gap-[20px]">
+						<Input
+							label={formState.errors.password?.message || 'Пароль'}
+							wrapperClassName="flex-row items-center gap-[10px]"
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+								formState.errors.password?.message ? 'text-error' : '',
+							)}
+							{...form.register('password')}
+							error={formState.errors.password?.message}
+							placeholder="Введите пароль"
+							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+						/>
+						<Input
+							label={formState.errors.secondPassword?.message || 'Повторите пароль'}
+							wrapperClassName="flex-row items-center gap-[10px]"
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+								formState.errors.secondPassword?.message ? 'text-error' : '',
+							)}
+							{...form.register('secondPassword')}
+							error={formState.errors.secondPassword?.message}
+							placeholder="Введите пароль"
+							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+						/>
 						<Input
 							label={formState.errors.payersRegistrationNumber?.message || 'УНП'}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
-								formState.errors.payersRegistrationNumber?.message
-									? 'text-error'
-									: '',
+								formState.errors.mainPhoneNumber?.message ? 'text-error' : '',
 							)}
-							disabled={!search.get('edit')}
 							wrapperClassName="flex-row items-center gap-[10px]"
 							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.payersRegistrationNumber?.message}
@@ -217,19 +198,20 @@ export const AccountForm = () => {
 						/>
 						<Input
 							label={formState.errors.paymentAccount?.message || 'Расчетный счет'}
+							onChange={(event) => {
+								setValue('paymentAccount', event.target.value);
+							}}
 							value={form.watch('paymentAccount')}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.paymentAccount?.message ? 'text-error' : '',
 							)}
-							disabled={!search.get('edit')}
 							wrapperClassName="flex-row items-center gap-[10px]"
 							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.paymentAccount?.message}
 							type={'text'}
 							placeholder="Введите расчетный счет"
 							maxLength={28}
-							{...form.register('paymentAccount')}
 						/>
 						<Input
 							label={formState.errors.bankIdNumber?.message || 'БИК'}
@@ -237,7 +219,6 @@ export const AccountForm = () => {
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.bankIdNumber?.message ? 'text-error' : '',
 							)}
-							disabled={!search.get('edit')}
 							wrapperClassName="flex-row items-center gap-[10px]"
 							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.bankIdNumber?.message}
@@ -252,7 +233,6 @@ export const AccountForm = () => {
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.directorFullName?.message ? 'text-error' : '',
 							)}
-							disabled={!search.get('edit')}
 							wrapperClassName="flex-row items-center gap-[10px]"
 							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.directorFullName?.message}
@@ -268,7 +248,6 @@ export const AccountForm = () => {
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.bankAddress?.message ? 'text-error' : '',
 							)}
-							disabled={!search.get('edit')}
 							wrapperClassName="flex-row items-center gap-[10px]"
 							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.bankAddress?.message}
@@ -284,7 +263,6 @@ export const AccountForm = () => {
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.companyAddress?.message ? 'text-error' : '',
 							)}
-							disabled={!search.get('edit')}
 							wrapperClassName="flex-row items-center gap-[10px]"
 							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.companyAddress?.message}
@@ -301,7 +279,6 @@ export const AccountForm = () => {
 
 								formState.errors.compannyInfo?.message ? 'text-error' : '',
 							)}
-							disabled={!search.get('edit')}
 							wrapperClassName="flex-row items-center gap-[10px]"
 							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							maxLength={100}
@@ -336,7 +313,6 @@ export const AccountForm = () => {
 								<Button
 									variant="primary"
 									type="button"
-									disabled={!search.get('edit')}
 									className="h-[30px] w-[220px]"
 									onClick={() => document.getElementById('file-upload')!.click()}
 								>
@@ -352,31 +328,7 @@ export const AccountForm = () => {
 							</div>
 						</div>
 					</div>
-					<div className="flex justify-end px-[16px] py-[13px]">
-						{search.get('edit') ? (
-							<Button
-								type={'submit'}
-								onClick={() => {
-									form.handleSubmit(onSubmit)();
-								}}
-								className="px-[16px]"
-							>
-								<p className="font-sans text-sm font-semibold leading-4">
-									{!search.get('edit') ? ButtonTitles.default : ButtonTitles.edit}
-								</p>
-							</Button>
-						) : (
-							<Button
-								onClick={() => navigate('', { edit: 'true' })}
-								className="px-[16px]"
-							>
-								<p className="font-sans text-sm font-semibold leading-4">
-									{!search.get('edit') ? ButtonTitles.default : ButtonTitles.edit}
-								</p>
-							</Button>
-						)}
-					</div>
-				</FormProvider>
+				</div>
 			</div>
 		</div>
 	);
