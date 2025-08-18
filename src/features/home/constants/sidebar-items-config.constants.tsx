@@ -52,14 +52,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 				path: DESIGNING_ROUTES.accounts.route,
 			},
 		},
-		{
-			params: {
-				icon: HiOutlineUsers,
-				id: USERS_LIST_ROUTES.client.id,
-				path: USERS_LIST_ROUTES.client.route,
-				label: 'Клиент',
-			},
-		},
+
 		{
 			params: {
 				id: DESIGNING_ROUTES.users_list.id,

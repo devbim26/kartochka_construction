@@ -1,4 +1,8 @@
-import type { DeleteUserCommand, GetUsersWithPaginationParamsQuery } from '@api-gen';
+import type {
+	AdditionalPhoneNumber,
+	DeleteUserCommand,
+	GetUsersWithPaginationParamsQuery,
+} from '@api-gen';
 import { fetchApi } from '@api-gen';
 import type { RegistrationFormData } from '@features/auth/types';
 
@@ -8,6 +12,24 @@ export const getUserById = async (id: string) => {
 
 export const createUser = async (data: RegistrationFormData) => {
 	return await fetchApi.api.accountRegisterCreate(data);
+};
+
+export const updateUser = async (data: {
+	userId?: string;
+	companyName?: string;
+	phoneNumber?: string;
+	payersRegistrationNumber?: string;
+	paymentAccount?: string;
+	bankIdNumber?: string;
+	directorFullName?: string;
+	bankAddress?: string;
+	companyAddress?: string;
+	companyDescription?: string;
+	additionalPhoneNumbers?: AdditionalPhoneNumber[];
+	/** @format binary */
+	formFile?: File;
+}) => {
+	return await fetchApi.api.accountUpdateUpdate(data);
 };
 
 export const deleteUser = async (data: DeleteUserCommand) => {

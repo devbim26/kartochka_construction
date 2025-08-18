@@ -159,30 +159,6 @@ export const UserAddEdit = () => {
 					</div>
 					<div className="flex flex-wrap gap-[20px]">
 						<Input
-							label={formState.errors.password?.message || 'Пароль'}
-							wrapperClassName="flex-row items-center gap-[10px]"
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
-								formState.errors.password?.message ? 'text-error' : '',
-							)}
-							{...form.register('password')}
-							error={formState.errors.password?.message}
-							placeholder="Введите пароль"
-							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						/>
-						<Input
-							label={formState.errors.secondPassword?.message || 'Повторите пароль'}
-							wrapperClassName="flex-row items-center gap-[10px]"
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
-								formState.errors.secondPassword?.message ? 'text-error' : '',
-							)}
-							{...form.register('secondPassword')}
-							error={formState.errors.secondPassword?.message}
-							placeholder="Введите пароль"
-							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						/>
-						<Input
 							label={formState.errors.payersRegistrationNumber?.message || 'УНП'}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',

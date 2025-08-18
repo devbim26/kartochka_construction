@@ -21,7 +21,6 @@ export const convertToServerAccountData = (data: AccountData) => {
 
 export const convertToServerAccountUpdateData = (data: AccountData) => {
 	return {
-		userId: data.id || '',
 		companyName: data.companyName!,
 		phoneNumber: data.mainPhoneNumber?.replaceAll(' ', ''),
 		payersRegistrationNumber: data.payersRegistrationNumber!,

@@ -19,9 +19,14 @@ import { AccountDataConfig } from '@features/account/utils';
 import { convertToServerRegistrationData } from '@features/auth/converters';
 import type { RegistrationFormData } from '@features/auth/types';
 import { useHeaderForm } from '@features/guidbooks/utils';
-import { updateArticle } from '@features/news/services';
 import { convertToServerUserFilterData } from '@features/users/converters';
-import { createUser, deleteUser, getPaginatedUsers, getUserById } from '@features/users/services';
+import {
+	createUser,
+	deleteUser,
+	getPaginatedUsers,
+	getUserById,
+	updateUser,
+} from '@features/users/services';
 import { userColumns } from '@features/users/utils';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -135,7 +140,7 @@ export const UserScreen = () => {
 	};
 
 	const handleEditTableData = (data: AccountData) => {
-		from(updateArticle({ data: convertToServerAccountUpdateData(data) }))
+		from(updateUser(convertToServerAccountUpdateData(data)))
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {

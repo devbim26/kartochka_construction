@@ -34,14 +34,6 @@ const AccountDataSchema = z.object({
 	compannyInfo: z.string().min(1, 'Поле обязательно для заполнения'),
 	companyLogo: z.string().optional(),
 	formFile: z.any().refine((file) => file instanceof File && file.size > 0, 'Логотип не выбран'),
-	password: z
-		.string()
-		.regex(/[A-Z]/, 'Пароль должен содержать хотя бы одну заглавную букву')
-		.regex(/[a-z]/, 'Пароль должен содержать хотя бы одну строчную букву')
-		.regex(/[0-9]/, 'Пароль должен содержать хотя бы одну цифру')
-		.regex(/[@$!%*?&#]/, 'Пароль должен содержать хотя бы один специальный символ')
-		.optional(),
-	secondPassword: z.string().optional(),
 });
 
 type AccountDataSchemaType = z.infer<typeof AccountDataSchema>;

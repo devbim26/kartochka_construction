@@ -4,7 +4,6 @@ import type { HeaderFormElements, HeaderFormTitles } from '@features/guidbooks/t
 import { HeaderFormTypes } from '@features/guidbooks/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
-import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
 
 interface NewsPageHeaderWrapperProps {
@@ -101,17 +100,6 @@ export const UserPageHeaderWrapper = memoize(
 			<div className="flex w-full flex-col gap-[14px]">
 				<div className="flex items-center justify-between">
 					<p className="font-sans text-lg font-semibold leading-6">{titles.pageTitle}</p>
-					{currentHeaderFormType === HeaderFormTypes.filter && (
-						<Button
-							className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
-							onClick={onAddHandle}
-						>
-							<FaPlus fill="white" width={'16px'} height={'16px'} />
-							<p className="font-sans text-sm font-semibold leading-[18px]">
-								Добавить
-							</p>
-						</Button>
-					)}
 				</div>
 				<div className="flex flex-col rounded-xl border border-solid bg-white">
 					<p className="flex justify-center pt-[16px] font-sans text-base font-semibold leading-4">
