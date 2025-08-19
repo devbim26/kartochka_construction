@@ -34,7 +34,7 @@ export const convertToServerAccountUpdateData = (data: AccountData) => {
 			number: ph.number.replaceAll(' ', ''),
 			id: ph.id,
 		})),
-		id: data.id,
+		userId: data.id,
 		formFile: data.formFile || null,
 	};
 };

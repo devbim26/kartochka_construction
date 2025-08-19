@@ -10,6 +10,8 @@
  */
 
 export interface AccountDto {
+	/** @format uuid */
+	id?: string;
 	companyName?: string | null;
 	phoneNumber?: string | null;
 	payersRegistrationNumber?: string | null;

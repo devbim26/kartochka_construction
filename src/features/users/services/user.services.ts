@@ -26,10 +26,9 @@ export const updateUser = async (data: {
 	companyAddress?: string;
 	companyDescription?: string;
 	additionalPhoneNumbers?: AdditionalPhoneNumber[];
-	/** @format binary */
 	formFile?: File;
 }) => {
-	return await fetchApi.api.accountUpdateUpdate(data);
+	return await fetchApi.api.userUpdateUpdate(data);
 };
 
 export const deleteUser = async (data: DeleteUserCommand) => {
