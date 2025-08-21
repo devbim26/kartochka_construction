@@ -24,6 +24,8 @@ import {
 	NotFoundScreen,
 	ReportFormScreen,
 	RequirementsScreen,
+	UserScreen,
+	UsersLayout,
 } from '@features';
 import { AUTH_ROUTES } from '@features/auth/constants';
 import { BillScreen } from '@features/bills';
@@ -102,14 +104,9 @@ export const AppRouter = () => {
 					/>
 					<Route path={GUIDBOOKS_ROUTES.issuers.route} element={<IssuersScreen />} />
 				</Route>
-				<Route
-					path={DESIGNING_ROUTES.users_list.route}
-					element={<div className="flex grow"></div>}
-				>
-					<Route
-						path={USERS_LIST_ROUTES.client.route}
-						element={<DevScreen title="Клиент" />}
-					/>
+
+				<Route path={DESIGNING_ROUTES.users_list.route} element={<UsersLayout />}>
+					<Route path={USERS_LIST_ROUTES.client.route} element={<UserScreen />} />
 					<Route
 						path={USERS_LIST_ROUTES.manager.route}
 						element={<DevScreen title="Менеджер" />}

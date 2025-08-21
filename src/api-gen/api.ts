@@ -10,6 +10,8 @@
  */
 
 export interface AccountDto {
+	/** @format uuid */
+	id?: string;
 	companyName?: string | null;
 	phoneNumber?: string | null;
 	payersRegistrationNumber?: string | null;
@@ -406,6 +408,11 @@ export interface DeleteRequirementCommand {
 export interface DeleteSubscriptionCommand {
 	/** @format uuid */
 	id?: string;
+}
+
+export interface DeleteUserCommand {
+	/** @format uuid */
+	userId?: string;
 }
 
 export interface DocumentReportFlagsDto {
@@ -921,6 +928,20 @@ export interface PaginatedUserDto {
 	role?: UserRole;
 	/** @format uuid */
 	userSubscriptionId?: string;
+}
+
+export interface PaginatedUserDtoPaginatedList {
+	items?: PaginatedUserDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
 }
 
 export interface PasswordGrantFlow {
@@ -1512,6 +1533,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 */
 		accountUpdateUpdate: (
 			data: {
+				/** @format uuid */
+				userId?: string;
 				companyName?: string;
 				phoneNumber?: string;
 				payersRegistrationNumber?: string;
@@ -2911,12 +2934,43 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: GetUsersWithPaginationParamsQuery,
 			params: RequestParams = {},
 		) =>
-			this.request<PaginatedUserDto, any>({
+			this.request<PaginatedUserDtoPaginatedList, any>({
 				path: `/api/User/get-paginated`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
 				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags User
+		 * @name UserDetail
+		 * @request GET:/api/User/{id}
+		 */
+		userDetail: (id: string, params: RequestParams = {}) =>
+			this.request<AccountDto, any>({
+				path: `/api/User/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags User
+		 * @name UserDelete
+		 * @request DELETE:/api/User
+		 */
+		userDelete: (data: DeleteUserCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/User`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
 				...params,
 			}),
 
@@ -2932,6 +2986,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				path: `/api/User/active-userSubscription`,
 				method: 'GET',
 				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags User
+		 * @name UserUpdateUpdate
+		 * @request PUT:/api/User/update
+		 */
+		userUpdateUpdate: (
+			data: {
+				/** @format uuid */
+				userId?: string;
+				companyName?: string;
+				phoneNumber?: string;
+				payersRegistrationNumber?: string;
+				paymentAccount?: string;
+				bankIdNumber?: string;
+				directorFullName?: string;
+				bankAddress?: string;
+				companyAddress?: string;
+				companyDescription?: string;
+				additionalPhoneNumbers?: AdditionalPhoneNumber[];
+				/** @format binary */
+				formFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/User/update`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
 				...params,
 			}),
 	};

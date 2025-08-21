@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 const AccountDataSchema = z.object({
+	id: z.string().optional(),
 	mainPhoneNumber: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')

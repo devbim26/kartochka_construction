@@ -52,6 +52,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 				path: DESIGNING_ROUTES.accounts.route,
 			},
 		},
+
 		{
 			params: {
 				id: DESIGNING_ROUTES.users_list.id,
