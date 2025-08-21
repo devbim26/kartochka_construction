@@ -1,8 +1,9 @@
+import { withGuardedBlock } from '@core/utils/permissions';
 import type { SidebarItemProps } from '@features/home/types';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
-export const SidebarItem = (props: SidebarItemProps) => {
+const SidebarItemBase = (props: SidebarItemProps) => {
 	return (
 		<Link to={props.path}>
 			<div
@@ -25,3 +26,5 @@ export const SidebarItem = (props: SidebarItemProps) => {
 		</Link>
 	);
 };
+
+export const SidebarItem = withGuardedBlock(SidebarItemBase);

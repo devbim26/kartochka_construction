@@ -1,3 +1,4 @@
+import type { UserRoles } from '@core';
 import type { IconType } from 'react-icons';
 
 export interface SidebarItemProps {
@@ -7,6 +8,7 @@ export interface SidebarItemProps {
 	label: string;
 	path: string;
 	isMutltiPathItem?: boolean;
+	permission: UserRoles | UserRoles[];
 }
 
 export interface SidebarListProps extends SidebarItemProps {

@@ -1,9 +1,16 @@
-import { PageLoader } from '@core';
-import { Suspense } from 'react';
+import { PageLoader, useAppDispatch } from '@core';
+import { getCurrentUser } from '@features/account/services';
+import { Suspense, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { HomeHeader, Sidebar } from '../components';
 
 export const HomeScreen = () => {
+	const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		dispatch(getCurrentUser());
+	}, []);
+
 	return (
 		<div className="flex h-screen w-screen flex-col overflow-x-hidden">
 			<HomeHeader />

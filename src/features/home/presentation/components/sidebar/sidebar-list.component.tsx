@@ -1,9 +1,10 @@
+import { withGuardedBlock } from '@core/utils/permissions';
 import type { SidebarListProps } from '@features/home/types';
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { twMerge } from 'tailwind-merge';
 
-export const SidebarList = (props: SidebarListProps) => {
+const SidebarListBase = (props: SidebarListProps) => {
 	const [showSubItems, setShowSubItems] = useState<boolean>(
 		(props.currentPath || '').includes(props.path),
 	);
@@ -29,3 +30,5 @@ export const SidebarList = (props: SidebarListProps) => {
 		</div>
 	);
 };
+
+export const SidebarList = withGuardedBlock(SidebarListBase);
