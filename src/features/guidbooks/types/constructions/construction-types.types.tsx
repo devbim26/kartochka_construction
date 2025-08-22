@@ -65,8 +65,8 @@ export const RuConstructionTypesMap = {
 	FramePartitionSingle: 'Каркасная перегородка (1 каркас)',
 	FramePartitionDouble: 'Каркасная перегородка (2 каркаса)',
 	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
-	OneGlassFrame: 'Одно стекло',
-	TwoGlassFrame: 'Многослойное стекло',
+	OneGlassFrame: 'Многослойное стекло',
+	TwoGlassFrame: 'Стеклопакет',
 };
 
 export const RuConstructionTypesSelectValues = [
@@ -92,11 +92,11 @@ export const RuConstructionTypesSelectValues = [
 		value: ConstructionTypeEnum.FramePartitionDouble,
 	},
 	{
-		label: 'Одно стекло',
+		label: 'Многослойное стекло',
 		value: ConstructionTypeEnum.OneGlassFrame,
 	},
 	{
-		label: 'Многослойное стекло',
+		label: 'Стеклопакет',
 		value: ConstructionTypeEnum.TwoGlassFrame,
 	},
 ];

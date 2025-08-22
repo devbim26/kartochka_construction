@@ -1,10 +1,11 @@
 import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import { Button, ChevronIcon, useAppDispatch, useAppSelector } from '@core';
 import type { GraphDetailResponse } from '@features';
-import { startLoading } from '@features';
+import { startLoading, stopLoading } from '@features';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
-import { getReportFloorById } from '@features/constructor/services';
+import { graphDotsConverterToClient } from '@features/constructor/converters';
+import { getReportFloorById, graphDetail } from '@features/constructor/services';
 import { RuMaterialParametrs } from '@features/constructor/types/material-parametrs.types';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
 import { RuMaterialTypeEnum } from '@features/guidbooks/types';
@@ -20,7 +21,7 @@ import { DesigningHeader } from './designing-header.component';
 const MyConstructions = () => {
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
-	const [graphData, setGraphData] = useState<GraphDetailResponse | null>(null);
+	const [graphData, setGraphData] = useState<GraphDetailResponse[] | null>(null);
 	const [isRelevant, setIsRelevant] = useState<boolean>(false);
 	const [constructionHeaderId, setConstructionHeaderId] = useState<string | undefined>(undefined);
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionHeaderDto | null>(
@@ -68,42 +69,22 @@ const MyConstructions = () => {
 	useEffect(() => {
 		if (!constructionHeaderId || graphData) return;
 		dispatch(startLoading());
-		//TODO: FIX
-		// from(graphDetail({ constructionHeaderId }))
-		// 	.pipe(
-		// 		catchError((error) => {
-		// 			toast.error('Не удалось загрузить данные графика');
-		// 			dispatch(stopLoading());
-		// 			return [];
-		// 		}),
-		// 	)
-		// 	.subscribe(({ data }) => {
-		// 		if (!data) {
-		// 			dispatch(stopLoading());
-		// 			return;
-		// 		}
-		// 		setGraphData({
-		// 			...data,
-		// 			dotRs: (data.dotRs || []).filter(
-		// 				(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
-		// 			) as Dot[],
-		// 			laboratoryDots: (data.laboratoryDots || []).filter(
-		// 				(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
-		// 			) as Dot[],
-		// 			deviationDots: (data.deviationDots || []).filter(
-		// 				(dot) => typeof dot.r === 'number' && typeof dot.f === 'number',
-		// 			) as Dot[],
-		// 			dotC:
-		// 				data.dotC?.r != null && data.dotC.f != null
-		// 					? { r: data.dotC.r, f: data.dotC.f }
-		// 					: undefined,
-		// 			dotB:
-		// 				data.dotB?.r != null && data.dotB.f != null
-		// 					? { r: data.dotB.r, f: data.dotB.f }
-		// 					: undefined,
-		// 		});
-		// 		dispatch(stopLoading());
-		// 	});
+		from(graphDetail({ constructionHeaderId }))
+			.pipe(
+				catchError((error) => {
+					toast.error('Не удалось загрузить данные графика');
+					dispatch(stopLoading());
+					return [];
+				}),
+			)
+			.subscribe(({ data }) => {
+				if (!data) {
+					dispatch(stopLoading());
+					return;
+				}
+				setGraphData(data.map(graphDotsConverterToClient));
+				dispatch(stopLoading());
+			});
 	}, [constructionHeaderId]);
 
 	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
