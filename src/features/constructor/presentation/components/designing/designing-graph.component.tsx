@@ -2,21 +2,23 @@ import type { GraphDetailResponse } from '@features/constructor/types';
 import DesigningChart from './designing-chart.component';
 
 interface GraphProps {
-	graphData: GraphDetailResponse | null;
+	graphData: GraphDetailResponse[] | null;
 }
 
 const DesigningGraph = ({ graphData }: GraphProps) => {
-	const labData = (graphData?.dotRs ?? [])
-		.map((dot) => ({ x: dot.f ?? 0, y: dot.r ?? 0 }))
+	const labData = (graphData?.[0].namedDots ?? [])
+		.map((dot) => ({ x: dot.dot?.f ?? 0, y: dot.dot?.r ?? 0 }))
 		.sort((a, b) => a.x - b.x);
 
-	const deviationDots = graphData?.deviationDots ?? [];
+	const deviationDots = graphData?.[2].namedDots ?? [];
 
 	const inSituData = labData.map(({ x: currentFrequency }) => {
-		const matchingDeviationDot = deviationDots.find((dot) => dot.f === currentFrequency);
+		const matchingDeviationDot = deviationDots.find((dot) => dot.dot?.f === currentFrequency);
 
 		const yValue =
-			currentFrequency >= 100 && matchingDeviationDot ? (matchingDeviationDot.r ?? 0) : null;
+			currentFrequency >= 100 && matchingDeviationDot
+				? (matchingDeviationDot.dot?.r ?? 0)
+				: null;
 		return {
 			x: currentFrequency,
 			y: yValue,

@@ -1,14 +1,6 @@
-import type { Dot } from './dot.types';
+import type { NamedDot } from './dot.types';
 
 export type GraphDetailResponse = {
-	delta?: number;
-	c?: number;
-	ctr?: number;
-	computingRw?: number;
-	labRw?: number;
-	dotRs?: Dot[] | null;
-	laboratoryDots?: Dot[] | null;
-	deviationDots?: Dot[] | null;
-	dotC?: Dot;
-	dotB?: Dot;
+	name?: string | null;
+	namedDots?: NamedDot[] | null;
 };
