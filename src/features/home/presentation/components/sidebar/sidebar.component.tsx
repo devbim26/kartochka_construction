@@ -15,6 +15,7 @@ export const Sidebar = () => {
 						key={item.params.id}
 						currentPath={pathname}
 						path={`${sidebarItemsConfig.basePath}/${item.params.path}`}
+						permission={item.params.permission}
 					>
 						<>
 							{item.childrens.map((children) => (
@@ -33,6 +34,7 @@ export const Sidebar = () => {
 						key={item.params.id}
 						currentPath={pathname}
 						path={`${sidebarItemsConfig.basePath}/${item.params.path}`}
+						permission={item.params.permission}
 					/>
 				),
 			)}

@@ -36,5 +36,6 @@ export const convertToServerAccountUpdateData = (data: AccountData) => {
 		})),
 		userId: data.id,
 		formFile: data.formFile || null,
+		roleId: data.roleId,
 	};
 };

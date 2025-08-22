@@ -5,6 +5,7 @@ export * from './checkbox-select';
 export * from './chevron';
 export * from './drag-element';
 export * from './forms';
+export * from './guarded';
 export * from './inputs';
 export * from './loaders';
 export * from './modals';

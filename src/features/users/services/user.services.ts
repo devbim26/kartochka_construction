@@ -35,6 +35,10 @@ export const deleteUser = async (data: DeleteUserCommand) => {
 	return await fetchApi.api.userDelete(data);
 };
 
+export const getRoles = async () => {
+	return await fetchApi.api.userRolesList();
+};
+
 export const getPaginatedUsers = async (data: GetUsersWithPaginationParamsQuery) => {
 	return await fetchApi.api.userGetPaginatedCreate(data);
 };
