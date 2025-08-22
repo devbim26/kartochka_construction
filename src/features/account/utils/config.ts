@@ -15,5 +15,7 @@ export const AccountDataConfig: EntityConfig = {
 		bankAdress: '',
 		companyLogo: undefined,
 		compannyInfo: '',
+		role: {},
+		roleId: '',
 	},
 };

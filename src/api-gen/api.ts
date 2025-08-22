@@ -23,6 +23,7 @@ export interface AccountDto {
 	companyDescription?: string | null;
 	additionalPhoneNumbers?: AdditionalPhoneNumber[] | null;
 	logoUrl?: string | null;
+	role?: UserRole;
 }
 
 export interface AdditionalPhoneNumber {
@@ -1545,6 +1546,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				companyAddress?: string;
 				companyDescription?: string;
 				additionalPhoneNumbers?: AdditionalPhoneNumber[];
+				/** @format uuid */
+				roleId?: string;
 				/** @format binary */
 				formFile?: File;
 			},
@@ -3010,6 +3013,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				companyAddress?: string;
 				companyDescription?: string;
 				additionalPhoneNumbers?: AdditionalPhoneNumber[];
+				/** @format uuid */
+				roleId?: string;
 				/** @format binary */
 				formFile?: File;
 			},
@@ -3020,6 +3025,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				method: 'PUT',
 				body: data,
 				type: ContentType.FormData,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags User
+		 * @name UserRolesList
+		 * @request GET:/api/User/roles
+		 */
+		userRolesList: (params: RequestParams = {}) =>
+			this.request<UserRole[], any>({
+				path: `/api/User/roles`,
+				method: 'GET',
 				...params,
 			}),
 	};

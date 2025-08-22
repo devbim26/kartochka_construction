@@ -1,18 +1,26 @@
+import type { UserRole } from '@core';
 import {
 	accountMask,
 	Button,
 	convertToBase64,
+	convertToSelectValues,
 	FormElementLabel,
 	Input,
 	phoneNumberMask,
+	Select,
 } from '@core';
 import type { AccountData } from '@features/account/types';
+import { getRoles } from '@features/users/services';
 import { useMask } from '@react-input/mask';
+import { AxiosError } from 'axios';
+import { useEffect, useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { useFormContext } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { TiDeleteOutline } from 'react-icons/ti';
 import { useSearchParams } from 'react-router-dom';
+import { catchError, from } from 'rxjs';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
 const PhoneInput = ({
@@ -85,7 +93,7 @@ export const UserAddEdit = () => {
 	const phoneRef = useMask(phoneNumberMask);
 	const [search] = useSearchParams();
 	const { setValue, watch, formState, trigger } = form;
-
+	const [roles, setRoles] = useState<Array<UserRole>>([]);
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
 		if (file) {
@@ -98,10 +106,25 @@ export const UserAddEdit = () => {
 		}
 	};
 
+	useEffect(() => {
+		from(getRoles())
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					setRoles(response.data.map((role) => ({ id: role.id!, name: role.name! })));
+				}
+			});
+	}, []);
+
 	const phoneNumbers = watch('phoneNumbers');
 	const logo = watch('companyLogo');
-
-	console.log(watch('paymentAccount'));
 
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
@@ -265,6 +288,20 @@ export const UserAddEdit = () => {
 								formState.errors.compannyInfo?.message || 'Информация о компании'
 							}
 							error={formState.errors.compannyInfo?.message}
+						/>
+						<Select
+							onChange={(value) => setValue('roleId', value as string)}
+							value={watch('roleId') || ''}
+							options={convertToSelectValues(roles) ?? []}
+							error={formState.errors.roleId?.message}
+							labelClassName={twMerge(
+								'text-sm leading-5 tracking-[0.1px] w-[145px]',
+								formState.errors.roleId?.message ? 'text-error' : '',
+							)}
+							wrapperClassname="flex-row items-center gap-[10px] ring-input-border-primary"
+							buttonClassName="text-sm w-[220px] rounded-[8px]"
+							label={formState.errors.roleId?.message || 'Роль'}
+							placeholder="Выберите роль"
 						/>
 						<div className="flex flex-row items-center gap-[8px]">
 							<FormElementLabel

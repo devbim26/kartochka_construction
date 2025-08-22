@@ -179,7 +179,7 @@ export const UserScreen = () => {
 	};
 
 	const onSaveHandle = useCallback(() => {
-		handleAddTableData(form.addForm.getValues() as RegistrationFormData);
+		handleAddTableData(form.addForm.getValues() as any);
 	}, [handleAddTableData, form.addForm.getValues()]);
 
 	const onEditHandle = useCallback(() => {

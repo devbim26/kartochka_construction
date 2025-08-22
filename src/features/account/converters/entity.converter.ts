@@ -1,5 +1,4 @@
 import type { AccountDto } from '@api-gen';
-import { UserRoles } from '@core';
 import type { AccountData } from '../types';
 
 export const convertToClientAccountData = (data: AccountDto): AccountData => ({
@@ -20,5 +19,6 @@ export const convertToClientAccountData = (data: AccountDto): AccountData => ({
 	paymentAccount: data.paymentAccount!,
 	bankAddress: data.bankAddress!,
 	bankIdNumber: data.bankIdNumber!,
-	role: { id: crypto.randomUUID(), name: UserRoles.Admin },
+	role: { id: data.role!.id!, name: data.role!.name! },
+	roleId: data.role!.id!,
 });
