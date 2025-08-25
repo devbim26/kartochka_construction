@@ -43,6 +43,10 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	youngModulus: String(data.youngModulus) ?? '',
 	damping: String(data.damping) ?? '',
 	solid: String(data.solid) ?? '',
+	rb: String(data.rb) ?? '',
+	rc: String(data.rc) ?? '',
+	fc: String(data.fc) ?? '',
+	fb: String(data.fb) ?? '',
 });
 
 export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): any => ({
@@ -63,6 +67,10 @@ export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): 
 	youngModulus: +data.youngModulus || null,
 	damping: +data.damping || null,
 	solid: +data.solid || null,
+	rb: +data.rb || null,
+	rc: +data.rc || null,
+	fc: +data.fc || null,
+	fb: +data.fb || null,
 });
 
 export const convertToServerMaterialsEditData = (data: MaterialsAddAndEditData): any => ({

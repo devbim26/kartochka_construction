@@ -48,6 +48,22 @@ export const MaterialsAddAndEditSchema = z.object({
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля')
 		.refine((value) => +value < 100, 'Значение должно быть меньше ста'),
+	fb: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	fc: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	rb: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	rc: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
 });
 
 export const MaterialsFilterSchema = z.object({

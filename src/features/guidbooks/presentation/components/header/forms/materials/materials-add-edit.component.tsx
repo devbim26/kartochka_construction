@@ -344,6 +344,58 @@ export const MaterialsAddAndEdit = () => {
 					{...form.register('solid')}
 					type={'number'}
 				/>
+				<Input
+					labelClassName={twMerge(
+						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+						formState.errors.fc?.message ? 'text-error' : '',
+					)}
+					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+					containerClassName="w-[226px]"
+					label={formState.errors.fc?.message || 'Fc'}
+					error={formState.errors.fc?.message}
+					placeholder="Введите значение"
+					{...form.register('fc')}
+					type={'number'}
+				/>
+				<Input
+					labelClassName={twMerge(
+						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+						formState.errors.fb?.message ? 'text-error' : '',
+					)}
+					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+					containerClassName="w-[226px]"
+					label={formState.errors.fb?.message || 'Fb'}
+					error={formState.errors.fb?.message}
+					placeholder="Введите значение"
+					{...form.register('fb')}
+					type={'number'}
+				/>
+				<Input
+					labelClassName={twMerge(
+						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+						formState.errors.rc?.message ? 'text-error' : '',
+					)}
+					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+					containerClassName="w-[226px]"
+					label={formState.errors.rc?.message || 'Rc'}
+					error={formState.errors.rc?.message}
+					placeholder="Введите значение"
+					{...form.register('rc')}
+					type={'number'}
+				/>
+				<Input
+					labelClassName={twMerge(
+						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+						formState.errors.rb?.message ? 'text-error' : '',
+					)}
+					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+					containerClassName="w-[226px]"
+					label={formState.errors.rb?.message || 'Rb'}
+					error={formState.errors.rb?.message}
+					placeholder="Введите значение"
+					{...form.register('rb')}
+					type={'number'}
+				/>
 			</div>
 		</div>
 	);
