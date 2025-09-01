@@ -1,21 +1,21 @@
-import { LogoIcon, LogoTextIcon } from '@core';
+import { APP_ROUTES, LogoIcon, LogoTextIcon } from '@core';
 import { useState } from 'react';
 import { ImMenu } from 'react-icons/im';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { HeaderNav } from './header-nav.component';
 import { LogoutHeader } from './logout-header.component';
 
 export const HomeHeader = () => {
 	const { pathname } = useLocation();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+	const navigate = useNavigate();
 	const toggleMenu = () => {
 		setIsMenuOpen((prev) => !prev);
 	};
 
 	return (
 		<>
-			<header className="flex w-full flex-row items-center justify-between border-b border-solid border-[#EDEFF2] bg-white px-[25px] pb-[6px] xs:px-[15px]">
+			<header className="flex w-full flex-row items-center justify-between border-b border-solid border-[#EDEFF2] bg-white px-[25px] py-[6px] xs:px-[15px]">
 				<div className="flex flex-row items-center gap-4">
 					<button
 						onClick={toggleMenu}
@@ -24,8 +24,11 @@ export const HomeHeader = () => {
 						<ImMenu className="size-6" />
 					</button>
 
-					<div className="flex flex-row items-center gap-[12px]">
-						<LogoIcon className="h-[40px] w-[39px] xs:h-[30px] xs:w-[29px]" />
+					<div
+						onClick={() => navigate(APP_ROUTES.landing.route)}
+						className="flex cursor-pointer flex-row items-center gap-[12px]"
+					>
+						<LogoIcon className="xs:size-[30px] md:size-[50px]" />
 						<LogoTextIcon className="h-[64px] w-[170px] xs:h-[44px] xs:w-[120px]" />
 					</div>
 				</div>

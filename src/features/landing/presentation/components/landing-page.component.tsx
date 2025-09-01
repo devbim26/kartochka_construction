@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router-dom';
-import { Contacts } from './contacts.component';
 import { Footer } from './footer.component';
 
 const LandingPage = () => {
@@ -8,7 +7,6 @@ const LandingPage = () => {
 			<main className="w-full grow">
 				<Outlet />
 			</main>
-			<Contacts />
 			<Footer />
 		</div>
 	);
