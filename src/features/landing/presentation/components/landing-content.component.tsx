@@ -4,6 +4,7 @@ import { LandingSections } from '@features/landing/constants';
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AboutUsComponent } from './about-us.component';
+import { Contacts } from './contacts.component';
 import { FAQ } from './faq.component';
 import { HowOurServiceWorks } from './how-our-service-works.component';
 import { NewsSection } from './news-section';
@@ -34,6 +35,7 @@ export const LandingContent = () => {
 			<SubSelect />
 			<FAQ />
 			<NewsSection />
+			<Contacts />
 		</div>
 	);
 };

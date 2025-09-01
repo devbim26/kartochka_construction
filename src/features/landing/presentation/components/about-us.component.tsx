@@ -28,8 +28,8 @@ export const AboutUsComponent = () => {
 
 					<div className="flex shrink-0 flex-col items-center">
 						<div className="mb-6 flex flex-row items-center gap-3">
-							<LogoIcon className="size-12 xs:h-[67px] xs:w-[65px]" />
-							<LogoTextIcon className="h-10 w-40 xs:h-[88px] xs:w-[232px]" />
+							<LogoIcon className="xs:h-[67px] xs:w-[65px] md:size-12" />
+							<LogoTextIcon className="xs:h-[88px] xs:w-[232px] md:h-10 md:w-40" />
 						</div>
 						<LogoBelniis className="mb-3 w-40 xs:w-auto" />
 						<div className="max-w-[250px] text-center font-montserrat text-xs leading-tight xs:text-sm sm:text-base">

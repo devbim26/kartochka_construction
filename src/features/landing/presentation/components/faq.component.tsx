@@ -16,7 +16,7 @@ export const FAQ = () => {
 
 	return (
 		<div className="flex w-full justify-center bg-background-primary px-4 sm:px-6 lg:px-10">
-			<div className="flex w-full max-w-screen-xl flex-col py-[40px] sm:py-[50px]">
+			<div className="flex w-3/4 max-w-screen-xl flex-col py-[40px] sm:py-[50px]">
 				<div className="mb-[20px] font-montserrat text-[18px] font-normal leading-[22px] sm:mb-[30px] sm:text-[20px] sm:leading-[24px]">
 					Часто задаваемые вопросы
 				</div>
