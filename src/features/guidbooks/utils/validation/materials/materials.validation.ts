@@ -47,7 +47,7 @@ export const MaterialsAddAndEditSchema = z.object({
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля')
-		.refine((value) => +value < 100, 'Значение должно быть меньше ста'),
+		.refine((value) => +value <= 100, 'Значение должно быть меньше или равно ста'),
 	fb: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
