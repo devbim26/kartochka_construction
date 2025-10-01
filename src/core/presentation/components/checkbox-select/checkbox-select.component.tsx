@@ -96,14 +96,34 @@ export const CheckboxSelect = React.forwardRef<HTMLDivElement, CheckboxSelectPro
 						<DropdownSelectButton
 							displayText={
 								multiple
-									? value.length === options.length
+									? (value as string[]).length === options.length
 										? 'Все'
-										: value.length === 1
-											? value[0]
+										: (value as string[]).length > 0
+											? options
+													.filter((opt) =>
+														(value as string[]).includes(opt.value),
+													)
+													.map((opt) => opt.label)
+													.join(', ')
 											: placeholder
-									: value.length
-										? value
+									: typeof value === 'string' && value.length
+										? (options.find((opt) => opt.value === value)?.label ??
+											value)
 										: placeholder
+							}
+							title={
+								multiple
+									? (value as string[]).length > 0
+										? options
+												.filter((opt) =>
+													(value as string[]).includes(opt.value),
+												)
+												.map((opt) => opt.label)
+												.join(', ')
+										: label
+									: typeof value === 'string' && value.length
+										? options.find((opt) => opt.value === value)?.label
+										: label
 							}
 							className={twMerge(
 								'flex w-[226px] rounded-[8px] ring-1 ring-inset ring-input-border-primary',
@@ -114,7 +134,6 @@ export const CheckboxSelect = React.forwardRef<HTMLDivElement, CheckboxSelectPro
 								classNames?.popover?.buttonTextClassName,
 								value.length && 'text-input-value-black',
 							)}
-							title={label}
 						/>
 					}
 				>
