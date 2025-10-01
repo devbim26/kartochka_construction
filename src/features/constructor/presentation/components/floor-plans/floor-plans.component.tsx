@@ -16,6 +16,7 @@ import { DESIGNING_ROUTES } from '@features/home/constants';
 import { AxiosError } from 'axios';
 import * as pdfjs from 'pdfjs-dist';
 import { useEffect, useState } from 'react';
+import { BsQuestionSquareFill } from 'react-icons/bs';
 import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, mergeMap } from 'rxjs';
@@ -29,7 +30,6 @@ import {
 } from '../modals';
 import { ConstructionSheets } from './constructions-sheet.component';
 import { FloorPlanViewer } from './floor-plan-viewer.component';
-
 export const FloorPlans = memoize(() => {
 	const navigate = useAppNavigate();
 	const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
@@ -260,9 +260,20 @@ export const FloorPlans = memoize(() => {
 				<div className="flex flex-col gap-[36px]">
 					<div className="flex flex-col rounded-xl bg-white">
 						<div className="flex flex-col gap-[18px] border-b px-[24px] py-[18px]">
-							<p className="font-sans text-lg font-semibold leading-4">
-								Добавить уровень
-							</p>
+							<div className="flex w-full items-center gap-[10px]">
+								<p className="font-sans text-lg font-semibold leading-4">
+									Добавить уровень
+								</p>
+
+								<div className="group relative">
+									<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
+
+									<div className="pointer-events-none absolute left-1/2 top-full z-10 w-[260px] -translate-x-1/2 translate-y-2 rounded bg-black px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+										Для создания конструкции нажмите правую кнопку мыши над
+										требуемой к расчету конструкцией
+									</div>
+								</div>
+							</div>
 							<Button className="flex h-[28px] w-[100px] flex-row items-center bg-white px-[10px] py-[6px] font-sans font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-white">
 								<FaPlus width={'16px'} height={'16px'} />
 								0.000

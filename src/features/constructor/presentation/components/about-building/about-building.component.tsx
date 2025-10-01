@@ -58,7 +58,7 @@ const AboutBuildingScreen = () => {
 		defaultValues: AboutBuildingConfig.defaultValues,
 		resolver: zodResolver(AboutBuildingConfig.schema),
 	});
-	const { register, control, formState, watch } = form;
+	const { register, control, formState, watch, setValue } = form;
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
 	const [requirementData, setRequirementData] = useState<Array<Requirement>>([]);
@@ -234,6 +234,9 @@ const AboutBuildingScreen = () => {
 				}),
 				tap((resData) => {
 					setRequirementData(resData.items);
+					if (!!resData.items.length) {
+						setValue('requirement', resData.items[0].id!);
+					}
 				}),
 				catchError((error) => {
 					console.log('Error:', error);
@@ -497,7 +500,7 @@ const AboutBuildingScreen = () => {
 											'Теплоизоляция*'
 										}
 										isSearchable
-										disabled={!!search.get('edit')}
+										disabled
 										error={formState.errors.requirement?.message}
 										labelClassName={twMerge(
 											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
@@ -516,7 +519,7 @@ const AboutBuildingScreen = () => {
 								name={'requirement'}
 								render={({ field }) => (
 									<Select
-										disabled={!!search.get('edit')}
+										disabled
 										{...field}
 										options={filteredRequirements ?? []}
 										value={field.value || ''}
@@ -535,7 +538,7 @@ const AboutBuildingScreen = () => {
 						</FormElementLabel>
 						<div className="flex items-center gap-x-[70px]">
 							<label className="font-sans text-sm font-semibold leading-6">
-								Поэтажные планы (pdf)
+								Поэтажные планы (pdf) и конструкции
 							</label>
 							<Controller
 								control={control}
@@ -555,7 +558,7 @@ const AboutBuildingScreen = () => {
 						</div>
 						<div className="flex items-center gap-x-[50px]">
 							<label className="font-sans text-sm font-semibold leading-6">
-								BIM-модель (в разработке)
+								BIM модель (ifc)
 							</label>
 							<Controller
 								control={control}

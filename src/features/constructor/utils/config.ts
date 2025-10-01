@@ -1,5 +1,6 @@
 import type { EntityConfig } from '@core';
-import { ReportCategory } from '../types';
+import { BuildingType, CategoryClass, Country } from '@features/guidbooks/types';
+import { PurposeBuilding, ReportCategory } from '../types';
 import { AddConstructionSchema, CreateConstructionSchema, FormReportSchema } from './validation';
 import { AboutBuildingSchema } from './validation/about-building.validation';
 import { DesigningSchema } from './validation/designing.validation';
@@ -8,12 +9,12 @@ import { FloorPlansSchema } from './validation/floor-plans.validation';
 export const AboutBuildingConfig: EntityConfig = {
 	schema: AboutBuildingSchema,
 	defaultValues: {
-		name: '',
-		region: '',
-		buildingPurpose: '',
-		buildingType: '',
-		maxHeight: '',
-		comfortClass: '',
+		name: 'Проект',
+		region: Country.Belarus,
+		buildingPurpose: PurposeBuilding.FramePanelBuilding,
+		buildingType: BuildingType.ResidentialBuildings,
+		maxHeight: '27',
+		comfortClass: CategoryClass.B,
 		requirement: '',
 		isFloorPlan: ReportCategory.Single,
 		isBim: false,
