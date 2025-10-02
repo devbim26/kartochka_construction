@@ -437,9 +437,20 @@ const AboutBuildingScreen = () => {
 								/>
 							)}
 						/>
-						<FormElementLabel className="font-sans text-lg font-semibold leading-4 text-primary">
-							Требования
-						</FormElementLabel>
+						<div className="flex w-full items-center gap-[50px]">
+							<FormElementLabel className="w-[145px] font-sans text-lg font-semibold leading-4 text-primary">
+								Требования
+							</FormElementLabel>
+							<div className="flex w-full items-center gap-[12px]">
+								<FormElementLabel className="w-[226px] text-center font-sans text-lg font-semibold leading-4 text-primary">
+									Расчет
+								</FormElementLabel>
+								<FormElementLabel className="w-[226px] text-center font-sans text-lg font-semibold leading-4 text-primary">
+									Допустимые значения
+								</FormElementLabel>
+							</div>
+						</div>
+
 						<div className="flex gap-[12px]">
 							<Controller
 								control={control}
