@@ -6,6 +6,7 @@ export type Bill = {
 	billType: BillTypeEnum;
 	fileUrl: string;
 	userId: string;
+	subsctiptionName: string;
 };
 
 export type UpdateBill = {

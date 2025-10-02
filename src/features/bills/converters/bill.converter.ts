@@ -11,6 +11,7 @@ export const convertBillToClient = (data: BillDto): Bill => {
 		billType: convertToClientBillType(data.billType!),
 		fileUrl: data.fileUrl || '',
 		userId: data.userId || '',
+		subsctiptionName: data.subscriptionName || '',
 	};
 };
 

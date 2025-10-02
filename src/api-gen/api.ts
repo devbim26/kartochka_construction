@@ -59,6 +59,7 @@ export interface BillDto {
 	fileUrl?: string | null;
 	/** @format uuid */
 	userId?: string;
+	subscriptionName?: string | null;
 }
 
 export interface BillDtoPaginatedList {

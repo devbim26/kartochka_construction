@@ -23,6 +23,12 @@ export const billColumns: ColumnDef<Bill>[] = [
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 	},
 	{
+		id: 'subscriptionName',
+		accessorKey: 'subsctiptionName',
+		header: () => <SimpleTableHeaderCell text={'Подписка'} />,
+		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+	},
+	{
 		id: 'billType',
 		accessorKey: 'billType',
 		header: () => <SimpleTableHeaderCell text={'Статус'} />,
