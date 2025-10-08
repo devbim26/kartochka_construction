@@ -1,4 +1,3 @@
-import type { ReportInfoFloorConstructionDto } from '@api-gen';
 import {
 	convertToPaginatedType,
 	convertToSelectValues,
@@ -9,16 +8,9 @@ import {
 } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { convertToUpdateReportCommand } from '@features/constructor/converters';
-import {
-	getReportFloorById,
-	getReportSingleById,
-	updateReportFloor,
-	updateReportSingle,
-} from '@features/constructor/services';
-import { constructorSlice } from '@features/constructor/store';
+import { updateReportFloor, updateReportSingle } from '@features/constructor/services';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
-import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
 
 import { CreateConstructionConfig } from '@features/constructor/utils';
 import { convertToClientConstructionsAddData } from '@features/guidbooks/converters';
@@ -78,41 +70,41 @@ export const CreateConstructionForm = memoize(
 			},
 		}));
 
-		useEffect(() => {
-			if (!search.get('reportId')) return;
-			from(
-				reportType == ReportCategory.Floor
-					? getReportFloorById({ id: search.get('reportId')! })
-					: getReportSingleById({ id: search.get('reportId')! }),
-			)
-				.pipe(
-					catchError((error) => {
-						return from([null]);
-					}),
-				)
-				.subscribe((response) => {
-					const requirement = response?.data?.requirements?.[0];
-					if (!requirement) return;
-					const firstRoom = requirement.firstPlacementRoom;
-					const secondRoom = requirement.secondPlacementRoom;
-					if (
-						reportType == ReportCategory.Floor &&
-						!!(response as AxiosResponse<ReportInfoFloorConstructionDto>).data
-							.floorConstructionInfos?.length
-					) {
-						setLayerId(
-							(response as AxiosResponse<ReportInfoFloorConstructionDto>)?.data
-								?.floorConstructionInfos?.[0]?.id,
-						);
-					}
-					setValue('firstPlacementRoom', firstRoom!.id!);
-					setValue('secondPlacementRoom', secondRoom!.id!);
-					setRoomOptions([
-						{ label: firstRoom!.name!, value: firstRoom!.id! },
-						{ label: secondRoom!.name!, value: secondRoom!.id! },
-					]);
-				});
-		}, [reportId, reportType, setValue]);
+		// useEffect(() => {
+		// 	if (!search.get('reportId')) return;
+		// 	from(
+		// 		reportType == ReportCategory.Floor
+		// 			? getReportFloorById({ id: search.get('reportId')! })
+		// 			: getReportSingleById({ id: search.get('reportId')! }),
+		// 	)
+		// 		.pipe(
+		// 			catchError((error) => {
+		// 				return from([null]);
+		// 			}),
+		// 		)
+		// 		.subscribe((response) => {
+		// 			const requirement = response?.data?.requirements?.[0];
+		// 			if (!requirement) return;
+		// 			const firstRoom = requirement.firstPlacementRoom;
+		// 			const secondRoom = requirement.secondPlacementRoom;
+		// 			if (
+		// 				reportType == ReportCategory.Floor &&
+		// 				!!(response as AxiosResponse<ReportInfoFloorConstructionDto>).data
+		// 					.floorConstructionInfos?.length
+		// 			) {
+		// 				setLayerId(
+		// 					(response as AxiosResponse<ReportInfoFloorConstructionDto>)?.data
+		// 						?.floorConstructionInfos?.[0]?.id,
+		// 				);
+		// 			}
+		// 			setValue('firstPlacementRoom', firstRoom!.id!);
+		// 			setValue('secondPlacementRoom', secondRoom!.id!);
+		// 			setRoomOptions([
+		// 				{ label: firstRoom!.name!, value: firstRoom!.id! },
+		// 				{ label: secondRoom!.name!, value: secondRoom!.id! },
+		// 			]);
+		// 		});
+		// }, [reportId, reportType, setValue]);
 
 		const handleAddConstruction = (data: CreateConstructionData) => {
 			if (reportId) {
@@ -149,43 +141,43 @@ export const CreateConstructionForm = memoize(
 					.subscribe((response) => {
 						if (response?.status === 200) {
 							toast.success('Конструкция успешно добавлена в отчёт');
-							if (reportType == ReportCategory.Floor)
-								from(getReportFloorById({ id: reportId! })).subscribe(
-									(response) => {
-										dispatch(
-											constructorSlice.actions.setInfo(
-												response.data.floorConstructionInfos?.[0]
-													.reportFloorInfos?.[0] || {},
-											),
-										);
-										dispatch(
-											constructorSlice.actions.setConstructionsSheet(
-												response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
-													(info) => ({
-														id: info.id,
-														title:
-															info.reportConstructionHeader
-																?.constructionHeader?.name ||
-															'Нет названия',
-														floorPlanImage: info.documentImageUrl || '',
-														constructionId:
-															info.reportConstructionHeader
-																?.constructionHeaderId,
-														constructionInfoImage:
-															info.documentImageUrl || '',
-														square:
-															info.reportConstructionHeader?.square ||
-															'0',
-														materials:
-															info.reportConstructionHeader
-																?.constructionHeader
-																?.constructionType?.constructions,
-													}),
-												) as ConstructionSheet[],
-											),
-										);
-									},
-								);
+							// if (reportType == ReportCategory.Floor)
+							// 	from(getReportFloorById({ id: reportId! })).subscribe(
+							// 		(response) => {
+							// 			dispatch(
+							// 				constructorSlice.actions.setInfo(
+							// 					response.data.floorConstructionInfos?.[0]
+							// 						.reportFloorInfos?.[0] || {},
+							// 				),
+							// 			);
+							// 			dispatch(
+							// 				constructorSlice.actions.setConstructionsSheet(
+							// 					response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
+							// 						(info) => ({
+							// 							id: info.id,
+							// 							title:
+							// 								info.reportConstructionHeader
+							// 									?.constructionHeader?.name ||
+							// 								'Нет названия',
+							// 							floorPlanImage: info.documentImageUrl || '',
+							// 							constructionId:
+							// 								info.reportConstructionHeader
+							// 									?.constructionHeaderId,
+							// 							constructionInfoImage:
+							// 								info.documentImageUrl || '',
+							// 							square:
+							// 								info.reportConstructionHeader?.square ||
+							// 								'0',
+							// 							materials:
+							// 								info.reportConstructionHeader
+							// 									?.constructionHeader
+							// 									?.constructionType?.constructions,
+							// 						}),
+							// 					) as ConstructionSheet[],
+							// 				),
+							// 			);
+							// 		},
+							// 	);
 						}
 					});
 			} else {

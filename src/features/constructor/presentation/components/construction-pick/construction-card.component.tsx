@@ -1,9 +1,5 @@
 import type { ReportConstructionDto } from '@api-gen';
 import { FormElementLabel } from '@core';
-import { formatMaterial } from '@features/constructor/utils';
-import { convertToClientConstructionType } from '@features/guidbooks/converters';
-import type { ConstructionTypeEnum, UserMaterials } from '@features/guidbooks/types';
-import { RuConstructionTypesMap } from '@features/guidbooks/types';
 import issuer from '../../../../../assets/issuer.png';
 import {
 	GeneralInformationFireResistance,
@@ -20,15 +16,15 @@ type Props = {
 export const ConstructionCard = ({ construction, svgUrl }: Props) => {
 	return (
 		<div className="flex flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
-			<p className="font-sans text-lg font-semibold leading-4">
+			{/* <p className="font-sans text-lg font-semibold leading-4">
 				{
 					RuConstructionTypesMap[
 						convertToClientConstructionType(
-							construction.constructionHeader!.constructionType!,
+							construction.!.constructionType!,
 						).constructionTypeEnum as ConstructionTypeEnum
 					]
 				}
-			</p>
+			</p> */}
 			<div className="flex flex-row justify-between">
 				<div className="flex w-1/2 flex-col gap-[10px]">
 					<div className="flex items-center gap-[20px]">
@@ -43,7 +39,7 @@ export const ConstructionCard = ({ construction, svgUrl }: Props) => {
 						{svgUrl && (
 							<img className="h-full w-[200px]" src={svgUrl} alt="SVG Construction" />
 						)}
-						<div className="flex w-fit flex-col">
+						{/* <div className="flex w-fit flex-col">
 							{construction?.constructionHeader?.constructionType?.constructions?.map(
 								(construction: any, index) =>
 									construction.userMaterials?.map(
@@ -57,7 +53,7 @@ export const ConstructionCard = ({ construction, svgUrl }: Props) => {
 										),
 									),
 							)}
-						</div>
+						</div> */}
 					</div>
 
 					<p className="text-primary">Стоимость</p>

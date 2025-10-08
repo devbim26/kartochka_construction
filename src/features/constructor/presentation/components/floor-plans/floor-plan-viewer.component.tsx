@@ -1,26 +1,11 @@
-import {
-	Button,
-	ChevronIcon,
-	convertBase64ToFile,
-	useAppDispatch,
-	useAppNavigate,
-	useAppSelector,
-} from '@core';
+import { Button, ChevronIcon, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
-import { getReportFloorById, uploadImage, uploadScreenshot } from '@features/constructor/services';
-import { constructorSlice, stopLoading } from '@features/constructor/store';
-import type { ConstructionSheet } from '@features/constructor/types';
-import { ReportCategory } from '@features/constructor/types';
-import { convertToClientConstructionTypeEnumData } from '@features/guidbooks/converters';
-import { RuConstructionTypesMap } from '@features/guidbooks/types';
-import { AxiosError } from 'axios';
+import { constructorSlice } from '@features/constructor/store';
 import * as pdfjs from 'pdfjs-dist';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { TbZoomReset } from 'react-icons/tb';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from } from 'rxjs';
-import { toast } from 'sonner';
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@5.1.91/build/pdf.worker.min.mjs`;
 
 type Props = {
@@ -189,147 +174,147 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 			page: pageNum.toString(),
 		});
 	};
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (!canvas) return;
-		if (pdfFile) {
-			from(renderPage(pageNum)).subscribe(() => {
-				if (info) {
-					if (info.page === pageNum) {
-						drawConstruction(
-							info.coordinates!.x! * scale,
-							info.coordinates!.y! * scale,
-							RuConstructionTypesMap[
-								convertToClientConstructionTypeEnumData(
-									info.reportConstructionHeader!.constructionHeader!
-										.constructionType!.constructionTypeEnum!,
-								)
-							],
-							info.reportConstructionHeader?.constructionHeader?.name || '',
-							info.reportConstructionHeader?.firstPlacementRoom?.name +
-								'/' +
-								info.reportConstructionHeader?.secondPlacementRoom?.name,
-						);
-						const rectWidth = 900;
-						const rectHeight = 400;
-						const centerX = info.coordinates!.x! * scale;
-						const centerY = info.coordinates!.y! * scale;
-						const startX = centerX - rectWidth / 2;
-						const startY = centerY - rectHeight / 2;
-						const croppedCanvas = document.createElement('canvas');
-						croppedCanvas.width = rectWidth;
-						croppedCanvas.height = rectHeight;
-						const croppedCtx = croppedCanvas.getContext('2d');
-						croppedCtx!.drawImage(
-							canvas,
-							startX,
-							startY,
-							rectWidth,
-							rectHeight,
-							0,
-							0,
-							rectWidth,
-							rectHeight,
-						);
+	// useEffect(() => {
+	// 	const canvas = canvasRef.current;
+	// 	if (!canvas) return;
+	// 	if (pdfFile) {
+	// 		from(renderPage(pageNum)).subscribe(() => {
+	// 			if (info) {
+	// 				if (info.page === pageNum) {
+	// 					drawConstruction(
+	// 						info.coordinates!.x! * scale,
+	// 						info.coordinates!.y! * scale,
+	// 						RuConstructionTypesMap[
+	// 							convertToClientConstructionTypeEnumData(
+	// 								info.reportConstructionHeader!.constructionHeader!
+	// 									.constructionType!.constructionTypeEnum!,
+	// 							)
+	// 						],
+	// 						info.reportConstructionHeader?.constructionHeader?.name || '',
+	// 						info.reportConstructionHeader?.firstPlacementRoom?.name +
+	// 							'/' +
+	// 							info.reportConstructionHeader?.secondPlacementRoom?.name,
+	// 					);
+	// 					const rectWidth = 900;
+	// 					const rectHeight = 400;
+	// 					const centerX = info.coordinates!.x! * scale;
+	// 					const centerY = info.coordinates!.y! * scale;
+	// 					const startX = centerX - rectWidth / 2;
+	// 					const startY = centerY - rectHeight / 2;
+	// 					const croppedCanvas = document.createElement('canvas');
+	// 					croppedCanvas.width = rectWidth;
+	// 					croppedCanvas.height = rectHeight;
+	// 					const croppedCtx = croppedCanvas.getContext('2d');
+	// 					croppedCtx!.drawImage(
+	// 						canvas,
+	// 						startX,
+	// 						startY,
+	// 						rectWidth,
+	// 						rectHeight,
+	// 						0,
+	// 						0,
+	// 						rectWidth,
+	// 						rectHeight,
+	// 					);
 
-						const imageFile = convertBase64ToFile(
-							croppedCanvas.toDataURL('image/png'),
-							'file',
-							'image/png',
-						);
-						if (info) {
-							from(
-								uploadImage({
-									data: {
-										reportFloorInfoId: info.id,
-										floorDocumentImage: imageFile,
-									},
-								}),
-							)
-								.pipe(
-									catchError((error) => {
-										if (error instanceof AxiosError) {
-											toast.error(error.response?.data);
-										}
-										dispatch(stopLoading());
-										return from([null]);
-									}),
-								) //TODO: Не отпралвять одно и то же
-								.subscribe((response) => {
-									if (response?.status === 200) {
-										from(
-											uploadScreenshot({
-												data: {
-													floorConstructionInfoId: id,
-													floorScreenshot: imageFile,
-												},
-											}),
-										)
-											.pipe(
-												catchError((error) => {
-													if (error instanceof AxiosError) {
-														toast.error(error.response?.data);
-													}
-													dispatch(stopLoading());
-													return from([null]);
-												}),
-											)
-											.subscribe((response) => {
-												if (
-													search.get('reportType') ==
-														ReportCategory.Floor &&
-													response?.status === 200
-												)
-													from(
-														getReportFloorById({
-															id: search.get('reportId')!,
-														}),
-													).subscribe((response) => {
-														dispatch(
-															constructorSlice.actions.setConstructionsSheet(
-																response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
-																	(info) => ({
-																		id: info.id,
-																		title:
-																			info
-																				.reportConstructionHeader
-																				?.constructionHeader
-																				?.name ||
-																			'Нет названия',
-																		floorPlanImage:
-																			info.documentImageUrl ||
-																			'',
-																		constructionId:
-																			info
-																				.reportConstructionHeader
-																				?.constructionHeaderId,
-																		constructionInfoImage:
-																			info.documentImageUrl ||
-																			'',
-																		square:
-																			info
-																				.reportConstructionHeader
-																				?.square || '0',
-																		materials:
-																			info
-																				.reportConstructionHeader
-																				?.constructionHeader
-																				?.constructionType
-																				?.constructions,
-																	}),
-																) as ConstructionSheet[],
-															),
-														);
-													});
-											});
-									}
-								});
-						}
-					}
-				}
-			});
-		}
-	}, [pdfFile, pageNum, scale, info]);
+	// 					const imageFile = convertBase64ToFile(
+	// 						croppedCanvas.toDataURL('image/png'),
+	// 						'file',
+	// 						'image/png',
+	// 					);
+	// 					if (info) {
+	// 						from(
+	// 							uploadImage({
+	// 								data: {
+	// 									reportFloorInfoId: info.id,
+	// 									floorDocumentImage: imageFile,
+	// 								},
+	// 							}),
+	// 						)
+	// 							.pipe(
+	// 								catchError((error) => {
+	// 									if (error instanceof AxiosError) {
+	// 										toast.error(error.response?.data);
+	// 									}
+	// 									dispatch(stopLoading());
+	// 									return from([null]);
+	// 								}),
+	// 							) //TODO: Не отпралвять одно и то же
+	// 							.subscribe((response) => {
+	// 								if (response?.status === 200) {
+	// 									from(
+	// 										uploadScreenshot({
+	// 											data: {
+	// 												floorConstructionInfoId: id,
+	// 												floorScreenshot: imageFile,
+	// 											},
+	// 										}),
+	// 									)
+	// 										.pipe(
+	// 											catchError((error) => {
+	// 												if (error instanceof AxiosError) {
+	// 													toast.error(error.response?.data);
+	// 												}
+	// 												dispatch(stopLoading());
+	// 												return from([null]);
+	// 											}),
+	// 										)
+	// 										.subscribe((response) => {
+	// 											if (
+	// 												search.get('reportType') ==
+	// 													ReportCategory.Floor &&
+	// 												response?.status === 200
+	// 											)
+	// 												from(
+	// 													getReportFloorById({
+	// 														id: search.get('reportId')!,
+	// 													}),
+	// 												).subscribe((response) => {
+	// 													dispatch(
+	// 														constructorSlice.actions.setConstructionsSheet(
+	// 															response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
+	// 																(info) => ({
+	// 																	id: info.id,
+	// 																	title:
+	// 																		info
+	// 																			.reportConstructionHeader
+	// 																			?.constructionHeader
+	// 																			?.name ||
+	// 																		'Нет названия',
+	// 																	floorPlanImage:
+	// 																		info.documentImageUrl ||
+	// 																		'',
+	// 																	constructionId:
+	// 																		info
+	// 																			.reportConstructionHeader
+	// 																			?.constructionHeaderId,
+	// 																	constructionInfoImage:
+	// 																		info.documentImageUrl ||
+	// 																		'',
+	// 																	square:
+	// 																		info
+	// 																			.reportConstructionHeader
+	// 																			?.square || '0',
+	// 																	materials:
+	// 																		info
+	// 																			.reportConstructionHeader
+	// 																			?.constructionHeader
+	// 																			?.constructionType
+	// 																			?.constructions,
+	// 																}),
+	// 															) as ConstructionSheet[],
+	// 														),
+	// 													);
+	// 												});
+	// 										});
+	// 								}
+	// 							});
+	// 					}
+	// 				}
+	// 			}
+	// 		});
+	// 	}
+	// }, [pdfFile, pageNum, scale, info]);
 
 	const handlePrev = () => {
 		if (pageNum > 1) setPageNum(pageNum - 1);

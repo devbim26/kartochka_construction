@@ -87,11 +87,11 @@ export const GeneralInformationForm = () => {
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">
 						Общая толщина, мм
 					</p>
-					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
+					{/* <p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						{info?.constructionHeader?.constructionType?.constructions?.[0]?.userMaterials?.[0]?.materialTypeValue?.find(
 							(v) => v.materialParametrs === 'Thickness',
 						)?.value ?? '—'}
-					</p>
+					</p> */}
 				</div>
 				<div className="flex flex-row gap-[20px]">
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">

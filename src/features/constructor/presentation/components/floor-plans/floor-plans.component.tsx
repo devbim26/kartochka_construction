@@ -3,24 +3,12 @@ import Loader from '@core/presentation/components/loaders/loader.component';
 import { useAppDispatch, useAppNavigate, useAppSelector } from '@core/utils';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
-import {
-	deleteConstruction,
-	getReportFloorById,
-	getReportSingleById,
-	uploadDocument,
-} from '@features/constructor/services';
-import { constructorSlice, startLoading, stopLoading } from '@features/constructor/store';
-import { ReportCategory } from '@features/constructor/types';
-import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
-import { AxiosError } from 'axios';
-import * as pdfjs from 'pdfjs-dist';
-import { useEffect, useState } from 'react';
+import type * as pdfjs from 'pdfjs-dist';
+import { useState } from 'react';
 import { BsQuestionSquareFill } from 'react-icons/bs';
 import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from, mergeMap } from 'rxjs';
-import { toast } from 'sonner';
 import {
 	CreateConstructionForm,
 	CreateConstructionModal,
@@ -41,213 +29,213 @@ export const FloorPlans = memoize(() => {
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const constructionId = search.get('constructionId');
 
-	const handleUploadPdf = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-		const file = event.target.files?.[0];
+	// const handleUploadPdf = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+	// 	const file = event.target.files?.[0];
 
-		if (file && file.type === 'application/pdf') {
-			dispatch(startLoading());
-			from(
-				uploadDocument({
-					data: {
-						reportInfoId: reportId!,
-						floorNumber: '0',
-						floorDocument: file,
-						floorConstructionInfoId: '',
-					},
-				}),
-			)
-				.pipe(
-					catchError((error) => {
-						if (error instanceof AxiosError) {
-							toast.error(error.response?.data);
-						}
-						dispatch(stopLoading());
-						return from([null]);
-					}),
-				)
-				.subscribe((response) => {
-					if (response?.status === 200) {
-						dispatch(
-							constructorSlice.actions.setFloorConstructionInfoId(response.data),
-						);
-						toast.success('Файл успешно загружен');
-						from(getReportFloorById({ id: reportId! }))
-							.pipe(
-								mergeMap(async (response) => {
-									const fileUrl =
-										response?.data?.floorConstructionInfos?.[0]
-											?.floorDocumentUrl;
-									if (!fileUrl) {
-										throw new Error('Файл не найден');
-									}
+	// 	if (file && file.type === 'application/pdf') {
+	// 		dispatch(startLoading());
+	// 		from(
+	// 			uploadDocument({
+	// 				data: {
+	// 					reportInfoId: reportId!,
+	// 					floorNumber: '0',
+	// 					floorDocument: file,
+	// 					floorConstructionInfoId: '',
+	// 				},
+	// 			}),
+	// 		)
+	// 			.pipe(
+	// 				catchError((error) => {
+	// 					if (error instanceof AxiosError) {
+	// 						toast.error(error.response?.data);
+	// 					}
+	// 					dispatch(stopLoading());
+	// 					return from([null]);
+	// 				}),
+	// 			)
+	// 			.subscribe((response) => {
+	// 				if (response?.status === 200) {
+	// 					dispatch(
+	// 						constructorSlice.actions.setFloorConstructionInfoId(response.data),
+	// 					);
+	// 					toast.success('Файл успешно загружен');
+	// 					from(getReportFloorById({ id: reportId! }))
+	// 						.pipe(
+	// 							mergeMap(async (response) => {
+	// 								const fileUrl =
+	// 									response?.data?.floorConstructionInfos?.[0]
+	// 										?.floorDocumentUrl;
+	// 								if (!fileUrl) {
+	// 									throw new Error('Файл не найден');
+	// 								}
 
-									const fileResponse = await fetch(fileUrl);
+	// 								const fileResponse = await fetch(fileUrl);
 
-									const blob = await fileResponse.blob();
-									const arrayBuffer = await blob.arrayBuffer();
-									const pdf = await pdfjs.getDocument({ data: arrayBuffer })
-										.promise;
+	// 								const blob = await fileResponse.blob();
+	// 								const arrayBuffer = await blob.arrayBuffer();
+	// 								const pdf = await pdfjs.getDocument({ data: arrayBuffer })
+	// 									.promise;
 
-									dispatch(
-										constructorSlice.actions.setInfo(
-											response.data.floorConstructionInfos?.[0]
-												.reportFloorInfos?.[0] || {},
-										),
-									);
+	// 								dispatch(
+	// 									constructorSlice.actions.setInfo(
+	// 										response.data.floorConstructionInfos?.[0]
+	// 											.reportFloorInfos?.[0] || {},
+	// 									),
+	// 								);
 
-									dispatch(
-										constructorSlice.actions.setConstructionsSheet(
-											response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
-												(info) => ({
-													id: info.id,
-													constructionId:
-														info.reportConstructionHeader
-															?.constructionHeaderId,
-													title:
-														info.reportConstructionHeader
-															?.constructionHeader?.name ||
-														'Нет названия',
-													floorPlanImage: info.documentImageUrl || '',
-													constructionInfoImage:
-														info.documentImageUrl || '',
-													square:
-														info.reportConstructionHeader?.square ||
-														'0',
-													materials:
-														info.reportConstructionHeader
-															?.constructionHeader?.constructionType
-															?.constructions,
-												}),
-											) as ConstructionSheet[],
-										),
-									);
-									return pdf;
-								}),
-							)
-							.subscribe((pdf) => {
-								setPdfDoc(pdf);
-								dispatch(stopLoading());
-							});
-					}
-				});
-		}
-	};
+	// 								dispatch(
+	// 									constructorSlice.actions.setConstructionsSheet(
+	// 										response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
+	// 											(info) => ({
+	// 												id: info.id,
+	// 												constructionId:
+	// 													info.reportConstructionHeader
+	// 														?.constructionHeaderId,
+	// 												title:
+	// 													info.reportConstructionHeader
+	// 														?.constructionHeader?.name ||
+	// 													'Нет названия',
+	// 												floorPlanImage: info.documentImageUrl || '',
+	// 												constructionInfoImage:
+	// 													info.documentImageUrl || '',
+	// 												square:
+	// 													info.reportConstructionHeader?.square ||
+	// 													'0',
+	// 												materials:
+	// 													info.reportConstructionHeader
+	// 														?.constructionHeader?.constructionType
+	// 														?.constructions,
+	// 											}),
+	// 										) as ConstructionSheet[],
+	// 									),
+	// 								);
+	// 								return pdf;
+	// 							}),
+	// 						)
+	// 						.subscribe((pdf) => {
+	// 							setPdfDoc(pdf);
+	// 							dispatch(stopLoading());
+	// 						});
+	// 				}
+	// 			});
+	// 	}
+	// };
 
-	const getReports = (reportId: string, reportType: ReportCategory) => {
-		dispatch(startLoading());
-		reportType === ReportCategory.Single
-			? from(getReportSingleById({ id: reportId }))
-					.pipe(
-						catchError((error) => {
-							if (error instanceof AxiosError) {
-								toast.error(error.response?.data);
-							}
-							dispatch(stopLoading());
-							return from([null]);
-						}),
-					)
-					.subscribe((response) => {
-						const reportCategory = response?.data?.category;
-						if (reportCategory) {
-							setCategory(reportCategory);
-						}
-						if (!!response!.data.singleConstructionInfos?.length) {
-							dispatch(
-								constructorSlice.actions.setInfo(
-									response!.data.singleConstructionInfos?.[0]
-										.reportConstructionHeader || {},
-								),
-							);
-							dispatch(
-								constructorSlice.actions.setConstructionsSheet(
-									response!.data.singleConstructionInfos?.[0]
-										.reportConstructionHeader || {},
-								),
-							);
-						}
-					})
-			: from(getReportFloorById({ id: reportId }))
-					.pipe(
-						catchError((error) => {
-							if (error instanceof AxiosError) {
-								toast.error(error.response?.data);
-							}
-							dispatch(stopLoading());
-							return from([null]);
-						}),
-					)
-					.subscribe(async (response) => {
-						const reportCategory = response?.data?.category;
-						if (reportCategory) {
-							setCategory(reportCategory);
-						}
-						const fileUrl =
-							response?.data?.floorConstructionInfos?.[0]?.floorDocumentUrl;
-						if (fileUrl) {
-							const fileResponse = await fetch(fileUrl);
+	// const getReports = (reportId: string, reportType: ReportCategory) => {
+	// 	dispatch(startLoading());
+	// 	reportType === ReportCategory.Single
+	// 		? from(getReportSingleById({ id: reportId }))
+	// 				.pipe(
+	// 					catchError((error) => {
+	// 						if (error instanceof AxiosError) {
+	// 							toast.error(error.response?.data);
+	// 						}
+	// 						dispatch(stopLoading());
+	// 						return from([null]);
+	// 					}),
+	// 				)
+	// 				.subscribe((response) => {
+	// 					const reportCategory = response?.data?.category;
+	// 					if (reportCategory) {
+	// 						setCategory(reportCategory);
+	// 					}
+	// 					if (!!response!.data.singleConstructionInfos?.length) {
+	// 						dispatch(
+	// 							constructorSlice.actions.setInfo(
+	// 								response!.data.singleConstructionInfos?.[0]
+	// 									.reportConstructionHeader || {},
+	// 							),
+	// 						);
+	// 						dispatch(
+	// 							constructorSlice.actions.setConstructionsSheet(
+	// 								response!.data.singleConstructionInfos?.[0]
+	// 									.reportConstructionHeader || {},
+	// 							),
+	// 						);
+	// 					}
+	// 				})
+	// 		: from(getReportFloorById({ id: reportId }))
+	// 				.pipe(
+	// 					catchError((error) => {
+	// 						if (error instanceof AxiosError) {
+	// 							toast.error(error.response?.data);
+	// 						}
+	// 						dispatch(stopLoading());
+	// 						return from([null]);
+	// 					}),
+	// 				)
+	// 				.subscribe(async (response) => {
+	// 					const reportCategory = response?.data?.category;
+	// 					if (reportCategory) {
+	// 						setCategory(reportCategory);
+	// 					}
+	// 					const fileUrl =
+	// 						response?.data?.floorConstructionInfos?.[0]?.floorDocumentUrl;
+	// 					if (fileUrl) {
+	// 						const fileResponse = await fetch(fileUrl);
 
-							const blob = await fileResponse.blob();
-							const arrayBuffer = await blob.arrayBuffer();
-							from(pdfjs.getDocument({ data: arrayBuffer }).promise).subscribe(
-								(result) => setPdfDoc(result),
-							);
-						}
-						if (!!response?.data.floorConstructionInfos?.length) {
-							dispatch(
-								constructorSlice.actions.setInfo(
-									response!.data.floorConstructionInfos?.[0]
-										.reportFloorInfos?.[0] || {},
-								),
-							);
-							dispatch(
-								constructorSlice.actions.setConstructionsSheet(
-									response!.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
-										(info) => ({
-											id: info.id,
-											constructionId:
-												info.reportConstructionHeader?.constructionHeaderId,
-											title:
-												info.reportConstructionHeader?.constructionHeader
-													?.name || 'Нет названия',
-											floorPlanImage: info.documentImageUrl || '',
-											constructionInfoImage: info.documentImageUrl || '',
-											square: info.reportConstructionHeader?.square || '0',
-											materials:
-												info.reportConstructionHeader?.constructionHeader
-													?.constructionType?.constructions,
-										}),
-									) as ConstructionSheet[],
-								),
-							);
-						} else {
-						}
-					});
-	};
+	// 						const blob = await fileResponse.blob();
+	// 						const arrayBuffer = await blob.arrayBuffer();
+	// 						from(pdfjs.getDocument({ data: arrayBuffer }).promise).subscribe(
+	// 							(result) => setPdfDoc(result),
+	// 						);
+	// 					}
+	// 					if (!!response?.data.floorConstructionInfos?.length) {
+	// 						dispatch(
+	// 							constructorSlice.actions.setInfo(
+	// 								response!.data.floorConstructionInfos?.[0]
+	// 									.reportFloorInfos?.[0] || {},
+	// 							),
+	// 						);
+	// 						dispatch(
+	// 							constructorSlice.actions.setConstructionsSheet(
+	// 								response!.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
+	// 									(info) => ({
+	// 										id: info.id,
+	// 										constructionId:
+	// 											info.reportConstructionHeader?.constructionHeaderId,
+	// 										title:
+	// 											info.reportConstructionHeader?.constructionHeader
+	// 												?.name || 'Нет названия',
+	// 										floorPlanImage: info.documentImageUrl || '',
+	// 										constructionInfoImage: info.documentImageUrl || '',
+	// 										square: info.reportConstructionHeader?.square || '0',
+	// 										materials:
+	// 											info.reportConstructionHeader?.constructionHeader
+	// 												?.constructionType?.constructions,
+	// 									}),
+	// 								) as ConstructionSheet[],
+	// 							),
+	// 						);
+	// 					} else {
+	// 					}
+	// 				});
+	// };
 
-	const deleteConstructionHandle = (id: string) => {
-		from(deleteConstruction(id))
-			.pipe(
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
-					}
-					dispatch(stopLoading());
-					return from([null]);
-				}),
-			)
-			.subscribe((response) => {
-				if (!reportId) return;
-				if (response?.status === 200) {
-					toast.success('Успешное удаление');
-				}
-				getReports(reportId, reportType as ReportCategory);
-			});
-	};
+	// const deleteConstructionHandle = (id: string) => {
+	// 	from(deleteConstruction(id))
+	// 		.pipe(
+	// 			catchError((error) => {
+	// 				if (error instanceof AxiosError) {
+	// 					toast.error(error.response?.data);
+	// 				}
+	// 				dispatch(stopLoading());
+	// 				return from([null]);
+	// 			}),
+	// 		)
+	// 		.subscribe((response) => {
+	// 			if (!reportId) return;
+	// 			if (response?.status === 200) {
+	// 				toast.success('Успешное удаление');
+	// 			}
+	// 			getReports(reportId, reportType as ReportCategory);
+	// 		});
+	// };
 
-	useEffect(() => {
-		if (!reportId) return;
-		getReports(reportId, reportType as ReportCategory);
-	}, [reportId, reportType]);
+	// useEffect(() => {
+	// 	if (!reportId) return;
+	// 	getReports(reportId, reportType as ReportCategory);
+	// }, [reportId, reportType]);
 
 	return (
 		<div className="relative">
@@ -299,7 +287,7 @@ export const FloorPlans = memoize(() => {
 										>
 											Загрузить план этажа
 										</Button>
-										<input
+										{/* <input
 											type="file"
 											id="pdf-upload"
 											accept="application/pdf"
@@ -308,7 +296,7 @@ export const FloorPlans = memoize(() => {
 										/>
 										<p className="font-sans text-lg leading-4 text-input-border-primary">
 											или
-										</p>
+										</p> */}
 										<Button
 											onClick={() =>
 												navigate(``, {
@@ -367,7 +355,7 @@ export const FloorPlans = memoize(() => {
 							onCancel={() => window.history.back()}
 							onClose={() => window.history.back()}
 							onConfirm={() => {
-								deleteConstructionHandle(constructionId || '');
+								//deleteConstructionHandle(constructionId || '');
 								window.history.back();
 							}}
 							headerTitle="Подтвердите действие"

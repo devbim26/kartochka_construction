@@ -235,7 +235,8 @@ const AboutBuildingScreen = () => {
 				tap((resData) => {
 					setRequirementData(resData.items);
 					if (!!resData.items.length) {
-						setValue('requirement', resData.items[0].id!);
+						setValue('calculationRequirementId', resData.items[0].id!);
+						setValue('regulatoryRequirementId', resData.items[0].id!);
 					}
 				}),
 				catchError((error) => {
@@ -311,7 +312,11 @@ const AboutBuildingScreen = () => {
 									{...field}
 									value={field.value || ''}
 									onChange={(val) => {
-										field.onChange(val), form.setValue('requirement', '');
+										field.onChange(val),
+											form.reset({
+												regulatoryRequirementId: '',
+												calculationRequirementId: '',
+											});
 									}}
 									label={formState.errors?.region?.message || 'Страна*'}
 									error={formState.errors.region?.message}
@@ -356,9 +361,12 @@ const AboutBuildingScreen = () => {
 									render={({ field }) => (
 										<Select
 											options={RuBuildingTypeSelectValues}
-											onChange={(value) => {
-												form.setValue('requirement', ''),
-													form.setValue('buildingType', value as string);
+											onChange={(val) => {
+												field.onChange(val),
+													form.reset({
+														regulatoryRequirementId: '',
+														calculationRequirementId: '',
+													});
 											}}
 											error={formState.errors.buildingType?.message}
 											value={field.value || ''}
@@ -415,9 +423,12 @@ const AboutBuildingScreen = () => {
 							render={({ field }) => (
 								<Select
 									options={RuCategoryClassSelectValues}
-									onChange={(value) => {
-										form.setValue('requirement', ''),
-											form.setValue('comfortClass', value as string);
+									onChange={(val) => {
+										field.onChange(val),
+											form.reset({
+												regulatoryRequirementId: '',
+												calculationRequirementId: '',
+											});
 									}}
 									value={field.value || ''}
 									label={
@@ -454,26 +465,26 @@ const AboutBuildingScreen = () => {
 						<div className="flex gap-[12px]">
 							<Controller
 								control={control}
-								name={'requirement'}
+								name={'calculationRequirementId'}
 								render={({ field }) => (
 									<Select
 										{...field}
 										options={filteredRequirements ?? []}
 										value={field.value || ''}
 										label={
-											formState.errors?.requirement?.message ||
+											formState.errors?.calculationRequirementId?.message ||
 											'Звукоизоляция*'
 										}
 										isSearchable
 										disabled={!!search.get('edit')}
-										error={formState.errors.requirement?.message}
+										error={formState.errors.calculationRequirementId?.message}
 										labelClassName={twMerge(
 											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
-											formState.errors.requirement?.message
+											formState.errors.calculationRequirementId?.message
 												? 'text-error'
 												: '',
 										)}
-										placeholder="Выберите требование"
+										placeholder="Выберите расч. требование"
 										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 									/>
@@ -481,7 +492,7 @@ const AboutBuildingScreen = () => {
 							/>
 							<Controller
 								control={control}
-								name={'requirement'}
+								name={'regulatoryRequirementId'}
 								render={({ field }) => (
 									<Select
 										{...field}
@@ -489,15 +500,15 @@ const AboutBuildingScreen = () => {
 										value={field.value || ''}
 										isSearchable
 										disabled={!!search.get('edit')}
-										error={formState.errors.requirement?.message}
-										placeholder="Выберите требование"
+										error={formState.errors.regulatoryRequirementId?.message}
+										placeholder="Выберите  требование"
 										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 									/>
 								)}
 							/>
 						</div>
-						<div className="flex gap-[12px]">
+						{/* <div className="flex gap-[12px]">
 							<Controller
 								control={control}
 								name={'requirement'}
@@ -542,7 +553,7 @@ const AboutBuildingScreen = () => {
 									/>
 								)}
 							/>
-						</div>
+						</div> */}
 
 						<FormElementLabel className="font-sans text-lg font-semibold leading-4 text-primary">
 							Ввод информации о конструкциях здания

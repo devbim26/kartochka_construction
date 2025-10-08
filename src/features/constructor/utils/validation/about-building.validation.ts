@@ -14,7 +14,8 @@ export const AboutBuildingSchema = z.object({
 		.refine((value) => Number.isInteger(Number(value)), 'Значение должно быть целым числом')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
 	comfortClass: z.string().min(1, 'Поле обязательно для заполнения'),
-	requirement: z.string().min(1, 'Поле обязательно для заполнения'),
+	calculationRequirementId: z.string().min(1, 'Поле обязательно для заполнения'),
+	regulatoryRequirementId: z.string().min(1, 'Поле обязательно для заполнения'),
 	isFloorPlan: z.nativeEnum(ReportCategory),
 	isBim: z.boolean(),
 });

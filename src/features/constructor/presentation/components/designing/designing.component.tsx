@@ -1,4 +1,4 @@
-import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
+import type { ConstructionHeaderDto } from '@api-gen';
 import { Button, Input, useAppDispatch, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import type { DesigningData, GraphDetailResponse } from '@features';
@@ -10,11 +10,7 @@ import {
 	stopLoading,
 } from '@features';
 import { graphDotsConverterToClient } from '@features/constructor/converters';
-import {
-	getReportFloorById,
-	graphDetail,
-	svgConstructionDetail,
-} from '@features/constructor/services';
+import { graphDetail, svgConstructionDetail } from '@features/constructor/services';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
 import {
 	convertToClientConstructionsEditData,
@@ -28,7 +24,7 @@ import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, finalize, from } from 'rxjs';
+import { catchError, from } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import DesigningGraph from './designing-graph.component';
@@ -53,36 +49,36 @@ const DesigningScreen = () => {
 		mode: 'onSubmit',
 	});
 
-	useEffect(() => {
-		if (!reportId) return;
-		dispatch(startLoading());
+	// useEffect(() => {
+	// 	if (!reportId) return;
+	// 	dispatch(startLoading());
 
-		const subscription = from(getReportFloorById({ id: reportId }))
-			.pipe(
-				catchError((error) => {
-					toast.error('Не удалось получить данные отчёта');
-					return [];
-				}),
-				finalize(() => {
-					dispatch(stopLoading());
-				}),
-			)
-			.subscribe((response) => {
-				const report: ReportInfoFloorConstructionDto | undefined = response?.data;
-				const reportConstructionHeader =
-					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-						?.reportConstructionHeader;
-				const header = reportConstructionHeader?.constructionHeader;
-				const headerId = reportConstructionHeader?.constructionHeaderId;
-				if (headerId) {
-					setConstructionHeaderId(headerId);
-				} else {
-					toast.error('Не найден constructionHeaderId');
-				}
-				setConstructionHeader(header || null);
-			});
-		return () => subscription.unsubscribe();
-	}, [reportId, refreshConstructionData, dispatch]);
+	// 	const subscription = from(getReportFloorById({ id: reportId }))
+	// 		.pipe(
+	// 			catchError((error) => {
+	// 				toast.error('Не удалось получить данные отчёта');
+	// 				return [];
+	// 			}),
+	// 			finalize(() => {
+	// 				dispatch(stopLoading());
+	// 			}),
+	// 		)
+	// 		.subscribe((response) => {
+	// 			const report: ReportInfoFloorConstructionDto | undefined = response?.data;
+	// 			const reportConstructionHeader =
+	// 				report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+	// 					?.reportConstructionHeader;
+	// 			const header = reportConstructionHeader?.constructionHeader;
+	// 			const headerId = reportConstructionHeader?.constructionHeaderId;
+	// 			if (headerId) {
+	// 				setConstructionHeaderId(headerId);
+	// 			} else {
+	// 				toast.error('Не найден constructionHeaderId');
+	// 			}
+	// 			setConstructionHeader(header || null);
+	// 		});
+	// 	return () => subscription.unsubscribe();
+	// }, [reportId, refreshConstructionData, dispatch]);
 
 	useEffect(() => {
 		if (!constructionHeader) return;

@@ -1,11 +1,11 @@
-import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
+import type { ConstructionHeaderDto } from '@api-gen';
 import { Button, ChevronIcon, useAppDispatch, useAppSelector } from '@core';
 import type { GraphDetailResponse } from '@features';
 import { startLoading, stopLoading } from '@features';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { graphDotsConverterToClient } from '@features/constructor/converters';
-import { getReportFloorById, graphDetail } from '@features/constructor/services';
+import { graphDetail } from '@features/constructor/services';
 import { RuMaterialParametrs } from '@features/constructor/types/material-parametrs.types';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
 import { RuMaterialTypeEnum } from '@features/guidbooks/types';
@@ -30,35 +30,35 @@ const MyConstructions = () => {
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const dispatch = useAppDispatch();
 
-	useEffect(() => {
-		if (!reportId) return;
-		from(getReportFloorById({ id: reportId }))
-			.pipe(
-				catchError((error) => {
-					toast.error('Не удалось получить данные отчёта');
-					return [];
-				}),
-			)
-			.subscribe((response) => {
-				const report: ReportInfoFloorConstructionDto | undefined = response?.data;
-				const constructionHeaderId =
-					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-						?.reportConstructionHeader?.constructionHeaderId;
-				const constructionHeader =
-					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-						?.reportConstructionHeader?.constructionHeader;
-				if (constructionHeaderId) {
-					setConstructionHeaderId(constructionHeaderId);
-				} else {
-					toast.error('Не найден constructionHeaderId');
-				}
-				if (constructionHeader) {
-					setConstructionHeader(constructionHeader);
-				} else {
-					toast.error('Не найден constructionHeader');
-				}
-			});
-	}, [reportId]);
+	// useEffect(() => {
+	// 	if (!reportId) return;
+	// 	from(getReportFloorById({ id: reportId }))
+	// 		.pipe(
+	// 			catchError((error) => {
+	// 				toast.error('Не удалось получить данные отчёта');
+	// 				return [];
+	// 			}),
+	// 		)
+	// 		.subscribe((response) => {
+	// 			const report: ReportInfoFloorConstructionDto | undefined = response?.data;
+	// 			const constructionHeaderId =
+	// 				report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+	// 					?.reportConstructionHeader?.constructionHeaderId;
+	// 			const constructionHeader =
+	// 				report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
+	// 					?.reportConstructionHeader?.constructionHeader;
+	// 			if (constructionHeaderId) {
+	// 				setConstructionHeaderId(constructionHeaderId);
+	// 			} else {
+	// 				toast.error('Не найден constructionHeaderId');
+	// 			}
+	// 			if (constructionHeader) {
+	// 				setConstructionHeader(constructionHeader);
+	// 			} else {
+	// 				toast.error('Не найден constructionHeader');
+	// 			}
+	// 		});
+	// }, [reportId]);
 
 	useEffect(() => {
 		const rwValue = constructionHeader?.rw || 0;
