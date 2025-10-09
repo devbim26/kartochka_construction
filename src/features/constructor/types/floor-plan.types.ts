@@ -6,4 +6,11 @@ type FloorPlanModalData = {
 	image: string;
 };
 
-export { type FloorPlansData, type FloorPlanModalData };
+type FloorFromReport = {
+	id: string;
+	reportFloorInfos: string[];
+	floorNumber: string;
+	floorDocumentUrl: string;
+};
+
+export { type FloorPlansData, type FloorPlanModalData, type FloorFromReport };

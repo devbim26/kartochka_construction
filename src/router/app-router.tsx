@@ -1,14 +1,20 @@
 import { APP_ROUTES } from '@core';
 import {
+	AboutBuildingSreen,
 	AccountScreen,
 	AuthorizationScreen,
 	CodeConfirmPage,
 	CompanyRegistrationPage,
+	ConstructionPickScreen,
 	ConstructionsScreen,
 	ConstructorLayout,
+	CONSTRUCTOR_ROUTES,
+	DesigningScreen,
 	DevScreen,
+	FloorPlansScreen,
 	GuidbooksLauout,
 	HomeScreen,
+	IFCModelScreen,
 	IssuersScreen,
 	LandingContent,
 	LandingScreen,
@@ -16,12 +22,14 @@ import {
 	MainScreen,
 	MaterialsScreen,
 	NotFoundScreen,
+	ReportFormScreen,
 	RequirementsScreen,
 	UserScreen,
 	UsersLayout,
 } from '@features';
 import { AUTH_ROUTES } from '@features/auth/constants';
 import { BillScreen } from '@features/bills';
+import MyConstructions from '@features/constructor/presentation/components/designing/my-costructions.component';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
 import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants';
 import { ArticlePage } from '@features/news/presentation/components/article-page.component';
@@ -51,7 +59,7 @@ export const AppRouter = () => {
 			<Route path={APP_ROUTES.designing.route} element={<HomeScreen />}>
 				<Route path={DESIGNING_ROUTES.main.route} element={<MainScreen />} />
 				<Route path={DESIGNING_ROUTES.constructor.route} element={<ConstructorLayout />}>
-					{/* <Route
+					<Route
 						path={CONSTRUCTOR_ROUTES.aboutBuilding.route}
 						element={<AboutBuildingSreen />}
 					/>
@@ -75,7 +83,7 @@ export const AppRouter = () => {
 						path={CONSTRUCTOR_ROUTES.reportForm.route}
 						element={<ReportFormScreen />}
 					/>
-					<Route path={CONSTRUCTOR_ROUTES.ifcModel.route} element={<IFCModelScreen />} /> */}
+					<Route path={CONSTRUCTOR_ROUTES.ifcModel.route} element={<IFCModelScreen />} />
 				</Route>
 				<Route path={DESIGNING_ROUTES.account.route} element={<AccountScreen />} />
 				<Route path={DESIGNING_ROUTES.accounts.route} element={<BillScreen />} />

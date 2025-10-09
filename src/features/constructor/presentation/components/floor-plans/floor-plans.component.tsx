@@ -3,12 +3,19 @@ import Loader from '@core/presentation/components/loaders/loader.component';
 import { useAppDispatch, useAppNavigate, useAppSelector } from '@core/utils';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
+import { convertToClientFloorInfo } from '@features/constructor/converters';
+import { getFloorById, uploadDocument } from '@features/constructor/services';
+import { startLoading, stopLoading } from '@features/constructor/store';
+import type { FloorFromReport } from '@features/constructor/types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
-import type * as pdfjs from 'pdfjs-dist';
+import { AxiosError } from 'axios';
+import * as pdfjs from 'pdfjs-dist';
 import { useState } from 'react';
 import { BsQuestionSquareFill } from 'react-icons/bs';
 import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
+import { catchError, from, of, switchMap, tap } from 'rxjs';
+import { toast } from 'sonner';
 import {
 	CreateConstructionForm,
 	CreateConstructionModal,
@@ -21,105 +28,67 @@ import { FloorPlanViewer } from './floor-plan-viewer.component';
 export const FloorPlans = memoize(() => {
 	const navigate = useAppNavigate();
 	const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
+	const [currentFloorInfo, setCurrentFloorInfo] = useState<FloorFromReport>();
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
 	const reportType = search.get('reportType');
-	const [category, setCategory] = useState<string | null>(null);
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
-	const constructionId = search.get('constructionId');
 
-	// const handleUploadPdf = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-	// 	const file = event.target.files?.[0];
+	const handleUploadPdf = (event: React.ChangeEvent<HTMLInputElement>): void => {
+		const file = event.target.files?.[0];
 
-	// 	if (file && file.type === 'application/pdf') {
-	// 		dispatch(startLoading());
-	// 		from(
-	// 			uploadDocument({
-	// 				data: {
-	// 					reportInfoId: reportId!,
-	// 					floorNumber: '0',
-	// 					floorDocument: file,
-	// 					floorConstructionInfoId: '',
-	// 				},
-	// 			}),
-	// 		)
-	// 			.pipe(
-	// 				catchError((error) => {
-	// 					if (error instanceof AxiosError) {
-	// 						toast.error(error.response?.data);
-	// 					}
-	// 					dispatch(stopLoading());
-	// 					return from([null]);
-	// 				}),
-	// 			)
-	// 			.subscribe((response) => {
-	// 				if (response?.status === 200) {
-	// 					dispatch(
-	// 						constructorSlice.actions.setFloorConstructionInfoId(response.data),
-	// 					);
-	// 					toast.success('Файл успешно загружен');
-	// 					from(getReportFloorById({ id: reportId! }))
-	// 						.pipe(
-	// 							mergeMap(async (response) => {
-	// 								const fileUrl =
-	// 									response?.data?.floorConstructionInfos?.[0]
-	// 										?.floorDocumentUrl;
-	// 								if (!fileUrl) {
-	// 									throw new Error('Файл не найден');
-	// 								}
+		if (!file || file.type !== 'application/pdf') {
+			toast.error('Выберите PDF-файл');
+			return;
+		}
 
-	// 								const fileResponse = await fetch(fileUrl);
+		dispatch(startLoading());
 
-	// 								const blob = await fileResponse.blob();
-	// 								const arrayBuffer = await blob.arrayBuffer();
-	// 								const pdf = await pdfjs.getDocument({ data: arrayBuffer })
-	// 									.promise;
-
-	// 								dispatch(
-	// 									constructorSlice.actions.setInfo(
-	// 										response.data.floorConstructionInfos?.[0]
-	// 											.reportFloorInfos?.[0] || {},
-	// 									),
-	// 								);
-
-	// 								dispatch(
-	// 									constructorSlice.actions.setConstructionsSheet(
-	// 										response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
-	// 											(info) => ({
-	// 												id: info.id,
-	// 												constructionId:
-	// 													info.reportConstructionHeader
-	// 														?.constructionHeaderId,
-	// 												title:
-	// 													info.reportConstructionHeader
-	// 														?.constructionHeader?.name ||
-	// 													'Нет названия',
-	// 												floorPlanImage: info.documentImageUrl || '',
-	// 												constructionInfoImage:
-	// 													info.documentImageUrl || '',
-	// 												square:
-	// 													info.reportConstructionHeader?.square ||
-	// 													'0',
-	// 												materials:
-	// 													info.reportConstructionHeader
-	// 														?.constructionHeader?.constructionType
-	// 														?.constructions,
-	// 											}),
-	// 										) as ConstructionSheet[],
-	// 									),
-	// 								);
-	// 								return pdf;
-	// 							}),
-	// 						)
-	// 						.subscribe((pdf) => {
-	// 							setPdfDoc(pdf);
-	// 							dispatch(stopLoading());
-	// 						});
-	// 				}
-	// 			});
-	// 	}
-	// };
+		from(
+			uploadDocument({
+				data: {
+					reportInfoId: reportId!,
+					floorNumber: '0',
+					floorDocument: file,
+					floorConstructionInfoId: '',
+				},
+			}),
+		)
+			.pipe(
+				switchMap((uploadResponse) => {
+					if (uploadResponse.status !== 200 || !uploadResponse.data) {
+						throw new Error('Ошибка при загрузке файла');
+					}
+					const uploadedFloorId = uploadResponse.data as string;
+					return from(getFloorById({ id: uploadedFloorId }));
+				}),
+				switchMap((floorResponse) => {
+					if (floorResponse.status !== 200 || !floorResponse.data) {
+						throw new Error('Ошибка получения данных этажа');
+					}
+					const { floorDocumentUrl } = convertToClientFloorInfo(floorResponse.data);
+					return from(fetch(floorDocumentUrl));
+				}),
+				switchMap((fileResponse) => from(fileResponse.blob())),
+				switchMap((blob) => from(blob.arrayBuffer())),
+				switchMap((arrayBuffer) => from(pdfjs.getDocument({ data: arrayBuffer }).promise)),
+				tap((pdf) => {
+					setPdfDoc(pdf);
+					toast.success('Файл успешно загружен');
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || 'Ошибка при загрузке');
+					} else {
+						toast.error((error as Error).message);
+					}
+					return of(null);
+				}),
+				tap(() => dispatch(stopLoading())),
+			)
+			.subscribe();
+	};
 
 	// const getReports = (reportId: string, reportType: ReportCategory) => {
 	// 	dispatch(startLoading());
@@ -283,11 +252,11 @@ export const FloorPlans = memoize(() => {
 											onClick={() =>
 												document.getElementById('pdf-upload')?.click()
 											}
-											disabled={category === 'Single'}
+											disabled={reportType === 'Single'}
 										>
 											Загрузить план этажа
 										</Button>
-										{/* <input
+										<input
 											type="file"
 											id="pdf-upload"
 											accept="application/pdf"
@@ -296,7 +265,7 @@ export const FloorPlans = memoize(() => {
 										/>
 										<p className="font-sans text-lg leading-4 text-input-border-primary">
 											или
-										</p> */}
+										</p>
 										<Button
 											onClick={() =>
 												navigate(``, {
@@ -305,7 +274,7 @@ export const FloorPlans = memoize(() => {
 													reportType: search.get('reportType')!,
 												})
 											}
-											disabled={category === 'Floor'}
+											disabled={reportType === 'Floor'}
 											className="h-[40px] w-[190px] bg-white px-[16px] text-[16px] text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
 										>
 											Создать конструкцию

@@ -1,17 +1,14 @@
 import type {
 	CountryType,
 	CreateReportInfoCommand,
+	NewFloorConstructionIfoDto,
 	ReportInfoShortDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
 import { convertToClientCountryData } from '@core';
 import { BuildingType, CategoryClass } from '@features/guidbooks/types';
-import {
-	PurposeBuilding,
-	ReportCategory,
-	type AboutBuildingData,
-	type ReportInfoUpdate,
-} from '../types';
+import type { AboutBuildingData, FloorFromReport, ReportInfoUpdate } from '../types';
+import { PurposeBuilding, ReportCategory } from '../types';
 
 export const convertToCreateReportInfoCommand = (
 	data: AboutBuildingData,
@@ -54,5 +51,14 @@ export const convertToUpdateReportInfoCommand = (
 		reportInfoId: data.reportInfoId,
 		description: data.commonDescription || '',
 		buildingName: data.name || '',
+	};
+};
+
+export const convertToClientFloorInfo = (data: NewFloorConstructionIfoDto): FloorFromReport => {
+	return {
+		id: data.id || '',
+		floorDocumentUrl: data.floorDocumentUrl || '',
+		floorNumber: data.floorNumber || '',
+		reportFloorInfos: data.reportFloorInfos?.map((data) => data.id || '') || [],
 	};
 };
