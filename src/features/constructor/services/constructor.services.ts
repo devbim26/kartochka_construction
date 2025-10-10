@@ -89,6 +89,12 @@ export const getFloorById = async ({ id }: GetReportByIdParams) => {
 	);
 };
 
+export const getFloorConstructionById = async (id: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoGetReportFloorInfoRenewDetail(id),
+	);
+};
+
 export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoSingleUpdate(data));
 };

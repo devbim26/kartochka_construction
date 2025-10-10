@@ -3,14 +3,21 @@ import Loader from '@core/presentation/components/loaders/loader.component';
 import { useAppDispatch, useAppNavigate, useAppSelector } from '@core/utils';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
-import { convertToClientFloorInfo } from '@features/constructor/converters';
-import { getFloorById, uploadDocument } from '@features/constructor/services';
+import {
+	convertToClientFloorConstruction,
+	convertToClientFloorInfo,
+} from '@features/constructor/converters';
+import {
+	getFloorById,
+	getFloorConstructionById,
+	uploadDocument,
+} from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
-import type { FloorFromReport } from '@features/constructor/types';
+import { ReportCategory, type FloorConstruction } from '@features/constructor/types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { AxiosError } from 'axios';
 import * as pdfjs from 'pdfjs-dist';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BsQuestionSquareFill } from 'react-icons/bs';
 import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
@@ -28,12 +35,55 @@ import { FloorPlanViewer } from './floor-plan-viewer.component';
 export const FloorPlans = memoize(() => {
 	const navigate = useAppNavigate();
 	const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
-	const [currentFloorInfo, setCurrentFloorInfo] = useState<FloorFromReport>();
+	const [currentReportFloorInfo, setCurrentReportFloorInfo] = useState<string[]>([]);
+	const [currentReportConstruction, setCurrentReportConstruction] = useState<FloorConstruction>();
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
 	const reportType = search.get('reportType');
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
+
+	const getFloorReportInfo = (floorId: string): void => {
+		from(getFloorById({ id: floorId }))
+			.pipe(
+				switchMap((floorResponse) => {
+					if (floorResponse.status !== 200 || !floorResponse.data) {
+						throw new Error('Ошибка получения данных этажа');
+					}
+
+					const { floorDocumentUrl, reportFloorInfos } = convertToClientFloorInfo(
+						floorResponse.data,
+					);
+					setCurrentReportFloorInfo(reportFloorInfos);
+
+					if (!floorDocumentUrl) return of(null);
+
+					return from(fetch(floorDocumentUrl));
+				}),
+				switchMap((fileResponse) => (fileResponse ? from(fileResponse.blob()) : of(null))),
+				switchMap((blob) => (blob ? from(blob.arrayBuffer()) : of(null))),
+				switchMap((arrayBuffer) => {
+					if (!arrayBuffer) return of(null);
+					return from(pdfjs.getDocument({ data: arrayBuffer }).promise);
+				}),
+				tap((pdf) => {
+					if (pdf) {
+						setPdfDoc(pdf);
+						toast.success('Файл успешно загружен');
+					}
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || 'Ошибка при загрузке');
+					} else {
+						toast.error((error as Error).message);
+					}
+					return of(null);
+				}),
+				tap(() => dispatch(stopLoading())),
+			)
+			.subscribe();
+	};
 
 	const handleUploadPdf = (event: React.ChangeEvent<HTMLInputElement>): void => {
 		const file = event.target.files?.[0];
@@ -67,7 +117,10 @@ export const FloorPlans = memoize(() => {
 					if (floorResponse.status !== 200 || !floorResponse.data) {
 						throw new Error('Ошибка получения данных этажа');
 					}
-					const { floorDocumentUrl } = convertToClientFloorInfo(floorResponse.data);
+					const { floorDocumentUrl, reportFloorInfos } = convertToClientFloorInfo(
+						floorResponse.data,
+					);
+					setCurrentReportFloorInfo(reportFloorInfos);
 					return from(fetch(floorDocumentUrl));
 				}),
 				switchMap((fileResponse) => from(fileResponse.blob())),
@@ -89,6 +142,51 @@ export const FloorPlans = memoize(() => {
 			)
 			.subscribe();
 	};
+
+	const fetchConstructionByFloorInfo = async (floorInfoId: string): Promise<void> => {
+		try {
+			const response = await getFloorConstructionById(floorInfoId);
+			if (response.status !== 200 || !response.data) {
+				throw new Error('Ошибка при получении конструкции');
+			}
+			setCurrentReportConstruction(convertToClientFloorConstruction(response.data));
+		} catch (error) {
+			toast.error('Ошибка при загрузке конструкции');
+		}
+	};
+
+	useEffect(() => {
+		if (!!currentReportFloorInfo[0]) {
+			const subscription = from(getFloorConstructionById(currentReportFloorInfo[0]))
+				.pipe(
+					switchMap((uploadResponse) => {
+						if (uploadResponse.status !== 200 || !uploadResponse.data) {
+							throw new Error('Ошибка при получении конструкции');
+						}
+						console.log(uploadResponse.data);
+						setCurrentReportConstruction(
+							convertToClientFloorConstruction(uploadResponse.data),
+						);
+						return from([null]);
+					}),
+				)
+				.subscribe({
+					error: (err) => {
+						toast.error('Ошибка при загрузке конструкции:', err);
+					},
+				});
+
+			return () => {
+				subscription.unsubscribe();
+			};
+		}
+	}, [currentReportFloorInfo]);
+
+	useEffect(() => {
+		if (reportType === ReportCategory.Floor && !!reportId) {
+			getFloorReportInfo(reportId);
+		}
+	}, [search]);
 
 	// const getReports = (reportId: string, reportType: ReportCategory) => {
 	// 	dispatch(startLoading());
@@ -244,7 +342,11 @@ export const FloorPlans = memoize(() => {
 						<div className="flex flex-col justify-center border-b">
 							<div className="flex flex-col items-center">
 								{pdfDoc ? (
-									<FloorPlanViewer pdfFile={pdfDoc} />
+									<FloorPlanViewer
+										pdfFile={pdfDoc}
+										currentConstruction={currentReportConstruction}
+										reportFloorInfoId={currentReportFloorInfo[0]}
+									/>
 								) : (
 									<div className="flex h-[518px] flex-col items-center justify-center gap-[20px]">
 										<Button

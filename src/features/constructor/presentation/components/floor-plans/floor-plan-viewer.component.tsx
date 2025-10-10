@@ -1,159 +1,44 @@
-import { Button, ChevronIcon, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
+import type { AppDispatch } from '@core';
+import { Button, ChevronIcon, useAppDispatch, useAppNavigate } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
-import { constructorSlice } from '@features/constructor/store';
+import { uploadImage, uploadScreenshot } from '@features/constructor/services';
+import { constructorSlice, stopLoading } from '@features/constructor/store';
+import type { FloorConstruction } from '@features/constructor/types';
+import {
+	cropCanvasToFile,
+	drawConstructionOnCanvas,
+	useRenderPage,
+} from '@features/constructor/utils';
+import { AxiosError } from 'axios';
 import * as pdfjs from 'pdfjs-dist';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { TbZoomReset } from 'react-icons/tb';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@5.1.91/build/pdf.worker.min.mjs`;
 
 type Props = {
 	pdfFile: pdfjs.PDFDocumentProxy;
+	currentConstruction?: FloorConstruction;
+	reportFloorInfoId?: string;
 };
 
-export const FloorPlanViewer = ({ pdfFile }: Props) => {
+export const FloorPlanViewer = ({ pdfFile, currentConstruction, reportFloorInfoId }: Props) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const renderTaskRef = useRef<pdfjs.RenderTask | null>(null);
 	const [pageNum, setPageNum] = useState(1);
 	const [numPages, setNumPages] = useState(0);
 	const [scale, setScale] = useState(1.5);
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const dispatch = useAppDispatch();
-	const [isRendering, setIsRendering] = useState(false);
+
+	const { renderPage, isRendering } = useRenderPage(pdfFile, canvasRef, scale);
+
 	useEffect(() => {
 		setNumPages(pdfFile.numPages);
 		setPageNum(1);
 	}, []);
-
-	const info = useAppSelector((store) => store.constructorData).reportInfo;
-	const id = useAppSelector((store) => store.constructorData.id);
-
-	const renderPage = useCallback(
-		async (num: number) => {
-			if (!pdfFile || !canvasRef.current) return;
-
-			if (renderTaskRef.current) {
-				try {
-					renderTaskRef.current.cancel();
-				} catch (error) {
-					console.warn('Ошибка отмены рендера:', error);
-				}
-			}
-
-			const page = await pdfFile.getPage(num);
-			const viewport = page.getViewport({ scale });
-
-			const canvas = canvasRef.current;
-			const context = canvas.getContext('2d');
-			if (!context) return;
-
-			canvas.width = viewport.width;
-			canvas.height = viewport.height;
-
-			setIsRendering(true);
-
-			renderTaskRef.current = page.render({
-				canvasContext: context,
-				viewport: viewport,
-			});
-
-			try {
-				await renderTaskRef.current.promise;
-			} catch (error) {
-				console.warn('Ошибка выполнения рендера:', error);
-			} finally {
-				setIsRendering(false);
-			}
-
-			renderTaskRef.current = null;
-		},
-		[scale, pageNum, pdfFile],
-	);
-
-	const drawConstruction = useCallback(
-		(
-			x: number,
-			y: number,
-			constructionName: string,
-			guidebookConstructionName: string,
-			dividedRooms: string,
-		) => {
-			const maxTextLength = Math.max(
-				constructionName.length,
-				guidebookConstructionName.length,
-				dividedRooms.length,
-			);
-
-			if (!canvasRef.current) return;
-			const canvas = canvasRef.current;
-			const context = canvas.getContext('2d');
-			if (!context) return;
-
-			const boxWidth = maxTextLength * 13;
-			const boxHeight = 70;
-			const padding = 10;
-			const arrowThickness = 2;
-			const dotSize = 2;
-
-			let boxX = x + 50;
-			const boxY = y - 100;
-
-			if (boxX + boxWidth + padding > canvas.width) {
-				boxX = x - 50 - boxWidth;
-			}
-
-			context.fillStyle = '#2175F3';
-			context.beginPath();
-			context.arc(x, y, dotSize, 0, Math.PI * 2);
-			context.fill();
-
-			context.strokeStyle = '#2175F3';
-			context.lineWidth = arrowThickness;
-			context.beginPath();
-			context.moveTo(x, y);
-			context.lineTo(boxX + 10, boxY + 45);
-			context.stroke();
-
-			context.fillStyle = 'white';
-			context.fillRect(boxX, boxY, boxWidth, boxHeight);
-			context.strokeStyle = '#2175F3';
-			context.lineWidth = 2;
-			context.strokeRect(boxX, boxY, boxWidth, boxHeight);
-
-			context.fillStyle = 'black';
-			context.font = '300 16px Source Sans Pro';
-			context.textAlign = 'left';
-			context.textBaseline = 'middle';
-			context.fillText(constructionName, boxX + 10, boxY + 20);
-
-			context.fillStyle = 'black';
-			context.font = '600 16px Source Sans Pro';
-			context.textAlign = 'left';
-			context.textBaseline = 'middle';
-			context.fillText('Конструкция:', boxX + 10, boxY + 35);
-
-			context.fillStyle = '#2175F3';
-			context.font = '800 16px Source Sans Pro';
-			context.textAlign = 'left';
-			context.textBaseline = 'middle';
-			context.fillText(guidebookConstructionName, boxX + 110, boxY + 35);
-
-			context.fillStyle = 'black';
-			context.font = '600 16px Source Sans Pro';
-			context.textAlign = 'left';
-			context.textBaseline = 'middle';
-			context.fillText('разделяет:', boxX + 10, boxY + 50);
-
-			context.fillStyle = 'black';
-			context.font = '800 16px Source Sans Pro';
-			context.textAlign = 'left';
-			context.textBaseline = 'middle';
-			context.fillText(dividedRooms, boxX + 90, boxY + 50);
-		},
-		[],
-	);
 
 	const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
 		event.preventDefault();
@@ -174,147 +59,68 @@ export const FloorPlanViewer = ({ pdfFile }: Props) => {
 			page: pageNum.toString(),
 		});
 	};
-	// useEffect(() => {
-	// 	const canvas = canvasRef.current;
-	// 	if (!canvas) return;
-	// 	if (pdfFile) {
-	// 		from(renderPage(pageNum)).subscribe(() => {
-	// 			if (info) {
-	// 				if (info.page === pageNum) {
-	// 					drawConstruction(
-	// 						info.coordinates!.x! * scale,
-	// 						info.coordinates!.y! * scale,
-	// 						RuConstructionTypesMap[
-	// 							convertToClientConstructionTypeEnumData(
-	// 								info.reportConstructionHeader!.constructionHeader!
-	// 									.constructionType!.constructionTypeEnum!,
-	// 							)
-	// 						],
-	// 						info.reportConstructionHeader?.constructionHeader?.name || '',
-	// 						info.reportConstructionHeader?.firstPlacementRoom?.name +
-	// 							'/' +
-	// 							info.reportConstructionHeader?.secondPlacementRoom?.name,
-	// 					);
-	// 					const rectWidth = 900;
-	// 					const rectHeight = 400;
-	// 					const centerX = info.coordinates!.x! * scale;
-	// 					const centerY = info.coordinates!.y! * scale;
-	// 					const startX = centerX - rectWidth / 2;
-	// 					const startY = centerY - rectHeight / 2;
-	// 					const croppedCanvas = document.createElement('canvas');
-	// 					croppedCanvas.width = rectWidth;
-	// 					croppedCanvas.height = rectHeight;
-	// 					const croppedCtx = croppedCanvas.getContext('2d');
-	// 					croppedCtx!.drawImage(
-	// 						canvas,
-	// 						startX,
-	// 						startY,
-	// 						rectWidth,
-	// 						rectHeight,
-	// 						0,
-	// 						0,
-	// 						rectWidth,
-	// 						rectHeight,
-	// 					);
 
-	// 					const imageFile = convertBase64ToFile(
-	// 						croppedCanvas.toDataURL('image/png'),
-	// 						'file',
-	// 						'image/png',
-	// 					);
-	// 					if (info) {
-	// 						from(
-	// 							uploadImage({
-	// 								data: {
-	// 									reportFloorInfoId: info.id,
-	// 									floorDocumentImage: imageFile,
-	// 								},
-	// 							}),
-	// 						)
-	// 							.pipe(
-	// 								catchError((error) => {
-	// 									if (error instanceof AxiosError) {
-	// 										toast.error(error.response?.data);
-	// 									}
-	// 									dispatch(stopLoading());
-	// 									return from([null]);
-	// 								}),
-	// 							) //TODO: Не отпралвять одно и то же
-	// 							.subscribe((response) => {
-	// 								if (response?.status === 200) {
-	// 									from(
-	// 										uploadScreenshot({
-	// 											data: {
-	// 												floorConstructionInfoId: id,
-	// 												floorScreenshot: imageFile,
-	// 											},
-	// 										}),
-	// 									)
-	// 										.pipe(
-	// 											catchError((error) => {
-	// 												if (error instanceof AxiosError) {
-	// 													toast.error(error.response?.data);
-	// 												}
-	// 												dispatch(stopLoading());
-	// 												return from([null]);
-	// 											}),
-	// 										)
-	// 										.subscribe((response) => {
-	// 											if (
-	// 												search.get('reportType') ==
-	// 													ReportCategory.Floor &&
-	// 												response?.status === 200
-	// 											)
-	// 												from(
-	// 													getReportFloorById({
-	// 														id: search.get('reportId')!,
-	// 													}),
-	// 												).subscribe((response) => {
-	// 													dispatch(
-	// 														constructorSlice.actions.setConstructionsSheet(
-	// 															response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
-	// 																(info) => ({
-	// 																	id: info.id,
-	// 																	title:
-	// 																		info
-	// 																			.reportConstructionHeader
-	// 																			?.constructionHeader
-	// 																			?.name ||
-	// 																		'Нет названия',
-	// 																	floorPlanImage:
-	// 																		info.documentImageUrl ||
-	// 																		'',
-	// 																	constructionId:
-	// 																		info
-	// 																			.reportConstructionHeader
-	// 																			?.constructionHeaderId,
-	// 																	constructionInfoImage:
-	// 																		info.documentImageUrl ||
-	// 																		'',
-	// 																	square:
-	// 																		info
-	// 																			.reportConstructionHeader
-	// 																			?.square || '0',
-	// 																	materials:
-	// 																		info
-	// 																			.reportConstructionHeader
-	// 																			?.constructionHeader
-	// 																			?.constructionType
-	// 																			?.constructions,
-	// 																}),
-	// 															) as ConstructionSheet[],
-	// 														),
-	// 													);
-	// 												});
-	// 										});
-	// 								}
-	// 							});
-	// 					}
-	// 				}
-	// 			}
-	// 		});
-	// 	}
-	// }, [pdfFile, pageNum, scale, info]);
+	const uploadImagesAndRefresh = async (
+		imageFile: File,
+		id: string,
+		dispatch: AppDispatch,
+	): Promise<void> => {
+		try {
+			const imageResponse = await uploadImage({
+				data: {
+					reportFloorInfoId: reportFloorInfoId,
+					floorDocumentImage: imageFile,
+				},
+			});
+
+			if (imageResponse.status !== 200) return;
+
+			const screenshotResponse = await uploadScreenshot({
+				data: {
+					floorConstructionInfoId: id,
+					floorScreenshot: imageFile,
+				},
+			});
+
+			if (screenshotResponse.status === 200) {
+				toast.success('Изображение и скриншот успешно загружены');
+			}
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				toast.error(error.response?.data);
+			}
+			dispatch(stopLoading());
+		}
+	};
+
+	useEffect(() => {
+		if (!pdfFile || !canvasRef.current) return;
+
+		const canvas = canvasRef.current;
+
+		renderPage(pageNum)
+			.then(() => {
+				if (currentConstruction) {
+					drawConstructionOnCanvas(canvas, currentConstruction, scale);
+
+					if (currentConstruction.page === pageNum) {
+						const centerX = currentConstruction.coordinates.x * scale;
+						const centerY = currentConstruction.coordinates.y * scale;
+						const imageFile = cropCanvasToFile(canvas, centerX, centerY, 900, 400);
+
+						uploadImagesAndRefresh(
+							imageFile,
+							currentConstruction.reportConstructionHeader.id,
+							dispatch,
+						);
+					}
+				}
+			})
+			.catch((error) => {
+				console.error('Ошибка при обработке конструкции:', error);
+				dispatch(stopLoading());
+			});
+	}, [pdfFile, pageNum, scale, currentConstruction]);
 
 	const handlePrev = () => {
 		if (pageNum > 1) setPageNum(pageNum - 1);

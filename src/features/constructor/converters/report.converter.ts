@@ -2,12 +2,18 @@ import type {
 	CountryType,
 	CreateReportInfoCommand,
 	NewFloorConstructionIfoDto,
+	NewReportFloorInfoDto,
 	ReportInfoShortDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
 import { convertToClientCountryData } from '@core';
 import { BuildingType, CategoryClass } from '@features/guidbooks/types';
-import type { AboutBuildingData, FloorFromReport, ReportInfoUpdate } from '../types';
+import type {
+	AboutBuildingData,
+	FloorConstruction,
+	FloorFromReport,
+	ReportInfoUpdate,
+} from '../types';
 import { PurposeBuilding, ReportCategory } from '../types';
 
 export const convertToCreateReportInfoCommand = (
@@ -60,5 +66,28 @@ export const convertToClientFloorInfo = (data: NewFloorConstructionIfoDto): Floo
 		floorDocumentUrl: data.floorDocumentUrl || '',
 		floorNumber: data.floorNumber || '',
 		reportFloorInfos: data.reportFloorInfos?.map((data) => data.id || '') || [],
+	};
+};
+
+export const convertToClientFloorConstruction = (
+	data: NewReportFloorInfoDto,
+): FloorConstruction => {
+	return {
+		documentImageUrl: data.documentImageUrl || '',
+		page: data.page || 0,
+		coordinates: { x: data.coordinates?.x || 0, y: data.coordinates?.y || 0 },
+		reportConstructionHeader: {
+			constructionHeaderId: data.reportConstructionHeader?.id || '',
+			square: data.reportConstructionHeader?.square || 0,
+			id: data.reportConstructionHeader?.id || '',
+			secondPlacementRoom: {
+				id: data.reportConstructionHeader?.secondPlacementRoom?.id || '',
+				name: data.reportConstructionHeader?.secondPlacementRoom?.name || '',
+			},
+			firstPlacemetnRoom: {
+				id: data.reportConstructionHeader?.firstPlacementRoom?.id || '',
+				name: data.reportConstructionHeader?.firstPlacementRoom?.name || '',
+			},
+		},
 	};
 };

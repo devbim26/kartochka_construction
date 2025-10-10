@@ -1082,6 +1082,8 @@ export interface ReportInfoShortDto {
 	category?: ReportCategory;
 	status?: ReportInfoStatus;
 	country?: CountryType;
+	calculationRequirements?: RequirementDto[] | null;
+	regulatoryRequirements?: RequirementDto[] | null;
 }
 
 export interface ReportInfoSingleConstructionDto {
@@ -1958,6 +1960,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags ImportExcelFile
+		 * @name ImportExcelFileCreate
+		 * @request POST:/api/ImportExcelFile
+		 */
+		importExcelFileCreate: (
+			data: {
+				/** @format binary */
+				formFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<CreateReportInfoDto, any>({
+				path: `/api/ImportExcelFile`,
+				method: 'POST',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags Issuer
 		 * @name IssuerDetail
 		 * @request GET:/api/Issuer/{id}
@@ -2549,7 +2574,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			},
 			params: RequestParams = {},
 		) =>
-			this.request<FloorConstructionInfoDto, any>({
+			this.request<string, any>({
 				path: `/api/ReportInfo/floor/document`,
 				method: 'PUT',
 				body: data,

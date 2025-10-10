@@ -1,0 +1,117 @@
+import { convertBase64ToFile } from '@core';
+import type { FloorConstruction } from '@features/constructor/types';
+
+export const drawConstruction = (
+	canvas: HTMLCanvasElement,
+	x: number,
+	y: number,
+	constructionName: string,
+	guidebookConstructionName: string,
+	dividedRooms: string,
+) => {
+	const context = canvas.getContext('2d');
+	if (!context) return;
+
+	const maxTextLength = Math.max(
+		constructionName.length,
+		guidebookConstructionName.length,
+		dividedRooms.length,
+	);
+
+	const boxWidth = maxTextLength * 13;
+	const boxHeight = 70;
+	const padding = 10;
+	const arrowThickness = 2;
+	const dotSize = 2;
+
+	let boxX = x + 50;
+	const boxY = y - 100;
+
+	if (boxX + boxWidth + padding > canvas.width) {
+		boxX = x - 50 - boxWidth;
+	}
+
+	context.fillStyle = '#2175F3';
+	context.beginPath();
+	context.arc(x, y, dotSize, 0, Math.PI * 2);
+	context.fill();
+
+	context.strokeStyle = '#2175F3';
+	context.lineWidth = arrowThickness;
+	context.beginPath();
+	context.moveTo(x, y);
+	context.lineTo(boxX + 10, boxY + 45);
+	context.stroke();
+
+	context.fillStyle = 'white';
+	context.fillRect(boxX, boxY, boxWidth, boxHeight);
+	context.strokeStyle = '#2175F3';
+	context.lineWidth = 2;
+	context.strokeRect(boxX, boxY, boxWidth, boxHeight);
+
+	context.fillStyle = 'black';
+	context.font = '300 16px Source Sans Pro';
+	context.fillText(constructionName, boxX + 10, boxY + 20);
+
+	context.font = '600 16px Source Sans Pro';
+	context.fillText('Конструкция:', boxX + 10, boxY + 35);
+
+	context.fillStyle = '#2175F3';
+	context.font = '800 16px Source Sans Pro';
+	context.fillText(guidebookConstructionName, boxX + 110, boxY + 35);
+
+	context.fillStyle = 'black';
+	context.font = '600 16px Source Sans Pro';
+	context.fillText('разделяет:', boxX + 10, boxY + 50);
+
+	context.font = '800 16px Source Sans Pro';
+	context.fillText(dividedRooms, boxX + 90, boxY + 50);
+};
+
+export const drawConstructionOnCanvas = (
+	canvas: HTMLCanvasElement,
+	info: FloorConstruction,
+	scale: number,
+): void => {
+	const { coordinates, reportConstructionHeader } = info;
+	const x = coordinates.x * scale;
+	const y = coordinates.y * scale;
+
+	drawConstruction(
+		canvas,
+		x,
+		y,
+		'Placeholder',
+		'Placeholder',
+		reportConstructionHeader.firstPlacemetnRoom.name +
+			'/' +
+			reportConstructionHeader.secondPlacementRoom.name,
+	);
+};
+
+export const cropCanvasToFile = (
+	canvas: HTMLCanvasElement,
+	centerX: number,
+	centerY: number,
+	width: number,
+	height: number,
+): File => {
+	const croppedCanvas = document.createElement('canvas');
+	croppedCanvas.width = width;
+	croppedCanvas.height = height;
+
+	const ctx = croppedCanvas.getContext('2d');
+	ctx?.drawImage(
+		canvas,
+		centerX - width / 2,
+		centerY - height / 2,
+		width,
+		height,
+		0,
+		0,
+		width,
+		height,
+	);
+
+	return convertBase64ToFile(croppedCanvas.toDataURL('image/png'), 'cropped.png', 'image/png');
+};
