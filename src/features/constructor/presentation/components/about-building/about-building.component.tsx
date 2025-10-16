@@ -64,11 +64,12 @@ const AboutBuildingScreen = () => {
 	const navigate = useAppNavigate();
 	const [requirementData, setRequirementData] = useState<Array<Requirement>>([]);
 	const [search] = useSearchParams();
-	const [selectedRegion, selectedType, selectedClass, reportType, name] = watch([
+	const [selectedRegion, selectedType, selectedClass, reportType, isConstruction, name] = watch([
 		'region',
 		'buildingType',
 		'comfortClass',
 		'isFloorPlan',
+		'isConstruction',
 		'name',
 	]);
 
@@ -151,7 +152,11 @@ const AboutBuildingScreen = () => {
 						const reportId = response.data.id;
 						navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
 							reportId,
-							reportType: reportType ? ReportCategory.Single : ReportCategory.Floor,
+							reportType: isConstruction
+								? ReportCategory.Single
+								: reportType
+									? ReportCategory.Floor
+									: ReportCategory.Floor,
 						});
 					}
 				}
@@ -577,7 +582,7 @@ const AboutBuildingScreen = () => {
 							</label>
 							<Controller
 								control={control}
-								name="isFloorPlan"
+								name="isConstruction"
 								render={({ field }) => (
 									<Switch
 										isEnabledProp={field.value}
@@ -600,7 +605,7 @@ const AboutBuildingScreen = () => {
 							</label>
 							<Controller
 								control={control}
-								name="isConstruction"
+								name="isFloorPlan"
 								render={({ field }) => (
 									<Switch
 										isEnabledProp={field.value}
