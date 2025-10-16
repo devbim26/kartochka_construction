@@ -1,6 +1,6 @@
 import type { EntityConfig } from '@core';
 import { BuildingType, CategoryClass, Country } from '@features/guidbooks/types';
-import { PurposeBuilding, ReportCategory } from '../types';
+import { PurposeBuilding } from '../types';
 import { AddConstructionSchema, CreateConstructionSchema, FormReportSchema } from './validation';
 import { AboutBuildingSchema } from './validation/about-building.validation';
 import { DesigningSchema } from './validation/designing.validation';
@@ -16,7 +16,8 @@ export const AboutBuildingConfig: EntityConfig = {
 		maxHeight: '27',
 		comfortClass: CategoryClass.B,
 		requirement: '',
-		isFloorPlan: ReportCategory.Single,
+		isFloorPlan: true,
+		isConstruction: false,
 		isBim: false,
 	},
 };

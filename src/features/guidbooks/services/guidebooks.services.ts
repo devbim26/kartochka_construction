@@ -103,3 +103,7 @@ export const getFirstPlacementRoomVariant = async (
 export const getSecondRoomVariant = async (data: GetPlacementRoomVariantByAllParametersQuery) => {
 	return await fetchApi.api.placementRoomVariantsGetSecondRoomCreate(data);
 };
+
+export const importMaterials = async (data: { formFile: File }) => {
+	return await fetchApi.api.importExcelFileCreate(data);
+};

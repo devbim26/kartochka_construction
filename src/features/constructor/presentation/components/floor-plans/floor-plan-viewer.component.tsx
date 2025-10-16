@@ -9,6 +9,7 @@ import {
 	drawConstructionOnCanvas,
 	useRenderPage,
 } from '@features/constructor/utils';
+import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
 import { AxiosError } from 'axios';
 import * as pdfjs from 'pdfjs-dist';
 import React, { useEffect, useRef, useState } from 'react';
@@ -22,9 +23,19 @@ type Props = {
 	pdfFile: pdfjs.PDFDocumentProxy;
 	currentConstruction?: FloorConstruction;
 	reportFloorInfoId?: string;
+	floorId?: string;
+	currentConstructionHeader?: ConstructionsEditData;
+	getData: () => void;
 };
 
-export const FloorPlanViewer = ({ pdfFile, currentConstruction, reportFloorInfoId }: Props) => {
+export const FloorPlanViewer = ({
+	pdfFile,
+	currentConstruction,
+	reportFloorInfoId,
+	floorId,
+	getData,
+	currentConstructionHeader,
+}: Props) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [pageNum, setPageNum] = useState(1);
 	const [numPages, setNumPages] = useState(0);
@@ -32,6 +43,8 @@ export const FloorPlanViewer = ({ pdfFile, currentConstruction, reportFloorInfoI
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const dispatch = useAppDispatch();
+
+	const previousConstructionRef = useRef<FloorConstruction | null>(null);
 
 	const { renderPage, isRendering } = useRenderPage(pdfFile, canvasRef, scale);
 
@@ -54,6 +67,7 @@ export const FloorPlanViewer = ({ pdfFile, currentConstruction, reportFloorInfoI
 			create: 'true',
 			reportId: search.get('reportId')!.toString(),
 			reportType: search.get('reportType')!.toString(),
+			layerId: floorId || '',
 			x: (x / scale).toString(),
 			y: (y / scale).toString(),
 			page: pageNum.toString(),
@@ -77,13 +91,14 @@ export const FloorPlanViewer = ({ pdfFile, currentConstruction, reportFloorInfoI
 
 			const screenshotResponse = await uploadScreenshot({
 				data: {
-					floorConstructionInfoId: id,
+					floorConstructionInfoId: floorId,
 					floorScreenshot: imageFile,
 				},
 			});
 
 			if (screenshotResponse.status === 200) {
 				toast.success('Изображение и скриншот успешно загружены');
+				getData();
 			}
 		} catch (error) {
 			if (error instanceof AxiosError) {
@@ -93,35 +108,6 @@ export const FloorPlanViewer = ({ pdfFile, currentConstruction, reportFloorInfoI
 		}
 	};
 
-	useEffect(() => {
-		if (!pdfFile || !canvasRef.current) return;
-
-		const canvas = canvasRef.current;
-
-		renderPage(pageNum)
-			.then(() => {
-				if (currentConstruction) {
-					drawConstructionOnCanvas(canvas, currentConstruction, scale);
-
-					if (currentConstruction.page === pageNum) {
-						const centerX = currentConstruction.coordinates.x * scale;
-						const centerY = currentConstruction.coordinates.y * scale;
-						const imageFile = cropCanvasToFile(canvas, centerX, centerY, 900, 400);
-
-						uploadImagesAndRefresh(
-							imageFile,
-							currentConstruction.reportConstructionHeader.id,
-							dispatch,
-						);
-					}
-				}
-			})
-			.catch((error) => {
-				console.error('Ошибка при обработке конструкции:', error);
-				dispatch(stopLoading());
-			});
-	}, [pdfFile, pageNum, scale, currentConstruction]);
-
 	const handlePrev = () => {
 		if (pageNum > 1) setPageNum(pageNum - 1);
 	};
@@ -129,6 +115,61 @@ export const FloorPlanViewer = ({ pdfFile, currentConstruction, reportFloorInfoI
 	const handleNext = () => {
 		if (pdfFile && pageNum < numPages) setPageNum(pageNum + 1);
 	};
+
+	useEffect(() => {
+		if (!pdfFile || !canvasRef.current) return;
+
+		const canvas = canvasRef.current;
+
+		renderPage(pageNum)
+			.then(() => {
+				if (currentConstruction?.page === pageNum && currentConstructionHeader) {
+					drawConstructionOnCanvas(
+						canvas,
+						currentConstruction,
+						scale,
+						currentConstructionHeader?.constructionType as ConstructionTypeEnum,
+						currentConstructionHeader?.name || 'Placeholder',
+					);
+
+					const prev = previousConstructionRef.current;
+					const hasChanged =
+						!prev ||
+						prev.reportConstructionHeader.id !==
+							currentConstruction.reportConstructionHeader.id ||
+						prev.coordinates.x !== currentConstruction.coordinates.x ||
+						prev.coordinates.y !== currentConstruction.coordinates.y;
+
+					if (hasChanged) {
+						requestAnimationFrame(() => {
+							requestAnimationFrame(() => {
+								const centerX = currentConstruction.coordinates.x * scale;
+								const centerY = currentConstruction.coordinates.y * scale;
+								const imageFile = cropCanvasToFile(
+									canvas,
+									centerX,
+									centerY,
+									900,
+									400,
+								);
+
+								uploadImagesAndRefresh(
+									imageFile,
+									currentConstruction.reportConstructionHeader.id,
+									dispatch,
+								);
+
+								previousConstructionRef.current = currentConstruction;
+							});
+						});
+					}
+				}
+			})
+			.catch((error) => {
+				console.error('Ошибка при отрисовке PDF:', error);
+				dispatch(stopLoading());
+			});
+	}, [pdfFile, pageNum, scale, currentConstruction, currentConstructionHeader]);
 
 	return (
 		<div className="flex items-center justify-center rounded-[20px] py-[30px]">
@@ -166,6 +207,10 @@ export const FloorPlanViewer = ({ pdfFile, currentConstruction, reportFloorInfoI
 								<FaMinus />
 							</Button>
 						</div>
+						<p className="text-[18px] text-primary">
+							Для создания конструкции нажмите правую кнопку мыши над требуемой к
+							расчету конструкцией
+						</p>
 						<div className="flex items-center gap-[10px]">
 							<Button
 								onClick={handlePrev}

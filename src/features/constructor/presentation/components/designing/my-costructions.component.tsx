@@ -1,17 +1,20 @@
-import type { ConstructionHeaderDto } from '@api-gen';
 import { Button, ChevronIcon, useAppDispatch, useAppSelector } from '@core';
-import type { GraphDetailResponse } from '@features';
-import { startLoading, stopLoading } from '@features';
+import type { GraphDetailResponse, ReportInfoShort } from '@features';
+import { formatMaterial, ReportCategory, startLoading, stopLoading } from '@features';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
-import { graphDotsConverterToClient } from '@features/constructor/converters';
-import { graphDetail } from '@features/constructor/services';
-import { RuMaterialParametrs } from '@features/constructor/types/material-parametrs.types';
+import {
+	convertToClientReportInfoShort,
+	graphDotsConverterToClient,
+} from '@features/constructor/converters';
+import { getReportFloorById, graphDetail } from '@features/constructor/services';
+import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
-import { RuMaterialTypeEnum } from '@features/guidbooks/types';
+import { getGuidebooksDetail } from '@features/guidbooks/services';
+import { Guidebooks, type ConstructionsEditData } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from } from 'rxjs';
+import { catchError, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import issuer from '../../../../../assets/issuer.png';
@@ -23,48 +26,69 @@ const MyConstructions = () => {
 	const reportId = search.get('reportId');
 	const [graphData, setGraphData] = useState<GraphDetailResponse[] | null>(null);
 	const [isRelevant, setIsRelevant] = useState<boolean>(false);
-	const [constructionHeaderId, setConstructionHeaderId] = useState<string | undefined>(undefined);
-	const [constructionHeader, setConstructionHeader] = useState<ConstructionHeaderDto | null>(
+	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
+	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
+	const reportType = search.get('reportType');
+	const constructionHeaderId = search.get('constructionHeaderId');
+
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const dispatch = useAppDispatch();
 
-	// useEffect(() => {
-	// 	if (!reportId) return;
-	// 	from(getReportFloorById({ id: reportId }))
-	// 		.pipe(
-	// 			catchError((error) => {
-	// 				toast.error('Не удалось получить данные отчёта');
-	// 				return [];
-	// 			}),
-	// 		)
-	// 		.subscribe((response) => {
-	// 			const report: ReportInfoFloorConstructionDto | undefined = response?.data;
-	// 			const constructionHeaderId =
-	// 				report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-	// 					?.reportConstructionHeader?.constructionHeaderId;
-	// 			const constructionHeader =
-	// 				report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-	// 					?.reportConstructionHeader?.constructionHeader;
-	// 			if (constructionHeaderId) {
-	// 				setConstructionHeaderId(constructionHeaderId);
-	// 			} else {
-	// 				toast.error('Не найден constructionHeaderId');
-	// 			}
-	// 			if (constructionHeader) {
-	// 				setConstructionHeader(constructionHeader);
-	// 			} else {
-	// 				toast.error('Не найден constructionHeader');
-	// 			}
-	// 		});
-	// }, [reportId]);
+	const handleGetCurrentReportFloorInfo = (id: string) => {
+		dispatch(startLoading());
+		from(getReportFloorById({ id: id }))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setCurrentReportInfo(convertToClientReportInfoShort(response.data));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации об отчете');
+					return of(null);
+				}),
+			)
+			.subscribe(() => dispatch(stopLoading()));
+	};
+
+	const handleGetConstructionByHeaderId = (id: string) => {
+		dispatch(startLoading());
+		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.CONSTRUCTION }))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setConstructionHeader(convertToClientConstructionsEditData(response.data));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации о конструкции');
+					return of(null);
+				}),
+			)
+			.subscribe(() => dispatch(stopLoading()));
+	};
 
 	useEffect(() => {
-		const rwValue = constructionHeader?.rw || 0;
-		const relevant = rwValue >= 55;
-		setIsRelevant(relevant);
-	}, [constructionHeader?.rw]);
+		if (!reportId || !constructionHeaderId) return;
+		handleGetConstructionByHeaderId(constructionHeaderId);
+	}, [reportId, constructionHeaderId]);
+
+	useEffect(() => {
+		reportType === ReportCategory.Floor && reportId
+			? handleGetCurrentReportFloorInfo(reportId)
+			: () => {};
+	}, [reportType, reportId]);
+
+	useEffect(() => {
+		const rwValue = +(constructionHeader?.RCalcs || 0);
+		setIsRelevant(
+			rwValue >= +(currentReportInfo?.regulatoryRequirement.noizeImpactIndex || 55),
+		);
+	}, [constructionHeader?.RCalcs, currentReportInfo]);
 
 	useEffect(() => {
 		if (!constructionHeaderId || graphData) return;
@@ -88,24 +112,8 @@ const MyConstructions = () => {
 	}, [constructionHeaderId]);
 
 	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
-	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
-
-	const formatMaterial = (material: (typeof materials)[0]) => {
-		const materialType =
-			RuMaterialTypeEnum[material.materialType as keyof typeof RuMaterialTypeEnum] ??
-			material.materialType;
-		const materialParams =
-			material.materialTypeValue
-				?.map((val) => {
-					const param =
-						RuMaterialParametrs[
-							val.materialParametrs as keyof typeof RuMaterialParametrs
-						] ?? val.materialParametrs;
-					return `${param}: ${val.value}`;
-				})
-				.join(', ') || 'нет данных';
-		return `${materialType} (${materialParams})`;
-	};
+	const materials =
+		constructionHeader?.constructionTypeObject?.constructions?.[0]?.userMaterials || [];
 
 	if (isLoading) {
 		return (
@@ -156,7 +164,7 @@ const MyConstructions = () => {
 				<div className="flex flex-col">
 					<p className="text-[12px] italic">СП 275.1325800.2016</p>
 					<p className="text-[12px] italic">Защита от шума, Россия </p>
-					<p className="text-[25px] font-[600]">Rw = {constructionHeader?.rw} dB</p>
+					<p className="text-[25px] font-[600]">Rw = {constructionHeader?.RCalcs} dB</p>
 					<p
 						className={twMerge(
 							'text-[20px] font-[600]',

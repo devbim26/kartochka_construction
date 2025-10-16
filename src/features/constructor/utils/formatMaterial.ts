@@ -2,19 +2,16 @@ import { RuMaterialTypeEnum, type UserMaterials } from '@features/guidbooks/type
 import { RuMaterialParametrs } from '../types';
 
 export const formatMaterial = (material: UserMaterials) => {
-	console.log(material);
 	const materialType =
 		RuMaterialTypeEnum[material.materialType as keyof typeof RuMaterialTypeEnum] ??
 		material.materialType;
-	console.log(materialType);
 	const materialParams =
 		material.materialTypeValue
 			?.map((val) => {
-				console.log(val);
 				const param =
 					RuMaterialParametrs[
-						val.materialParametrs as keyof typeof RuMaterialParametrs
-					] ?? val.materialParametrs;
+						val.materialParameters as keyof typeof RuMaterialParametrs
+					] ?? val.materialParameters;
 				return `${param}: ${val.value}`;
 			})
 			.join(', ') || 'нет данных';

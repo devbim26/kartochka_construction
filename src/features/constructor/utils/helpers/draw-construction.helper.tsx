@@ -1,5 +1,7 @@
 import { convertBase64ToFile } from '@core';
 import type { FloorConstruction } from '@features/constructor/types';
+import type { ConstructionTypeEnum } from '@features/guidbooks/types';
+import { RuConstructionTypesMap } from '@features/guidbooks/types';
 
 export const drawConstruction = (
 	canvas: HTMLCanvasElement,
@@ -72,6 +74,8 @@ export const drawConstructionOnCanvas = (
 	canvas: HTMLCanvasElement,
 	info: FloorConstruction,
 	scale: number,
+	constructionType?: ConstructionTypeEnum,
+	constructionName?: string,
 ): void => {
 	const { coordinates, reportConstructionHeader } = info;
 	const x = coordinates.x * scale;
@@ -81,8 +85,8 @@ export const drawConstructionOnCanvas = (
 		canvas,
 		x,
 		y,
-		'Placeholder',
-		'Placeholder',
+		constructionType ? RuConstructionTypesMap[constructionType] : '',
+		constructionName || 'Placeholder',
 		reportConstructionHeader.firstPlacemetnRoom.name +
 			'/' +
 			reportConstructionHeader.secondPlacementRoom.name,
@@ -97,21 +101,20 @@ export const cropCanvasToFile = (
 	height: number,
 ): File => {
 	const croppedCanvas = document.createElement('canvas');
-	croppedCanvas.width = width;
-	croppedCanvas.height = height;
-
 	const ctx = croppedCanvas.getContext('2d');
-	ctx?.drawImage(
-		canvas,
-		centerX - width / 2,
-		centerY - height / 2,
-		width,
-		height,
-		0,
-		0,
-		width,
-		height,
-	);
+
+	const startX = Math.max(centerX - width / 2, 0);
+	const startY = Math.max(centerY - height / 2, 0);
+
+	const maxWidth = canvas.width - startX;
+	const maxHeight = canvas.height - startY;
+	const cropWidth = Math.min(width, maxWidth);
+	const cropHeight = Math.min(height, maxHeight);
+
+	croppedCanvas.width = cropWidth;
+	croppedCanvas.height = cropHeight;
+
+	ctx?.drawImage(canvas, startX, startY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
 
 	return convertBase64ToFile(croppedCanvas.toDataURL('image/png'), 'cropped.png', 'image/png');
 };

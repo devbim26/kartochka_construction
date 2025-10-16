@@ -7,14 +7,18 @@ import type {
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
 import { convertToClientCountryData } from '@core';
+import { convertToClientRequirementTableData } from '@features/guidbooks/converters';
+import type { ConstructionsEditData } from '@features/guidbooks/types';
 import { BuildingType, CategoryClass } from '@features/guidbooks/types';
 import type {
 	AboutBuildingData,
+	ConstructionSheet,
 	FloorConstruction,
 	FloorFromReport,
 	ReportInfoUpdate,
 } from '../types';
-import { PurposeBuilding, ReportCategory } from '../types';
+import { ReportCategory } from '../types';
+import type { ReportInfoShort } from '../utils';
 
 export const convertToCreateReportInfoCommand = (
 	data: AboutBuildingData,
@@ -28,7 +32,7 @@ export const convertToCreateReportInfoCommand = (
 		regulatoryRequirementIds: data.regulatoryRequirementId
 			? [data.regulatoryRequirementId]
 			: null,
-		category: data.isFloorPlan,
+		category: data.isFloorPlan ? ReportCategory.Floor : ReportCategory.Single,
 		country: data.region as CountryType,
 	};
 };
@@ -38,14 +42,35 @@ export const convertToClientReportInfo = (data: ReportInfoShortDto): AboutBuildi
 		...data,
 		commonDescription: data.description,
 		name: data.buildingName || '',
-		calculationRequirementId: '', //не хватает в шорте
-		regulatoryRequirementId: '', // не хватает в шорте
+		calculationRequirementId: data.calculationRequirements![0].id!,
+		regulatoryRequirementId: data.regulatoryRequirements![0].id!,
 		region: convertToClientCountryData(data.country!) as string,
-		buildingPurpose: PurposeBuilding.FramePanelBuilding,
+		buildingPurpose: data.purposeBuilding as string,
 		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
 		comfortClass: CategoryClass.A, //convertToClientCategoryClassData(data.requirements![0]!.class!), не хватает в шорте
 		maxHeight: '0',
-		isFloorPlan: ReportCategory.Floor,
+		isFloorPlan: true,
+		isConstruction: false,
+		isBim: true,
+	};
+};
+
+export const convertToClientReportInfoShort = (data: ReportInfoShortDto): ReportInfoShort => {
+	return {
+		...data,
+		commonDescription: data.description,
+		name: data.buildingName || '',
+		calculationRequirement: convertToClientRequirementTableData(
+			data.calculationRequirements![0],
+		),
+		regulatoryRequirement: convertToClientRequirementTableData(data.regulatoryRequirements![0]),
+		region: convertToClientCountryData(data.country!) as string,
+		buildingPurpose: data.purposeBuilding as string,
+		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
+		comfortClass: CategoryClass.A, //convertToClientCategoryClassData(data.requirements![0]!.class!), не хватает в шорте
+		maxHeight: '0',
+		isFloorPlan: true,
+		isConstruction: false,
 		isBim: true,
 	};
 };
@@ -77,7 +102,7 @@ export const convertToClientFloorConstruction = (
 		page: data.page || 0,
 		coordinates: { x: data.coordinates?.x || 0, y: data.coordinates?.y || 0 },
 		reportConstructionHeader: {
-			constructionHeaderId: data.reportConstructionHeader?.id || '',
+			constructionHeaderId: data.reportConstructionHeader?.constructionHeaderId || '',
 			square: data.reportConstructionHeader?.square || 0,
 			id: data.reportConstructionHeader?.id || '',
 			secondPlacementRoom: {
@@ -89,5 +114,20 @@ export const convertToClientFloorConstruction = (
 				name: data.reportConstructionHeader?.firstPlacementRoom?.name || '',
 			},
 		},
+	};
+};
+
+export const convertFloorDataToClientConstructionSheet = (
+	data: FloorConstruction,
+	constructionHeader: ConstructionsEditData,
+): ConstructionSheet => {
+	return {
+		constructionInfoImage: data.documentImageUrl || '',
+		square: String(data.reportConstructionHeader?.square) || '',
+		constructionId: data.reportConstructionHeader?.constructionHeaderId || '',
+		id: data.reportConstructionHeader?.id || '',
+		title: constructionHeader.name || 'Placeholder',
+		materials: [],
+		floorPlanImage: data.documentImageUrl || '',
 	};
 };

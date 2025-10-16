@@ -6,9 +6,16 @@ import {
 	useAppDispatch,
 	useAppSelector,
 } from '@core';
+import Loader from '@core/presentation/components/loaders/loader.component';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { convertToUpdateReportCommand } from '@features/constructor/converters';
-import { updateReportFloor, updateReportSingle } from '@features/constructor/services';
+import {
+	getReportFloorById,
+	getReportSingleById,
+	updateReportFloor,
+	updateReportSingle,
+} from '@features/constructor/services';
+import { startLoading, stopLoading } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
 
@@ -45,144 +52,116 @@ export const CreateConstructionForm = memoize(
 		});
 		const { register, formState, control, setValue, watch, handleSubmit, getValues } = form;
 		const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>([]);
-		const [layerId, setLayerId] = useState<string>();
-		const [length, width, construction, area] = watch([
+		const [length, width, construction, area, name] = watch([
 			'length',
 			'width',
 			'construction',
 			'area',
+			'name',
 		]);
 		const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>([]);
 		const [search] = useSearchParams();
 		const reportId = search.get('reportId');
 		const reportType = search.get('reportType');
+		const layerId = search.get('layerId');
+
+		const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 
 		const dispatch = useAppDispatch();
-
-		const image = useAppSelector((store) => store.constructorData).file;
 
 		useImperativeHandle(ref, () => ({
 			submit: () => {
 				handleSubmit((data) => {
 					handleAddConstruction(data);
-					onSuccess?.();
 				})();
 			},
 		}));
 
-		// useEffect(() => {
-		// 	if (!search.get('reportId')) return;
-		// 	from(
-		// 		reportType == ReportCategory.Floor
-		// 			? getReportFloorById({ id: search.get('reportId')! })
-		// 			: getReportSingleById({ id: search.get('reportId')! }),
-		// 	)
-		// 		.pipe(
-		// 			catchError((error) => {
-		// 				return from([null]);
-		// 			}),
-		// 		)
-		// 		.subscribe((response) => {
-		// 			const requirement = response?.data?.requirements?.[0];
-		// 			if (!requirement) return;
-		// 			const firstRoom = requirement.firstPlacementRoom;
-		// 			const secondRoom = requirement.secondPlacementRoom;
-		// 			if (
-		// 				reportType == ReportCategory.Floor &&
-		// 				!!(response as AxiosResponse<ReportInfoFloorConstructionDto>).data
-		// 					.floorConstructionInfos?.length
-		// 			) {
-		// 				setLayerId(
-		// 					(response as AxiosResponse<ReportInfoFloorConstructionDto>)?.data
-		// 						?.floorConstructionInfos?.[0]?.id,
-		// 				);
-		// 			}
-		// 			setValue('firstPlacementRoom', firstRoom!.id!);
-		// 			setValue('secondPlacementRoom', secondRoom!.id!);
-		// 			setRoomOptions([
-		// 				{ label: firstRoom!.name!, value: firstRoom!.id! },
-		// 				{ label: secondRoom!.name!, value: secondRoom!.id! },
-		// 			]);
-		// 		});
-		// }, [reportId, reportType, setValue]);
+		useEffect(() => {
+			if (!search.get('reportId')) return;
+
+			dispatch(startLoading());
+
+			from(
+				reportType === ReportCategory.Floor
+					? getReportFloorById({ id: search.get('reportId')! })
+					: getReportSingleById({ id: search.get('reportId')! }),
+			)
+				.pipe(
+					catchError((error) => {
+						console.error(error);
+						return from([null]);
+					}),
+				)
+				.subscribe((response) => {
+					const requirement = response?.data?.calculationRequirements?.[0];
+					if (requirement) {
+						const firstRoom = requirement.firstPlacementRoom;
+						const secondRoom = requirement.secondPlacementRoom;
+
+						setValue('firstPlacementRoom', firstRoom?.id ?? '');
+						setValue('secondPlacementRoom', secondRoom?.id ?? '');
+						setRoomOptions([
+							{ label: firstRoom?.name ?? '', value: firstRoom?.id ?? '' },
+							{ label: secondRoom?.name ?? '', value: secondRoom?.id ?? '' },
+						]);
+					}
+				});
+			dispatch(stopLoading());
+		}, [reportId, reportType]);
 
 		const handleAddConstruction = (data: CreateConstructionData) => {
-			if (reportId) {
-				const command = convertToUpdateReportCommand(reportId, data);
-				from(
-					reportType == ReportCategory.Floor
-						? updateReportFloor({
-								data: {
-									floorConstructionInfoId: layerId,
-									'floorInfo.coordinates.x': +search.get('x')!.split('.')[0]!,
-									'floorInfo.coordinates.y': +search.get('y')!.split('.')[0]!,
-									'floorInfo.page': +search.get('page')!,
-									'floorInfo.reportConstructionHeader.constructionHeaderId':
-										construction,
-									'floorInfo.reportConstructionHeader.square': +area,
-									'floorInfo.reportConstructionHeader.firstPlacementRoomId':
-										getValues('firstPlacementRoom'),
-									'floorInfo.reportConstructionHeader.secondPlacementRoomId':
-										getValues('secondPlacementRoom'),
-									'floorInfo.floorNumber': '1',
-									reportInfoId: search.get('reportId')!,
-								},
-							})
-						: updateReportSingle({ data: command }),
-				)
-					.pipe(
-						catchError((error) => {
-							if (error instanceof AxiosError) {
-								toast.error(error.response?.data);
-							}
-							return from([null]);
-						}),
-					)
-					.subscribe((response) => {
-						if (response?.status === 200) {
-							toast.success('Конструкция успешно добавлена в отчёт');
-							// if (reportType == ReportCategory.Floor)
-							// 	from(getReportFloorById({ id: reportId! })).subscribe(
-							// 		(response) => {
-							// 			dispatch(
-							// 				constructorSlice.actions.setInfo(
-							// 					response.data.floorConstructionInfos?.[0]
-							// 						.reportFloorInfos?.[0] || {},
-							// 				),
-							// 			);
-							// 			dispatch(
-							// 				constructorSlice.actions.setConstructionsSheet(
-							// 					response.data.floorConstructionInfos?.[0]?.reportFloorInfos?.map(
-							// 						(info) => ({
-							// 							id: info.id,
-							// 							title:
-							// 								info.reportConstructionHeader
-							// 									?.constructionHeader?.name ||
-							// 								'Нет названия',
-							// 							floorPlanImage: info.documentImageUrl || '',
-							// 							constructionId:
-							// 								info.reportConstructionHeader
-							// 									?.constructionHeaderId,
-							// 							constructionInfoImage:
-							// 								info.documentImageUrl || '',
-							// 							square:
-							// 								info.reportConstructionHeader?.square ||
-							// 								'0',
-							// 							materials:
-							// 								info.reportConstructionHeader
-							// 									?.constructionHeader
-							// 									?.constructionType?.constructions,
-							// 						}),
-							// 					) as ConstructionSheet[],
-							// 				),
-							// 			);
-							// 		},
-							// 	);
-						}
-					});
-			} else {
+			if (!reportId) {
 				toast.error('Не удалось найти ID отчёта');
+				return;
 			}
+
+			dispatch(startLoading());
+
+			const command = convertToUpdateReportCommand(reportId, data);
+
+			from(
+				reportType === ReportCategory.Floor
+					? updateReportFloor({
+							data: {
+								floorConstructionInfoId: layerId || '',
+								'floorInfo.coordinates.x': +search.get('x')!.split('.')[0]!,
+								'floorInfo.coordinates.y': +search.get('y')!.split('.')[0]!,
+								'floorInfo.page': +search.get('page')!,
+								'floorInfo.reportConstructionHeader.constructionHeaderId':
+									construction,
+								'floorInfo.reportConstructionHeader.square': +area,
+								'floorInfo.reportConstructionHeader.firstPlacementRoomId':
+									getValues('firstPlacementRoom'),
+								'floorInfo.reportConstructionHeader.secondPlacementRoomId':
+									getValues('secondPlacementRoom'),
+								'floorInfo.floorNumber': '1',
+								'floorInfo.reportConstructionHeader.name': name,
+								reportInfoId: reportId,
+							},
+						})
+					: updateReportSingle({ data: command }),
+			)
+				.pipe(
+					catchError((error) => {
+						if (error instanceof AxiosError) {
+							toast.error(
+								error.response?.data || 'Ошибка при добавлении конструкции',
+							);
+						} else {
+							toast.error('Неизвестная ошибка');
+						}
+						dispatch(stopLoading());
+						return from([null]);
+					}),
+				)
+				.subscribe((response) => {
+					if (response?.status === 200) {
+						toast.success('Конструкция успешно добавлена в отчёт');
+						onSuccess?.();
+					}
+					dispatch(stopLoading());
+				});
 		};
 
 		useEffect(() => {
@@ -194,6 +173,7 @@ export const CreateConstructionForm = memoize(
 		}, [length, width, setValue]);
 
 		const handleGetConstructionData = () => {
+			dispatch(startLoading());
 			from(
 				getGuidebooksPaginated({
 					data: {},
@@ -216,14 +196,20 @@ export const CreateConstructionForm = memoize(
 						return from([null]);
 					}),
 				)
-				.subscribe();
+				.subscribe(() => dispatch(stopLoading()));
 		};
 
 		useEffect(() => {
 			handleGetConstructionData();
 		}, []);
+
 		return (
-			<div className="flex flex-col border-b">
+			<div className="relative flex flex-col border-b">
+				{isLoading && (
+					<div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+						<Loader />
+					</div>
+				)}
 				<FormProvider {...form}>
 					<div className="flex flex-col gap-[20px]">
 						<Input

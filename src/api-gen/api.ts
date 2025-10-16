@@ -282,6 +282,7 @@ export interface CreateFloorReportReceivingCommand {
 export interface CreateReportConstructionDto {
 	/** @format uuid */
 	id?: string | null;
+	name?: string | null;
 	/** @format uuid */
 	constructionHeaderId?: string;
 	/** @format double */
@@ -2600,6 +2601,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				reportFloorInfoId?: string;
 				/** @format uuid */
 				'floorInfo.reportConstructionHeader.id'?: string;
+				'floorInfo.reportConstructionHeader.name'?: string;
 				/** @format uuid */
 				'floorInfo.reportConstructionHeader.constructionHeaderId'?: string;
 				/** @format double */

@@ -6,6 +6,7 @@ export * from './chevron';
 export * from './drag-element';
 export * from './forms';
 export * from './guarded';
+export * from './image';
 export * from './inputs';
 export * from './loaders';
 export * from './modals';
