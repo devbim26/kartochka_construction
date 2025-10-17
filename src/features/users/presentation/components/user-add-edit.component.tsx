@@ -1,4 +1,4 @@
-import type { UserRole } from '@core';
+import type { NamedEntity, UserRole } from '@core';
 import {
 	accountMask,
 	Button,
@@ -118,7 +118,12 @@ export const UserAddEdit = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					setRoles(response.data.map((role) => ({ id: role.id!, name: role.name! })));
+					setRoles(
+						(response.data as unknown as NamedEntity[]).map((role) => ({
+							id: role.id!,
+							name: role.name!,
+						})),
+					);
 				}
 			});
 	}, []);

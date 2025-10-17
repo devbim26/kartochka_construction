@@ -282,6 +282,7 @@ export interface CreateFloorReportReceivingCommand {
 export interface CreateReportConstructionDto {
 	/** @format uuid */
 	id?: string | null;
+	name?: string | null;
 	/** @format uuid */
 	constructionHeaderId?: string;
 	/** @format double */
@@ -295,7 +296,8 @@ export interface CreateReportConstructionDto {
 export interface CreateReportInfoCommand {
 	buildingName?: string | null;
 	description?: string | null;
-	requirementIds?: string[] | null;
+	calculationRequirementIds?: string[] | null;
+	regulatoryRequirementIds?: string[] | null;
 	country?: CountryType;
 	category?: ReportCategory;
 }
@@ -305,7 +307,8 @@ export interface CreateReportInfoDto {
 	id?: string;
 	buildingName?: string | null;
 	description?: string | null;
-	requirements?: Requirement[] | null;
+	calculationRequirements?: Requirement[] | null;
+	regulatoryRequirements?: Requirement[] | null;
 	category?: ReportCategory;
 }
 
@@ -453,6 +456,11 @@ export interface FloorConstructionInfoDto {
 	reportFloorInfos?: ReportFloorInfoDto[] | null;
 	floorNumber?: string | null;
 	floorDocumentUrl?: string | null;
+}
+
+export interface FloorConstructionInfoIdDto {
+	/** @format uuid */
+	id?: string;
 }
 
 export interface GeneralCharacteristicFlagsDto {
@@ -802,6 +810,22 @@ export interface NamedEntity {
 	name?: string | null;
 }
 
+export interface NewFloorConstructionIfoDto {
+	/** @format uuid */
+	id?: string;
+	reportFloorInfos?: FloorConstructionInfoIdDto[] | null;
+	floorNumber?: string | null;
+	floorDocumentUrl?: string | null;
+}
+
+export interface NewReportFloorInfoDto {
+	reportConstructionHeader?: ReportConstructionDto;
+	documentImageUrl?: string | null;
+	coordinates?: Coordinates;
+	/** @format int32 */
+	page?: number;
+}
+
 export interface PaginatedArticleDto {
 	/** @format uuid */
 	id?: string;
@@ -992,7 +1016,6 @@ export interface ReportConstructionDto {
 	id?: string;
 	/** @format uuid */
 	constructionHeaderId?: string;
-	constructionHeader?: ConstructionHeaderDto;
 	/** @format double */
 	square?: number;
 	secondPlacementRoom?: PlacementRoomDto;
@@ -1051,15 +1074,17 @@ export interface ReportFloorInfoDto {
 	page?: number;
 }
 
-export interface ReportInfoFloorConstructionDto {
-	floorConstructionInfos?: FloorConstructionInfoDto[] | null;
+export interface ReportInfoShortDto {
+	/** @format uuid */
+	id?: string;
 	buildingName?: string | null;
-	requirements?: RequirementDto[] | null;
-	category?: ReportCategory;
-	reportDocumentInfo?: ReportDocumentInfoDto;
-	country?: CountryType;
-	status?: ReportInfoStatus;
+	purposeBuilding?: PurposeBuilding;
 	description?: string | null;
+	category?: ReportCategory;
+	status?: ReportInfoStatus;
+	country?: CountryType;
+	calculationRequirements?: RequirementDto[] | null;
+	regulatoryRequirements?: RequirementDto[] | null;
 }
 
 export interface ReportInfoSingleConstructionDto {
@@ -1067,7 +1092,8 @@ export interface ReportInfoSingleConstructionDto {
 	id?: string;
 	singleConstructionInfos?: SingleConstructionInfoDto[] | null;
 	buildingName?: string | null;
-	requirements?: RequirementDto[] | null;
+	calculationRequirements?: RequirementDto[] | null;
+	regulatoryRequirements?: RequirementDto[] | null;
 	category?: ReportCategory;
 	reportDocumentInfo?: ReportDocumentInfoDto;
 	status?: ReportInfoStatus;
@@ -1935,6 +1961,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags ImportExcelFile
+		 * @name ImportExcelFileCreate
+		 * @request POST:/api/ImportExcelFile
+		 */
+		importExcelFileCreate: (
+			data: {
+				/** @format binary */
+				formFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<CreateReportInfoDto, any>({
+				path: `/api/ImportExcelFile`,
+				method: 'POST',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags Issuer
 		 * @name IssuerDetail
 		 * @request GET:/api/Issuer/{id}
@@ -2369,8 +2418,89 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/ReportInfo/{id}/floor
 		 */
 		reportInfoFloorDetail: (id: string, params: RequestParams = {}) =>
-			this.request<ReportInfoFloorConstructionDto, any>({
+			this.request<ReportInfoShortDto, any>({
 				path: `/api/ReportInfo/${id}/floor`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoGetReportInfoRenewDetail
+		 * @request GET:/api/ReportInfo/{id}/GetReportInfoRenew
+		 */
+		reportInfoGetReportInfoRenewDetail: (id: string, params: RequestParams = {}) =>
+			this.request<ReportInfoShortDto, any>({
+				path: `/api/ReportInfo/${id}/GetReportInfoRenew`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoGetReportFloorConstructionInfoIdsRenewDetail
+		 * @request GET:/api/ReportInfo/{id}/GetReportFloorConstructionInfoIdsRenew
+		 */
+		reportInfoGetReportFloorConstructionInfoIdsRenewDetail: (
+			id: string,
+			params: RequestParams = {},
+		) =>
+			this.request<FloorConstructionInfoIdDto[], any>({
+				path: `/api/ReportInfo/${id}/GetReportFloorConstructionInfoIdsRenew`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoGetReportFloorConstructionInfoRenewDetail
+		 * @request GET:/api/ReportInfo/{id}/GetReportFloorConstructionInfoRenew
+		 */
+		reportInfoGetReportFloorConstructionInfoRenewDetail: (
+			id: string,
+			params: RequestParams = {},
+		) =>
+			this.request<NewFloorConstructionIfoDto, any>({
+				path: `/api/ReportInfo/${id}/GetReportFloorConstructionInfoRenew`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoGetReportFloorInfoRenewDetail
+		 * @request GET:/api/ReportInfo/{id}/GetReportFloorInfoRenew
+		 */
+		reportInfoGetReportFloorInfoRenewDetail: (id: string, params: RequestParams = {}) =>
+			this.request<NewReportFloorInfoDto, any>({
+				path: `/api/ReportInfo/${id}/GetReportFloorInfoRenew`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoGetConstructionsByFloorDetail
+		 * @request GET:/api/ReportInfo/{id}/getConstructionsByFloor
+		 */
+		reportInfoGetConstructionsByFloorDetail: (id: string, params: RequestParams = {}) =>
+			this.request<FloorConstructionInfoDto, any>({
+				path: `/api/ReportInfo/${id}/getConstructionsByFloor`,
 				method: 'GET',
 				format: 'json',
 				...params,
@@ -2445,7 +2575,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			},
 			params: RequestParams = {},
 		) =>
-			this.request<FloorConstructionInfoDto, any>({
+			this.request<string, any>({
 				path: `/api/ReportInfo/floor/document`,
 				method: 'PUT',
 				body: data,
@@ -2471,6 +2601,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				reportFloorInfoId?: string;
 				/** @format uuid */
 				'floorInfo.reportConstructionHeader.id'?: string;
+				'floorInfo.reportConstructionHeader.name'?: string;
 				/** @format uuid */
 				'floorInfo.reportConstructionHeader.constructionHeaderId'?: string;
 				/** @format double */
@@ -3037,7 +3168,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/User/roles
 		 */
 		userRolesList: (params: RequestParams = {}) =>
-			this.request<UserRole[], any>({
+			this.request<void, any>({
 				path: `/api/User/roles`,
 				method: 'GET',
 				...params,

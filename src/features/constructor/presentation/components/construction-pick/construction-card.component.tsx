@@ -1,8 +1,6 @@
-import type { ReportConstructionDto } from '@api-gen';
 import { FormElementLabel } from '@core';
 import { formatMaterial } from '@features/constructor/utils';
-import { convertToClientConstructionType } from '@features/guidbooks/converters';
-import type { ConstructionTypeEnum, UserMaterials } from '@features/guidbooks/types';
+import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
 import { RuConstructionTypesMap } from '@features/guidbooks/types';
 import issuer from '../../../../../assets/issuer.png';
 import {
@@ -13,7 +11,7 @@ import {
 } from '../modals';
 
 type Props = {
-	construction: ReportConstructionDto;
+	construction: ConstructionsEditData;
 	svgUrl: string | null;
 };
 
@@ -23,9 +21,8 @@ export const ConstructionCard = ({ construction, svgUrl }: Props) => {
 			<p className="font-sans text-lg font-semibold leading-4">
 				{
 					RuConstructionTypesMap[
-						convertToClientConstructionType(
-							construction.constructionHeader!.constructionType!,
-						).constructionTypeEnum as ConstructionTypeEnum
+						construction.constructionTypeObject!
+							.constructionTypeEnum as ConstructionTypeEnum
 					]
 				}
 			</p>
@@ -44,7 +41,7 @@ export const ConstructionCard = ({ construction, svgUrl }: Props) => {
 							<img className="h-full w-[200px]" src={svgUrl} alt="SVG Construction" />
 						)}
 						<div className="flex w-fit flex-col">
-							{construction?.constructionHeader?.constructionType?.constructions?.map(
+							{construction?.constructionTypeObject.constructions?.map(
 								(construction: any, index) =>
 									construction.userMaterials?.map(
 										(material: any, materialIndex: any) => (
@@ -52,7 +49,7 @@ export const ConstructionCard = ({ construction, svgUrl }: Props) => {
 												key={`${index}-${materialIndex}`}
 												className="text-[16px]"
 											>
-												- {formatMaterial(material as UserMaterials)}
+												- {formatMaterial(material)}
 											</p>
 										),
 									),

@@ -1,8 +1,8 @@
-import type { ConstructionType } from '@features/guidbooks/types';
+import type { AlternateConstruction } from '@features/guidbooks/types';
 import { AlternateConstructionCard } from './alternate-construction-card.component';
 
 type Props = {
-	alternateConstructions: ConstructionType[];
+	alternateConstructions: AlternateConstruction[];
 };
 
 export const AlternateConstructionList = ({ alternateConstructions }: Props) => {

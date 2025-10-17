@@ -1,4 +1,4 @@
-import type { ReportFloorInfoDto, ReportInfoFloorConstructionDto } from '@api-gen';
+import type { ReportFloorInfoDto } from '@api-gen';
 import { type SliceInitialState } from '@core/utils/fetch/create-cases.util';
 import { createSlice } from '@reduxjs/toolkit';
 import type { AboutBuildingData, CreateConstructionData, FloorPlanModalData } from '../types';
@@ -13,7 +13,7 @@ export interface ConstructorSliceState extends SliceInitialState {
 	reportInfo: ReportFloorInfoDto | null;
 	file: FloorPlanModalData | null;
 	constructionsSheet: ConstructionSheet[];
-	reportInfoFull: ReportInfoFloorConstructionDto | null;
+	reportInfoFull: any; //TODO: ubrat
 	id: string;
 }
 

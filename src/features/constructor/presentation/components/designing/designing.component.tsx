@@ -1,15 +1,18 @@
-import type { ConstructionHeaderDto, ReportInfoFloorConstructionDto } from '@api-gen';
 import { Button, Input, useAppDispatch, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
-import type { DesigningData, GraphDetailResponse } from '@features';
+import type { DesigningData, GraphDetailResponse, ReportInfoShort } from '@features';
 import {
 	DesigningConfig,
 	DesigningHeader,
-	RuMaterialParametrs,
+	formatMaterial,
+	ReportCategory,
 	startLoading,
 	stopLoading,
 } from '@features';
-import { graphDotsConverterToClient } from '@features/constructor/converters';
+import {
+	convertToClientReportInfoShort,
+	graphDotsConverterToClient,
+} from '@features/constructor/converters';
 import {
 	getReportFloorById,
 	graphDetail,
@@ -20,15 +23,15 @@ import {
 	convertToClientConstructionsEditData,
 	convertToServerConstructionsEditData,
 } from '@features/guidbooks/converters';
-import { getGuidebooksEdit } from '@features/guidbooks/services';
+import { getGuidebooksDetail, getGuidebooksEdit } from '@features/guidbooks/services';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
-import { Guidebooks, RuConstructionTypesMap, RuMaterialTypeEnum } from '@features/guidbooks/types';
+import { Guidebooks, RuConstructionTypesMap } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, finalize, from } from 'rxjs';
+import { catchError, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import DesigningGraph from './designing-graph.component';
@@ -37,15 +40,17 @@ const DesigningScreen = () => {
 	const dispatch = useAppDispatch();
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
+	const reportType = search.get('reportType');
+	const constructionHeaderId = search.get('constructionHeaderId');
 	const [graphData, setGraphData] = useState<GraphDetailResponse[] | null>(null);
-	const [constructionHeaderId, setConstructionHeaderId] = useState<string | undefined>(undefined);
-	const [constructionHeader, setConstructionHeader] = useState<ConstructionHeaderDto | null>(
+	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
 	const [isRelevant, setIsRelevant] = useState<boolean>(false);
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [refreshConstructionData, setRefreshConstructionData] = useState(0);
+	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
@@ -53,46 +58,47 @@ const DesigningScreen = () => {
 		mode: 'onSubmit',
 	});
 
-	useEffect(() => {
-		if (!reportId) return;
+	const handleGetCurrentReportFloorInfo = (id: string) => {
 		dispatch(startLoading());
-
-		const subscription = from(getReportFloorById({ id: reportId }))
+		from(getReportFloorById({ id: id }))
 			.pipe(
-				catchError((error) => {
-					toast.error('Не удалось получить данные отчёта');
-					return [];
+				tap((response) => {
+					if (response.status === 200) {
+						setCurrentReportInfo(convertToClientReportInfoShort(response.data));
+					}
 				}),
-				finalize(() => {
-					dispatch(stopLoading());
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации об отчете');
+					return of(null);
 				}),
 			)
-			.subscribe((response) => {
-				const report: ReportInfoFloorConstructionDto | undefined = response?.data;
-				const reportConstructionHeader =
-					report?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-						?.reportConstructionHeader;
-				const header = reportConstructionHeader?.constructionHeader;
-				const headerId = reportConstructionHeader?.constructionHeaderId;
-				if (headerId) {
-					setConstructionHeaderId(headerId);
-				} else {
-					toast.error('Не найден constructionHeaderId');
-				}
-				setConstructionHeader(header || null);
-			});
-		return () => subscription.unsubscribe();
-	}, [reportId, refreshConstructionData, dispatch]);
+			.subscribe(() => dispatch(stopLoading()));
+	};
+
+	const handleGetConstructionByHeaderId = (id: string) => {
+		dispatch(startLoading());
+		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.CONSTRUCTION }))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setConstructionHeader(convertToClientConstructionsEditData(response.data));
+						form.reset(convertToClientConstructionsEditData(response.data));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации о конструкции');
+					return of(null);
+				}),
+			)
+			.subscribe(() => dispatch(stopLoading()));
+	};
 
 	useEffect(() => {
-		if (!constructionHeader) return;
-		try {
-			const dataForForm = convertToClientConstructionsEditData(constructionHeader);
-			form.reset(dataForForm);
-		} catch (error) {
-			toast.error('Ошибка при заполнении формы');
-		}
-	}, [constructionHeader, form]);
+		if (!reportId || !constructionHeaderId) return;
+		handleGetConstructionByHeaderId(constructionHeaderId);
+	}, [reportId, refreshConstructionData, constructionHeaderId]);
 
 	useEffect(() => {
 		if (!constructionHeaderId || graphData) return;
@@ -116,17 +122,24 @@ const DesigningScreen = () => {
 	}, [constructionHeaderId]);
 
 	useEffect(() => {
-		const rwValue = constructionHeader?.rw || 0;
-		setIsRelevant(rwValue >= 55);
-	}, [constructionHeader?.rw]);
+		reportType === ReportCategory.Floor && reportId
+			? handleGetCurrentReportFloorInfo(reportId)
+			: () => {};
+	}, [reportType, reportId]);
+
+	useEffect(() => {
+		const rwValue = +(constructionHeader?.RCalcs || 0);
+		setIsRelevant(
+			rwValue >= +(currentReportInfo?.regulatoryRequirement.noizeImpactIndex || 55),
+		);
+	}, [constructionHeader?.RCalcs, currentReportInfo]);
 
 	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
 
-	const constructionType = constructionHeader?.constructionType?.constructionTypeEnum as
+	const constructionType = constructionHeader?.constructionTypeObject?.constructionTypeEnum as
 		| ConstructionTypeEnum
 		| undefined;
 	const ruConstructionType = constructionType ? RuConstructionTypesMap[constructionType] : '';
-	const materials = constructionHeader?.constructionType?.constructions?.[0]?.userMaterials || [];
 
 	const handleGetConstructionImage = useCallback((id: string) => {
 		from(svgConstructionDetail(id))
@@ -149,23 +162,6 @@ const DesigningScreen = () => {
 		if (!constructionHeaderId) return;
 		handleGetConstructionImage(constructionHeaderId);
 	}, [constructionHeaderId, handleGetConstructionImage]);
-
-	const formatMaterial = (material: (typeof materials)[0]) => {
-		const materialType =
-			RuMaterialTypeEnum[material.materialType as keyof typeof RuMaterialTypeEnum] ??
-			material.materialType;
-		const materialParams =
-			material.materialTypeValue
-				?.map((val) => {
-					const param =
-						RuMaterialParametrs[
-							val.materialParametrs as keyof typeof RuMaterialParametrs
-						] ?? val.materialParametrs;
-					return `${param}: ${val.value}`;
-				})
-				.join(', ') || 'нет данных';
-		return `${materialType} (${materialParams})`;
-	};
 
 	const onEditHandle = useCallback(() => {
 		const formData = form.getValues() as ConstructionsEditData;
@@ -204,11 +200,7 @@ const DesigningScreen = () => {
 		<div className="flex w-full flex-col gap-[30px]">
 			<DesigningHeader />
 			<div className="flex h-[428px] w-full flex-row gap-[72px] rounded-[20px] bg-white px-[44px] py-[34px]">
-				<img
-					className="h-full w-[100px]"
-					src={svgUrl ?? undefined}
-					alt="SVG Construction"
-				/>
+				<img className="h-full w-fit" src={svgUrl ?? undefined} alt="SVG Construction" />
 				<div className="flex flex-col gap-[30px]">
 					<Input
 						label="Тип конструкции"
@@ -219,7 +211,7 @@ const DesigningScreen = () => {
 						disabled
 					/>
 					<div className="flex flex-col">
-						{constructionHeader?.constructionType?.constructions?.map(
+						{constructionHeader?.constructionTypeObject?.constructions?.map(
 							(layer, layerIndex) => (
 								<div key={layerIndex}>
 									{layer.userMaterials?.map((material, materialIndex) => (
@@ -253,7 +245,7 @@ const DesigningScreen = () => {
 				<div className="flex flex-col">
 					<p className="text-[12px] italic">СП 275.1325800.2016</p>
 					<p className="text-[12px] italic">Защита от шума, Россия </p>
-					<p className="text-[25px] font-[600]">Rw = {constructionHeader?.rw} dB</p>
+					<p className="text-[25px] font-[600]">Rw = {constructionHeader?.RCalcs} dB</p>
 					<p
 						className={twMerge(
 							'text-[20px] font-[600]',

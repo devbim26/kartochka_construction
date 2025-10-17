@@ -25,7 +25,10 @@ export interface ConstructionFieldTypesProps {
 export interface UserMaterials {
 	materialId: string;
 	positionId: string;
-	materialTypeValue: Array<any>;
+	materialTypeValue?: Array<{
+		materialParameters: string;
+		value: string;
+	}> | null;
 	materialType: string;
 }
 

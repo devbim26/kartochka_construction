@@ -1,9 +1,17 @@
 import { FormElementLabel, useAppDispatch, useAppSelector } from '@core';
-import { getReportFloorById } from '@features/constructor/services';
-import { constructorSlice } from '@features/constructor/store';
-import { useEffect } from 'react';
+import Loader from '@core/presentation/components/loaders/loader.component';
+import { convertToClientFloorConstruction } from '@features/constructor/converters';
+import { getFloorConstructionById } from '@features/constructor/services';
+import { startLoading, stopLoading } from '@features/constructor/store';
+import type { FloorConstruction } from '@features/constructor/types';
+import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
+import { getGuidebooksDetail } from '@features/guidbooks/services';
+import type { ConstructionsEditData } from '@features/guidbooks/types';
+import { Guidebooks } from '@features/guidbooks/types';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from } from 'rxjs';
+import { catchError, from, of, tap } from 'rxjs';
+import { toast } from 'sonner';
 import {
 	GeneralInformationFireResistance,
 	GeneralInformationPhysical,
@@ -12,32 +20,71 @@ import {
 } from './general-information-tables';
 
 export const GeneralInformationForm = () => {
-	const dispatch = useAppDispatch();
 	const [search] = useSearchParams();
-	const reportId = search.get('reportId');
-	const reportInfoFull = useAppSelector((state) => state.constructorData.reportInfoFull);
-
-	useEffect(() => {
-		if (!reportId) return;
-		from(getReportFloorById({ id: reportId }))
+	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
+	const [constructionType, setConstructionType] = useState<ConstructionsEditData>();
+	const reportFloorInfoId = search.get('reportFloorInfoId');
+	const dispatch = useAppDispatch();
+	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
+	const handleGetCurrentConstructionReportHeader = (id: string) => {
+		dispatch(startLoading());
+		from(getFloorConstructionById(id))
 			.pipe(
-				catchError(() => {
-					return [];
+				tap((response) => {
+					if (response?.data && response.status === 200) {
+						setCurrentConstruction(convertToClientFloorConstruction(response.data));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации о конструкции');
+					return of(null);
 				}),
 			)
-			.subscribe((response) => {
-				if (response?.data) {
-					dispatch(constructorSlice.actions.setInfoFull(response.data));
-				}
+			.subscribe(() => {
+				dispatch(stopLoading());
 			});
-	}, [reportId]);
+	};
 
-	const info =
-		reportInfoFull?.floorConstructionInfos?.[0]?.reportFloorInfos?.[0]
-			?.reportConstructionHeader;
+	const handleGetConstructionByHeaderId = (id: string) => {
+		dispatch(startLoading());
+		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.CONSTRUCTION }))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setConstructionType(convertToClientConstructionsEditData(response.data));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации о конструкции');
+					return of(null);
+				}),
+			)
+			.subscribe();
+	};
+
+	useEffect(() => {
+		if (!reportFloorInfoId) return;
+		handleGetCurrentConstructionReportHeader(reportFloorInfoId);
+	}, [search]);
+
+	useEffect(() => {
+		if (!currentConstruction) return;
+		handleGetConstructionByHeaderId(
+			currentConstruction.reportConstructionHeader.constructionHeaderId,
+		);
+	}, [currentConstruction]);
+
+	console.log(constructionType);
 
 	return (
-		<div className="flex flex-row gap-[10px] border-b">
+		<div className="relative flex flex-row gap-[10px] border-b">
+			{isLoading && (
+				<div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+					<Loader />
+				</div>
+			)}
 			<div className="flex flex-col gap-[24px]">
 				<FormElementLabel className="text-left font-sans font-semibold leading-6">
 					Общая информация
@@ -47,7 +94,7 @@ export const GeneralInformationForm = () => {
 						Название
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						{info?.constructionHeader?.name ?? ''}
+						{constructionType?.name}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -55,8 +102,11 @@ export const GeneralInformationForm = () => {
 						Конструкция разделяет
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						{info?.firstPlacementRoom?.name ?? '—'} /{' '}
-						{info?.secondPlacementRoom?.name ?? '—'}
+						{currentConstruction?.reportConstructionHeader.firstPlacemetnRoom?.name ??
+							'—'}{' '}
+						/{' '}
+						{currentConstruction?.reportConstructionHeader?.secondPlacementRoom.name ??
+							'—'}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -80,7 +130,7 @@ export const GeneralInformationForm = () => {
 						Площадь, м2
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						{info?.square ?? '—'}
+						{currentConstruction?.reportConstructionHeader.square ?? '—'}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -88,8 +138,8 @@ export const GeneralInformationForm = () => {
 						Общая толщина, мм
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						{info?.constructionHeader?.constructionType?.constructions?.[0]?.userMaterials?.[0]?.materialTypeValue?.find(
-							(v) => v.materialParametrs === 'Thickness',
+						{constructionType?.constructionTypeObject.constructions?.[0]?.userMaterials?.[0]?.materialTypeValue?.find(
+							(v) => v.materialParameters === 'Thickness',
 						)?.value ?? '—'}
 					</p>
 				</div>

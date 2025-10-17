@@ -5,26 +5,31 @@ import {
 	DesigningTable,
 	EditIcon,
 	FormElementLabel,
+	ImagePreviewModal,
 	InfoIcon,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppDispatch,
 	useAppNavigate,
-	useAppSelector,
 } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ConstructionImage } from './construction-info-image.component';
 
-export const ConstructionSheets = () => {
+type Props = {
+	constructionSheets?: ConstructionSheet[];
+	reportFloorInfoId?: string;
+};
+
+export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Props) => {
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
-	const constructions = useAppSelector((store) => store.constructorData).constructionsSheet;
+	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
 	const columns = useMemo(() => {
 		const cols: ColumnDef<ConstructionSheet>[] = [
@@ -41,23 +46,29 @@ export const ConstructionSheets = () => {
 			{
 				accessorKey: 'floorPlanImage',
 				header: () => <SimpleTableHeaderCell text="План" />,
-				cell: (info) => (
-					<SimpleTableCell
-						content={
-							info.getValue() ? (
-								<div className="h-[400px] w-[450px]">
-									<img
-										className="h-[400px] w-[450px] rounded-[18px] border-[3px] border-primary bg-white object-scale-down"
-										src={info.getValue() as string}
-										alt="floorPlanImage"
-									/>
-								</div>
-							) : (
-								<div className="h-[400px] w-[450px] rounded-[18px] border-[3px] border-primary bg-white"></div>
-							)
-						}
-					/>
-				),
+				cell: (info) => {
+					const src = info.getValue() as string;
+					return (
+						<SimpleTableCell
+							content={
+								src ? (
+									<div
+										className="h-[150px] w-[200px] cursor-pointer"
+										onClick={() => setPreviewSrc(src)}
+									>
+										<img
+											className="size-full rounded-[8px] border border-primary object-cover"
+											src={src}
+											alt="floorPlanPreview"
+										/>
+									</div>
+								) : (
+									<div className="h-[100px] w-[120px] rounded-[8px] border border-primary bg-white" />
+								)
+							}
+						/>
+					);
+				},
 			},
 			{
 				accessorKey: 'constructionInfoImage',
@@ -67,7 +78,7 @@ export const ConstructionSheets = () => {
 						content={
 							<ConstructionImage
 								id={info.row.original.constructionId}
-								materials={info.row.original.materials}
+								constructionHeaderId={info.row.original.constructionId}
 							/>
 						}
 					/>
@@ -97,6 +108,7 @@ export const ConstructionSheets = () => {
 													info: 'true',
 													reportId: search.get('reportId')!,
 													reportType: search.get('reportType')!,
+													reportFloorInfoId: reportFloorInfoId!,
 												});
 											}}
 										/>
@@ -107,6 +119,7 @@ export const ConstructionSheets = () => {
 													constructionId:
 														info.row.original.constructionId,
 													reportType: search.get('reportType')!,
+													reportId: search.get('reportId')!,
 												});
 											}}
 										/>
@@ -134,6 +147,8 @@ export const ConstructionSheets = () => {
 												{
 													reportId: search.get('reportId')!,
 													reportType: search.get('reportType')!,
+													constructionHeaderId:
+														info.row.original.constructionId,
 												},
 											)
 										}
@@ -154,6 +169,8 @@ export const ConstructionSheets = () => {
 												{
 													reportId: search.get('reportId')!,
 													reportType: search.get('reportType')!,
+													constructionHeaderId:
+														info.row.original.constructionId,
 												},
 											)
 										}
@@ -168,9 +185,13 @@ export const ConstructionSheets = () => {
 			},
 		];
 		return cols;
-	}, []);
+	}, [reportFloorInfoId]);
 	return (
 		<div className="flex-col overflow-x-auto">
+			{previewSrc && (
+				<ImagePreviewModal src={previewSrc} onClose={() => setPreviewSrc(null)} />
+			)}
+
 			<FormElementLabel className="font-[18px] text-primary">
 				Ведомость конструкций
 			</FormElementLabel>
@@ -179,7 +200,7 @@ export const ConstructionSheets = () => {
 					headerCellClassName: 'w-[50px]',
 					contentRowClassName: 'max-w-[100px] w-fit',
 				}}
-				data={constructions || []}
+				data={constructionSheets || []}
 				columns={columns}
 			/>
 		</div>

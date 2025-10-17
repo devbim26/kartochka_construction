@@ -60,6 +60,7 @@ type UpdateFloorReportProps = {
 		'floorInfo.page'?: number;
 		'floorInfo.floorDocument'?: File;
 		'floorInfo.floorNumber'?: string;
+		'floorInfo.reportConstructionHeader.name'?: string;
 	};
 };
 type GetGraphParams = {
@@ -76,12 +77,32 @@ export const updateReport = async (data: ReportInfoUpdate) => {
 		),
 	);
 };
+
+export const getReportInfoIds = async (id: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoGetReportFloorConstructionInfoIdsRenewDetail(id),
+	);
+};
+
 export const getReportSingleById = async ({ id }: GetReportByIdParams) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoSingleDetail(id));
 };
 export const getReportFloorById = async ({ id }: GetReportByIdParams) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorDetail(id));
 };
+
+export const getFloorById = async ({ id }: GetReportByIdParams) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoGetReportFloorConstructionInfoRenewDetail(id),
+	);
+};
+
+export const getFloorConstructionById = async (id: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoGetReportFloorInfoRenewDetail(id),
+	);
+};
+
 export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoSingleUpdate(data));
 };
@@ -109,8 +130,11 @@ export const svgConstructionDetail = async (id: string) => {
 	return await withConstructorLoader(() => fetchApi.api.svgConstructionDetail(id));
 };
 export const deleteConstruction = async (id: string) => {
-	return await withConstructorLoader(() => fetchApi.api.constructionDelete({ id: id }));
+	const result = await withConstructorLoader(() => fetchApi.api.constructionDelete({ id }));
+	console.log('API ответ на удаление:', result);
+	return result;
 };
+
 export const formReport = async (data: FormReportSchemaType) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.reportInfoDocumentInfoUpdate(convertToServerReportFormFlags(data)),
