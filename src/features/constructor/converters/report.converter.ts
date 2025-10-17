@@ -3,13 +3,21 @@ import type {
 	CreateReportInfoCommand,
 	NewFloorConstructionIfoDto,
 	NewReportFloorInfoDto,
+	PaginatedConstructionHeaderDto,
 	ReportInfoShortDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
 import { convertToClientCountryData } from '@core';
-import { convertToClientRequirementTableData } from '@features/guidbooks/converters';
-import type { ConstructionsEditData } from '@features/guidbooks/types';
-import { BuildingType, CategoryClass } from '@features/guidbooks/types';
+import {
+	convertToClientConstructionTypeEnumData,
+	convertToClientRequirementTableData,
+} from '@features/guidbooks/converters';
+import type {
+	AlternateConstruction,
+	ConstructionsEditData,
+	Country,
+} from '@features/guidbooks/types';
+import { BuildingType, CategoryClass, ConstructionTypeEnum } from '@features/guidbooks/types';
 import type {
 	AboutBuildingData,
 	ConstructionSheet,
@@ -49,7 +57,7 @@ export const convertToClientReportInfo = (data: ReportInfoShortDto): AboutBuildi
 		buildingPurpose: data.purposeBuilding as string,
 		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
 		comfortClass: CategoryClass.A, //convertToClientCategoryClassData(data.requirements![0]!.class!), не хватает в шорте
-		maxHeight: '0',
+		maxHeight: '1',
 		isFloorPlan: true,
 		isConstruction: false,
 		isBim: true,
@@ -130,5 +138,28 @@ export const convertFloorDataToClientConstructionSheet = (
 		title: constructionHeader.name || 'Placeholder',
 		materials: [],
 		floorPlanImage: data.documentImageUrl || '',
+	};
+};
+
+export const convertToClientAlternateConstruction = (
+	data: PaginatedConstructionHeaderDto,
+): AlternateConstruction => {
+	return {
+		...data,
+		constructionId: data.constructionId || '',
+		constructionType: data.constructionType
+			? convertToClientConstructionTypeEnumData(data.constructionType)
+			: ConstructionTypeEnum.HeavySingleLayerWall,
+		countries: data.countries
+			? (data.countries.map((o) => convertToClientCountryData(o)) as Country[])
+			: [],
+		description: data.description || '',
+		id: data.id || '',
+		descriptionSource: data.descriptionSource || '',
+		issuer: { id: data.issuer?.id || '', name: data.issuer?.name || '' },
+		issuerLogo: data.issuerLogo || '',
+		maxHeight: data.maxHeight || 0,
+		name: data.name || '',
+		shortName: data.shortName || '',
 	};
 };

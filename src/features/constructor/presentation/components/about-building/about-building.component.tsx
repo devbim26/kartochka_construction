@@ -150,6 +150,11 @@ const AboutBuildingScreen = () => {
 					toast.success('Отчет успешно создан');
 					if (response?.data?.id) {
 						const reportId = response.data.id;
+						sessionStorage.setItem('reportId', reportId);
+						sessionStorage.setItem(
+							'reportType',
+							reportType ? ReportCategory.Floor : ReportCategory.Single,
+						);
 						navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
 							reportId,
 							reportType: isConstruction

@@ -1,5 +1,6 @@
 import { APP_ROUTES } from '@core';
 import { UserRoles } from '@core/types';
+import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
 import { BiNews, BiSolidCalendarEdit, BiSolidHome } from 'react-icons/bi';
 import { FaUser } from 'react-icons/fa6';
@@ -8,6 +9,21 @@ import { RiFileList3Line, RiPencilRulerLine, RiWallet3Fill } from 'react-icons/r
 import { TiDocumentText } from 'react-icons/ti';
 import type { SidebarItemsConfig } from '../types';
 import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from './home-routes.constants';
+
+const reportId = sessionStorage.getItem('reportId');
+const reportType = sessionStorage.getItem('reportType');
+
+function buildPathWithParams(
+	basePath: string,
+	params: Record<string, string | number | boolean>,
+): string {
+	const stringParams: Record<string, string> = Object.fromEntries(
+		Object.entries(params).map(([key, value]) => [key, String(value)]),
+	);
+
+	const query = new URLSearchParams(stringParams).toString();
+	return `${basePath}?${query}`;
+}
 
 export const sidebarItemsConfig: SidebarItemsConfig = {
 	basePath: APP_ROUTES.designing.route,
@@ -30,6 +46,37 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 				isMutltiPathItem: true,
 				permission: [UserRoles.Admin, UserRoles.User],
 			},
+			childrens:
+				reportId && reportType
+					? [
+							{
+								id: CONSTRUCTOR_ROUTES.aboutBuilding.id,
+								path: buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
+									reportId,
+									reportType,
+									edit: true,
+								}),
+								label: 'О здании',
+								permission: [UserRoles.Admin, UserRoles.User],
+							},
+							{
+								id: CONSTRUCTOR_ROUTES.floorPlans.id,
+								path: buildPathWithParams(CONSTRUCTOR_ROUTES.floorPlans.route, {
+									reportId,
+									reportType,
+								}),
+								label: 'Поэтажные планы',
+								permission: [UserRoles.Admin, UserRoles.User],
+							},
+						]
+					: [
+							{
+								id: CONSTRUCTOR_ROUTES.aboutBuilding.id,
+								path: CONSTRUCTOR_ROUTES.aboutBuilding.route,
+								label: 'О здании',
+								permission: [UserRoles.Admin, UserRoles.User],
+							},
+						],
 		},
 		{
 			params: {

@@ -23,6 +23,8 @@ import { GeneralInfoForm } from './general-info-form.component';
 const ReportFromComponent = () => {
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
+	const reportType = search.get('reportType');
+
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 
@@ -80,6 +82,8 @@ const ReportFromComponent = () => {
 								}
 								dispatch(stopLoading());
 							});
+					sessionStorage.setItem('reportId', reportId);
+					sessionStorage.setItem('reportType', reportType as string);
 				});
 		} else {
 			toast.error('Заполните форму');

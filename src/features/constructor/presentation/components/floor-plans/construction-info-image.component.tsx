@@ -67,14 +67,10 @@ export const ConstructionImage = ({
 	return svgUrl ? (
 		<>
 			<div
-				className="flex h-[100px] w-[120px] cursor-pointer items-center justify-center rounded-[12px] border-2 border-primary bg-white"
+				className="flex h-[150px] w-[200px] cursor-pointer items-center justify-center rounded-[12px] border-2 border-primary bg-white"
 				onClick={() => setIsPreviewOpen(true)}
 			>
-				<img
-					className="h-[90px] w-[60px] object-contain"
-					src={svgUrl}
-					alt="constructionPreview"
-				/>
+				<img className="size-full object-contain" src={svgUrl} alt="constructionPreview" />
 			</div>
 			{isPreviewOpen && (
 				<ConstructionImageModal
