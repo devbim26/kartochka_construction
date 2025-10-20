@@ -189,7 +189,11 @@ const ContructionPick = () => {
 			</div>
 			<p className="font-sans text-lg font-semibold leading-4">Базовая конструкция</p>
 			{currentReportInfo && constructionHeader && (
-				<ConstructionCard construction={constructionHeader} svgUrl={svgUrl} />
+				<ConstructionCard
+					construction={constructionHeader}
+					svgUrl={svgUrl}
+					reportInfo={currentReportInfo}
+				/>
 			)}
 			<div className="flex gap-[30px]">
 				<p className="font-sans text-lg font-semibold leading-4">
@@ -198,7 +202,7 @@ const ContructionPick = () => {
 				<Switch onChange={() => setShowAlternate(!showAlternate)} />
 			</div>
 
-			{showAlternate && (
+			{showAlternate && currentReportInfo && (
 				<div className="flex flex-col gap-[30px]">
 					<FormProvider {...form}>
 						<ConstructionFilters
@@ -207,6 +211,7 @@ const ContructionPick = () => {
 					</FormProvider>
 					<AlternateConstructionList
 						alternateConstructions={alternateConstructions || []}
+						reportInfo={currentReportInfo}
 					/>
 				</div>
 			)}

@@ -1,4 +1,3 @@
-import { Button } from '@core';
 import type { ChartData, ChartOptions } from 'chart.js';
 import {
 	CategoryScale,
@@ -107,18 +106,6 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 				},
 				formatter: (value) => `${value}`,
 			},
-			zoom: {
-				pan: {
-					enabled: true,
-					mode: 'xy',
-				},
-				zoom: {
-					wheel: {
-						enabled: true,
-					},
-					mode: 'xy',
-				},
-			},
 		},
 		scales: {
 			x: {
@@ -157,20 +144,8 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 		},
 	};
 
-	const handleResetZoom = () => {
-		if (chartRef.current) {
-			chartRef.current.resetZoom();
-		}
-	};
-
 	return (
-		<div className="relative w-full">
-			<Button
-				onClick={handleResetZoom}
-				className="absolute right-2 top-2 z-10 rounded bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-300"
-			>
-				Сбросить масштаб
-			</Button>
+		<div className="relative w-[800px]">
 			<div className="h-[500px] w-full">
 				<Line ref={chartRef} data={chartData} options={options} />
 			</div>

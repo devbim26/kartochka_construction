@@ -3,14 +3,7 @@ import type { FireResistanceStandart } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 
-const dataFireResistance: FireResistanceStandart[] = [
-	{
-		label: 'Справочно',
-		fire: 'EI',
-		values: '45',
-		requirements: '45',
-	},
-];
+const dataFireResistance: FireResistanceStandart[] = [];
 
 export const GeneralInformationFireResistance = () => {
 	const columns = useMemo(() => {
