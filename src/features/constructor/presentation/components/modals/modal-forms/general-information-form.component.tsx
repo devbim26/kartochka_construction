@@ -1,13 +1,17 @@
 import { FormElementLabel, useAppDispatch, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
-import { convertToClientFloorConstruction } from '@features/constructor/converters';
-import { getFloorConstructionById } from '@features/constructor/services';
+import {
+	convertToClientFloorConstruction,
+	convertToClientReportInfoShort,
+} from '@features/constructor/converters';
+import { getFloorConstructionById, getReportFloorById } from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
-import type { FloorConstruction } from '@features/constructor/types';
+import { ReportCategory, type FloorConstruction } from '@features/constructor/types';
+import type { ReportInfoShort } from '@features/constructor/utils';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import type { ConstructionsEditData } from '@features/guidbooks/types';
-import { Guidebooks } from '@features/guidbooks/types';
+import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
+import { Guidebooks, RuConstructionTypesMap } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, of, tap } from 'rxjs';
@@ -23,9 +27,68 @@ export const GeneralInformationForm = () => {
 	const [search] = useSearchParams();
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 	const [constructionType, setConstructionType] = useState<ConstructionsEditData>();
+	const [thickness, setThickness] = useState<number>();
+	const [mass, setMass] = useState<number>();
+	const [density, setDensity] = useState<number>();
+	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const reportFloorInfoId = search.get('reportFloorInfoId');
+	const reportId = search.get('reportId');
+	const reportType = search.get('reportType');
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
+
+	useEffect(() => {
+		reportType === ReportCategory.Floor && reportId
+			? handleGetCurrentReportFloorInfo(reportId)
+			: () => {};
+	}, [reportType, reportId]);
+
+	useEffect(() => {
+		if (!constructionType) return;
+
+		const materialValues =
+			constructionType.constructionTypeObject.constructions?.[0]?.userMaterials?.[0]
+				?.materialTypeValue;
+
+		const thicknessValue = materialValues?.find(
+			(v) => v.materialParameters === 'Thickness',
+		)?.value;
+		const densityValue = materialValues?.find((v) => v.materialParameters === 'Density')?.value;
+
+		if (thicknessValue) setThickness(+thicknessValue);
+		if (densityValue) setDensity(+densityValue);
+	}, [constructionType]);
+
+	useEffect(() => {
+		if (!thickness || !density || !currentConstruction) return;
+
+		const square = currentConstruction.reportConstructionHeader.square;
+		if (!square) return;
+
+		const calculatedMass = (square * thickness * density) / 1000;
+		setMass(calculatedMass);
+	}, [thickness, density, currentConstruction]);
+
+	const handleGetCurrentReportFloorInfo = (id: string) => {
+		dispatch(startLoading());
+		from(getReportFloorById({ id: id }))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setCurrentReportInfo(convertToClientReportInfoShort(response.data));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации об отчете');
+					return of(null);
+				}),
+			)
+			.subscribe(() => {
+				dispatch(stopLoading());
+			});
+	};
+
 	const handleGetCurrentConstructionReportHeader = (id: string) => {
 		dispatch(startLoading());
 		from(getFloorConstructionById(id))
@@ -76,8 +139,6 @@ export const GeneralInformationForm = () => {
 		);
 	}, [currentConstruction]);
 
-	console.log(constructionType);
-
 	return (
 		<div className="relative flex flex-row gap-[10px] border-b">
 			{isLoading && (
@@ -89,12 +150,25 @@ export const GeneralInformationForm = () => {
 				<FormElementLabel className="text-left font-sans font-semibold leading-6">
 					Общая информация
 				</FormElementLabel>
+
 				<div className="flex flex-row gap-[20px]">
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						Название
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						{constructionType?.name}
+					</p>
+				</div>
+				<div className="flex flex-row gap-[20px]">
+					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">
+						Тип конструкции
+					</p>
+					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
+						{constructionType
+							? RuConstructionTypesMap[
+									constructionType.constructionType as ConstructionTypeEnum
+								]
+							: ''}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -114,7 +188,7 @@ export const GeneralInformationForm = () => {
 						Длина, м
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						2
+						?
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -122,7 +196,7 @@ export const GeneralInformationForm = () => {
 						Ширина (высота), м
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						2
+						{constructionType?.maxHeight ?? '—'} {/*//TODO: dobavit iz reportHeaader */}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -138,9 +212,7 @@ export const GeneralInformationForm = () => {
 						Общая толщина, мм
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						{constructionType?.constructionTypeObject.constructions?.[0]?.userMaterials?.[0]?.materialTypeValue?.find(
-							(v) => v.materialParameters === 'Thickness',
-						)?.value ?? '—'}
+						{thickness ?? '-'}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -148,7 +220,7 @@ export const GeneralInformationForm = () => {
 						Общая масса, кг
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						1212
+						{mass ?? '-'}
 					</p>
 				</div>
 			</div>
@@ -156,8 +228,43 @@ export const GeneralInformationForm = () => {
 				<FormElementLabel className="text-left font-sans font-semibold leading-6">
 					Соответствие нормам
 				</FormElementLabel>
-				<GeneralInformationPhysical />
-				<GeneralInformationSoundproofing />
+				<GeneralInformationPhysical
+					data={[
+						{
+							physical: 'Толщина, мм',
+							values: String(thickness) || '-',
+							requirements: '?',
+						},
+						{
+							physical: 'Масса, кг/м²',
+							values: String(mass) || '-',
+							requirements: '?',
+						},
+						{
+							physical: 'Высота, м',
+							values: String(constructionType?.maxHeight) || '-',
+							requirements: String(constructionType?.maxHeight) || '-',
+						},
+					]}
+				/>
+				<GeneralInformationSoundproofing
+					data={[
+						{
+							label: 'Расчёт',
+							soundproofing: 'Rw, dB',
+							values: String(constructionType?.labIndexValue) || '-',
+							requirements:
+								currentReportInfo?.regulatoryRequirement.noizeIsolationIndex || '-',
+						},
+						{
+							label: 'Лаб.тест',
+							soundproofing: 'Rw, dB',
+							values: String(constructionType?.RCalcs) || '-',
+							requirements:
+								currentReportInfo?.regulatoryRequirement.noizeIsolationIndex || '-',
+						},
+					]}
+				/>
 				<GeneralInformationThermal />
 				<GeneralInformationFireResistance />
 			</div>

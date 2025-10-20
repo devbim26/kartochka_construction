@@ -7,9 +7,9 @@ export enum MaterialParametrs {
 }
 
 export enum RuMaterialParametrs {
-	Thickness = 'Толщина',
-	Density = 'Плотность',
-	ConnectionNumber = 'Количество соединений',
-	RackStep = 'Шаг стоек',
-	Width = 'Ширина',
+	Thickness = 'Толщина(мм)',
+	Density = 'Плотность(кг/м³)',
+	ConnectionNumber = 'Количество соединений(шт.)',
+	RackStep = 'Шаг стоек(м)',
+	Width = 'Ширина(м)',
 }

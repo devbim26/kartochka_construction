@@ -11,12 +11,13 @@ import { getReportFloorById, graphDetail } from '@features/constructor/services'
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import { Guidebooks, type ConstructionsEditData } from '@features/guidbooks/types';
+import type { ConstructionsEditData, Country } from '@features/guidbooks/types';
+import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
+
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
-import { twMerge } from 'tailwind-merge';
 import issuer from '../../../../../assets/issuer.png';
 import DesigningGraph from './designing-graph.component';
 import { DesigningHeader } from './designing-header.component';
@@ -161,22 +162,44 @@ const MyConstructions = () => {
 				</div>
 			</div>
 			<div className="flex w-full gap-[72px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				<div className="flex flex-col">
-					<p className="text-[12px] italic">СП 275.1325800.2016</p>
-					<p className="text-[12px] italic">Защита от шума, Россия </p>
-					<p className="text-[25px] font-[600]">Rw = {constructionHeader?.RCalcs} dB</p>
-					<p
-						className={twMerge(
-							'text-[20px] font-[600]',
-							isRelevant ? 'text-[#008C54]' : 'text-[#FF0000]',
-						)}
-					>
-						{relevantText}
-					</p>
-					<p className="text-[12px] italic">
-						СП 51.13330.2011 &quot;Защита от шума&quot;{' '}
-					</p>
-					<p className="text-[25px] font-[600]">Rw ≥ 55 dB</p>
+				<div className="flex flex-col gap-[10px] px-[24px] py-[10px]">
+					{currentReportInfo ? (
+						<>
+							<p className="font-sans text-[14px]">
+								{currentReportInfo?.calculationRequirement.standartShortName},
+								{currentReportInfo?.calculationRequirement.standartFullName},
+								{
+									RuCountryNamesMap[
+										currentReportInfo?.calculationRequirement
+											.countryType as Country
+									]
+								}
+							</p>
+							<p className="font-sans text-[30px] font-semibold leading-4">
+								Rw={constructionHeader?.RCalcs}
+							</p>
+							<p className={isRelevant ? 'text-green-600' : 'text-error'}>
+								{relevantText}
+							</p>
+							<p className="font-sans text-[14px]">
+								{currentReportInfo?.regulatoryRequirement.standartShortName},
+								{currentReportInfo?.regulatoryRequirement.standartFullName},
+								{
+									RuCountryNamesMap[
+										currentReportInfo?.regulatoryRequirement
+											.countryType as Country
+									]
+								}
+							</p>
+							<p className="font-sans text-[30px] font-semibold leading-4">
+								Rw⩾{currentReportInfo?.regulatoryRequirement.noizeIsolationIndex}
+							</p>
+						</>
+					) : (
+						<div className="flex size-full items-center justify-center">
+							<Loader />
+						</div>
+					)}
 				</div>
 				<DesigningGraph graphData={graphData} />
 			</div>

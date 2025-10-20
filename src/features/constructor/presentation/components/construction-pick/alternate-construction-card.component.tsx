@@ -1,6 +1,7 @@
 import { Button, FormElementLabel, useAppDispatch } from '@core';
 import { svgConstructionDetail } from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
+import type { ReportInfoShort } from '@features/constructor/utils';
 import { formatMaterial } from '@features/constructor/utils';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
@@ -22,15 +23,46 @@ import {
 
 type Props = {
 	construction: AlternateConstruction;
+	reportInfo: ReportInfoShort;
 };
 
-export const AlternateConstructionCard = ({ construction }: Props) => {
+export const AlternateConstructionCard = ({ construction, reportInfo }: Props) => {
 	const dispatch = useAppDispatch();
 
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
+	const [thickness, setThickness] = useState<number>();
+	const [mass, setMass] = useState<number>();
+	const [density, setDensity] = useState<number>();
+
+	useEffect(() => {
+		if (!constructionHeader) return;
+
+		const materialValues =
+			constructionHeader.constructionTypeObject.constructions?.[0]?.userMaterials?.[0]
+				?.materialTypeValue;
+
+		const thicknessValue = materialValues?.find(
+			(v) => v.materialParameters === 'Thickness',
+		)?.value;
+		const densityValue = materialValues?.find((v) => v.materialParameters === 'Density')?.value;
+
+		if (thicknessValue) setThickness(+thicknessValue);
+		if (densityValue) setDensity(+densityValue);
+	}, [constructionHeader]);
+
+	useEffect(() => {
+		if (!thickness || !density || !construction) return;
+
+		const square = 100; //TODO: спросить;
+		if (!square) return;
+
+		const calculatedMass = (square * thickness * density) / 1000;
+		setMass(calculatedMass);
+	}, [thickness, density]);
+
 	const handleGetConstructionByHeaderId = (id: string) => {
 		dispatch(startLoading());
 		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.CONSTRUCTION }))
@@ -112,18 +144,45 @@ export const AlternateConstructionCard = ({ construction }: Props) => {
 				<FormElementLabel className="text-left font-sans font-semibold leading-6 text-primary">
 					Технические параметры
 				</FormElementLabel>
-				<GeneralInformationPhysical />
-				<GeneralInformationSoundproofing />
+				<GeneralInformationPhysical
+					data={[
+						{
+							physical: 'Толщина, мм',
+							values: String(thickness) || '-',
+							requirements: '?',
+						},
+						{
+							physical: 'Масса, кг/м²',
+							values: String(mass) || '-',
+							requirements: '?',
+						},
+						{
+							physical: 'Высота, м',
+							values: String(constructionHeader?.maxHeight) || '-',
+							requirements: String(constructionHeader?.maxHeight) || '-',
+						},
+					]}
+				/>
+				<GeneralInformationSoundproofing
+					data={[
+						{
+							label: 'Расчёт',
+							soundproofing: 'Rw, dB',
+							values: String(constructionHeader?.labIndexValue) || '-',
+							requirements:
+								reportInfo?.regulatoryRequirement.noizeIsolationIndex || '-',
+						},
+						{
+							label: 'Лаб.тест',
+							soundproofing: 'Rw, dB',
+							values: String(constructionHeader?.RCalcs) || '-',
+							requirements:
+								reportInfo?.regulatoryRequirement.noizeIsolationIndex || '-',
+						},
+					]}
+				/>
 				<GeneralInformationThermal />
 				<GeneralInformationFireResistance />
-			</div>
-			<FormElementLabel className="text-left font-sans font-semibold leading-6 text-primary">
-				Стоимость
-			</FormElementLabel>
-			<div className="flex flex-col gap-1">
-				<p className="text-[22px]">2500 RUB/м²</p>
-				<p className="font-sans text-[14px] italic">(ориентировочная)</p>
-				<p className="font-sans text-[14px] italic text-primary">{'подробнее>>'}</p>
 			</div>
 			<Button variant="primary" className="self-end" onClick={() => {}}>
 				Добавить в отчет

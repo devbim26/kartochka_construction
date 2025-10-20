@@ -3,14 +3,7 @@ import type { ThermalInsulationStandarts } from '@features/constructor/types/the
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 
-const dataThermal: ThermalInsulationStandarts[] = [
-	{
-		label: 'Расчёт',
-		insulation: 'R, м²·К/Вт',
-		values: '3,15',
-		requirements: '3,15',
-	},
-];
+const dataThermal: ThermalInsulationStandarts[] = [];
 
 export const GeneralInformationThermal = () => {
 	const columns = useMemo(() => {

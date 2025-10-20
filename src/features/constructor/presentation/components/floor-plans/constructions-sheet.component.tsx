@@ -53,7 +53,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 							content={
 								src ? (
 									<div
-										className="h-[150px] w-[200px] cursor-pointer"
+										className="h-[150px] w-[300px] cursor-pointer"
 										onClick={() => setPreviewSrc(src)}
 									>
 										<img

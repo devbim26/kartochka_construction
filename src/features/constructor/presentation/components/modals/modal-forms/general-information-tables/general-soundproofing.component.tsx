@@ -3,22 +3,11 @@ import type { SoundproofingStandarts } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 
-const dataSoundproofing: SoundproofingStandarts[] = [
-	{
-		label: 'Расчёт',
-		soundproofing: 'Rw, dB',
-		values: '45',
-		requirements: '450',
-	},
-	{
-		label: 'Лаб.тест',
-		soundproofing: 'Rw, dB',
-		values: '43',
-		requirements: '430',
-	},
-];
+type Props = {
+	data: SoundproofingStandarts[];
+};
 
-export const GeneralInformationSoundproofing = () => {
+export const GeneralInformationSoundproofing = ({ data }: Props) => {
 	const columns = useMemo(() => {
 		const cols: ColumnDef<SoundproofingStandarts>[] = [
 			{
@@ -62,19 +51,33 @@ export const GeneralInformationSoundproofing = () => {
 				header: () => (
 					<SimpleTableHeaderCell text="" textClassName="w-[100px] text-right" />
 				),
-				cell: (info) => (
-					<SimpleTableCell
-						content={info.getValue() as string}
-						contentClassName="w-[100px]"
-					/>
-				),
+				cell: (info) => {
+					const requirement = info.getValue() as string;
+					const value = info.row.original.values;
+					const isMatch = +requirement >= +value;
+					return (
+						<SimpleTableCell
+							content={
+								<span className="flex items-center justify-end gap-[6px]">
+									{requirement}
+									{isMatch ? (
+										<span className="text-green-600">✔</span>
+									) : (
+										<span className="text-error">✘</span>
+									)}
+								</span>
+							}
+							contentClassName="w-[100px]"
+						/>
+					);
+				},
 			},
 		];
 		return cols;
 	}, []);
 	return (
 		<div className="flex-col">
-			<DesigningTable data={dataSoundproofing} columns={columns} />
+			<DesigningTable data={data} columns={columns} />
 		</div>
 	);
 };
