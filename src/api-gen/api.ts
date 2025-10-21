@@ -287,6 +287,10 @@ export interface CreateReportConstructionDto {
 	constructionHeaderId?: string;
 	/** @format double */
 	square?: number;
+	/** @format double */
+	width?: number;
+	/** @format double */
+	length?: number;
 	/** @format uuid */
 	secondPlacementRoomId?: string;
 	/** @format uuid */
@@ -1018,6 +1022,10 @@ export interface ReportConstructionDto {
 	constructionHeaderId?: string;
 	/** @format double */
 	square?: number;
+	/** @format double */
+	width?: number;
+	/** @format double */
+	length?: number;
 	secondPlacementRoom?: PlacementRoomDto;
 	firstPlacementRoom?: PlacementRoomDto;
 }
@@ -2606,6 +2614,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				'floorInfo.reportConstructionHeader.constructionHeaderId'?: string;
 				/** @format double */
 				'floorInfo.reportConstructionHeader.square'?: number;
+				/** @format double */
+				'floorInfo.reportConstructionHeader.width'?: number;
+				/** @format double */
+				'floorInfo.reportConstructionHeader.length'?: number;
 				/** @format uuid */
 				'floorInfo.reportConstructionHeader.secondPlacementRoomId'?: string;
 				/** @format uuid */
