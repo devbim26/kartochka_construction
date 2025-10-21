@@ -188,7 +188,7 @@ export const GeneralInformationForm = () => {
 						Длина, м
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						?
+						{currentConstruction?.reportConstructionHeader.length}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -196,7 +196,7 @@ export const GeneralInformationForm = () => {
 						Ширина (высота), м
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						{constructionType?.maxHeight ?? '—'} {/*//TODO: dobavit iz reportHeaader */}
+						{currentConstruction?.reportConstructionHeader.width}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -242,7 +242,8 @@ export const GeneralInformationForm = () => {
 						},
 						{
 							physical: 'Высота, м',
-							values: String(constructionType?.maxHeight) || '-',
+							values:
+								String(currentConstruction?.reportConstructionHeader.width) || '-',
 							requirements: String(constructionType?.maxHeight) || '-',
 						},
 					]}

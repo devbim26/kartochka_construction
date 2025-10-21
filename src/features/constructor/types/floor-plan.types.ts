@@ -20,6 +20,8 @@ type ReportConstructionHeader = {
 	square: number;
 	secondPlacementRoom: NamedEntity;
 	firstPlacemetnRoom: NamedEntity;
+	width: number;
+	length: number;
 };
 
 type FloorConstruction = {

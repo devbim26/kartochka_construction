@@ -118,6 +118,8 @@ export const convertToClientFloorConstruction = (
 				id: data.reportConstructionHeader?.secondPlacementRoom?.id || '',
 				name: data.reportConstructionHeader?.secondPlacementRoom?.name || '',
 			},
+			length: data.reportConstructionHeader?.length || 0,
+			width: data.reportConstructionHeader?.width || 0,
 			firstPlacemetnRoom: {
 				id: data.reportConstructionHeader?.firstPlacementRoom?.id || '',
 				name: data.reportConstructionHeader?.firstPlacementRoom?.name || '',
