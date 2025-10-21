@@ -131,6 +131,8 @@ export const CreateConstructionForm = memoize(
 								'floorInfo.reportConstructionHeader.constructionHeaderId':
 									construction,
 								'floorInfo.reportConstructionHeader.square': +area,
+								width: +width,
+								length: +length,
 								'floorInfo.reportConstructionHeader.firstPlacementRoomId':
 									getValues('firstPlacementRoom'),
 								'floorInfo.reportConstructionHeader.secondPlacementRoomId':

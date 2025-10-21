@@ -10,6 +10,7 @@ export const convertToUpdateReportCommand = (
 ): UpdateReportInfoWithSingleConstructionCommand => ({
 	reportInfoId: reportId || undefined,
 	reportConstruction: {
+		name: data.name || null,
 		constructionHeaderId: data.construction || null,
 		square: Number(data.area) || null,
 		firstPlacementRoom: data.firstPlacementRoom || null,

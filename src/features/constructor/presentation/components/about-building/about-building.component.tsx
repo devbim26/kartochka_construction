@@ -595,9 +595,9 @@ const AboutBuildingScreen = () => {
 										onChange={(isEnabled) => {
 											field.onChange(isEnabled);
 											if (isEnabled) {
-												form.setValue('isConstruction', false);
+												form.setValue('isFloorPlan', false);
 											} else {
-												form.setValue('isConstruction', true);
+												form.setValue('isFloorPlan', true);
 											}
 										}}
 									/>
@@ -618,9 +618,9 @@ const AboutBuildingScreen = () => {
 										onChange={(isEnabled) => {
 											field.onChange(isEnabled);
 											if (isEnabled) {
-												form.setValue('isFloorPlan', false);
+												form.setValue('isConstruction', false);
 											} else {
-												form.setValue('isFloorPlan', true);
+												form.setValue('isConstruction', true);
 											}
 										}}
 									/>
