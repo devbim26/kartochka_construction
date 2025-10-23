@@ -13,10 +13,10 @@ export const convertToUpdateReportCommand = (
 		name: data.name || null,
 		constructionHeaderId: data.construction || null,
 		square: Number(data.area) || null,
-		firstPlacementRoom: data.firstPlacementRoom || null,
-
-		secondPlacementRoom: data.secondPlacementRoom || null,
-
+		firstPlacementRoomId: data.firstPlacementRoom || null,
+		width: +data.width || null,
+		secondPlacementRoomId: data.secondPlacementRoom || null,
+		length: +data.width || null,
 		constructionName: data.name || null,
 		constructionType: data.constructionType || null,
 	} as CreateReportConstructionDto,

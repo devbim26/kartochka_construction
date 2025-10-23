@@ -5,6 +5,7 @@ import type {
 	NewReportFloorInfoDto,
 	PaginatedConstructionHeaderDto,
 	ReportInfoShortDto,
+	SingleConstructionInfoDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
 import { convertToClientCountryData } from '@core';
@@ -24,6 +25,7 @@ import type {
 	FloorConstruction,
 	FloorFromReport,
 	ReportInfoUpdate,
+	SingleConstruction,
 } from '../types';
 import { ReportCategory } from '../types';
 import type { ReportInfoShort } from '../utils';
@@ -128,8 +130,31 @@ export const convertToClientFloorConstruction = (
 	};
 };
 
+export const convertToClientSingleConstruction = (
+	data: SingleConstructionInfoDto,
+): SingleConstruction => {
+	return {
+		documentImageUrl: '',
+		reportConstructionHeader: {
+			constructionHeaderId: data.reportConstructionHeader?.constructionHeaderId || '',
+			square: data.reportConstructionHeader?.square || 0,
+			id: data.reportConstructionHeader?.id || '',
+			secondPlacementRoom: {
+				id: data.reportConstructionHeader?.secondPlacementRoom?.id || '',
+				name: data.reportConstructionHeader?.secondPlacementRoom?.name || '',
+			},
+			length: data.reportConstructionHeader?.length || 0,
+			width: data.reportConstructionHeader?.width || 0,
+			firstPlacemetnRoom: {
+				id: data.reportConstructionHeader?.firstPlacementRoom?.id || '',
+				name: data.reportConstructionHeader?.firstPlacementRoom?.name || '',
+			},
+		},
+	};
+};
+
 export const convertFloorDataToClientConstructionSheet = (
-	data: FloorConstruction,
+	data: FloorConstruction | SingleConstruction,
 	constructionHeader: ConstructionsEditData,
 ): ConstructionSheet => {
 	return {

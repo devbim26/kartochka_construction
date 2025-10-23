@@ -34,10 +34,16 @@ type FloorConstruction = {
 	reportConstructionHeader: ReportConstructionHeader;
 };
 
+type SingleConstruction = {
+	documentImageUrl: string;
+	reportConstructionHeader: ReportConstructionHeader;
+};
+
 export {
 	type FloorPlansData,
 	type FloorPlanModalData,
 	type FloorFromReport,
 	type ReportConstructionHeader,
 	type FloorConstruction,
+	type SingleConstruction,
 };
