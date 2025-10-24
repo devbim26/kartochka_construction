@@ -87,7 +87,7 @@ const MyConstructions = () => {
 	useEffect(() => {
 		const rwValue = +(constructionHeader?.RCalcs || 0);
 		setIsRelevant(
-			rwValue >= +(currentReportInfo?.regulatoryRequirement.noizeImpactIndex || 55),
+			rwValue >= +(currentReportInfo?.regulatoryRequirement.noizeIsolationIndex || 55),
 		);
 	}, [constructionHeader?.RCalcs, currentReportInfo]);
 

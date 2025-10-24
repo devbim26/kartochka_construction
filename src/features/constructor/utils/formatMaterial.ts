@@ -12,7 +12,7 @@ export const formatMaterial = (material: UserMaterials) => {
 					RuMaterialParametrs[
 						val.materialParameters as keyof typeof RuMaterialParametrs
 					] ?? val.materialParameters;
-				return `${param}: ${val.value}`;
+				return `${param}: ${Math.round(+val.value)}`;
 			})
 			.join(', ') || 'нет данных';
 	return `${materialType} (${materialParams})`;

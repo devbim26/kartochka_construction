@@ -38,8 +38,14 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 				header: () => <SimpleTableHeaderCell text="Название" />,
 				cell: (info) => (
 					<SimpleTableCell
-						contentClassName="max-w-[150px]"
-						content={<div className="max-w-[150px]">{info.getValue() as string}</div>}
+						contentClassName="w-fit text-[15px]"
+						content={
+							<div className="flex flex-col gap-[2px]">
+								<p>Тип: {info.row.original.constructionType}</p>
+								<p>Конструкция: {info.getValue() as string}</p>
+								<p>Разделяет: {info.row.original.constructionDivide}</p>
+							</div>
+						}
 					/>
 				),
 			},

@@ -208,7 +208,10 @@ export const CreateConstructionForm = memoize(
 		return (
 			<div className="relative flex flex-col border-b">
 				{isLoading && (
-					<div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+					<div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-[10px] bg-white/60">
+						<p className="text-[18px] text-primary">
+							Проводится расчет значений конструкции
+						</p>
 						<Loader />
 					</div>
 				)}

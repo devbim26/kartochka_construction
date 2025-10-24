@@ -97,16 +97,16 @@ export const GeneralInformationForm = () => {
 					if (response?.data && response.status === 200) {
 						setCurrentConstruction(convertToClientFloorConstruction(response.data));
 					}
+					dispatch(stopLoading());
 				}),
 				catchError((error) => {
 					console.error('Ошибка запроса:', error);
 					toast.error('Ошибка при получении информации о конструкции');
+					dispatch(stopLoading());
 					return of(null);
 				}),
 			)
-			.subscribe(() => {
-				dispatch(stopLoading());
-			});
+			.subscribe();
 	};
 
 	const handleGetConstructionByHeaderId = (id: string) => {
@@ -141,11 +141,12 @@ export const GeneralInformationForm = () => {
 
 	return (
 		<div className="relative flex flex-row gap-[10px] border-b">
-			{isLoading && (
-				<div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/60">
-					<Loader />
-				</div>
-			)}
+			{isLoading ||
+				(!currentReportInfo && (
+					<div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/60">
+						<Loader />
+					</div>
+				))}
 			<div className="flex flex-col gap-[24px]">
 				<FormElementLabel className="text-left font-sans font-semibold leading-6">
 					Общая информация
@@ -233,12 +234,12 @@ export const GeneralInformationForm = () => {
 						{
 							physical: 'Толщина, мм',
 							values: String(thickness) || '-',
-							requirements: '?',
+							requirements: '-',
 						},
 						{
 							physical: 'Масса, кг/м²',
 							values: String(mass) || '-',
-							requirements: '?',
+							requirements: '-',
 						},
 						{
 							physical: 'Высота, м',

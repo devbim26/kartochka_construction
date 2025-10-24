@@ -18,7 +18,12 @@ import type {
 	ConstructionsEditData,
 	Country,
 } from '@features/guidbooks/types';
-import { BuildingType, CategoryClass, ConstructionTypeEnum } from '@features/guidbooks/types';
+import {
+	BuildingType,
+	CategoryClass,
+	ConstructionTypeEnum,
+	RuConstructionTypesMap,
+} from '@features/guidbooks/types';
 import type {
 	AboutBuildingData,
 	ConstructionSheet,
@@ -158,6 +163,12 @@ export const convertFloorDataToClientConstructionSheet = (
 	constructionHeader: ConstructionsEditData,
 ): ConstructionSheet => {
 	return {
+		constructionDivide:
+			data.reportConstructionHeader.firstPlacemetnRoom.name +
+			'/' +
+			data.reportConstructionHeader.secondPlacementRoom.name,
+		constructionType:
+			RuConstructionTypesMap[constructionHeader.constructionType as ConstructionTypeEnum],
 		constructionInfoImage: data.documentImageUrl || '',
 		square: String(data.reportConstructionHeader?.square) || '',
 		constructionId: data.reportConstructionHeader?.constructionHeaderId || '',

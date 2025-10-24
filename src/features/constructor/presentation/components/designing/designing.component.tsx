@@ -1,7 +1,8 @@
-import { Button, Input, useAppDispatch, useAppSelector } from '@core';
+import { Button, Input, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import type { DesigningData, GraphDetailResponse, ReportInfoShort } from '@features';
 import {
+	CONSTRUCTOR_ROUTES,
 	DesigningConfig,
 	DesigningHeader,
 	formatMaterial,
@@ -55,6 +56,8 @@ const DesigningScreen = () => {
 	const [refreshConstructionData, setRefreshConstructionData] = useState(0);
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 
+	const navigate = useAppNavigate();
+
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
 		defaultValues: DesigningConfig.defaultValues,
@@ -98,15 +101,9 @@ const DesigningScreen = () => {
 			.subscribe(() => dispatch(stopLoading()));
 	};
 
-	useEffect(() => {
-		if (!reportId || !constructionHeaderId) return;
-		handleGetConstructionByHeaderId(constructionHeaderId);
-	}, [reportId, refreshConstructionData, constructionHeaderId]);
-
-	useEffect(() => {
-		if (!constructionHeaderId || graphData) return;
+	const handleGetGraphDetail = (id: string) => {
 		dispatch(startLoading());
-		from(graphDetail({ constructionHeaderId }))
+		from(graphDetail({ constructionHeaderId: id }))
 			.pipe(
 				catchError((error) => {
 					toast.error('Не удалось загрузить данные графика');
@@ -122,6 +119,16 @@ const DesigningScreen = () => {
 				setGraphData(data.map(graphDotsConverterToClient));
 				dispatch(stopLoading());
 			});
+	};
+
+	useEffect(() => {
+		if (!reportId || !constructionHeaderId) return;
+		handleGetConstructionByHeaderId(constructionHeaderId);
+	}, [reportId, refreshConstructionData, constructionHeaderId]);
+
+	useEffect(() => {
+		if (!constructionHeaderId || graphData) return;
+		handleGetGraphDetail(constructionHeaderId);
 	}, [constructionHeaderId]);
 
 	useEffect(() => {
@@ -131,13 +138,12 @@ const DesigningScreen = () => {
 	}, [reportType, reportId]);
 
 	useEffect(() => {
-		const rwValue = +(constructionHeader?.RCalcs || 0);
-		setIsRelevant(
-			rwValue >= +(currentReportInfo?.regulatoryRequirement.noizeImpactIndex || 55),
-		);
-	}, [constructionHeader?.RCalcs, currentReportInfo]);
-
-	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
+		if (!!constructionHeader && !!currentReportInfo?.regulatoryRequirement) {
+			const rwValue = +(constructionHeader.RCalcs || 0);
+			const requiredRw = +(currentReportInfo.regulatoryRequirement.noizeIsolationIndex || 0);
+			setIsRelevant(rwValue >= requiredRw);
+		}
+	}, [constructionHeader, currentReportInfo]);
 
 	const constructionType = constructionHeader?.constructionTypeObject?.constructionTypeEnum as
 		| ConstructionTypeEnum
@@ -186,21 +192,52 @@ const DesigningScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					toast.success('Параметры конструкции успешно обновлены');
-					setRefreshConstructionData((prev) => prev + 1);
+
+					if (!constructionHeaderId) return;
+					handleGetConstructionByHeaderId(constructionHeaderId);
+					handleGetConstructionImage(constructionHeaderId);
+					handleGetGraphDetail(constructionHeaderId);
 				}
 			});
 	}, [form]);
 
-	if (isLoading || !constructionHeader) {
-		return (
-			<div className="flex size-full items-center justify-center">
-				<Loader />
-			</div>
-		);
-	}
+	const onEditHandleWithRedirect = useCallback(() => {
+		const formData = form.getValues() as ConstructionsEditData;
+		const dataForServer = convertToServerConstructionsEditData(formData);
+		from(
+			getGuidebooksEdit({
+				data: dataForServer,
+				guidebookType: Guidebooks.CONSTRUCTION,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					toast.success('Параметры конструкции успешно обновлены');
+
+					if (!constructionHeaderId) return;
+					navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
+						reportId: reportId!,
+						reportType: reportType!,
+					});
+				}
+			});
+	}, [form]);
 
 	return (
-		<div className="flex w-full flex-col gap-[30px]">
+		<div className="relative flex w-full flex-col gap-[30px]">
+			{isLoading && (
+				<div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-[10px] bg-white/60">
+					<Loader />
+				</div>
+			)}
 			<DesigningHeader />
 			<div className="flex h-[428px] w-full flex-row gap-[72px] rounded-[20px] bg-white px-[44px] py-[34px]">
 				<img className="h-full w-fit" src={svgUrl ?? undefined} alt="SVG Construction" />
@@ -218,7 +255,7 @@ const DesigningScreen = () => {
 							(layer, layerIndex) => (
 								<div key={layerIndex}>
 									{layer.userMaterials?.map((material, materialIndex) => (
-										<p key={materialIndex} className="pl-4 text-[16px]">
+										<p key={materialIndex} className="pl-4 text-[22px]">
 											- {formatMaterial(material)}
 										</p>
 									))}
@@ -237,12 +274,20 @@ const DesigningScreen = () => {
 						currentConstruction: constructionType,
 						currentForm: form,
 					}).component}
-				<Button
-					onClick={onEditHandle}
-					className="ml-auto h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
-				>
-					Применить
-				</Button>
+				<div className="flex items-center justify-end gap-[10px]">
+					<Button
+						onClick={onEditHandle}
+						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
+					>
+						Применить
+					</Button>
+					<Button
+						onClick={onEditHandleWithRedirect}
+						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
+					>
+						Сохранить
+					</Button>
+				</div>
 			</div>
 			<div className="flex w-full gap-[10px] rounded-[20px] bg-white px-[25px] py-[27px]">
 				<div className="flex flex-col gap-[10px] px-[24px] py-[10px]">
@@ -262,7 +307,7 @@ const DesigningScreen = () => {
 								Rw={constructionHeader?.RCalcs}
 							</p>
 							<p className={isRelevant ? 'text-green-600' : 'text-error'}>
-								{relevantText}
+								{isRelevant ? 'Соответствует' : 'Не соответствует'}
 							</p>
 							<p className="font-sans text-[14px]">
 								{currentReportInfo?.regulatoryRequirement.standartShortName},

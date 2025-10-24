@@ -13,11 +13,11 @@ export const GeneralInformationThermal = () => {
 				header: () => (
 					<SimpleTableHeaderCell
 						text="Тепловая изоляция"
-						textClassName="w-[200px] text-left"
+						textClassName="w-[200px] text-left text-[#6F7276]"
 					/>
 				),
 				cell: (info) => {
-					const row = info.row.original as ThermalInsulationStandarts;
+					const row = info.row.original;
 					return (
 						<SimpleTableCell
 							content={
@@ -37,30 +37,49 @@ export const GeneralInformationThermal = () => {
 				header: () => (
 					<SimpleTableHeaderCell text="" textClassName="w-[100px] text-right" />
 				),
-				cell: (info) => (
-					<SimpleTableCell
-						content={info.getValue() as string}
-						contentClassName="w-[100px]"
-					/>
-				),
+				cell: (info) => {
+					const value = info.getValue() as string;
+					const rounded = value === '-' ? '-' : Math.round(+value).toString();
+					return <SimpleTableCell content={rounded} contentClassName="w-[100px]" />;
+				},
 			},
 			{
 				accessorKey: 'requirements',
 				header: () => (
 					<SimpleTableHeaderCell text="" textClassName="w-[100px] text-right" />
 				),
-				cell: (info) => (
-					<SimpleTableCell
-						content={info.getValue() as string}
-						contentClassName="w-[100px]"
-					/>
-				),
+				cell: (info) => {
+					const requirement = info.getValue() as string;
+					const value = info.row.original.values;
+
+					const isDash = requirement === '-' || value === '-';
+					const roundedRequirement = isDash ? '-' : Math.round(+requirement).toString();
+					const isMatch = !isDash && +requirement >= +value;
+
+					return (
+						<SimpleTableCell
+							content={
+								<span className="flex items-center justify-end gap-[6px]">
+									{roundedRequirement}
+									{!isDash &&
+										(isMatch ? (
+											<span className="text-green-600">✔</span>
+										) : (
+											<span className="text-error">✘</span>
+										))}
+								</span>
+							}
+							contentClassName="w-[100px]"
+						/>
+					);
+				},
 			},
 		];
 		return cols;
 	}, []);
+
 	return (
-		<div className="flex-col">
+		<div className="flex-col text-[#6F7276]">
 			<DesigningTable data={dataThermal} columns={columns} />
 		</div>
 	);

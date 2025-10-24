@@ -13,7 +13,7 @@ export const GeneralInformationFireResistance = () => {
 				header: () => (
 					<SimpleTableHeaderCell
 						text="Огнестойкость"
-						textClassName="w-[200px] text-left"
+						textClassName="w-[200px] text-left text-[#6F7276]"
 					/>
 				),
 				cell: (info) => {
@@ -61,7 +61,7 @@ export const GeneralInformationFireResistance = () => {
 	}, []);
 
 	return (
-		<div className="flex-col">
+		<div className="flex-col text-[#6F7276]">
 			<DesigningTable data={dataFireResistance} columns={columns} />
 		</div>
 	);
