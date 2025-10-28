@@ -24,8 +24,6 @@ export const News = () => {
 					const fetchedArticles = response.data.items ?? [];
 					if (fetchedArticles.length > 0) {
 						setArticles(fetchedArticles);
-					} else {
-						toast.error('Новых новостей пока нет.');
 					}
 				}),
 				catchError((error) => {

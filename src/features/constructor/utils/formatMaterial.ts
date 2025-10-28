@@ -15,5 +15,5 @@ export const formatMaterial = (material: UserMaterials) => {
 				return `${param}: ${Math.round(+val.value)}`;
 			})
 			.join(', ') || 'нет данных';
-	return `${materialType} (${materialParams})`;
+	return `${material.materialName}(${materialType}), ${materialParams}`;
 };

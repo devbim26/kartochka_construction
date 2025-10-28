@@ -19,6 +19,7 @@ const AccountDataSchema = z.object({
 	directorFullName: z.string().min(1, 'Поле обязательно для заполнения'),
 	companyAddress: z.string().min(1, 'Поле обязательно для заполнения'),
 	role: z.object({ id: z.string(), name: z.string() }).optional(),
+	expiresAt: z.number().optional(),
 	payersRegistrationNumber: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')

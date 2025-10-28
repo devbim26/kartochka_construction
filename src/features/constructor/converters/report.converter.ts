@@ -38,7 +38,6 @@ import type { ReportInfoShort } from '../utils';
 export const convertToCreateReportInfoCommand = (
 	data: AboutBuildingData,
 ): CreateReportInfoCommand => {
-	console.log(data);
 	return {
 		description: data.commonDescription || '',
 		buildingName: data.name,

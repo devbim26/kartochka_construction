@@ -81,6 +81,7 @@ export const convertToServerConstructionType = (
 			userMaterials:
 				construction.userMaterials?.map((userMaterial) => ({
 					materialId: userMaterial.materialId,
+					materialName: userMaterial.materialName || '',
 					positionId: +userMaterial.positionId,
 					materialTypeValue:
 						userMaterial.materialTypeValue?.map((materialTypeValue) => ({
@@ -103,6 +104,7 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 			userMaterials:
 				construction.userMaterials?.map((userMaterial: any) => ({
 					materialId: userMaterial.materialId ?? '',
+					materialName: userMaterial.materialName || '',
 					positionId: String(userMaterial.positionId ?? ''),
 					materialType: userMaterial.materialType ?? '',
 					materialTypeValue:

@@ -88,6 +88,10 @@ export const ConstructionTypeMap = ({
 				]);
 			},
 		},
+		[ConstructionTypeEnum.Floor]: {
+			component: <></>,
+			action: () => {},
+		},
 		[ConstructionTypeEnum.HeavySingleWallFacing]: {
 			component: <></>,
 			action: () => {},

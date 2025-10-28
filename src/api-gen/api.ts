@@ -24,6 +24,8 @@ export interface AccountDto {
 	additionalPhoneNumbers?: AdditionalPhoneNumber[] | null;
 	logoUrl?: string | null;
 	role?: UserRole;
+	/** @format int32 */
+	expiresAt?: number;
 }
 
 export interface AdditionalPhoneNumber {
@@ -172,6 +174,7 @@ export enum ConstructionTypeEnum {
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
 	OneGlassFrame = 'OneGlassFrame',
 	TwoGlassFrame = 'TwoGlassFrame',
+	Floor = 'Floor',
 }
 
 export interface ConstructionTypeTemplate {
@@ -1340,6 +1343,7 @@ export interface UpdateSubscriptionCommand {
 export interface UserMaterialDto {
 	/** @format uuid */
 	materialId?: string;
+	materialName?: string | null;
 	materialType?: MaterialTypeEnum;
 	/** @format int32 */
 	positionId?: number;

@@ -24,6 +24,7 @@ const ReportFromComponent = () => {
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
 	const reportType = search.get('reportType');
+	const userData = useAppSelector((store) => store.userData);
 
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
@@ -103,6 +104,7 @@ const ReportFromComponent = () => {
 					<GeneralInfoForm />
 					<DocumentFlags />
 					<div className="flex w-full items-center justify-end gap-[50px]">
+						<p>Осталось отчетов: {userData.data?.expiresAt || 0}</p>
 						<Button onClick={() => form.handleSubmit(handleDownloadReport)()}>
 							Скачать
 						</Button>

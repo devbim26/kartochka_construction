@@ -25,6 +25,7 @@ export interface ConstructionFieldTypesProps {
 export interface UserMaterials {
 	materialId: string;
 	positionId: string;
+	materialName?: string;
 	materialTypeValue?: Array<{
 		materialParameters: string;
 		value: string;
@@ -48,6 +49,7 @@ export enum ConstructionTypeEnum {
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
 	OneGlassFrame = 'OneGlassFrame',
 	TwoGlassFrame = 'TwoGlassFrame',
+	Floor = 'Floor',
 }
 
 export const RuConstructionTypesMap = {
@@ -70,6 +72,7 @@ export const RuConstructionTypesMap = {
 	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
 	OneGlassFrame: 'Многослойное стекло',
 	TwoGlassFrame: 'Стеклопакет',
+	Floor: 'Поэтажный',
 };
 
 export const RuConstructionTypesSelectValues = [

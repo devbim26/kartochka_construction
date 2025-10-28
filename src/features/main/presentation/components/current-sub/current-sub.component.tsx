@@ -1,5 +1,5 @@
 import { fetchApi } from '@api-gen';
-import { Button, convertToPaginatedType } from '@core';
+import { Button, convertToPaginatedType, useAppSelector } from '@core';
 import {
 	convertSubscriptionToClient,
 	getPaginatedSubscriptions,
@@ -14,7 +14,7 @@ import { SubImage } from './images';
 export const CurrentSub = () => {
 	const [subscription, setSubscription] = useState<Subscription>();
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
-
+	const userData = useAppSelector((store) => store.userData);
 	const handleGetTableData = () => {
 		from(
 			getPaginatedSubscriptions({
@@ -92,7 +92,7 @@ export const CurrentSub = () => {
 							</div>
 							<div className="flex flex-row">
 								<p className="mr-[5px] font-sans text-lg font-normal leading-4">
-									количество скачиваний: {subscription.numberOfReports}
+									осталось скачиваний: {userData.data?.expiresAt}
 								</p>
 							</div>
 							<div className="flex flex-row">

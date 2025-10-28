@@ -13,6 +13,7 @@ export const MaterialTypeValues = z.object({
 });
 export const UserMaterial = z.object({
 	materialId: z.string().min(1, 'Поле обязательно для заполнения'),
+	materialName: z.string().optional(),
 	positionId: z.string().min(1, 'Поле обязательно для заполнения'),
 	materialTypeValue: z.array(MaterialTypeValues).optional().nullable(),
 	materialType: z.string().min(1, 'Поле обязательно для заполнения'),

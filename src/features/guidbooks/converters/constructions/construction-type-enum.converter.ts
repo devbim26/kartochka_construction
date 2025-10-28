@@ -29,6 +29,7 @@ const constructionTypeEnumMap = createDataRecordConverter({
 		ServerConstructionTypeEnum.HeavySingleWallFacing,
 	[ClientConstructionTypeEnum.OneGlassFrame]: ServerConstructionTypeEnum.OneGlassFrame,
 	[ClientConstructionTypeEnum.TwoGlassFrame]: ServerConstructionTypeEnum.TwoGlassFrame,
+	[ClientConstructionTypeEnum.Floor]: ServerConstructionTypeEnum.Floor,
 });
 export const convertToServerConstructionTypeEnumData = (
 	type: ClientConstructionTypeEnum,
