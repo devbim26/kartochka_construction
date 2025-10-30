@@ -38,12 +38,21 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 				header: () => <SimpleTableHeaderCell text="Название" />,
 				cell: (info) => (
 					<SimpleTableCell
-						contentClassName="w-fit text-[15px]"
+						contentClassName="w-[300px] text-[15px]"
 						content={
-							<div className="flex flex-col gap-[2px]">
-								<p>Тип: {info.row.original.constructionType}</p>
-								<p>Конструкция: {info.getValue() as string}</p>
-								<p>Разделяет: {info.row.original.constructionDivide}</p>
+							<div className="flex flex-col items-center gap-2 text-center font-sans text-[20px]">
+								<div>
+									<p className="font-semibold">Название</p>
+									<p>{info.getValue() as string}</p>
+								</div>
+								<div>
+									<p className="font-semibold">Тип</p>
+									<p>{info.row.original.constructionType}</p>
+								</div>
+								<div>
+									<p className="font-semibold">Разделяет</p>
+									<p>{info.row.original.constructionDivide}</p>
+								</div>
 							</div>
 						}
 					/>
@@ -95,7 +104,11 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 				header: () => <SimpleTableHeaderCell text="Площадь, м²" />,
 				cell: (info) => (
 					<SimpleTableCell
-						content={<div className="w-fit">{info.getValue() as string}</div>}
+						content={
+							<div className="w-fit text-[20px] font-semibold">
+								{info.getValue() as string}
+							</div>
+						}
 					/>
 				),
 			},
@@ -106,83 +119,101 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 					return (
 						<SimpleTableCell
 							content={
-								<div className="flex w-[150px] flex-col gap-5">
-									<div className="flex justify-between">
-										<InfoIcon
-											onClick={() => {
-												navigate('', {
-													info: 'true',
-													reportId: search.get('reportId')!,
-													reportType: search.get('reportType')!,
-													reportFloorInfoId: reportFloorInfoId!,
-												});
-											}}
-										/>
-										<DeleteIcon
-											onClick={() => {
-												navigate('', {
-													delete: 'true',
-													constructionId:
-														info.row.original.constructionId,
-													reportType: search.get('reportType')!,
-													reportId: search.get('reportId')!,
-												});
-											}}
-										/>
+								<div className="flex w-full flex-col gap-5">
+									<div className="flex flex-col items-center gap-[5px] text-[20px]">
+										<div className="flex w-full items-center gap-[10px]">
+											<Button
+												variant="primary"
+												onClick={() =>
+													navigate(
+														APP_ROUTES.designing.route +
+															'/' +
+															DESIGNING_ROUTES.constructor.route +
+															'/' +
+															CONSTRUCTOR_ROUTES.designing.route,
+														{
+															reportId: search.get('reportId')!,
+															reportType: search.get('reportType')!,
+															constructionHeaderId:
+																info.row.original.constructionId,
+														},
+													)
+												}
+												className="h-[50px] w-[200px] p-[6px] text-[20px]"
+											>
+												Проектирование
+											</Button>{' '}
+											<p className="text-[15px] font-semibold text-input-label-primary">
+												Расчет звукоизоляции конструкции
+											</p>
+										</div>
+										<div className="flex w-full items-center gap-[10px]">
+											<Button
+												variant="primary"
+												className="h-[50px] w-[200px] p-[6px] text-[20px]"
+												onClick={() =>
+													navigate(
+														APP_ROUTES.designing.route +
+															'/' +
+															DESIGNING_ROUTES.constructor.route +
+															'/' +
+															CONSTRUCTOR_ROUTES.constructionSelect
+																.route,
+														{
+															reportId: search.get('reportId')!,
+															reportType: search.get('reportType')!,
+															constructionHeaderId:
+																info.row.original.constructionId,
+														},
+													)
+												}
+											>
+												Выбор из каталога
+											</Button>
+											<p className="text-[15px] font-semibold text-input-label-primary">
+												Выбор из каталога производителей
+											</p>
+										</div>
 									</div>
 									<div className="flex justify-between">
-										<EditIcon
-											onClick={() => {
-												navigate('', {
-													edit: 'true',
-													reportId: search.get('reportId')!,
-													reportType: search.get('reportType')!,
-												});
-											}}
-										/>
+										<div className="flex w-full items-center gap-[5px] text-[20px]">
+											<InfoIcon
+												onClick={() => {
+													navigate('', {
+														info: 'true',
+														reportId: search.get('reportId')!,
+														reportType: search.get('reportType')!,
+														reportFloorInfoId: reportFloorInfoId!,
+													});
+												}}
+											/>
+											<p className="text-[15px] font-semibold text-input-label-primary">
+												Свойства конструкции
+											</p>
+										</div>
+										<div className="flex items-center gap-[10px]">
+											<EditIcon
+												onClick={() => {
+													navigate('', {
+														edit: 'true',
+														reportId: search.get('reportId')!,
+														reportType: search.get('reportType')!,
+													});
+												}}
+											/>
+											<DeleteIcon
+												onClick={() => {
+													navigate('', {
+														delete: 'true',
+														constructionId:
+															info.row.original.constructionId,
+														reportType: search.get('reportType')!,
+														reportId: search.get('reportId')!,
+													});
+												}}
+											/>
+										</div>
 									</div>
-									<Button
-										variant="primary"
-										onClick={() =>
-											navigate(
-												APP_ROUTES.designing.route +
-													'/' +
-													DESIGNING_ROUTES.constructor.route +
-													'/' +
-													CONSTRUCTOR_ROUTES.designing.route,
-												{
-													reportId: search.get('reportId')!,
-													reportType: search.get('reportType')!,
-													constructionHeaderId:
-														info.row.original.constructionId,
-												},
-											)
-										}
-										className="p-[6px]"
-									>
-										Проектирование
-									</Button>
-									<Button
-										variant="primary"
-										className="p-[6px]"
-										onClick={() =>
-											navigate(
-												APP_ROUTES.designing.route +
-													'/' +
-													DESIGNING_ROUTES.constructor.route +
-													'/' +
-													CONSTRUCTOR_ROUTES.constructionSelect.route,
-												{
-													reportId: search.get('reportId')!,
-													reportType: search.get('reportType')!,
-													constructionHeaderId:
-														info.row.original.constructionId,
-												},
-											)
-										}
-									>
-										Выбор из каталога
-									</Button>
 								</div>
 							}
 						/>

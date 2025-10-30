@@ -420,7 +420,7 @@ export const FloorPlans = memoize(() => {
 							)
 						}
 						variant="primary"
-						className="self-end"
+						className="h-[50px] self-end text-[20px]"
 					>
 						Сформировать отчет
 					</Button>

@@ -1,4 +1,4 @@
-import { Button, useAppDispatch, useAppSelector } from '@core';
+import { APP_ROUTES, Button, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { convertToClientReportFormFlags } from '@features/constructor/converters';
 import {
@@ -11,6 +11,7 @@ import { stopLoading } from '@features/constructor/store';
 import { ReportCategory } from '@features/constructor/types';
 import type { FormReportSchemaType } from '@features/constructor/utils';
 import { FormReportConfig } from '@features/constructor/utils';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -25,7 +26,7 @@ const ReportFromComponent = () => {
 	const reportId = search.get('reportId');
 	const reportType = search.get('reportType');
 	const userData = useAppSelector((store) => store.userData);
-
+	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 
@@ -83,6 +84,45 @@ const ReportFromComponent = () => {
 								}
 								dispatch(stopLoading());
 							});
+					sessionStorage.removeItem('reportId');
+					sessionStorage.removeItem('reportType');
+				});
+		} else {
+			toast.error('Заполните форму');
+		}
+	};
+
+	const handleSaveReport = () => {
+		if (!Object.keys(form.formState.errors).length) {
+			if (!reportId) return;
+			from(formReport({ ...form.getValues(), reportInfoId: reportId }))
+				.pipe(
+					catchError(() => {
+						return [];
+					}),
+				)
+				.subscribe((response) => {
+					if (response.status === 200)
+						from(
+							search.get('reportType') == ReportCategory.Floor
+								? reportReceiveFloor(reportId)
+								: reportReceiveSingle(reportId),
+						)
+							.pipe(
+								catchError(() => {
+									return [null];
+								}),
+							)
+							.subscribe((response) => {
+								if (response?.status === 200) {
+									navigate(
+										APP_ROUTES.designing.route +
+											'/' +
+											DESIGNING_ROUTES.reports.route,
+									);
+								}
+								dispatch(stopLoading());
+							});
 					sessionStorage.setItem('reportId', reportId);
 					sessionStorage.setItem('reportType', reportType as string);
 				});
@@ -108,7 +148,9 @@ const ReportFromComponent = () => {
 						<Button onClick={() => form.handleSubmit(handleDownloadReport)()}>
 							Скачать
 						</Button>
-						<Button>Сохранить</Button>
+						<Button onClick={() => form.handleSubmit(handleSaveReport)()}>
+							Сохранить
+						</Button>
 					</div>
 				</div>
 			</div>
