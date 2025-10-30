@@ -8,17 +8,20 @@ import {
 	graphDotsConverterToClient,
 } from '@features/constructor/converters';
 import { getReportFloorById, graphDetail } from '@features/constructor/services';
-import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
+import {
+	convertToClientConstructionsEditData,
+	convertToClientIssuerData,
+} from '@features/guidbooks/converters';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import type { ConstructionsEditData, Country } from '@features/guidbooks/types';
+import type { ConstructionsEditData, Country, Issuer } from '@features/guidbooks/types';
 import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
 
+import type { IssuerDto } from '@api-gen';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
-import issuer from '../../../../../assets/issuer.png';
 import DesigningGraph from './designing-graph.component';
 import { DesigningHeader } from './designing-header.component';
 
@@ -30,6 +33,8 @@ const MyConstructions = () => {
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
+	const [issuer, setIssuer] = useState<Issuer | null>(null);
+
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const reportType = search.get('reportType');
 	const constructionHeaderId = search.get('constructionHeaderId');
@@ -89,7 +94,26 @@ const MyConstructions = () => {
 		setIsRelevant(
 			rwValue >= +(currentReportInfo?.regulatoryRequirement.noizeIsolationIndex || 55),
 		);
+		if (constructionHeader) handleGetIssuerByHeaderId(constructionHeader.issuer);
 	}, [constructionHeader?.RCalcs, currentReportInfo]);
+
+	const handleGetIssuerByHeaderId = (id: string) => {
+		dispatch(startLoading());
+		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.ISSUER }))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setIssuer(convertToClientIssuerData(response.data as IssuerDto));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации о производителе');
+					return of(null);
+				}),
+			)
+			.subscribe(() => dispatch(stopLoading()));
+	};
 
 	useEffect(() => {
 		if (!constructionHeaderId || graphData) return;
@@ -144,12 +168,16 @@ const MyConstructions = () => {
 						</div>
 					</div>
 					<div className="flex flex-col">
-						<img
-							src={issuer}
-							alt="Превью изображения"
-							className="h-[66px] w-[140px] rounded-md object-cover"
-						/>
-						<p>www.acoustic.ru</p>
+						{issuer?.logoUrl && (
+							<img
+								src={issuer?.logoUrl}
+								alt="Превью изображения"
+								className="h-[66px] w-[140px] rounded-md object-cover"
+							/>
+						)}
+						<p>
+							{issuer?.name}: {issuer?.webSite}
+						</p>
 						<div className="flex items-center gap-[20px]">
 							<Button variant="primary" className="p-[10px]">
 								<ChevronIcon className="rotate-90" fill="white" />

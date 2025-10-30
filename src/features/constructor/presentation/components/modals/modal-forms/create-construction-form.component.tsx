@@ -262,7 +262,14 @@ export const CreateConstructionForm = memoize(
 							name={'construction'}
 							render={({ field }) => (
 								<Select
-									options={convertToSelectValues(constructionData) ?? []}
+									options={
+										convertToSelectValues(
+											constructionData.map((construction) => ({
+												...construction,
+												name: construction.description,
+											})),
+										) ?? []
+									}
 									{...field}
 									value={field.value || ''}
 									label={formState.errors?.construction?.message || 'Конструкция'}
