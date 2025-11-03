@@ -75,7 +75,6 @@ export const convertToClientRequirementTableData = (data: RequirementDto): Requi
 });
 
 export const convertToServerRequirementData = (data: FormRequirement): CreateRequirementCommand => {
-	console.log(data);
 	if ((data.constructionType as ConstructionClass) === ConstructionClass.Wall) {
 		return {
 			secondPlacementRoomId: data.secondPlacementRoomId || undefined,
@@ -118,7 +117,6 @@ export const convertToServerRequirementData = (data: FormRequirement): CreateReq
 export const convertToServerRequirementUpdateData = (
 	data: FormRequirement,
 ): UpdateRequirementCommand => {
-	console.log(data);
 	if ((data.constructionType as ConstructionClass) === ConstructionClass.Wall) {
 		return {
 			id: data.id,
