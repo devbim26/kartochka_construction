@@ -39,6 +39,7 @@ import {
 	Country,
 	country2title,
 	Guidebooks,
+	RequirementType,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuCountryNamesSelectValues,
@@ -62,7 +63,13 @@ const AboutBuildingScreen = () => {
 	const { register, control, formState, watch, setValue } = form;
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
-	const [requirementData, setRequirementData] = useState<Array<Requirement>>([]);
+	const [calculationRequirementData, setCalculationRequirementData] = useState<
+		Array<Requirement>
+	>([]);
+	const [regulatoryRequirementData, setRegulatoryRequirementData] = useState<Array<Requirement>>(
+		[],
+	);
+
 	const [search] = useSearchParams();
 	const [selectedRegion, selectedType, selectedClass, reportType, isConstruction, name] = watch([
 		'region',
@@ -75,8 +82,16 @@ const AboutBuildingScreen = () => {
 
 	const reportId = search.get('reportId');
 
-	const filteredRequirements = convertToRequirementSelectValues(
-		requirementData.filter(
+	const filteredCalculationRequirements = convertToRequirementSelectValues(
+		calculationRequirementData.filter(
+			(req) =>
+				(!selectedRegion || req.countryType === selectedRegion) &&
+				(!selectedType || req.buildingType === selectedType),
+		),
+	);
+
+	const filteredRegulatoryRequirements = convertToRequirementSelectValues(
+		regulatoryRequirementData.filter(
 			(req) =>
 				(!selectedRegion || req.countryType === selectedRegion) &&
 				(!selectedType || req.buildingType === selectedType),
@@ -245,10 +260,30 @@ const AboutBuildingScreen = () => {
 					return from([resData]);
 				}),
 				tap((resData) => {
-					setRequirementData(resData.items);
+					setCalculationRequirementData(
+						resData.items.filter(
+							(req) => req.requirementType === RequirementType.Calculation,
+						),
+					);
+					setRegulatoryRequirementData(
+						resData.items.filter(
+							(req) => req.requirementType === RequirementType.Regulatory,
+						),
+					);
+
 					if (!!resData.items.length) {
-						setValue('calculationRequirementId', resData.items[0].id!);
-						setValue('regulatoryRequirementId', resData.items[0].id!);
+						setValue(
+							'calculationRequirementId',
+							resData.items.filter(
+								(req) => req.requirementType === RequirementType.Calculation,
+							)[0].id!,
+						);
+						setValue(
+							'regulatoryRequirementId',
+							resData.items.filter(
+								(req) => req.requirementType === RequirementType.Regulatory,
+							)[0].id!,
+						);
 					}
 				}),
 				catchError((error) => {
@@ -492,7 +527,7 @@ const AboutBuildingScreen = () => {
 								render={({ field }) => (
 									<Select
 										{...field}
-										options={filteredRequirements ?? []}
+										options={filteredCalculationRequirements ?? []}
 										value={field.value || ''}
 										label={
 											formState.errors?.calculationRequirementId?.message ||
@@ -519,7 +554,7 @@ const AboutBuildingScreen = () => {
 								render={({ field }) => (
 									<Select
 										{...field}
-										options={filteredRequirements ?? []}
+										options={filteredRegulatoryRequirements ?? []}
 										value={field.value || ''}
 										isSearchable
 										disabled={!!search.get('edit')}

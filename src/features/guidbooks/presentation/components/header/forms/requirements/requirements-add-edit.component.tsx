@@ -8,6 +8,7 @@ import { getFirstPlacementRoomVariant, getSecondRoomVariant } from '@features/gu
 import type { BuildingType } from '@features/guidbooks/types';
 import {
 	ConstructionClass,
+	RequirementTypeSelectValues,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuConstructionTypeSelectValues,
@@ -227,6 +228,26 @@ export const RequirementsAddAndEdit = () => {
 						placeholder="Выберите второе помещение"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 						wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
+					/>
+				)}
+			/>
+			<Controller
+				control={control}
+				name={'requirementType'}
+				render={({ field }) => (
+					<Select
+						options={RequirementTypeSelectValues}
+						{...field}
+						value={field.value || ''}
+						label={formState.errors?.requirementType?.message || 'Тип требования'}
+						isSearchable
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+							formState.errors.requirementType?.message ? 'text-error' : '',
+						)}
+						placeholder="Выберите тип требования"
+						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+						wrapperClassname="w-[150px] shadow-none ring-input-border-primary"
 					/>
 				)}
 			/>

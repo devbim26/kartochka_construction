@@ -337,6 +337,7 @@ export interface CreateRequirementCommand {
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
+	requirementType?: RequirementType;
 }
 
 export interface CreateSingleReportReceivingCommand {
@@ -619,6 +620,7 @@ export interface GetRequirementsWithPaginationParamsQuery {
 	/** @format date */
 	standartValidityPeriod?: string | null;
 	class?: CategoryClass;
+	requirementType?: RequirementType;
 }
 
 export interface GetSubscriptionsWithPaginationParamsQuery {
@@ -1139,6 +1141,7 @@ export interface Requirement {
 	/** @format float */
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
+	requirementType?: RequirementType;
 	constructionClass?: ConstructionClass;
 }
 
@@ -1160,6 +1163,7 @@ export interface RequirementDto {
 	noizeImpactIndex?: number;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
+	requirementType?: RequirementType;
 }
 
 export interface RequirementDtoPaginatedList {
@@ -1174,6 +1178,11 @@ export interface RequirementDtoPaginatedList {
 	pageSize?: number;
 	hasPreviousPage?: boolean;
 	hasNextPage?: boolean;
+}
+
+export enum RequirementType {
+	Calculation = 'Calculation',
+	Regulatory = 'Regulatory',
 }
 
 export interface SendSmsCommand {
@@ -1326,6 +1335,7 @@ export interface UpdateRequirementCommand {
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
+	requirementType?: RequirementType;
 }
 
 export interface UpdateSubscriptionCommand {
