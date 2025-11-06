@@ -29,6 +29,7 @@ export enum MaterialTypeEnum {
 	Heavy = 'Heavy',
 	Board = 'Board',
 	ZPanel = 'ZPanel',
+	GapDistance = 'GapDistance',
 }
 
 export enum RuMaterialTypeEnum {
@@ -134,6 +135,7 @@ export const RuMaterialTypesSelectValues = [
 	{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
 	{ label: 'Плиты', value: MaterialTypeEnum.Board },
 	{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
+	{ label: 'Зазоры', value: MaterialTypeEnum.GapDistance },
 ];
 
 export interface MaterialType {

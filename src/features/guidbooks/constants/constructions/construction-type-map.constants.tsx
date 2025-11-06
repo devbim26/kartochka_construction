@@ -989,6 +989,14 @@ export const ConstructionTypeMap = ({
 							{
 								positionId: '5',
 								materialId: '',
+								materialType: MaterialTypeEnum.GapDistance,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+								],
+							},
+							{
+								positionId: '6',
+								materialId: '',
 								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },

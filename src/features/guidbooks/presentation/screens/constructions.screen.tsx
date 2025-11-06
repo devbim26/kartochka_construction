@@ -83,12 +83,12 @@ const ConstructionsScreen = () => {
 		const cols: ColumnDef<ConstructionsAddData>[] = [
 			{
 				accessorKey: 'name',
-				header: () => <SimpleTableHeaderCell text="Название" />,
+				header: () => <SimpleTableHeaderCell text="Код" />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'description',
-				header: () => <SimpleTableHeaderCell text="Описание" />,
+				header: () => <SimpleTableHeaderCell text="Название" />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{

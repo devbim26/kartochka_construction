@@ -792,6 +792,7 @@ export enum MaterialTypeEnum {
 	Heavy = 'Heavy',
 	Board = 'Board',
 	ZPanel = 'ZPanel',
+	GapDistance = 'GapDistance',
 }
 
 export interface MaterialTypeValue {

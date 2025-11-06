@@ -266,7 +266,7 @@ export const CreateConstructionForm = memoize(
 										convertToSelectValues(
 											constructionData.map((construction) => ({
 												...construction,
-												name: construction.description,
+												name: `${construction.description}(${construction.name})`,
 											})),
 										) ?? []
 									}
