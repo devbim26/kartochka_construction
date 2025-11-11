@@ -15,9 +15,9 @@ export const drawConstruction = (
 	if (!context) return;
 
 	const maxTextLength = Math.max(
-		constructionName.length,
-		guidebookConstructionName.length,
-		dividedRooms.length,
+		constructionName?.length ?? 0,
+		guidebookConstructionName?.length ?? 0,
+		dividedRooms?.length ?? 0,
 	);
 
 	const boxWidth = maxTextLength * 13;

@@ -44,8 +44,8 @@ export enum ConstructionTypeEnum {
 	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLayerWallFacingBothSide',
 	HeavyMultiLayerWallSoundproofingOneSide = 'HeavyMultiLayerWallSoundproofingOneSide',
 	HeavyMultiLayerWallSoundproofingBothSide = 'HeavyMultiLayerWallSoundproofingBothSide',
-	FramePartitionSingle = 'FramePartitionSingle',
-	FramePartitionDouble = 'FramePartitionDouble',
+	OneFramePartition = 'OneFramePartition',
+	TwoFramePartition = 'TwoFramePartition',
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
 	OneGlassFrame = 'OneGlassFrame',
 	TwoGlassFrame = 'TwoGlassFrame',
@@ -67,8 +67,8 @@ export const RuConstructionTypesMap = {
 		'Тяжелая многослойная стена + звукоизоляционная панель с одной стороны',
 	HeavyMultiLayerWallSoundproofingBothSide:
 		'Тяжелая многослойная стена + звукоизоляционная панель с двух сторон',
-	FramePartitionSingle: 'Каркасная перегородка (1 каркас)',
-	FramePartitionDouble: 'Каркасная перегородка (2 каркаса)',
+	OneFramePartition: 'Каркасная перегородка (1 каркас)',
+	TwoFramePartition: 'Каркасная перегородка (2 каркаса)',
 	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
 	OneGlassFrame: 'Многослойное стекло',
 	TwoGlassFrame: 'Стеклопакет',
@@ -91,11 +91,11 @@ export const RuConstructionTypesSelectValues = [
 	},
 	{
 		label: 'Каркасная перегородка (1 каркас)',
-		value: ConstructionTypeEnum.FramePartitionSingle,
+		value: ConstructionTypeEnum.OneFramePartition,
 	},
 	{
 		label: 'Каркасная перегородка (2 каркаса)',
-		value: ConstructionTypeEnum.FramePartitionDouble,
+		value: ConstructionTypeEnum.TwoFramePartition,
 	},
 	{
 		label: 'Многослойное стекло',

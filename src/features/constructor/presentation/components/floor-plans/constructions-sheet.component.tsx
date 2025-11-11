@@ -38,9 +38,9 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 				header: () => <SimpleTableHeaderCell text="Название" />,
 				cell: (info) => (
 					<SimpleTableCell
-						contentClassName="w-[300px] text-[15px]"
+						contentClassName="w-[350px] text-[15px]"
 						content={
-							<div className="flex flex-col items-center gap-2 text-center font-sans text-[20px]">
+							<div className="flex flex-col items-center gap-1 text-center font-sans text-[20px]">
 								<div>
 									<p className="font-semibold">Название</p>
 									<p>{info.getValue() as string}</p>
@@ -101,11 +101,11 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 			},
 			{
 				accessorKey: 'square',
-				header: () => <SimpleTableHeaderCell text="Площадь, м²" />,
+				header: () => <SimpleTableHeaderCell textClassName="w-[100px]" text="Площадь,м²" />,
 				cell: (info) => (
 					<SimpleTableCell
 						content={
-							<div className="w-fit text-[20px] font-semibold">
+							<div className="w-[100px] text-[20px] font-semibold">
 								{info.getValue() as string}
 							</div>
 						}
@@ -139,7 +139,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 														},
 													)
 												}
-												className="h-[50px] w-[200px] p-[6px] text-[20px]"
+												className="h-[50px] w-[250px] p-[6px] text-[20px]"
 											>
 												Проектирование
 											</Button>{' '}
@@ -150,7 +150,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 										<div className="flex w-full items-center gap-[10px]">
 											<Button
 												variant="primary"
-												className="h-[50px] w-[200px] p-[6px] text-[20px]"
+												className="h-[50px] w-[250px] p-[6px] text-[20px]"
 												onClick={() =>
 													navigate(
 														APP_ROUTES.designing.route +

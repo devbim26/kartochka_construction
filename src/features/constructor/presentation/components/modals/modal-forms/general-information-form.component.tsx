@@ -213,7 +213,7 @@ export const GeneralInformationForm = () => {
 						Общая толщина, мм
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						{thickness ?? '-'}
+						{thickness?.toFixed(0) ?? '-'}
 					</p>
 				</div>
 				<div className="flex flex-row gap-[20px]">
@@ -221,7 +221,7 @@ export const GeneralInformationForm = () => {
 						Общая масса, кг
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						{mass ?? '-'}
+						{mass?.toFixed(0) ?? '-'}
 					</p>
 				</div>
 			</div>

@@ -23,8 +23,8 @@ const constructionTypeEnumMap = createDataRecordConverter({
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallZPanelOneSide,
 	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallZPanelBothSide,
-	[ClientConstructionTypeEnum.FramePartitionSingle]: ServerConstructionTypeEnum.OneFramePartition,
-	[ClientConstructionTypeEnum.FramePartitionDouble]: ServerConstructionTypeEnum.TwoFramePartition,
+	[ClientConstructionTypeEnum.OneFramePartition]: ServerConstructionTypeEnum.OneFramePartition,
+	[ClientConstructionTypeEnum.TwoFramePartition]: ServerConstructionTypeEnum.TwoFramePartition,
 	[ClientConstructionTypeEnum.HeavySingleWallFacing]:
 		ServerConstructionTypeEnum.HeavySingleWallFacing,
 	[ClientConstructionTypeEnum.OneGlassFrame]: ServerConstructionTypeEnum.OneGlassFrame,

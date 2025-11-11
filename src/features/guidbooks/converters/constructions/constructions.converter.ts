@@ -137,5 +137,6 @@ export const convertToServerConstructionsEditData = (data: ConstructionsEditData
 	...convertToServerConstructionsAddData(data),
 	id: data.id || null,
 	rw: data.RCalcs || null,
+	reportInfoId: data.reportInfoId || undefined,
 	conputingIndexValue: data.estimatedIndexValue || null,
 });

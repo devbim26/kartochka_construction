@@ -948,12 +948,12 @@ export const ConstructionTypeMap = ({
 				]);
 			},
 		},
-		[ConstructionTypeEnum.FramePartitionSingle]: {
+		[ConstructionTypeEnum.OneFramePartition]: {
 			component: <FramePartitionSingleComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.FramePartitionSingle,
+					ConstructionTypeEnum.OneFramePartition,
 				);
 				setValue('constructionTypeObject.constructions', [
 					{
@@ -1008,12 +1008,12 @@ export const ConstructionTypeMap = ({
 				]);
 			},
 		},
-		[ConstructionTypeEnum.FramePartitionDouble]: {
+		[ConstructionTypeEnum.TwoFramePartition]: {
 			component: <FramePartitionDoubleComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.FramePartitionDouble,
+					ConstructionTypeEnum.TwoFramePartition,
 				);
 				setValue('constructionTypeObject.constructions', [
 					{

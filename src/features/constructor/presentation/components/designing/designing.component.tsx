@@ -174,7 +174,10 @@ const DesigningScreen = () => {
 
 	const onEditHandle = useCallback(() => {
 		const formData = form.getValues() as ConstructionsEditData;
-		const dataForServer = convertToServerConstructionsEditData(formData);
+		const dataForServer = convertToServerConstructionsEditData({
+			...formData,
+			reportInfoId: reportId || undefined,
+		});
 		from(
 			getGuidebooksEdit({
 				data: dataForServer,
@@ -203,7 +206,11 @@ const DesigningScreen = () => {
 
 	const onEditHandleWithRedirect = useCallback(() => {
 		const formData = form.getValues() as ConstructionsEditData;
-		const dataForServer = convertToServerConstructionsEditData(formData);
+		const dataForServer = convertToServerConstructionsEditData({
+			...formData,
+			reportInfoId: reportId || undefined,
+		});
+
 		from(
 			getGuidebooksEdit({
 				data: dataForServer,
