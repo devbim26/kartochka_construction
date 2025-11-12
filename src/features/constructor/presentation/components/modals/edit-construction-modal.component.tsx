@@ -14,6 +14,7 @@ interface CreateConstructionModalProps extends Omit<ModalProps, 'Footer'> {
 	currentReportFloorInfo?: FloorConstruction;
 	currentConstructionHeader?: ConstructionsEditData;
 	floorId?: string;
+	reportFloorInfoId?: string;
 }
 
 export const EditConstructionModal = ({
@@ -22,6 +23,7 @@ export const EditConstructionModal = ({
 	currentReportFloorInfo,
 	currentConstructionHeader,
 	floorId,
+	reportFloorInfoId,
 	...props
 }: CreateConstructionModalProps) => {
 	const formRef = useRef<CreateConstructionFormHandle>(null);
@@ -38,6 +40,7 @@ export const EditConstructionModal = ({
 	useEffect(() => {
 		if (currentReportFloorInfo && currentConstructionHeader) {
 			formRef.current?.reset({
+				id: reportFloorInfoId,
 				length: String(currentReportFloorInfo.reportConstructionHeader.length),
 				width: String(currentReportFloorInfo.reportConstructionHeader.width),
 				construction: currentReportFloorInfo.reportConstructionHeader.constructionHeaderId,

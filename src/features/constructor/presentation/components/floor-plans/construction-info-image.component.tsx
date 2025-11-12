@@ -62,7 +62,7 @@ export const ConstructionImage = ({
 	useEffect(() => {
 		if (!id) return;
 		handleGetConstructionImage(id);
-	}, []);
+	}, [id]);
 
 	return svgUrl ? (
 		<>

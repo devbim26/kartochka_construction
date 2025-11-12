@@ -373,6 +373,7 @@ export const FloorPlans = memoize(() => {
 							className="!w-[1000px] md:!w-[900px]"
 							currentConstructionHeader={currentConstructionHeader}
 							currentReportFloorInfo={currentReportConstruction}
+							reportFloorInfoId={currentReportFloorInfo[0]}
 							floorId={currentReportFloorId}
 						>
 							<CreateConstructionForm />

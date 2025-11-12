@@ -60,12 +60,13 @@ export const CreateConstructionForm = memoize(
 			const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>(
 				[],
 			);
-			const [length, width, construction, area, name] = watch([
+			const [length, width, construction, area, name, id] = watch([
 				'length',
 				'width',
 				'construction',
 				'area',
 				'name',
+				'id',
 			]);
 			const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>(
 				[],
@@ -138,6 +139,7 @@ export const CreateConstructionForm = memoize(
 					reportType === ReportCategory.Floor
 						? updateReportFloor({
 								data: {
+									reportFloorInfoId: id || '',
 									floorConstructionInfoId: floorId ? floorId : layerId || '',
 									'floorInfo.coordinates.x': x
 										? +String(x).split('.')[0]
@@ -196,7 +198,7 @@ export const CreateConstructionForm = memoize(
 				dispatch(startLoading());
 				from(
 					getGuidebooksPaginated({
-						data: {},
+						data: { constructionIdToUpdate: construction || undefined },
 						guidebookType: Guidebooks.CONSTRUCTION,
 						pagination: { pageNumber: 1, pageSize: 99999 },
 					}),
@@ -221,7 +223,7 @@ export const CreateConstructionForm = memoize(
 
 			useEffect(() => {
 				handleGetConstructionData();
-			}, []);
+			}, [construction]);
 
 			return (
 				<div className="relative flex flex-col border-b">
