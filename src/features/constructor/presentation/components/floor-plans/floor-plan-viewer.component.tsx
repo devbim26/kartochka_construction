@@ -97,7 +97,6 @@ export const FloorPlanViewer = ({
 			});
 
 			if (screenshotResponse.status === 200) {
-				toast.success('Изображение и скриншот успешно загружены');
 				getData();
 			}
 		} catch (error) {
@@ -121,10 +120,12 @@ export const FloorPlanViewer = ({
 
 		const canvas = canvasRef.current;
 
-		renderPage(pageNum)
-			.then(() => {
+		const renderAndDraw = async () => {
+			try {
+				await renderPage(pageNum);
+
 				if (currentConstruction?.page === pageNum && currentConstructionHeader) {
-					drawConstructionOnCanvas(
+					await drawConstructionOnCanvas(
 						canvas,
 						currentConstruction,
 						scale,
@@ -141,34 +142,26 @@ export const FloorPlanViewer = ({
 						prev.coordinates.y !== currentConstruction.coordinates.y;
 
 					if (hasChanged) {
-						requestAnimationFrame(() => {
-							requestAnimationFrame(() => {
-								const centerX = currentConstruction.coordinates.x * scale;
-								const centerY = currentConstruction.coordinates.y * scale;
-								const imageFile = cropCanvasToFile(
-									canvas,
-									centerX,
-									centerY,
-									900,
-									400,
-								);
+						const centerX = currentConstruction.coordinates.x * scale;
+						const centerY = currentConstruction.coordinates.y * scale;
+						const imageFile = cropCanvasToFile(canvas, centerX, centerY, 900, 400);
 
-								uploadImagesAndRefresh(
-									imageFile,
-									currentConstruction.reportConstructionHeader.id,
-									dispatch,
-								);
+						await uploadImagesAndRefresh(
+							imageFile,
+							currentConstruction.reportConstructionHeader.id,
+							dispatch,
+						);
 
-								previousConstructionRef.current = currentConstruction;
-							});
-						});
+						previousConstructionRef.current = currentConstruction;
 					}
 				}
-			})
-			.catch((error) => {
-				console.error('Ошибка при отрисовке PDF:', error);
+			} catch (error) {
+				console.error('Ошибка при отрисовке PDF или конструкции:', error);
 				dispatch(stopLoading());
-			});
+			}
+		};
+
+		renderAndDraw();
 	}, [pdfFile, pageNum, scale, currentConstruction, currentConstructionHeader]);
 
 	return (

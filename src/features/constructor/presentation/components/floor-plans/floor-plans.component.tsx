@@ -368,11 +368,13 @@ export const FloorPlans = memoize(() => {
 							isOpen={!!search.get('edit')}
 							onCancel={() => window.history.back()}
 							onClose={() => window.history.back()}
-							onConfirm={() => {
-								navigate('');
-							}}
+							onConfirm={() => window.history.back()}
 							headerTitle="Редактирование конструкцию"
 							className="!w-[1000px] md:!w-[900px]"
+							currentConstructionHeader={currentConstructionHeader}
+							currentReportFloorInfo={currentReportConstruction}
+							reportFloorInfoId={currentReportFloorInfo[0]}
+							floorId={currentReportFloorId}
 						>
 							<CreateConstructionForm />
 						</EditConstructionModal>

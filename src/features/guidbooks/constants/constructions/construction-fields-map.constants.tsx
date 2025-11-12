@@ -2,6 +2,7 @@ import { MaterialParametrs } from '@api-gen';
 import {
 	PointConnectionsFieldsType,
 	ThicknessDensityFieldsType,
+	ThicknessFieldsType,
 	WidthRacksStepFieldsType,
 } from '@features/guidbooks/presentation';
 import { MaterialTypeEnum } from '@features/guidbooks/types';
@@ -86,6 +87,13 @@ export const ConstructionFieldsMap = ({
 		[MaterialTypeEnum.FoamMaterials]: <></>,
 		[MaterialTypeEnum.Glazing]: (
 			<ThicknessDensityFieldsType
+				fieldIndex={fieldIndex}
+				constructionIndex={constructionIndex}
+				currentForm={currentForm}
+			/>
+		),
+		[MaterialTypeEnum.GapDistance]: (
+			<ThicknessFieldsType
 				fieldIndex={fieldIndex}
 				constructionIndex={constructionIndex}
 				currentForm={currentForm}
@@ -199,6 +207,12 @@ export const MaterialTypeValuesMap = {
 		},
 		{
 			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
+	[MaterialTypeEnum.GapDistance]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
 			value: '',
 		},
 	],

@@ -552,6 +552,8 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	constructionType?: ConstructionTypeEnum;
 	countryType?: CountryType;
 	isReportConstruction?: boolean | null;
+	/** @format uuid */
+	constructionIdToUpdate?: string | null;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -792,6 +794,7 @@ export enum MaterialTypeEnum {
 	Heavy = 'Heavy',
 	Board = 'Board',
 	ZPanel = 'ZPanel',
+	GapDistance = 'GapDistance',
 }
 
 export interface MaterialTypeValue {
@@ -1290,6 +1293,8 @@ export interface UpdateConstructionHeaderCommand {
 	/** @format float */
 	indexValue?: number;
 	constructionType?: CreateConstructionTypeDto;
+	/** @format uuid */
+	reportInfoId?: string | null;
 }
 
 export interface UpdateReportCommand {

@@ -948,12 +948,12 @@ export const ConstructionTypeMap = ({
 				]);
 			},
 		},
-		[ConstructionTypeEnum.FramePartitionSingle]: {
+		[ConstructionTypeEnum.OneFramePartition]: {
 			component: <FramePartitionSingleComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.FramePartitionSingle,
+					ConstructionTypeEnum.OneFramePartition,
 				);
 				setValue('constructionTypeObject.constructions', [
 					{
@@ -989,6 +989,14 @@ export const ConstructionTypeMap = ({
 							{
 								positionId: '5',
 								materialId: '',
+								materialType: MaterialTypeEnum.GapDistance,
+								materialTypeValue: [
+									{ materialParameters: MaterialParametrs.Thickness, value: '' },
+								],
+							},
+							{
+								positionId: '6',
+								materialId: '',
 								materialType: MaterialTypeEnum.Board,
 								materialTypeValue: [
 									{ materialParameters: MaterialParametrs.Thickness, value: '' },
@@ -1000,12 +1008,12 @@ export const ConstructionTypeMap = ({
 				]);
 			},
 		},
-		[ConstructionTypeEnum.FramePartitionDouble]: {
+		[ConstructionTypeEnum.TwoFramePartition]: {
 			component: <FramePartitionDoubleComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.FramePartitionDouble,
+					ConstructionTypeEnum.TwoFramePartition,
 				);
 				setValue('constructionTypeObject.constructions', [
 					{

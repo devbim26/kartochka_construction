@@ -2,6 +2,7 @@ export * from './air-gap-material-type.component';
 export * from './board-material-type.component';
 export * from './filler-material-type.component';
 export * from './frame-material-type.component';
+export * from './gap-distance-material-type.component';
 export * from './glass-material-type.component';
 export * from './heavy-material-type.component';
 export * from './link-material-type.component';

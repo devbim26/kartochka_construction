@@ -74,6 +74,7 @@ export const ConstructionsAddSchema = z.object({
 	labIndexValue: z.string().min(1, 'Поле обязательно для заполнения'),
 	laboratoryTestSource: z.string().min(1, 'Поле обязательно для заполнения'),
 	constructionTypeObject: ConstructionTypeShema,
+	reportInfoId: z.string().optional(),
 });
 
 export const ConstructionsEditSchema = ConstructionsAddSchema.merge(

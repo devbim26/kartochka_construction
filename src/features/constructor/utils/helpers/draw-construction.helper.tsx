@@ -15,9 +15,9 @@ export const drawConstruction = (
 	if (!context) return;
 
 	const maxTextLength = Math.max(
-		constructionName.length,
-		guidebookConstructionName.length,
-		dividedRooms.length,
+		constructionName?.length ?? 0,
+		guidebookConstructionName?.length ?? 0,
+		dividedRooms?.length ?? 0,
 	);
 
 	const boxWidth = maxTextLength * 13;
@@ -70,13 +70,13 @@ export const drawConstruction = (
 	context.fillText(dividedRooms, boxX + 90, boxY + 50);
 };
 
-export const drawConstructionOnCanvas = (
+export const drawConstructionOnCanvas = async (
 	canvas: HTMLCanvasElement,
 	info: FloorConstruction,
 	scale: number,
 	constructionType?: ConstructionTypeEnum,
 	constructionName?: string,
-): void => {
+): Promise<void> => {
 	const { coordinates, reportConstructionHeader } = info;
 	const x = coordinates.x * scale;
 	const y = coordinates.y * scale;
@@ -91,6 +91,8 @@ export const drawConstructionOnCanvas = (
 			'/' +
 			reportConstructionHeader.secondPlacementRoom.name,
 	);
+
+	return Promise.resolve();
 };
 
 export const cropCanvasToFile = (

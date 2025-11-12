@@ -61,8 +61,8 @@ type UpdateFloorReportProps = {
 		'floorInfo.floorDocument'?: File;
 		'floorInfo.floorNumber'?: string;
 		'floorInfo.reportConstructionHeader.name'?: string;
-		width?: number;
-		length?: number;
+		'floorInfo.reportConstructionHeader.width'?: number;
+		'floorInfo.reportConstructionHeader.length'?: number;
 	};
 };
 type GetGraphParams = {
