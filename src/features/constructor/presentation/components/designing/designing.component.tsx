@@ -187,8 +187,13 @@ const DesigningScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
+						const message =
+							typeof error.response?.data === 'string'
+								? error.response.data
+								: error.response?.data?.title || 'Ошибка при отправке';
+						toast.error(message);
 					}
+
 					return from([null]);
 				}),
 			)
@@ -220,8 +225,13 @@ const DesigningScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
+						const message =
+							typeof error.response?.data === 'string'
+								? error.response.data
+								: error.response?.data?.title || 'Ошибка при отправке';
+						toast.error(message);
 					}
+
 					return from([null]);
 				}),
 			)
