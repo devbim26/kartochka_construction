@@ -3,11 +3,19 @@ import type { UserMaterials } from '@features/guidbooks/types';
 
 type Props = {
 	src: string;
-	materials: UserMaterials[];
+	leftMaterials: UserMaterials[];
+	centerMaterials: UserMaterials[];
+	rightMaterials: UserMaterials[];
 	onClose: () => void;
 };
 
-export const ConstructionImageModal = ({ src, materials, onClose }: Props) => {
+export const ConstructionImageModal = ({
+	src,
+	leftMaterials,
+	centerMaterials,
+	rightMaterials,
+	onClose,
+}: Props) => {
 	return (
 		<div
 			className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
@@ -22,15 +30,43 @@ export const ConstructionImageModal = ({ src, materials, onClose }: Props) => {
 					alt="constructionImage"
 					className="h-fit w-[300px] rounded-lg border border-primary object-contain"
 				/>
+
 				<div className="flex flex-col justify-center gap-2 overflow-y-auto">
-					{materials?.map((material, index) => (
-						<p
-							key={material.materialId ?? index}
-							className="text-sm font-normal leading-5 tracking-[0.1px] text-black"
-						>
-							-{formatMaterial(material)}
-						</p>
-					))}
+					{leftMaterials
+						?.slice()
+						.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+						.map((material, index) => (
+							<p
+								key={material.materialId ?? `left-${index}`}
+								className="text-sm font-normal leading-5 tracking-[0.1px] text-black"
+							>
+								- {formatMaterial(material)}
+							</p>
+						))}
+
+					{centerMaterials
+						?.slice()
+						.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+						.map((material, index) => (
+							<p
+								key={material.materialId ?? `center-${index}`}
+								className="text-sm font-normal leading-5 tracking-[0.1px] text-black"
+							>
+								- {formatMaterial(material)}
+							</p>
+						))}
+
+					{rightMaterials
+						?.slice()
+						.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+						.map((material, index) => (
+							<p
+								key={material.materialId ?? `right-${index}`}
+								className="text-sm font-normal leading-5 tracking-[0.1px] text-black"
+							>
+								- {formatMaterial(material)}
+							</p>
+						))}
 				</div>
 			</div>
 		</div>

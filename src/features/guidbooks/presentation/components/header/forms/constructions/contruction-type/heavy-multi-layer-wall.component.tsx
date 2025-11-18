@@ -15,17 +15,14 @@ import {
 	type MaterialTypeEnum,
 } from '@features/guidbooks/types';
 
-import { useFieldArray } from 'react-hook-form';
+import { useConstructionMaterials } from '@features/guidbooks/utils';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { Fragment } from 'react/jsx-runtime';
 
 export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
-	const { control } = currentForm;
+	const { control, watch } = currentForm;
 
-	const { fields, append, remove } = useFieldArray({
-		control,
-		name: 'constructionTypeObject.constructions.0.userMaterials',
-	});
+	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Left');
 
 	const renderAddButton = (positionId: string) => (
 		<AiOutlinePlusCircle
@@ -50,7 +47,7 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 						currentForm={currentForm}
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionIndex={0}
+						constructionPosition="Left"
 						materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 					/>
 				)}
@@ -58,14 +55,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 				{['2', '5'].includes(positionId) && (
 					<>
 						<HeavyMaterialType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 					</>
 				)}
@@ -73,14 +66,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 				{positionId === '3' && (
 					<>
 						<FillerMaterialType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 					</>
 				)}
@@ -88,14 +77,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 				{positionId === '4' && (
 					<>
 						<LinkMaterialType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 						<PointConnectionsFieldsType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 					</>
 				)}
@@ -105,9 +90,9 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 						{ConstructionFieldsMap({
 							currentForm,
 							fieldIndex,
-							constructionIndex: 0,
+							constructionPosition: 'Left',
 							materialType: (fields[fieldIndex] as any)
-								.materialType as MaterialTypeEnum,
+								?.materialType as MaterialTypeEnum,
 						})}
 					</div>
 				)}

@@ -19,37 +19,54 @@ import {
 	type MaterialTypeEnum,
 } from '@features/guidbooks/types';
 
-import { useFieldArray } from 'react-hook-form';
+import { useConstructionMaterials } from '@features/guidbooks/utils';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { Fragment } from 'react/jsx-runtime';
 
 export const HeavySingleLayerWallFacingOneSideComponent = ({
 	currentForm,
 }: ConstructionTypeProps) => {
-	const { control } = currentForm;
+	const { control, watch } = currentForm;
 
 	const layerConfigs = [
 		{
 			title: '1. Базовая конструкция',
-			constructionIndex: 0,
+			constructionPosition: 'Left' as const,
 			positions: ['0', '1', '2', '3', '4'],
 			selectable: ['0', '1', '3', '4'],
 			materialType: MaterialTypesSelectValuesEnum.Base,
 		},
 		{
 			title: '2. Облицовка',
-			constructionIndex: 1,
+			constructionPosition: 'Center' as const,
 			positions: ['0', '1', '2', '3', '4', '5', '6'],
 			selectable: ['5', '6'],
 			materialType: MaterialTypesSelectValuesEnum.Facing,
 		},
 	];
 
+	const materialComponentsMap: Record<
+		'Left' | 'Center' | 'Right',
+		Record<string, React.ComponentType<any>[]>
+	> = {
+		Left: {
+			'2': [HeavyMaterialType, ThicknessDensityFieldsType],
+		},
+		Center: {
+			'0': [AirGapMaterialType, ThicknessDensityFieldsType],
+			'1': [LinkMaterialType, PointConnectionsFieldsType],
+			'2': [FrameMaterialType, WidthRacksStepFieldsType],
+			'3': [FillerMaterialType, ThicknessDensityFieldsType],
+			'4': [BoardMaterialType, ThicknessDensityFieldsType],
+		},
+		Right: {},
+	};
+
 	const renderBlock = (
 		positionId: string,
 		fieldIndex: number,
 		fieldId: string,
-		constructionIndex: number,
+		constructionPosition: 'Left' | 'Center' | 'Right',
 		selectable: string[],
 		materialType: MaterialTypesSelectValuesEnum,
 		remove: (index: number) => void,
@@ -62,71 +79,21 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 						currentForm={currentForm}
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionIndex={constructionIndex}
+						constructionPosition={constructionPosition}
 						materialTypesSelectValues={materialType}
 					/>
 				)}
 
-				{positionId === '2' && constructionIndex === 0 && (
-					<>
-						<HeavyMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
-						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
-						/>
-					</>
-				)}
-
-				{positionId === '2' && constructionIndex === 1 && (
-					<>
-						<FrameMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
-						<WidthRacksStepFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
-						/>
-					</>
-				)}
-
-				{positionId === '3' && constructionIndex === 1 && (
-					<>
-						<FillerMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
-						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
-						/>
-					</>
-				)}
-
-				{positionId === '4' && constructionIndex === 1 && (
-					<>
-						<BoardMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
-						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
-						/>
-					</>
-				)}
-
-				{positionId === '1' && constructionIndex === 1 && (
-					<>
-						<LinkMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
-						<PointConnectionsFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
-						/>
-					</>
-				)}
-
-				{positionId === '0' && constructionIndex === 1 && (
-					<>
-						<AirGapMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
-						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
-						/>
-					</>
-				)}
+				{materialComponentsMap[constructionPosition]?.[positionId]?.map((Comp, i) => (
+					<Comp key={i} {...{ fieldIndex, constructionPosition, currentForm }} />
+				))}
 
 				{selectable.includes(positionId) && (
 					<div className="flex gap-[8px]">
 						{ConstructionFieldsMap({
 							currentForm,
 							fieldIndex,
-							constructionIndex,
+							constructionPosition,
 							materialType: fields[fieldIndex]?.materialType as MaterialTypeEnum,
 						})}
 					</div>
@@ -142,11 +109,12 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 	return (
 		<>
 			{layerConfigs.map(
-				({ title, constructionIndex, positions, selectable, materialType }) => {
-					const { fields, append, remove } = useFieldArray({
+				({ title, constructionPosition, positions, selectable, materialType }) => {
+					const { fields, append, insert, remove } = useConstructionMaterials(
 						control,
-						name: `constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-					});
+						watch,
+						constructionPosition,
+					);
 
 					return (
 						<ConstructionLayer key={title} title={title}>
@@ -170,7 +138,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 											<AiOutlinePlusCircle
 												key={`add-${positionId}`}
 												onClick={() =>
-													append({
+													insert(index, {
 														positionId,
 														materialId: '',
 														materialType: '',
@@ -189,7 +157,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 													positionId,
 													fieldIndex,
 													field.id,
-													constructionIndex,
+													constructionPosition,
 													selectable,
 													materialType,
 													remove,

@@ -1,10 +1,9 @@
-import type {
+import {
 	ConstructionPosition,
-	ConstructionTypeEnum as ServerConstructionTypeEnum,
-	CountryType,
-	CreateConstructionTypeDto,
-	IndexType,
-	MaterialParametrs,
+	type ConstructionTypeEnum as ServerConstructionTypeEnum,
+	type CountryType,
+	type CreateConstructionTypeDto,
+	type IndexType,
 } from '@api-gen';
 import {
 	convertToClientCountryData,
@@ -13,6 +12,7 @@ import {
 	convertToServerCountryData,
 	convertToServerPriorityData,
 } from '@core';
+import type { MaterialParametrs } from '@features/constructor';
 import type { Country, Priority } from '@features/guidbooks/types';
 import type {
 	ConstructionsAddData,
@@ -75,46 +75,117 @@ export const convertToServerConstructionType = (
 	constructionTypeEnum: convertToServerConstructionTypeEnumData(
 		data.constructionTypeEnum as ConstructionTypeEnum,
 	),
-	constructions:
-		data.constructions?.map((construction) => ({
-			constructionPosition: construction.contructionPosition as ConstructionPosition,
-			userMaterials:
-				construction.userMaterials?.map((userMaterial) => ({
-					materialId: userMaterial.materialId,
-					materialName: userMaterial.materialName || '',
-					positionId: +userMaterial.positionId,
-					materialTypeValue:
-						userMaterial.materialTypeValue?.map((materialTypeValue) => ({
-							value: +materialTypeValue.value,
-							materialParametrs:
-								materialTypeValue.materialParameters as MaterialParametrs,
-						})) || [],
-				})) || [],
-		})) || [],
+	constructions: [
+		...(data.leftConstruction
+			? [
+					{
+						constructionPosition: ConstructionPosition.Left,
+						userMaterials: data.leftConstruction.map((m) => ({
+							materialId: m.materialId,
+							materialName: m.materialName || '',
+							positionId: Number(m.positionId), // ← число
+							materialType: m.materialType,
+							materialTypeValue:
+								m.materialTypeValue?.map((mtv) => ({
+									value: Number(mtv.value), // ← число
+									materialParametrs: mtv.materialParameters as MaterialParametrs,
+								})) || [],
+						})),
+					},
+				]
+			: []),
+		...(data.centerConstruction
+			? [
+					{
+						constructionPosition: ConstructionPosition.Center,
+						userMaterials: data.centerConstruction.map((m) => ({
+							materialId: m.materialId,
+							materialName: m.materialName || '',
+							positionId: Number(m.positionId),
+							materialType: m.materialType,
+							materialTypeValue:
+								m.materialTypeValue?.map((mtv) => ({
+									value: Number(mtv.value),
+									materialParametrs: mtv.materialParameters as MaterialParametrs,
+								})) || [],
+						})),
+					},
+				]
+			: []),
+		...(data.rightConstruction
+			? [
+					{
+						constructionPosition: ConstructionPosition.Right,
+						userMaterials: data.rightConstruction.map((m) => ({
+							materialId: m.materialId,
+							materialName: m.materialName || '',
+							positionId: Number(m.positionId),
+							materialType: m.materialType,
+							materialTypeValue:
+								m.materialTypeValue?.map((mtv) => ({
+									value: Number(mtv.value),
+									materialParametrs: mtv.materialParameters as MaterialParametrs,
+								})) || [],
+						})),
+					},
+				]
+			: []),
+	],
 });
 
-export const convertToClientConstructionType = (data: any): ConstructionType => ({
-	constructionTypeEnum:
-		convertToClientConstructionTypeEnumData(
-			data.constructionTypeEnum as ServerConstructionTypeEnum,
-		) ?? '',
-	constructions:
-		data.constructions?.map((construction: any) => ({
-			contructionPosition: construction.constructionPosition ?? '',
-			userMaterials:
-				construction.userMaterials?.map((userMaterial: any) => ({
-					materialId: userMaterial.materialId ?? '',
-					materialName: userMaterial.materialName || '',
-					positionId: String(userMaterial.positionId ?? ''),
-					materialType: userMaterial.materialType ?? '',
-					materialTypeValue:
-						userMaterial.materialTypeValue?.map((materialTypeValue: any) => ({
-							value: String(materialTypeValue.value ?? ''),
-							materialParameters: String(materialTypeValue.materialParametrs ?? ''),
-						})) || [],
+export const convertToClientConstructionType = (data: any): ConstructionType => {
+	const left =
+		data.constructions?.find((c: any) => c.constructionPosition === 'Left')?.userMaterials ||
+		[];
+
+	const center =
+		data.constructions?.find((c: any) => c.constructionPosition === 'Center')?.userMaterials ||
+		[];
+
+	const right =
+		data.constructions?.find((c: any) => c.constructionPosition === 'Right')?.userMaterials ||
+		[];
+
+	return {
+		constructionTypeEnum:
+			convertToClientConstructionTypeEnumData(
+				data.constructionTypeEnum as ServerConstructionTypeEnum,
+			) ?? '',
+		leftConstruction: left.map((userMaterial: any) => ({
+			materialId: userMaterial.materialId ?? '',
+			materialName: userMaterial.materialName || '',
+			positionId: String(userMaterial.positionId ?? ''),
+			materialType: userMaterial.materialType ?? '',
+			materialTypeValue:
+				userMaterial.materialTypeValue?.map((mtv: any) => ({
+					value: String(mtv.value ?? ''),
+					materialParameters: String(mtv.materialParametrs ?? ''),
 				})) || [],
-		})) || [],
-});
+		})),
+		centerConstruction: center.map((userMaterial: any) => ({
+			materialId: userMaterial.materialId ?? '',
+			materialName: userMaterial.materialName || '',
+			positionId: String(userMaterial.positionId ?? ''),
+			materialType: userMaterial.materialType ?? '',
+			materialTypeValue:
+				userMaterial.materialTypeValue?.map((mtv: any) => ({
+					value: String(mtv.value ?? ''),
+					materialParameters: String(mtv.materialParametrs ?? ''),
+				})) || [],
+		})),
+		rightConstruction: right.map((userMaterial: any) => ({
+			materialId: userMaterial.materialId ?? '',
+			materialName: userMaterial.materialName || '',
+			positionId: String(userMaterial.positionId ?? ''),
+			materialType: userMaterial.materialType ?? '',
+			materialTypeValue:
+				userMaterial.materialTypeValue?.map((mtv: any) => ({
+					value: String(mtv.value ?? ''),
+					materialParameters: String(mtv.materialParametrs ?? ''),
+				})) || [],
+		})),
+	};
+};
 
 export const convertToServerConstructionsAddData = (data: ConstructionsAddData): any => ({
 	name: data.name || null,

@@ -33,39 +33,51 @@ export const AlternateConstructionCard = ({ construction, reportInfo }: Props) =
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
-	const [thickness, setThickness] = useState<number>();
-	const [mass, setMass] = useState<number>();
-	const [density, setDensity] = useState<number>();
+	const [thickness, setThickness] = useState<number>(0);
+	const [mass, setMass] = useState<number>(0);
+	const [density, setDensity] = useState<number>(0);
 
 	useEffect(() => {
 		if (!constructionHeader) return;
 
-		const materialValues =
-			constructionHeader.constructionTypeObject.constructions?.[0]?.userMaterials?.[0]
-				?.materialTypeValue;
+		const allMaterials = [
+			...(constructionHeader.constructionTypeObject.leftConstruction || []),
+			...(constructionHeader.constructionTypeObject.centerConstruction || []),
+			...(constructionHeader.constructionTypeObject.rightConstruction || []),
+		];
 
-		const thicknessValue = materialValues?.find(
-			(v) => v.materialParameters === 'Thickness',
-		)?.value;
-		const densityValue = materialValues?.find((v) => v.materialParameters === 'Density')?.value;
+		const thicknessValues = allMaterials
+			.flatMap((m) => m.materialTypeValue || [])
+			.filter((v) => v.materialParameters === 'Thickness')
+			.map((v) => Number(v.value) || 0);
 
-		if (thicknessValue) setThickness(+thicknessValue);
-		if (densityValue) setDensity(+densityValue);
+		const densityValues = allMaterials
+			.flatMap((m) => m.materialTypeValue || [])
+			.filter((v) => v.materialParameters === 'Density')
+			.map((v) => Number(v.value) || 0);
+
+		const totalThickness = thicknessValues.reduce((acc, val) => acc + val, 0);
+		const avgDensity = densityValues.length
+			? densityValues.reduce((acc, val) => acc + val, 0) / densityValues.length
+			: 0;
+
+		setThickness(totalThickness);
+		setDensity(avgDensity);
 	}, [constructionHeader]);
 
 	useEffect(() => {
 		if (!thickness || !density || !construction) return;
 
-		const square = 100; //TODO: спросить;
+		const square = 100;
 		if (!square) return;
 
 		const calculatedMass = (square * thickness * density) / 1000;
 		setMass(calculatedMass);
-	}, [thickness, density]);
+	}, [thickness, density, construction]);
 
 	const handleGetConstructionByHeaderId = (id: string) => {
 		dispatch(startLoading());
-		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.CONSTRUCTION }))
+		from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
 			.pipe(
 				tap((response) => {
 					if (response.status === 200) {
@@ -107,18 +119,17 @@ export const AlternateConstructionCard = ({ construction, reportInfo }: Props) =
 					{RuConstructionTypesMap[construction.constructionType as ConstructionTypeEnum]}
 				</p>
 				<Button
-					className={
-						'h-[40px] w-fit self-end bg-white px-[16px] font-sans text-sm font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-primary enabled:hover:text-white'
-					}
+					className="h-[40px] w-fit self-end bg-white px-[16px] font-sans text-sm font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-primary enabled:hover:text-white"
 					onClick={() => {}}
 				>
 					Сделать базовой
 				</Button>
 			</div>
+
 			<div className="flex w-full items-center gap-[20px]">
 				<div className="flex items-center gap-[20px]">
 					<img
-						src={construction.issuerLogo ? construction.issuerLogo : ''}
+						src={construction.issuerLogo || ''}
 						alt="Превью изображения"
 						className="h-[66px] w-[140px] rounded-md object-cover"
 					/>
@@ -127,19 +138,22 @@ export const AlternateConstructionCard = ({ construction, reportInfo }: Props) =
 					{construction.issuer.name}
 				</p>
 			</div>
+
 			<div className="flex size-fit">
 				{svgUrl && <img className="h-full w-[200px]" src={svgUrl} alt="SVG Construction" />}
 				<div className="flex w-fit flex-col">
-					{constructionHeader?.constructionTypeObject.constructions?.map(
-						(construction: any, index) =>
-							construction.userMaterials?.map((material: any, materialIndex: any) => (
-								<p key={`${index}-${materialIndex}`} className="text-[16px]">
-									- {formatMaterial(material)}
-								</p>
-							)),
-					)}
+					{[
+						...(constructionHeader?.constructionTypeObject.leftConstruction || []),
+						...(constructionHeader?.constructionTypeObject.centerConstruction || []),
+						...(constructionHeader?.constructionTypeObject.rightConstruction || []),
+					].map((material: any, index: number) => (
+						<p key={index} className="text-[16px]">
+							- {formatMaterial(material)}
+						</p>
+					))}
 				</div>
 			</div>
+
 			<div className="flex w-full flex-col gap-[10px]">
 				<FormElementLabel className="text-left font-sans font-semibold leading-6 text-primary">
 					Технические параметры
@@ -184,6 +198,7 @@ export const AlternateConstructionCard = ({ construction, reportInfo }: Props) =
 				<GeneralInformationThermal />
 				<GeneralInformationFireResistance />
 			</div>
+
 			<Button variant="primary" className="self-end" onClick={() => {}}>
 				Добавить в отчет
 			</Button>

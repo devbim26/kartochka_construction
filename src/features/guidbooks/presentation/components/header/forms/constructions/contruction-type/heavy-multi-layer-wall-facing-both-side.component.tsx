@@ -1,28 +1,5 @@
-import type { MaterialTypeEnum } from '@api-gen';
-import { DeleteIcon } from '@core';
-import { ConstructionLayer } from '@features';
-import { ConstructionFieldsMap } from '@features/guidbooks/constants';
-import {
-	MaterialTypesSelectValuesEnum,
-	type ConstructionTypeProps,
-	type UserMaterials,
-} from '@features/guidbooks/types';
+import { type ConstructionTypeProps, type UserMaterials } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
-import {
-	PointConnectionsFieldsType,
-	ThicknessDensityFieldsType,
-	WidthRacksStepFieldsType,
-} from '../construction-fields-types';
-import {
-	AirGapMaterialType,
-	BoardMaterialType,
-	FillerMaterialType,
-	FrameMaterialType,
-	HeavyMaterialType,
-	LinkMaterialType,
-	SelectableMaterialType,
-} from '../construction-material-types';
 
 export const HeavyMultiLayerWallFacingBothSideComponent = ({
 	currentForm,
@@ -170,7 +147,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = ({
 
 	return (
 		<>
-			<ConstructionLayer title="1. Облицовка">
+			{/* <ConstructionLayer title="1. Облицовка">
 				{topFacingIndices.sixIndex < 0 && topFacingIndices.fiveIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
@@ -816,7 +793,7 @@ export const HeavyMultiLayerWallFacingBothSideComponent = ({
 						)}
 					</>
 				)}
-			</ConstructionLayer>
+			</ConstructionLayer> */}
 		</>
 	);
 };

@@ -21,7 +21,7 @@ export const ConstructionImage = ({
 	const [construction, setConstruction] = useState<ConstructionsEditData>();
 
 	const handleGetConstructionByHeaderId = (id: string) => {
-		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.CONSTRUCTION }))
+		from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
 			.pipe(
 				tap((response) => {
 					if (response.status === 200) {
@@ -72,13 +72,13 @@ export const ConstructionImage = ({
 			>
 				<img className="size-full object-contain" src={svgUrl} alt="constructionPreview" />
 			</div>
+
 			{isPreviewOpen && (
 				<ConstructionImageModal
 					src={svgUrl}
-					materials={
-						construction?.constructionTypeObject?.constructions?.[0]?.userMaterials ||
-						[]
-					}
+					leftMaterials={construction?.constructionTypeObject?.leftConstruction || []}
+					centerMaterials={construction?.constructionTypeObject?.centerConstruction || []}
+					rightMaterials={construction?.constructionTypeObject?.rightConstruction || []}
 					onClose={() => setIsPreviewOpen(false)}
 				/>
 			)}

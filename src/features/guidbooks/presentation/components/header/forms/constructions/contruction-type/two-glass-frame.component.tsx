@@ -9,20 +9,17 @@ import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import type { ConstructionTypeProps, MaterialTypeEnum } from '@features/guidbooks/types';
 import { MaterialTypesSelectValuesEnum } from '@features/guidbooks/types';
 
-import { useFieldArray } from 'react-hook-form';
+import { useConstructionMaterials } from '@features/guidbooks/utils';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { Fragment } from 'react/jsx-runtime';
 
 export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) => {
-	const { control } = currentForm;
+	const { control, watch } = currentForm;
+
+	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Left');
 
 	const positions = ['0', '1', '2', '3', '4'];
 	const selectable = ['0', '1', '3', '4'];
-
-	const { fields, append, remove } = useFieldArray({
-		control,
-		name: 'constructionTypeObject.constructions.0.userMaterials',
-	});
 
 	const renderBlock = (positionId: string, fieldIndex: number, fieldId: string) => (
 		<div key={fieldId} className="flex w-full items-start justify-between">
@@ -31,7 +28,7 @@ export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) =
 					<SelectableMaterialType
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionIndex={0}
+						constructionPosition="Left"
 						materialTypesSelectValues={MaterialTypesSelectValuesEnum.MultiGlass}
 						currentForm={currentForm}
 					/>
@@ -40,14 +37,10 @@ export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) =
 				{positionId === '2' && (
 					<>
 						<GlassMaterialType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 					</>
 				)}
@@ -56,7 +49,7 @@ export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) =
 					<div className="flex gap-[8px]">
 						{ConstructionFieldsMap({
 							fieldIndex,
-							constructionIndex: 0,
+							constructionPosition: 'Left',
 							materialType: (fields as any)[fieldIndex]
 								?.materialType as MaterialTypeEnum,
 							currentForm,

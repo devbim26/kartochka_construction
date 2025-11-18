@@ -7,32 +7,23 @@ import {
 } from '@features';
 import { MaterialTypeEnum, type ConstructionTypeProps } from '@features/guidbooks/types';
 
-import { useFieldArray } from 'react-hook-form';
+import { useConstructionMaterials } from '@features/guidbooks/utils';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { Fragment } from 'react/jsx-runtime';
 
 export const OneGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) => {
-	const { control } = currentForm;
+	const { control, watch } = currentForm;
+
+	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Left');
 
 	const positions = ['0', '1', '2', '3', '4'];
-
-	const { fields, append, remove } = useFieldArray({
-		control,
-		name: 'constructionTypeObject.constructions.0.userMaterials',
-	});
 
 	const renderBlock = (positionId: string, fieldIndex: number, fieldId: string) => (
 		<div key={fieldId} className="flex w-full items-start justify-between">
 			<div className="flex flex-1 gap-[20px]">
-				<GlassMaterialType
-					fieldIndex={fieldIndex}
-					constructionIndex={0}
-					currentForm={currentForm}
-				/>
+				<GlassMaterialType {...{ fieldIndex, constructionPosition: 'Left', currentForm }} />
 				<ThicknessDensityFieldsType
-					fieldIndex={fieldIndex}
-					constructionIndex={0}
-					currentForm={currentForm}
+					{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 				/>
 			</div>
 			<DeleteIcon className="shrink-0 self-start" onClick={() => remove(fieldIndex)} />

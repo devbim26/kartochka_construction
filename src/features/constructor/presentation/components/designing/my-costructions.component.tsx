@@ -137,9 +137,9 @@ const MyConstructions = () => {
 	}, [constructionHeaderId]);
 
 	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
-	const materials =
-		constructionHeader?.constructionTypeObject?.constructions?.[0]?.userMaterials || [];
-
+	const leftMaterials = constructionHeader?.constructionTypeObject?.leftConstruction || [];
+	const centerMaterials = constructionHeader?.constructionTypeObject?.centerConstruction || [];
+	const rightMaterials = constructionHeader?.constructionTypeObject?.rightConstruction || [];
 	if (isLoading) {
 		return (
 			<div className="flex size-full items-center justify-center">
@@ -159,12 +159,36 @@ const MyConstructions = () => {
 					</div>
 					<div className="rounded-lg border border-blue-500 p-[20px]">
 						<FormSubTitle text="Конструкция 1" />
-						<div className="flex flex-col">
-							{materials.map((material, index) => (
-								<p key={index} className="text-[16px]">
-									- {formatMaterial(material)}
-								</p>
-							))}
+						<div className="rounded-lg border border-blue-500 p-[20px]">
+							<FormSubTitle text="Конструкция 1" />
+							<div className="flex flex-col">
+								{leftMaterials
+									?.slice()
+									.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+									.map((material, index) => (
+										<p key={`left-${index}`} className="text-[16px]">
+											- {formatMaterial(material)}
+										</p>
+									))}
+
+								{centerMaterials
+									?.slice()
+									.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+									.map((material, index) => (
+										<p key={`center-${index}`} className="text-[16px]">
+											- {formatMaterial(material)}
+										</p>
+									))}
+
+								{rightMaterials
+									?.slice()
+									.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+									.map((material, index) => (
+										<p key={`right-${index}`} className="text-[16px]">
+											- {formatMaterial(material)}
+										</p>
+									))}
+							</div>
 						</div>
 					</div>
 					<div className="flex flex-col">

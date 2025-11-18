@@ -23,15 +23,17 @@ export const UserMaterialType = z.object({
 	value: z.string().min(1, 'Поле обязательно для заполнения'),
 });
 export const subConstructionSchema = z.object({
-	contructionPosition: z.string().min(1, 'Поле обязательно для заполнения'),
+	constructionPosition: z.string().min(1, 'Поле обязательно для заполнения'),
 	userMaterials: z.array(UserMaterial).optional().nullable(),
 });
 
 export type SubConstructionTypeSchemaType = z.infer<typeof subConstructionSchema>;
 
 export const ConstructionTypeShema = z.object({
-	constructionTypeEnum: z.string().min(1, 'Поле обязательно для заполнения'),
-	constructions: z.array(subConstructionSchema).optional().nullable(),
+	constructionTypeEnum: z.string().min(1, 'Обязательно'),
+	leftConstruction: z.array(UserMaterial).optional().nullable(),
+	centerConstruction: z.array(UserMaterial).optional().nullable(),
+	rightConstruction: z.array(UserMaterial).optional().nullable(),
 });
 
 export type ConstructionTypeSchemaType = z.infer<typeof ConstructionTypeShema>;

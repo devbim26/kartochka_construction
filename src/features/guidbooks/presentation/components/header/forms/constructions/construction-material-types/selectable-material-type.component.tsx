@@ -23,31 +23,38 @@ import { twMerge } from 'tailwind-merge';
 interface Props {
 	fieldIndex: number;
 	positionId: number;
-	constructionIndex: number;
+	constructionPosition: 'Left' | 'Center' | 'Right';
 	materialTypesSelectValues: MaterialTypesSelectValuesEnum;
 	currentForm: UseFormReturn<any>;
 }
+
+const positionMap: Record<'Left' | 'Center' | 'Right', string> = {
+	Left: 'leftConstruction',
+	Center: 'centerConstruction',
+	Right: 'rightConstruction',
+};
 
 export const SelectableMaterialType = memoize(
 	({
 		fieldIndex,
 		positionId,
-		constructionIndex,
+		constructionPosition,
 		materialTypesSelectValues,
 		currentForm,
 	}: Props) => {
 		const { formState, control, watch, setValue } = currentForm;
 		const [materials, setMaterials] = useState<MaterialsAddAndEditData[]>([]);
+
 		const [currentMaterialType, userMaterials, materialTypeValue] = watch([
-			`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialType`,
-			`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-			`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue`,
+			`constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}.materialType`,
+			`constructionTypeObject.${positionMap[constructionPosition]}`,
+			`constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}.materialTypeValue`,
 		]);
 
 		const handleGetMaterials = (data: MaterialsFilterData) => {
 			from(
 				getGuidebooksPaginated({
-					data: data,
+					data,
 					pagination: { pageSize: 999999, pageNumber: 1 },
 					guidebookType: Guidebooks.MATERIAL,
 				}),
@@ -70,12 +77,14 @@ export const SelectableMaterialType = memoize(
 
 		useEffect(() => {
 			currentMaterialType && handleGetMaterials({ materialType: currentMaterialType });
-		}, []);
+		}, [currentMaterialType]);
+
+		const basePath = `constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}`;
 
 		return (
 			<div className="flex flex-wrap gap-[16px]">
 				<Controller
-					name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialType`}
+					name={`${basePath}.materialType`}
 					control={control}
 					render={({ field }) => (
 						<Select
@@ -83,15 +92,15 @@ export const SelectableMaterialType = memoize(
 							value={field.value || ''}
 							options={[...MaterialTypesSelectValuesMap[materialTypesSelectValues]]}
 							error={
-								(formState.errors as any)?.constructionTypeObject?.constructions?.[
-									constructionIndex
-								]?.userMaterials?.[fieldIndex]?.materialType?.message
+								(formState.errors as any)?.constructionTypeObject?.[
+									positionMap[constructionPosition]
+								]?.[fieldIndex]?.materialType?.message
 							}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
-								(formState.errors as any)?.constructionTypeObject?.constructions?.[
-									constructionIndex
-								]?.userMaterials?.[fieldIndex]?.materialType?.message
+								(formState.errors as any)?.constructionTypeObject?.[
+									positionMap[constructionPosition]
+								]?.[fieldIndex]?.materialType?.message
 									? 'text-error'
 									: '',
 							)}
@@ -103,9 +112,9 @@ export const SelectableMaterialType = memoize(
 									? setMaterials([])
 									: handleGetMaterials({ materialType: selectedOption });
 								setValue(
-									`constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-									userMaterials!.map((material: UserMaterials) =>
-										material.positionId === String(positionId)
+									`constructionTypeObject.${positionMap[constructionPosition]}`,
+									userMaterials!.map((material: UserMaterials, idx: number) =>
+										idx === fieldIndex
 											? {
 													...material,
 													materialId: '',
@@ -125,7 +134,7 @@ export const SelectableMaterialType = memoize(
 				/>
 
 				<Controller
-					name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`}
+					name={`${basePath}.materialId`}
 					control={control}
 					render={({ field }) => (
 						<Select
@@ -133,15 +142,15 @@ export const SelectableMaterialType = memoize(
 							value={field.value || ''}
 							options={convertToSelectValues(materials) || []}
 							error={
-								(formState.errors as any)?.constructionTypeObject?.constructions?.[
-									constructionIndex
-								]?.userMaterials?.[fieldIndex]?.materialId?.message
+								(formState.errors as any)?.constructionTypeObject?.[
+									positionMap[constructionPosition]
+								]?.[fieldIndex]?.materialId?.message
 							}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
-								(formState.errors as any)?.constructionTypeObject?.constructions?.[
-									constructionIndex
-								]?.userMaterials?.[fieldIndex]?.materialId?.message
+								(formState.errors as any)?.constructionTypeObject?.[
+									positionMap[constructionPosition]
+								]?.[fieldIndex]?.materialId?.message
 									? 'text-error'
 									: '',
 							)}
@@ -149,10 +158,7 @@ export const SelectableMaterialType = memoize(
 							buttonClassName="text-sm rounded-[8px] w-[226px]"
 							placeholder="Выберите материал"
 							onChange={(selectedOption: string) => {
-								setValue(
-									`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`,
-									selectedOption,
-								);
+								setValue(`${basePath}.materialId`, selectedOption);
 								if (
 									materialTypeValue?.[0].materialParameters ===
 										MaterialParametrs.Thickness &&
@@ -163,11 +169,11 @@ export const SelectableMaterialType = memoize(
 										(m) => m.id === selectedOption,
 									);
 									setValue<any>(
-										`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.0.value`,
+										`${basePath}.materialTypeValue.0.value`,
 										selectedMaterial?.thickness,
 									);
 									setValue<any>(
-										`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.1.value`,
+										`${basePath}.materialTypeValue.1.value`,
 										selectedMaterial?.density,
 									);
 								}

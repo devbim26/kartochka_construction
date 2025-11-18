@@ -18,17 +18,18 @@ import {
 	type MaterialTypeEnum,
 } from '@features/guidbooks/types';
 
-import { useFieldArray } from 'react-hook-form';
+import { useConstructionMaterials } from '@features/guidbooks/utils';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { Fragment } from 'react/jsx-runtime';
 
 export const FramePartitionDoubleComponent = ({ currentForm }: ConstructionTypeProps) => {
-	const { control } = currentForm;
+	const { control, watch } = currentForm;
 
-	const { fields, append, remove } = useFieldArray({
+	const { fields, append, remove, userMaterials } = useConstructionMaterials(
 		control,
-		name: 'constructionTypeObject.constructions.0.userMaterials',
-	});
+		watch,
+		'Left',
+	);
 
 	const renderAddButton = (positionId: string) => (
 		<AiOutlinePlusCircle
@@ -53,7 +54,7 @@ export const FramePartitionDoubleComponent = ({ currentForm }: ConstructionTypeP
 						currentForm={currentForm}
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionIndex={0}
+						constructionPosition="Left"
 						materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 					/>
 				)}
@@ -61,66 +62,46 @@ export const FramePartitionDoubleComponent = ({ currentForm }: ConstructionTypeP
 				{positionId === '2' || positionId === '9' ? (
 					<>
 						<BoardMaterialType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 					</>
 				) : positionId === '3' || positionId === '8' ? (
 					<>
 						<FillerMaterialType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 					</>
 				) : positionId === '4' || positionId === '7' ? (
 					<>
 						<FrameMaterialType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 						<WidthRacksStepFieldsType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 					</>
 				) : positionId === '5' ? (
 					<>
 						<AirGapMaterialType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 					</>
 				) : positionId === '6' ? (
 					<>
 						<LinkMaterialType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 						<PointConnectionsFieldsType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 					</>
 				) : (
@@ -128,9 +109,9 @@ export const FramePartitionDoubleComponent = ({ currentForm }: ConstructionTypeP
 						{ConstructionFieldsMap({
 							currentForm,
 							fieldIndex,
-							constructionIndex: 0,
-							materialType: (fields[fieldIndex] as any)
-								.materialType as MaterialTypeEnum,
+							constructionPosition: 'Left',
+							materialType: (userMaterials[fieldIndex] as any)
+								?.materialType as MaterialTypeEnum,
 						})}
 					</div>
 				)}
@@ -144,22 +125,24 @@ export const FramePartitionDoubleComponent = ({ currentForm }: ConstructionTypeP
 
 	const positions = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
 
-	console.log(fields);
-
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
 			<div className="flex flex-col gap-[24px]">
+				{fields.length === 0 && renderAddButton('0')}
+
 				{positions.map((positionId, index) => {
-					const fieldIndex = fields.findIndex((f: any) => f.positionId === positionId);
-					const field = fields[fieldIndex];
+					const fieldIndex = userMaterials.findIndex(
+						(f: any) => f.positionId === positionId,
+					);
+					const field = userMaterials[fieldIndex];
 
 					const prevId = positions[index - 1];
 					const nextId = positions[index + 1];
 
 					const showAddButton =
 						fieldIndex === -1 &&
-						(fields.some((f: any) => f.positionId === prevId) ||
-							fields.some((f: any) => f.positionId === nextId));
+						(userMaterials.some((f: any) => f.positionId === prevId) ||
+							userMaterials.some((f: any) => f.positionId === nextId));
 
 					if (showAddButton) {
 						return renderAddButton(positionId);

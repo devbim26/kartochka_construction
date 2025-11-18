@@ -19,33 +19,33 @@ import {
 	type MaterialTypeEnum,
 } from '@features/guidbooks/types';
 
-import { useFieldArray } from 'react-hook-form';
+import { useConstructionMaterials } from '@features/guidbooks/utils';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { Fragment } from 'react/jsx-runtime';
 
 export const HeavySingleLayerWallFacingBothSideComponent = ({
 	currentForm,
 }: ConstructionTypeProps) => {
-	const { control } = currentForm;
+	const { control, watch } = currentForm;
 
 	const layerConfigs = [
 		{
 			title: '1. Облицовка',
-			constructionIndex: 0,
+			constructionPosition: 'Left' as const,
 			positions: ['0', '1', '2', '3', '4', '5', '6'],
 			selectable: ['5', '6'],
 			materialType: MaterialTypesSelectValuesEnum.Facing,
 		},
 		{
 			title: '2. Базовая конструкция',
-			constructionIndex: 1,
+			constructionPosition: 'Center' as const,
 			positions: ['0', '1', '2', '3', '4'],
 			selectable: ['0', '1', '3', '4'],
 			materialType: MaterialTypesSelectValuesEnum.Base,
 		},
 		{
 			title: '3. Облицовка',
-			constructionIndex: 2,
+			constructionPosition: 'Right' as const,
 			positions: ['0', '1', '2', '3', '4', '5', '6'],
 			selectable: ['5', '6'],
 			materialType: MaterialTypesSelectValuesEnum.Facing,
@@ -56,7 +56,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = ({
 		positionId: string,
 		fieldIndex: number,
 		fieldId: string,
-		constructionIndex: number,
+		constructionPosition: 'Left' | 'Center' | 'Right',
 		selectable: string[],
 		materialType: MaterialTypesSelectValuesEnum,
 		remove: (index: number) => void,
@@ -69,60 +69,64 @@ export const HeavySingleLayerWallFacingBothSideComponent = ({
 						currentForm={currentForm}
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionIndex={constructionIndex}
+						constructionPosition={constructionPosition}
 						materialTypesSelectValues={materialType}
 					/>
 				)}
 
-				{positionId === '2' && constructionIndex === 1 && (
+				{positionId === '2' && constructionPosition === 'Center' && (
 					<>
-						<HeavyMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
+						<HeavyMaterialType {...{ fieldIndex, constructionPosition, currentForm }} />
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
+							{...{ fieldIndex, constructionPosition, currentForm }}
 						/>
 					</>
 				)}
-				{positionId === '2' && constructionIndex !== 1 && (
+				{positionId === '2' && constructionPosition !== 'Center' && (
 					<>
-						<FrameMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
+						<FrameMaterialType {...{ fieldIndex, constructionPosition, currentForm }} />
 						<WidthRacksStepFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
+							{...{ fieldIndex, constructionPosition, currentForm }}
 						/>
 					</>
 				)}
 
-				{positionId === '3' && constructionIndex !== 1 && (
+				{positionId === '3' && constructionPosition !== 'Center' && (
 					<>
-						<FillerMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
+						<FillerMaterialType
+							{...{ fieldIndex, constructionPosition, currentForm }}
+						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
+							{...{ fieldIndex, constructionPosition, currentForm }}
 						/>
 					</>
 				)}
 
-				{positionId === '4' && constructionIndex !== 1 && (
+				{positionId === '4' && constructionPosition !== 'Center' && (
 					<>
-						<BoardMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
+						<BoardMaterialType {...{ fieldIndex, constructionPosition, currentForm }} />
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
+							{...{ fieldIndex, constructionPosition, currentForm }}
 						/>
 					</>
 				)}
 
-				{positionId === '1' && constructionIndex !== 1 && (
+				{positionId === '1' && constructionPosition !== 'Center' && (
 					<>
-						<LinkMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
+						<LinkMaterialType {...{ fieldIndex, constructionPosition, currentForm }} />
 						<PointConnectionsFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
+							{...{ fieldIndex, constructionPosition, currentForm }}
 						/>
 					</>
 				)}
 
-				{positionId === '0' && constructionIndex !== 1 && (
+				{positionId === '0' && constructionPosition !== 'Center' && (
 					<>
-						<AirGapMaterialType {...{ fieldIndex, constructionIndex, currentForm }} />
+						<AirGapMaterialType
+							{...{ fieldIndex, constructionPosition, currentForm }}
+						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionIndex, currentForm }}
+							{...{ fieldIndex, constructionPosition, currentForm }}
 						/>
 					</>
 				)}
@@ -132,7 +136,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = ({
 						{ConstructionFieldsMap({
 							currentForm,
 							fieldIndex,
-							constructionIndex,
+							constructionPosition,
 							materialType: fields[fieldIndex]?.materialType as MaterialTypeEnum,
 						})}
 					</div>
@@ -148,11 +152,12 @@ export const HeavySingleLayerWallFacingBothSideComponent = ({
 	return (
 		<>
 			{layerConfigs.map(
-				({ title, constructionIndex, positions, selectable, materialType }) => {
-					const { fields, append, remove } = useFieldArray({
+				({ title, constructionPosition, positions, selectable, materialType }) => {
+					const { fields, append, remove } = useConstructionMaterials(
 						control,
-						name: `constructionTypeObject.constructions.${constructionIndex}.userMaterials`,
-					});
+						watch,
+						constructionPosition,
+					);
 
 					return (
 						<ConstructionLayer key={title} title={title}>
@@ -195,7 +200,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = ({
 													positionId,
 													fieldIndex,
 													field.id,
-													constructionIndex,
+													constructionPosition,
 													selectable,
 													materialType,
 													remove,

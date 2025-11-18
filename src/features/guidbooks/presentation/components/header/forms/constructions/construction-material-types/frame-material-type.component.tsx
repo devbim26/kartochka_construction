@@ -15,15 +15,27 @@ import { Controller } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
+const positionMap: Record<'Left' | 'Center' | 'Right', string> = {
+	Left: 'leftConstruction',
+	Center: 'centerConstruction',
+	Right: 'rightConstruction',
+};
+
 export const FrameMaterialType = memoize(
-	({ constructionIndex, fieldIndex, currentForm }: ConstructionMaterialTypesProps) => {
+	({
+		constructionPosition,
+		fieldIndex,
+		currentForm,
+	}: Omit<ConstructionMaterialTypesProps, 'constructionIndex'> & {
+		constructionPosition: 'Left' | 'Center' | 'Right';
+	}) => {
 		const { formState, control } = currentForm;
 		const [materials, setMaterials] = useState<Array<SelectOption>>();
 
 		const handleGetMaterials = (data: MaterialsFilterData) => {
 			from(
 				getGuidebooksPaginated({
-					data: data,
+					data,
 					pagination: { pageSize: 999999, pageNumber: 1 },
 					guidebookType: Guidebooks.MATERIAL,
 				}),
@@ -50,10 +62,12 @@ export const FrameMaterialType = memoize(
 			});
 		}, []);
 
+		const basePath = `constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}`;
+
 		return (
 			<div className="flex flex-wrap gap-[16px]">
 				<Controller
-					name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`}
+					name={`${basePath}.materialId`}
 					control={control}
 					render={({ field }) => (
 						<Select
@@ -61,24 +75,24 @@ export const FrameMaterialType = memoize(
 							value={field.value || ''}
 							options={materials || []}
 							error={
-								(formState.errors as any)?.constructionTypeObject?.constructions?.[
-									constructionIndex
-								]?.userMaterials?.[fieldIndex]?.materialId?.message
+								(formState.errors as any)?.constructionTypeObject?.[
+									positionMap[constructionPosition]
+								]?.[fieldIndex]?.materialId?.message
 							}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
-								(formState.errors as any)?.constructionTypeObject?.constructions?.[
-									constructionIndex
-								]?.userMaterials?.[fieldIndex]?.materialId?.message
+								(formState.errors as any)?.constructionTypeObject?.[
+									positionMap[constructionPosition]
+								]?.[fieldIndex]?.materialId?.message
 									? 'text-error'
 									: '',
 							)}
 							wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
 							buttonClassName="text-sm rounded-[8px] w-[226px]"
 							label={
-								(formState.errors as any)?.constructionTypeObject?.constructions?.[
-									constructionIndex
-								]?.userMaterials?.[fieldIndex]?.materialId?.message || 'Каркас'
+								(formState.errors as any)?.constructionTypeObject?.[
+									positionMap[constructionPosition]
+								]?.[fieldIndex]?.materialId?.message || 'Каркас'
 							}
 							placeholder="Выберите материал"
 							isSearchable

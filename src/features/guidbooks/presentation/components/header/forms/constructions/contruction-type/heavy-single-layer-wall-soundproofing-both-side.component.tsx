@@ -1,21 +1,5 @@
-import { DeleteIcon } from '@core';
-import {
-	BoardMaterialType,
-	ConstructionLayer,
-	HeavyMaterialType,
-	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-	ZPanelMaterialType,
-} from '@features';
-import { ConstructionFieldsMap } from '@features/guidbooks/constants';
-import {
-	MaterialTypesSelectValuesEnum,
-	type ConstructionTypeProps,
-	type MaterialTypeEnum,
-	type UserMaterials,
-} from '@features/guidbooks/types';
+import { type ConstructionTypeProps, type UserMaterials } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const HeavySingleLayerWallSoundproofingBothSideComponent = ({
 	currentForm,
@@ -156,7 +140,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = ({
 
 	return (
 		<>
-			<ConstructionLayer title="1. Облицовка">
+			{/* <ConstructionLayer title="1. Облицовка">
 				{topSoundproofingIndices.threeIndex < 0 && topSoundproofingIndices.twoIndex > 0 ? (
 					<AiOutlinePlusCircle
 						onClick={() => {
@@ -679,7 +663,7 @@ export const HeavySingleLayerWallSoundproofingBothSideComponent = ({
 						)}
 					</>
 				)}
-			</ConstructionLayer>
+			</ConstructionLayer> */}
 		</>
 	);
 };

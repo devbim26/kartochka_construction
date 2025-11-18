@@ -15,15 +15,27 @@ import { Controller } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
+const positionMap: Record<'Left' | 'Center' | 'Right', string> = {
+	Left: 'leftConstruction',
+	Center: 'centerConstruction',
+	Right: 'rightConstruction',
+};
+
 export const ZPanelMaterialType = memoize(
-	({ constructionIndex, fieldIndex, currentForm }: ConstructionMaterialTypesProps) => {
+	({
+		constructionPosition,
+		fieldIndex,
+		currentForm,
+	}: Omit<ConstructionMaterialTypesProps, 'constructionIndex'> & {
+		constructionPosition: 'Left' | 'Center' | 'Right';
+	}) => {
 		const { formState, control, setValue } = currentForm;
 		const [materials, setMaterials] = useState<MaterialsAddAndEditData[]>();
 
 		const handleGetMaterials = (data: MaterialsFilterData) => {
 			from(
 				getGuidebooksPaginated({
-					data: data,
+					data,
 					pagination: { pageSize: 999999, pageNumber: 1 },
 					guidebookType: Guidebooks.MATERIAL,
 				}),
@@ -50,10 +62,12 @@ export const ZPanelMaterialType = memoize(
 			});
 		}, []);
 
+		const basePath = `constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}`;
+
 		return (
 			<div className="flex flex-wrap gap-[16px]">
 				<Controller
-					name={`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`}
+					name={`${basePath}.materialId`}
 					control={control}
 					render={({ field }) => (
 						<Select
@@ -61,42 +75,38 @@ export const ZPanelMaterialType = memoize(
 							value={field.value || ''}
 							options={convertToSelectValues(materials) || []}
 							error={
-								(formState.errors as any)?.constructionTypeObject?.constructions?.[
-									constructionIndex
-								]?.userMaterials?.[fieldIndex]?.materialId?.message
+								(formState.errors as any)?.constructionTypeObject?.[
+									positionMap[constructionPosition]
+								]?.[fieldIndex]?.materialId?.message
 							}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px] text-nowrap w-[226px]',
-								(formState.errors as any)?.constructionTypeObject?.constructions?.[
-									constructionIndex
-								]?.userMaterials?.[fieldIndex]?.materialId?.message
+								(formState.errors as any)?.constructionTypeObject?.[
+									positionMap[constructionPosition]
+								]?.[fieldIndex]?.materialId?.message
 									? 'text-error'
 									: '',
 							)}
 							wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
 							buttonClassName="text-sm rounded-[8px] w-[226px]"
 							label={
-								(formState.errors as any)?.constructionTypeObject?.constructions?.[
-									constructionIndex
-								]?.userMaterials?.[fieldIndex]?.materialId?.message ||
-								'Звукоизоляционная панель'
+								(formState.errors as any)?.constructionTypeObject?.[
+									positionMap[constructionPosition]
+								]?.[fieldIndex]?.materialId?.message || 'Звукоизоляционная панель'
 							}
 							placeholder="Выберите материал"
 							isSearchable
 							onChange={(selectedOption: string) => {
-								setValue(
-									`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialId`,
-									selectedOption,
-								);
+								setValue(`${basePath}.materialId`, selectedOption);
 								const selectedMaterial = materials?.find(
 									(m) => m.id === selectedOption,
 								);
 								setValue<any>(
-									`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.0.value`,
+									`${basePath}.materialTypeValue.0.value`,
 									selectedMaterial?.thickness,
 								);
 								setValue<any>(
-									`constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue.1.value`,
+									`${basePath}.materialTypeValue.1.value`,
 									selectedMaterial?.density,
 								);
 							}}

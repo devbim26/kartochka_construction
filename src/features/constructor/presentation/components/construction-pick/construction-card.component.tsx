@@ -19,35 +19,48 @@ type Props = {
 };
 
 export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) => {
-	const [thickness, setThickness] = useState<number>();
-	const [mass, setMass] = useState<number>();
-	const [density, setDensity] = useState<number>();
+	const [thickness, setThickness] = useState<number>(0);
+	const [mass, setMass] = useState<number>(0);
+	const [density, setDensity] = useState<number>(0);
 
 	useEffect(() => {
 		if (!construction) return;
 
-		const materialValues =
-			construction.constructionTypeObject.constructions?.[0]?.userMaterials?.[0]
-				?.materialTypeValue;
+		const allMaterials = [
+			...(construction.constructionTypeObject.leftConstruction || []),
+			...(construction.constructionTypeObject.centerConstruction || []),
+			...(construction.constructionTypeObject.rightConstruction || []),
+		];
 
-		const thicknessValue = materialValues?.find(
-			(v) => v.materialParameters === 'Thickness',
-		)?.value;
-		const densityValue = materialValues?.find((v) => v.materialParameters === 'Density')?.value;
+		const thicknessValues = allMaterials
+			.flatMap((m) => m.materialTypeValue || [])
+			.filter((v) => v.materialParameters === 'Thickness')
+			.map((v) => Number(v.value) || 0);
 
-		if (thicknessValue) setThickness(+thicknessValue);
-		if (densityValue) setDensity(+densityValue);
+		const densityValues = allMaterials
+			.flatMap((m) => m.materialTypeValue || [])
+			.filter((v) => v.materialParameters === 'Density')
+			.map((v) => Number(v.value) || 0);
+
+		const totalThickness = thicknessValues.reduce((acc, val) => acc + val, 0);
+
+		const avgDensity = densityValues.length
+			? densityValues.reduce((acc, val) => acc + val, 0) / densityValues.length
+			: 0;
+
+		setThickness(totalThickness);
+		setDensity(avgDensity);
 	}, [construction]);
 
 	useEffect(() => {
 		if (!thickness || !density || !construction) return;
 
-		const square = 100; //TODO: спросить;
+		const square = 100;
 		if (!square) return;
 
 		const calculatedMass = (square * thickness * density) / 1000;
 		setMass(calculatedMass);
-	}, [thickness, density]);
+	}, [thickness, density, construction]);
 
 	return (
 		<div className="flex flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
@@ -74,19 +87,15 @@ export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) =>
 							<img className="h-full w-[200px]" src={svgUrl} alt="SVG Construction" />
 						)}
 						<div className="flex w-fit flex-col">
-							{construction?.constructionTypeObject.constructions?.map(
-								(construction: any, index) =>
-									construction.userMaterials?.map(
-										(material: any, materialIndex: any) => (
-											<p
-												key={`${index}-${materialIndex}`}
-												className="text-[16px]"
-											>
-												- {formatMaterial(material)}
-											</p>
-										),
-									),
-							)}
+							{[
+								...(construction?.constructionTypeObject.leftConstruction || []),
+								...(construction?.constructionTypeObject.centerConstruction || []),
+								...(construction?.constructionTypeObject.rightConstruction || []),
+							].map((material: any, index: number) => (
+								<p key={index} className="text-[16px]">
+									- {formatMaterial(material)}
+								</p>
+							))}
 						</div>
 					</div>
 				</div>

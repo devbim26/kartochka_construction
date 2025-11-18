@@ -1,4 +1,4 @@
-import { ConstructionPosition, MaterialParametrs } from '@api-gen';
+import { MaterialParametrs } from '@api-gen';
 import {
 	FramePartitionDoubleComponent,
 	FramePartitionSingleComponent,
@@ -45,24 +45,24 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.OneGlassFrame,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Glazing,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Glazing,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
+
+				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
+
 		[ConstructionTypeEnum.TwoGlassFrame]: {
 			component: <TwoGlassFrameComponent currentForm={currentForm} />,
 			action: () => {
@@ -70,24 +70,24 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.TwoGlassFrame,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Glazing,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Glazing,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
+
+				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
+
 		[ConstructionTypeEnum.Floor]: {
 			component: <></>,
 			action: () => {},
@@ -103,24 +103,24 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWall,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
+
+				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
+
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]: {
 			component: <HeavySingleLayerWallFacingOneSideComponent currentForm={currentForm} />,
 			action: () => {
@@ -128,77 +128,70 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 				);
-				setValue('constructionTypeObject.constructions', [
-					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-					},
-					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.AirGap,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Frame,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
 
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+				setValue('constructionTypeObject.leftConstruction', [
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
+
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.AirGap,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Frame,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+						],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
+
 		[ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]: {
 			component: <HeavySingleLayerWallFacingBothSideComponent currentForm={currentForm} />,
 			action: () => {
@@ -206,128 +199,115 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Frame,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.AirGap,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Right,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.AirGap,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Frame,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Frame,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+						],
+					},
+					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.AirGap,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.rightConstruction', [
+					{
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.AirGap,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Frame,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+						],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
 			},
 		},
+
 		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide]: {
 			component: (
 				<HeavySingleLayerWallSoundproofingOneSideComponent currentForm={currentForm} />
@@ -337,45 +317,41 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-						],
-					},
-					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.ZPanel,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
+
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.ZPanel,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]: {
@@ -387,70 +363,63 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.ZPanel,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.ZPanel,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.rightConstruction', [
+					{
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.ZPanel,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Right,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.ZPanel,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
 						],
 					},
 				]);
 			},
 		},
+
 		[ConstructionTypeEnum.HeavyMultiLayerWall]: {
 			component: <HeavyMultiLayerWallComponent currentForm={currentForm} />,
 			action: () => {
@@ -458,53 +427,50 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavyMultiLayerWall,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '5',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '5',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
+
+				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
+
 		[ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide]: {
 			component: <HeavyMultiLayerWallFacingOneSideComponent currentForm={currentForm} />,
 			action: () => {
@@ -512,105 +478,96 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '5',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.AirGap,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Frame,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '5',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
+
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.AirGap,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Frame,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+						],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
+
 		[ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]: {
 			component: <HeavyMultiLayerWallFacingBothSideComponent currentForm={currentForm} />,
 			action: () => {
@@ -618,157 +575,144 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				// Left
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.AirGap,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Frame,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.AirGap,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '5',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Right,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.AirGap,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Frame,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Frame,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+						],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				// Center
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '5',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				// Right
+				setValue('constructionTypeObject.rightConstruction', [
+					{
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.AirGap,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Frame,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+						],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
 			},
 		},
+
 		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide]: {
 			component: (
 				<HeavyMultiLayerWallSoundproofingOneSideComponent currentForm={currentForm} />
@@ -778,76 +722,70 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '5',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.ZPanel,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '5',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
+
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.ZPanel,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
+
 		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide]: {
 			component: <HeavyMultiLayerWallSoundproofBothSideComponent currentForm={currentForm} />,
 			action: () => {
@@ -855,99 +793,89 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.ZPanel,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.ZPanel,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Center,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '5',
-								materialId: '',
-								materialType: MaterialTypeEnum.Heavy,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
-						contructionPosition: ConstructionPosition.Right,
-						userMaterials: [
-							{
-								positionId: '0',
-								materialId: '',
-								materialType: MaterialTypeEnum.ZPanel,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '1',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '5',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.rightConstruction', [
+					{
+						positionId: '0',
+						materialId: '',
+						materialType: MaterialTypeEnum.ZPanel,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
 			},
 		},
+
 		[ConstructionTypeEnum.OneFramePartition]: {
 			component: <FramePartitionSingleComponent currentForm={currentForm} />,
 			action: () => {
@@ -955,57 +883,56 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.OneFramePartition,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Frame,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '5',
-								materialId: '',
-								materialType: MaterialTypeEnum.GapDistance,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-								],
-							},
-							{
-								positionId: '6',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Frame,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+						],
+					},
+					{
+						positionId: '5',
+						materialId: '',
+						materialType: MaterialTypeEnum.GapDistance,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+						],
+					},
+					{
+						positionId: '6',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
+
+				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
 		[ConstructionTypeEnum.TwoFramePartition]: {
@@ -1015,87 +942,83 @@ export const ConstructionTypeMap = ({
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.TwoFramePartition,
 				);
-				setValue('constructionTypeObject.constructions', [
+
+				setValue('constructionTypeObject.leftConstruction', [
 					{
-						contructionPosition: ConstructionPosition.Left,
-						userMaterials: [
-							{
-								positionId: '2',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '3',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '4',
-								materialId: '',
-								materialType: MaterialTypeEnum.Frame,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '5',
-								materialId: '',
-								materialType: MaterialTypeEnum.AirGap,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '6',
-								materialId: '',
-								materialType: MaterialTypeEnum.Link,
-								materialTypeValue: [
-									{
-										materialParameters: MaterialParametrs.ConnectionNumber,
-										value: '',
-									},
-								],
-							},
-							{
-								positionId: '7',
-								materialId: '',
-								materialType: MaterialTypeEnum.Frame,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Width, value: '' },
-									{ materialParameters: MaterialParametrs.RackStep, value: '' },
-								],
-							},
-							{
-								positionId: '8',
-								materialId: '',
-								materialType: MaterialTypeEnum.Filler,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
-							{
-								positionId: '9',
-								materialId: '',
-								materialType: MaterialTypeEnum.Board,
-								materialTypeValue: [
-									{ materialParameters: MaterialParametrs.Thickness, value: '' },
-									{ materialParameters: MaterialParametrs.Density, value: '' },
-								],
-							},
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
+						materialId: '',
+						materialType: MaterialTypeEnum.Frame,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+						],
+					},
+					{
+						positionId: '5',
+						materialId: '',
+						materialType: MaterialTypeEnum.AirGap,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '6',
+						materialId: '',
+						materialType: MaterialTypeEnum.Link,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+						],
+					},
+					{
+						positionId: '7',
+						materialId: '',
+						materialType: MaterialTypeEnum.Frame,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.RackStep, value: '' },
+						],
+					},
+					{
+						positionId: '8',
+						materialId: '',
+						materialType: MaterialTypeEnum.Filler,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '9',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
+
+				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
 	};

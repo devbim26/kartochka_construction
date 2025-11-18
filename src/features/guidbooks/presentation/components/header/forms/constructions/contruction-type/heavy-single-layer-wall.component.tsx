@@ -9,18 +9,15 @@ import { ConstructionFieldsMap } from '@features/guidbooks/constants';
 import type { ConstructionTypeProps, MaterialTypeEnum } from '@features/guidbooks/types';
 import { MaterialTypesSelectValuesEnum } from '@features/guidbooks/types';
 
-import { useFieldArray } from 'react-hook-form';
+import { useConstructionMaterials } from '@features/guidbooks/utils';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { Fragment } from 'react/jsx-runtime';
 
 export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
-	const { control, watch, setValue } = currentForm;
+	const { control, watch } = currentForm;
 
-	const { fields, append, remove } = useFieldArray({
-		control,
-		name: 'constructionTypeObject.constructions.0.userMaterials',
-	});
-
+	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Left');
+	console.log(currentForm.getValues());
 	const renderAddButton = (positionId: string) => (
 		<AiOutlinePlusCircle
 			key={`add-${positionId}`}
@@ -35,6 +32,7 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 			className="size-[40px] self-center text-primary"
 		/>
 	);
+
 	const renderMaterialBlock = (positionId: string, fieldIndex: number, fieldId: string) => (
 		<div key={fieldId} className="flex w-full items-start justify-between">
 			<div className="flex flex-1 gap-[20px]">
@@ -42,7 +40,7 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 					<SelectableMaterialType
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionIndex={0}
+						constructionPosition="Left"
 						materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 						currentForm={currentForm}
 					/>
@@ -51,23 +49,19 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 				{positionId === '2' ? (
 					<>
 						<HeavyMaterialType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							fieldIndex={fieldIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
+							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
 						/>
 					</>
 				) : (
 					<div className="flex gap-[8px]">
 						{ConstructionFieldsMap({
 							fieldIndex,
-							constructionIndex: 0,
+							constructionPosition: 'Left',
 							materialType: (fields[fieldIndex] as any)
-								.materialType as MaterialTypeEnum,
+								?.materialType as MaterialTypeEnum,
 							currentForm,
 						})}
 					</div>
@@ -85,6 +79,8 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
 			<div className="flex flex-col gap-[24px]">
+				{fields.length === 0 && renderAddButton('0')}
+
 				{positions.map((positionId, index) => {
 					const fieldIndex = fields.findIndex((f: any) => f.positionId === positionId);
 					const field = fields[fieldIndex];

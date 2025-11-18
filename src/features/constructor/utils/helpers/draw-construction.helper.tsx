@@ -20,7 +20,7 @@ export const drawConstruction = (
 		dividedRooms?.length ?? 0,
 	);
 
-	const boxWidth = maxTextLength * 13;
+	const boxWidth = maxTextLength * 9;
 	const boxHeight = 70;
 	const padding = 10;
 	const arrowThickness = 2;

@@ -4,11 +4,23 @@ import { MaterialParametrs } from '@features/constructor';
 import type { ConstructionFieldTypesProps } from '@features/guidbooks/types';
 import { twMerge } from 'tailwind-merge';
 
-export const PointConnectionsFieldsType = memoize(
-	({ fieldIndex, constructionIndex, currentForm }: ConstructionFieldTypesProps) => {
-		const { formState, register, getValues } = currentForm;
+const positionMap: Record<'Left' | 'Center' | 'Right', string> = {
+	Left: 'leftConstruction',
+	Center: 'centerConstruction',
+	Right: 'rightConstruction',
+};
 
-		const basePath = `constructionTypeObject.constructions.${constructionIndex}.userMaterials.${fieldIndex}.materialTypeValue`;
+export const PointConnectionsFieldsType = memoize(
+	({
+		fieldIndex,
+		constructionPosition,
+		currentForm,
+	}: Omit<ConstructionFieldTypesProps, 'constructionIndex'> & {
+		constructionPosition: 'Left' | 'Center' | 'Right';
+	}) => {
+		const { formState, register, getValues, watch } = currentForm;
+
+		const basePath = `constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}.materialTypeValue`;
 		const values = getValues(basePath) || [];
 
 		const pointIndex = values.findIndex(
@@ -16,8 +28,9 @@ export const PointConnectionsFieldsType = memoize(
 		);
 
 		const getError = (index: number) =>
-			(formState.errors as any)?.constructionTypeObject?.constructions?.[constructionIndex]
-				?.userMaterials?.[fieldIndex]?.materialTypeValue?.[index]?.value?.message;
+			(formState.errors as any)?.constructionTypeObject?.[
+				positionMap[constructionPosition]
+			]?.[fieldIndex]?.materialTypeValue?.[index]?.value?.message;
 
 		return (
 			<div className="flex flex-wrap gap-[16px]">

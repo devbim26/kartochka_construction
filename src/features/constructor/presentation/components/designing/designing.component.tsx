@@ -256,29 +256,44 @@ const DesigningScreen = () => {
 				</div>
 			)}
 			<DesigningHeader />
-			<div className="flex h-[428px] w-full flex-row gap-[72px] rounded-[20px] bg-white px-[44px] py-[34px]">
+			<div className="flex h-fit w-full flex-row gap-[72px] rounded-[20px] bg-white px-[44px] py-[34px]">
 				<img className="h-full w-fit" src={svgUrl ?? undefined} alt="SVG Construction" />
-				<div className="flex flex-col gap-[30px]">
+				<div className="flex h-fit flex-col gap-[30px]">
 					<Input
 						label="Тип конструкции"
 						labelClassName="font-sans text-[16px] font-[600] text-input-label-primary"
-						inputClassName="h-[30px] px-[12px] font-sans text-[14px] font-[400] w-[300px] rounded-[8px]"
+						inputClassName="h-[30px] px-[12px] font-sans text-[14px] font-[400] w-fit min-w-[400px] rounded-[8px]"
 						wrapperClassName="flex-row items-center gap-[66px]"
 						value={ruConstructionType}
 						disabled
 					/>
-					<div className="flex flex-col">
-						{constructionHeader?.constructionTypeObject?.constructions?.map(
-							(layer, layerIndex) => (
-								<div key={layerIndex}>
-									{layer.userMaterials?.map((material, materialIndex) => (
-										<p key={materialIndex} className="pl-4 text-[22px]">
-											- {formatMaterial(material)}
-										</p>
-									))}
-								</div>
-							),
-						)}
+					<div className="flex h-fit flex-col">
+						{constructionHeader?.constructionTypeObject?.leftConstruction
+							?.slice()
+							.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+							.map((material, i) => (
+								<p key={`left-${i}`} className="pl-4 text-[22px]">
+									- {formatMaterial(material)}
+								</p>
+							))}
+
+						{constructionHeader?.constructionTypeObject?.centerConstruction
+							?.slice()
+							.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+							.map((material, i) => (
+								<p key={`center-${i}`} className="pl-4 text-[22px]">
+									- {formatMaterial(material)}
+								</p>
+							))}
+
+						{constructionHeader?.constructionTypeObject?.rightConstruction
+							?.slice()
+							.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+							.map((material, i) => (
+								<p key={`right-${i}`} className="pl-4 text-[22px]">
+									- {formatMaterial(material)}
+								</p>
+							))}
 					</div>
 				</div>
 			</div>

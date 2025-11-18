@@ -46,17 +46,27 @@ export const GeneralInformationForm = () => {
 	useEffect(() => {
 		if (!constructionType) return;
 
-		const materialValues =
-			constructionType.constructionTypeObject.constructions?.[0]?.userMaterials?.[0]
-				?.materialTypeValue;
+		const allMaterials = [
+			...(constructionType.constructionTypeObject.leftConstruction || []),
+			...(constructionType.constructionTypeObject.centerConstruction || []),
+			...(constructionType.constructionTypeObject.rightConstruction || []),
+		];
 
-		const thicknessValue = materialValues?.find(
-			(v) => v.materialParameters === 'Thickness',
-		)?.value;
-		const densityValue = materialValues?.find((v) => v.materialParameters === 'Density')?.value;
+		const thicknessValues = allMaterials
+			.flatMap((m) => m.materialTypeValue || [])
+			.filter((v) => v.materialParameters === 'Thickness')
+			.map((v) => Number(v.value) || 0);
 
-		if (thicknessValue) setThickness(+thicknessValue);
-		if (densityValue) setDensity(+densityValue);
+		const densityValues = allMaterials
+			.flatMap((m) => m.materialTypeValue || [])
+			.filter((v) => v.materialParameters === 'Density')
+			.map((v) => Number(v.value) || 0);
+
+		const totalThickness = thicknessValues.reduce((acc, val) => acc + val, 0);
+		const totalDensity = densityValues.reduce((acc, val) => acc + val, 0);
+
+		if (totalThickness) setThickness(totalThickness);
+		if (totalDensity) setDensity(totalDensity);
 	}, [constructionType]);
 
 	useEffect(() => {

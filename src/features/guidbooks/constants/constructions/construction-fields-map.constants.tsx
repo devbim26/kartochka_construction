@@ -7,80 +7,81 @@ import {
 } from '@features/guidbooks/presentation';
 import { MaterialTypeEnum } from '@features/guidbooks/types';
 import type { UseFormReturn } from 'react-hook-form';
+
 interface ConstructionFieldsMapProps {
 	materialType: MaterialTypeEnum;
 	fieldIndex: number;
-	constructionIndex: number;
+	constructionPosition: 'Left' | 'Center' | 'Right';
 	currentForm: UseFormReturn<any>;
 }
 
 export const ConstructionFieldsMap = ({
 	materialType,
 	fieldIndex,
-	constructionIndex,
+	constructionPosition,
 	currentForm,
 }: ConstructionFieldsMapProps) => {
 	const componentsMap = {
 		[MaterialTypeEnum.Heavy]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.AirGap]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.Link]: (
 			<PointConnectionsFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.Frame]: (
 			<WidthRacksStepFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.Filler]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.Board]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.AcousticTreatmentMaterials]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.Membrane]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.ZPanel]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
@@ -88,14 +89,14 @@ export const ConstructionFieldsMap = ({
 		[MaterialTypeEnum.Glazing]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
 		[MaterialTypeEnum.GapDistance]: (
 			<ThicknessFieldsType
 				fieldIndex={fieldIndex}
-				constructionIndex={constructionIndex}
+				constructionPosition={constructionPosition}
 				currentForm={currentForm}
 			/>
 		),
