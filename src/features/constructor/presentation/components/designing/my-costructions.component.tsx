@@ -7,7 +7,11 @@ import {
 	convertToClientReportInfoShort,
 	graphDotsConverterToClient,
 } from '@features/constructor/converters';
-import { getReportFloorById, graphDetail } from '@features/constructor/services';
+import {
+	getReportFloorById,
+	getReportSingleById,
+	graphDetail,
+} from '@features/constructor/services';
 import {
 	convertToClientConstructionsEditData,
 	convertToClientIssuerData,
@@ -83,10 +87,29 @@ const MyConstructions = () => {
 		handleGetConstructionByHeaderId(constructionHeaderId);
 	}, [reportId, constructionHeaderId]);
 
+	const handleGetCurrentReportShortSingleInfo = (id: string) => {
+		dispatch(startLoading());
+		from(getReportSingleById({ id: id }))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setCurrentReportInfo(convertToClientReportInfoShort(response.data));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации об отчете');
+					return of(null);
+				}),
+			)
+			.subscribe(() => dispatch(stopLoading()));
+	};
+
 	useEffect(() => {
-		reportType === ReportCategory.Floor && reportId
-			? handleGetCurrentReportFloorInfo(reportId)
-			: () => {};
+		if (reportType === ReportCategory.Floor && reportId)
+			handleGetCurrentReportFloorInfo(reportId);
+		else if (reportType === ReportCategory.Single && reportId)
+			handleGetCurrentReportShortSingleInfo(reportId);
 	}, [reportType, reportId]);
 
 	useEffect(() => {

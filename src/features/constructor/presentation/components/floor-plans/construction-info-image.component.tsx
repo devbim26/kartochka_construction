@@ -84,6 +84,6 @@ export const ConstructionImage = ({
 			)}
 		</>
 	) : (
-		<div className="h-[100px] w-[120px] rounded-[12px] border-2 border-primary bg-white" />
+		<div className="h-[150px] w-[300px] rounded-[12px] border-2 border-primary bg-white" />
 	);
 };

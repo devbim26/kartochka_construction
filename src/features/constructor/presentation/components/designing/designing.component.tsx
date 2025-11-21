@@ -16,6 +16,7 @@ import {
 } from '@features/constructor/converters';
 import {
 	getReportFloorById,
+	getReportSingleById,
 	graphDetail,
 	svgConstructionDetail,
 } from '@features/constructor/services';
@@ -82,6 +83,24 @@ const DesigningScreen = () => {
 			.subscribe(() => dispatch(stopLoading()));
 	};
 
+	const handleGetCurrentReportShortSingleInfo = (id: string) => {
+		dispatch(startLoading());
+		from(getReportSingleById({ id: id }))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setCurrentReportInfo(convertToClientReportInfoShort(response.data));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации об отчете');
+					return of(null);
+				}),
+			)
+			.subscribe(() => dispatch(stopLoading()));
+	};
+
 	const handleGetConstructionByHeaderId = (id: string) => {
 		dispatch(startLoading());
 		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.CONSTRUCTION }))
@@ -132,9 +151,10 @@ const DesigningScreen = () => {
 	}, [constructionHeaderId]);
 
 	useEffect(() => {
-		reportType === ReportCategory.Floor && reportId
-			? handleGetCurrentReportFloorInfo(reportId)
-			: () => {};
+		if (reportType === ReportCategory.Floor && reportId)
+			handleGetCurrentReportFloorInfo(reportId);
+		else if (reportType === ReportCategory.Single && reportId)
+			handleGetCurrentReportShortSingleInfo(reportId);
 	}, [reportType, reportId]);
 
 	useEffect(() => {

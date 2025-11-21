@@ -3,8 +3,13 @@ import Loader from '@core/presentation/components/loaders/loader.component';
 import {
 	convertToClientFloorConstruction,
 	convertToClientReportInfoShort,
+	convertToClientSingleToFloorConstruction,
 } from '@features/constructor/converters';
-import { getFloorConstructionById, getReportFloorById } from '@features/constructor/services';
+import {
+	getFloorConstructionById,
+	getReportFloorById,
+	getReportSingleById,
+} from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
 import { ReportCategory, type FloorConstruction } from '@features/constructor/types';
 import type { ReportInfoShort } from '@features/constructor/utils';
@@ -12,9 +17,10 @@ import { convertToClientConstructionsEditData } from '@features/guidbooks/conver
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
 import { Guidebooks, RuConstructionTypesMap } from '@features/guidbooks/types';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from, of, tap } from 'rxjs';
+import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import {
 	GeneralInformationFireResistance,
@@ -38,9 +44,10 @@ export const GeneralInformationForm = () => {
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 
 	useEffect(() => {
-		reportType === ReportCategory.Floor && reportId
-			? handleGetCurrentReportFloorInfo(reportId)
-			: () => {};
+		if (reportType === ReportCategory.Floor && reportId)
+			handleGetCurrentReportFloorInfo(reportId);
+		else if (reportType === ReportCategory.Single && reportId)
+			handleGetCurrentReportShortSingleInfo(reportId);
 	}, [reportType, reportId]);
 
 	useEffect(() => {
@@ -79,6 +86,24 @@ export const GeneralInformationForm = () => {
 		setMass(calculatedMass);
 	}, [thickness, density, currentConstruction]);
 
+	const handleGetCurrentReportShortSingleInfo = (id: string) => {
+		dispatch(startLoading());
+		from(getReportSingleById({ id: id }))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setCurrentReportInfo(convertToClientReportInfoShort(response.data));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации об отчете');
+					return of(null);
+				}),
+			)
+			.subscribe(() => dispatch(stopLoading()));
+	};
+
 	const handleGetCurrentReportFloorInfo = (id: string) => {
 		dispatch(startLoading());
 		from(getReportFloorById({ id: id }))
@@ -97,6 +122,37 @@ export const GeneralInformationForm = () => {
 			.subscribe(() => {
 				dispatch(stopLoading());
 			});
+	};
+
+	const handleGetSingleConstruction = (id: string) => {
+		dispatch(startLoading());
+
+		from(getReportSingleById({ id }))
+			.pipe(
+				switchMap((singleResponse) => {
+					if (singleResponse.status !== 200 || !singleResponse.data) {
+						throw new Error('Ошибка при получении конструкции');
+					}
+
+					setCurrentConstruction(
+						convertToClientSingleToFloorConstruction(singleResponse.data),
+					);
+
+					return of(singleResponse.data);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || 'Ошибка при загрузке');
+					} else {
+						toast.error((error as Error).message);
+					}
+					return of(null);
+				}),
+				finalize(() => {
+					dispatch(stopLoading());
+				}),
+			)
+			.subscribe();
 	};
 
 	const handleGetCurrentConstructionReportHeader = (id: string) => {
@@ -138,8 +194,12 @@ export const GeneralInformationForm = () => {
 	};
 
 	useEffect(() => {
-		if (!reportFloorInfoId) return;
-		handleGetCurrentConstructionReportHeader(reportFloorInfoId);
+		if (reportType === ReportCategory.Single && reportId) {
+			handleGetSingleConstruction(reportId);
+		} else {
+			if (!reportFloorInfoId) return;
+			handleGetCurrentConstructionReportHeader(reportFloorInfoId);
+		}
 	}, [search]);
 
 	useEffect(() => {

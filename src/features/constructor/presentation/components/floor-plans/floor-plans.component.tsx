@@ -7,12 +7,14 @@ import {
 	convertFloorDataToClientConstructionSheet,
 	convertToClientFloorConstruction,
 	convertToClientFloorInfo,
+	convertToClientSingleToFloorConstruction,
 } from '@features/constructor/converters';
 import {
 	deleteConstruction,
 	getFloorById,
 	getFloorConstructionById,
 	getReportInfoIds,
+	getReportSingleById,
 	uploadDocument,
 } from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
@@ -29,7 +31,7 @@ import { useEffect, useState } from 'react';
 import { BsQuestionSquareFill } from 'react-icons/bs';
 import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, filter, from, of, switchMap, tap } from 'rxjs';
+import { catchError, filter, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import {
 	CreateConstructionForm,
@@ -134,7 +136,7 @@ export const FloorPlans = memoize(() => {
 	};
 
 	useEffect(() => {
-		if (!currentReportConstruction) return;
+		if (!currentReportConstruction?.reportConstructionHeader.id) return;
 		handleGetConstructionByHeaderId(
 			currentReportConstruction.reportConstructionHeader.constructionHeaderId,
 		);
@@ -218,6 +220,37 @@ export const FloorPlans = memoize(() => {
 			.subscribe();
 	};
 
+	const handleGetSingleConstruction = (id: string) => {
+		dispatch(startLoading());
+
+		from(getReportSingleById({ id }))
+			.pipe(
+				switchMap((singleResponse) => {
+					if (singleResponse.status !== 200 || !singleResponse.data) {
+						throw new Error('Ошибка при получении конструкции');
+					}
+
+					setCurrentReportConstruction(
+						convertToClientSingleToFloorConstruction(singleResponse.data),
+					);
+
+					return of(singleResponse.data);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || 'Ошибка при загрузке');
+					} else {
+						toast.error((error as Error).message);
+					}
+					return of(null);
+				}),
+				finalize(() => {
+					dispatch(stopLoading());
+				}),
+			)
+			.subscribe();
+	};
+
 	const deleteConstructionHandle = (id: string) => {
 		dispatch(startLoading());
 		from(deleteConstruction(id))
@@ -237,6 +270,8 @@ export const FloorPlans = memoize(() => {
 					toast.success('Успешное удаление');
 					if (reportType === ReportCategory.Floor) {
 						handleGetCurrentReportFloorInfos(reportId);
+					} else if (reportType === ReportCategory.Single) {
+						handleGetSingleConstruction(reportId);
 					}
 					window.history.back();
 				}
@@ -246,6 +281,8 @@ export const FloorPlans = memoize(() => {
 	useEffect(() => {
 		if (reportType === ReportCategory.Floor && !!reportId) {
 			handleGetCurrentReportFloorInfos(reportId);
+		} else if (reportType === ReportCategory.Single && !!reportId) {
+			handleGetSingleConstruction(reportId);
 		}
 	}, [search]);
 
@@ -331,6 +368,10 @@ export const FloorPlans = memoize(() => {
 														reportType: search.get('reportType')!,
 													})
 												}
+												disabled={
+													!!currentReportConstruction
+														?.reportConstructionHeader.id
+												}
 												className="h-[40px] w-[190px] bg-white px-[16px] text-[16px] text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
 											>
 												Создать конструкцию
@@ -395,7 +436,8 @@ export const FloorPlans = memoize(() => {
 					</div>
 					<ConstructionSheets
 						constructionSheets={
-							currentReportConstruction && currentConstructionHeader
+							currentReportConstruction?.reportConstructionHeader.id &&
+							currentConstructionHeader
 								? [
 										convertFloorDataToClientConstructionSheet(
 											currentReportConstruction,

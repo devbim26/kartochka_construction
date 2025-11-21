@@ -13,6 +13,7 @@ import {
 	useAppNavigate,
 } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
+import { ReportCategory } from '@features/constructor/types';
 import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -29,6 +30,8 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
+
+	const reportType = search.get('reportType');
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
 	const columns = useMemo(() => {
@@ -78,7 +81,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 										/>
 									</div>
 								) : (
-									<div className="h-[100px] w-[120px] rounded-[8px] border border-primary bg-white" />
+									<div className="h-[150px] w-[300px] rounded-[8px] border border-primary bg-white" />
 								)
 							}
 						/>
@@ -179,12 +182,21 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 										<div className="flex w-full items-center gap-[5px] text-[20px]">
 											<InfoIcon
 												onClick={() => {
-													navigate('', {
-														info: 'true',
-														reportId: search.get('reportId')!,
-														reportType: search.get('reportType')!,
-														reportFloorInfoId: reportFloorInfoId!,
-													});
+													reportType === ReportCategory.Floor
+														? navigate('', {
+																info: 'true',
+																reportId: search.get('reportId')!,
+																reportType:
+																	search.get('reportType')!,
+																reportFloorInfoId:
+																	reportFloorInfoId!,
+															})
+														: navigate('', {
+																info: 'true',
+																reportId: search.get('reportId')!,
+																reportType:
+																	search.get('reportType')!,
+															});
 												}}
 											/>
 											<p className="text-[15px] font-semibold text-input-label-primary">

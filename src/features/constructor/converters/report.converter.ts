@@ -5,6 +5,7 @@ import type {
 	NewReportFloorInfoDto,
 	PaginatedConstructionHeaderDto,
 	ReportInfoShortDto,
+	ReportInfoSingleConstructionDto,
 	SingleConstructionInfoDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
@@ -13,17 +14,15 @@ import {
 	convertToClientConstructionTypeEnumData,
 	convertToClientRequirementTableData,
 } from '@features/guidbooks/converters';
-import type {
-	AlternateConstruction,
-	ConstructionsEditData,
-	Country,
-} from '@features/guidbooks/types';
+import type { AlternateConstruction, ConstructionsEditData } from '@features/guidbooks/types';
 import {
 	BuildingType,
 	CategoryClass,
 	ConstructionTypeEnum,
+	Country,
 	RuConstructionTypesMap,
 } from '@features/guidbooks/types';
+
 import type {
 	AboutBuildingData,
 	ConstructionSheet,
@@ -64,6 +63,28 @@ export const convertToClientReportInfo = (data: ReportInfoShortDto): AboutBuildi
 		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
 		comfortClass: CategoryClass.A, //convertToClientCategoryClassData(data.requirements![0]!.class!), не хватает в шорте
 		maxHeight: '1',
+		isFloorPlan: true,
+		isConstruction: false,
+		isBim: true,
+	};
+};
+
+export const convertToClientSingleReportInfoShort = (
+	data: ReportInfoSingleConstructionDto,
+): ReportInfoShort => {
+	return {
+		...data,
+		commonDescription: '',
+		name: data.buildingName || '',
+		calculationRequirement: convertToClientRequirementTableData(
+			data.calculationRequirements![0],
+		),
+		regulatoryRequirement: convertToClientRequirementTableData(data.regulatoryRequirements![0]),
+		region: Country.Belarus,
+		buildingPurpose: data.purposeBuilding as string,
+		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
+		comfortClass: CategoryClass.A, //convertToClientCategoryClassData(data.requirements![0]!.class!), не хватает в шорте
+		maxHeight: '0',
 		isFloorPlan: true,
 		isConstruction: false,
 		isBim: true,
@@ -129,6 +150,33 @@ export const convertToClientFloorConstruction = (
 			firstPlacemetnRoom: {
 				id: data.reportConstructionHeader?.firstPlacementRoom?.id || '',
 				name: data.reportConstructionHeader?.firstPlacementRoom?.name || '',
+			},
+		},
+	};
+};
+
+export const convertToClientSingleToFloorConstruction = (
+	data: ReportInfoSingleConstructionDto,
+): FloorConstruction => {
+	const headerFromSingle = data.singleConstructionInfos?.[0]?.reportConstructionHeader;
+
+	return {
+		documentImageUrl: '',
+		page: 0,
+		coordinates: { x: 0, y: 0 },
+		reportConstructionHeader: {
+			constructionHeaderId: headerFromSingle?.constructionHeaderId ?? '',
+			square: headerFromSingle?.square ?? 0,
+			id: headerFromSingle?.id ?? '',
+			secondPlacementRoom: {
+				id: headerFromSingle?.secondPlacementRoom?.id ?? '',
+				name: headerFromSingle?.secondPlacementRoom?.name ?? '',
+			},
+			length: headerFromSingle?.length ?? 0,
+			width: headerFromSingle?.width ?? 0,
+			firstPlacemetnRoom: {
+				id: headerFromSingle?.firstPlacementRoom?.id ?? '',
+				name: headerFromSingle?.firstPlacementRoom?.name ?? '',
 			},
 		},
 	};
