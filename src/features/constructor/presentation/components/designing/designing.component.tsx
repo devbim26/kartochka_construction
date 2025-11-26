@@ -1,22 +1,30 @@
 import { Button, Input, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
-import type { DesigningData, GraphDetailResponse, ReportInfoShort } from '@features';
+import type {
+	AdditionalGraphParameters,
+	DesigningData,
+	GraphDetailResponse,
+	ReportInfoShort,
+} from '@features';
 import {
 	CONSTRUCTOR_ROUTES,
 	DesigningConfig,
 	DesigningHeader,
 	formatMaterial,
+	GraphDetailTable,
 	ReportCategory,
 	startLoading,
 	stopLoading,
 } from '@features';
 import {
 	convertToClientReportInfoShort,
+	graphAdditionalValuesConverterToClient,
 	graphDotsConverterToClient,
 } from '@features/constructor/converters';
 import {
 	getReportFloorById,
 	getReportSingleById,
+	graphAdditionalDetail,
 	graphDetail,
 	svgConstructionDetail,
 } from '@features/constructor/services';
@@ -48,6 +56,9 @@ const DesigningScreen = () => {
 	const reportType = search.get('reportType');
 	const constructionHeaderId = search.get('constructionHeaderId');
 	const [graphData, setGraphData] = useState<GraphDetailResponse[] | null>(null);
+	const [graphAdditionalData, setGraphAdditionalData] =
+		useState<AdditionalGraphParameters | null>(null);
+
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
@@ -140,6 +151,26 @@ const DesigningScreen = () => {
 			});
 	};
 
+	const handleGetGraphAdditionalDetail = (id: string) => {
+		dispatch(startLoading());
+		from(graphAdditionalDetail({ constructionHeaderId: id }))
+			.pipe(
+				catchError((error) => {
+					toast.error('Не удалось загрузить данные графика');
+					dispatch(stopLoading());
+					return [];
+				}),
+			)
+			.subscribe(({ data }) => {
+				if (!data) {
+					dispatch(stopLoading());
+					return;
+				}
+				setGraphAdditionalData(graphAdditionalValuesConverterToClient(data));
+				dispatch(stopLoading());
+			});
+	};
+
 	useEffect(() => {
 		if (!reportId || !constructionHeaderId) return;
 		handleGetConstructionByHeaderId(constructionHeaderId);
@@ -148,6 +179,7 @@ const DesigningScreen = () => {
 	useEffect(() => {
 		if (!constructionHeaderId || graphData) return;
 		handleGetGraphDetail(constructionHeaderId);
+		handleGetGraphAdditionalDetail(constructionHeaderId);
 	}, [constructionHeaderId]);
 
 	useEffect(() => {
@@ -225,6 +257,7 @@ const DesigningScreen = () => {
 					handleGetConstructionByHeaderId(constructionHeaderId);
 					handleGetConstructionImage(constructionHeaderId);
 					handleGetGraphDetail(constructionHeaderId);
+					handleGetGraphAdditionalDetail(constructionHeaderId);
 				}
 			});
 	}, [form]);
@@ -383,17 +416,11 @@ const DesigningScreen = () => {
 				</div>
 				<DesigningGraph graphData={graphData} />
 				<div className="w-[300px]"></div>
-				{/* <CombinedSoundReductionTable
-					frequencyLabels={graphData?.dotRs?.map((dot) => dot.f) || []}
-					rLab={graphData?.laboratoryDots?.map((dot) => dot.r) || []}
-					rInSitu={graphData?.dotRs?.map((dot) => dot.r) || []}
-					labRw={graphData?.labRw || 0}
-					computingRw={graphData?.computingRw || 0}
-					delta={graphData?.delta || 0}
-					c={graphData?.c || 0}
-					ctr={graphData?.ctr || 0}
+				<GraphDetailTable
+					graphData={graphData}
+					additional={graphAdditionalData || undefined}
 					noPadding={true}
-				/> */}
+				/>
 			</div>
 		</div>
 	);

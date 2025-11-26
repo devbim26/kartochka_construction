@@ -128,6 +128,11 @@ export const getReportFormInfo = async (id: string) => {
 export const graphDetail = async ({ constructionHeaderId }: GetGraphParams) => {
 	return await withConstructorLoader(() => fetchApi.api.graphDetail(constructionHeaderId));
 };
+export const graphAdditionalDetail = async ({ constructionHeaderId }: GetGraphParams) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.graphAdditionalGraphParamsDetail(constructionHeaderId),
+	);
+};
 export const svgConstructionDetail = async (id: string) => {
 	return await withConstructorLoader(() => fetchApi.api.svgConstructionDetail(id));
 };

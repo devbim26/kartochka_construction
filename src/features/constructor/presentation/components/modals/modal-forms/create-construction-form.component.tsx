@@ -134,7 +134,6 @@ export const CreateConstructionForm = memoize(
 				dispatch(startLoading());
 
 				const command = convertToUpdateReportCommand(reportId, data);
-
 				from(
 					reportType === ReportCategory.Floor
 						? updateReportFloor({

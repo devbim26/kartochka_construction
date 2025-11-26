@@ -1,69 +1,73 @@
 import { SimpleTableCell, SimpleTableHeaderCell } from '@core';
+import { DesigningRwTable } from '@features';
+import type { AdditionalGraphParameters, GraphDetailResponse } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
-import { DesigningRwTable } from './designing-rw-table.component';
 
-interface SoundReductionData {
+interface GraphTableRow {
 	frequency: string;
 	rLab: string;
 	rInSitu: string;
 }
 
-interface CombinedSoundReductionTableProps {
-	frequencyLabels?: number[];
-	rLab?: number[];
-	rInSitu?: number[];
-	labRw: number;
-	computingRw: number;
-	delta: number;
-	c: number;
-	ctr: number;
+interface GraphTableProps {
+	graphData: GraphDetailResponse[] | null;
+	additional?: AdditionalGraphParameters;
 	noPadding?: boolean;
 }
 
-export const CombinedSoundReductionTable = ({
-	frequencyLabels = [],
-	rLab = [],
-	rInSitu = [],
-	labRw,
-	computingRw,
-	delta,
-	c,
-	ctr,
-	noPadding = false,
-}: CombinedSoundReductionTableProps) => {
-	const tableData = useMemo(() => {
-		const rawData = frequencyLabels.map((f, index) => ({
-			frequency: f.toString(),
-			rLab: (rLab[index] ?? 0).toString(),
-			rInSitu: (rInSitu[index] ?? 0).toString(),
+export const GraphDetailTable = ({ graphData, additional, noPadding = false }: GraphTableProps) => {
+	const tableData = useMemo<GraphTableRow[]>(() => {
+		const labData = (graphData?.[0]?.namedDots ?? [])
+			.map((dot) => ({
+				frequency: dot.dot?.f?.toString() ?? '',
+				rLab: dot.dot?.r != null ? String(dot.dot.r) : '–',
+				rInSitu: '–',
+			}))
+			.sort((a, b) => Number(a.frequency) - Number(b.frequency));
+
+		const deviationDots = graphData?.[2]?.namedDots ?? [];
+		const inSituMap = new Map<number, string>();
+
+		deviationDots.forEach((dot) => {
+			if (dot.dot?.f && dot.dot?.r != null && dot.dot.f >= 100) {
+				inSituMap.set(dot.dot.f, String(dot.dot.r));
+			}
+		});
+
+		const rows = labData.map((row) => ({
+			...row,
+			rInSitu: inSituMap.get(Number(row.frequency)) ?? '–',
 		}));
 
-		const sortedData = rawData.sort((a, b) => Number(a.frequency) - Number(b.frequency));
+		if (additional) {
+			if (additional.computingRw !== undefined) {
+				rows.push({
+					frequency: 'Rw',
+					rLab: String(additional.computingRw),
+					rInSitu: String(additional.computingRw),
+				});
+			}
+			if (additional.ctr !== undefined && additional.delta !== undefined) {
+				rows.push({
+					frequency: 'Ctr',
+					rLab: `(${additional.delta}, ${additional.ctr})`,
+					rInSitu: `(${additional.delta}, ${additional.ctr})`,
+				});
+			}
+			if (additional.c !== undefined && additional.delta !== undefined) {
+				rows.push({
+					frequency: 'C50-5000',
+					rLab: `(${additional.delta}, ${additional.c})`,
+					rInSitu: `(${additional.delta}, ${additional.c})`,
+				});
+			}
+		}
 
-		const finalData: SoundReductionData[] = [
-			...sortedData,
-			{
-				frequency: 'Rw',
-				rLab: (labRw ?? 0).toString(),
-				rInSitu: (computingRw ?? 0).toString(),
-			},
-			{
-				frequency: 'Ctr',
-				rLab: `(${delta ?? 0}, ${ctr ?? 0})`,
-				rInSitu: `(${delta ?? 0}, ${ctr ?? 0})`,
-			},
-			{
-				frequency: 'C50-5000',
-				rLab: `(${delta ?? 0}, ${c ?? 0})`,
-				rInSitu: `(${delta ?? 0}, ${c ?? 0})`,
-			},
-		];
+		return rows;
+	}, [graphData, additional]);
 
-		return finalData;
-	}, [frequencyLabels, rLab, rInSitu, labRw, computingRw, delta, c, ctr]);
-
-	const columns = useMemo<ColumnDef<SoundReductionData>[]>(
+	const columns = useMemo<ColumnDef<GraphTableRow>[]>(
 		() => [
 			{
 				accessorKey: 'frequency',
@@ -77,11 +81,7 @@ export const CombinedSoundReductionTable = ({
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName={`w-[60px] border-r border-[#EDEFF2] text-center ${
-							info.row.original.frequency === 'Rw'
-								? 'bg-[#CCCCCC] text-[#FF0000]'
-								: ''
-						}`}
+						contentClassName="w-[60px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
@@ -98,11 +98,7 @@ export const CombinedSoundReductionTable = ({
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName={`w-[80px] border-r border-[#EDEFF2] text-center ${
-							info.row.original.frequency === 'Rw'
-								? 'bg-[#CCCCCC] text-[#FF0000]'
-								: ''
-						}`}
+						contentClassName="w-[80px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
@@ -119,11 +115,7 @@ export const CombinedSoundReductionTable = ({
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName={`w-[90px] text-center ${
-							info.row.original.frequency === 'Rw'
-								? 'bg-[#CCCCCC] text-[#FF0000]'
-								: ''
-						}`}
+						contentClassName="w-[90px] text-center"
 						noPadding={noPadding}
 					/>
 				),

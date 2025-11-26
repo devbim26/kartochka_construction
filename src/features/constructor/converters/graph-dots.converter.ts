@@ -1,5 +1,5 @@
-import type { GraphParametrsDto } from '@api-gen';
-import type { GraphDetailResponse } from '../types';
+import type { AdditionalGraphParametersDto, GraphParametrsDto } from '@api-gen';
+import type { AdditionalGraphParameters, GraphDetailResponse } from '../types';
 
 export const graphDotsConverterToClient = (data: GraphParametrsDto): GraphDetailResponse => ({
 	...data,
@@ -10,4 +10,10 @@ export const graphDotsConverterToClient = (data: GraphParametrsDto): GraphDetail
 			r: dot.dot?.r !== undefined ? parseFloat(dot.dot.r.toFixed(2)) : 0,
 		},
 	})),
+});
+
+export const graphAdditionalValuesConverterToClient = (
+	data: AdditionalGraphParametersDto,
+): AdditionalGraphParameters => ({
+	...data,
 });

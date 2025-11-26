@@ -28,6 +28,17 @@ export interface AccountDto {
 	expiresAt?: number;
 }
 
+export interface AdditionalGraphParametersDto {
+	/** @format double */
+	delta?: number;
+	/** @format double */
+	c?: number;
+	/** @format double */
+	ctr?: number;
+	/** @format double */
+	computingRw?: number;
+}
+
 export interface AdditionalPhoneNumber {
 	/** @format uuid */
 	id?: string;
@@ -1980,6 +1991,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		graphDetail: (constructionHeaderId: string, params: RequestParams = {}) =>
 			this.request<GraphParametrsDto[], any>({
 				path: `/api/Graph/${constructionHeaderId}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Graph
+		 * @name GraphAdditionalGraphParamsDetail
+		 * @request GET:/api/Graph/additionalGraphParams/{constructionHeaderId}
+		 */
+		graphAdditionalGraphParamsDetail: (
+			constructionHeaderId: string,
+			params: RequestParams = {},
+		) =>
+			this.request<AdditionalGraphParametersDto, any>({
+				path: `/api/Graph/additionalGraphParams/${constructionHeaderId}`,
 				method: 'GET',
 				format: 'json',
 				...params,
