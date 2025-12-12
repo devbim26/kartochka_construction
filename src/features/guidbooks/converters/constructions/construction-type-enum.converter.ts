@@ -28,6 +28,7 @@ const constructionTypeEnumMap = createDataRecordConverter({
 	[ClientConstructionTypeEnum.HeavySingleWallFacing]:
 		ServerConstructionTypeEnum.HeavySingleWallFacing,
 	[ClientConstructionTypeEnum.OneGlassFrame]: ServerConstructionTypeEnum.OneGlassFrame,
+	[ClientConstructionTypeEnum.ThreeGlassFrame]: ServerConstructionTypeEnum.ThreeGlassFrame,
 	[ClientConstructionTypeEnum.TwoGlassFrame]: ServerConstructionTypeEnum.TwoGlassFrame,
 	[ClientConstructionTypeEnum.Floor]: ServerConstructionTypeEnum.Floor,
 });

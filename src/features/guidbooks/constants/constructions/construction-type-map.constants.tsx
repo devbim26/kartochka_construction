@@ -96,6 +96,10 @@ export const ConstructionTypeMap = ({
 			component: <></>,
 			action: () => {},
 		},
+		[ConstructionTypeEnum.ThreeGlassFrame]: {
+			component: <></>,
+			action: () => {},
+		},
 		[ConstructionTypeEnum.HeavySingleLayerWall]: {
 			component: <HeavySingleLayerWallComponent currentForm={currentForm} />,
 			action: () => {

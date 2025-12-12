@@ -37,6 +37,9 @@ export interface AdditionalGraphParametersDto {
 	ctr?: number;
 	/** @format double */
 	computingRw?: number;
+	laboratoryIndexType?: IndexType;
+	/** @format float */
+	laboratoryIndexValue?: number;
 }
 
 export interface AdditionalPhoneNumber {
@@ -185,6 +188,7 @@ export enum ConstructionTypeEnum {
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
 	OneGlassFrame = 'OneGlassFrame',
 	TwoGlassFrame = 'TwoGlassFrame',
+	ThreeGlassFrame = 'ThreeGlassFrame',
 	Floor = 'Floor',
 }
 
@@ -764,6 +768,7 @@ export enum MaterialParametrs {
 	Width = 'Width',
 	Length = 'Length',
 	Square = 'Square',
+	Filler = 'Filler',
 }
 
 export interface MaterialType {

@@ -49,6 +49,7 @@ export enum ConstructionTypeEnum {
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
 	OneGlassFrame = 'OneGlassFrame',
 	TwoGlassFrame = 'TwoGlassFrame',
+	ThreeGlassFrame = 'ThreeGlassFrame',
 	Floor = 'Floor',
 }
 
@@ -72,6 +73,7 @@ export const RuConstructionTypesMap = {
 	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
 	OneGlassFrame: 'Многослойное стекло',
 	TwoGlassFrame: 'Стеклопакет',
+	ThreeGlassFrame: 'Тройное стекло',
 	Floor: 'Поэтажный',
 };
 
