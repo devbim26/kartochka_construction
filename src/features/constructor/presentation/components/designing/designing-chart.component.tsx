@@ -38,23 +38,24 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 	const chartData: ChartData<'line'> = {
 		labels: graphSeries[0]?.data.map((point) => String(point.x)) ?? [],
 		datasets: graphSeries.map((series) => {
-			const isInSitu = series.label.toLowerCase().includes('in situ');
-			const baseColor = isInSitu ? '#000000' : '#3b82f6';
-			const backgroundColor = isInSitu ? 'rgba(0, 0, 0, 0.1)' : 'rgba(59, 130, 246, 0.2)';
-			const borderDash = isInSitu ? [5, 5] : undefined;
+			const label = series.label.toLowerCase();
+			const isInSitu = label.includes('in situ');
+			const isRlab = label.includes('rlab') || label.includes('laboratory');
+
+			const baseColor = isInSitu ? '#000000' : isRlab ? '#ef4444' : '#3b82f6';
 
 			return {
 				label: series.label,
 				data: series.data.map((point) => point.y),
 				borderColor: baseColor,
-				backgroundColor,
-				borderWidth: 3,
+				backgroundColor: 'transparent',
+				borderWidth: 4,
 				pointBackgroundColor: baseColor,
 				pointRadius: 3,
 				pointHoverRadius: 5,
 				tension: 0.3,
-				fill: !isInSitu,
-				borderDash,
+				fill: false,
+				borderDash: isInSitu || isRlab ? [5, 5] : undefined,
 				spanGaps: true,
 			};
 		}),

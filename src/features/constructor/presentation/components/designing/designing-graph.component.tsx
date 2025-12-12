@@ -6,11 +6,13 @@ interface GraphProps {
 }
 
 const DesigningGraph = ({ graphData }: GraphProps) => {
-	const labData = (graphData?.[0].namedDots ?? [])
+	const labDots = graphData?.find((g) => g.name === 'abcd')?.namedDots ?? [];
+	const deviationDots = graphData?.find((g) => g.name === 'deviationDotsList')?.namedDots ?? [];
+	const laboratoryDots = graphData?.find((g) => g.name === 'LaboratoryDots')?.namedDots ?? [];
+
+	const labData = labDots
 		.map((dot) => ({ x: dot.dot?.f ?? 0, y: dot.dot?.r ?? 0 }))
 		.sort((a, b) => a.x - b.x);
-
-	const deviationDots = graphData?.[2].namedDots ?? [];
 
 	const inSituData = labData.map(({ x: currentFrequency }) => {
 		const matchingDeviationDot = deviationDots.find((dot) => dot.dot?.f === currentFrequency);
@@ -19,10 +21,8 @@ const DesigningGraph = ({ graphData }: GraphProps) => {
 			currentFrequency >= 100 && matchingDeviationDot
 				? (matchingDeviationDot.dot?.r ?? 0)
 				: null;
-		return {
-			x: currentFrequency,
-			y: yValue,
-		};
+
+		return { x: currentFrequency, y: yValue };
 	});
 
 	const defaultFrequencyLabels = [
@@ -33,6 +33,10 @@ const DesigningGraph = ({ graphData }: GraphProps) => {
 		? [
 				{ label: 'R (lab)', data: labData },
 				{ label: 'R (in situ)', data: inSituData },
+				{
+					label: 'Laboratory',
+					data: laboratoryDots.map((dot) => ({ x: dot.dot?.f ?? 0, y: dot.dot?.r ?? 0 })),
+				},
 			]
 		: [
 				{

@@ -3,6 +3,11 @@ import type { FloorConstruction } from '@features/constructor/types';
 import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { RuConstructionTypesMap } from '@features/guidbooks/types';
 
+const measureTextWidth = (ctx: CanvasRenderingContext2D, text: string, font: string) => {
+	ctx.font = font;
+	return ctx.measureText(text).width;
+};
+
 export const drawConstruction = (
 	canvas: HTMLCanvasElement,
 	x: number,
@@ -14,13 +19,15 @@ export const drawConstruction = (
 	const context = canvas.getContext('2d');
 	if (!context) return;
 
-	const maxTextLength = Math.max(
-		constructionName?.length ?? 0,
-		guidebookConstructionName?.length ?? 0,
-		dividedRooms?.length ?? 0,
-	);
+	const widths = [
+		measureTextWidth(context, constructionName, '300 16px Source Sans Pro'),
+		measureTextWidth(context, 'Конструкция:', '600 16px Source Sans Pro') +
+			measureTextWidth(context, guidebookConstructionName, '800 16px Source Sans Pro'),
+		measureTextWidth(context, 'разделяет:', '600 16px Source Sans Pro') +
+			measureTextWidth(context, dividedRooms, '800 16px Source Sans Pro'),
+	];
 
-	const boxWidth = maxTextLength * 9;
+	const boxWidth = Math.max(...widths) + 20;
 	const boxHeight = 70;
 	const padding = 10;
 	const arrowThickness = 2;

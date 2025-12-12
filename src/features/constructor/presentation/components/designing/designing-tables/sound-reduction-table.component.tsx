@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 interface GraphTableRow {
 	frequency: string;
 	rLab: string;
+	rLabExtra: string; // новый столбец
 	rInSitu: string;
 }
 
@@ -18,53 +19,62 @@ interface GraphTableProps {
 
 export const GraphDetailTable = ({ graphData, additional, noPadding = false }: GraphTableProps) => {
 	const tableData = useMemo<GraphTableRow[]>(() => {
-		const labData = (graphData?.[0]?.namedDots ?? [])
-			.map((dot) => ({
-				frequency: dot.dot?.f?.toString() ?? '',
-				rLab: dot.dot?.r != null ? String(dot.dot.r) : '–',
-				rInSitu: '–',
-			}))
-			.sort((a, b) => Number(a.frequency) - Number(b.frequency));
+		const labDots = graphData?.find((g) => g.name === 'abcd')?.namedDots ?? [];
+		const deviationDots =
+			graphData?.find((g) => g.name === 'deviationDotsList')?.namedDots ?? [];
+		const laboratoryDots = graphData?.find((g) => g.name === 'LaboratoryDots')?.namedDots ?? [];
 
-		const deviationDots = graphData?.[2]?.namedDots ?? [];
+		const labExtraMap = new Map<number, string>();
+		laboratoryDots.forEach((dot) => {
+			if (dot.dot?.f && dot.dot?.r != null) {
+				labExtraMap.set(dot.dot.f, String(dot.dot.r));
+			}
+		});
+
 		const inSituMap = new Map<number, string>();
-
 		deviationDots.forEach((dot) => {
 			if (dot.dot?.f && dot.dot?.r != null && dot.dot.f >= 100) {
 				inSituMap.set(dot.dot.f, String(dot.dot.r));
 			}
 		});
 
-		const rows = labData.map((row) => ({
-			...row,
-			rInSitu: inSituMap.get(Number(row.frequency)) ?? '–',
-		}));
+		const labData = labDots
+			.map((dot) => ({
+				frequency: dot.dot?.f?.toString() ?? '',
+				rLab: dot.dot?.r != null ? String(dot.dot.r) : '–',
+				rLabExtra: labExtraMap.get(dot.dot?.f ?? 0) ?? '–',
+				rInSitu: inSituMap.get(dot.dot?.f ?? 0) ?? '–',
+			}))
+			.sort((a, b) => Number(a.frequency) - Number(b.frequency));
 
 		if (additional) {
 			if (additional.computingRw !== undefined) {
-				rows.push({
+				labData.push({
 					frequency: 'Rw',
 					rLab: String(additional.computingRw),
+					rLabExtra: String(additional.computingRw),
 					rInSitu: String(additional.computingRw),
 				});
 			}
 			if (additional.ctr !== undefined && additional.delta !== undefined) {
-				rows.push({
+				labData.push({
 					frequency: 'Ctr',
 					rLab: `(${additional.delta}, ${additional.ctr})`,
+					rLabExtra: `(${additional.delta}, ${additional.ctr})`,
 					rInSitu: `(${additional.delta}, ${additional.ctr})`,
 				});
 			}
 			if (additional.c !== undefined && additional.delta !== undefined) {
-				rows.push({
+				labData.push({
 					frequency: 'C50-5000',
 					rLab: `(${additional.delta}, ${additional.c})`,
+					rLabExtra: `(${additional.delta}, ${additional.c})`,
 					rInSitu: `(${additional.delta}, ${additional.c})`,
 				});
 			}
 		}
 
-		return rows;
+		return labData;
 	}, [graphData, additional]);
 
 	const columns = useMemo<ColumnDef<GraphTableRow>[]>(
@@ -91,6 +101,23 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				header: () => (
 					<SimpleTableHeaderCell
 						text="R (lab), dB"
+						textClassName="w-[80px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName="w-[80px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+			},
+			{
+				accessorKey: 'rLabExtra',
+				header: () => (
+					<SimpleTableHeaderCell
+						text="Rlab, dB"
 						textClassName="w-[80px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
