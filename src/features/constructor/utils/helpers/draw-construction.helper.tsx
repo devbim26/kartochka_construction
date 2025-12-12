@@ -31,7 +31,7 @@ export const drawConstruction = (
 	const boxHeight = 70;
 	const padding = 10;
 	const arrowThickness = 2;
-	const dotSize = 2;
+	const dotSize = 5;
 
 	let boxX = x + 50;
 	const boxY = y - 100;

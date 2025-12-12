@@ -50,30 +50,38 @@ export const DesigningRwTable = memoize(
 							))}
 						</thead>
 						<tbody>
-							{getRowModel().rows.map((row) => (
-								<tr
-									key={row.id}
-									className={twMerge(
-										'border border-[#EDEFF2] hover:bg-[#C9DEFF]',
-										classNames?.contentRowClassName,
-									)}
-								>
-									{row.getVisibleCells().map((cell) => (
-										<td
-											key={cell.id}
-											className={twMerge(
-												'border border-[#EDEFF2] p-0',
-												classNames?.contentCellClassName,
-											)}
-										>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
-										</td>
-									))}
-								</tr>
-							))}
+							{getRowModel().rows.map((row) => {
+								const isRwRow =
+									(row.original as any)?.frequency === 'Rw' ||
+									(row.original as any)?.label === 'Rw';
+
+								return (
+									<tr
+										key={row.id}
+										className={twMerge(
+											'border border-[#EDEFF2] hover:bg-[#C9DEFF]',
+											isRwRow ? 'font-bold text-blue-600' : '',
+											classNames?.contentRowClassName,
+										)}
+									>
+										{row.getVisibleCells().map((cell) => (
+											<td
+												key={cell.id}
+												className={twMerge(
+													'border border-[#EDEFF2] p-0 !text-primary',
+													isRwRow ? 'font-bold !text-blue-600' : '',
+													classNames?.contentCellClassName,
+												)}
+											>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</td>
+										))}
+									</tr>
+								);
+							})}
 						</tbody>
 					</table>
 				</div>

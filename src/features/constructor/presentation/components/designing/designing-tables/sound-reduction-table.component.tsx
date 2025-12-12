@@ -3,6 +3,7 @@ import { DesigningRwTable } from '@features';
 import type { AdditionalGraphParameters, GraphDetailResponse } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 interface GraphTableRow {
 	frequency: string;
@@ -18,7 +19,7 @@ interface GraphTableProps {
 }
 
 export const GraphDetailTable = ({ graphData, additional, noPadding = false }: GraphTableProps) => {
-	const tableData = useMemo<GraphTableRow[]>(() => {
+	const { freqData, extraData } = useMemo(() => {
 		const labDots = graphData?.find((g) => g.name === 'abcd')?.namedDots ?? [];
 		const deviationDots =
 			graphData?.find((g) => g.name === 'deviationDotsList')?.namedDots ?? [];
@@ -38,7 +39,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 			}
 		});
 
-		const labData = labDots
+		const freqData = labDots
 			.map((dot) => ({
 				frequency: dot.dot?.f?.toString() ?? '',
 				rLab: dot.dot?.r != null ? String(dot.dot.r) : '–',
@@ -47,9 +48,10 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 			}))
 			.sort((a, b) => Number(a.frequency) - Number(b.frequency));
 
+		const extraData: GraphTableRow[] = [];
 		if (additional) {
 			if (additional.computingRw !== undefined) {
-				labData.push({
+				extraData.push({
 					frequency: 'Rw',
 					rLab: String(additional.computingRw),
 					rLabExtra: String(additional.computingRw),
@@ -57,7 +59,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				});
 			}
 			if (additional.ctr !== undefined && additional.delta !== undefined) {
-				labData.push({
+				extraData.push({
 					frequency: 'Ctr',
 					rLab: `(${additional.delta}, ${additional.ctr})`,
 					rLabExtra: `(${additional.delta}, ${additional.ctr})`,
@@ -65,7 +67,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				});
 			}
 			if (additional.c !== undefined && additional.delta !== undefined) {
-				labData.push({
+				extraData.push({
 					frequency: 'C50-5000',
 					rLab: `(${additional.delta}, ${additional.c})`,
 					rLabExtra: `(${additional.delta}, ${additional.c})`,
@@ -74,7 +76,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 			}
 		}
 
-		return labData;
+		return { freqData, extraData };
 	}, [graphData, additional]);
 
 	const columns = useMemo<ColumnDef<GraphTableRow>[]>(
@@ -88,13 +90,19 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						noPadding={noPadding}
 					/>
 				),
-				cell: (info) => (
-					<SimpleTableCell
-						content={info.getValue() as string}
-						contentClassName="w-[60px] border-r border-[#EDEFF2] text-center"
-						noPadding={noPadding}
-					/>
-				),
+				cell: (info) => {
+					const isRw = info.row.original.frequency === 'Rw';
+					return (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge(
+								'w-[60px] border-r border-[#EDEFF2] text-center',
+								isRw && 'text-blue-600 font-bold',
+							)}
+							noPadding={noPadding}
+						/>
+					);
+				},
 			},
 			{
 				accessorKey: 'rLab',
@@ -105,13 +113,19 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						noPadding={noPadding}
 					/>
 				),
-				cell: (info) => (
-					<SimpleTableCell
-						content={info.getValue() as string}
-						contentClassName="w-[80px] border-r border-[#EDEFF2] text-center"
-						noPadding={noPadding}
-					/>
-				),
+				cell: (info) => {
+					const isRw = info.row.original.frequency === 'Rw';
+					return (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge(
+								'w-[80px] border-r border-[#EDEFF2] text-center',
+								isRw && 'text-blue-600 font-bold',
+							)}
+							noPadding={noPadding}
+						/>
+					);
+				},
 			},
 			{
 				accessorKey: 'rLabExtra',
@@ -122,13 +136,19 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						noPadding={noPadding}
 					/>
 				),
-				cell: (info) => (
-					<SimpleTableCell
-						content={info.getValue() as string}
-						contentClassName="w-[80px] border-r border-[#EDEFF2] text-center"
-						noPadding={noPadding}
-					/>
-				),
+				cell: (info) => {
+					const isRw = info.row.original.frequency === 'Rw';
+					return (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge(
+								'w-[80px] border-r border-[#EDEFF2] text-center',
+								isRw && 'text-blue-600 font-bold',
+							)}
+							noPadding={noPadding}
+						/>
+					);
+				},
 			},
 			{
 				accessorKey: 'rInSitu',
@@ -139,22 +159,28 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						noPadding={noPadding}
 					/>
 				),
-				cell: (info) => (
-					<SimpleTableCell
-						content={info.getValue() as string}
-						contentClassName="w-[90px] text-center"
-						noPadding={noPadding}
-					/>
-				),
+				cell: (info) => {
+					const isRw = info.row.original.frequency === 'Rw';
+					return (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge(
+								'w-[90px] text-center',
+								isRw && 'text-blue-600 font-bold',
+							)}
+							noPadding={noPadding}
+						/>
+					);
+				},
 			},
 		],
 		[noPadding],
 	);
 
 	return (
-		<div className="flex-col">
+		<div className="flex flex-col gap-4">
 			<DesigningRwTable
-				data={tableData}
+				data={freqData}
 				columns={columns}
 				classNames={{
 					tableClassName: 'border border-[#EDEFF2] border-collapse',
@@ -162,6 +188,18 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 					contentCellClassName: 'border border-[#EDEFF2]',
 				}}
 			/>
+
+			{extraData.length > 0 && (
+				<DesigningRwTable
+					data={extraData}
+					columns={columns}
+					classNames={{
+						tableClassName: 'border border-[#EDEFF2] border-collapse',
+						headerCellClassName: 'border border-[#EDEFF2]',
+						contentCellClassName: 'border border-[#EDEFF2] font-bold',
+					}}
+				/>
+			)}
 		</div>
 	);
 };
