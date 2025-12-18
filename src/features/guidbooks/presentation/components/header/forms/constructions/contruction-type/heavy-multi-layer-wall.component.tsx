@@ -22,7 +22,7 @@ import { Fragment } from 'react/jsx-runtime';
 export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
 	const { control, watch } = currentForm;
 
-	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Left');
+	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Center');
 
 	const renderAddButton = (positionId: string) => (
 		<AiOutlinePlusCircle
@@ -47,7 +47,7 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 						currentForm={currentForm}
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionPosition="Left"
+						constructionPosition="Center"
 						materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 					/>
 				)}
@@ -55,10 +55,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 				{['2', '5'].includes(positionId) && (
 					<>
 						<HeavyMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				)}
@@ -66,10 +66,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 				{positionId === '3' && (
 					<>
 						<FillerMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				)}
@@ -77,10 +77,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 				{positionId === '4' && (
 					<>
 						<LinkMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<PointConnectionsFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				)}

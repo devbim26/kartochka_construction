@@ -138,7 +138,6 @@ export const svgConstructionDetail = async (id: string) => {
 };
 export const deleteConstruction = async (id: string) => {
 	const result = await withConstructorLoader(() => fetchApi.api.constructionDelete({ id }));
-	console.log('API ответ на удаление:', result);
 	return result;
 };
 

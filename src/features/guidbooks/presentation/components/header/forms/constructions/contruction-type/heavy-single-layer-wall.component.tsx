@@ -16,8 +16,7 @@ import { Fragment } from 'react/jsx-runtime';
 export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
 	const { control, watch } = currentForm;
 
-	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Left');
-	console.log(currentForm.getValues());
+	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Center');
 	const renderAddButton = (positionId: string) => (
 		<AiOutlinePlusCircle
 			key={`add-${positionId}`}
@@ -40,7 +39,7 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 					<SelectableMaterialType
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionPosition="Left"
+						constructionPosition="Center"
 						materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 						currentForm={currentForm}
 					/>
@@ -49,17 +48,17 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 				{positionId === '2' ? (
 					<>
 						<HeavyMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				) : (
 					<div className="flex gap-[8px]">
 						{ConstructionFieldsMap({
 							fieldIndex,
-							constructionPosition: 'Left',
+							constructionPosition: 'Center',
 							materialType: (fields[fieldIndex] as any)
 								?.materialType as MaterialTypeEnum,
 							currentForm,

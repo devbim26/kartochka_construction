@@ -108,7 +108,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.HeavySingleLayerWall,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
+				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
 						materialId: '',
@@ -120,7 +120,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.leftConstruction', []);
 				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
@@ -133,7 +133,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
+				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
 						materialId: '',
@@ -145,7 +145,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.centerConstruction', [
+				setValue('constructionTypeObject.rightConstruction', [
 					{
 						positionId: '0',
 						materialId: '',
@@ -161,6 +161,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -192,7 +193,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.rightConstruction', []);
+				setValue('constructionTypeObject.leftConstruction', []);
 			},
 		},
 
@@ -238,6 +239,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -279,6 +281,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -322,7 +325,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
+				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
 						materialId: '',
@@ -334,7 +337,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.centerConstruction', [
+				setValue('constructionTypeObject.rightConstruction', [
 					{
 						positionId: '0',
 						materialId: '',
@@ -355,7 +358,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.rightConstruction', []);
+				setValue('constructionTypeObject.leftConstruction', []);
 			},
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]: {
@@ -432,7 +435,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.HeavyMultiLayerWall,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
+				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
 						materialId: '',
@@ -457,6 +460,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -470,7 +474,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.leftConstruction', []);
 				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
@@ -508,6 +512,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -537,6 +542,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -597,6 +603,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -654,6 +661,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -684,6 +692,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -752,6 +761,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -844,6 +854,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -990,6 +1001,7 @@ export const ConstructionTypeMap = ({
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{

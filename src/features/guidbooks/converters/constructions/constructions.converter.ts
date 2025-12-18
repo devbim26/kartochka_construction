@@ -83,11 +83,11 @@ export const convertToServerConstructionType = (
 						userMaterials: data.leftConstruction.map((m) => ({
 							materialId: m.materialId,
 							materialName: m.materialName || '',
-							positionId: Number(m.positionId), // ← число
+							positionId: Number(m.positionId),
 							materialType: m.materialType,
 							materialTypeValue:
 								m.materialTypeValue?.map((mtv) => ({
-									value: Number(mtv.value), // ← число
+									value: Number(mtv.value),
 									materialParametrs: mtv.materialParameters as MaterialParametrs,
 								})) || [],
 						})),

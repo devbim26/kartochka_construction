@@ -25,8 +25,6 @@ export const DocumentFlags = () => {
 		name: 'floorDocumentsFlags.thermalInsulationCalculation.baseReportInfoFlags',
 	});
 
-	console.log(watch('floorDocumentsFlags.soundInsulationCalculation.baseReportInfoFlags'));
-
 	return (
 		<div className="flex w-full flex-col gap-[20px] px-[300px] font-semibold">
 			<div className="flex w-full items-center justify-start gap-[10px]">

@@ -1,7 +1,8 @@
-import { Input } from '@core';
+import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { MaterialParametrs } from '@features/constructor';
+import { ConnectionTypeSelectValues, MaterialParametrs } from '@features/constructor';
 import type { ConstructionFieldTypesProps } from '@features/guidbooks/types';
+import { Controller } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 const positionMap: Record<'Left' | 'Center' | 'Right', string> = {
@@ -27,6 +28,10 @@ export const PointConnectionsFieldsType = memoize(
 			(v: any) => v.materialParameters === MaterialParametrs.ConnectionNumber,
 		);
 
+		const typeIndex = values.findIndex(
+			(v: any) => v.materialParameters === MaterialParametrs.ConnectionType,
+		);
+
 		const getError = (index: number) =>
 			(formState.errors as any)?.constructionTypeObject?.[
 				positionMap[constructionPosition]
@@ -47,6 +52,26 @@ export const PointConnectionsFieldsType = memoize(
 						placeholder="Введите количество"
 						{...register(`${basePath}.${pointIndex}.value`)}
 						type="number"
+					/>
+				)}
+
+				{typeIndex !== -1 && (
+					<Controller
+						name={`${basePath}.${typeIndex}.value`}
+						control={currentForm.control}
+						render={({ field }) => (
+							<Select
+								{...field}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
+									getError(typeIndex) ? 'text-error' : '',
+								)}
+								wrapperClassname="flex-row w-[300px] ring-input-border-primary items-center gap-[16px]"
+								label={getError(typeIndex) || 'Тип связи'}
+								error={getError(typeIndex)}
+								options={ConnectionTypeSelectValues}
+							/>
+						)}
 					/>
 				)}
 			</div>
