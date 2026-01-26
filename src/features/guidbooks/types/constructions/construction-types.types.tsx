@@ -83,10 +83,10 @@ export const RuConstructionTypesSelectValues = [
 		label: 'Тяжелая однослойная стена + облицовка с одной стороны',
 		value: ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 	},
-	{
-		label: 'Тяжелая однослойная стена + облицовка с двух сторон',
-		value: ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
-	},
+	// {
+	// 	label: 'Тяжелая однослойная стена + облицовка с двух сторон',
+	// 	value: ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
+	// },
 	{
 		label: 'Тяжелая многослойная стена',
 		value: ConstructionTypeEnum.HeavyMultiLayerWall,
@@ -95,10 +95,10 @@ export const RuConstructionTypesSelectValues = [
 		label: 'Каркасная перегородка (1 каркас)',
 		value: ConstructionTypeEnum.OneFramePartition,
 	},
-	{
-		label: 'Каркасная перегородка (2 каркаса)',
-		value: ConstructionTypeEnum.TwoFramePartition,
-	},
+	// {
+	// 	label: 'Каркасная перегородка (2 каркаса)',
+	// 	value: ConstructionTypeEnum.TwoFramePartition,
+	// },
 	{
 		label: 'Многослойное стекло',
 		value: ConstructionTypeEnum.OneGlassFrame,

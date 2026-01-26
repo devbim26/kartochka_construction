@@ -7,19 +7,15 @@ import {
 	phoneNumberMask,
 	useAppDispatch,
 	useAppNavigate,
-	useAppSelector,
 } from '@core';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
-import { useEffect, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
-import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { TiDeleteOutline } from 'react-icons/ti';
 import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
-import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
 import { authRegistration } from '../../../services';
 import type { RegistrationFormData } from '../../../types';
 import { RegistrationFormDataConfig } from '../../../utils';
@@ -61,12 +57,7 @@ const PhoneInput = ({
 const CompanyRegistrationPage = () => {
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
-	const authData = useAppSelector((store) => store.authData);
 	const [search] = useSearchParams();
-
-	useEffect(() => {
-		form.setValue('mainPhoneNumber', search.get('phoneNumber')!);
-	}, [search]);
 
 	const form = useForm<RegistrationFormData>({
 		resolver: zodResolver(RegistrationFormDataConfig.schema),
@@ -75,20 +66,24 @@ const CompanyRegistrationPage = () => {
 
 	const { formState, watch, trigger, setValue } = form;
 	const phoneNumbers = watch('phoneNumbers');
-	const [showPassword, setShowPassword] = useState(false);
 
 	const onSubmit = () => {
 		dispatch(
 			authRegistration({
 				...form.getValues(),
 			}),
-		);
+		)
+			.unwrap()
+			.then(() => {
+				navigate(APP_ROUTES.designing.route);
+			})
+			.catch((e) => {});
 	};
 
-	useEffect(() => {
-		authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.registration.fetch_name &&
-			navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.login.route);
-	}, [authData.fetch_data]);
+	// useEffect(() => {
+	// 	authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.registration.fetch_name &&
+	// 		navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.login.route);
+	// }, [authData.fetch_data]);
 
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
@@ -103,7 +98,7 @@ const CompanyRegistrationPage = () => {
 	};
 
 	const logo = watch('companyLogo');
-
+	const phoneRef = useMask(phoneNumberMask);
 	return (
 		<div className="mb-[100px] flex w-[508px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[23px]">
 			<p className="text-center font-raleway text-[28px] font-semibold text-black">
@@ -113,16 +108,28 @@ const CompanyRegistrationPage = () => {
 				<div className="flex flex-col gap-[20px]">
 					<div className="flex flex-col gap-[8px] text-[14px] placeholder:text-input-label-primary">
 						<Input
-							label={formState.errors.mainPhoneNumber?.message || 'Номер телефона'}
+							{...form.register('email')}
+							label={formState.errors.mainPhoneNumber?.message || 'Email'}
 							labelClassName={
 								formState.errors.mainPhoneNumber?.message ? 'text-error' : ''
 							}
 							error={formState.errors.mainPhoneNumber?.message}
 							disabled
+							defaultValue={search.get('email')!}
+						/>
+						<Input
+							label={formState.errors.mainPhoneNumber?.message || 'Номер телефона'}
+							labelClassName={
+								formState.errors.mainPhoneNumber?.message ? 'text-error' : ''
+							}
+							ref={phoneRef}
+							error={formState.errors.mainPhoneNumber?.message}
 							iconPos="right"
 							iconClassName="w-[40px] h-[40px] text-primary right-[2px]"
 							Icon={phoneNumbers.length < 3 ? AiOutlinePlusCircle : undefined}
-							defaultValue={search.get('phoneNumber')!}
+							onChange={(e) => {
+								form.setValue('mainPhoneNumber', e.target.value);
+							}}
 							onIconClick={() =>
 								form.setValue('phoneNumbers', [
 									...phoneNumbers,
@@ -140,32 +147,7 @@ const CompanyRegistrationPage = () => {
 								/>
 							))}
 					</div>
-					<Input
-						label={formState.errors.password?.message || 'Пароль'}
-						labelClassName={formState.errors.password?.message ? 'text-error' : ''}
-						{...form.register('password')}
-						error={formState.errors.password?.message}
-						type={showPassword ? 'password' : 'text'}
-						placeholder="Введите пароль"
-						Icon={showPassword ? IoMdEyeOff : IoMdEye}
-						iconClassName="text-input-label-primary"
-						iconPos="right"
-						onIconClick={() => setShowPassword(!showPassword)}
-					/>
-					<Input
-						label={formState.errors.secondPassword?.message || 'Повторите пароль'}
-						labelClassName={
-							formState.errors.secondPassword?.message ? 'text-error' : ''
-						}
-						{...form.register('secondPassword')}
-						error={formState.errors.secondPassword?.message}
-						type={showPassword ? 'password' : 'text'}
-						placeholder="Введите пароль"
-						Icon={showPassword ? IoMdEyeOff : IoMdEye}
-						iconClassName="text-input-label-primary"
-						iconPos="right"
-						onIconClick={() => setShowPassword(!showPassword)}
-					/>
+
 					<Input
 						label={formState.errors.companyName?.message || 'Название компании'}
 						labelClassName={formState.errors.companyName?.message ? 'text-error' : ''}

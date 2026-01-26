@@ -12,6 +12,7 @@
 export interface AccountDto {
 	/** @format uuid */
 	id?: string;
+	email?: string | null;
 	companyName?: string | null;
 	phoneNumber?: string | null;
 	payersRegistrationNumber?: string | null;
@@ -792,17 +793,12 @@ export interface MaterialTypeDto {
 }
 
 export enum MaterialTypeEnum {
-	MasonryAndSolid = 'MasonryAndSolid',
+	Plaster = 'Plaster',
 	Frame = 'Frame',
-	PorousMaterials = 'PorousMaterials',
-	SandwichPanel = 'SandwichPanel',
-	GypsumBondedbBoards = 'GypsumBondedbBoards',
 	WoodBasedBoard = 'WoodBasedBoard',
 	MineralBondedBoards = 'MineralBondedBoards',
-	Metal = 'Metal',
 	Glazing = 'Glazing',
 	Membrane = 'Membrane',
-	FoamMaterials = 'FoamMaterials',
 	AcousticTreatmentMaterials = 'AcousticTreatmentMaterials',
 	AirGap = 'AirGap',
 	Link = 'Link',
@@ -1556,6 +1552,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 */
 		accountRegisterCreate: (
 			data: {
+				email?: string;
 				phoneNumber?: string;
 				companyName?: string;
 				bankIdNumber?: string;
@@ -1568,7 +1565,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				additionalPhoneNumbers?: string[];
 				/** @format binary */
 				formFile?: File;
-				password: string;
 			},
 			params: RequestParams = {},
 		) =>
@@ -1778,6 +1774,34 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<void, any>({
 				path: `/api/Auth/logout`,
 				method: 'POST',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Auth
+		 * @name AuthLoginGoogleList
+		 * @request GET:/api/Auth/login-google
+		 */
+		authLoginGoogleList: (params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Auth/login-google`,
+				method: 'GET',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Auth
+		 * @name AuthGoogleResponseList
+		 * @request GET:/api/Auth/google-response
+		 */
+		authGoogleResponseList: (params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Auth/google-response`,
+				method: 'GET',
 				...params,
 			}),
 

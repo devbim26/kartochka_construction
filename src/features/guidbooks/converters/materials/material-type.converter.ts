@@ -4,17 +4,11 @@ import { MaterialTypeEnum as ClientMaterialType } from '@features/guidbooks/type
 
 export const materialTypeMap = createDataRecordConverter({
 	[ClientMaterialType.AcousticTreatmentMaterials]: ServerMaterialType.AcousticTreatmentMaterials,
-	[ClientMaterialType.MasonryAndSolid]: ServerMaterialType.MasonryAndSolid,
 	[ClientMaterialType.Frame]: ServerMaterialType.Frame,
-	[ClientMaterialType.PorousMaterials]: ServerMaterialType.PorousMaterials,
-	[ClientMaterialType.SandwichPanel]: ServerMaterialType.SandwichPanel,
-	[ClientMaterialType.GypsumBondedbBoards]: ServerMaterialType.GypsumBondedbBoards,
 	[ClientMaterialType.WoodBasedBoard]: ServerMaterialType.WoodBasedBoard,
 	[ClientMaterialType.MineralBondedBoards]: ServerMaterialType.MineralBondedBoards,
-	[ClientMaterialType.Metal]: ServerMaterialType.Metal,
 	[ClientMaterialType.Glazing]: ServerMaterialType.Glazing,
 	[ClientMaterialType.Membrane]: ServerMaterialType.Membrane,
-	[ClientMaterialType.FoamMaterials]: ServerMaterialType.FoamMaterials,
 	[ClientMaterialType.AirGap]: ServerMaterialType.AirGap,
 	[ClientMaterialType.Link]: ServerMaterialType.Link,
 	[ClientMaterialType.Filler]: ServerMaterialType.Filler,
@@ -22,6 +16,7 @@ export const materialTypeMap = createDataRecordConverter({
 	[ClientMaterialType.Board]: ServerMaterialType.Board,
 	[ClientMaterialType.ZPanel]: ServerMaterialType.ZPanel,
 	[ClientMaterialType.GapDistance]: ServerMaterialType.GapDistance,
+	[ClientMaterialType.Plaster]: ServerMaterialType.Plaster,
 });
 
 export const convertToServerMaterialTypeData = (type: ClientMaterialType): ServerMaterialType => {

@@ -1,8 +1,9 @@
-import { APP_ROUTES } from '@core';
 import { Api } from './api';
 
+export const API_URL = `${process.env.REACT_APP_API_URL || '/api'}`;
+
 export const fetchApi = new Api({
-	baseURL: process.env.REACT_APP_API_URL,
+	baseURL: API_URL,
 	withCredentials: true,
 });
 
@@ -19,14 +20,14 @@ fetchApi.instance.interceptors.response.use(
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			originalRequest._retry = true;
 
-			try {
-				await fetchApi.api.authRefreshCreate(); // 👈 твой метод
-				return fetchApi.instance.request(originalRequest);
-			} catch (refreshError) {
-				console.warn('Refresh failed. Redirecting to login...');
-				window.location.href = APP_ROUTES.auth.route;
-				return Promise.reject(refreshError);
-			}
+			// try {
+			// 	await fetchApi.api.authRefreshCreate();
+			// 	return fetchApi.instance.request(originalRequest);
+			// } catch (refreshError) {
+			// 	console.warn('Refresh failed. Redirecting to login...');
+			// 	window.location.href = APP_ROUTES.auth.route;
+			// 	return Promise.reject(refreshError);
+			// }
 		}
 		return Promise.reject(error);
 	},

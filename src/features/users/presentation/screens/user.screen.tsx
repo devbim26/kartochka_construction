@@ -16,17 +16,10 @@ import {
 } from '@features/account/converters';
 import type { AccountData } from '@features/account/types';
 import { AccountDataConfig } from '@features/account/utils';
-import { convertToServerRegistrationData } from '@features/auth/converters';
 import type { RegistrationFormData } from '@features/auth/types';
 import { useHeaderForm } from '@features/guidbooks/utils';
 import { convertToServerUserFilterData } from '@features/users/converters';
-import {
-	createUser,
-	deleteUser,
-	getPaginatedUsers,
-	getUserById,
-	updateUser,
-} from '@features/users/services';
+import { deleteUser, getPaginatedUsers, getUserById, updateUser } from '@features/users/services';
 import { userColumns } from '@features/users/utils';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -101,24 +94,24 @@ export const UserScreen = () => {
 	};
 
 	const handleAddTableData = (data: RegistrationFormData) => {
-		from(createUser(convertToServerRegistrationData(data)))
-			.pipe(
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(
-							error.response?.data?.message || 'Ошибка создания пользователя',
-						);
-					}
-					return from([null]);
-				}),
-			)
-			.subscribe((response) => {
-				if (response?.status === 200) {
-					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Пользователь успешно добавлен');
-					navigate('');
-				}
-			});
+		// from(createUser(convertToServerRegistrationData(data)))
+		// 	.pipe(
+		// 		catchError((error) => {
+		// 			if (error instanceof AxiosError) {
+		// 				toast.error(
+		// 					error.response?.data?.message || 'Ошибка создания пользователя',
+		// 				);
+		// 			}
+		// 			return from([null]);
+		// 		}),
+		// 	)
+		// 	.subscribe((response) => {
+		// 		if (response?.status === 200) {
+		// 			handleGetTableData(form.filterForm.getValues(), paginationState);
+		// 			toast.success('Пользователь успешно добавлен');
+		// 			navigate('');
+		// 		}
+		// 	});
 	};
 
 	const handleDeleteTableData = (id: string) => {

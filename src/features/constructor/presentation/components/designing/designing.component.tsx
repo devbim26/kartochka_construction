@@ -1,4 +1,4 @@
-import { Button, Input, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
+import { Button, Input, Select, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import type {
 	AdditionalGraphParameters,
@@ -39,14 +39,20 @@ import type {
 	ConstructionTypeEnum,
 	Country,
 } from '@features/guidbooks/types';
-import { Guidebooks, RuConstructionTypesMap, RuCountryNamesMap } from '@features/guidbooks/types';
+import {
+	Guidebooks,
+	RuConstructionTypesMap,
+	RuConstructionTypesSelectValues,
+	RuCountryNamesMap,
+} from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
+import { twMerge } from 'tailwind-merge';
 import DesigningGraph from './designing-graph.component';
 
 const DesigningScreen = () => {
@@ -312,6 +318,47 @@ const DesigningScreen = () => {
 			<div className="flex h-fit w-full flex-row gap-[72px] rounded-[20px] bg-white px-[44px] py-[34px]">
 				<img className="h-full w-fit" src={svgUrl ?? undefined} alt="SVG Construction" />
 				<div className="flex h-fit flex-col gap-[30px]">
+					<Controller
+						name="constructionTypeObject.constructionTypeEnum"
+						control={form.control}
+						render={({ field }) => (
+							<Select
+								{...field}
+								isSearchable
+								value={field.value || ''}
+								onChange={(value) => {
+									form.setValue(
+										'constructionTypeObject.constructionTypeEnum',
+										value as string,
+									);
+									value &&
+										ConstructionTypeMap({
+											currentConstruction: value as ConstructionTypeEnum,
+											currentForm: form,
+										}).action();
+								}}
+								options={RuConstructionTypesSelectValues}
+								error={
+									form.formState.errors.constructionTypeObject
+										?.constructionTypeEnum?.message
+								}
+								labelClassName={twMerge(
+									'text-sm leading-5 tracking-[0.1px]',
+									form.formState.errors.constructionTypeObject
+										?.constructionTypeEnum?.message
+										? 'text-error'
+										: '',
+								)}
+								wrapperClassname="w-fit min-w-[468px] ring-input-border-primary"
+								buttonClassName="text-sm rounded-[8px]"
+								label={
+									form.formState.errors.constructionTypeObject
+										?.constructionTypeEnum?.message || ''
+								}
+								placeholder="Выберите тип"
+							/>
+						)}
+					/>
 					<Input
 						label="Тип конструкции"
 						labelClassName="font-sans text-[16px] font-[600] text-input-label-primary"

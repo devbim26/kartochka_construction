@@ -1,7 +1,6 @@
+import { API_URL } from '@api-gen';
 import {
 	APP_ROUTES,
-	Button,
-	Input,
 	LogoIcon,
 	LogoTextIcon,
 	phoneNumberMask,
@@ -14,8 +13,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
-import { AUTH_FETCH_ROUTES, AUTH_ROUTES } from '../../../constants';
+import { FaGoogle } from 'react-icons/fa6';
+import { AUTH_FETCH_ROUTES } from '../../../constants';
 import { authLogin } from '../../../services';
 import type { LoginFormData } from '../../../types';
 import { LoginFormDataConfig } from '../../../utils';
@@ -51,14 +50,14 @@ const LoginPage = () => {
 
 	return (
 		<FormProvider {...form}>
-			<div className="flex w-[412px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[21px]">
+			<div className="flex h-full w-[412px] flex-col items-center justify-center gap-[23px] rounded-[12px] border bg-white px-[32px] py-[21px]">
 				<div className="flex h-[64px] flex-row items-center justify-center gap-[10px]">
 					<LogoIcon />
 					<LogoTextIcon />
 				</div>
 				<form onSubmit={form.handleSubmit(onSubmit)}>
 					<div className="flex flex-col gap-[24px]">
-						<Input
+						{/* <Input
 							label={formState.errors.phoneNumber?.message || 'Номер телефона'}
 							labelClassName={
 								formState.errors.phoneNumber?.message ? 'text-error' : ''
@@ -79,23 +78,19 @@ const LoginPage = () => {
 							onIconClick={() => setShowPassword(!showPassword)}
 							{...form.register('password')}
 							error={formState.errors.password?.message}
-						/>
-						<Button variant="primary" type="submit" className="h-[36px]">
+						/> */}
+						<a
+							href={`${API_URL}api/Auth/login-google`}
+							className="flex h-[50px] w-full items-center gap-[10px] rounded-lg border-2 border-primary bg-primary px-[10px] font-montserrat text-[17px] text-white hover:opacity-80"
+						>
+							<FaGoogle className="size-[30px]" />
+							продолжить с Google
+						</a>
+						{/* <Button variant="primary" type="submit" className="h-[36px]">
 							Войти
-						</Button>
+						</Button> */}
 					</div>
 				</form>
-				<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
-					<p>Нет аккаунта?</p>
-					<p
-						onClick={() =>
-							navigate(APP_ROUTES.auth.route + '/' + AUTH_ROUTES.code_approve.route)
-						}
-						className="cursor-pointer font-semibold underline-offset-auto hover:underline"
-					>
-						Зарегистрироваться
-					</p>
-				</div>
 				<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
 					<p
 						onClick={() => navigate(APP_ROUTES.landing.route)}

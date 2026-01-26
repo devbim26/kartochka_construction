@@ -24,55 +24,34 @@ const ApproveFormDataSchema = z.object({
 
 type ApproveFormDataSchemaType = z.infer<typeof ApproveFormDataSchema>;
 
-const RegistrationFormDataSchema = z
-	.object({
-		mainPhoneNumber: z
-			.string()
-			.min(1, 'Поле обязательно для заполнения')
-			.refine((value) => !value.includes('_'), 'Неверный формат номера телефона'),
-		phoneNumbers: z.array(
-			z.object({
-				number: z
-					.string()
-					.min(1, 'Поле обязательно для заполнения')
-					.refine((value) => !value.includes('_'), 'Неверный формат номера телефона'),
-				id: z.string(),
-			}),
-		),
-		password: z
-			.string()
-			.min(1, 'Поле обязательно для заполнения')
-			.min(8, 'Пароль должен содержать не менее 8 символов')
-			.regex(/[A-Z]/, 'Пароль должен содержать хотя бы одну заглавную букву')
-			.regex(/[a-z]/, 'Пароль должен содержать хотя бы одну строчную букву')
-			.regex(/[0-9]/, 'Пароль должен содержать хотя бы одну цифру')
-			.regex(/[@$!%*?&#]/, 'Пароль должен содержать хотя бы один специальный символ'),
-		secondPassword: z.string().min(1, 'Поле обязательно для заполнения'),
-		companyName: z.string().min(1, 'Поле обязательно для заполнения'),
-		directorFullName: z.string().min(1, 'Поле обязательно для заполнения'),
-		companyAddress: z.string().min(1, 'Поле обязательно для заполнения'),
-		payersRegistrationNumber: z.string().min(1, 'Поле обязательно для заполнения'),
-		paymentAccount: z.string().min(1, 'Поле обязательно для заполнения'),
-		bankIdNumber: z.string().min(1, 'Поле обязательно для заполнения'),
-		bankAddress: z.string().min(1, 'Поле обязательно для заполнения'),
-		companyLogo: z.string().optional(),
-		formFile: z
-			.any()
-			.refine(
-				(file) => file instanceof File && file.size > 0,
-				'Поле обязательно для заполнения',
-			),
-		compannyInfo: z.string().min(1, 'Поле обязательно для заполнения'),
-	})
-	.superRefine(({ password, secondPassword }, ctx) => {
-		if (password !== secondPassword) {
-			ctx.addIssue({
-				path: ['secondPassword'],
-				code: z.ZodIssueCode.custom,
-				message: 'Пароли должны совпадать',
-			});
-		}
-	});
+const RegistrationFormDataSchema = z.object({
+	mainPhoneNumber: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => !value.includes('_'), 'Неверный формат номера телефона'),
+	phoneNumbers: z.array(
+		z.object({
+			number: z
+				.string()
+				.min(1, 'Поле обязательно для заполнения')
+				.refine((value) => !value.includes('_'), 'Неверный формат номера телефона'),
+			id: z.string(),
+		}),
+	),
+	email: z.string().email().min(1, 'Поле обязательно для заполнения'),
+	companyName: z.string().min(1, 'Поле обязательно для заполнения'),
+	directorFullName: z.string().min(1, 'Поле обязательно для заполнения'),
+	companyAddress: z.string().min(1, 'Поле обязательно для заполнения'),
+	payersRegistrationNumber: z.string().min(1, 'Поле обязательно для заполнения'),
+	paymentAccount: z.string().min(1, 'Поле обязательно для заполнения'),
+	bankIdNumber: z.string().min(1, 'Поле обязательно для заполнения'),
+	bankAddress: z.string().min(1, 'Поле обязательно для заполнения'),
+	companyLogo: z.string().optional(),
+	formFile: z
+		.any()
+		.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),
+	compannyInfo: z.string().min(1, 'Поле обязательно для заполнения'),
+});
 
 type RegistrationFormDataSchemaType = z.infer<typeof RegistrationFormDataSchema>;
 

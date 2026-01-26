@@ -11,17 +11,12 @@ export const RuMaterialOriginTypesSelectValues = [
 ];
 
 export enum MaterialTypeEnum {
-	MasonryAndSolid = 'MasonryAndSolid',
+	Plaster = 'Plaster',
 	Frame = 'Frame',
-	PorousMaterials = 'PorousMaterials',
-	SandwichPanel = 'SandwichPanel',
-	GypsumBondedbBoards = 'GypsumBondedbBoards',
 	WoodBasedBoard = 'WoodBasedBoard',
 	MineralBondedBoards = 'MineralBondedBoards',
-	Metal = 'Metal',
 	Glazing = 'Glazing',
 	Membrane = 'Membrane',
-	FoamMaterials = 'FoamMaterials',
 	AcousticTreatmentMaterials = 'AcousticTreatmentMaterials',
 	AirGap = 'AirGap',
 	Link = 'Link',
@@ -117,17 +112,11 @@ export const MaterialTypesSelectValuesMap = {
 };
 
 export const RuMaterialTypesSelectValues = [
-	{ label: 'Кирпичные и монолитные', value: MaterialTypeEnum.MasonryAndSolid },
 	{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
-	{ label: 'Пористые материалы', value: MaterialTypeEnum.PorousMaterials },
-	{ label: 'Сэндвич-панели', value: MaterialTypeEnum.SandwichPanel },
-	{ label: 'Гипсокартонные', value: MaterialTypeEnum.GypsumBondedbBoards },
 	{ label: 'Древесно-стружечные плиты', value: MaterialTypeEnum.WoodBasedBoard },
 	{ label: 'Минеральные плиты', value: MaterialTypeEnum.MineralBondedBoards },
-	{ label: 'Металлические', value: MaterialTypeEnum.Metal },
 	{ label: 'Стеклянные', value: MaterialTypeEnum.Glazing },
 	{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
-	{ label: 'Пеноматериалы', value: MaterialTypeEnum.FoamMaterials },
 	{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
 	{ label: 'Воздушные зазоры', value: MaterialTypeEnum.AirGap },
 	{ label: 'Связующие', value: MaterialTypeEnum.Link },

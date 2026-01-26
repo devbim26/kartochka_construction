@@ -85,7 +85,6 @@ export const ConstructionFieldsMap = ({
 				currentForm={currentForm}
 			/>
 		),
-		[MaterialTypeEnum.FoamMaterials]: <></>,
 		[MaterialTypeEnum.Glazing]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
@@ -100,13 +99,9 @@ export const ConstructionFieldsMap = ({
 				currentForm={currentForm}
 			/>
 		),
-		[MaterialTypeEnum.GypsumBondedbBoards]: <></>,
 		[MaterialTypeEnum.WoodBasedBoard]: <></>,
-		[MaterialTypeEnum.Metal]: <></>,
-		[MaterialTypeEnum.MasonryAndSolid]: <></>,
-		[MaterialTypeEnum.PorousMaterials]: <></>,
-		[MaterialTypeEnum.SandwichPanel]: <></>,
 		[MaterialTypeEnum.MineralBondedBoards]: <></>,
+		[MaterialTypeEnum.Plaster]: <></>,
 	};
 
 	return componentsMap[materialType] || <></>;
@@ -200,7 +195,6 @@ export const MaterialTypeValuesMap = {
 			value: '',
 		},
 	],
-	[MaterialTypeEnum.FoamMaterials]: [],
 	[MaterialTypeEnum.Glazing]: [
 		{
 			materialParameters: MaterialParametrs.Thickness,
@@ -217,11 +211,7 @@ export const MaterialTypeValuesMap = {
 			value: '',
 		},
 	],
-	[MaterialTypeEnum.GypsumBondedbBoards]: [],
 	[MaterialTypeEnum.WoodBasedBoard]: [],
-	[MaterialTypeEnum.Metal]: [],
-	[MaterialTypeEnum.MasonryAndSolid]: [],
-	[MaterialTypeEnum.PorousMaterials]: [],
-	[MaterialTypeEnum.SandwichPanel]: [],
+	[MaterialTypeEnum.Plaster]: [],
 	[MaterialTypeEnum.MineralBondedBoards]: [],
 };

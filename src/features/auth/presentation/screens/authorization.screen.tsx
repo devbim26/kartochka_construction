@@ -1,15 +1,14 @@
-import { APP_ROUTES, LogoIcon, LogoTextIcon, PageLoader } from '@core';
-import { AUTH_ROUTES } from '@features/auth/constants';
-import { Suspense, useEffect } from 'react';
+import { LogoIcon, LogoTextIcon, PageLoader } from '@core';
+import { Suspense } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 export const AuthorizationScreen = () => {
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		if (!location.pathname.startsWith(`/auth/login`))
-			navigate(`${APP_ROUTES.auth.route}/${AUTH_ROUTES.login.route}`);
-	}, []);
+	// useEffect(() => {
+	// 	if (!location.pathname.startsWith(`/auth/login`))
+	// 		navigate(`${APP_ROUTES.auth.route}/${AUTH_ROUTES.login.route}`);
+	// }, []);
 
 	return (
 		<div className="flex min-h-screen w-full flex-col">
@@ -17,7 +16,7 @@ export const AuthorizationScreen = () => {
 				<LogoIcon />
 				<LogoTextIcon />
 			</div>
-			<div className="flex justify-center pt-[40px]">
+			<div className="flex h-full items-center justify-center pt-[40px]">
 				<Suspense fallback={<PageLoader />}>
 					<Outlet />
 				</Suspense>
