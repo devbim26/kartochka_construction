@@ -46,7 +46,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.OneGlassFrame,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
+				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
 						materialId: '',
@@ -58,7 +58,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.leftConstruction', []);
 				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
@@ -71,7 +71,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.TwoGlassFrame,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
+				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
 						materialId: '',
@@ -83,7 +83,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.leftConstruction', []);
 				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
@@ -145,7 +145,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.rightConstruction', [
+				setValue('constructionTypeObject.leftConstruction', [
 					{
 						positionId: '0',
 						materialId: '',
@@ -193,7 +193,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.leftConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
 
@@ -437,6 +437,15 @@ export const ConstructionTypeMap = ({
 
 				setValue('constructionTypeObject.centerConstruction', [
 					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Plaster,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
 						positionId: '2',
 						materialId: '',
 						materialType: MaterialTypeEnum.Heavy,
@@ -448,7 +457,7 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '3',
 						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
+						materialType: MaterialTypeEnum.Board,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -457,16 +466,16 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '4',
 						materialId: '',
-						materialType: MaterialTypeEnum.Link,
+						materialType: MaterialTypeEnum.Heavy,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
 						positionId: '5',
 						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
+						materialType: MaterialTypeEnum.Plaster,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -899,7 +908,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.OneFramePartition,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
+				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
 						materialId: '',
@@ -946,7 +955,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.leftConstruction', []);
 				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},

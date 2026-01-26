@@ -14,16 +14,18 @@ import { Fragment } from 'react/jsx-runtime';
 export const OneGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) => {
 	const { control, watch } = currentForm;
 
-	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Left');
+	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Center');
 
 	const positions = ['0', '1', '2', '3', '4'];
 
 	const renderBlock = (positionId: string, fieldIndex: number, fieldId: string) => (
 		<div key={fieldId} className="flex w-full items-start justify-between">
 			<div className="flex flex-1 gap-[20px]">
-				<GlassMaterialType {...{ fieldIndex, constructionPosition: 'Left', currentForm }} />
+				<GlassMaterialType
+					{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
+				/>
 				<ThicknessDensityFieldsType
-					{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+					{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 				/>
 			</div>
 			<DeleteIcon className="shrink-0 self-start" onClick={() => remove(fieldIndex)} />

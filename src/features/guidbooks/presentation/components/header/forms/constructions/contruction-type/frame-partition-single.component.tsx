@@ -27,7 +27,7 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 	const { fields, append, remove, userMaterials } = useConstructionMaterials(
 		control,
 		watch,
-		'Left',
+		'Center',
 	);
 
 	const renderAddButton = (positionId: string) => (
@@ -53,7 +53,7 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 						currentForm={currentForm}
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionPosition="Left"
+						constructionPosition="Center"
 						materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
 					/>
 				)}
@@ -61,10 +61,10 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 				{['2', '6'].includes(positionId) && (
 					<>
 						<BoardMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				)}
@@ -72,10 +72,10 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 				{positionId === '3' && (
 					<>
 						<FillerMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				)}
@@ -83,10 +83,10 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 				{positionId === '4' && (
 					<>
 						<FrameMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<WidthRacksStepFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				)}
@@ -94,10 +94,10 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 				{positionId === '5' && (
 					<>
 						<GapDistanceMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<ThicknessFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				)}
@@ -107,7 +107,7 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 						{ConstructionFieldsMap({
 							currentForm,
 							fieldIndex,
-							constructionPosition: 'Left',
+							constructionPosition: 'Center',
 							materialType: (userMaterials[fieldIndex] as any)
 								?.materialType as MaterialTypeEnum,
 						})}

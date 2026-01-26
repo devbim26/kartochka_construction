@@ -16,7 +16,7 @@ import { Fragment } from 'react/jsx-runtime';
 export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) => {
 	const { control, watch } = currentForm;
 
-	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Left');
+	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Center');
 
 	const positions = ['0', '1', '2', '3', '4'];
 	const selectable = ['0', '1', '3', '4'];
@@ -28,7 +28,7 @@ export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) =
 					<SelectableMaterialType
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionPosition="Left"
+						constructionPosition="Center"
 						materialTypesSelectValues={MaterialTypesSelectValuesEnum.MultiGlass}
 						currentForm={currentForm}
 					/>
@@ -37,10 +37,10 @@ export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) =
 				{positionId === '2' && (
 					<>
 						<GlassMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				)}
@@ -49,7 +49,7 @@ export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) =
 					<div className="flex gap-[8px]">
 						{ConstructionFieldsMap({
 							fieldIndex,
-							constructionPosition: 'Left',
+							constructionPosition: 'Center',
 							materialType: (fields as any)[fieldIndex]
 								?.materialType as MaterialTypeEnum,
 							currentForm,

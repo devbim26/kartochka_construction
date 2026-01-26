@@ -38,7 +38,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 		},
 		{
 			title: '2. Облицовка',
-			constructionPosition: 'Right' as const,
+			constructionPosition: 'Left' as const,
 			positions: ['0', '1', '2', '3', '4', '5', '6'],
 			selectable: ['5', '6'],
 			materialType: MaterialTypesSelectValuesEnum.Facing,
@@ -52,14 +52,14 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 		Center: {
 			'2': [HeavyMaterialType, ThicknessDensityFieldsType],
 		},
-		Right: {
+		Left: {
 			'0': [AirGapMaterialType, ThicknessDensityFieldsType],
 			'1': [LinkMaterialType, PointConnectionsFieldsType],
 			'2': [FrameMaterialType, WidthRacksStepFieldsType],
 			'3': [FillerMaterialType, ThicknessDensityFieldsType],
 			'4': [BoardMaterialType, ThicknessDensityFieldsType],
 		},
-		Left: {},
+		Right: {},
 	};
 
 	const renderBlock = (
