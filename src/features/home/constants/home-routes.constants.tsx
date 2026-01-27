@@ -15,6 +15,10 @@ export const DESIGNING_ROUTES = {
 		id: 'main-page-id',
 		route: 'main',
 	},
+	visualization: {
+		id: 'visualization-page-id',
+		route: 'visualization',
+	},
 	constructor: {
 		id: 'constructor-page-id',
 		route: 'constructor',

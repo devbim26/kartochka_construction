@@ -4,6 +4,7 @@ import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
 import { BiNews, BiSolidCalendarEdit, BiSolidHome } from 'react-icons/bi';
 import { FaUser } from 'react-icons/fa6';
+import { GiCloudRing } from 'react-icons/gi';
 import { HiOutlineUsers } from 'react-icons/hi2';
 import { RiFileList3Line, RiPencilRulerLine, RiWallet3Fill } from 'react-icons/ri';
 import { TiDocumentText } from 'react-icons/ti';
@@ -34,6 +35,15 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 				label: 'Главная',
 				icon: BiSolidHome,
 				path: DESIGNING_ROUTES.main.route,
+				permission: [UserRoles.Admin, UserRoles.User],
+			},
+		},
+		{
+			params: {
+				id: DESIGNING_ROUTES.visualization.id,
+				label: 'Визуализация',
+				icon: GiCloudRing,
+				path: DESIGNING_ROUTES.visualization.route,
 				permission: [UserRoles.Admin, UserRoles.User],
 			},
 		},

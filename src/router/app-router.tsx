@@ -27,6 +27,7 @@ import {
 	UserScreen,
 	UsersLayout,
 } from '@features';
+import { AiVisualizationScreen } from '@features/ai-visualization/presentation/screens/ai-vizualization.screen';
 import { AUTH_ROUTES } from '@features/auth/constants';
 import { BillScreen } from '@features/bills';
 import MyConstructions from '@features/constructor/presentation/components/designing/my-costructions.component';
@@ -57,6 +58,10 @@ export const AppRouter = () => {
 				/>
 			</Route>
 			<Route path={APP_ROUTES.designing.route} element={<HomeScreen />}>
+				<Route
+					path={DESIGNING_ROUTES.visualization.route}
+					element={<AiVisualizationScreen />}
+				/>
 				<Route path={DESIGNING_ROUTES.main.route} element={<MainScreen />} />
 				<Route path={DESIGNING_ROUTES.constructor.route} element={<ConstructorLayout />}>
 					<Route
