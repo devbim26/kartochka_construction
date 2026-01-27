@@ -1,4 +1,3 @@
-import { API_URL } from '@api-gen';
 import {
 	APP_ROUTES,
 	LogoIcon,
@@ -80,7 +79,7 @@ const LoginPage = () => {
 							error={formState.errors.password?.message}
 						/> */}
 						<a
-							href={`${API_URL}api/Auth/login-google`}
+							href={`https://5.44.44.202:5001/Auth/login-google`}
 							className="flex h-[50px] w-full items-center gap-[10px] rounded-lg border-2 border-primary bg-primary px-[10px] font-montserrat text-[17px] text-white hover:opacity-80"
 						>
 							<FaGoogle className="size-[30px]" />
