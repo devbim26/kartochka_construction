@@ -11,12 +11,12 @@ export const withGuardedBlock = <P extends { permission?: UserRoles | UserRoles[
 
 		const effectivePermission = staticPermission ?? props.permission;
 
-		// if (!effectivePermission || validate(effectivePermission)) {
-		// 	return <Component {...props} />;
-		// }
+		if (!effectivePermission || validate(effectivePermission)) {
+			return <Component {...props} />;
+		}
 
-		return <Component {...props} />;
+		// return <Component {...props} />; //TODO: FOR TEST
 
-		//return null;
+		return null;
 	};
 };
