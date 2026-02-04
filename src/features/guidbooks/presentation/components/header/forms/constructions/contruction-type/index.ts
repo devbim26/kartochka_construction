@@ -1,3 +1,4 @@
+export * from './elastic-base-floor.component';
 export * from './frame-partition-double.component';
 export * from './frame-partition-single.component';
 export * from './heavy-multi-layer-wall-facing-both-side.component';
@@ -10,5 +11,6 @@ export * from './heavy-single-layer-wall-facing-one-side.component';
 export * from './heavy-single-layer-wall-soundproofing-both-side.component';
 export * from './heavy-single-layer-wall-soundproofing-one-side.component';
 export * from './heavy-single-layer-wall.component';
+export * from './homogenius-floor.component';
 export * from './one-glass-frame.component';
 export * from './two-glass-frame.component';

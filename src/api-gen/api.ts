@@ -187,10 +187,10 @@ export enum ConstructionTypeEnum {
 	OneFramePartition = 'OneFramePartition',
 	TwoFramePartition = 'TwoFramePartition',
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
+	DoubleGlazedFrame = 'DoubleGlazedFrame',
 	OneGlassFrame = 'OneGlassFrame',
-	TwoGlassFrame = 'TwoGlassFrame',
-	ThreeGlassFrame = 'ThreeGlassFrame',
-	Floor = 'Floor',
+	HomogeneousFloor = 'HomogeneousFloor',
+	ElasticBaseFloor = 'ElasticBaseFloor',
 }
 
 export interface ConstructionTypeTemplate {
@@ -736,6 +736,8 @@ export interface MaterialDto {
 	lossFactor?: number;
 	/** @format float */
 	youngModulus?: number;
+	/** @format float */
+	relativeCompression?: number;
 	/** @format float */
 	damping?: number;
 	/** @format float */
@@ -2238,6 +2240,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				/** @format float */
 				youngModulus?: number;
 				/** @format float */
+				relativeCompression?: number;
+				/** @format float */
 				damping?: number;
 				/** @format float */
 				solid?: number;
@@ -2310,6 +2314,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				lossFactor?: number;
 				/** @format float */
 				youngModulus?: number;
+				/** @format float */
+				relativeCompression?: number;
 				/** @format float */
 				damping?: number;
 				/** @format float */
@@ -3259,6 +3265,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		userRolesList: (params: RequestParams = {}) =>
 			this.request<void, any>({
 				path: `/api/User/roles`,
+				method: 'GET',
+				...params,
+			}),
+	};
+	testAuth = {
+		/**
+		 * No description
+		 *
+		 * @tags Acoustics.API
+		 * @name TestAuthDetail
+		 * @request GET:/test-auth/{email}
+		 */
+		testAuthDetail: (email: string, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/test-auth/${email}`,
 				method: 'GET',
 				...params,
 			}),

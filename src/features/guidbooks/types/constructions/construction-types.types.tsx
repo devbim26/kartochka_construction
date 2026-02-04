@@ -48,9 +48,10 @@ export enum ConstructionTypeEnum {
 	TwoFramePartition = 'TwoFramePartition',
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
 	OneGlassFrame = 'OneGlassFrame',
-	TwoGlassFrame = 'TwoGlassFrame',
-	ThreeGlassFrame = 'ThreeGlassFrame',
-	Floor = 'Floor',
+	DoubleGlazedFrame = 'DoubleGlazedFrame',
+
+	HomogeneousFloor = 'HomogeneousFloor',
+	ElasticBaseFloor = 'ElasticBaseFloor',
 }
 
 export const RuConstructionTypesMap = {
@@ -72,9 +73,9 @@ export const RuConstructionTypesMap = {
 	TwoFramePartition: 'Каркасная перегородка (2 каркаса)',
 	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
 	OneGlassFrame: 'Многослойное стекло',
-	TwoGlassFrame: 'Стеклопакет',
-	ThreeGlassFrame: 'Тройное стекло',
-	Floor: 'Поэтажный',
+	DoubleGlazedFrame: 'Стеклопакет',
+	HomogeneousFloor: 'Однородный пол',
+	ElasticBaseFloor: 'Пол с эластичным основанием',
 };
 
 export const RuConstructionTypesSelectValues = [
@@ -105,6 +106,14 @@ export const RuConstructionTypesSelectValues = [
 	},
 	{
 		label: 'Стеклопакет',
-		value: ConstructionTypeEnum.TwoGlassFrame,
+		value: ConstructionTypeEnum.DoubleGlazedFrame,
+	},
+	{
+		label: 'Однородный пол',
+		value: ConstructionTypeEnum.HomogeneousFloor,
+	},
+	{
+		label: 'Пол с эластичным основанием',
+		value: ConstructionTypeEnum.ElasticBaseFloor,
 	},
 ];

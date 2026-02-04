@@ -1,5 +1,6 @@
 import { MaterialParametrs } from '@api-gen';
 import {
+	ElasticBaseFloorComponent,
 	FramePartitionDoubleComponent,
 	FramePartitionSingleComponent,
 	HeavyMultiLayerWallComponent,
@@ -12,6 +13,7 @@ import {
 	HeavySingleLayerWallFacingOneSideComponent,
 	HeavySingleLayerWallSoundproofingBothSideComponent,
 	HeavySingleLayerWallSoundproofingOneSideComponent,
+	HomogeniusFloorComponent,
 	OneGlassFrameComponent,
 	TwoGlassFrameComponent,
 } from '@features';
@@ -63,17 +65,35 @@ export const ConstructionTypeMap = ({
 			},
 		},
 
-		[ConstructionTypeEnum.TwoGlassFrame]: {
+		[ConstructionTypeEnum.DoubleGlazedFrame]: {
 			component: <TwoGlassFrameComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
-					ConstructionTypeEnum.TwoGlassFrame,
+					ConstructionTypeEnum.DoubleGlazedFrame,
 				);
 
 				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Glazing,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.AirGap,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '4',
 						materialId: '',
 						materialType: MaterialTypeEnum.Glazing,
 						materialTypeValue: [
@@ -88,18 +108,74 @@ export const ConstructionTypeMap = ({
 			},
 		},
 
-		[ConstructionTypeEnum.Floor]: {
-			component: <></>,
-			action: () => {},
+		[ConstructionTypeEnum.HomogeneousFloor]: {
+			component: <HomogeniusFloorComponent currentForm={currentForm} />,
+			action: () => {
+				setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.HomogeneousFloor,
+				);
+
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.leftConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
+			},
+		},
+		[ConstructionTypeEnum.ElasticBaseFloor]: {
+			component: <ElasticBaseFloorComponent currentForm={currentForm} />,
+			action: () => {
+				setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.ElasticBaseFloor,
+				);
+
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: '',
+						materialTypeValue: [],
+					},
+					{
+						positionId: '3',
+						materialId: '',
+						materialType: MaterialTypeEnum.Heavy,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.leftConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
+			},
 		},
 		[ConstructionTypeEnum.HeavySingleWallFacing]: {
 			component: <></>,
 			action: () => {},
 		},
-		[ConstructionTypeEnum.ThreeGlassFrame]: {
-			component: <></>,
-			action: () => {},
-		},
+
 		[ConstructionTypeEnum.HeavySingleLayerWall]: {
 			component: <HeavySingleLayerWallComponent currentForm={currentForm} />,
 			action: () => {
