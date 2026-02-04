@@ -5,68 +5,76 @@ interface GraphProps {
 	graphData: GraphDetailResponse[] | null;
 }
 
+export type GraphDataPoint = {
+	x: number;
+	y: number | null;
+	pointLabel?: string;
+};
+
+export type GraphDataSeries = {
+	label: string;
+	data: GraphDataPoint[];
+	pointLabels?: Array<{ x: number; y: number; label: string }>;
+};
+
 const DesigningGraph = ({ graphData }: GraphProps) => {
-	const labDots = graphData?.find((g) => g.name === 'abcd')?.namedDots ?? [];
-	const deviationDots = graphData?.find((g) => g.name === 'deviationDotsList')?.namedDots ?? [];
-	const laboratoryDots = graphData?.find((g) => g.name === 'LaboratoryDots')?.namedDots ?? [];
+	if (!graphData || graphData.length === 0) {
+		return <div>Нет данных для отображения графика</div>;
+	}
 
-	const labData = labDots
-		.filter((dot) => dot.dot?.f !== null && dot.dot?.r !== null && dot.dot?.r !== undefined)
-		.map((dot) => ({
-			x: dot.dot?.f ?? 0,
-			y: dot.dot?.r ?? 0,
-		}))
-		.sort((a, b) => a.x - b.x);
+	// Преобразуем все графики из данных
+	const graphSeries: GraphDataSeries[] = graphData
+		.filter(
+			(item): item is { name: string; namedDots: NonNullable<typeof item.namedDots> } =>
+				!!item.name && !!item.namedDots && item.namedDots.length > 0,
+		)
+		.map((item) => {
+			// Сортируем точки по частоте и фильтруем только точки с валидными данными
+			const sortedData = item.namedDots
+				.filter(
+					(dot): dot is { name: string | null; dot: { f: number; r: number } } =>
+						!!dot &&
+						!!dot.dot &&
+						typeof dot.dot.f === 'number' &&
+						!isNaN(dot.dot.f) &&
+						typeof dot.dot.r === 'number' &&
+						!isNaN(dot.dot.r),
+				)
+				.map((dot) => ({
+					x: dot.dot.f,
+					y: dot.dot.r,
+					name: dot.name || '',
+				}))
+				.sort((a, b) => a.x - b.x);
 
-	const availableFrequencies = labData.map((point) => point.x);
+			// Для точек, у которых есть имя, будем выводить его в подписи
+			const dataWithLabels = sortedData.map((point) => ({
+				x: point.x,
+				y: point.y,
+				pointLabel: point.name,
+			}));
 
-	const inSituData = availableFrequencies.map((currentFrequency) => {
-		const matchingDeviationDot = deviationDots.find((dot) => dot.dot?.f === currentFrequency);
+			const pointLabels = sortedData
+				.filter(
+					(p): p is { x: number; y: number; name: string } =>
+						!!p.name && p.name.trim() !== '',
+				)
+				.map((p) => ({
+					x: p.x,
+					y: p.y,
+					label: p.name,
+				}));
 
-		const yValue =
-			currentFrequency >= 100 && matchingDeviationDot
-				? (matchingDeviationDot.dot?.r ?? null)
-				: null;
+			return {
+				label: item.name,
+				data: dataWithLabels,
+				pointLabels,
+			};
+		});
 
-		return {
-			x: currentFrequency,
-			y: yValue,
-		};
-	});
-
-	const laboratoryData = laboratoryDots
-		.filter((dot) => dot.dot?.f !== null && dot.dot?.r !== null && dot.dot?.r !== undefined)
-		.map((dot) => ({
-			x: dot.dot?.f ?? 0,
-			y: dot.dot?.r ?? 0,
-		}))
-		.sort((a, b) => a.x - b.x);
-
-	const graphSeries = graphData
-		? [
-				{
-					label: 'R (lab)',
-					data: labData,
-				},
-				{
-					label: 'R (in situ)',
-					data: inSituData,
-				},
-				{
-					label: 'Laboratory',
-					data: laboratoryData,
-				},
-			]
-		: [
-				{
-					label: 'Sound Reduction Index',
-					data: [],
-				},
-				{
-					label: 'Deviations (in situ)',
-					data: [],
-				},
-			];
+	if (graphSeries.length === 0) {
+		return <div>Нет валидных данных для построения графиков</div>;
+	}
 
 	return <DesigningChart graphSeries={graphSeries} />;
 };
