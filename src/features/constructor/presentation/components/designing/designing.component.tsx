@@ -1,4 +1,4 @@
-import { Button, Input, Select, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
+import { Button, Select, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import type {
 	AdditionalGraphParameters,
@@ -41,13 +41,12 @@ import type {
 } from '@features/guidbooks/types';
 import {
 	Guidebooks,
-	RuConstructionTypesMap,
 	RuConstructionTypesSelectValues,
 	RuCountryNamesMap,
 } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, of, tap } from 'rxjs';
@@ -81,6 +80,13 @@ const DesigningScreen = () => {
 		defaultValues: DesigningConfig.defaultValues,
 		mode: 'onSubmit',
 	});
+
+	const constructionType = useMemo(() => {
+		return (form.watch('constructionTypeObject.constructionTypeEnum') ||
+			constructionHeader?.constructionTypeObject?.constructionTypeEnum) as
+			| ConstructionTypeEnum
+			| undefined;
+	}, [form, constructionHeader]);
 
 	const handleGetCurrentReportFloorInfo = (id: string) => {
 		dispatch(startLoading());
@@ -124,8 +130,9 @@ const DesigningScreen = () => {
 			.pipe(
 				tap((response) => {
 					if (response.status === 200) {
-						setConstructionHeader(convertToClientConstructionsEditData(response.data));
-						form.reset(convertToClientConstructionsEditData(response.data));
+						const data = convertToClientConstructionsEditData(response.data);
+						setConstructionHeader(data);
+						form.reset(data);
 					}
 				}),
 				catchError((error) => {
@@ -203,11 +210,6 @@ const DesigningScreen = () => {
 		}
 	}, [constructionHeader, currentReportInfo]);
 
-	const constructionType = constructionHeader?.constructionTypeObject?.constructionTypeEnum as
-		| ConstructionTypeEnum
-		| undefined;
-	const ruConstructionType = constructionType ? RuConstructionTypesMap[constructionType] : '';
-
 	const handleGetConstructionImage = useCallback((id: string) => {
 		from(svgConstructionDetail(id))
 			.pipe(
@@ -229,6 +231,39 @@ const DesigningScreen = () => {
 		if (!constructionHeaderId) return;
 		handleGetConstructionImage(constructionHeaderId);
 	}, [constructionHeaderId, handleGetConstructionImage]);
+
+	const handleConstructionTypeChange = useCallback(
+		(value: string) => {
+			const constructionType = value as ConstructionTypeEnum;
+
+			form.setValue('constructionTypeObject.constructionTypeEnum', constructionType);
+
+			ConstructionTypeMap({
+				currentConstruction: constructionType,
+				currentForm: form,
+			}).action();
+
+			setConstructionHeader((prev) => {
+				if (!prev) return null;
+
+				return {
+					...prev,
+					constructionTypeObject: {
+						...prev.constructionTypeObject,
+						constructionTypeEnum: constructionType,
+						leftConstruction: undefined,
+						centerConstruction: undefined,
+						rightConstruction: undefined,
+					},
+				};
+			});
+
+			if (constructionHeaderId) {
+				handleGetConstructionImage(constructionHeaderId);
+			}
+		},
+		[form, constructionHeaderId, handleGetConstructionImage],
+	);
 
 	const onEditHandle = useCallback(() => {
 		const formData = form.getValues() as ConstructionsEditData;
@@ -264,9 +299,12 @@ const DesigningScreen = () => {
 					handleGetConstructionImage(constructionHeaderId);
 					handleGetGraphDetail(constructionHeaderId);
 					handleGetGraphAdditionalDetail(constructionHeaderId);
+
+					setGraphData(null);
+					setGraphAdditionalData(null);
 				}
 			});
-	}, [form]);
+	}, [form, constructionHeaderId, handleGetConstructionByHeaderId, handleGetConstructionImage]);
 
 	const onEditHandleWithRedirect = useCallback(() => {
 		const formData = form.getValues() as ConstructionsEditData;
@@ -305,7 +343,7 @@ const DesigningScreen = () => {
 					});
 				}
 			});
-	}, [form]);
+	}, [form, constructionHeaderId, navigate, reportId, reportType]);
 
 	return (
 		<div className="relative flex w-full flex-col gap-[30px]">
@@ -316,7 +354,18 @@ const DesigningScreen = () => {
 			)}
 			<DesigningHeader />
 			<div className="flex h-fit w-full flex-row gap-[72px] rounded-[20px] bg-white px-[44px] py-[34px]">
-				<img className="h-full w-fit" src={svgUrl ?? undefined} alt="SVG Construction" />
+				{svgUrl ? (
+					<img
+						className="h-full w-fit"
+						src={svgUrl}
+						alt="SVG Construction"
+						key={constructionHeaderId}
+					/>
+				) : (
+					<div className="flex size-[300px] items-center justify-center">
+						<Loader />
+					</div>
+				)}
 				<div className="flex h-fit flex-col gap-[30px]">
 					<Controller
 						name="constructionTypeObject.constructionTypeEnum"
@@ -326,17 +375,7 @@ const DesigningScreen = () => {
 								{...field}
 								isSearchable
 								value={field.value || ''}
-								onChange={(value) => {
-									form.setValue(
-										'constructionTypeObject.constructionTypeEnum',
-										value as string,
-									);
-									value &&
-										ConstructionTypeMap({
-											currentConstruction: value as ConstructionTypeEnum,
-											currentForm: form,
-										}).action();
-								}}
+								onChange={handleConstructionTypeChange}
 								options={RuConstructionTypesSelectValues}
 								error={
 									form.formState.errors.constructionTypeObject
@@ -358,14 +397,6 @@ const DesigningScreen = () => {
 								placeholder="Выберите тип"
 							/>
 						)}
-					/>
-					<Input
-						label="Тип конструкции"
-						labelClassName="font-sans text-[16px] font-[600] text-input-label-primary"
-						inputClassName="h-[30px] px-[12px] font-sans text-[14px] font-[400] w-fit min-w-[400px] rounded-[8px]"
-						wrapperClassName="flex-row items-center gap-[66px]"
-						value={ruConstructionType}
-						disabled
 					/>
 					<div className="flex h-fit flex-col">
 						{constructionHeader?.constructionTypeObject?.leftConstruction
@@ -398,7 +429,7 @@ const DesigningScreen = () => {
 				</div>
 			</div>
 			<div
-				key={refreshConstructionData}
+				key={`${refreshConstructionData}-${constructionType}`}
 				className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]"
 			>
 				{constructionType &&

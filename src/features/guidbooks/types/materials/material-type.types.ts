@@ -125,6 +125,7 @@ export const RuMaterialTypesSelectValues = [
 	{ label: 'Плиты', value: MaterialTypeEnum.Board },
 	{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
 	{ label: 'Зазоры', value: MaterialTypeEnum.GapDistance },
+	{ label: 'Штукатурка', value: MaterialTypeEnum.Plaster },
 ];
 
 export interface MaterialType {

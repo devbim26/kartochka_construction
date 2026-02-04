@@ -97,7 +97,7 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		Center: {
 			'1': [PlasterMaterialType, ThicknessDensityFieldsType],
 			'2': [HeavyMaterialType, ThicknessDensityFieldsType],
-			'3': [BoardMaterialType, ThicknessDensityFieldsType],
+			'3': [FillerMaterialType, ThicknessDensityFieldsType],
 			'4': [HeavyMaterialType, ThicknessDensityFieldsType],
 			'5': [PlasterMaterialType, ThicknessDensityFieldsType],
 		},
