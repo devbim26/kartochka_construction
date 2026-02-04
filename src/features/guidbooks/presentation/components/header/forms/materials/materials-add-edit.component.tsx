@@ -282,6 +282,19 @@ export const MaterialsAddAndEdit = () => {
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+						formState.errors.relativeCompression?.message ? 'text-error' : '',
+					)}
+					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+					containerClassName="w-[226px]"
+					label={formState.errors.relativeCompression?.message || 'Относительное сжатие'}
+					error={formState.errors.relativeCompression?.message}
+					placeholder="Введите сжатие"
+					{...form.register('relativeCompression')}
+					type={'number'}
+				/>
+				<Input
+					labelClassName={twMerge(
+						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
 						formState.errors.velocity?.message ? 'text-error' : '',
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"

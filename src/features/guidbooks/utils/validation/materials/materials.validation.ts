@@ -20,6 +20,10 @@ export const MaterialsAddAndEditSchema = z.object({
 	type: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
 	imageUrl: z.string().min(1, 'Поле обязательно для заполнения'),
+	relativeCompression: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
 	imageFile: z
 		.any()
 		.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),

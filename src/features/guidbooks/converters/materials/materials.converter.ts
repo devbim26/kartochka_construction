@@ -47,6 +47,7 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	rc: String(data.rc) ?? '',
 	fc: String(data.fc) ?? '',
 	fb: String(data.fb) ?? '',
+	relativeCompression: String(data.relativeCompression) ?? '',
 });
 
 export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): any => ({
@@ -71,6 +72,7 @@ export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): 
 	rc: +data.rc || null,
 	fc: +data.fc || null,
 	fb: +data.fb || null,
+	relativeCompression: +data.relativeCompression || null,
 });
 
 export const convertToServerMaterialsEditData = (data: MaterialsAddAndEditData): any => ({
