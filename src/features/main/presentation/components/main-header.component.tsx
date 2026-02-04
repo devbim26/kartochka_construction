@@ -2,7 +2,7 @@ import { APP_ROUTES, Carousel, CarouselSlide, MainSliderLogo, useAppNavigate } f
 import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useCallback } from 'react';
-import { FaArrowRight } from 'react-icons/fa';
+import { twMerge } from 'tailwind-merge';
 
 interface FeatureCard {
 	id: string;
@@ -17,7 +17,7 @@ interface FeatureCard {
 const AIFeatures: FeatureCard[] = [
 	{
 		id: 'ai-assistant',
-		title: 'AI ассистент',
+		title: 'Визуализация',
 		description: 'Визуализация фасадов и интерьеров',
 		features: [
 			'AI-генерация изображений с кастомными настройками.',
@@ -116,17 +116,17 @@ export const MainHeader = () => {
 		<div className="w-full">
 			<div className="mb-6 flex w-full items-center justify-between">
 				<p className="font-sans text-lg font-semibold leading-6">Главная</p>
-				<button
+				{/* <button
 					onClick={handleRedirect}
 					className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
 				>
 					{reportId && reportType ? 'Продолжить проектирование' : 'Создать новый проект'}
 					<FaArrowRight className="size-4" />
-				</button>
+				</button> */}
 			</div>
 
 			<div className="mb-6 flex w-full items-center gap-[10px]">
-				<h2 className="min-w-fit text-xl font-bold text-gray-400">
+				<h2 className="min-w-fit text-[15px] font-bold text-gray-400">
 					Проектирование и расчеты
 				</h2>
 				<div className="h-[2px] w-full bg-gray-400"></div>
@@ -149,7 +149,7 @@ export const MainHeader = () => {
 						<div className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
 							<div className="mb-3">
 								<div className="mb-2 flex items-start justify-between">
-									<h3 className="text-sm font-semibold text-gray-800">
+									<h3 className="text-[15px] font-semibold text-gray-800">
 										{feature.title}
 									</h3>
 								</div>
@@ -179,7 +179,11 @@ export const MainHeader = () => {
 							</div>
 							<button
 								onClick={() => handleFeatureClick(feature.id)}
-								className="mt-auto w-full rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+								className={twMerge(
+									'mt-auto w-[150px] cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
+									feature.price === 'FREE' &&
+										'cursor-pointer bg-primary hover:bg-blue-700',
+								)}
 							>
 								{feature.price === 'FREE' ? 'Начать бесплатно' : 'Начать PRO'}
 							</button>
@@ -189,7 +193,7 @@ export const MainHeader = () => {
 			</Carousel>
 
 			<div className="my-6 flex w-full items-center gap-[10px]">
-				<h2 className="min-w-fit text-xl font-bold text-gray-400">AI ассистент</h2>
+				<h2 className="min-w-fit text-[15px] font-bold text-gray-400">AI ассистент</h2>
 				<div className="h-[2px] w-full bg-gray-400"></div>
 			</div>
 
@@ -210,7 +214,7 @@ export const MainHeader = () => {
 						<div className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
 							<div className="mb-3">
 								<div className="mb-2 flex items-start justify-between">
-									<h3 className="text-sm font-semibold text-gray-800">
+									<h3 className="text-[15px] font-semibold text-gray-800">
 										{feature.title}
 									</h3>
 								</div>
@@ -240,7 +244,11 @@ export const MainHeader = () => {
 							</div>
 							<button
 								onClick={() => handleFeatureClick(feature.id)}
-								className="mt-auto w-full rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+								className={twMerge(
+									'mt-auto w-[150px] cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
+									feature.price === 'FREE' &&
+										'cursor-pointer bg-primary hover:bg-blue-700',
+								)}
 							>
 								{feature.price === 'FREE' ? 'Начать бесплатно' : 'Начать PRO'}
 							</button>
