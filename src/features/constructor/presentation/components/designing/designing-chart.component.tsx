@@ -43,46 +43,54 @@ type DesigningChartProps = {
 const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 	const chartRef = useRef<ChartJS<'line'>>(null);
 
-	const inSituSeries = graphSeries.find((series) => series.label === 'R (in situ)');
+	// Собираем все частоты из всех графиков
+	const allFrequencies = Array.from(
+		new Set(
+			graphSeries
+				.flatMap((series) => series.data.map((point) => point.x))
+				.filter((freq) => freq !== null && freq !== undefined)
+				.sort((a, b) => a - b),
+		),
+	);
 
-	const inSituDataWithValues = inSituSeries
-		? inSituSeries.data.filter((point) => point.y !== null && point.y !== undefined)
-		: [];
+	// Находим мин и макс частоты для масштабирования
+	const minFrequency = allFrequencies.length > 0 ? Math.min(...allFrequencies) : 50;
+	const maxFrequency = allFrequencies.length > 0 ? Math.max(...allFrequencies) : 5000;
 
-	let minFrequency = 50;
-	let maxFrequency = 5000;
-
-	if (inSituDataWithValues.length > 0) {
-		const frequencies = inSituDataWithValues.map((p) => p.x);
-		minFrequency = Math.min(...frequencies);
-		maxFrequency = Math.max(...frequencies);
-	}
-
-	const standardFrequencies = [
-		50, 63, 80, 100, 125, 160, 200, 315, 500, 800, 1250, 2500, 3150, 5000,
-	];
-	const allFrequencies = standardFrequencies.filter(
+	// Фильтруем частоты в диапазоне
+	const displayFrequencies = allFrequencies.filter(
 		(freq) => freq >= minFrequency && freq <= maxFrequency,
 	);
 
 	const chartData: ChartData<'line'> = {
-		labels: allFrequencies.map((freq) => String(freq)),
-		datasets: graphSeries.map((series) => {
-			const label = series.label.toLowerCase();
-			const isInSitu = label.includes('in situ');
-			const isRlab = label.includes('rlab') || label.includes('laboratory');
+		labels: displayFrequencies.map((freq) => String(freq)),
+		datasets: graphSeries.map((series, index) => {
+			// Генерируем цвета для графиков
+			const colors = [
+				'#3b82f6', // blue
+				'#ef4444', // red
+				'#10b981', // green
+				'#f59e0b', // yellow
+				'#8b5cf6', // purple
+				'#ec4899', // pink
+				'#06b6d4', // cyan
+			];
 
-			const baseColor = isInSitu ? '#000000' : isRlab ? '#ef4444' : '#3b82f6';
+			const color = colors[index % colors.length];
 
-			const dataPoints = allFrequencies.map((frequency) => {
+			// Создаем массив данных для каждой частоты
+			const dataPoints = displayFrequencies.map((frequency) => {
 				const point = series.data.find((p) => p.x === frequency);
 				return point ? point.y : null;
 			});
 
+			// Собираем метки для точек этого графика
+			const pointLabels = series.pointLabels || [];
+
 			return {
 				label: series.label,
 				data: dataPoints,
-				borderColor: baseColor,
+				borderColor: color,
 				backgroundColor: 'transparent',
 				borderWidth: 3,
 				pointBackgroundColor: (context) => {
@@ -143,26 +151,17 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 				},
 				tension: 0.3,
 				fill: false,
-				borderDash: isInSitu ? [5, 5] : undefined,
 				spanGaps: true,
-				showLine: true,
 			};
 		}),
 	};
 
-	const allValues = graphSeries
-		.flatMap((s) =>
-			s.data
-				.filter(
-					(p) =>
-						p.x >= minFrequency &&
-						p.x <= maxFrequency &&
-						p.y !== null &&
-						p.y !== undefined,
-				)
-				.map((p) => p.y),
-		)
-		.filter((y): y is number => y !== null && y !== undefined);
+	// Собираем все значения Y для определения диапазона оси Y
+	const allValues = graphSeries.flatMap((series) =>
+		series.data
+			.filter((point) => point.y !== null && point.y !== undefined)
+			.map((point) => point.y as number),
+	);
 
 	const maxY = allValues.length > 0 ? Math.max(...allValues) : 0;
 	const minY = allValues.length > 0 ? Math.min(...allValues) : 0;
@@ -239,6 +238,10 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 				ticks: {
 					autoSkip: true,
 					maxTicksLimit: 15,
+					callback: (value, index) => {
+						const freq = displayFrequencies[index];
+						return freq ? String(freq) : '';
+					},
 				},
 			},
 			y: {
