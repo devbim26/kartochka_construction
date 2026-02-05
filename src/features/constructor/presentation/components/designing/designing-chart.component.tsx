@@ -2,14 +2,14 @@ import type { ChartData, ChartOptions } from 'chart.js';
 import {
 	CategoryScale,
 	Chart as ChartJS,
+	Legend,
 	LinearScale,
 	LineElement,
 	PointElement,
 	Title,
 	Tooltip,
 } from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
-import zoomPlugin from 'chartjs-plugin-zoom';
+import zoomPlugin from 'chartjs-plugin-zoom'; // Убрали ChartDataLabels
 import { useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 
@@ -20,20 +20,20 @@ ChartJS.register(
 	LineElement,
 	Title,
 	Tooltip,
-	ChartDataLabels,
-	zoomPlugin,
+	Legend,
+	zoomPlugin, // Убрали ChartDataLabels
 );
 
 type GraphDataPoint = {
 	x: number;
 	y: number | null;
-	pointLabel?: string; // Добавляем опциональное поле для метки точки
+	pointLabel?: string;
 };
 
 type GraphDataSeries = {
 	label: string;
 	data: GraphDataPoint[];
-	pointLabels?: Array<{ x: number; y: number; label: string }>; // Метки для отдельных точек
+	pointLabels?: Array<{ x: number; y: number; label: string }>;
 };
 
 type DesigningChartProps = {
@@ -97,27 +97,53 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
 
+					if (value === null || value === undefined) return 'transparent';
+
 					// Проверяем, есть ли метка для этой точки
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
 
-					return hasLabel ? '#000000' : color; // Черные точки для точек с метками
+					return hasLabel ? '#000000' : color;
+				},
+				pointBorderColor: (context) => {
+					const value = context.dataset.data[context.dataIndex];
+					const frequency = displayFrequencies[context.dataIndex];
+
+					if (value === null || value === undefined) return 'transparent';
+
+					// Проверяем, есть ли метка для этой точки
+					const hasLabel = pointLabels.some(
+						(label) => label.x === frequency && label.y === value,
+					);
+
+					return hasLabel ? '#000000' : color;
 				},
 				pointRadius: (context) => {
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
 
+					if (value === null || value === undefined) return 0;
+
 					// Проверяем, есть ли метка для этой точки
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
 
-					return value !== null && value !== undefined
-						? hasLabel
-							? 6
-							: 3 // Большие точки для точек с метками
-						: 0;
+					return hasLabel ? 6 : 3;
+				},
+				pointBorderWidth: (context) => {
+					const value = context.dataset.data[context.dataIndex];
+					const frequency = displayFrequencies[context.dataIndex];
+
+					if (value === null || value === undefined) return 0;
+
+					// Проверяем, есть ли метка для этой точки
+					const hasLabel = pointLabels.some(
+						(label) => label.x === frequency && label.y === value,
+					);
+
+					return hasLabel ? 2 : 1;
 				},
 				pointHoverRadius: (context) => {
 					const value = context.dataset.data[context.dataIndex];
@@ -146,20 +172,27 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 		plugins: {
 			legend: {
 				display: true,
-				position: 'bottom',
-				align: 'start',
+				position: 'right', // Легенда справа от графика
+				align: 'center',
 				labels: {
 					boxWidth: 20,
 					padding: 16,
 					font: {
 						size: 12,
+						weight: 'bold',
 					},
+					usePointStyle: true,
+					pointStyle: 'circle',
 				},
 			},
 			tooltip: {
 				enabled: true,
 				mode: 'index',
 				intersect: false,
+				filter: (tooltipItem) => {
+					// Фильтруем tooltip для точек без данных
+					return tooltipItem.dataset.data[tooltipItem.dataIndex] !== null;
+				},
 				callbacks: {
 					label: (context) => {
 						const value = context.raw as number | null;
@@ -167,13 +200,15 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 						const dataIndex = context.dataIndex;
 						const frequency = displayFrequencies[dataIndex];
 
+						if (value === null || value === undefined) return '';
+
 						// Находим метку точки, если она есть
 						const series = graphSeries[datasetIndex];
 						const pointLabel = series.pointLabels?.find(
 							(label) => label.x === frequency && label.y === value,
 						);
 
-						const baseLabel = `${context.dataset.label}: ${value !== null ? value.toFixed(1) : 'нет данных'}`;
+						const baseLabel = `${context.dataset.label}: ${value.toFixed(1)}`;
 
 						return pointLabel ? `${baseLabel} (${pointLabel.label})` : baseLabel;
 					},
@@ -183,42 +218,7 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 					},
 				},
 			},
-			datalabels: {
-				display: (context) => {
-					const value = context.dataset.data[context.dataIndex];
-					const datasetIndex = context.datasetIndex;
-					const dataIndex = context.dataIndex;
-					const frequency = displayFrequencies[dataIndex];
-
-					// Показываем метку только если у точки есть имя
-					const series = graphSeries[datasetIndex];
-					const pointLabel = series.pointLabels?.find(
-						(label) => label.x === frequency && label.y === value,
-					);
-
-					return pointLabel !== undefined;
-				},
-				anchor: 'end',
-				align: 'top',
-				color: '#000000',
-				font: {
-					weight: 'bold',
-					size: 12,
-				},
-				formatter: (value, context) => {
-					const datasetIndex = context.datasetIndex;
-					const dataIndex = context.dataIndex;
-					const frequency = displayFrequencies[dataIndex];
-
-					// Находим метку для этой точки
-					const series = graphSeries[datasetIndex];
-					const pointLabel = series.pointLabels?.find(
-						(label) => label.x === frequency && label.y === value,
-					);
-
-					return pointLabel ? pointLabel.label : '';
-				},
-			},
+			// Убрали полностью плагин datalabels
 		},
 		scales: {
 			x: {
@@ -273,6 +273,10 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 				radius: 3,
 				hoverRadius: 6,
 			},
+		},
+		interaction: {
+			intersect: false,
+			mode: 'index',
 		},
 	};
 
