@@ -281,7 +281,7 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 	};
 
 	return (
-		<div className="relative w-[800px]">
+		<div className="relative w-[790px]">
 			<div className="h-[500px] w-full">
 				<Line ref={chartRef} data={chartData} options={options} />
 			</div>
