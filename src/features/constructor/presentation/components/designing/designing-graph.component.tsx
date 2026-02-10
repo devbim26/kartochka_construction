@@ -15,6 +15,7 @@ const DesigningGraph = ({ graphData }: GraphProps) => {
 		.map((dot) => ({
 			x: dot.dot?.f ?? 0,
 			y: dot.dot?.r ?? 0,
+			label: dot.name,
 		}))
 		.sort((a, b) => a.x - b.x);
 
@@ -39,6 +40,7 @@ const DesigningGraph = ({ graphData }: GraphProps) => {
 		.map((dot) => ({
 			x: dot.dot?.f ?? 0,
 			y: dot.dot?.r ?? 0,
+			label: dot.name,
 		}))
 		.sort((a, b) => a.x - b.x);
 
@@ -47,10 +49,6 @@ const DesigningGraph = ({ graphData }: GraphProps) => {
 				{
 					label: 'R (lab)',
 					data: labData,
-				},
-				{
-					label: 'R (in situ)',
-					data: inSituData,
 				},
 				{
 					label: 'Laboratory',

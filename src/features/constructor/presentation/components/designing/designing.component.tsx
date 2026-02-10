@@ -258,6 +258,8 @@ const DesigningScreen = () => {
 				};
 			});
 
+			setSvgUrl(null);
+
 			if (constructionHeaderId) {
 				handleGetConstructionImage(constructionHeaderId);
 			}

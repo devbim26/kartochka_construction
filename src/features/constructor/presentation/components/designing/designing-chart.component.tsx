@@ -40,6 +40,11 @@ type DesigningChartProps = {
 	graphSeries: GraphDataSeries[];
 };
 
+const legendLabels: Record<string, string> = {
+	Laboratory: 'СП Test ...',
+	'R (lab)': 'тест № 2 от 12.03.2023 . РУП "БелНИИС',
+};
+
 const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 	const chartRef = useRef<ChartJS<'line'>>(null);
 
@@ -47,6 +52,7 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 	const allFrequencies = Array.from(
 		new Set(
 			graphSeries
+				.filter((ser) => ser.label.includes('Laboratory'))
 				.flatMap((series) => series.data.map((point) => point.x))
 				.filter((freq) => freq !== null && freq !== undefined)
 				.sort((a, b) => a - b),
@@ -54,8 +60,8 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 	);
 
 	// Находим мин и макс частоты для масштабирования
-	const minFrequency = allFrequencies.length > 0 ? Math.min(...allFrequencies) : 50;
-	const maxFrequency = allFrequencies.length > 0 ? Math.max(...allFrequencies) : 5000;
+	const minFrequency = allFrequencies.length > 0 ? Math.min(...allFrequencies) + 1 : 50;
+	const maxFrequency = allFrequencies.length > 0 ? Math.max(...allFrequencies) + 1 : 5000;
 
 	// Фильтруем частоты в диапазоне
 	const displayFrequencies = allFrequencies.filter(
@@ -86,9 +92,8 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 
 			// Собираем метки для точек этого графика
 			const pointLabels = series.pointLabels || [];
-
 			return {
-				label: series.label,
+				label: legendLabels[series.label],
 				data: dataPoints,
 				borderColor: color,
 				backgroundColor: 'transparent',
@@ -99,7 +104,6 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 
 					if (value === null || value === undefined) return 'transparent';
 
-					// Проверяем, есть ли метка для этой точки
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
@@ -154,6 +158,10 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 				spanGaps: true,
 			};
 		}),
+	};
+
+	const areNumbersEqual = (a: number, b: number, tolerance = 0.01): boolean => {
+		return Math.abs(a - b) <= tolerance;
 	};
 
 	// Собираем все значения Y для определения диапазона оси Y
@@ -218,8 +226,8 @@ const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
 					},
 				},
 			},
-			// Убрали полностью плагин datalabels
 		},
+
 		scales: {
 			x: {
 				type: 'category',

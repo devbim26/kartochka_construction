@@ -41,7 +41,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 		{
 			params: {
 				id: DESIGNING_ROUTES.visualization.id,
-				label: 'Визуализация',
+				label: 'AI ассистент',
 				icon: GiCloudRing,
 				path: DESIGNING_ROUTES.visualization.route,
 				permission: [UserRoles.Admin, UserRoles.User],

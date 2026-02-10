@@ -61,6 +61,7 @@ export const logout = createAsyncThunk(
 			const response = await fetchApi.api.authLogoutCreate();
 			if (response.status === 200) {
 				toast.success('Выход из аккаунта прошел успешно');
+				sessionStorage.clear();
 			}
 			return {
 				status: response.status,

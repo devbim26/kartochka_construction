@@ -12,6 +12,7 @@ interface FeatureCard {
 	price: 'FREE' | 'PRO';
 	buttonText: string;
 	isPro?: boolean;
+	active?: boolean;
 }
 
 const AIFeatures: FeatureCard[] = [
@@ -25,6 +26,7 @@ const AIFeatures: FeatureCard[] = [
 		],
 		price: 'PRO',
 		buttonText: 'Начать PRO',
+		active: true,
 	},
 	{
 		id: 'norm-control',
@@ -33,6 +35,7 @@ const AIFeatures: FeatureCard[] = [
 		features: ['Генерация отчетов'],
 		price: 'PRO',
 		buttonText: 'Начать PRO',
+		active: true,
 	},
 	{
 		id: 'document-analytics',
@@ -41,6 +44,7 @@ const AIFeatures: FeatureCard[] = [
 		features: ['Выдает готовый отчет в DOC/Excel для смет, ТЗ, протоколов.'],
 		price: 'PRO',
 		buttonText: 'Начать PRO',
+		active: true,
 	},
 	{
 		id: 'internet-search',
@@ -49,6 +53,7 @@ const AIFeatures: FeatureCard[] = [
 		features: ['Генерация отчетов'],
 		price: 'PRO',
 		buttonText: 'Начать PRO',
+		active: true,
 	},
 	{
 		id: 'ifc-analytics',
@@ -57,6 +62,7 @@ const AIFeatures: FeatureCard[] = [
 		features: ['Генерация отчетов'],
 		price: 'PRO',
 		buttonText: 'Начать PRO',
+		active: true,
 	},
 ];
 
@@ -68,6 +74,7 @@ const features: FeatureCard[] = [
 		features: ['Генератор PDF-отчет с формулами, готовый к подаче на экспертизу.'],
 		price: 'FREE',
 		buttonText: 'Начать',
+		active: true,
 	},
 	{
 		id: 'heat-isolation',
@@ -129,7 +136,7 @@ export const MainHeader = () => {
 				<h2 className="min-w-fit text-[15px] font-bold text-gray-400">
 					Проектирование и расчеты
 				</h2>
-				<div className="h-[2px] w-full bg-gray-400"></div>
+				<div className="h-px w-full bg-gray-400"></div>
 			</div>
 
 			<Carousel
@@ -146,10 +153,15 @@ export const MainHeader = () => {
 						key={feature.id}
 						className="min-w-0 basis-1/3 px-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
 					>
-						<div className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+						<div
+							className={twMerge(
+								'flex h-full flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md',
+								!feature.active && 'bg-gray-text/30',
+							)}
+						>
 							<div className="mb-3">
 								<div className="mb-2 flex items-start justify-between">
-									<h3 className="text-[15px] font-semibold text-gray-800">
+									<h3 className="text-[15px] font-bold text-gray-800">
 										{feature.title}
 									</h3>
 								</div>
@@ -177,16 +189,26 @@ export const MainHeader = () => {
 									</div>
 								</div>
 							</div>
-							<button
-								onClick={() => handleFeatureClick(feature.id)}
-								className={twMerge(
-									'mt-auto w-[150px] cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
-									feature.price === 'FREE' &&
+							<div className="flex w-full justify-between">
+								<button
+									onClick={() => handleFeatureClick(feature.id)}
+									className={twMerge(
+										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
+									)}
+								>
+									{'FREE'}
+								</button>
+								<button
+									onClick={() => handleFeatureClick(feature.id)}
+									className={twMerge(
+										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
+
 										'cursor-pointer bg-primary hover:bg-blue-700',
-								)}
-							>
-								{feature.price === 'FREE' ? 'Начать бесплатно' : 'Начать PRO'}
-							</button>
+									)}
+								>
+									{'Начать PRO'}
+								</button>
+							</div>
 						</div>
 					</CarouselSlide>
 				))}
@@ -194,7 +216,7 @@ export const MainHeader = () => {
 
 			<div className="my-6 flex w-full items-center gap-[10px]">
 				<h2 className="min-w-fit text-[15px] font-bold text-gray-400">AI ассистент</h2>
-				<div className="h-[2px] w-full bg-gray-400"></div>
+				<div className="h-px w-full bg-gray-400"></div>
 			</div>
 
 			<Carousel
@@ -211,10 +233,15 @@ export const MainHeader = () => {
 						key={feature.id}
 						className="min-w-0 basis-1/3 px-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
 					>
-						<div className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
-							<div className="mb-3">
+						<div
+							className={twMerge(
+								'flex h-full flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md',
+								!feature.active && 'bg-gray-text/30',
+							)}
+						>
+							<div className="mb-3 h-full">
 								<div className="mb-2 flex items-start justify-between">
-									<h3 className="text-[15px] font-semibold text-gray-800">
+									<h3 className="text-[15px] font-bold text-gray-800">
 										{feature.title}
 									</h3>
 								</div>
@@ -242,16 +269,26 @@ export const MainHeader = () => {
 									</div>
 								</div>
 							</div>
-							<button
-								onClick={() => handleFeatureClick(feature.id)}
-								className={twMerge(
-									'mt-auto w-[150px] cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
-									feature.price === 'FREE' &&
+							<div className="flex w-full justify-between">
+								<button
+									onClick={() => handleFeatureClick(feature.id)}
+									className={twMerge(
+										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
+									)}
+								>
+									{'FREE'}
+								</button>
+								<button
+									onClick={() => handleFeatureClick(feature.id)}
+									className={twMerge(
+										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
+
 										'cursor-pointer bg-primary hover:bg-blue-700',
-								)}
-							>
-								{feature.price === 'FREE' ? 'Начать бесплатно' : 'Начать PRO'}
-							</button>
+									)}
+								>
+									{'Начать PRO'}
+								</button>
+							</div>
 						</div>
 					</CarouselSlide>
 				))}

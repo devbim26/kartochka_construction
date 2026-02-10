@@ -150,29 +150,6 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 					);
 				},
 			},
-			{
-				accessorKey: 'rInSitu',
-				header: () => (
-					<SimpleTableHeaderCell
-						text="R' (in situ), dB"
-						textClassName="w-[90px] text-center"
-						noPadding={noPadding}
-					/>
-				),
-				cell: (info) => {
-					const isRw = info.row.original.frequency === 'Rw';
-					return (
-						<SimpleTableCell
-							content={info.getValue() as string}
-							contentClassName={twMerge(
-								'w-[90px] text-center',
-								isRw && 'text-blue-600 font-bold',
-							)}
-							noPadding={noPadding}
-						/>
-					);
-				},
-			},
 		],
 		[noPadding],
 	);
