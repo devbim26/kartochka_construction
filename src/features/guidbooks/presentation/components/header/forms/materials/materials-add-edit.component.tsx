@@ -282,6 +282,19 @@ export const MaterialsAddAndEdit = () => {
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+						formState.errors.edin?.message ? 'text-error' : '',
+					)}
+					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+					containerClassName="w-[226px]"
+					label={formState.errors.edin?.message || 'Динамический модуль упругости'}
+					error={formState.errors.edin?.message}
+					placeholder="Введите динамический модуль упругости"
+					{...form.register('edin')}
+					type={'number'}
+				/>
+				<Input
+					labelClassName={twMerge(
+						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
 						formState.errors.relativeCompression?.message ? 'text-error' : '',
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
