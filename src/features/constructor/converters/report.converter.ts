@@ -40,12 +40,8 @@ export const convertToCreateReportInfoCommand = (
 	return {
 		description: data.commonDescription || '',
 		buildingName: data.name,
-		calculationRequirementIds: data.calculationRequirementId
-			? [data.calculationRequirementId]
-			: null,
-		regulatoryRequirementIds: data.regulatoryRequirementId
-			? [data.regulatoryRequirementId]
-			: null,
+		calculationDocumentId: data.calculationDocumentId ? data.calculationDocumentId : '',
+		regulatoryDocumentId: data.regulatoryDocumentId ? data.regulatoryDocumentId : '',
 		category: data.isFloorPlan ? ReportCategory.Floor : ReportCategory.Single,
 		country: data.region as CountryType,
 	};
@@ -56,8 +52,8 @@ export const convertToClientReportInfo = (data: ReportInfoShortDto): AboutBuildi
 		...data,
 		commonDescription: data.description,
 		name: data.buildingName || '',
-		calculationRequirementId: data.calculationRequirements![0].id!,
-		regulatoryRequirementId: data.regulatoryRequirements![0].id!,
+		calculationDocumentId: data.calculationDocument?.id || '',
+		regulatoryDocumentId: data.regulatoryDocument?.id || '',
 		region: convertToClientCountryData(data.country!) as string,
 		buildingPurpose: data.purposeBuilding as string,
 		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
@@ -74,6 +70,7 @@ export const convertToClientSingleReportInfoShort = (
 ): ReportInfoShort => {
 	return {
 		...data,
+		reportInfoId: data.id,
 		commonDescription: '',
 		name: data.buildingName || '',
 		calculationRequirement: convertToClientRequirementTableData(
@@ -88,6 +85,14 @@ export const convertToClientSingleReportInfoShort = (
 		isFloorPlan: true,
 		isConstruction: false,
 		isBim: true,
+		calculationDocument: {
+			id: data.calculationDocument!.id || '',
+			name: data.calculationDocument!.name! || '',
+		},
+		regulatoryDocument: {
+			id: data.regulatoryDocument!.id! || '',
+			name: data.regulatoryDocument!.name! || '',
+		},
 	};
 };
 
@@ -96,10 +101,14 @@ export const convertToClientReportInfoShort = (data: ReportInfoShortDto): Report
 		...data,
 		commonDescription: data.description,
 		name: data.buildingName || '',
-		calculationRequirement: convertToClientRequirementTableData(
-			data.calculationRequirements![0],
-		),
-		regulatoryRequirement: convertToClientRequirementTableData(data.regulatoryRequirements![0]),
+		calculationDocument: {
+			id: data.calculationDocument!.id || '',
+			name: data.calculationDocument!.name! || '',
+		},
+		regulatoryDocument: {
+			id: data.regulatoryDocument!.id! || '',
+			name: data.regulatoryDocument!.name! || '',
+		},
 		region: convertToClientCountryData(data.country!) as string,
 		buildingPurpose: data.purposeBuilding as string,
 		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте

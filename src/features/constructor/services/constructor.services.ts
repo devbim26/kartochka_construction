@@ -1,5 +1,6 @@
 import type {
 	CreateReportInfoCommand,
+	GetPlacementRoomFromRequirementsQuery,
 	UpdateReportInfoWithSingleConstructionCommand,
 } from '@api-gen';
 import { fetchApi } from '@api-gen';
@@ -67,6 +68,12 @@ type UpdateFloorReportProps = {
 };
 type GetGraphParams = {
 	constructionHeaderId: string;
+};
+
+export const getConstructionRooms = async (data: GetPlacementRoomFromRequirementsQuery) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.placementRoomVariantsRequirementsCreate(data),
+	);
 };
 
 export const createReport = async ({ data }: ReportCreateProps) => {

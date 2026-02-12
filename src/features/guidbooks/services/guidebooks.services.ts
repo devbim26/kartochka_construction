@@ -94,6 +94,14 @@ export const getGuidebooksConstructionTypes = async () => {
 	return await fetchApi.api.constructionConstructionTypesList();
 };
 
+export const getRegulatoryRequirementDocuments = async () => {
+	return await fetchApi.api.regulatoryRequirementDocumentList();
+};
+
+export const getCalculationRequirementDocuments = async () => {
+	return await fetchApi.api.calculationRequirementDocumentList();
+};
+
 export const getFirstPlacementRoomVariant = async (
 	data: GetPalacementRoomVariantsWithTypesQuery,
 ) => {

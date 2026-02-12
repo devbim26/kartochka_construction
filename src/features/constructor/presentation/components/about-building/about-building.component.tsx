@@ -1,7 +1,8 @@
+import type { SelectOption } from '@core';
 import {
 	APP_ROUTES,
 	Button,
-	convertToPaginatedType,
+	convertToSelectValues,
 	FormElementLabel,
 	Input,
 	Select,
@@ -15,7 +16,6 @@ import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import {
 	convertToClientReportInfo,
 	convertToCreateReportInfoCommand,
-	convertToRequirementSelectValues,
 } from '@features/constructor/converters';
 import {
 	createReport,
@@ -32,14 +32,13 @@ import {
 	type AboutBuildingData,
 } from '@features/constructor/types';
 import { AboutBuildingConfig } from '@features/constructor/utils';
-import { convertToClientRequirementTableData } from '@features/guidbooks/converters';
-import { getGuidebooksPaginated } from '@features/guidbooks/services';
-import type { BuildingType, CategoryClass, Requirement } from '@features/guidbooks/types';
+import {
+	getCalculationRequirementDocuments,
+	getRegulatoryRequirementDocuments,
+} from '@features/guidbooks/services';
 import {
 	Country,
 	country2title,
-	Guidebooks,
-	RequirementType,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuCountryNamesSelectValues,
@@ -47,11 +46,12 @@ import {
 import { DESIGNING_ROUTES } from '@features/home/constants';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AxiosError, type AxiosResponse } from 'axios';
+import type { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from, switchMap, tap } from 'rxjs';
+import { catchError, from, map } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
@@ -63,12 +63,47 @@ const AboutBuildingScreen = () => {
 	const { register, control, formState, watch, setValue } = form;
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
-	const [calculationRequirementData, setCalculationRequirementData] = useState<
-		Array<Requirement>
+
+	const [regulatoryRequirementDocuments, setRegulatoryRequirementDocuments] = useState<
+		SelectOption[]
 	>([]);
-	const [regulatoryRequirementData, setRegulatoryRequirementData] = useState<Array<Requirement>>(
-		[],
-	);
+	const [calculationRequirementDocuments, setCalculationRequirementDocuments] = useState<
+		SelectOption[]
+	>([]);
+
+	const handleGetRequirementDocuments = () => {
+		from(getRegulatoryRequirementDocuments())
+			.pipe(
+				map((r: AxiosResponse) => {
+					const variants = convertToSelectValues(r.data) || [];
+					setRegulatoryRequirementDocuments(variants);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
+
+	const handleGetCalculationDocuments = () => {
+		from(getCalculationRequirementDocuments())
+			.pipe(
+				map((r: AxiosResponse) => {
+					const variants = convertToSelectValues(r.data) || [];
+					setCalculationRequirementDocuments(variants);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
 
 	const [search] = useSearchParams();
 	const [selectedRegion, selectedType, selectedClass, reportType, isConstruction, name] = watch([
@@ -81,22 +116,6 @@ const AboutBuildingScreen = () => {
 	]);
 
 	const reportId = search.get('reportId');
-
-	const filteredCalculationRequirements = convertToRequirementSelectValues(
-		calculationRequirementData.filter(
-			(req) =>
-				(!selectedRegion || req.countryType === selectedRegion) &&
-				(!selectedType || req.buildingType === selectedType),
-		),
-	);
-
-	const filteredRegulatoryRequirements = convertToRequirementSelectValues(
-		regulatoryRequirementData.filter(
-			(req) =>
-				(!selectedRegion || req.countryType === selectedRegion) &&
-				(!selectedType || req.buildingType === selectedType),
-		),
-	);
 
 	const handleSubmit = () => {
 		form.handleSubmit(onSubmit)();
@@ -145,6 +164,11 @@ const AboutBuildingScreen = () => {
 			handleGetReport(reportId!);
 		}
 	}, [search]);
+
+	useEffect(() => {
+		handleGetRequirementDocuments();
+		handleGetCalculationDocuments();
+	}, []);
 
 	const handleCreateReport = (data: AboutBuildingData) => {
 		from(
@@ -231,77 +255,6 @@ const AboutBuildingScreen = () => {
 			});
 	};
 
-	const handleGetRequirementData = (
-		buildingType?: BuildingType,
-		countryType?: Country,
-		categoryClass?: CategoryClass,
-	) => {
-		from(
-			getGuidebooksPaginated({
-				data: {
-					countryType: countryType || null,
-					buildingType: buildingType || null,
-					firstPlacementRoomName: null,
-					secondPlacementRoomName: null,
-					standartShortName: null,
-					standartFullName: null,
-					standartValidityPeriod: null,
-					class: categoryClass || null,
-				},
-				guidebookType: Guidebooks.REQUIREMENT,
-				pagination: { pageNumber: 1, pageSize: 99999 },
-			}),
-		)
-			.pipe(
-				switchMap((response: AxiosResponse) => {
-					const resData = convertToPaginatedType(convertToClientRequirementTableData)(
-						response.data,
-					);
-					return from([resData]);
-				}),
-				tap((resData) => {
-					setCalculationRequirementData(
-						resData.items.filter(
-							(req) => req.requirementType === RequirementType.Calculation,
-						),
-					);
-					setRegulatoryRequirementData(
-						resData.items.filter(
-							(req) => req.requirementType === RequirementType.Regulatory,
-						),
-					);
-
-					if (!!resData.items.length) {
-						setValue(
-							'calculationRequirementId',
-							resData.items.filter(
-								(req) => req.requirementType === RequirementType.Calculation,
-							)[0].id!,
-						);
-						setValue(
-							'regulatoryRequirementId',
-							resData.items.filter(
-								(req) => req.requirementType === RequirementType.Regulatory,
-							)[0].id!,
-						);
-					}
-				}),
-				catchError((error) => {
-					console.log('Error:', error);
-					return from([null]);
-				}),
-			)
-			.subscribe();
-	};
-
-	useEffect(() => {
-		handleGetRequirementData(
-			selectedType as BuildingType,
-			selectedRegion as Country,
-			selectedClass as CategoryClass,
-		);
-	}, [selectedRegion, selectedType, selectedClass]);
-
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
 			<div className="flex border-b px-[24px] py-[18px]">
@@ -368,9 +321,6 @@ const AboutBuildingScreen = () => {
 											field.onChange(val),
 												form.reset({
 													...form.getValues(),
-
-													regulatoryRequirementId: '',
-													calculationRequirementId: '',
 												});
 										}}
 										label={formState.errors?.region?.message || 'Страна*'}
@@ -422,9 +372,6 @@ const AboutBuildingScreen = () => {
 												field.onChange(val),
 													form.reset({
 														...form.getValues(),
-
-														regulatoryRequirementId: '',
-														calculationRequirementId: '',
 													});
 											}}
 											error={formState.errors.buildingType?.message}
@@ -485,8 +432,6 @@ const AboutBuildingScreen = () => {
 										field.onChange(val),
 											form.reset({
 												...form.getValues(),
-												regulatoryRequirementId: '',
-												calculationRequirementId: '',
 											});
 									}}
 									value={field.value || ''}
@@ -523,26 +468,26 @@ const AboutBuildingScreen = () => {
 						<div className="flex gap-[12px]">
 							<Controller
 								control={control}
-								name={'calculationRequirementId'}
+								name={'calculationDocumentId'}
 								render={({ field }) => (
 									<Select
 										{...field}
-										options={filteredCalculationRequirements ?? []}
+										options={calculationRequirementDocuments ?? []}
 										value={field.value || ''}
 										label={
-											formState.errors?.calculationRequirementId?.message ||
+											formState.errors?.calculationDocumentId?.message ||
 											'Звукоизоляция*'
 										}
 										isSearchable
 										disabled={!!search.get('edit')}
-										error={formState.errors.calculationRequirementId?.message}
+										error={formState.errors.calculationDocumentId?.message}
 										labelClassName={twMerge(
 											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
-											formState.errors.calculationRequirementId?.message
+											formState.errors.calculationDocumentId?.message
 												? 'text-error'
 												: '',
 										)}
-										placeholder="Выберите расч. требование"
+										placeholder="Выберите расч. документ"
 										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 									/>
@@ -550,16 +495,16 @@ const AboutBuildingScreen = () => {
 							/>
 							<Controller
 								control={control}
-								name={'regulatoryRequirementId'}
+								name={'regulatoryDocumentId'}
 								render={({ field }) => (
 									<Select
 										{...field}
-										options={filteredRegulatoryRequirements ?? []}
+										options={regulatoryRequirementDocuments ?? []}
 										value={field.value || ''}
 										isSearchable
 										disabled={!!search.get('edit')}
-										error={formState.errors.regulatoryRequirementId?.message}
-										placeholder="Выберите  требование"
+										error={formState.errors.regulatoryDocumentId?.message}
+										placeholder="Выберите норм. документ"
 										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 									/>

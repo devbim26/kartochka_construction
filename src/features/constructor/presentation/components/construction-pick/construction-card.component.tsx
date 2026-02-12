@@ -129,14 +129,14 @@ export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) =>
 								soundproofing: 'Rw, dB',
 								values: String(construction?.labIndexValue) || '-',
 								requirements:
-									reportInfo?.regulatoryRequirement.noizeIsolationIndex || '-',
+									reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
 							},
 							{
 								label: 'Лаб.тест',
 								soundproofing: 'Rw, dB',
 								values: String(construction?.RCalcs) || '-',
 								requirements:
-									reportInfo?.regulatoryRequirement.noizeIsolationIndex || '-',
+									reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
 							},
 						]}
 					/>

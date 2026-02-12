@@ -20,17 +20,12 @@ import type {
 	FormRequirement,
 	Requirement,
 	RequirementFilter,
-	RequirementType,
 } from '@features/guidbooks/types';
 import { ConstructionClass } from '@features/guidbooks/types';
 import {
 	convertToClientConstructionTypeData,
 	convertToServerConstructionTypeData,
 } from '../constructions';
-import {
-	convertToClientRequirementType,
-	convertToServerRequirementType,
-} from './requirement-type.converter';
 
 export const convertToClientRequirementData = (data: RequirementDto): FormRequirement => ({
 	...data,
@@ -48,9 +43,7 @@ export const convertToClientRequirementData = (data: RequirementDto): FormRequir
 	noizeIsolationIndex: String(data.noizeIsolationIndex),
 	noizeImpactIndex: String(data.noizeImpactIndex),
 	notice: data.notice ?? '',
-	requirementType: data.requirementType
-		? convertToClientRequirementType(data.requirementType)
-		: '',
+	regulatoryDocumentId: data.regulatoryDocument?.id ?? '',
 });
 
 export const convertToClientRequirementTableData = (data: RequirementDto): Requirement => ({
@@ -69,9 +62,7 @@ export const convertToClientRequirementTableData = (data: RequirementDto): Requi
 	noizeIsolationIndex: String(data.noizeIsolationIndex),
 	noizeImpactIndex: String(data.noizeImpactIndex),
 	notice: data.notice ?? '',
-	requirementType: data.requirementType
-		? convertToClientRequirementType(data.requirementType)
-		: '',
+	regularyDocumentName: data.regulatoryDocument?.name ?? '',
 });
 
 export const convertToServerRequirementData = (data: FormRequirement): CreateRequirementCommand => {
@@ -90,9 +81,7 @@ export const convertToServerRequirementData = (data: FormRequirement): CreateReq
 				data.constructionType as ConstructionClass,
 			),
 			notice: data.notice || null,
-			requirementType: convertToServerRequirementType(
-				data.requirementType as RequirementType,
-			),
+			regulatoryDocumentId: data.regulatoryDocumentId,
 		};
 	}
 	return {
@@ -110,7 +99,7 @@ export const convertToServerRequirementData = (data: FormRequirement): CreateReq
 			data.constructionType as ConstructionClass,
 		),
 		notice: data.notice || null,
-		requirementType: convertToServerRequirementType(data.requirementType as RequirementType),
+		regulatoryDocumentId: data.regulatoryDocumentId,
 	};
 };
 
@@ -133,9 +122,7 @@ export const convertToServerRequirementUpdateData = (
 				data.constructionType as ConstructionClass,
 			),
 			notice: data.notice || null,
-			requirementType: convertToServerRequirementType(
-				data.requirementType as RequirementType,
-			),
+			regulatoryDocumentId: data.regulatoryDocumentId,
 		};
 	}
 	return {
@@ -154,7 +141,7 @@ export const convertToServerRequirementUpdateData = (
 			data.constructionType as ConstructionClass,
 		),
 		notice: data.notice || null,
-		requirementType: convertToServerRequirementType(data.requirementType as RequirementType),
+		regulatoryDocumentId: data.regulatoryDocumentId,
 	};
 };
 

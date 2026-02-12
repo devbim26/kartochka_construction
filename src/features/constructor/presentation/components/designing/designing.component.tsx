@@ -34,16 +34,8 @@ import {
 	convertToServerConstructionsEditData,
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksEdit } from '@features/guidbooks/services';
-import type {
-	ConstructionsEditData,
-	ConstructionTypeEnum,
-	Country,
-} from '@features/guidbooks/types';
-import {
-	Guidebooks,
-	RuConstructionTypesSelectValues,
-	RuCountryNamesMap,
-} from '@features/guidbooks/types';
+import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
+import { Guidebooks, RuConstructionTypesSelectValues } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -459,14 +451,14 @@ const DesigningScreen = () => {
 					{currentReportInfo ? (
 						<>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.calculationRequirement.standartShortName},
-								{currentReportInfo?.calculationRequirement.standartFullName},
-								{
+								{currentReportInfo?.calculationRequirement?.standartShortName},
+								{currentReportInfo?.calculationRequirement?.standartFullName},
+								{/* {
 									RuCountryNamesMap[
 										currentReportInfo?.calculationRequirement
 											.countryType as Country
 									]
-								}
+								} */}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
 								Rw={constructionHeader?.RCalcs}
@@ -475,17 +467,17 @@ const DesigningScreen = () => {
 								{isRelevant ? 'Соответствует' : 'Не соответствует'}
 							</p>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.regulatoryRequirement.standartShortName},
-								{currentReportInfo?.regulatoryRequirement.standartFullName},
-								{
+								{currentReportInfo?.regulatoryRequirement?.standartShortName},
+								{currentReportInfo?.regulatoryRequirement?.standartFullName},
+								{/* {
 									RuCountryNamesMap[
 										currentReportInfo?.regulatoryRequirement
 											.countryType as Country
 									]
-								}
+								} */}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
-								Rw⩾{currentReportInfo?.regulatoryRequirement.noizeIsolationIndex}
+								Rw⩾{currentReportInfo?.regulatoryRequirement?.noizeIsolationIndex}
 							</p>
 						</>
 					) : (

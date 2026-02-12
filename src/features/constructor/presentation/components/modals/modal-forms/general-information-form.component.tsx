@@ -326,14 +326,16 @@ export const GeneralInformationForm = () => {
 							soundproofing: 'Rw, dB',
 							values: String(constructionType?.labIndexValue) || '-',
 							requirements:
-								currentReportInfo?.regulatoryRequirement.noizeIsolationIndex || '-',
+								currentReportInfo?.regulatoryRequirement?.noizeIsolationIndex ||
+								'-',
 						},
 						{
 							label: 'Лаб.тест',
 							soundproofing: 'Rw, dB',
 							values: String(constructionType?.RCalcs) || '-',
 							requirements:
-								currentReportInfo?.regulatoryRequirement.noizeIsolationIndex || '-',
+								currentReportInfo?.regulatoryRequirement?.noizeIsolationIndex ||
+								'-',
 						},
 					]}
 				/>

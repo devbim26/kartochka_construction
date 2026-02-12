@@ -281,6 +281,13 @@ const RequirementsScreen = () => {
 				},
 			},
 			{
+				accessorKey: 'regularyDocumentName',
+				header: () => <SimpleTableHeaderCell text={'Документ'} />,
+				cell: (info) => {
+					return <SimpleTableCell content={info.getValue() as string} />;
+				},
+			},
+			{
 				accessorKey: 'constructionType',
 				header: () => <SimpleTableHeaderCell text={'Тип конструкции'} />,
 				cell: (info) => {

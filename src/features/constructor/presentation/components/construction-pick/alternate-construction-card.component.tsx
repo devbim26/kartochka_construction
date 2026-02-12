@@ -184,14 +184,14 @@ export const AlternateConstructionCard = ({ construction, reportInfo }: Props) =
 							soundproofing: 'Rw, dB',
 							values: String(constructionHeader?.labIndexValue) || '-',
 							requirements:
-								reportInfo?.regulatoryRequirement.noizeIsolationIndex || '-',
+								reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
 						},
 						{
 							label: 'Лаб.тест',
 							soundproofing: 'Rw, dB',
 							values: String(constructionHeader?.RCalcs) || '-',
 							requirements:
-								reportInfo?.regulatoryRequirement.noizeIsolationIndex || '-',
+								reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
 						},
 					]}
 				/>

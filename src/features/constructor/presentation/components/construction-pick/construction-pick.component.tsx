@@ -16,12 +16,8 @@ import { ReportCategory } from '@features/constructor/types';
 import type { ReportInfoShort } from '@features/constructor/utils';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import type {
-	AlternateConstruction,
-	ConstructionsEditData,
-	Country,
-} from '@features/guidbooks/types';
-import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
+import type { AlternateConstruction, ConstructionsEditData } from '@features/guidbooks/types';
+import { Guidebooks } from '@features/guidbooks/types';
 import { AxiosError } from 'axios';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
@@ -187,21 +183,22 @@ const ContructionPick = () => {
 					{currentReportInfo && (
 						<>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.calculationRequirement.standartShortName},
-								{currentReportInfo?.calculationRequirement.standartFullName},
-								{
+								{currentReportInfo?.calculationRequirement?.standartShortName},
+								{currentReportInfo?.calculationRequirement?.standartFullName},
+								{/* {
 									RuCountryNamesMap[
 										currentReportInfo?.calculationRequirement
 											.countryType as Country
 									]
-								}
+								} */}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
 								Rw⩾
-								{currentReportInfo?.calculationRequirement.noizeIsolationIndex}
+								{currentReportInfo?.calculationRequirement?.noizeIsolationIndex}
 							</p>
 							<p className="font-sans text-[20px] font-semibold leading-4">
-								Класс <span>{currentReportInfo?.calculationRequirement.class}</span>
+								Класс{' '}
+								<span>{currentReportInfo?.calculationRequirement?.class}</span>
 							</p>
 						</>
 					)}

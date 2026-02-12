@@ -18,8 +18,8 @@ import {
 } from '@features/guidbooks/converters';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import type { ConstructionsEditData, Country, Issuer } from '@features/guidbooks/types';
-import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
+import type { ConstructionsEditData, Issuer } from '@features/guidbooks/types';
+import { Guidebooks } from '@features/guidbooks/types';
 
 import type { IssuerDto } from '@api-gen';
 import { useEffect, useState } from 'react';
@@ -115,7 +115,7 @@ const MyConstructions = () => {
 	useEffect(() => {
 		const rwValue = +(constructionHeader?.RCalcs || 0);
 		setIsRelevant(
-			rwValue >= +(currentReportInfo?.regulatoryRequirement.noizeIsolationIndex || 55),
+			rwValue >= +(currentReportInfo?.regulatoryRequirement?.noizeIsolationIndex || 55),
 		);
 		if (constructionHeader) handleGetIssuerByHeaderId(constructionHeader.issuer);
 	}, [constructionHeader?.RCalcs, currentReportInfo]);
@@ -241,14 +241,14 @@ const MyConstructions = () => {
 					{currentReportInfo ? (
 						<>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.calculationRequirement.standartShortName},
-								{currentReportInfo?.calculationRequirement.standartFullName},
-								{
+								{currentReportInfo?.calculationRequirement?.standartShortName},
+								{currentReportInfo?.calculationRequirement?.standartFullName},
+								{/* {
 									RuCountryNamesMap[
 										currentReportInfo?.calculationRequirement
 											.countryType as Country
 									]
-								}
+								} */}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
 								Rw={constructionHeader?.RCalcs}
@@ -257,17 +257,17 @@ const MyConstructions = () => {
 								{relevantText}
 							</p>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.regulatoryRequirement.standartShortName},
-								{currentReportInfo?.regulatoryRequirement.standartFullName},
-								{
+								{currentReportInfo?.regulatoryRequirement?.standartShortName},
+								{currentReportInfo?.regulatoryRequirement?.standartFullName},
+								{/* {
 									RuCountryNamesMap[
 										currentReportInfo?.regulatoryRequirement
 											.countryType as Country
 									]
-								}
+								} */}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
-								Rw⩾{currentReportInfo?.regulatoryRequirement.noizeIsolationIndex}
+								Rw⩾{currentReportInfo?.regulatoryRequirement?.noizeIsolationIndex}
 							</p>
 						</>
 					) : (

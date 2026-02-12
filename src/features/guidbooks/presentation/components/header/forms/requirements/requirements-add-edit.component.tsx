@@ -4,11 +4,15 @@ import type {
 } from '@api-gen';
 import type { SelectOption } from '@core';
 import { convertToSelectValues, dateMask, Input, Select } from '@core';
-import { getFirstPlacementRoomVariant, getSecondRoomVariant } from '@features/guidbooks/services';
+import {
+	getCalculationRequirementDocuments,
+	getFirstPlacementRoomVariant,
+	getRegulatoryRequirementDocuments,
+	getSecondRoomVariant,
+} from '@features/guidbooks/services';
 import type { BuildingType } from '@features/guidbooks/types';
 import {
 	ConstructionClass,
-	RequirementTypeSelectValues,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuConstructionTypeSelectValues,
@@ -36,6 +40,46 @@ export const RequirementsAddAndEdit = () => {
 	]);
 	const [placementRoomVariants, setPlacementRoomVariants] = useState<SelectOption[]>([]);
 	const [secondRoomVariants, setSecondRoomVariants] = useState<SelectOption[]>([]);
+	const [regulatoryRequirementDocuments, setRegulatoryRequirementDocuments] = useState<
+		SelectOption[]
+	>([]);
+	const [calculationRequirementDocuments, setCalculationRequirementDocuments] = useState<
+		SelectOption[]
+	>([]);
+
+	const handleGetRequirementDocuments = () => {
+		from(getRegulatoryRequirementDocuments())
+			.pipe(
+				map((r: AxiosResponse) => {
+					const variants = convertToSelectValues(r.data) || [];
+					setRegulatoryRequirementDocuments(variants);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
+
+	const handleGetCalculationDocuments = () => {
+		from(getCalculationRequirementDocuments())
+			.pipe(
+				map((r: AxiosResponse) => {
+					const variants = convertToSelectValues(r.data) || [];
+					setCalculationRequirementDocuments(variants);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data);
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe();
+	};
 
 	const onGetFirstPlacementRoom = (data: GetPalacementRoomVariantsWithTypesQuery) => {
 		from(getFirstPlacementRoomVariant(data))
@@ -99,6 +143,11 @@ export const RequirementsAddAndEdit = () => {
 			});
 		}
 	}, [buildingType, construction, firstPlacementRoomId]);
+
+	useEffect(() => {
+		handleGetRequirementDocuments();
+		handleGetCalculationDocuments();
+	}, []);
 
 	return (
 		<>
@@ -233,19 +282,22 @@ export const RequirementsAddAndEdit = () => {
 			/>
 			<Controller
 				control={control}
-				name={'requirementType'}
+				name={'regulatoryDocumentId'}
 				render={({ field }) => (
 					<Select
-						options={RequirementTypeSelectValues}
+						options={[
+							...regulatoryRequirementDocuments,
+							...calculationRequirementDocuments,
+						]}
 						{...field}
 						value={field.value || ''}
-						label={formState.errors?.requirementType?.message || 'Тип требования'}
+						label={formState.errors?.regulatoryDocumentId?.message || 'Документ'}
 						isSearchable
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-							formState.errors.requirementType?.message ? 'text-error' : '',
+							formState.errors.regulatoryDocumentId?.message ? 'text-error' : '',
 						)}
-						placeholder="Выберите тип требования"
+						placeholder="Выберите документ"
 						buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 						wrapperClassname="w-[150px] shadow-none ring-input-border-primary"
 					/>

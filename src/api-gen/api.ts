@@ -107,6 +107,14 @@ export enum BuildingType {
 	PreschoolEducationalInstitutions = 'PreschoolEducationalInstitutions',
 }
 
+export interface CalculationRequirementDocumentDto {
+	/** @format uuid */
+	id?: string;
+	country?: CountryType;
+	shortName?: string | null;
+	fullName?: string | null;
+}
+
 export enum CategoryClass {
 	General = 'General',
 	A = 'A',
@@ -319,10 +327,14 @@ export interface CreateReportConstructionDto {
 export interface CreateReportInfoCommand {
 	buildingName?: string | null;
 	description?: string | null;
-	calculationRequirementIds?: string[] | null;
-	regulatoryRequirementIds?: string[] | null;
+	/** @format uuid */
+	calculationDocumentId?: string;
+	/** @format uuid */
+	regulatoryDocumentId?: string;
 	country?: CountryType;
 	category?: ReportCategory;
+	buildingType?: BuildingType;
+	class?: CategoryClass;
 }
 
 export interface CreateReportInfoDto {
@@ -333,6 +345,8 @@ export interface CreateReportInfoDto {
 	calculationRequirements?: Requirement[] | null;
 	regulatoryRequirements?: Requirement[] | null;
 	category?: ReportCategory;
+	buildingType?: BuildingType;
+	class?: CategoryClass;
 }
 
 export interface CreateRequirementCommand {
@@ -353,7 +367,8 @@ export interface CreateRequirementCommand {
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
-	requirementType?: RequirementType;
+	/** @format uuid */
+	regulatoryDocumentId?: string;
 }
 
 export interface CreateSingleReportReceivingCommand {
@@ -604,6 +619,14 @@ export interface GetPalacementRoomVariantsWithTypesQuery {
 	constructionType?: ConstructionClass;
 }
 
+export interface GetPlacementRoomFromRequirementsQuery {
+	buildingType?: BuildingType;
+	constructionClass?: ConstructionClass;
+	class?: CategoryClass;
+	/** @format uuid */
+	regulatoryDocumentId?: string;
+}
+
 export interface GetPlacementRoomVariantByAllParametersQuery {
 	buildingType?: BuildingType;
 	constructionType?: ConstructionClass;
@@ -638,7 +661,8 @@ export interface GetRequirementsWithPaginationParamsQuery {
 	/** @format date */
 	standartValidityPeriod?: string | null;
 	class?: CategoryClass;
-	requirementType?: RequirementType;
+	/** @format uuid */
+	regulatoryDocumentId?: string | null;
 }
 
 export interface GetSubscriptionsWithPaginationParamsQuery {
@@ -1032,6 +1056,23 @@ export enum PurposeBuilding {
 	FramePanelBuilding = 'FramePanelBuilding',
 }
 
+export interface RegulatoryRequirementDocument {
+	/** @format uuid */
+	id?: string;
+	country?: CountryType;
+	shortName?: string | null;
+	fullName?: string | null;
+	requirements?: Requirement[] | null;
+}
+
+export interface RegulatoryRequirementDocumentDto {
+	/** @format uuid */
+	id?: string;
+	country?: CountryType;
+	shortName?: string | null;
+	fullName?: string | null;
+}
+
 export enum ReportCategory {
 	Floor = 'Floor',
 	Single = 'Single',
@@ -1050,6 +1091,7 @@ export interface ReportConstructionDto {
 	length?: number;
 	secondPlacementRoom?: PlacementRoomDto;
 	firstPlacementRoom?: PlacementRoomDto;
+	requirement?: RequirementDto;
 }
 
 export interface ReportDocumentInfoDto {
@@ -1113,8 +1155,8 @@ export interface ReportInfoShortDto {
 	category?: ReportCategory;
 	status?: ReportInfoStatus;
 	country?: CountryType;
-	calculationRequirements?: RequirementDto[] | null;
-	regulatoryRequirements?: RequirementDto[] | null;
+	regulatoryDocument?: NamedEntity;
+	calculationDocument?: NamedEntity;
 }
 
 export interface ReportInfoSingleConstructionDto {
@@ -1128,6 +1170,8 @@ export interface ReportInfoSingleConstructionDto {
 	reportDocumentInfo?: ReportDocumentInfoDto;
 	status?: ReportInfoStatus;
 	purposeBuilding?: PurposeBuilding;
+	regulatoryDocument?: NamedEntity;
+	calculationDocument?: NamedEntity;
 }
 
 export enum ReportInfoStatus {
@@ -1146,6 +1190,9 @@ export interface Requirement {
 	id?: string;
 	secondPlacementRoom?: PlacementRoom;
 	firstPlacementRoom?: PlacementRoom;
+	regulatoryDocument?: RegulatoryRequirementDocument;
+	/** @format uuid */
+	regulatoryDocumentId?: string;
 	buildingType?: BuildingType;
 	standartShortName?: string | null;
 	standartFullName?: string | null;
@@ -1158,7 +1205,6 @@ export interface Requirement {
 	/** @format float */
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
-	requirementType?: RequirementType;
 	constructionClass?: ConstructionClass;
 }
 
@@ -1180,7 +1226,7 @@ export interface RequirementDto {
 	noizeImpactIndex?: number;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
-	requirementType?: RequirementType;
+	regulatoryDocument?: NamedEntity;
 }
 
 export interface RequirementDtoPaginatedList {
@@ -1195,11 +1241,6 @@ export interface RequirementDtoPaginatedList {
 	pageSize?: number;
 	hasPreviousPage?: boolean;
 	hasNextPage?: boolean;
-}
-
-export enum RequirementType {
-	Calculation = 'Calculation',
-	Regulatory = 'Regulatory',
 }
 
 export interface SendSmsCommand {
@@ -1354,7 +1395,8 @@ export interface UpdateRequirementCommand {
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
-	requirementType?: RequirementType;
+	/** @format uuid */
+	regulatoryDocumentId?: string;
 }
 
 export interface UpdateSubscriptionCommand {
@@ -1895,6 +1937,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags CalculationRequirementDocument
+		 * @name CalculationRequirementDocumentList
+		 * @request GET:/api/CalculationRequirementDocument
+		 */
+		calculationRequirementDocumentList: (params: RequestParams = {}) =>
+			this.request<CalculationRequirementDocumentDto[], any>({
+				path: `/api/CalculationRequirementDocument`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags Construction
 		 * @name ConstructionDetail
 		 * @request GET:/api/Construction/{ConstructionHeaderId}
@@ -2403,6 +2460,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags PlacementRoomVariants
+		 * @name PlacementRoomVariantsRequirementsCreate
+		 * @request POST:/api/PlacementRoomVariants/requirements
+		 */
+		placementRoomVariantsRequirementsCreate: (
+			data: GetPlacementRoomFromRequirementsQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/PlacementRoomVariants/requirements`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags RegulatoryRequirementDocument
+		 * @name RegulatoryRequirementDocumentList
+		 * @request GET:/api/RegulatoryRequirementDocument
+		 */
+		regulatoryRequirementDocumentList: (params: RequestParams = {}) =>
+			this.request<RegulatoryRequirementDocumentDto[], any>({
+				path: `/api/RegulatoryRequirementDocument`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags Report
 		 * @name ReportGetPaginatedCreate
 		 * @request POST:/api/Report/get-paginated
@@ -2690,6 +2781,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				floorConstructionInfoId?: string;
 				/** @format uuid */
 				reportFloorInfoId?: string;
+				/** @format uuid */
+				requirementId?: string;
 				/** @format uuid */
 				'floorInfo.reportConstructionHeader.id'?: string;
 				'floorInfo.reportConstructionHeader.name'?: string;

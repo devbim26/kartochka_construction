@@ -8,8 +8,12 @@ import {
 } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { convertToUpdateReportCommand } from '@features/constructor/converters';
 import {
+	convertToClientReportInfo,
+	convertToUpdateReportCommand,
+} from '@features/constructor/converters';
+import {
+	getConstructionRooms,
 	getReportFloorById,
 	getReportSingleById,
 	updateReportFloor,
@@ -19,14 +23,19 @@ import { startLoading, stopLoading } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
 
+import type { ReportInfoShort } from '@features/constructor/utils';
 import { CreateConstructionConfig } from '@features/constructor/utils';
 import { convertToClientConstructionsAddData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
-import {
-	Guidebooks,
-	RuConstructionTypeSelectValues,
-	type ConstructionsAddData,
+import type {
+	BuildingType,
+	CategoryClass,
+	ConstructionClass,
+	ConstructionsAddData,
 } from '@features/guidbooks/types';
+import { Guidebooks, RuConstructionTypeSelectValues } from '@features/guidbooks/types';
+import type { PlacementRoomResponse } from '@features/guidbooks/types/requirements/placementRoom.types';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
@@ -60,13 +69,17 @@ export const CreateConstructionForm = memoize(
 			const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>(
 				[],
 			);
-			const [length, width, construction, area, name, id] = watch([
+
+			const [reportInfoData, setReportInfoData] = useState<ReportInfoShort>();
+
+			const [length, width, construction, area, name, id, constructionType] = watch([
 				'length',
 				'width',
 				'construction',
 				'area',
 				'name',
 				'id',
+				'constructionType',
 			]);
 			const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>(
 				[],
@@ -92,38 +105,69 @@ export const CreateConstructionForm = memoize(
 				},
 			}));
 
-			useEffect(() => {
-				if (!search.get('reportId')) return;
-
-				dispatch(startLoading());
-
+			const handleGetReport = (id: string) => {
 				from(
-					reportType === ReportCategory.Floor
-						? getReportFloorById({ id: search.get('reportId')! })
-						: getReportSingleById({ id: search.get('reportId')! }),
+					search.get('reportType') == ReportCategory.Floor
+						? getReportFloorById({ id: id })
+						: getReportSingleById({ id: id }),
 				)
 					.pipe(
 						catchError((error) => {
-							console.error(error);
+							if (error instanceof AxiosError) {
+								toast.error(error.response?.data);
+							}
 							return from([null]);
 						}),
 					)
 					.subscribe((response) => {
-						const requirement = response?.data?.calculationRequirements?.[0];
-						if (requirement) {
-							const firstRoom = requirement.firstPlacementRoom;
-							const secondRoom = requirement.secondPlacementRoom;
-							setValue('constructionType', requirement.constructionClass as string);
-							setValue('firstPlacementRoom', firstRoom?.id ?? '');
-							setValue('secondPlacementRoom', secondRoom?.id ?? '');
-							setRoomOptions([
-								{ label: firstRoom?.name ?? '', value: firstRoom?.id ?? '' },
-								{ label: secondRoom?.name ?? '', value: secondRoom?.id ?? '' },
-							]);
+						if (response?.status === 200) {
+							console.log(response);
+							toast.info(response.data.regulatoryDocument?.name);
+							const data = convertToClientReportInfo(response.data);
+							if (data) setReportInfoData(data);
 						}
 					});
-				dispatch(stopLoading());
-			}, [reportId, reportType]);
+			};
+
+			useEffect(() => {
+				if (reportId) handleGetReport(reportId);
+				console.log(123);
+			}, [reportId]);
+
+			useEffect(() => {
+				if (!!reportInfoData && constructionType) {
+					console.log(123);
+					from(
+						getConstructionRooms({
+							class: reportInfoData.comfortClass as CategoryClass,
+							regulatoryDocumentId: reportInfoData.regulatoryDocument?.id,
+							buildingType: reportInfoData.buildingType as BuildingType,
+							constructionClass: constructionType as ConstructionClass,
+						}),
+					)
+						.pipe(
+							catchError((error) => {
+								if (error instanceof AxiosError) {
+									toast.error(error.response?.data);
+								}
+								return from([null]);
+							}),
+						)
+						.subscribe((response) => {
+							if (response?.status === 200) {
+								const variants =
+									convertToSelectValues(
+										(response.data as any as PlacementRoomResponse[]).map(
+											(r) => ({
+												...r.placementRoom,
+											}),
+										),
+									) || [];
+								setRoomOptions(variants);
+							}
+						});
+				}
+			}, [constructionType, reportInfoData]);
 
 			const handleAddConstruction = (data: CreateConstructionData) => {
 				if (!reportId) {
@@ -262,7 +306,6 @@ export const CreateConstructionForm = memoize(
 											formState.errors?.constructionType?.message ||
 											'Тип конструкции'
 										}
-										disabled
 										isSearchable
 										error={formState.errors.constructionType?.message}
 										labelClassName={twMerge(
@@ -334,7 +377,6 @@ export const CreateConstructionForm = memoize(
 												options={roomOptions}
 												{...field}
 												value={field.value || ''}
-												disabled
 												placeholder="Выберите помещение"
 												buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 												wrapperClassname="shadow-none ring-input-border-primary"
@@ -348,7 +390,6 @@ export const CreateConstructionForm = memoize(
 											<Select
 												options={roomOptions}
 												{...field}
-												disabled
 												value={field.value || ''}
 												placeholder="Выберите помещение"
 												buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
