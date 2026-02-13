@@ -38,15 +38,21 @@ type GraphDataSeries = {
 
 type DesigningChartProps = {
 	graphSeries: GraphDataSeries[];
+	regulatoryDocName: string;
+	calculationDocName: string;
 };
 
-const legendLabels: Record<string, string> = {
-	Laboratory: 'СП Test ...',
-	'R (lab)': 'тест № 2 от 12.03.2023 . РУП "БелНИИС',
-};
-
-const DesigningChart = ({ graphSeries }: DesigningChartProps) => {
+const DesigningChart = ({
+	graphSeries,
+	regulatoryDocName,
+	calculationDocName,
+}: DesigningChartProps) => {
 	const chartRef = useRef<ChartJS<'line'>>(null);
+
+	const legendLabels: Record<string, string> = {
+		Laboratory: regulatoryDocName,
+		'R (lab)': calculationDocName,
+	};
 
 	// Собираем все частоты из всех графиков
 	const allFrequencies = Array.from(

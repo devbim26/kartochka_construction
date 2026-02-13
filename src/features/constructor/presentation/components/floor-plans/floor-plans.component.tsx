@@ -134,7 +134,6 @@ export const FloorPlans = memoize(() => {
 			)
 			.subscribe();
 	};
-
 	useEffect(() => {
 		if (!currentReportConstruction?.reportConstructionHeader.id) return;
 		handleGetConstructionByHeaderId(

@@ -489,6 +489,11 @@ export interface EnclosingStructuresThermalInsulationCalculationFlagsDto {
 	baseReportInfoFlags?: ThermalInsulationFloorReportInfoFlagsDto[] | null;
 }
 
+export interface FirstRequirementPlacementRoomDto {
+	firstPlacementRoom?: PlacementRoomDto;
+	secondRequirementRooms?: SecondRequirementPlacementRoomDto[] | null;
+}
+
 export interface FloorConstructionInfoDto {
 	/** @format uuid */
 	id?: string;
@@ -1155,8 +1160,8 @@ export interface ReportInfoShortDto {
 	category?: ReportCategory;
 	status?: ReportInfoStatus;
 	country?: CountryType;
-	regulatoryDocument?: NamedEntity;
-	calculationDocument?: NamedEntity;
+	calculationRequirementDocument?: CalculationRequirementDocumentDto;
+	regulatoryRequirementDocument?: RegulatoryRequirementDocumentDto;
 }
 
 export interface ReportInfoSingleConstructionDto {
@@ -1164,14 +1169,12 @@ export interface ReportInfoSingleConstructionDto {
 	id?: string;
 	singleConstructionInfos?: SingleConstructionInfoDto[] | null;
 	buildingName?: string | null;
-	calculationRequirements?: RequirementDto[] | null;
-	regulatoryRequirements?: RequirementDto[] | null;
+	calculationRequirementDocument?: CalculationRequirementDocumentDto;
+	regulatoryRequirementDocument?: RegulatoryRequirementDocumentDto;
 	category?: ReportCategory;
 	reportDocumentInfo?: ReportDocumentInfoDto;
 	status?: ReportInfoStatus;
 	purposeBuilding?: PurposeBuilding;
-	regulatoryDocument?: NamedEntity;
-	calculationDocument?: NamedEntity;
 }
 
 export enum ReportInfoStatus {
@@ -1241,6 +1244,12 @@ export interface RequirementDtoPaginatedList {
 	pageSize?: number;
 	hasPreviousPage?: boolean;
 	hasNextPage?: boolean;
+}
+
+export interface SecondRequirementPlacementRoomDto {
+	secondPlacementRoom?: PlacementRoomDto;
+	/** @format uuid */
+	requirementId?: string;
 }
 
 export interface SendSmsCommand {
@@ -1372,6 +1381,8 @@ export interface UpdateReportInfoBaseFieldsCommand {
 export interface UpdateReportInfoWithSingleConstructionCommand {
 	/** @format uuid */
 	reportInfoId?: string;
+	/** @format uuid */
+	requirementId?: string;
 	reportConstruction?: CreateReportConstructionDto;
 }
 
@@ -2468,11 +2479,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: GetPlacementRoomFromRequirementsQuery,
 			params: RequestParams = {},
 		) =>
-			this.request<void, any>({
+			this.request<FirstRequirementPlacementRoomDto[], any>({
 				path: `/api/PlacementRoomVariants/requirements`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 

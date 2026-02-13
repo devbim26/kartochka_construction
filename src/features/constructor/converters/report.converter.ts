@@ -52,8 +52,8 @@ export const convertToClientReportInfo = (data: ReportInfoShortDto): AboutBuildi
 		...data,
 		commonDescription: data.description,
 		name: data.buildingName || '',
-		calculationDocumentId: data.calculationDocument?.id || '',
-		regulatoryDocumentId: data.regulatoryDocument?.id || '',
+		calculationDocumentId: data.calculationRequirementDocument?.id || '',
+		regulatoryDocumentId: data.regulatoryRequirementDocument?.id || '',
 		region: convertToClientCountryData(data.country!) as string,
 		buildingPurpose: data.purposeBuilding as string,
 		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
@@ -69,14 +69,9 @@ export const convertToClientSingleReportInfoShort = (
 	data: ReportInfoSingleConstructionDto,
 ): ReportInfoShort => {
 	return {
-		...data,
 		reportInfoId: data.id,
 		commonDescription: '',
 		name: data.buildingName || '',
-		calculationRequirement: convertToClientRequirementTableData(
-			data.calculationRequirements![0],
-		),
-		regulatoryRequirement: convertToClientRequirementTableData(data.regulatoryRequirements![0]),
 		region: Country.Belarus,
 		buildingPurpose: data.purposeBuilding as string,
 		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
@@ -86,28 +81,37 @@ export const convertToClientSingleReportInfoShort = (
 		isConstruction: false,
 		isBim: true,
 		calculationDocument: {
-			id: data.calculationDocument!.id || '',
-			name: data.calculationDocument!.name! || '',
+			id: data.calculationRequirementDocument!.id || '',
+			name: data.calculationRequirementDocument!.shortName! || '',
 		},
 		regulatoryDocument: {
-			id: data.regulatoryDocument!.id! || '',
-			name: data.regulatoryDocument!.name! || '',
+			id: data.regulatoryRequirementDocument!.id! || '',
+			name: data.regulatoryRequirementDocument!.shortName! || '',
 		},
 	};
 };
 
 export const convertToClientReportInfoShort = (data: ReportInfoShortDto): ReportInfoShort => {
 	return {
-		...data,
 		commonDescription: data.description,
 		name: data.buildingName || '',
 		calculationDocument: {
-			id: data.calculationDocument!.id || '',
-			name: data.calculationDocument!.name! || '',
+			id: data.calculationRequirementDocument!.id || '',
+			name: data.calculationRequirementDocument!.shortName! || '',
+			fullName: data.calculationRequirementDocument?.fullName || '',
+			country:
+				(convertToClientCountryData(
+					data.calculationRequirementDocument!.country!,
+				) as string) || '',
 		},
 		regulatoryDocument: {
-			id: data.regulatoryDocument!.id! || '',
-			name: data.regulatoryDocument!.name! || '',
+			fullName: data.regulatoryRequirementDocument?.fullName || '',
+			country:
+				(convertToClientCountryData(
+					data.regulatoryRequirementDocument!.country!,
+				) as string) || '',
+			id: data.regulatoryRequirementDocument!.id! || '',
+			name: data.regulatoryRequirementDocument!.shortName! || '',
 		},
 		region: convertToClientCountryData(data.country!) as string,
 		buildingPurpose: data.purposeBuilding as string,
@@ -160,6 +164,9 @@ export const convertToClientFloorConstruction = (
 				id: data.reportConstructionHeader?.firstPlacementRoom?.id || '',
 				name: data.reportConstructionHeader?.firstPlacementRoom?.name || '',
 			},
+			requirement: !!data.reportConstructionHeader?.requirement
+				? convertToClientRequirementTableData(data.reportConstructionHeader!.requirement!)
+				: undefined,
 		},
 	};
 };
@@ -187,6 +194,7 @@ export const convertToClientSingleToFloorConstruction = (
 				id: headerFromSingle?.firstPlacementRoom?.id ?? '',
 				name: headerFromSingle?.firstPlacementRoom?.name ?? '',
 			},
+			requirement: convertToClientRequirementTableData(headerFromSingle!.requirement!),
 		},
 	};
 };

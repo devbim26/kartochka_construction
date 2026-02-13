@@ -3,6 +3,7 @@ import Loader from '@core/presentation/components/loaders/loader.component';
 import type {
 	AdditionalGraphParameters,
 	DesigningData,
+	FloorConstruction,
 	GraphDetailResponse,
 	ReportInfoShort,
 } from '@features';
@@ -18,10 +19,12 @@ import {
 } from '@features';
 import {
 	convertToClientReportInfoShort,
+	convertToClientSingleToFloorConstruction,
 	graphAdditionalValuesConverterToClient,
 	graphDotsConverterToClient,
 } from '@features/constructor/converters';
 import {
+	getReportConstruction,
 	getReportFloorById,
 	getReportSingleById,
 	graphAdditionalDetail,
@@ -34,8 +37,16 @@ import {
 	convertToServerConstructionsEditData,
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksEdit } from '@features/guidbooks/services';
-import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
-import { Guidebooks, RuConstructionTypesSelectValues } from '@features/guidbooks/types';
+import type {
+	ConstructionsEditData,
+	ConstructionTypeEnum,
+	Country,
+} from '@features/guidbooks/types';
+import {
+	Guidebooks,
+	RuConstructionTypesSelectValues,
+	RuCountryNamesMap,
+} from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -64,7 +75,7 @@ const DesigningScreen = () => {
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [refreshConstructionData, setRefreshConstructionData] = useState(0);
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
-
+	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 	const navigate = useAppNavigate();
 
 	const form = useForm<DesigningData>({
@@ -105,6 +116,26 @@ const DesigningScreen = () => {
 				tap((response) => {
 					if (response.status === 200) {
 						setCurrentReportInfo(convertToClientReportInfoShort(response.data));
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации об отчете');
+					return of(null);
+				}),
+			)
+			.subscribe(() => dispatch(stopLoading()));
+	};
+
+	const handleGetReportConstruction = (id: string) => {
+		dispatch(startLoading());
+		from(getReportConstruction(id))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setCurrentConstruction(
+							convertToClientSingleToFloorConstruction(response.data),
+						);
 					}
 				}),
 				catchError((error) => {
@@ -188,6 +219,11 @@ const DesigningScreen = () => {
 	}, [constructionHeaderId]);
 
 	useEffect(() => {
+		if (!constructionHeader?.id || graphData) return;
+		handleGetReportConstruction(constructionHeader!.id!);
+	}, [constructionHeader]);
+
+	useEffect(() => {
 		if (reportType === ReportCategory.Floor && reportId)
 			handleGetCurrentReportFloorInfo(reportId);
 		else if (reportType === ReportCategory.Single && reportId)
@@ -197,7 +233,9 @@ const DesigningScreen = () => {
 	useEffect(() => {
 		if (!!constructionHeader && !!currentReportInfo?.regulatoryRequirement) {
 			const rwValue = +(constructionHeader.RCalcs || 0);
-			const requiredRw = +(currentReportInfo.regulatoryRequirement.noizeIsolationIndex || 0);
+			const requiredRw = +(
+				currentConstruction?.reportConstructionHeader.requirement?.noizeIsolationIndex || 50
+			);
 			setIsRelevant(rwValue >= requiredRw);
 		}
 	}, [constructionHeader, currentReportInfo]);
@@ -451,14 +489,11 @@ const DesigningScreen = () => {
 					{currentReportInfo ? (
 						<>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.calculationRequirement?.standartShortName},
-								{currentReportInfo?.calculationRequirement?.standartFullName},
-								{/* {
+								{currentReportInfo?.calculationDocument?.fullName},
+								{currentReportInfo?.calculationDocument?.country &&
 									RuCountryNamesMap[
-										currentReportInfo?.calculationRequirement
-											.countryType as Country
-									]
-								} */}
+										currentReportInfo?.calculationDocument?.country as Country
+									]}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
 								Rw={constructionHeader?.RCalcs}
@@ -467,17 +502,16 @@ const DesigningScreen = () => {
 								{isRelevant ? 'Соответствует' : 'Не соответствует'}
 							</p>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.regulatoryRequirement?.standartShortName},
-								{currentReportInfo?.regulatoryRequirement?.standartFullName},
-								{/* {
+								{currentReportInfo?.regulatoryDocument?.fullName},
+								{currentReportInfo?.regulatoryDocument?.country &&
 									RuCountryNamesMap[
-										currentReportInfo?.regulatoryRequirement
-											.countryType as Country
-									]
-								} */}
+										currentReportInfo?.regulatoryDocument?.country as Country
+									]}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
-								Rw⩾{currentReportInfo?.regulatoryRequirement?.noizeIsolationIndex}
+								Rw⩾
+								{currentConstruction?.reportConstructionHeader.requirement
+									?.noizeIsolationIndex || 50}
 							</p>
 						</>
 					) : (
@@ -486,7 +520,11 @@ const DesigningScreen = () => {
 						</div>
 					)}
 				</div>
-				<DesigningGraph graphData={graphData} />
+				<DesigningGraph
+					graphData={graphData}
+					regulatoryDocName={currentReportInfo?.regulatoryDocument?.name || ''}
+					calculationDocName={currentReportInfo?.calculationDocument?.name || ''}
+				/>
 				<div className="w-[300px]"></div>
 				<GraphDetailTable
 					graphData={graphData}

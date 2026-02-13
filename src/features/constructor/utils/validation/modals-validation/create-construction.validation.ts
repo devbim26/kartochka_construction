@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const CreateConstructionSchema = z.object({
 	id: z.string().optional(),
+	requirementId: z.string().optional(),
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	constructionType: z.string().min(1, 'Поле обязательно для заполнения'),
 	construction: z.string().min(1, 'Поле обязательно для заполнения'),

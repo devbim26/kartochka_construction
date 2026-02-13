@@ -9,7 +9,7 @@ import {
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import {
-	convertToClientReportInfo,
+	convertToClientSingleReportInfoShort,
 	convertToUpdateReportCommand,
 } from '@features/constructor/converters';
 import {
@@ -27,14 +27,8 @@ import type { ReportInfoShort } from '@features/constructor/utils';
 import { CreateConstructionConfig } from '@features/constructor/utils';
 import { convertToClientConstructionsAddData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
-import type {
-	BuildingType,
-	CategoryClass,
-	ConstructionClass,
-	ConstructionsAddData,
-} from '@features/guidbooks/types';
+import type { ConstructionsAddData } from '@features/guidbooks/types';
 import { Guidebooks, RuConstructionTypeSelectValues } from '@features/guidbooks/types';
-import type { PlacementRoomResponse } from '@features/guidbooks/types/requirements/placementRoom.types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
@@ -58,6 +52,14 @@ interface CreateConstructionFormProps {
 	floorId?: string;
 }
 
+interface RoomRequirementMap {
+	[firstRoomId: string]: Array<{
+		secondRoomId: string;
+		secondRoomName: string;
+		requirementId: string;
+	}>;
+}
+
 export const CreateConstructionForm = memoize(
 	forwardRef<CreateConstructionFormHandle, CreateConstructionFormProps>(
 		({ onSuccess, x, y, page, floorId }, ref) => {
@@ -69,10 +71,23 @@ export const CreateConstructionForm = memoize(
 			const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>(
 				[],
 			);
-
 			const [reportInfoData, setReportInfoData] = useState<ReportInfoShort>();
 
-			const [length, width, construction, area, name, id, constructionType] = watch([
+			const [roomRequirementsMap, setRoomRequirementsMap] = useState<RoomRequirementMap>({});
+			const [secondRoomOptions, setSecondRoomOptions] = useState<
+				Array<{ label: string; value: string }>
+			>([]);
+
+			const [
+				length,
+				width,
+				construction,
+				area,
+				name,
+				id,
+				constructionType,
+				firstPlacementRoom,
+			] = watch([
 				'length',
 				'width',
 				'construction',
@@ -80,7 +95,9 @@ export const CreateConstructionForm = memoize(
 				'name',
 				'id',
 				'constructionType',
+				'firstPlacementRoom', // NEW: отслеживаем выбор первой комнаты
 			]);
+
 			const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>(
 				[],
 			);
@@ -90,8 +107,65 @@ export const CreateConstructionForm = memoize(
 			const layerId = search.get('layerId');
 
 			const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
-
 			const dispatch = useAppDispatch();
+
+			const processRoomRequirements = (roomRequirementsData: any[]) => {
+				const map: RoomRequirementMap = {};
+
+				roomRequirementsData.forEach((item) => {
+					const firstRoomId = item.firstPlacementRoom.id;
+					const firstRoomName = item.firstPlacementRoom.name;
+
+					item.secondRequirementRooms.forEach((requirement: any) => {
+						const secondRoomId = requirement.secondPlacementRoom.id;
+						const secondRoomName = requirement.secondPlacementRoom.name;
+						const requirementId = requirement.requirementId;
+
+						if (!map[firstRoomId]) {
+							map[firstRoomId] = [];
+						}
+
+						map[firstRoomId].push({
+							secondRoomId,
+							secondRoomName,
+							requirementId,
+						});
+					});
+				});
+
+				setRoomRequirementsMap(map);
+			};
+
+			useEffect(() => {
+				if (firstPlacementRoom && roomRequirementsMap[firstPlacementRoom]) {
+					const availableRooms = roomRequirementsMap[firstPlacementRoom];
+					const options = availableRooms.map((room) => ({
+						label: room.secondRoomName,
+						value: room.secondRoomId,
+					}));
+					setSecondRoomOptions(options);
+
+					setValue('secondPlacementRoom', '');
+					setValue('requirementId', '');
+				} else {
+					setSecondRoomOptions([]);
+					setValue('secondPlacementRoom', '');
+					setValue('requirementId', '');
+				}
+			}, [firstPlacementRoom, roomRequirementsMap, setValue]);
+
+			useEffect(() => {
+				const secondRoomId = watch('secondPlacementRoom');
+				if (firstPlacementRoom && secondRoomId && roomRequirementsMap[firstPlacementRoom]) {
+					const requirement = roomRequirementsMap[firstPlacementRoom].find(
+						(room) => room.secondRoomId === secondRoomId,
+					);
+
+					if (requirement) {
+						setValue('requirementId', requirement.requirementId);
+					}
+				}
+			}, [watch('secondPlacementRoom'), firstPlacementRoom, roomRequirementsMap, setValue]);
 
 			useImperativeHandle(ref, () => ({
 				submit: () => {
@@ -121,9 +195,7 @@ export const CreateConstructionForm = memoize(
 					)
 					.subscribe((response) => {
 						if (response?.status === 200) {
-							console.log(response);
-							toast.info(response.data.regulatoryDocument?.name);
-							const data = convertToClientReportInfo(response.data);
+							const data = convertToClientSingleReportInfoShort(response.data);
 							if (data) setReportInfoData(data);
 						}
 					});
@@ -131,18 +203,16 @@ export const CreateConstructionForm = memoize(
 
 			useEffect(() => {
 				if (reportId) handleGetReport(reportId);
-				console.log(123);
 			}, [reportId]);
 
 			useEffect(() => {
 				if (!!reportInfoData && constructionType) {
-					console.log(123);
 					from(
 						getConstructionRooms({
-							class: reportInfoData.comfortClass as CategoryClass,
+							// class: reportInfoData.comfortClass as CategoryClass,
 							regulatoryDocumentId: reportInfoData.regulatoryDocument?.id,
-							buildingType: reportInfoData.buildingType as BuildingType,
-							constructionClass: constructionType as ConstructionClass,
+							// buildingType: reportInfoData.buildingType as BuildingType,
+							// constructionClass: constructionType as ConstructionClass,
 						}),
 					)
 						.pipe(
@@ -155,14 +225,24 @@ export const CreateConstructionForm = memoize(
 						)
 						.subscribe((response) => {
 							if (response?.status === 200) {
-								const variants =
-									convertToSelectValues(
-										(response.data as any as PlacementRoomResponse[]).map(
-											(r) => ({
-												...r.placementRoom,
-											}),
-										),
-									) || [];
+								const roomsData = response.data as any;
+
+								// NEW: Обрабатываем полученные данные о комнатах
+								if (Array.isArray(roomsData)) {
+									processRoomRequirements(roomsData);
+								}
+
+								// Уникальные комнаты для первого селекта
+								const uniqueRooms = Array.from(
+									new Map(
+										roomsData.map((item: any) => [
+											item.firstPlacementRoom.id,
+											item.firstPlacementRoom,
+										]),
+									).values(),
+								);
+
+								const variants = convertToSelectValues(uniqueRooms as any) || [];
 								setRoomOptions(variants);
 							}
 						});
@@ -203,6 +283,7 @@ export const CreateConstructionForm = memoize(
 									'floorInfo.floorNumber': '1',
 									'floorInfo.reportConstructionHeader.name': name,
 									reportInfoId: reportId,
+									requirementId: getValues('requirementId'),
 								},
 							})
 						: updateReportSingle({ data: command }),
@@ -380,6 +461,12 @@ export const CreateConstructionForm = memoize(
 												placeholder="Выберите помещение"
 												buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 												wrapperClassname="shadow-none ring-input-border-primary"
+												onChange={(value) => {
+													field.onChange(value);
+													// NEW: Дополнительная логика при изменении первой комнаты
+													setValue('secondPlacementRoom', '');
+													setValue('requirementId', '');
+												}}
 											/>
 										)}
 									/>
@@ -388,17 +475,21 @@ export const CreateConstructionForm = memoize(
 										name="secondPlacementRoom"
 										render={({ field }) => (
 											<Select
-												options={roomOptions}
+												// NEW: Используем отфильтрованные опции
+												options={secondRoomOptions}
 												{...field}
 												value={field.value || ''}
 												placeholder="Выберите помещение"
 												buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 												wrapperClassname="shadow-none ring-input-border-primary"
+												isDisabled={!firstPlacementRoom} // NEW: Блокируем если не выбрана первая комната
 											/>
 										)}
 									/>
 								</div>
 							</div>
+							{/* NEW: Скрытое поле для requirementId */}
+							<input type="hidden" {...register('requirementId')} />
 							<Input
 								{...register('width')}
 								labelClassName={twMerge(

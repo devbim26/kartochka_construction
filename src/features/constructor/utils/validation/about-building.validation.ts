@@ -36,11 +36,22 @@ export const ReportInfoShortScheme = z.object({
 	comfortClass: z.string().min(1, 'Поле обязательно для заполнения'),
 	calculationRequirement: RequirementsSchema.optional(),
 	regulatoryRequirement: RequirementsSchema.optional(),
+
 	regulatoryDocument: z
-		.object({ id: z.string().optional(), name: z.string().optional() })
+		.object({
+			id: z.string().optional(),
+			name: z.string().optional(),
+			country: z.string().optional(),
+			fullName: z.string().optional(),
+		})
 		.optional(),
 	calculationDocument: z
-		.object({ id: z.string().optional(), name: z.string().optional() })
+		.object({
+			id: z.string().optional(),
+			name: z.string().optional(),
+			country: z.string().optional(),
+			fullName: z.string().optional(),
+		})
 		.optional(),
 	isFloorPlan: z.boolean(),
 	isConstruction: z.boolean(),

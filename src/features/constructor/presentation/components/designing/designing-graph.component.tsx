@@ -3,9 +3,11 @@ import DesigningChart from './designing-chart.component';
 
 interface GraphProps {
 	graphData: GraphDetailResponse[] | null;
+	regulatoryDocName: string;
+	calculationDocName: string;
 }
 
-const DesigningGraph = ({ graphData }: GraphProps) => {
+const DesigningGraph = ({ graphData, regulatoryDocName, calculationDocName }: GraphProps) => {
 	const labDots = graphData?.find((g) => g.name === 'abcd')?.namedDots ?? [];
 	const deviationDots = graphData?.find((g) => g.name === 'deviationDotsList')?.namedDots ?? [];
 	const laboratoryDots = graphData?.find((g) => g.name === 'LaboratoryDots')?.namedDots ?? [];
@@ -66,7 +68,13 @@ const DesigningGraph = ({ graphData }: GraphProps) => {
 				},
 			];
 
-	return <DesigningChart graphSeries={graphSeries} />;
+	return (
+		<DesigningChart
+			graphSeries={graphSeries}
+			regulatoryDocName={regulatoryDocName}
+			calculationDocName={calculationDocName}
+		/>
+	);
 };
 
 export default DesigningGraph;

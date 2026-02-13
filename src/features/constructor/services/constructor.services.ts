@@ -49,6 +49,7 @@ type UpdateFloorReportProps = {
 	data: {
 		reportFloorInfoId?: string;
 		reportInfoId?: string;
+		requirementId?: string;
 		floorConstructionInfoId?: string;
 		'floorInfo.reportConstructionHeader.id'?: string;
 		'floorInfo.reportConstructionHeader.constructionHeaderId'?: string;
@@ -110,6 +111,10 @@ export const getFloorConstructionById = async (id: string) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.reportInfoGetReportFloorInfoRenewDetail(id),
 	);
+};
+
+export const getReportConstruction = async (id: string) => {
+	return await withConstructorLoader(() => fetchApi.api.reportInfoReportConstructionDetail(id));
 };
 
 export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {

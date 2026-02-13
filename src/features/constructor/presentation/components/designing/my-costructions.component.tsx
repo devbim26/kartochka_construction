@@ -1,13 +1,15 @@
 import { Button, ChevronIcon, useAppDispatch, useAppSelector } from '@core';
-import type { GraphDetailResponse, ReportInfoShort } from '@features';
+import type { FloorConstruction, GraphDetailResponse, ReportInfoShort } from '@features';
 import { formatMaterial, ReportCategory, startLoading, stopLoading } from '@features';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
 import {
 	convertToClientReportInfoShort,
+	convertToClientSingleToFloorConstruction,
 	graphDotsConverterToClient,
 } from '@features/constructor/converters';
 import {
+	getReportConstruction,
 	getReportFloorById,
 	getReportSingleById,
 	graphDetail,
@@ -18,8 +20,8 @@ import {
 } from '@features/guidbooks/converters';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import type { ConstructionsEditData, Issuer } from '@features/guidbooks/types';
-import { Guidebooks } from '@features/guidbooks/types';
+import type { ConstructionsEditData, Country, Issuer } from '@features/guidbooks/types';
+import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
 
 import type { IssuerDto } from '@api-gen';
 import { useEffect, useState } from 'react';
@@ -38,6 +40,7 @@ const MyConstructions = () => {
 		null,
 	);
 	const [issuer, setIssuer] = useState<Issuer | null>(null);
+	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const reportType = search.get('reportType');
@@ -45,6 +48,31 @@ const MyConstructions = () => {
 
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const dispatch = useAppDispatch();
+
+	const handleGetReportConstruction = (id: string) => {
+		dispatch(startLoading());
+		from(getReportConstruction(id))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						setCurrentConstruction(
+							convertToClientSingleToFloorConstruction(response.data),
+						);
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации об отчете');
+					return of(null);
+				}),
+			)
+			.subscribe(() => dispatch(stopLoading()));
+	};
+
+	useEffect(() => {
+		if (!constructionHeader?.id || graphData) return;
+		handleGetReportConstruction(constructionHeader!.id!);
+	}, [constructionHeader]);
 
 	const handleGetCurrentReportFloorInfo = (id: string) => {
 		dispatch(startLoading());
@@ -241,33 +269,29 @@ const MyConstructions = () => {
 					{currentReportInfo ? (
 						<>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.calculationRequirement?.standartShortName},
-								{currentReportInfo?.calculationRequirement?.standartFullName},
-								{/* {
+								{currentReportInfo?.calculationDocument?.fullName},
+								{currentReportInfo?.calculationDocument?.country &&
 									RuCountryNamesMap[
-										currentReportInfo?.calculationRequirement
-											.countryType as Country
-									]
-								} */}
+										currentReportInfo?.calculationDocument?.country as Country
+									]}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
 								Rw={constructionHeader?.RCalcs}
 							</p>
 							<p className={isRelevant ? 'text-green-600' : 'text-error'}>
-								{relevantText}
+								{isRelevant ? 'Соответствует' : 'Не соответствует'}
 							</p>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.regulatoryRequirement?.standartShortName},
-								{currentReportInfo?.regulatoryRequirement?.standartFullName},
-								{/* {
+								{currentReportInfo?.regulatoryDocument?.fullName},
+								{currentReportInfo?.regulatoryDocument?.country &&
 									RuCountryNamesMap[
-										currentReportInfo?.regulatoryRequirement
-											.countryType as Country
-									]
-								} */}
+										currentReportInfo?.regulatoryDocument?.country as Country
+									]}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
-								Rw⩾{currentReportInfo?.regulatoryRequirement?.noizeIsolationIndex}
+								Rw⩾
+								{currentConstruction?.reportConstructionHeader.requirement
+									?.noizeIsolationIndex || 50}
 							</p>
 						</>
 					) : (
@@ -276,7 +300,11 @@ const MyConstructions = () => {
 						</div>
 					)}
 				</div>
-				<DesigningGraph graphData={graphData} />
+				<DesigningGraph
+					graphData={graphData}
+					regulatoryDocName={currentReportInfo?.regulatoryDocument?.name || ''}
+					calculationDocName={currentReportInfo?.calculationDocument?.name || ''}
+				/>
 			</div>
 		</div>
 	);
