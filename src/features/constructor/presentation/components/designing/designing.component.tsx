@@ -129,6 +129,7 @@ const DesigningScreen = () => {
 
 	const handleGetReportConstruction = (id: string) => {
 		dispatch(startLoading());
+		console.log(123);
 		from(getReportConstruction(id))
 			.pipe(
 				tap((response) => {
@@ -510,8 +511,10 @@ const DesigningScreen = () => {
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
 								Rw⩾
-								{currentConstruction?.reportConstructionHeader.requirement
-									?.noizeIsolationIndex || 50}
+								{
+									currentConstruction?.reportConstructionHeader.requirement
+										?.noizeIsolationIndex
+								}
 							</p>
 						</>
 					) : (

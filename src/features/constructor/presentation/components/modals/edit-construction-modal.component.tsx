@@ -1,7 +1,7 @@
 import type { ModalProps } from '@core';
 import { Button, Modal } from '@core';
 import type { FloorConstruction } from '@features/constructor/types';
-import type { ConstructionsEditData } from '@features/guidbooks/types';
+import { ConstructionClass, type ConstructionsEditData } from '@features/guidbooks/types';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { twJoin } from 'tailwind-merge';
@@ -37,9 +37,12 @@ export const EditConstructionModal = ({
 		onConfirm();
 	};
 
+	console.log(currentReportFloorInfo);
+	console.log(currentConstructionHeader);
 	useEffect(() => {
 		if (currentReportFloorInfo && currentConstructionHeader) {
 			formRef.current?.reset({
+				constructionType: ConstructionClass.Floor,
 				id: reportFloorInfoId,
 				length: String(currentReportFloorInfo.reportConstructionHeader.length),
 				width: String(currentReportFloorInfo.reportConstructionHeader.width),
