@@ -27,7 +27,12 @@ import type { ReportInfoShort } from '@features/constructor/utils';
 import { CreateConstructionConfig } from '@features/constructor/utils';
 import { convertToClientConstructionsAddData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
-import type { ConstructionsAddData } from '@features/guidbooks/types';
+import type {
+	BuildingType,
+	CategoryClass,
+	ConstructionClass,
+	ConstructionsAddData,
+} from '@features/guidbooks/types';
 import { Guidebooks, RuConstructionTypeSelectValues } from '@features/guidbooks/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -214,10 +219,10 @@ export const CreateConstructionForm = memoize(
 				if (!!reportInfoData && constructionType) {
 					from(
 						getConstructionRooms({
-							// class: reportInfoData.comfortClass as CategoryClass,
+							class: reportInfoData.comfortClass as CategoryClass,
 							regulatoryDocumentId: reportInfoData.regulatoryDocument?.id,
-							// buildingType: reportInfoData.buildingType as BuildingType,
-							// constructionClass: constructionType as ConstructionClass,
+							buildingType: reportInfoData.buildingType as BuildingType,
+							constructionClass: constructionType as ConstructionClass,
 						}),
 					)
 						.pipe(
