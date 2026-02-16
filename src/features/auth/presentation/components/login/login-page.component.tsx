@@ -80,7 +80,7 @@ const LoginPage = () => {
 							error={formState.errors.password?.message}
 						/> */}
 						<a
-							href={`${API_URL}test-auth/devbim25@gmail.com`}
+							href={`${API_URL}test-auth/anavarich29@gmail.com`}
 							//href={`/api/Auth/login-google`}
 							className="flex h-[50px] w-full items-center gap-[10px] rounded-lg border-2 border-primary bg-primary px-[10px] font-montserrat text-[17px] text-white hover:opacity-80"
 						>

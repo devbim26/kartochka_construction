@@ -139,6 +139,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 															reportType: search.get('reportType')!,
 															constructionHeaderId:
 																info.row.original.constructionId,
+															reportFloorInfoId: reportFloorInfoId!,
 														},
 													)
 												}

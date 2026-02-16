@@ -18,13 +18,14 @@ import {
 	stopLoading,
 } from '@features';
 import {
+	convertToClientFloorConstruction,
 	convertToClientReportInfoShort,
 	convertToClientSingleToFloorConstruction,
 	graphAdditionalValuesConverterToClient,
 	graphDotsConverterToClient,
 } from '@features/constructor/converters';
 import {
-	getReportConstruction,
+	getFloorConstructionById,
 	getReportFloorById,
 	getReportSingleById,
 	graphAdditionalDetail,
@@ -52,7 +53,7 @@ import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from, of, tap } from 'rxjs';
+import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import DesigningGraph from './designing-graph.component';
@@ -77,7 +78,7 @@ const DesigningScreen = () => {
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 	const navigate = useAppNavigate();
-
+	const reportFloorInfoId = search.get('reportFloorInfoId');
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
 		defaultValues: DesigningConfig.defaultValues,
@@ -116,27 +117,6 @@ const DesigningScreen = () => {
 				tap((response) => {
 					if (response.status === 200) {
 						setCurrentReportInfo(convertToClientReportInfoShort(response.data));
-					}
-				}),
-				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации об отчете');
-					return of(null);
-				}),
-			)
-			.subscribe(() => dispatch(stopLoading()));
-	};
-
-	const handleGetReportConstruction = (id: string) => {
-		dispatch(startLoading());
-		console.log(123);
-		from(getReportConstruction(id))
-			.pipe(
-				tap((response) => {
-					if (response.status === 200) {
-						setCurrentConstruction(
-							convertToClientSingleToFloorConstruction(response.data),
-						);
 					}
 				}),
 				catchError((error) => {
@@ -208,6 +188,66 @@ const DesigningScreen = () => {
 			});
 	};
 
+	const handleGetCurrentConstructionReportHeader = (id: string) => {
+		dispatch(startLoading());
+		from(getFloorConstructionById(id))
+			.pipe(
+				tap((response) => {
+					if (response?.data && response.status === 200) {
+						setCurrentConstruction(convertToClientFloorConstruction(response.data));
+					}
+					dispatch(stopLoading());
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации о конструкции');
+					dispatch(stopLoading());
+					return of(null);
+				}),
+			)
+			.subscribe();
+	};
+
+	const handleGetSingleConstruction = (id: string) => {
+		dispatch(startLoading());
+
+		from(getReportSingleById({ id }))
+			.pipe(
+				switchMap((singleResponse) => {
+					if (singleResponse.status !== 200 || !singleResponse.data) {
+						throw new Error('Ошибка при получении конструкции');
+					}
+
+					setCurrentConstruction(
+						convertToClientSingleToFloorConstruction(singleResponse.data),
+					);
+
+					return of(singleResponse.data);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || 'Ошибка при загрузке');
+					} else {
+						toast.error((error as Error).message);
+					}
+					return of(null);
+				}),
+				finalize(() => {
+					dispatch(stopLoading());
+				}),
+			)
+			.subscribe();
+	};
+
+	useEffect(() => {
+		if (reportType === ReportCategory.Single && reportId) {
+			handleGetSingleConstruction(reportId);
+		} else {
+			if (!reportFloorInfoId) return;
+			handleGetCurrentConstructionReportHeader(reportFloorInfoId);
+		}
+	}, [search]);
+
 	useEffect(() => {
 		if (!reportId || !constructionHeaderId) return;
 		handleGetConstructionByHeaderId(constructionHeaderId);
@@ -218,11 +258,6 @@ const DesigningScreen = () => {
 		handleGetGraphDetail(constructionHeaderId);
 		handleGetGraphAdditionalDetail(constructionHeaderId);
 	}, [constructionHeaderId]);
-
-	useEffect(() => {
-		if (!constructionHeader?.id || graphData) return;
-		handleGetReportConstruction(constructionHeader!.id!);
-	}, [constructionHeader]);
 
 	useEffect(() => {
 		if (reportType === ReportCategory.Floor && reportId)
@@ -525,7 +560,7 @@ const DesigningScreen = () => {
 				</div>
 				<DesigningGraph
 					graphData={graphData}
-					regulatoryDocName={currentReportInfo?.regulatoryDocument?.name || ''}
+					regulatoryDocName={constructionHeader?.laboratoryTestSource || ''}
 					calculationDocName={currentReportInfo?.calculationDocument?.name || ''}
 				/>
 				<div className="w-[300px]"></div>

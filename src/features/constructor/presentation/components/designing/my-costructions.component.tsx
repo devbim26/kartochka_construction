@@ -4,11 +4,13 @@ import { formatMaterial, ReportCategory, startLoading, stopLoading } from '@feat
 
 import Loader from '@core/presentation/components/loaders/loader.component';
 import {
+	convertToClientFloorConstruction,
 	convertToClientReportInfoShort,
 	convertToClientSingleToFloorConstruction,
 	graphDotsConverterToClient,
 } from '@features/constructor/converters';
 import {
+	getFloorConstructionById,
 	getReportConstruction,
 	getReportFloorById,
 	getReportSingleById,
@@ -24,9 +26,10 @@ import type { ConstructionsEditData, Country, Issuer } from '@features/guidbooks
 import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
 
 import type { IssuerDto } from '@api-gen';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from, of, tap } from 'rxjs';
+import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import DesigningGraph from './designing-graph.component';
 import { DesigningHeader } from './designing-header.component';
@@ -42,12 +45,74 @@ const MyConstructions = () => {
 	const [issuer, setIssuer] = useState<Issuer | null>(null);
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 
+	const reportFloorInfoId = search.get('reportFloorInfoId');
+
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const reportType = search.get('reportType');
 	const constructionHeaderId = search.get('constructionHeaderId');
 
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const dispatch = useAppDispatch();
+
+	const handleGetCurrentConstructionReportHeader = (id: string) => {
+		dispatch(startLoading());
+		from(getFloorConstructionById(id))
+			.pipe(
+				tap((response) => {
+					if (response?.data && response.status === 200) {
+						setCurrentConstruction(convertToClientFloorConstruction(response.data));
+					}
+					dispatch(stopLoading());
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Ошибка при получении информации о конструкции');
+					dispatch(stopLoading());
+					return of(null);
+				}),
+			)
+			.subscribe();
+	};
+
+	const handleGetSingleConstruction = (id: string) => {
+		dispatch(startLoading());
+
+		from(getReportSingleById({ id }))
+			.pipe(
+				switchMap((singleResponse) => {
+					if (singleResponse.status !== 200 || !singleResponse.data) {
+						throw new Error('Ошибка при получении конструкции');
+					}
+
+					setCurrentConstruction(
+						convertToClientSingleToFloorConstruction(singleResponse.data),
+					);
+
+					return of(singleResponse.data);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || 'Ошибка при загрузке');
+					} else {
+						toast.error((error as Error).message);
+					}
+					return of(null);
+				}),
+				finalize(() => {
+					dispatch(stopLoading());
+				}),
+			)
+			.subscribe();
+	};
+
+	useEffect(() => {
+		if (reportType === ReportCategory.Single && reportId) {
+			handleGetSingleConstruction(reportId);
+		} else {
+			if (!reportFloorInfoId) return;
+			handleGetCurrentConstructionReportHeader(reportFloorInfoId);
+		}
+	}, [search]);
 
 	const handleGetReportConstruction = (id: string) => {
 		dispatch(startLoading());

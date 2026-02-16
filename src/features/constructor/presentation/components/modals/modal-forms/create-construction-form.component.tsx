@@ -102,6 +102,7 @@ export const CreateConstructionForm = memoize(
 				[],
 			);
 			const [search] = useSearchParams();
+			const editMode = search.get('editMode');
 			const reportId = search.get('reportId');
 			const reportType = search.get('reportType');
 			const layerId = search.get('layerId');
@@ -145,12 +146,16 @@ export const CreateConstructionForm = memoize(
 					}));
 					setSecondRoomOptions(options);
 
-					setValue('secondPlacementRoom', '');
-					setValue('requirementId', '');
+					if (!editMode) {
+						setValue('secondPlacementRoom', '');
+						setValue('requirementId', '');
+					}
 				} else {
-					setSecondRoomOptions([]);
-					setValue('secondPlacementRoom', '');
-					setValue('requirementId', '');
+					if (!editMode) {
+						setSecondRoomOptions([]);
+						setValue('secondPlacementRoom', '');
+						setValue('requirementId', '');
+					}
 				}
 			}, [firstPlacementRoom, roomRequirementsMap, setValue]);
 

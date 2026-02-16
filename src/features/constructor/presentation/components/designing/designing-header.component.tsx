@@ -33,6 +33,7 @@ export const DesigningHeader = () => {
 								reportId: search.get('reportId')!,
 								reportType: search.get('reportType')!,
 								constructionHeaderId: search.get('constructionHeaderId')!,
+								reportFloorInfoId: search.get('reportFloorInfoId')!,
 							},
 						)
 					}
@@ -57,6 +58,7 @@ export const DesigningHeader = () => {
 								reportId: search.get('reportId')!,
 								reportType: search.get('reportType')!,
 								constructionHeaderId: search.get('constructionHeaderId')!,
+								reportFloorInfoId: search.get('reportFloorInfoId')!,
 							},
 						)
 					}

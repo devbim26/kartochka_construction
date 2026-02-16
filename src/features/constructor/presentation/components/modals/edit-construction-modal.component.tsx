@@ -1,7 +1,7 @@
 import type { ModalProps } from '@core';
 import { Button, Modal } from '@core';
 import type { FloorConstruction } from '@features/constructor/types';
-import { ConstructionClass, type ConstructionsEditData } from '@features/guidbooks/types';
+import { type ConstructionsEditData } from '@features/guidbooks/types';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { twJoin } from 'tailwind-merge';
@@ -37,12 +37,11 @@ export const EditConstructionModal = ({
 		onConfirm();
 	};
 
-	console.log(currentReportFloorInfo);
-	console.log(currentConstructionHeader);
 	useEffect(() => {
 		if (currentReportFloorInfo && currentConstructionHeader) {
 			formRef.current?.reset({
-				constructionType: ConstructionClass.Floor,
+				constructionType:
+					currentReportFloorInfo.reportConstructionHeader.requirement?.constructionType,
 				id: reportFloorInfoId,
 				length: String(currentReportFloorInfo.reportConstructionHeader.length),
 				width: String(currentReportFloorInfo.reportConstructionHeader.width),
@@ -52,6 +51,7 @@ export const EditConstructionModal = ({
 					currentReportFloorInfo.reportConstructionHeader.firstPlacemetnRoom.id,
 				secondPlacementRoom:
 					currentReportFloorInfo.reportConstructionHeader.secondPlacementRoom.id,
+				area: String(currentReportFloorInfo.reportConstructionHeader.square),
 			});
 		}
 	}, [currentReportFloorInfo, currentConstructionHeader]);
