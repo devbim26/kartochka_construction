@@ -5,6 +5,7 @@ export const MaterialsAddAndEditSchema = z.object({
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	shortName: z.string().min(1, 'Поле обязательно для заполнения'),
+	editFile: z.boolean(),
 	density: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')

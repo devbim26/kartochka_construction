@@ -27,6 +27,7 @@ export const convertToServerMaterialsFilterData = (
 
 export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddAndEditData => ({
 	id: data.id ?? '',
+	editFile: false,
 	name: data.name ?? '',
 	description: data.description ?? '',
 	shortName: data.shortName ?? '',
@@ -75,6 +76,7 @@ export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): 
 	fb: +data.fb || null,
 	relativeCompression: +data.relativeCompression || null,
 	edin: +data.edin || null,
+	editFile: data.editFile,
 });
 
 export const convertToServerMaterialsEditData = (data: MaterialsAddAndEditData): any => ({

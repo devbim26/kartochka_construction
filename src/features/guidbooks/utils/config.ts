@@ -31,6 +31,7 @@ export const MaterialsAddAndEditConfig: EntityConfig = {
 		youngModulus: '',
 		damping: '',
 		solid: '',
+		editFile: false,
 	},
 };
 
