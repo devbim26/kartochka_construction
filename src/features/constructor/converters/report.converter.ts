@@ -14,14 +14,13 @@ import {
 	convertToClientConstructionTypeEnumData,
 	convertToClientRequirementTableData,
 } from '@features/guidbooks/converters';
-import type { AlternateConstruction, ConstructionsEditData } from '@features/guidbooks/types';
-import {
+import type {
+	AlternateConstruction,
 	BuildingType,
 	CategoryClass,
-	ConstructionTypeEnum,
-	Country,
-	RuConstructionTypesMap,
+	ConstructionsEditData,
 } from '@features/guidbooks/types';
+import { ConstructionTypeEnum, Country, RuConstructionTypesMap } from '@features/guidbooks/types';
 
 import type {
 	AboutBuildingData,
@@ -44,6 +43,8 @@ export const convertToCreateReportInfoCommand = (
 		regulatoryDocumentId: data.regulatoryDocumentId ? data.regulatoryDocumentId : '',
 		category: data.isFloorPlan ? ReportCategory.Floor : ReportCategory.Single,
 		country: data.region as CountryType,
+		class: data.comfortClass as CategoryClass,
+		buildingType: data.buildingType as BuildingType,
 	};
 };
 
@@ -56,8 +57,8 @@ export const convertToClientReportInfo = (data: ReportInfoShortDto): AboutBuildi
 		regulatoryDocumentId: data.regulatoryRequirementDocument?.id || '',
 		region: convertToClientCountryData(data.country!) as string,
 		buildingPurpose: data.purposeBuilding as string,
-		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
-		comfortClass: CategoryClass.A, //convertToClientCategoryClassData(data.requirements![0]!.class!), не хватает в шорте
+		buildingType: data.buildingType as BuildingType,
+		comfortClass: data.class as CategoryClass,
 		maxHeight: '1',
 		isFloorPlan: true,
 		isConstruction: false,
@@ -74,8 +75,8 @@ export const convertToClientSingleReportInfoShort = (
 		name: data.buildingName || '',
 		region: Country.Belarus,
 		buildingPurpose: data.purposeBuilding as string,
-		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
-		comfortClass: CategoryClass.A, //convertToClientCategoryClassData(data.requirements![0]!.class!), не хватает в шорте
+		buildingType: data.buildingType as BuildingType,
+		comfortClass: data.class as CategoryClass,
 		maxHeight: '0',
 		isFloorPlan: true,
 		isConstruction: false,
@@ -115,8 +116,8 @@ export const convertToClientReportInfoShort = (data: ReportInfoShortDto): Report
 		},
 		region: convertToClientCountryData(data.country!) as string,
 		buildingPurpose: data.purposeBuilding as string,
-		buildingType: BuildingType.AdministrativeBuildings, //convertToClientBuildingTypeData(data.requirements![0].buildingType!), не хватает в шорте
-		comfortClass: CategoryClass.A, //convertToClientCategoryClassData(data.requirements![0]!.class!), не хватает в шорте
+		buildingType: data.buildingType as BuildingType,
+		comfortClass: data.class as CategoryClass,
 		maxHeight: '0',
 		isFloorPlan: true,
 		isConstruction: false,

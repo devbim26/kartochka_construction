@@ -1159,6 +1159,8 @@ export interface ReportInfoShortDto {
 	description?: string | null;
 	category?: ReportCategory;
 	status?: ReportInfoStatus;
+	class?: CategoryClass;
+	buildingType?: BuildingType;
 	country?: CountryType;
 	calculationRequirementDocument?: CalculationRequirementDocumentDto;
 	regulatoryRequirementDocument?: RegulatoryRequirementDocumentDto;
@@ -1174,6 +1176,8 @@ export interface ReportInfoSingleConstructionDto {
 	category?: ReportCategory;
 	reportDocumentInfo?: ReportDocumentInfoDto;
 	status?: ReportInfoStatus;
+	buildingType?: BuildingType;
+	class?: CategoryClass;
 	purposeBuilding?: PurposeBuilding;
 }
 
@@ -2775,6 +2779,30 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				body: data,
 				type: ContentType.FormData,
 				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoFloorDocumentDelete
+		 * @request DELETE:/api/ReportInfo/floor/document
+		 */
+		reportInfoFloorDocumentDelete: (
+			data: {
+				/** @format uuid */
+				reportInfoId?: string;
+				/** @format uuid */
+				floorConstructionInfoToDeleteId?: string;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportInfo/floor/document`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.FormData,
 				...params,
 			}),
 
