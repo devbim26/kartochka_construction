@@ -5,7 +5,6 @@ import type {
 import type { SelectOption } from '@core';
 import { convertToSelectValues, dateMask, Input, Select } from '@core';
 import {
-	getCalculationRequirementDocuments,
 	getFirstPlacementRoomVariant,
 	getRegulatoryRequirementDocuments,
 	getSecondRoomVariant,
@@ -43,9 +42,6 @@ export const RequirementsAddAndEdit = () => {
 	const [regulatoryRequirementDocuments, setRegulatoryRequirementDocuments] = useState<
 		SelectOption[]
 	>([]);
-	const [calculationRequirementDocuments, setCalculationRequirementDocuments] = useState<
-		SelectOption[]
-	>([]);
 
 	const handleGetRequirementDocuments = () => {
 		from(getRegulatoryRequirementDocuments())
@@ -53,23 +49,6 @@ export const RequirementsAddAndEdit = () => {
 				map((r: AxiosResponse) => {
 					const variants = convertToSelectValues(r.data) || [];
 					setRegulatoryRequirementDocuments(variants);
-				}),
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
-					}
-					return from([null]);
-				}),
-			)
-			.subscribe();
-	};
-
-	const handleGetCalculationDocuments = () => {
-		from(getCalculationRequirementDocuments())
-			.pipe(
-				map((r: AxiosResponse) => {
-					const variants = convertToSelectValues(r.data) || [];
-					setCalculationRequirementDocuments(variants);
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -146,7 +125,6 @@ export const RequirementsAddAndEdit = () => {
 
 	useEffect(() => {
 		handleGetRequirementDocuments();
-		handleGetCalculationDocuments();
 	}, []);
 
 	return (
@@ -285,10 +263,7 @@ export const RequirementsAddAndEdit = () => {
 				name={'regulatoryDocumentId'}
 				render={({ field }) => (
 					<Select
-						options={[
-							...regulatoryRequirementDocuments,
-							...calculationRequirementDocuments,
-						]}
+						options={regulatoryRequirementDocuments}
 						{...field}
 						value={field.value || ''}
 						label={formState.errors?.regulatoryDocumentId?.message || 'Документ'}
