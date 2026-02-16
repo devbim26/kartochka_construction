@@ -1,3 +1,4 @@
+export * from './acoustic-treatment-materials-type.component';
 export * from './air-gap-material-type.component';
 export * from './board-material-type.component';
 export * from './filler-material-type.component';

@@ -277,12 +277,21 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		<>
 			<div className="mb-4 flex justify-center">
 				{!hasLeftCladding ? (
-					<AiOutlinePlusCircle
-						onClick={addLeftCladding}
-						className="size-[60px] self-center text-black"
-					/>
+					<div className="flex w-full items-center justify-center gap-[10px]">
+						<AiOutlinePlusCircle
+							onClick={addLeftCladding}
+							className="size-[60px] self-center text-black"
+						/>
+						<span className="text-sm text-gray-500">Добавить облицовку</span>
+					</div>
 				) : (
-					<DeleteIcon onClick={removeLeftCladding} className="size-[40px] self-center" />
+					<div className="flex w-full items-center justify-center gap-[10px]">
+						<DeleteIcon
+							onClick={removeLeftCladding}
+							className="size-[40px] self-center"
+						/>
+						<span className="text-sm text-gray-500">Удалить облицовку</span>
+					</div>
 				)}
 			</div>
 
@@ -361,12 +370,21 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 
 			<div className="mt-4 flex justify-center">
 				{!hasRightCladding ? (
-					<AiOutlinePlusCircle
-						onClick={addRightCladding}
-						className="size-[60px] self-center text-black"
-					/>
+					<div className="flex w-full items-center justify-center gap-[10px]">
+						<AiOutlinePlusCircle
+							onClick={addRightCladding}
+							className="size-[60px] self-center text-black"
+						/>
+						<span className="text-sm text-gray-500">Добавить облицовку </span>
+					</div>
 				) : (
-					<DeleteIcon onClick={removeRightCladding} className="size-[40px] self-center" />
+					<div className="flex w-full items-center justify-center gap-[10px]">
+						<DeleteIcon
+							onClick={removeRightCladding}
+							className="size-[40px] self-center"
+						/>
+						<span className="text-sm text-gray-500">Удалить облицовку</span>
+					</div>
 				)}
 			</div>
 		</>

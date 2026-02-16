@@ -142,7 +142,7 @@ export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) =
 					className="text-red-600 border-red-300 hover:bg-red-50 flex items-center gap-2 rounded border px-3 py-1 text-sm transition-colors"
 				>
 					<DeleteIcon onClick={removeTopPair} className="size-4" />
-					Удалить верхнее стекло с зазором
+					Удалить стекло с зазором
 				</button>
 			);
 		} else if (canAddPairAtTop()) {
@@ -153,7 +153,7 @@ export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) =
 					className="flex items-center gap-2 rounded border border-blue-300 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50"
 				>
 					<AiOutlinePlusCircle className="size-4" />
-					Добавить стекло с зазором сверху
+					Добавить стекло с зазором
 				</button>
 			);
 		} else if (maxGlassReached) {
@@ -182,7 +182,7 @@ export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) =
 					className="text-red-600 border-red-300 hover:bg-red-50 flex items-center gap-2 rounded border px-3 py-1 text-sm transition-colors"
 				>
 					<DeleteIcon onClick={removeBottomPair} className="size-4" />
-					Удалить нижнее стекло с зазором
+					Удалить стекло с зазором
 				</button>
 			);
 		} else if (canAddPairAtBottom()) {
@@ -193,7 +193,7 @@ export const TwoGlassFrameComponent = ({ currentForm }: ConstructionTypeProps) =
 					className="flex items-center gap-2 rounded border border-blue-300 px-3 py-1 text-sm text-blue-600 transition-colors hover:bg-blue-50"
 				>
 					<AiOutlinePlusCircle className="size-4" />
-					Добавить стекло с зазором снизу
+					Добавить стекло с зазором
 				</button>
 			);
 		} else if (maxGlassReached) {

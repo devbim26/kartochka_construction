@@ -153,8 +153,11 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '2',
 						materialId: '',
-						materialType: '',
-						materialTypeValue: [],
+						materialType: MaterialTypeEnum.AcousticTreatmentMaterials,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
 					},
 					{
 						positionId: '3',

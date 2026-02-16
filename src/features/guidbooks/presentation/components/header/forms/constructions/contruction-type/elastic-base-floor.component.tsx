@@ -1,8 +1,8 @@
 import { DeleteIcon } from '@core';
 import {
+	AcousticTreatmentMaterialsType,
 	ConstructionLayer,
 	HeavyMaterialType,
-	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 } from '@features';
 import { ConstructionFieldsMap } from '@features/guidbooks/constants';
@@ -49,26 +49,17 @@ export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps
 			<div key={fieldId} className="flex w-full items-start justify-between">
 				<div className="flex flex-1 gap-[20px]">
 					{isAcousticPosition && (
-						<SelectableMaterialType
-							fieldIndex={fieldIndex}
-							positionId={Number(positionId)}
-							constructionPosition="Center"
-							materialTypesSelectValues={getSelectValuesForPosition(positionId)}
-							currentForm={currentForm}
-						/>
+						<>
+							<AcousticTreatmentMaterialsType
+								{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
+							/>
+							{/* <ThicknessDensityFieldsType
+								{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
+							/> */}
+						</>
 					)}
 
-					{!isHeavyPosition && !isAcousticPosition && (
-						<SelectableMaterialType
-							fieldIndex={fieldIndex}
-							positionId={Number(positionId)}
-							constructionPosition="Center"
-							materialTypesSelectValues={getSelectValuesForPosition(positionId)}
-							currentForm={currentForm}
-						/>
-					)}
-
-					{isHeavyPosition ? (
+					{isHeavyPosition && !isAcousticPosition ? (
 						<>
 							<HeavyMaterialType
 								{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
