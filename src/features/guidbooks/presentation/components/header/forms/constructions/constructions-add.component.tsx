@@ -280,19 +280,6 @@ export const ConstructionsAdd = () => {
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.labIndexValue?.message ? 'text-error' : '',
-							)}
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={formState.errors.labIndexValue?.message || 'Index value, dBA'}
-							error={formState.errors.labIndexValue?.message}
-							placeholder="Введите индекс"
-							{...register('labIndexValue')}
-							type={'number'}
-						/>
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
 								formState.errors.laboratoryTestSource?.message ? 'text-error' : '',
 							)}
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"

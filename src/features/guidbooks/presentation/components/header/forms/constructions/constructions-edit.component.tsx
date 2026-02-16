@@ -284,6 +284,7 @@ export const ConstructionsEdit = () => {
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
 								formState.errors.labIndexValue?.message ? 'text-error' : '',
 							)}
+							disabled
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 							containerClassName="w-[226px]"
 							label={formState.errors.labIndexValue?.message || 'Index value, dBA'}
@@ -292,6 +293,7 @@ export const ConstructionsEdit = () => {
 							{...register('labIndexValue')}
 							type={'number'}
 						/>
+
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
@@ -305,35 +307,32 @@ export const ConstructionsEdit = () => {
 							{...register('laboratoryTestSource')}
 							type={'text'}
 						/>
-					</div>
-					<FormSubTitle text="Расчетное значение" />
-					<div className="flex flex-wrap gap-[16px]">
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.RCalcs?.message ? 'text-error' : '',
+								formState.errors.labIndexValue?.message ? 'text-error' : '',
 							)}
+							disabled
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 							containerClassName="w-[226px]"
-							label={formState.errors.RCalcs?.message || 'R_calcs'}
-							error={formState.errors.RCalcs?.message}
-							placeholder="R_calc"
-							{...register('RCalcs')}
-							type={'text'}
+							label={formState.errors.labIndexValue?.message || 'C'}
+							error={formState.errors.labIndexValue?.message}
+							placeholder="Введите C"
+							{...register('laboratoryC')}
+							type={'number'}
 						/>
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.estimatedIndexValue?.message ? 'text-error' : '',
+								formState.errors.labIndexValue?.message ? 'text-error' : '',
 							)}
+							disabled
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 							containerClassName="w-[226px]"
-							label={
-								formState.errors.estimatedIndexValue?.message || 'Index value, dBa'
-							}
-							error={formState.errors.estimatedIndexValue?.message}
-							placeholder="Введите индекс"
-							{...register('estimatedIndexValue')}
+							label={formState.errors.labIndexValue?.message || 'Ctr'}
+							error={formState.errors.labIndexValue?.message}
+							placeholder="Введите Ctr"
+							{...register('laboratoryCtr')}
 							type={'number'}
 						/>
 					</div>

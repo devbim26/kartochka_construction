@@ -108,7 +108,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				accessorKey: 'rLab',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="R (lab), dB"
+						text="R calc, dB"
 						textClassName="w-[80px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>

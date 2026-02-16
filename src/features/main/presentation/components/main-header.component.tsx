@@ -13,78 +13,8 @@ interface FeatureCard {
 	buttonText: string;
 	isPro?: boolean;
 	active?: boolean;
+	onClick?: () => void;
 }
-
-const AIFeatures: FeatureCard[] = [
-	{
-		id: 'ai-assistant',
-		title: 'Визуализация',
-		description: 'Визуализация фасадов и интерьеров',
-		features: [
-			'AI-генерация изображений с кастомными настройками.',
-			'Меняйте материалы, мебель, положение камеры и др.',
-		],
-		price: 'PRO',
-		buttonText: 'Начать PRO',
-		active: true,
-	},
-	{
-		id: 'norm-control',
-		title: 'Нормоконтроль',
-		description: 'Проверка на соответствия действующим ТНПА Беларуси',
-		features: ['Генерация отчетов'],
-		price: 'PRO',
-		buttonText: 'Начать PRO',
-		active: true,
-	},
-	{
-		id: 'document-analytics',
-		title: 'Аналитика документов',
-		description: 'AI проверяет, суммирует и структурирует документы',
-		features: ['Выдает готовый отчет в DOC/Excel для смет, ТЗ, протоколов.'],
-		price: 'PRO',
-		buttonText: 'Начать PRO',
-		active: true,
-	},
-	{
-		id: 'internet-search',
-		title: 'Поиск в интернете. deep research',
-		description: 'Проверка на соответствия действующим ТНПА Беларуси',
-		features: ['Генерация отчетов'],
-		price: 'PRO',
-		buttonText: 'Начать PRO',
-		active: true,
-	},
-	{
-		id: 'ifc-analytics',
-		title: 'Аналитика IFC модели',
-		description: 'Проверка на соответствия действующим ТНПА Беларуси',
-		features: ['Генерация отчетов'],
-		price: 'PRO',
-		buttonText: 'Начать PRO',
-		active: true,
-	},
-];
-
-const features: FeatureCard[] = [
-	{
-		id: 'sound-isolation',
-		title: 'Расчет звукоизоляции',
-		description: 'стен и перекрытий по СП 02.03.01-2023.',
-		features: ['Генератор PDF-отчет с формулами, готовый к подаче на экспертизу.'],
-		price: 'FREE',
-		buttonText: 'Начать',
-		active: true,
-	},
-	{
-		id: 'heat-isolation',
-		title: 'Расчет теплоизоляции',
-		description: 'стен и перекрытий по СП 02.03.01-2023.',
-		features: ['Генератор PDF-отчет с формулами, готовый к подаче на экспертизу.'],
-		price: 'PRO',
-		buttonText: 'Начать PRO',
-	},
-];
 
 export const MainHeader = () => {
 	const navigate = useAppNavigate();
@@ -111,6 +41,78 @@ export const MainHeader = () => {
 					CONSTRUCTOR_ROUTES.aboutBuilding.route,
 			);
 	}, [reportId, reportType, navigate]);
+
+	const AIFeatures: FeatureCard[] = [
+		{
+			id: 'ai-assistant',
+			title: 'Визуализация',
+			description: 'Визуализация фасадов и интерьеров',
+			features: [
+				'AI-генерация изображений с кастомными настройками.',
+				'Меняйте материалы, мебель, положение камеры и др.',
+			],
+			price: 'PRO',
+			buttonText: 'Начать PRO',
+			active: true,
+		},
+		{
+			id: 'norm-control',
+			title: 'Нормоконтроль',
+			description: 'Проверка на соответствия действующим ТНПА Беларуси',
+			features: ['Генерация отчетов'],
+			price: 'PRO',
+			buttonText: 'Начать PRO',
+			active: true,
+		},
+		{
+			id: 'document-analytics',
+			title: 'Аналитика документов',
+			description: 'AI проверяет, суммирует и структурирует документы',
+			features: ['Выдает готовый отчет в DOC/Excel для смет, ТЗ, протоколов.'],
+			price: 'PRO',
+			buttonText: 'Начать PRO',
+			active: true,
+		},
+		{
+			id: 'internet-search',
+			title: 'Поиск в интернете. deep research',
+			description: 'Проверка на соответствия действующим ТНПА Беларуси',
+			features: ['Генерация отчетов'],
+			price: 'PRO',
+			buttonText: 'Начать PRO',
+			active: true,
+		},
+		{
+			id: 'ifc-analytics',
+			title: 'Аналитика IFC модели',
+			description: 'Проверка на соответствия действующим ТНПА Беларуси',
+			features: ['Генерация отчетов'],
+			price: 'PRO',
+			buttonText: 'Начать PRO',
+			active: true,
+		},
+	];
+
+	const features: FeatureCard[] = [
+		{
+			id: 'sound-isolation',
+			title: 'Расчет звукоизоляции',
+			description: 'стен и перекрытий по СП 02.03.01-2023.',
+			features: ['Генератор PDF-отчет с формулами, готовый к подаче на экспертизу.'],
+			price: 'FREE',
+			buttonText: reportId && reportType ? 'Продолжить' : 'Начать',
+			active: true,
+			onClick: handleRedirect,
+		},
+		{
+			id: 'heat-isolation',
+			title: 'Расчет теплоизоляции',
+			description: 'стен и перекрытий по СП 02.03.01-2023.',
+			features: ['Генератор PDF-отчет с формулами, готовый к подаче на экспертизу.'],
+			price: 'PRO',
+			buttonText: 'Начать PRO',
+		},
+	];
 
 	const handleFeatureClick = useCallback(
 		(featureId: string) => {
@@ -199,14 +201,14 @@ export const MainHeader = () => {
 									{'FREE'}
 								</button>
 								<button
-									onClick={() => handleFeatureClick(feature.id)}
+									onClick={feature.onClick}
 									className={twMerge(
 										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
 
 										'cursor-pointer bg-primary hover:bg-blue-700',
 									)}
 								>
-									{'Начать PRO'}
+									{feature.buttonText}
 								</button>
 							</div>
 						</div>

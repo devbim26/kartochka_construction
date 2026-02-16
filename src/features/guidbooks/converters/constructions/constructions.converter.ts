@@ -58,6 +58,8 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 	laboratoryTestSource: data.laboratoryTestSource ?? '',
 	issuer: data.issuerId ?? '',
 	issuerName: data.issuer?.name ?? '',
+	laboratoryC: data.laboratoryC ?? '',
+	laboratoryCtr: data.laboratoryCtr ?? '',
 });
 
 export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => {
@@ -199,7 +201,6 @@ export const convertToServerConstructionsAddData = (data: ConstructionsAddData):
 	propertySource: data.propertySource || null,
 	rTotal: data.labRTotal.split(',').map((split) => +split) || null,
 	index: (data.labIndex as IndexType) || null,
-	indexValue: +data.labIndexValue || undefined,
 	laboratoryTestSource: data.laboratoryTestSource || null,
 	constructionType: convertToServerConstructionType(data.constructionTypeObject) || null,
 });

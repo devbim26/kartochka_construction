@@ -41,6 +41,12 @@ export interface AdditionalGraphParametersDto {
 	laboratoryIndexType?: IndexType;
 	/** @format float */
 	laboratoryIndexValue?: number;
+	/** @format double */
+	laboratoryDelta?: number;
+	/** @format double */
+	laboratoryC?: number;
+	/** @format double */
+	laboratoryCtr?: number;
 }
 
 export interface AdditionalPhoneNumber {
@@ -157,6 +163,12 @@ export interface ConstructionHeaderDto {
 	index?: IndexType;
 	/** @format float */
 	laboratoryIndexValue?: number;
+	/** @format double */
+	laboratoryC?: number;
+	/** @format double */
+	laboratoryCtr?: number;
+	/** @format double */
+	laboratoryDelta?: number;
 	constructionType?: ConstructionTypeDto;
 	/** @format double */
 	rw?: number | null;
@@ -291,8 +303,6 @@ export interface CreateConstructionHeaderCommand {
 	rTotal?: number[] | null;
 	laboratoryTestSource?: string | null;
 	index?: IndexType;
-	/** @format float */
-	indexValue?: number;
 	constructionType?: CreateConstructionTypeDto;
 }
 
@@ -1149,6 +1159,20 @@ export interface ReportFloorInfoDto {
 	coordinates?: Coordinates;
 	/** @format int32 */
 	page?: number;
+}
+
+export interface ReportInfoFloorConstructionDto {
+	floorConstructionInfos?: FloorConstructionInfoDto[] | null;
+	buildingName?: string | null;
+	calculationRequirementDocument?: CalculationRequirementDocumentDto;
+	regulatoryRequirementDocument?: RegulatoryRequirementDocumentDto;
+	category?: ReportCategory;
+	buildingType?: BuildingType;
+	class?: CategoryClass;
+	reportDocumentInfo?: ReportDocumentInfoDto;
+	country?: CountryType;
+	status?: ReportInfoStatus;
+	description?: string | null;
 }
 
 export interface ReportInfoShortDto {
@@ -2616,7 +2640,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/ReportInfo/{id}/floor
 		 */
 		reportInfoFloorDetail: (id: string, params: RequestParams = {}) =>
-			this.request<ReportInfoShortDto, any>({
+			this.request<ReportInfoFloorConstructionDto, any>({
 				path: `/api/ReportInfo/${id}/floor`,
 				method: 'GET',
 				format: 'json',

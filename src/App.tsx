@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import faviconUrl from '@assets/favicon.svg';
 
 export const App = () => {
 	return (
@@ -22,6 +23,9 @@ export const App = () => {
 						name="keywords"
 						content="AI проектирование, звукоизоляция СП 02.03.01-2023, нормоконтроль Беларусь, нормоконтроль Россия, ТНПА проверка, визуализация фасадов, AI архитектура, анализ смет, техническое задание AI, строительный AI, отчёт для экспертизы, проектная документация, строительные нормы Беларусии"
 					/>
+					<link rel="icon" href={faviconUrl} type="image/svg+xml" />
+					<link rel="alternate icon" href={faviconUrl} type="image/svg+xml" />
+					<link rel="apple-touch-icon" href={faviconUrl} />
 				</Helmet>
 				<AppRouter />
 				<Toaster

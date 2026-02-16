@@ -73,7 +73,9 @@ export const ConstructionsAddSchema = z.object({
 			return areNumbers;
 		}, 'Значение должны быть числами'),
 	labIndex: z.string().min(1, 'Поле обязательно для заполнения'),
-	labIndexValue: z.string().min(1, 'Поле обязательно для заполнения'),
+	labIndexValue: z.string().optional(),
+	laboratoryC: z.string().optional(),
+	laboratoryCtr: z.string().optional(),
 	laboratoryTestSource: z.string().min(1, 'Поле обязательно для заполнения'),
 	constructionTypeObject: ConstructionTypeShema,
 	reportInfoId: z.string().optional(),
