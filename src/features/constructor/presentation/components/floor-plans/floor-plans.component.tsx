@@ -11,6 +11,7 @@ import {
 } from '@features/constructor/converters';
 import {
 	deleteConstruction,
+	deleteFloorPlan,
 	getFloorById,
 	getFloorConstructionById,
 	getReportInfoIds,
@@ -75,6 +76,52 @@ export const FloorPlans = memoize(() => {
 			.subscribe();
 	};
 
+	const handleDeleteDocument = () => {
+		if (!currentReportFloorId || !reportId) {
+			toast.info('Поэтажный план не загружен');
+			return;
+		}
+
+		dispatch(startLoading());
+
+		from(
+			deleteFloorPlan({
+				floorConstructionInfoToDeleteId: currentReportFloorId,
+				reportInfoId: reportId,
+			}),
+		)
+			.pipe(
+				tap((response) => {
+					if (response?.status === 200) {
+						// Очищаем все данные, связанные с поэтажным планом
+						setCurrentReportFloorInfo([]);
+						setCurrentReportFloorId(undefined);
+						setPdfDoc(null);
+						setCurrentReportConstruction(undefined);
+						setCurrentConstructionHeader(undefined);
+
+						toast.success('Поэтажный план успешно удален');
+
+						// Если это отчет с типом Floor, обновляем данные
+						if (reportType === ReportCategory.Floor && reportId) {
+							handleGetCurrentReportFloorInfos(reportId);
+						}
+					}
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || 'Ошибка при удалении поэтажного плана');
+					} else {
+						toast.error('Произошла ошибка при удалении');
+					}
+					return of(null);
+				}),
+				finalize(() => {
+					dispatch(stopLoading());
+				}),
+			)
+			.subscribe();
+	};
 	const handleUploadPdf = (event: React.ChangeEvent<HTMLInputElement>): void => {
 		const file = event.target.files?.[0];
 
@@ -313,7 +360,7 @@ export const FloorPlans = memoize(() => {
 								<FaPlus width={'16px'} height={'16px'} />
 								0.000
 								<DeleteIcon
-									onClick={() => console.log(123)}
+									onClick={handleDeleteDocument}
 									withoutBg
 									withoutBorder
 								/>

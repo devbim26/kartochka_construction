@@ -77,6 +77,13 @@ export const getConstructionRooms = async (data: GetPlacementRoomFromRequirement
 	);
 };
 
+export const deleteFloorPlan = async (data: {
+	reportInfoId?: string;
+	floorConstructionInfoToDeleteId?: string;
+}) => {
+	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorDocumentDelete(data));
+};
+
 export const createReport = async ({ data }: ReportCreateProps) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoCreate(data));
 };
