@@ -59,7 +59,7 @@ export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps
 						</>
 					)}
 
-					{isHeavyPosition && !isAcousticPosition ? (
+					{isHeavyPosition ? (
 						<>
 							<HeavyMaterialType
 								{...{ fieldIndex, constructionPosition: 'Center', currentForm }}

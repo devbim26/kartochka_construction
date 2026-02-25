@@ -9,6 +9,7 @@ import {
 	Title,
 	Tooltip,
 } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import zoomPlugin from 'chartjs-plugin-zoom'; // Убрали ChartDataLabels
 import { useRef } from 'react';
 import { Line } from 'react-chartjs-2';
@@ -22,6 +23,7 @@ ChartJS.register(
 	Tooltip,
 	Legend,
 	zoomPlugin, // Убрали ChartDataLabels
+	ChartDataLabels,
 );
 
 type GraphDataPoint = {
@@ -66,8 +68,8 @@ const DesigningChart = ({
 	);
 
 	// Находим мин и макс частоты для масштабирования
-	const minFrequency = allFrequencies.length > 0 ? Math.min(...allFrequencies) + 1 : 50;
-	const maxFrequency = allFrequencies.length > 0 ? Math.max(...allFrequencies) + 1 : 5000;
+	const minFrequency = allFrequencies.length > 0 ? Math.min(...allFrequencies) : 50;
+	const maxFrequency = allFrequencies.length > 0 ? Math.max(...allFrequencies) : 5000;
 
 	// Фильтруем частоты в диапазоне
 	const displayFrequencies = allFrequencies.filter(
@@ -99,7 +101,7 @@ const DesigningChart = ({
 			// Собираем метки для точек этого графика
 			const pointLabels = series.pointLabels || [];
 			return {
-				label: legendLabels[series.label],
+				label: legendLabels[series.label] || series.label,
 				data: dataPoints,
 				borderColor: color,
 				backgroundColor: 'transparent',
@@ -184,13 +186,41 @@ const DesigningChart = ({
 		responsive: true,
 		maintainAspectRatio: false,
 		plugins: {
+			datalabels: {
+				align: 'top', // Положение относительно точки (сверху)
+				anchor: 'end', // Якорь (конец вектора точки)
+				offset: 4, // Отступ в пикселях от точки
+				clip: false, // Чтобы метки не обрезались краями области графика
+
+				// Логика отображения текста
+				formatter: (value, context) => {
+					const datasetIndex = context.datasetIndex;
+					const dataIndex = context.dataIndex;
+					const frequency = displayFrequencies[dataIndex];
+					const series = graphSeries[datasetIndex];
+					// Ищем метку в ваших данных
+					const pointLabel = series.data?.find((p) => p.x === frequency && p.y === value);
+					console.log(series);
+					// Возвращаем текст метки, если она найдена, иначе null (ничего не рисуем)
+					return pointLabel ? (pointLabel as any).label : null;
+				},
+				font: {
+					weight: 'bold',
+					size: 11,
+				},
+				color: (context) => {
+					// Можно сделать цвет текста таким же, как цвет линии
+					return context.dataset.borderColor as string;
+				},
+			},
 			legend: {
+				maxWidth: 200,
 				display: true,
-				position: 'right', // Легенда справа от графика
+				position: 'right',
 				align: 'center',
 				labels: {
-					boxWidth: 20,
-					padding: 16,
+					boxWidth: 100,
+					padding: 25,
 					font: {
 						size: 12,
 						weight: 'bold',
@@ -216,7 +246,6 @@ const DesigningChart = ({
 
 						if (value === null || value === undefined) return '';
 
-						// Находим метку точки, если она есть
 						const series = graphSeries[datasetIndex];
 						const pointLabel = series.pointLabels?.find(
 							(label) => label.x === frequency && label.y === value,

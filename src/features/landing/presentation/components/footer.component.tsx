@@ -1,7 +1,6 @@
-import { APP_ROUTES, Button, LogoIcon, LogoTextIcon } from '@core';
+import { APP_ROUTES, LogoIcon } from '@core';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useNavigate } from 'react-router-dom';
-import { EmailImage, PhoneImage } from '../images';
 
 export const Footer = () => {
 	const navigate = useNavigate();
@@ -11,7 +10,7 @@ export const Footer = () => {
 			<div className="flex w-full max-w-screen-xl flex-col gap-[40px] py-[40px] xs:flex-col xs:items-center sm:flex-col sm:items-center sm:gap-[30px] md:flex-row md:items-start md:justify-between md:gap-0 md:py-[50px]">
 				<div className="flex flex-row items-center gap-[12px]">
 					<LogoIcon className="size-[42px] sm:size-[70px]" />
-					<LogoTextIcon className="h-[60px] w-[160px] sm:h-[79px] sm:w-[209px]" />
+					{/* <LogoTextIcon className="h-[60px] w-[160px] sm:h-[79px] sm:w-[209px]" /> */}
 				</div>
 
 				<div className="flex w-full max-w-[600px] justify-between gap-[40px] xs:gap-[30px] sm:gap-[40px] md:w-auto md:max-w-none md:flex-row">
@@ -69,14 +68,6 @@ export const Footer = () => {
 						>
 							Подписки
 						</span>
-						<div className="flex flex-row gap-[16px] sm:gap-[23px]">
-							<Button className="rounded-[12px] p-[10px] sm:rounded-[14px]">
-								<PhoneImage color="white" />
-							</Button>
-							<Button className="rounded-[12px] p-[10px] sm:rounded-[14px]">
-								<EmailImage color="white" />
-							</Button>
-						</div>
 					</div>
 				</div>
 			</div>

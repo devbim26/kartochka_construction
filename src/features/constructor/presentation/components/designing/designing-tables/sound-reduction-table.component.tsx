@@ -12,6 +12,13 @@ interface GraphTableRow {
 	rInSitu: string;
 }
 
+interface ExtraTableRow {
+	type: string;
+	rLab: string;
+	rLabExtra: string; // новый столбец
+	rInSitu: string;
+}
+
 interface GraphTableProps {
 	graphData: GraphDetailResponse[] | null;
 	additional?: AdditionalGraphParameters;
@@ -24,6 +31,8 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 		const deviationDots =
 			graphData?.find((g) => g.name === 'deviationDotsList')?.namedDots ?? [];
 		const laboratoryDots = graphData?.find((g) => g.name === 'LaboratoryDots')?.namedDots ?? [];
+
+		console.log(additional);
 
 		const labExtraMap = new Map<number, string>();
 		laboratoryDots.forEach((dot) => {
@@ -48,30 +57,22 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 			}))
 			.sort((a, b) => Number(a.frequency) - Number(b.frequency));
 
-		const extraData: GraphTableRow[] = [];
+		const extraData: ExtraTableRow[] = [];
 		if (additional) {
 			if (additional.computingRw !== undefined) {
 				extraData.push({
-					frequency: 'Rw',
+					type: 'Rw',
 					rLab: String(additional.computingRw),
-					rLabExtra: String(additional.computingRw),
+					rLabExtra: String(additional.laboratoryIndexValue),
 					rInSitu: String(additional.computingRw),
 				});
 			}
 			if (additional.ctr !== undefined && additional.delta !== undefined) {
 				extraData.push({
-					frequency: 'Ctr',
-					rLab: `(${additional.delta}, ${additional.ctr})`,
-					rLabExtra: `(${additional.delta}, ${additional.ctr})`,
+					type: 'C, Ctr',
+					rLab: `(${additional.c}, ${additional.ctr})`,
+					rLabExtra: `(${additional.laboratoryC}, ${additional.laboratoryCtr})`,
 					rInSitu: `(${additional.delta}, ${additional.ctr})`,
-				});
-			}
-			if (additional.c !== undefined && additional.delta !== undefined) {
-				extraData.push({
-					frequency: 'C50-5000',
-					rLab: `(${additional.delta}, ${additional.c})`,
-					rLabExtra: `(${additional.delta}, ${additional.c})`,
-					rInSitu: `(${additional.delta}, ${additional.c})`,
 				});
 			}
 		}
@@ -154,8 +155,94 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 		[noPadding],
 	);
 
+	const extraColumns = useMemo<ColumnDef<ExtraTableRow>[]>(
+		() => [
+			{
+				accessorKey: 'type',
+				header: () => (
+					<SimpleTableHeaderCell
+						text="Данные"
+						textClassName="w-[60px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+				cell: (info) => {
+					const isRw = info.row.original.type === 'Rw';
+					return (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge(
+								'w-[60px] border-r border-[#EDEFF2] text-center',
+								isRw && 'text-blue-600 font-bold',
+							)}
+							noPadding={noPadding}
+						/>
+					);
+				},
+			},
+			{
+				accessorKey: 'rLab',
+				header: () => (
+					<SimpleTableHeaderCell
+						text="R calc, dB"
+						textClassName="w-[80px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+				cell: (info) => {
+					const isRw = info.row.original.type === 'Rw';
+					return (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge(
+								'w-[80px] border-r border-[#EDEFF2] text-center',
+								isRw && 'text-blue-600 font-bold',
+							)}
+							noPadding={noPadding}
+						/>
+					);
+				},
+			},
+			{
+				accessorKey: 'rLabExtra',
+				header: () => (
+					<SimpleTableHeaderCell
+						text="Rlab, dB"
+						textClassName="w-[80px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+				cell: (info) => {
+					const isRw = info.row.original.type === 'Rw';
+					return (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge(
+								'w-[80px] border-r border-[#EDEFF2] text-center',
+								isRw && 'text-blue-600 font-bold',
+							)}
+							noPadding={noPadding}
+						/>
+					);
+				},
+			},
+		],
+		[noPadding],
+	);
+
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="flex gap-4">
+			{extraData.length > 0 && (
+				<DesigningRwTable
+					data={extraData}
+					columns={extraColumns}
+					classNames={{
+						tableClassName: 'border border-[#EDEFF2] border-collapse',
+						headerCellClassName: 'border border-[#EDEFF2]',
+						contentCellClassName: 'border border-[#EDEFF2] font-bold',
+					}}
+				/>
+			)}
 			<DesigningRwTable
 				data={freqData}
 				columns={columns}
@@ -165,18 +252,6 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 					contentCellClassName: 'border border-[#EDEFF2]',
 				}}
 			/>
-
-			{extraData.length > 0 && (
-				<DesigningRwTable
-					data={extraData}
-					columns={columns}
-					classNames={{
-						tableClassName: 'border border-[#EDEFF2] border-collapse',
-						headerCellClassName: 'border border-[#EDEFF2]',
-						contentCellClassName: 'border border-[#EDEFF2] font-bold',
-					}}
-				/>
-			)}
 		</div>
 	);
 };

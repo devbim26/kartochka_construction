@@ -34,7 +34,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = ({
 			constructionPosition: 'Left' as const,
 			positions: ['0', '1', '2', '3', '4', '5', '6'],
 			selectable: ['5', '6'],
-			materialType: MaterialTypesSelectValuesEnum.Facing,
+			materialType: MaterialTypesSelectValuesEnum.Additional,
 		},
 		{
 			title: '2. Базовая конструкция',
@@ -48,7 +48,7 @@ export const HeavySingleLayerWallFacingBothSideComponent = ({
 			constructionPosition: 'Right' as const,
 			positions: ['0', '1', '2', '3', '4', '5', '6'],
 			selectable: ['5', '6'],
-			materialType: MaterialTypesSelectValuesEnum.Facing,
+			materialType: MaterialTypesSelectValuesEnum.Additional,
 		},
 	];
 

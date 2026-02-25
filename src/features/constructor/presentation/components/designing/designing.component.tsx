@@ -38,16 +38,8 @@ import {
 	convertToServerConstructionsEditData,
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksEdit } from '@features/guidbooks/services';
-import type {
-	ConstructionsEditData,
-	ConstructionTypeEnum,
-	Country,
-} from '@features/guidbooks/types';
-import {
-	Guidebooks,
-	RuConstructionTypesSelectValues,
-	RuCountryNamesMap,
-} from '@features/guidbooks/types';
+import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
+import { Guidebooks, RuConstructionTypesSelectValues } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -71,7 +63,9 @@ const DesigningScreen = () => {
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
-	const [isRelevant, setIsRelevant] = useState<boolean>(false);
+	const [compIsRelevant, setCompIsRelevant] = useState<boolean>(false);
+	const [labIsRelevant, setLabIsRelevant] = useState<boolean>(false);
+
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [refreshConstructionData, setRefreshConstructionData] = useState(0);
@@ -267,12 +261,15 @@ const DesigningScreen = () => {
 	}, [reportType, reportId]);
 
 	useEffect(() => {
-		if (!!constructionHeader && !!currentReportInfo?.regulatoryRequirement) {
+		if (!!constructionHeader && !!currentConstruction?.reportConstructionHeader.requirement) {
 			const rwValue = +(constructionHeader.RCalcs || 0);
+			const labRwValue = +(constructionHeader.labIndexValue || 0);
+
 			const requiredRw = +(
 				currentConstruction?.reportConstructionHeader.requirement?.noizeIsolationIndex || 50
 			);
-			setIsRelevant(rwValue >= requiredRw);
+			setLabIsRelevant(labRwValue >= requiredRw);
+			setCompIsRelevant(rwValue >= requiredRw);
 		}
 	}, [constructionHeader, currentReportInfo]);
 
@@ -524,27 +521,41 @@ const DesigningScreen = () => {
 				<div className="flex flex-col gap-[10px] px-[24px] py-[10px]">
 					{currentReportInfo ? (
 						<>
+							<div className="flex flex-col gap-2">
+								<p className="text-[30px] font-extrabold text-black">
+									Расчетное значение
+								</p>
+								<p className="font-sans text-[14px]">
+									{currentReportInfo?.calculationDocument?.fullName}
+								</p>
+								<p className="font-sans text-[25px] font-semibold leading-4">
+									Rw={constructionHeader?.RCalcs}
+								</p>
+								<p className={compIsRelevant ? 'text-green-600' : 'text-error'}>
+									{compIsRelevant ? 'Соответствует' : 'Не соответствует'}
+								</p>
+							</div>
+							<div className="flex flex-col gap-2">
+								<p className="text-[30px] font-extrabold text-black">
+									Лабораторное значение
+								</p>
+								<p className="font-sans text-[14px]">
+									{currentReportInfo?.calculationDocument?.fullName}
+								</p>
+								<p className="font-sans text-[25px] font-semibold leading-4">
+									Rw={constructionHeader?.labIndexValue}
+								</p>
+								<p className={labIsRelevant ? 'text-green-600' : 'text-error'}>
+									{labIsRelevant ? 'Соответствует' : 'Не соответствует'}
+								</p>
+							</div>
+							<p className="text-[30px] font-extrabold text-primary">
+								Допустимое значение
+							</p>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.calculationDocument?.fullName},
-								{currentReportInfo?.calculationDocument?.country &&
-									RuCountryNamesMap[
-										currentReportInfo?.calculationDocument?.country as Country
-									]}
+								{currentReportInfo?.regulatoryDocument?.fullName}
 							</p>
-							<p className="font-sans text-[30px] font-semibold leading-4">
-								Rw={constructionHeader?.RCalcs}
-							</p>
-							<p className={isRelevant ? 'text-green-600' : 'text-error'}>
-								{isRelevant ? 'Соответствует' : 'Не соответствует'}
-							</p>
-							<p className="font-sans text-[14px]">
-								{currentReportInfo?.regulatoryDocument?.fullName},
-								{currentReportInfo?.regulatoryDocument?.country &&
-									RuCountryNamesMap[
-										currentReportInfo?.regulatoryDocument?.country as Country
-									]}
-							</p>
-							<p className="font-sans text-[30px] font-semibold leading-4">
+							<p className="font-sans text-[25px] font-semibold leading-4">
 								Rw⩾
 								{
 									currentConstruction?.reportConstructionHeader.requirement

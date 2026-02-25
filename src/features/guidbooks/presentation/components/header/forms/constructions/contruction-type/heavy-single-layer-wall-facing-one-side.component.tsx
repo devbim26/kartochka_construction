@@ -41,7 +41,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 			constructionPosition: 'Left' as const,
 			positions: ['0', '1', '2', '3', '4', '5', '6'],
 			selectable: ['5', '6'],
-			materialType: MaterialTypesSelectValuesEnum.Facing,
+			materialType: MaterialTypesSelectValuesEnum.Additional,
 		},
 	];
 

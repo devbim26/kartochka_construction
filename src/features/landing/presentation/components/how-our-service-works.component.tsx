@@ -35,9 +35,6 @@ export const HowOurServiceWorks = () => {
 
 				<div className="flex flex-col items-center justify-center gap-10 xs:flex-row xs:flex-nowrap xs:items-center xs:justify-center">
 					<div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
-						<div className="font-montserrat text-xl font-medium leading-snug sm:text-2xl">
-							Этапы проектирования
-						</div>
 						<div className="mt-10 flex flex-col gap-6">
 							{steps.map((step, index) => (
 								<div
@@ -78,19 +75,28 @@ export const HowOurServiceWorks = () => {
 					>
 						<div
 							className={twMerge(
-								'flex min-h-[260px] w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-200',
+								'relative flex min-h-[260px] w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-200',
 								'md:h-[408px]',
 								isHover ? 'opacity-0' : 'opacity-100',
 							)}
 						>
-							<div className="flex flex-row items-start justify-between gap-4 sm:gap-6">
-								<div className="font-montserrat text-base font-semibold leading-snug sm:text-lg">
-									{steps[selectedStep]}
-								</div>
-								<div className="shrink-0">{numberImages[selectedStep]}</div>
+							{/* Картинка на заднем фоне */}
+							<div className="absolute inset-0 flex justify-end p-5 text-[#0F6CAF38]">
+								<div className="size-auto">{numberImages[selectedStep]}</div>
 							</div>
-							<div className="mt-6 whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed sm:text-base">
-								{stepDescriptions[selectedStep]}
+
+							{/* Контент поверх картинки */}
+							<div className="relative z-10 flex flex-col gap-6">
+								<div className="flex flex-row items-start justify-between gap-4 sm:gap-6">
+									<div className="font-montserrat text-base font-semibold leading-snug sm:text-lg">
+										{steps[selectedStep]}
+									</div>
+									{/* Можно оставить или убрать - если убрать, то картинка будет только на фоне */}
+									{/* <div className="shrink-0">{numberImages[selectedStep]}</div> */}
+								</div>
+								<div className="whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed sm:text-base">
+									{stepDescriptions[selectedStep]}
+								</div>
 							</div>
 						</div>
 

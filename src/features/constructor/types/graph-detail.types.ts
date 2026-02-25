@@ -10,4 +10,8 @@ export interface AdditionalGraphParameters {
 	c?: number;
 	ctr?: number;
 	computingRw?: number;
+	laboratoryIndexValue?: number;
+	laboratoryC?: number;
+	laboratoryCtr?: number;
+	laboratoryDelta?: number;
 }

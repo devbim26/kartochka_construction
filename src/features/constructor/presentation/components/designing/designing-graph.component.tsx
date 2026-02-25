@@ -8,65 +8,39 @@ interface GraphProps {
 }
 
 const DesigningGraph = ({ graphData, regulatoryDocName, calculationDocName }: GraphProps) => {
-	const labDots = graphData?.find((g) => g.name === 'abcd')?.namedDots ?? [];
-	const deviationDots = graphData?.find((g) => g.name === 'deviationDotsList')?.namedDots ?? [];
-	const laboratoryDots = graphData?.find((g) => g.name === 'LaboratoryDots')?.namedDots ?? [];
+	const abcdRaw = graphData?.find((g) => g.name === 'abcd')?.namedDots ?? [];
+	const laboratoryRaw = graphData?.find((g) => g.name === 'LaboratoryDots')?.namedDots ?? [];
 
-	const labData = labDots
-		.filter((dot) => dot.dot?.f !== null && dot.dot?.r !== null && dot.dot?.r !== undefined)
-		.map((dot) => ({
-			x: dot.dot?.f ?? 0,
-			y: dot.dot?.r ?? 0,
-			label: dot.name,
-		}))
-		.sort((a, b) => a.x - b.x);
+	console.log(graphData);
 
-	const availableFrequencies = labData.map((point) => point.x);
+	const mapWithLabels = (dots: any[]) =>
+		dots
+			.filter((d) => d.dot?.f != null && d.dot?.r != null)
+			.map((d) => ({ x: d.dot!.f!, y: d.dot!.r!, label: d.name }));
 
-	const inSituData = availableFrequencies.map((currentFrequency) => {
-		const matchingDeviationDot = deviationDots.find((dot) => dot.dot?.f === currentFrequency);
+	const handledNames = ['abcd', 'LaboratoryDots', 'deviationDotsList'];
+	const graphSeries = [];
 
-		const yValue =
-			currentFrequency >= 100 && matchingDeviationDot
-				? (matchingDeviationDot.dot?.r ?? null)
-				: null;
+	if (graphData) {
+		graphSeries.push({
+			label: 'R (lab)',
+			data: mapWithLabels(abcdRaw).sort((a, b) => a.x - b.x),
+		});
 
-		return {
-			x: currentFrequency,
-			y: yValue,
-		};
-	});
+		graphSeries.push({
+			label: 'Laboratory',
+			data: mapWithLabels(laboratoryRaw).sort((a, b) => a.x - b.x),
+		});
 
-	const laboratoryData = laboratoryDots
-		.filter((dot) => dot.dot?.f !== null && dot.dot?.r !== null && dot.dot?.r !== undefined)
-		.map((dot) => ({
-			x: dot.dot?.f ?? 0,
-			y: dot.dot?.r ?? 0,
-			label: dot.name,
-		}))
-		.sort((a, b) => a.x - b.x);
+		const extraSeries = graphData
+			.filter((g) => !handledNames.includes(g.name ?? ''))
+			.map((g) => ({
+				label: g.name || 'Unknown',
+				data: mapWithLabels(g.namedDots ?? []).sort((a, b) => a.x - b.x),
+			}));
 
-	const graphSeries = graphData
-		? [
-				{
-					label: 'R (lab)',
-					data: labData,
-				},
-				{
-					label: 'Laboratory',
-					data: laboratoryData,
-				},
-			]
-		: [
-				{
-					label: 'Sound Reduction Index',
-					data: [],
-				},
-				{
-					label: 'Deviations (in situ)',
-					data: [],
-				},
-			];
+		graphSeries.push(...extraSeries);
+	}
 
 	return (
 		<DesigningChart

@@ -21,8 +21,6 @@ export const Contacts = () => {
 					<span className="font-montserrat text-[16px] leading-[20px] xs:text-[18px] xs:leading-[22px] sm:text-[22px] sm:leading-[27px]">
 						ул. Матусевича 35, офис 36
 					</span>
-				</div>
-				<div className="flex flex-col gap-[12px] sm:justify-end">
 					<div className="flex flex-row gap-[7px]">
 						<PhoneImage />
 						<span className="font-montserrat text-[14px] leading-[18px] xs:text-[16px] xs:leading-[20px] sm:text-[20px] sm:leading-[24px]">

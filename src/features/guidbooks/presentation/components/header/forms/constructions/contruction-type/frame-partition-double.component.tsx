@@ -55,7 +55,7 @@ export const FramePartitionDoubleComponent = ({ currentForm }: ConstructionTypeP
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
 						constructionPosition="Left"
-						materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+						materialTypesSelectValues={MaterialTypesSelectValuesEnum.Additional}
 					/>
 				)}
 
