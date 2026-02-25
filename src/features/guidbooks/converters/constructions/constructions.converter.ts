@@ -58,8 +58,8 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 	laboratoryTestSource: data.laboratoryTestSource ?? '',
 	issuer: data.issuerId ?? '',
 	issuerName: data.issuer?.name ?? '',
-	laboratoryC: data.laboratoryC ?? '',
-	laboratoryCtr: data.laboratoryCtr ?? '',
+	laboratoryC: String(data.laboratoryC) ?? '',
+	laboratoryCtr: String(data.laboratoryCtr) ?? '',
 });
 
 export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => {
