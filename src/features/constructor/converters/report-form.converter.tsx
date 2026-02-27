@@ -42,7 +42,6 @@ export const convertToServerReportFormFlags = (
 	'floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation'?: boolean;
 	'floorDocumentFlags.takeSupplementThermalInsulationProtocolsWithCalculation'?: boolean;
 } => {
-	console.log(data);
 	return {
 		reportInfoId: data.reportInfoId,
 		reportNumber: data.code,
