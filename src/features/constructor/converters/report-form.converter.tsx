@@ -42,6 +42,7 @@ export const convertToServerReportFormFlags = (
 	'floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation'?: boolean;
 	'floorDocumentFlags.takeSupplementThermalInsulationProtocolsWithCalculation'?: boolean;
 } => {
+	console.log(data);
 	return {
 		reportInfoId: data.reportInfoId,
 		reportNumber: data.code,
@@ -66,12 +67,14 @@ export const convertToServerReportFormFlags = (
 		'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation':
 			data.floorDocumentsFlags.soundInsulationCalculation
 				?.takeEnclosingStructuresSoundInsulationCalculation,
-		'floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags':
-			data.floorDocumentsFlags.soundInsulationCalculation?.baseReportInfoFlags || [],
+		'floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags': [
+			data.floorDocumentsFlags.soundInsulationCalculation?.baseReportInfoFlags as any,
+		],
 		'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod':
 			data.floorDocumentsFlags.thermalInsulationCalculation?.takeDetailedCalculatingMethod,
-		'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags':
-			data.floorDocumentsFlags.thermalInsulationCalculation?.baseReportInfoFlags || [],
+		'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags': [
+			data.floorDocumentsFlags.thermalInsulationCalculation?.baseReportInfoFlags as any,
+		],
 		'floorDocumentFlags.takeConclusion': data.floorDocumentsFlags.takeConclusion,
 		'floorDocumentFlags.takeUsedLiteratureList':
 			data.floorDocumentsFlags.takeUsedLiteratureList,

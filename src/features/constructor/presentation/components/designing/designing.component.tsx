@@ -528,8 +528,8 @@ const DesigningScreen = () => {
 								<p className="font-sans text-[14px]">
 									{currentReportInfo?.calculationDocument?.fullName}
 								</p>
-								<p className="font-sans text-[25px] font-semibold leading-4">
-									Rw={constructionHeader?.RCalcs}
+								<p className="font-sans text-[30px] font-semibold leading-4">
+									Rw = {constructionHeader?.RCalcs} дБ
 								</p>
 								<p className={compIsRelevant ? 'text-green-600' : 'text-error'}>
 									{compIsRelevant ? 'Соответствует' : 'Не соответствует'}
@@ -542,8 +542,8 @@ const DesigningScreen = () => {
 								<p className="font-sans text-[14px]">
 									{currentReportInfo?.calculationDocument?.fullName}
 								</p>
-								<p className="font-sans text-[25px] font-semibold leading-4">
-									Rw={constructionHeader?.labIndexValue}
+								<p className="font-sans text-[30px] font-semibold leading-4">
+									Rw = {constructionHeader?.labIndexValue} дБ
 								</p>
 								<p className={labIsRelevant ? 'text-green-600' : 'text-error'}>
 									{labIsRelevant ? 'Соответствует' : 'Не соответствует'}
@@ -555,12 +555,13 @@ const DesigningScreen = () => {
 							<p className="font-sans text-[14px]">
 								{currentReportInfo?.regulatoryDocument?.fullName}
 							</p>
-							<p className="font-sans text-[25px] font-semibold leading-4">
-								Rw⩾
+							<p className="font-sans text-[30px] font-semibold leading-4">
+								Rw ⩾
 								{
 									currentConstruction?.reportConstructionHeader.requirement
 										?.noizeIsolationIndex
-								}
+								}{' '}
+								дБ
 							</p>
 						</>
 					) : (

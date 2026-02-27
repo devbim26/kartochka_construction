@@ -35,11 +35,7 @@ export const PageTop = () => {
 		// </div>
 		<div className="relative flex min-h-[500px] w-full items-center overflow-hidden">
 			{/* Гифка справа */}
-			<img
-				src={LandingGif}
-				alt="GIF"
-				className="absolute right-0 h-full w-1/2 object-cover"
-			/>
+			<img src={LandingGif} alt="GIF" className="absolute right-0 h-full w-3/4" />
 
 			{/* Прозрачная плашка слева, наезжающая на гифку */}
 			<div className="relative z-10 ml-[5%] flex h-full w-1/2 rounded-3xl bg-[#74b1f7]/20 p-[20px] backdrop-blur-sm">
@@ -47,12 +43,12 @@ export const PageTop = () => {
 					<span className="block font-montserrat text-[20px] font-bold leading-[1.2] text-black sm:text-[22px] md:text-[28px] lg:text-[28px] xl:text-[36px]">
 						ИНЖЕНЕРНАЯ AI-ПЛАТФОРМА
 					</span>
-					<span className="block w-1/2 font-montserrat text-[16px] font-bold leading-[1.2] text-black sm:text-[18px] md:text-[22px] lg:text-[22px] xl:text-[28px]">
+					<span className="block w-1/2 font-montserrat text-[16px] leading-[1.2] text-black sm:text-[18px] md:text-[22px] lg:text-[22px] xl:text-[28px]">
 						Автоматизирует расчеты. Проверяет соответствие. Оптимизирует бюджеты.
 						Экономит время проектировщиков, дизайнеров и девелоперов
 					</span>
 					<Button
-						className="mt-10 w-fit bg-primary text-[25px] leading-[24px]"
+						className="mt-[130px] w-fit bg-primary text-[25px] leading-[24px]"
 						onClick={handleStart}
 					>
 						{isAuthenticated ? 'Начать' : 'Начать'}
