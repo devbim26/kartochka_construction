@@ -49,7 +49,7 @@ const ReportFromComponent = () => {
 			.subscribe((response) => {
 				if (response.status === 200)
 					form.setValue(
-						'floorDocumentsFlags',
+						'floorDocumentFlags',
 						convertToClientReportFormFlags(response.data),
 					);
 				dispatch(stopLoading());

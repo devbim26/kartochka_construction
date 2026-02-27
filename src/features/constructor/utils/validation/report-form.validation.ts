@@ -70,7 +70,7 @@ export const FormReportSchema = z.object({
 				date.getDate() === day
 			);
 		}, 'Дата указана некорректно'),
-	floorDocumentsFlags: FloorDocumentsFlags,
+	floorDocumentFlags: FloorDocumentsFlags,
 });
 
 export type FormReportSchemaType = z.infer<typeof FormReportSchema>;

@@ -10,7 +10,7 @@ export const DocumentFlags = () => {
 
 	const [showThermalInfo, setShowThermalInfo] = useState(true);
 
-	const generalCharacteristics = watch('floorDocumentsFlags.generalCharacteristics');
+	const generalCharacteristics = watch('floorDocumentFlags.generalCharacteristics');
 	const isGeneralEnabled =
 		generalCharacteristics?.takeFloorMaterialsVolumesCalculation ||
 		generalCharacteristics?.takeRoomCharacteristic ||
@@ -18,11 +18,11 @@ export const DocumentFlags = () => {
 
 	const soundBaseReportInfoFlags = useWatch({
 		control,
-		name: 'floorDocumentsFlags.soundInsulationCalculation.baseReportInfoFlags',
+		name: 'floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags',
 	});
 	const thermalBaseReportInfoFlags = useWatch({
 		control,
-		name: 'floorDocumentsFlags.thermalInsulationCalculation.baseReportInfoFlags',
+		name: 'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags',
 	});
 
 	return (
@@ -33,7 +33,7 @@ export const DocumentFlags = () => {
 				</FormElementLabel>
 				<Controller
 					control={control}
-					name="floorDocumentsFlags.takeTitleList"
+					name="floorDocumentFlags.takeTitleList"
 					render={({ field }) => (
 						<Switch
 							onChange={(isEnabled) => {
@@ -47,7 +47,7 @@ export const DocumentFlags = () => {
 				<FormElementLabel className="w-[120px] text-[#383838]">Содержание</FormElementLabel>
 				<Controller
 					control={control}
-					name="floorDocumentsFlags.takeContent"
+					name="floorDocumentFlags.takeContent"
 					render={({ field }) => (
 						<Switch
 							onChange={(isEnabled) => {
@@ -61,7 +61,7 @@ export const DocumentFlags = () => {
 				<FormElementLabel className="w-[120px] text-[#383838]">Введение</FormElementLabel>
 				<Controller
 					control={control}
-					name="floorDocumentsFlags.takeIntroduction"
+					name="floorDocumentFlags.takeIntroduction"
 					render={({ field }) => (
 						<Switch
 							onChange={(isEnabled) => {
@@ -78,7 +78,7 @@ export const DocumentFlags = () => {
 				<Switch
 					isEnabledProp={isGeneralEnabled}
 					onChange={(isEnabled) => {
-						setValue('floorDocumentsFlags.generalCharacteristics', {
+						setValue('floorDocumentFlags.generalCharacteristics', {
 							takeFloorMaterialsVolumesCalculation: isEnabled,
 							takeRoomCharacteristic: isEnabled,
 							takeWallMaterialsVolumesCalculation: isEnabled,
@@ -100,11 +100,11 @@ export const DocumentFlags = () => {
 						</FormElementLabel>
 						<Controller
 							control={control}
-							name="floorDocumentsFlags.generalCharacteristics.takeRoomCharacteristic"
+							name="floorDocumentFlags.generalCharacteristics.takeRoomCharacteristic"
 							render={({ field }) => (
 								<Switch
 									isEnabledProp={watch(
-										'floorDocumentsFlags.generalCharacteristics.takeRoomCharacteristic',
+										'floorDocumentFlags.generalCharacteristics.takeRoomCharacteristic',
 									)}
 									onChange={(isEnabled) => {
 										field.onChange(isEnabled);
@@ -119,11 +119,11 @@ export const DocumentFlags = () => {
 						</FormElementLabel>
 						<Controller
 							control={control}
-							name="floorDocumentsFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation"
+							name="floorDocumentFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation"
 							render={({ field }) => (
 								<Switch
 									isEnabledProp={watch(
-										'floorDocumentsFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation',
+										'floorDocumentFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation',
 									)}
 									onChange={(isEnabled) => {
 										field.onChange(isEnabled);
@@ -138,11 +138,11 @@ export const DocumentFlags = () => {
 						</FormElementLabel>
 						<Controller
 							control={control}
-							name="floorDocumentsFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation"
+							name="floorDocumentFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation"
 							render={({ field }) => (
 								<Switch
 									isEnabledProp={watch(
-										'floorDocumentsFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation',
+										'floorDocumentFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation',
 									)}
 									onChange={(isEnabled) => {
 										field.onChange(isEnabled);
@@ -160,7 +160,7 @@ export const DocumentFlags = () => {
 				<Switch
 					isEnabledProp={isGeneralEnabled}
 					onChange={(isEnabled) => {
-						setValue('floorDocumentsFlags.soundInsulationCalculation', {
+						setValue('floorDocumentFlags.soundInsulationCalculation', {
 							takeEnclosingStructuresSoundInsulationCalculation: isEnabled,
 						});
 					}}
@@ -181,11 +181,11 @@ export const DocumentFlags = () => {
 							</FormElementLabel>
 							<Controller
 								control={control}
-								name="floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+								name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
 								render={({ field }) => (
 									<Switch
 										isEnabledProp={watch(
-											'floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
+											'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
 										)}
 										onChange={(isEnabled) => {
 											field.onChange(isEnabled);
@@ -209,11 +209,11 @@ export const DocumentFlags = () => {
 										</FormElementLabel>
 										<Controller
 											control={control}
-											name="floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+											name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
 											render={({ field }) => (
 												<Switch
 													isEnabledProp={watch(
-														'floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
+														'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
 													)}
 													onChange={(isEnabled) => {
 														field.onChange(isEnabled);
@@ -235,11 +235,11 @@ export const DocumentFlags = () => {
 													</FormElementLabel>
 													<Controller
 														control={control}
-														name="floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+														name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
 														render={({ field }) => (
 															<Switch
 																isEnabledProp={watch(
-																	'floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
+																	'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
 																)}
 																onChange={(isEnabled) => {
 																	field.onChange(isEnabled);
@@ -255,11 +255,11 @@ export const DocumentFlags = () => {
 													</FormElementLabel>
 													<Controller
 														control={control}
-														name="floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+														name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
 														render={({ field }) => (
 															<Switch
 																isEnabledProp={watch(
-																	'floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
+																	'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
 																)}
 																onChange={(isEnabled) => {
 																	field.onChange(isEnabled);
@@ -275,11 +275,11 @@ export const DocumentFlags = () => {
 													</FormElementLabel>
 													<Controller
 														control={control}
-														name="floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+														name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
 														render={({ field }) => (
 															<Switch
 																isEnabledProp={watch(
-																	'floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
+																	'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
 																)}
 																onChange={(isEnabled) => {
 																	field.onChange(isEnabled);
@@ -305,7 +305,7 @@ export const DocumentFlags = () => {
 					isEnabledProp={isGeneralEnabled}
 					onChange={(isEnabled) => {
 						setValue(
-							'floorDocumentsFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod',
+							'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod',
 							isEnabled,
 						);
 					}}
@@ -326,11 +326,11 @@ export const DocumentFlags = () => {
 							</FormElementLabel>
 							<Controller
 								control={control}
-								name="floorDocumentsFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod"
+								name="floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod"
 								render={({ field }) => (
 									<Switch
 										isEnabledProp={watch(
-											'floorDocumentsFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod',
+											'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod',
 										)}
 										onChange={(isEnabled) => {
 											field.onChange(isEnabled);
@@ -354,11 +354,11 @@ export const DocumentFlags = () => {
 										</FormElementLabel>
 										<Controller
 											control={control}
-											name="floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+											name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
 											render={({ field }) => (
 												<Switch
 													isEnabledProp={watch(
-														'floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
+														'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
 													)}
 													onChange={(isEnabled) => {
 														field.onChange(isEnabled);
@@ -380,11 +380,11 @@ export const DocumentFlags = () => {
 													</FormElementLabel>
 													<Controller
 														control={control}
-														name="floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+														name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
 														render={({ field }) => (
 															<Switch
 																isEnabledProp={watch(
-																	'floorDocumentsFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
+																	'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
 																)}
 																onChange={(isEnabled) => {
 																	field.onChange(isEnabled);
@@ -406,7 +406,7 @@ export const DocumentFlags = () => {
 				<FormElementLabel className="w-[120px] text-[#383838]">Выводы</FormElementLabel>
 				<Controller
 					control={control}
-					name="floorDocumentsFlags.takeConclusion"
+					name="floorDocumentFlags.takeConclusion"
 					render={({ field }) => (
 						<Switch
 							onChange={(isEnabled) => {
@@ -422,7 +422,7 @@ export const DocumentFlags = () => {
 				</FormElementLabel>
 				<Controller
 					control={control}
-					name="floorDocumentsFlags.takeUsedLiteratureList"
+					name="floorDocumentFlags.takeUsedLiteratureList"
 					render={({ field }) => (
 						<Switch
 							onChange={(isEnabled) => {
@@ -438,7 +438,7 @@ export const DocumentFlags = () => {
 				</FormElementLabel>
 				<Controller
 					control={control}
-					name="floorDocumentsFlags.takeSupplementSoundInsulationProtocolsWithCalculation"
+					name="floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation"
 					render={({ field }) => (
 						<Switch
 							onChange={(isEnabled) => {
@@ -454,7 +454,7 @@ export const DocumentFlags = () => {
 				</FormElementLabel>
 				<Controller
 					control={control}
-					name="floorDocumentsFlags.takeSupplementThermalInsulationProtocolsWithCalculation"
+					name="floorDocumentFlags.takeSupplementThermalInsulationProtocolsWithCalculation"
 					render={({ field }) => (
 						<Switch
 							onChange={(isEnabled) => {
