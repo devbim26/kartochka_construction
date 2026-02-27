@@ -165,6 +165,10 @@ export const formReport = async (data: FormReportSchemaType) => {
 		fetchApi.api.reportInfoDocumentInfoUpdate(convertToServerReportFormFlags(data)),
 	);
 };
+
+export const formReportLogo = async (data: { reportInfoId?: string; logo?: File }) => {
+	return await withConstructorLoader(() => fetchApi.api.reportInfoDocumentInfoLogoUpdate(data));
+};
 export const getAlternateConstructions = async (data: AlternateConstructionsType) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.constructionAlternativeConstructionsCreate(

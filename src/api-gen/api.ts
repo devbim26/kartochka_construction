@@ -38,6 +38,8 @@ export interface AdditionalGraphParametersDto {
 	ctr?: number;
 	/** @format double */
 	computingRw?: number;
+	/** @format double */
+	computingLw?: number;
 	laboratoryIndexType?: IndexType;
 	/** @format float */
 	laboratoryIndexValue?: number;
@@ -497,6 +499,22 @@ export interface EnclosingStructuresSoundInsulationCalculationFlagsDto {
 export interface EnclosingStructuresThermalInsulationCalculationFlagsDto {
 	takeDetailedCalculatingMethod?: boolean;
 	baseReportInfoFlags?: ThermalInsulationFloorReportInfoFlagsDto[] | null;
+}
+
+export interface FinalizeReportInfoCommand {
+	/** @format uuid */
+	reportInfoId?: string;
+	reportNumber?: string | null;
+	reportName?: string | null;
+	customerName?: string | null;
+	objectDescription?: string | null;
+	creatorFullName?: string | null;
+	code?: string | null;
+	country?: string | null;
+	director?: string | null;
+	/** @format date */
+	date?: string;
+	floorDocumentFlags?: DocumentReportFlagsDto;
 }
 
 export interface FirstRequirementPlacementRoomDto {
@@ -2938,40 +2956,35 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request PUT:/api/ReportInfo/documentInfo
 		 */
 		reportInfoDocumentInfoUpdate: (
-			data: {
-				/** @format uuid */
-				reportInfoId?: string;
-				reportNumber?: string;
-				reportName?: string;
-				customerName?: string;
-				objectDescription?: string;
-				creatorFullName?: string;
-				code?: string;
-				country?: string;
-				director?: string;
-				/** @format date */
-				date?: string;
-				/** @format binary */
-				logo?: File;
-				'floorDocumentFlags.takeTitleList'?: boolean;
-				'floorDocumentFlags.takeContent'?: boolean;
-				'floorDocumentFlags.takeIntroduction'?: boolean;
-				'floorDocumentFlags.generalCharacteristics.takeRoomCharacteristic'?: boolean;
-				'floorDocumentFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation'?: boolean;
-				'floorDocumentFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation'?: boolean;
-				'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation'?: boolean;
-				'floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags'?: SoundInsulationFloorReportInfoFlagsDto[];
-				'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod'?: boolean;
-				'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags'?: ThermalInsulationFloorReportInfoFlagsDto[];
-				'floorDocumentFlags.takeConclusion'?: boolean;
-				'floorDocumentFlags.takeUsedLiteratureList'?: boolean;
-				'floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation'?: boolean;
-				'floorDocumentFlags.takeSupplementThermalInsulationProtocolsWithCalculation'?: boolean;
-			},
+			data: FinalizeReportInfoCommand,
 			params: RequestParams = {},
 		) =>
 			this.request<void, any>({
 				path: `/api/ReportInfo/documentInfo`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoDocumentInfoLogoUpdate
+		 * @request PUT:/api/ReportInfo/documentInfo/logo
+		 */
+		reportInfoDocumentInfoLogoUpdate: (
+			data: {
+				/** @format uuid */
+				reportInfoId?: string;
+				/** @format binary */
+				logo?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportInfo/documentInfo/logo`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.FormData,
