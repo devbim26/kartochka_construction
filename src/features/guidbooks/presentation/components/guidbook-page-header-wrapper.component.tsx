@@ -1,4 +1,5 @@
-import { Button, CleanUpIcon, useAppNavigate } from '@core';
+import type { TranslationKey } from '@core';
+import { Button, CleanUpIcon, useAppNavigate, useI18n } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { guidbookHeaderTitlesMap } from '@features/guidbooks/constants';
 import { importMaterials } from '@features/guidbooks/services';
@@ -33,6 +34,8 @@ export const GuidbookPageHeaderWrapper = memoize(
 			HeaderFormTypes.filter,
 		);
 		const fileInputRef = useRef<HTMLInputElement>(null);
+		const { t } = useI18n();
+
 		const handleImportClick = () => {
 			if (fileInputRef.current) {
 				fileInputRef.current.click();
@@ -59,7 +62,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 			const file = event.target.files?.[0];
 
 			if (!file) {
-				toast.error('Файл не выбран');
+				toast.error(t('errors.fileNotSelected'));
 				return;
 			}
 
@@ -67,14 +70,14 @@ export const GuidbookPageHeaderWrapper = memoize(
 				.pipe(
 					tap((response) => {
 						if (response.status === 200) {
-							toast.success('Импорт успешно выполнен');
+							toast.success(t('guides.import.success'));
 						} else {
-							toast.error('Ошибка при импорте');
+							toast.error(t('errors.import'));
 						}
 					}),
 					catchError((error) => {
 						console.error(error);
-						toast.error('Ошибка при загрузке файла');
+						toast.error(t('errors.fileUpload'));
 						return of(null);
 					}),
 				)
@@ -130,7 +133,9 @@ export const GuidbookPageHeaderWrapper = memoize(
 		return (
 			<div className="flex w-full flex-col gap-[14px]">
 				<div className="flex w-full items-center justify-between">
-					<p className="font-sans text-lg font-semibold leading-6">{titles.pageTitle}</p>
+					<p className="font-sans text-lg font-semibold leading-6">
+						{t(titles.pageTitleKey)}
+					</p>
 					<div className="flex items-center gap-2">
 						<div className="flex items-center justify-between">
 							{currentHeaderFormType === HeaderFormTypes.filter &&
@@ -146,7 +151,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 												height={'16px'}
 											/>
 											<p className="font-sans text-sm font-semibold leading-[18px]">
-												Импорт
+												{t('common.import')}
 											</p>
 										</Button>
 										<input
@@ -167,7 +172,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 								>
 									<FaPlus fill="white" width={'16px'} height={'16px'} />
 									<p className="font-sans text-sm font-semibold leading-[18px]">
-										Добавить
+										{t('common.add')}
 									</p>
 								</Button>
 							)}
@@ -177,7 +182,12 @@ export const GuidbookPageHeaderWrapper = memoize(
 
 				<div className="flex flex-col rounded-xl border border-solid bg-white">
 					<p className="flex justify-center pt-[16px] font-sans text-base font-semibold leading-4">
-						{guidbookHeaderTitlesMap.get(currentHeaderFormType)!(titles)}
+						{guidbookHeaderTitlesMap.get(currentHeaderFormType)!(titles) &&
+							t(
+								guidbookHeaderTitlesMap.get(currentHeaderFormType)!(
+									titles,
+								) as unknown as TranslationKey,
+							)}
 					</p>
 					<div className="flex flex-wrap gap-[16px] border-b border-solid px-[16px] pb-[24px] pt-[16px]">
 						{formComponent}
@@ -190,8 +200,8 @@ export const GuidbookPageHeaderWrapper = memoize(
 							>
 								<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
 									{currentHeaderFormType === HeaderFormTypes.add
-										? 'Сохранить'
-										: 'Сохранить изменения'}
+										? t('common.save')
+										: t('common.saveChanges')}
 								</p>
 							</Button>
 						)}
@@ -210,8 +220,8 @@ export const GuidbookPageHeaderWrapper = memoize(
 							/>
 							<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
 								{currentHeaderFormType === HeaderFormTypes.filter
-									? 'Очистить'
-									: 'Отмена'}
+									? t('common.clear')
+									: t('common.cancel')}
 							</p>
 						</Button>
 					</div>

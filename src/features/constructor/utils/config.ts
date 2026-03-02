@@ -9,7 +9,7 @@ import { FloorPlansSchema } from './validation/floor-plans.validation';
 export const AboutBuildingConfig: EntityConfig = {
 	schema: AboutBuildingSchema,
 	defaultValues: {
-		name: 'Проект',
+		name: '',
 		region: Country.Belarus,
 		buildingPurpose: PurposeBuilding.FramePanelBuilding,
 		buildingType: BuildingType.ResidentialBuildings,

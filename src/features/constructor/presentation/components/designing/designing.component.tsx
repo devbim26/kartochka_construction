@@ -1,4 +1,4 @@
-import { Button, Select, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
+import { Button, Select, useAppDispatch, useAppNavigate, useAppSelector, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import type {
 	AdditionalGraphParameters,
@@ -39,7 +39,11 @@ import {
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksEdit } from '@features/guidbooks/services';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
-import { Guidebooks, RuConstructionTypesSelectValues } from '@features/guidbooks/types';
+import {
+	EnConstructionTypesSelectValues,
+	Guidebooks,
+	RuConstructionTypesSelectValues,
+} from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -68,11 +72,11 @@ const DesigningScreen = () => {
 
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
-	const [refreshConstructionData, setRefreshConstructionData] = useState(0);
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 	const navigate = useAppNavigate();
 	const reportFloorInfoId = search.get('reportFloorInfoId');
+	const { t, locale } = useI18n();
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
 		defaultValues: DesigningConfig.defaultValues,
@@ -96,8 +100,8 @@ const DesigningScreen = () => {
 					}
 				}),
 				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации об отчете');
+					console.error('Request error:', error);
+					toast.error(t('errors.reportInfoLoad'));
 					return of(null);
 				}),
 			)
@@ -114,8 +118,8 @@ const DesigningScreen = () => {
 					}
 				}),
 				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации об отчете');
+					console.error('Request error:', error);
+					toast.error(t('errors.reportInfoLoad'));
 					return of(null);
 				}),
 			)
@@ -134,8 +138,8 @@ const DesigningScreen = () => {
 					}
 				}),
 				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации о конструкции');
+					console.error('Request error:', error);
+					toast.error(t('errors.constructionLoad'));
 					return of(null);
 				}),
 			)
@@ -146,8 +150,8 @@ const DesigningScreen = () => {
 		dispatch(startLoading());
 		from(graphDetail({ constructionHeaderId: id }))
 			.pipe(
-				catchError((error) => {
-					toast.error('Не удалось загрузить данные графика');
+				catchError(() => {
+					toast.error(t('errors.graphDataLoad'));
 					dispatch(stopLoading());
 					return [];
 				}),
@@ -166,8 +170,8 @@ const DesigningScreen = () => {
 		dispatch(startLoading());
 		from(graphAdditionalDetail({ constructionHeaderId: id }))
 			.pipe(
-				catchError((error) => {
-					toast.error('Не удалось загрузить данные графика');
+				catchError(() => {
+					toast.error(t('errors.graphDataLoad'));
 					dispatch(stopLoading());
 					return [];
 				}),
@@ -193,8 +197,8 @@ const DesigningScreen = () => {
 					dispatch(stopLoading());
 				}),
 				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации о конструкции');
+					console.error('Request error:', error);
+					toast.error(t('errors.constructionLoad'));
 					dispatch(stopLoading());
 					return of(null);
 				}),
@@ -209,7 +213,7 @@ const DesigningScreen = () => {
 			.pipe(
 				switchMap((singleResponse) => {
 					if (singleResponse.status !== 200 || !singleResponse.data) {
-						throw new Error('Ошибка при получении конструкции');
+						throw new Error(t('errors.constructionLoad'));
 					}
 
 					setCurrentConstruction(
@@ -220,7 +224,7 @@ const DesigningScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || 'Ошибка при загрузке');
+						toast.error(error.response?.data || t('errors.upload'));
 					} else {
 						toast.error((error as Error).message);
 					}
@@ -245,7 +249,7 @@ const DesigningScreen = () => {
 	useEffect(() => {
 		if (!reportId || !constructionHeaderId) return;
 		handleGetConstructionByHeaderId(constructionHeaderId);
-	}, [reportId, refreshConstructionData, constructionHeaderId]);
+	}, [reportId, constructionHeaderId]);
 
 	useEffect(() => {
 		if (!constructionHeaderId || graphData) return;
@@ -276,8 +280,8 @@ const DesigningScreen = () => {
 	const handleGetConstructionImage = useCallback((id: string) => {
 		from(svgConstructionDetail(id))
 			.pipe(
-				catchError((error) => {
-					toast.error('Не удалось получить картинку');
+				catchError(() => {
+					toast.error(t('errors.imageLoad'));
 					return [];
 				}),
 			)
@@ -285,7 +289,7 @@ const DesigningScreen = () => {
 				if (response.status === 200 && typeof response.data === 'string') {
 					setSvgUrl(response.data);
 				} else {
-					toast.error('Неверный формат');
+					toast.error(t('errors.invalidFormat'));
 				}
 			});
 	}, []);
@@ -348,7 +352,7 @@ const DesigningScreen = () => {
 						const message =
 							typeof error.response?.data === 'string'
 								? error.response.data
-								: error.response?.data?.title || 'Ошибка при отправке';
+								: error.response?.data?.title || t('errors.request');
 						toast.error(message);
 					}
 
@@ -357,7 +361,7 @@ const DesigningScreen = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					toast.success('Параметры конструкции успешно обновлены');
+					toast.success(t('success.constructionUpdated'));
 
 					if (!constructionHeaderId) return;
 					handleGetConstructionByHeaderId(constructionHeaderId);
@@ -390,7 +394,7 @@ const DesigningScreen = () => {
 						const message =
 							typeof error.response?.data === 'string'
 								? error.response.data
-								: error.response?.data?.title || 'Ошибка при отправке';
+								: error.response?.data?.title || t('errors.request');
 						toast.error(message);
 					}
 
@@ -399,7 +403,7 @@ const DesigningScreen = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					toast.success('Параметры конструкции успешно обновлены');
+					toast.success(t('success.constructionUpdated'));
 
 					if (!constructionHeaderId) return;
 					navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
@@ -441,7 +445,11 @@ const DesigningScreen = () => {
 								isSearchable
 								value={field.value || ''}
 								onChange={handleConstructionTypeChange}
-								options={RuConstructionTypesSelectValues}
+								options={
+									locale === 'ru'
+										? RuConstructionTypesSelectValues
+										: EnConstructionTypesSelectValues
+								}
 								error={
 									form.formState.errors.constructionTypeObject
 										?.constructionTypeEnum?.message
@@ -459,7 +467,7 @@ const DesigningScreen = () => {
 									form.formState.errors.constructionTypeObject
 										?.constructionTypeEnum?.message || ''
 								}
-								placeholder="Выберите тип"
+								placeholder={t('constructor.designing.selectType')}
 							/>
 						)}
 					/>
@@ -469,7 +477,7 @@ const DesigningScreen = () => {
 							.sort((a, b) => Number(a.positionId) - Number(b.positionId))
 							.map((material, i) => (
 								<p key={`left-${i}`} className="pl-4 text-[22px]">
-									- {formatMaterial(material)}
+									- {formatMaterial(material, locale)}
 								</p>
 							))}
 
@@ -478,7 +486,7 @@ const DesigningScreen = () => {
 							.sort((a, b) => Number(a.positionId) - Number(b.positionId))
 							.map((material, i) => (
 								<p key={`center-${i}`} className="pl-4 text-[22px]">
-									- {formatMaterial(material)}
+									- {formatMaterial(material, locale)}
 								</p>
 							))}
 
@@ -487,16 +495,13 @@ const DesigningScreen = () => {
 							.sort((a, b) => Number(a.positionId) - Number(b.positionId))
 							.map((material, i) => (
 								<p key={`right-${i}`} className="pl-4 text-[22px]">
-									- {formatMaterial(material)}
+									- {formatMaterial(material, locale)}
 								</p>
 							))}
 					</div>
 				</div>
 			</div>
-			<div
-				key={`${refreshConstructionData}-${constructionType}`}
-				className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]"
-			>
+			<div className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]">
 				{constructionType &&
 					ConstructionTypeMap({
 						currentConstruction: constructionType,
@@ -507,61 +512,69 @@ const DesigningScreen = () => {
 						onClick={onEditHandle}
 						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
 					>
-						Применить
+						{t('common.apply')}
 					</Button>
 					<Button
 						onClick={onEditHandleWithRedirect}
 						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
 					>
-						Сохранить
+						{t('common.save')}
 					</Button>
 				</div>
 			</div>
 			<div className="flex w-full gap-[10px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				<div className="flex flex-col gap-[10px] px-[24px] py-[10px]">
+				<div className="flex w-full flex-col gap-[10px] px-[24px] py-[10px]">
 					{currentReportInfo ? (
 						<>
-							<div className="flex flex-col gap-2">
+							<div className="flex flex-col gap-1">
 								<p className="text-[30px] font-extrabold text-black">
-									Расчетное значение
+									{t('constructor.designing.calcValue')}
 								</p>
 								<p className="font-sans text-[14px]">
 									{currentReportInfo?.calculationDocument?.fullName}
 								</p>
-								<p className="font-sans text-[30px] font-semibold leading-4">
-									Rw = {constructionHeader?.RCalcs} дБ
-								</p>
-								<p className={compIsRelevant ? 'text-green-600' : 'text-error'}>
-									{compIsRelevant ? 'Соответствует' : 'Не соответствует'}
-								</p>
+								<div className="flex w-full items-center gap-1">
+									<p className="font-sans text-[25px] font-semibold leading-4">
+										Rw = {constructionHeader?.RCalcs} dB
+									</p>
+									<p className={compIsRelevant ? 'text-green-600' : 'text-error'}>
+										{compIsRelevant
+											? t('constructor.relevant.yes')
+											: t('constructor.relevant.no')}
+									</p>
+								</div>
 							</div>
 							<div className="flex flex-col gap-2">
 								<p className="text-[30px] font-extrabold text-black">
-									Лабораторное значение
+									{t('constructor.designing.labValue')}
 								</p>
 								<p className="font-sans text-[14px]">
 									{currentReportInfo?.calculationDocument?.fullName}
 								</p>
-								<p className="font-sans text-[30px] font-semibold leading-4">
-									Rw = {constructionHeader?.labIndexValue} дБ
-								</p>
-								<p className={labIsRelevant ? 'text-green-600' : 'text-error'}>
-									{labIsRelevant ? 'Соответствует' : 'Не соответствует'}
-								</p>
+								<div className="flex w-full items-center gap-1">
+									<p className="font-sans text-[25px] font-semibold leading-4">
+										Rw = {constructionHeader?.labIndexValue} dB
+									</p>
+									<p className={labIsRelevant ? 'text-green-600' : 'text-error'}>
+										{labIsRelevant
+											? t('constructor.relevant.yes')
+											: t('constructor.relevant.no')}
+									</p>
+								</div>
 							</div>
 							<p className="text-[30px] font-extrabold text-primary">
-								Допустимое значение
+								{t('constructor.designing.allowedValue')}
 							</p>
 							<p className="font-sans text-[14px]">
 								{currentReportInfo?.regulatoryDocument?.fullName}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
-								Rw ⩾
+								Rw ⩾{' '}
 								{
 									currentConstruction?.reportConstructionHeader.requirement
 										?.noizeIsolationIndex
 								}{' '}
-								дБ
+								dB
 							</p>
 						</>
 					) : (
@@ -575,7 +588,7 @@ const DesigningScreen = () => {
 					regulatoryDocName={constructionHeader?.laboratoryTestSource || ''}
 					calculationDocName={currentReportInfo?.calculationDocument?.name || ''}
 				/>
-				<div className="w-[300px]"></div>
+
 				<GraphDetailTable
 					graphData={graphData}
 					additional={graphAdditionalData || undefined}

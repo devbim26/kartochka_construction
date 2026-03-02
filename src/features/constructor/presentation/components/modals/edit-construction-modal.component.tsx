@@ -1,5 +1,5 @@
 import type { ModalProps } from '@core';
-import { Button, Modal } from '@core';
+import { Button, Modal, useI18n } from '@core';
 import type { FloorConstruction } from '@features/constructor/types';
 import { type ConstructionsEditData } from '@features/guidbooks/types';
 import { useEffect, useRef } from 'react';
@@ -27,13 +27,14 @@ export const EditConstructionModal = ({
 	...props
 }: CreateConstructionModalProps) => {
 	const formRef = useRef<CreateConstructionFormHandle>(null);
+	const { t } = useI18n();
 
 	const handleConfirm = () => {
 		formRef.current?.submit();
 	};
 
 	const handleSuccess = () => {
-		toast.success('Конструкция успешно отредактирована!');
+		toast.success(t('guides.constructions.editSuccess'));
 		onConfirm();
 	};
 
@@ -64,13 +65,15 @@ export const EditConstructionModal = ({
 						onClick={onCancel}
 						className="flex w-fit flex-row items-center px-4 py-1.5"
 					>
-						<p className="font-sans text-sm font-semibold">Отмена</p>
+						<p className="font-sans text-sm font-semibold">{t('common.cancel')}</p>
 					</Button>
 					<Button
 						onClick={handleConfirm}
 						className="flex w-fit flex-row items-center px-4 py-1.5"
 					>
-						<p className="font-sans text-sm font-semibold">Редактировать конструкции</p>
+						<p className="font-sans text-sm font-semibold">
+							{t('guides.constructions.editTitle')}
+						</p>
 					</Button>
 				</div>
 			)}

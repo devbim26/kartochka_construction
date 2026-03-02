@@ -1,4 +1,6 @@
+import type { TranslationKey } from '@core';
+
 export interface HeaderNavItemOptions {
 	id: string;
-	text: string;
+	textKey: TranslationKey;
 }

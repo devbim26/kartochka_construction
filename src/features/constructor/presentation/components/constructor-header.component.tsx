@@ -1,4 +1,4 @@
-import { Button, useAppNavigate } from '@core';
+import { Button, useAppNavigate, useI18n } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { FaPlus } from 'react-icons/fa6';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -11,10 +11,11 @@ export const ConstructorHeader = () => {
 	const reportType = search.get('reportType');
 	const reportId = search.get('reportId');
 	const isActive = (route: string) => location.pathname.endsWith(route);
+	const { t } = useI18n();
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
-			<p className="font-sans text-lg font-semibold leading-6">Конструктор</p>
+			<p className="font-sans text-lg font-semibold leading-6">{t('constructor.header.title')}</p>
 			<div className="flex flex-row gap-[20px]">
 				<Button
 					className={twMerge(
@@ -34,7 +35,8 @@ export const ConstructorHeader = () => {
 							: () => navigate(CONSTRUCTOR_ROUTES.aboutBuilding.route)
 					}
 				>
-					<FaPlus width={'16px'} height={'16px'} />О здании
+					<FaPlus width={'16px'} height={'16px'} />
+					{t('constructor.header.aboutBuilding')}
 				</Button>
 				<Button
 					className={twMerge(
@@ -57,7 +59,7 @@ export const ConstructorHeader = () => {
 							: () => navigate(CONSTRUCTOR_ROUTES.floorPlans.route)
 					}
 				>
-					Поэтажные планы
+					{t('constructor.header.floorPlans')}
 				</Button>
 				<Button
 					className={twMerge(
@@ -73,7 +75,7 @@ export const ConstructorHeader = () => {
 					)}
 					disabled
 				>
-					Проектирование
+					{t('constructor.header.designing')}
 				</Button>
 				<Button
 					className={twMerge(
@@ -88,7 +90,7 @@ export const ConstructorHeader = () => {
 					)}
 					disabled
 				>
-					Выбор конструкции
+					{t('constructor.header.constructionPick')}
 				</Button>
 				<Button
 					className={twMerge(
@@ -100,7 +102,7 @@ export const ConstructorHeader = () => {
 					onClick={() => navigate(CONSTRUCTOR_ROUTES.ifcModel.route)}
 					//disabled={!isActive(CONSTRUCTOR_ROUTES.ifcModel.route)}
 				>
-					IFC модель
+					{t('constructor.header.ifcModel')}
 				</Button>
 			</div>
 		</div>

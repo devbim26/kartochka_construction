@@ -1,5 +1,5 @@
 import type { PaginatedArticleDto } from '@api-gen';
-import { Carousel, CarouselSlide } from '@core';
+import { Carousel, CarouselSlide, useI18n } from '@core';
 import { getPaginatedArticles } from '@features/news';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { NewsCard } from './news-card.component';
 
 export const NewsSection = () => {
 	const [articles, setArticles] = useState<PaginatedArticleDto[] | null>(null);
+	const { t } = useI18n();
 
 	useEffect(() => {
 		from(getPaginatedArticles({ data: { pageNumber: 1, pageSize: 6 } }))
@@ -19,11 +20,11 @@ export const NewsSection = () => {
 					setArticles(res.items);
 				}),
 				catchError((error) => {
-					console.error('Ошибка при загрузке новостей:', error);
+					console.error('News load error:', error);
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка загрузки новостей');
+						toast.error(error.response?.data?.message || t('errors.newsLoad'));
 					} else {
-						toast.error('Произошла непредвиденная ошибка');
+						toast.error(t('errors.unexpected'));
 					}
 					setArticles([]);
 					return from([null]);
@@ -36,7 +37,9 @@ export const NewsSection = () => {
 		return (
 			<div className="w-full bg-gray-50 py-16">
 				<div className="mx-auto max-w-7xl px-4">
-					<h2 className="mb-10 text-xl font-medium text-gray-800">Новости</h2>
+						<h2 className="mb-10 text-xl font-medium text-gray-800">
+							{t('landing.news.title')}
+						</h2>
 					<div className="flex animate-pulse">
 						<div className="basis-1/3 px-3">
 							<div className="h-[320px] rounded-2xl bg-gray-200"></div>
@@ -57,7 +60,9 @@ export const NewsSection = () => {
 	return (
 		<div className="w-full bg-gray-50 py-16">
 			<div className="mx-auto max-w-7xl px-4">
-				<h2 className="mb-10 text-[24px] font-medium text-gray-800">Новости</h2>
+				<h2 className="mb-10 text-[24px] font-medium text-gray-800">
+					{t('landing.news.title')}
+				</h2>
 				<Carousel
 					options={{
 						align: 'start',

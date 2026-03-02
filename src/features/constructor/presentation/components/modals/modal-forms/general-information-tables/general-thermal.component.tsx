@@ -1,4 +1,4 @@
-import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell } from '@core';
+import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell, useI18n } from '@core';
 import type { ThermalInsulationStandarts } from '@features/constructor/types/thermal-insulation.types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
@@ -6,13 +6,15 @@ import { useMemo } from 'react';
 const dataThermal: ThermalInsulationStandarts[] = [];
 
 export const GeneralInformationThermal = () => {
+	const { t } = useI18n();
+
 	const columns = useMemo(() => {
 		const cols: ColumnDef<ThermalInsulationStandarts>[] = [
 			{
 				accessorKey: 'soundproofing',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="Тепловая изоляция"
+						text={t('thermalInsulation.title')}
 						textClassName="w-[200px] text-left text-[#6F7276]"
 					/>
 				),
@@ -76,7 +78,7 @@ export const GeneralInformationThermal = () => {
 			},
 		];
 		return cols;
-	}, []);
+	}, [t]);
 
 	return (
 		<div className="flex-col text-[#6F7276]">

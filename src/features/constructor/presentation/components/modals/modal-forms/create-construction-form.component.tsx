@@ -5,6 +5,7 @@ import {
 	Select,
 	useAppDispatch,
 	useAppSelector,
+	useI18n,
 } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { memoize } from '@core/utils/hoc/memo.utils';
@@ -16,6 +17,7 @@ import {
 	getConstructionRooms,
 	getReportFloorById,
 	getReportSingleById,
+	svgConstructionDetail,
 	updateReportFloor,
 	updateReportSingle,
 } from '@features/constructor/services';
@@ -23,24 +25,33 @@ import { startLoading, stopLoading } from '@features/constructor/store';
 import type { CreateConstructionData } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
 
+import { formatMaterial } from '@features'; // предполагаемый хелпер
 import type { ReportInfoShort } from '@features/constructor/utils';
 import { CreateConstructionConfig } from '@features/constructor/utils';
-import { convertToClientConstructionsAddData } from '@features/guidbooks/converters';
-import { getGuidebooksPaginated } from '@features/guidbooks/services';
+import {
+	convertToClientConstructionsAddData,
+	convertToClientConstructionsEditData,
+} from '@features/guidbooks/converters';
+import { getGuidebooksDetail, getGuidebooksPaginated } from '@features/guidbooks/services';
 import type {
 	BuildingType,
 	CategoryClass,
 	ConstructionClass,
 	ConstructionsAddData,
+	ConstructionsEditData,
 } from '@features/guidbooks/types';
-import { Guidebooks, RuConstructionTypeSelectValues } from '@features/guidbooks/types';
+import {
+	EnConstructionTypeSelectValues,
+	Guidebooks,
+	RuConstructionTypeSelectValues,
+} from '@features/guidbooks/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from, switchMap, tap } from 'rxjs';
+import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
@@ -68,6 +79,7 @@ interface RoomRequirementMap {
 export const CreateConstructionForm = memoize(
 	forwardRef<CreateConstructionFormHandle, CreateConstructionFormProps>(
 		({ onSuccess, x, y, page, floorId }, ref) => {
+			const { t, locale } = useI18n();
 			const form = useForm<CreateConstructionData>({
 				defaultValues: CreateConstructionConfig.defaultValues,
 				resolver: zodResolver(CreateConstructionConfig.schema),
@@ -77,6 +89,9 @@ export const CreateConstructionForm = memoize(
 				[],
 			);
 			const [reportInfoData, setReportInfoData] = useState<ReportInfoShort>();
+			const [constructionDetail, setConstructionDetail] =
+				useState<ConstructionsEditData | null>(null);
+			const [svgUrl, setSvgUrl] = useState<string | null>(null);
 
 			const [roomRequirementsMap, setRoomRequirementsMap] = useState<RoomRequirementMap>({});
 			const [secondRoomOptions, setSecondRoomOptions] = useState<
@@ -100,7 +115,7 @@ export const CreateConstructionForm = memoize(
 				'name',
 				'id',
 				'constructionType',
-				'firstPlacementRoom', // NEW: отслеживаем выбор первой комнаты
+				'firstPlacementRoom',
 			]);
 
 			const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>(
@@ -114,6 +129,10 @@ export const CreateConstructionForm = memoize(
 
 			const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 			const dispatch = useAppDispatch();
+
+			// Выбор массива типов конструкций в зависимости от языка
+			const constructionTypeOptions =
+				locale === 'ru' ? RuConstructionTypeSelectValues : EnConstructionTypeSelectValues;
 
 			const processRoomRequirements = (roomRequirementsData: any[]) => {
 				const map: RoomRequirementMap = {};
@@ -237,12 +256,10 @@ export const CreateConstructionForm = memoize(
 							if (response?.status === 200) {
 								const roomsData = response.data as any;
 
-								// NEW: Обрабатываем полученные данные о комнатах
 								if (Array.isArray(roomsData)) {
 									processRoomRequirements(roomsData);
 								}
 
-								// Уникальные комнаты для первого селекта
 								const uniqueRooms = Array.from(
 									new Map(
 										roomsData.map((item: any) => [
@@ -261,7 +278,7 @@ export const CreateConstructionForm = memoize(
 
 			const handleAddConstruction = (data: CreateConstructionData) => {
 				if (!reportId) {
-					toast.error('Не удалось найти ID отчёта');
+					toast.error(t('createConstruction.error.reportId'));
 					return;
 				}
 
@@ -302,10 +319,11 @@ export const CreateConstructionForm = memoize(
 						catchError((error) => {
 							if (error instanceof AxiosError) {
 								toast.error(
-									error.response?.data || 'Ошибка при добавлении конструкции',
+									error.response?.data ||
+										t('createConstruction.error.addConstruction'),
 								);
 							} else {
-								toast.error('Неизвестная ошибка');
+								toast.error(t('createConstruction.error.unknown'));
 							}
 							dispatch(stopLoading());
 							return from([null]);
@@ -313,7 +331,7 @@ export const CreateConstructionForm = memoize(
 					)
 					.subscribe((response) => {
 						if (response?.status === 200) {
-							toast.success('Конструкция успешно добавлена в отчёт');
+							toast.success(t('createConstruction.success.added'));
 							onSuccess?.();
 						}
 						dispatch(stopLoading());
@@ -355,20 +373,73 @@ export const CreateConstructionForm = memoize(
 					.subscribe(() => dispatch(stopLoading()));
 			};
 
+			// Получение детальной информации о выбранной конструкции
+			const handleGetConstructionDetail = (id: string) => {
+				dispatch(startLoading());
+				from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
+					.pipe(
+						tap((response) => {
+							if (response.status === 200) {
+								const data = convertToClientConstructionsEditData(response.data);
+								setConstructionDetail(data);
+							}
+						}),
+						catchError((error) => {
+							console.error('Ошибка загрузки деталей конструкции:', error);
+							toast.error(t('errors.constructionLoad'));
+							return of(null);
+						}),
+						finalize(() => dispatch(stopLoading())),
+					)
+					.subscribe();
+			};
+
+			const handleGetConstructionImage = (id: string) => {
+				dispatch(startLoading());
+				from(svgConstructionDetail(id))
+					.pipe(
+						tap((response) => {
+							if (response.status === 200 && typeof response.data === 'string') {
+								setSvgUrl(response.data);
+							} else {
+								toast.error(t('errors.imageLoad'));
+							}
+						}),
+						catchError(() => {
+							toast.error(t('errors.imageLoad'));
+							return of(null);
+						}),
+						finalize(() => dispatch(stopLoading())),
+					)
+					.subscribe();
+			};
+
+			useEffect(() => {
+				if (construction) {
+					handleGetConstructionDetail(construction);
+					handleGetConstructionImage(construction);
+				} else {
+					setConstructionDetail(null);
+					setSvgUrl(null);
+				}
+			}, [construction]);
+
 			useEffect(() => {
 				handleGetConstructionData();
 			}, [construction]);
 
 			return (
-				<div className="relative flex flex-col border-b">
+				<div className="relative flex w-full flex-col border-b">
 					{isLoading && (
 						<div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-[10px] bg-white/60">
 							<p className="text-[18px] text-primary">
-								Проводится расчет значений конструкции
+								{t('createConstruction.loadingMessage')}
 							</p>
 							<Loader />
 						</div>
 					)}
+
+					{/* Форма */}
 					<FormProvider {...form}>
 						<div className="flex flex-col gap-[20px]">
 							<Input
@@ -379,10 +450,18 @@ export const CreateConstructionForm = memoize(
 								)}
 								wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
 								inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-								error={formState.errors.name?.message}
+								error={
+									formState.errors.name?.message
+										? t(formState.errors.name.message as any)
+										: undefined
+								}
 								containerClassName="w-[226px]"
-								label={formState.errors?.name?.message || 'Название'}
-								placeholder="Введите название"
+								label={
+									formState.errors?.name?.message
+										? t(formState.errors.name.message as any)
+										: t('createConstruction.name.label')
+								}
+								placeholder={t('createConstruction.name.placeholder')}
 								maxLength={50}
 							/>
 							<Controller
@@ -390,22 +469,35 @@ export const CreateConstructionForm = memoize(
 								name={'constructionType'}
 								render={({ field }) => (
 									<Select
-										options={RuConstructionTypeSelectValues}
+										options={constructionTypeOptions}
 										{...field}
 										value={field.value || ''}
 										label={
-											formState.errors?.constructionType?.message ||
-											'Тип конструкции'
+											formState.errors?.constructionType?.message
+												? t(
+														formState.errors.constructionType
+															.message as any,
+													)
+												: t('createConstruction.constructionType.label')
 										}
 										isSearchable
-										error={formState.errors.constructionType?.message}
+										error={
+											formState.errors.constructionType?.message
+												? t(
+														formState.errors.constructionType
+															.message as any,
+													)
+												: undefined
+										}
 										labelClassName={twMerge(
 											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px] text-left',
 											formState.errors.constructionType?.message
 												? 'text-error'
 												: '',
 										)}
-										placeholder="Выберите тип конструкции"
+										placeholder={t(
+											'createConstruction.constructionType.placeholder',
+										)}
 										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 										wrapperClassname="shadow-none ring-input-border-primary flex-row gap-[20px]"
 									/>
@@ -427,17 +519,25 @@ export const CreateConstructionForm = memoize(
 										{...field}
 										value={field.value || ''}
 										label={
-											formState.errors?.construction?.message || 'Конструкция'
+											formState.errors?.construction?.message
+												? t(formState.errors.construction.message as any)
+												: t('createConstruction.construction.label')
 										}
 										isSearchable
-										error={formState.errors.construction?.message}
+										error={
+											formState.errors.construction?.message
+												? t(formState.errors.construction.message as any)
+												: undefined
+										}
 										labelClassName={twMerge(
 											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px] text-left',
 											formState.errors.construction?.message
 												? 'text-error'
 												: '',
 										)}
-										placeholder="Выберите конструкцию"
+										placeholder={t(
+											'createConstruction.construction.placeholder',
+										)}
 										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 										wrapperClassname="shadow-none ring-input-border-primary flex-row gap-[20px]"
 									/>
@@ -455,8 +555,8 @@ export const CreateConstructionForm = memoize(
 									>
 										{formState.errors.firstPlacementRoom ||
 										formState.errors.secondPlacementRoom
-											? 'Поле обязательно для заполнения'
-											: 'Конструкция разделяет'}
+											? t('validation.required')
+											: t('createConstruction.rooms.label')}
 									</label>
 								</div>
 								<div className="flex gap-x-[12px]">
@@ -468,12 +568,13 @@ export const CreateConstructionForm = memoize(
 												options={roomOptions}
 												{...field}
 												value={field.value || ''}
-												placeholder="Выберите помещение"
+												placeholder={t(
+													'createConstruction.firstRoom.placeholder',
+												)}
 												buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 												wrapperClassname="shadow-none ring-input-border-primary"
 												onChange={(value) => {
 													field.onChange(value);
-													// NEW: Дополнительная логика при изменении первой комнаты
 													setValue('secondPlacementRoom', '');
 													setValue('requirementId', '');
 												}}
@@ -485,20 +586,20 @@ export const CreateConstructionForm = memoize(
 										name="secondPlacementRoom"
 										render={({ field }) => (
 											<Select
-												// NEW: Используем отфильтрованные опции
 												options={secondRoomOptions}
 												{...field}
 												value={field.value || ''}
-												placeholder="Выберите помещение"
+												placeholder={t(
+													'createConstruction.secondRoom.placeholder',
+												)}
 												buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 												wrapperClassname="shadow-none ring-input-border-primary"
-												isDisabled={!firstPlacementRoom} // NEW: Блокируем если не выбрана первая комната
+												isDisabled={!firstPlacementRoom}
 											/>
 										)}
 									/>
 								</div>
 							</div>
-							{/* NEW: Скрытое поле для requirementId */}
 							<input type="hidden" {...register('requirementId')} />
 							<Input
 								{...register('width')}
@@ -508,10 +609,18 @@ export const CreateConstructionForm = memoize(
 								)}
 								wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
 								inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-								error={formState.errors.width?.message}
+								error={
+									formState.errors.width?.message
+										? t(formState.errors.width.message as any)
+										: undefined
+								}
 								containerClassName="w-[226px]"
-								label={formState.errors?.width?.message || 'Ширина (высота), м'}
-								placeholder="Введите ширину"
+								label={
+									formState.errors?.width?.message
+										? t(formState.errors.width.message as any)
+										: t('createConstruction.width.label')
+								}
+								placeholder={t('createConstruction.width.placeholder')}
 								maxLength={50}
 							/>
 							<Input
@@ -522,10 +631,18 @@ export const CreateConstructionForm = memoize(
 								)}
 								wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
 								inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-								error={formState.errors.length?.message}
+								error={
+									formState.errors.length?.message
+										? t(formState.errors.length.message as any)
+										: undefined
+								}
 								containerClassName="w-[226px]"
-								label={formState.errors?.length?.message || 'Длина, м'}
-								placeholder="Введите длину"
+								label={
+									formState.errors?.length?.message
+										? t(formState.errors.length.message as any)
+										: t('createConstruction.length.label')
+								}
+								placeholder={t('createConstruction.length.placeholder')}
 								maxLength={50}
 							/>
 							<Input
@@ -536,16 +653,78 @@ export const CreateConstructionForm = memoize(
 								)}
 								wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
 								inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-								error={formState.errors.area?.message}
+								error={
+									formState.errors.area?.message
+										? t(formState.errors.area.message as any)
+										: undefined
+								}
 								containerClassName="w-[226px]"
-								label={formState.errors?.area?.message || 'Площадь, м2'}
-								placeholder="Введите площадь"
+								label={
+									formState.errors?.area?.message
+										? t(formState.errors.area.message as any)
+										: t('createConstruction.area.label')
+								}
+								placeholder={t('createConstruction.area.placeholder')}
 								maxLength={50}
 								readOnly
 							/>
 						</div>
-						<div className="flex border-b py-[10px]"></div>
 					</FormProvider>
+
+					{/* Блок выбранной конструкции (под формой) */}
+					{construction && (
+						<div className="mt-6 flex flex-col gap-3">
+							<p className="text-lg font-semibold text-gray-800">
+								{t('createConstruction.selectedConstruction') ||
+									'Выбранная конструкция'}
+							</p>
+							<div className="flex flex-row gap-4">
+								{/* Изображение */}
+								<div className="w-1/2">
+									{svgUrl ? (
+										<img
+											className="h-auto max-h-[100px] w-full object-contain"
+											src={svgUrl}
+											alt={'constr'}
+										/>
+									) : (
+										<div className="flex h-[100px] w-full items-center justify-center">
+											<Loader />
+										</div>
+									)}
+								</div>
+								{/* Список материалов */}
+								<div className="w-1/2">
+									{constructionDetail?.constructionTypeObject?.leftConstruction
+										?.slice()
+										.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+										.map((material, i) => (
+											<p key={`left-${i}`} className="pl-4 text-[15px]">
+												- {formatMaterial(material, locale)}
+											</p>
+										))}
+									{constructionDetail?.constructionTypeObject?.centerConstruction
+										?.slice()
+										.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+										.map((material, i) => (
+											<p key={`center-${i}`} className="pl-4 text-[15px]">
+												- {formatMaterial(material, locale)}
+											</p>
+										))}
+									{constructionDetail?.constructionTypeObject?.rightConstruction
+										?.slice()
+										.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+										.map((material, i) => (
+											<p key={`right-${i}`} className="pl-4 text-[15px]">
+												- {formatMaterial(material, locale)}
+											</p>
+										))}
+								</div>
+							</div>
+						</div>
+					)}
+
+					<div className="flex border-b py-[10px]"></div>
 				</div>
 			);
 		},

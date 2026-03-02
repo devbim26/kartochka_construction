@@ -3,19 +3,19 @@ import { z } from 'zod';
 
 export const AboutBuildingSchema = z.object({
 	reportInfoId: z.string().optional(),
-	name: z.string().min(1, 'Поле обязательно для заполнения'),
-	region: z.string().min(1, 'Поле обязательно для заполнения'),
+	name: z.string().min(1, 'validation.required'),
+	region: z.string().min(1, 'validation.required'),
 	commonDescription: z.string().nullable().optional(),
-	buildingPurpose: z.string().min(1, 'Поле обязательно для заполнения'),
-	buildingType: z.string().min(1, 'Поле обязательно для заполнения'),
+	buildingPurpose: z.string().min(1, 'validation.required'),
+	buildingType: z.string().min(1, 'validation.required'),
 	maxHeight: z
 		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => Number.isInteger(Number(value)), 'Значение должно быть целым числом')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	comfortClass: z.string().min(1, 'Поле обязательно для заполнения'),
-	regulatoryDocumentId: z.string().min(1, 'Поле обязательно для заполнения'),
-	calculationDocumentId: z.string().min(1, 'Поле обязательно для заполнения'),
+		.min(1, 'validation.required')
+		.refine((value) => Number.isInteger(Number(value)), 'validation.integer')
+		.refine((value) => +value > 0, 'validation.positiveNumber'),
+	comfortClass: z.string().min(1, 'validation.required'),
+	regulatoryDocumentId: z.string().min(1, 'validation.required'),
+	calculationDocumentId: z.string().min(1, 'validation.required'),
 	isFloorPlan: z.boolean(),
 	isConstruction: z.boolean(),
 	isBim: z.boolean(),
@@ -23,20 +23,19 @@ export const AboutBuildingSchema = z.object({
 
 export const ReportInfoShortScheme = z.object({
 	reportInfoId: z.string().optional(),
-	name: z.string().min(1, 'Поле обязательно для заполнения'),
-	region: z.string().min(1, 'Поле обязательно для заполнения'),
+	name: z.string().min(1, 'validation.required'),
+	region: z.string().min(1, 'validation.required'),
 	commonDescription: z.string().nullable().optional(),
-	buildingPurpose: z.string().min(1, 'Поле обязательно для заполнения'),
-	buildingType: z.string().min(1, 'Поле обязательно для заполнения'),
+	buildingPurpose: z.string().min(1, 'validation.required'),
+	buildingType: z.string().min(1, 'validation.required'),
 	maxHeight: z
 		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => Number.isInteger(Number(value)), 'Значение должно быть целым числом')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	comfortClass: z.string().min(1, 'Поле обязательно для заполнения'),
+		.min(1, 'validation.required')
+		.refine((value) => Number.isInteger(Number(value)), 'validation.integer')
+		.refine((value) => +value > 0, 'validation.positiveNumber'),
+	comfortClass: z.string().min(1, 'validation.required'),
 	calculationRequirement: RequirementsSchema.optional(),
 	regulatoryRequirement: RequirementsSchema.optional(),
-
 	regulatoryDocument: z
 		.object({
 			id: z.string().optional(),

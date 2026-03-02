@@ -1,3 +1,4 @@
+import type { TranslationKey } from '@core';
 import type { Control, FieldValues, FormState, UseFormSetValue } from 'react-hook-form';
 
 export const enum HeaderFormTypes {
@@ -7,9 +8,9 @@ export const enum HeaderFormTypes {
 }
 
 export interface HeaderFormTitles {
-	pageTitle: string;
-	editTitle: string;
-	addTitle: string;
+	pageTitleKey: TranslationKey;
+	editTitleKey: TranslationKey;
+	addTitleKey: TranslationKey;
 }
 
 export interface HeaderFormsProps<T extends FieldValues> {

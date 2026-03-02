@@ -1,9 +1,10 @@
-import { APP_ROUTES, LogoIcon } from '@core';
+import { APP_ROUTES, LogoIcon, useI18n } from '@core';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useNavigate } from 'react-router-dom';
 
 export const Footer = () => {
 	const navigate = useNavigate();
+	const { t } = useI18n();
 
 	return (
 		<div className="flex w-full justify-center bg-background-primary px-4 sm:px-6 lg:px-10">
@@ -23,7 +24,7 @@ export const Footer = () => {
 							}
 							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
 						>
-							Главная
+							{t('landing.footer.home')}
 						</span>
 						<span
 							onClick={() =>
@@ -33,7 +34,7 @@ export const Footer = () => {
 							}
 							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
 						>
-							О нас
+							{t('landing.footer.about')}
 						</span>
 						<span
 							onClick={() =>
@@ -43,7 +44,7 @@ export const Footer = () => {
 							}
 							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
 						>
-							Контакты
+							{t('landing.footer.contacts')}
 						</span>
 					</div>
 
@@ -56,7 +57,7 @@ export const Footer = () => {
 							}
 							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
 						>
-							Проектирование
+							{t('landing.footer.design')}
 						</span>
 						<span
 							onClick={() =>
@@ -66,7 +67,7 @@ export const Footer = () => {
 							}
 							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
 						>
-							Подписки
+							{t('landing.footer.subscriptions')}
 						</span>
 					</div>
 				</div>

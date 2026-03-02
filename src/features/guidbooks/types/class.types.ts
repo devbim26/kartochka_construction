@@ -11,3 +11,10 @@ export const RuCategoryClassSelectValues = [
 	{ label: 'В', value: CategoryClass.C },
 	{ label: 'General', value: CategoryClass.General },
 ];
+
+export const EnCategoryClassSelectValues = [
+	{ label: 'A', value: CategoryClass.A },
+	{ label: 'B', value: CategoryClass.B },
+	{ label: 'C', value: CategoryClass.C },
+	{ label: 'General', value: CategoryClass.General },
+];

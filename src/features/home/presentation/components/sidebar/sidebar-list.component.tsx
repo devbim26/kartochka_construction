@@ -1,10 +1,12 @@
 import { withGuardedBlock } from '@core/utils/permissions';
+import { useI18n } from '@core';
 import type { SidebarListProps } from '@features/home/types';
 import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { twMerge } from 'tailwind-merge';
 
 const SidebarListBase = (props: SidebarListProps) => {
+	const { t } = useI18n();
 	const [showSubItems, setShowSubItems] = useState<boolean>(
 		(props.currentPath || '').includes(props.path),
 	);
@@ -17,7 +19,7 @@ const SidebarListBase = (props: SidebarListProps) => {
 			>
 				<div className="flex flex-row items-center gap-[16px] text-sm font-normal leading-5 tracking-tight text-[#383838]">
 					{props.icon && <props.icon size={'20px'} />}
-					{props.label}
+					{t(props.labelKey)}
 				</div>
 				<FaChevronDown
 					className={twMerge(

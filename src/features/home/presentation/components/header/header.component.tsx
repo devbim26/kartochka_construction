@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ImMenu } from 'react-icons/im';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { HeaderNav } from './header-nav.component';
+import { LanguageToggle } from './language-toggle.component';
 import { LogoutHeader } from './logout-header.component';
 
 export const HomeHeader = () => {
@@ -38,7 +39,8 @@ export const HomeHeader = () => {
 				</div>
 
 				{pathname.startsWith('/') && (
-					<div className="hidden sm:flex">
+					<div className="hidden items-center gap-3 sm:flex">
+						<LanguageToggle />
 						<LogoutHeader />
 					</div>
 				)}
@@ -62,12 +64,15 @@ export const HomeHeader = () => {
 								<LogoIcon className="h-[32px] w-[31px]" />
 								{/* <LogoTextIcon className="h-[48px] w-[130px]" /> */}
 							</div>
-							<button
-								onClick={toggleMenu}
-								className="p-1 text-gray-600 hover:text-gray-900"
-							>
-								✕
-							</button>
+							<div className="flex items-center gap-2">
+								<LanguageToggle />
+								<button
+									onClick={toggleMenu}
+									className="p-1 text-gray-600 hover:text-gray-900"
+								>
+									✕
+								</button>
+							</div>
 						</div>
 
 						<div className="flex-1">

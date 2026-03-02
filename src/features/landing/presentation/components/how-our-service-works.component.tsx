@@ -1,4 +1,4 @@
-import { Chevron } from '@core';
+import { Chevron, useI18n } from '@core';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { stepDescriptions, stepDetailDescriptions, steps } from '../../constants';
@@ -21,6 +21,7 @@ const numberImages = [
 export const HowOurServiceWorks = () => {
 	const [selectedStep, setSelectedStep] = useState(0);
 	const [isHover, setIsHover] = useState<boolean | null>(null);
+	const { t } = useI18n();
 
 	const handleStepClick = (index: number) => {
 		setSelectedStep(index);
@@ -30,7 +31,7 @@ export const HowOurServiceWorks = () => {
 		<div className="flex w-full justify-center bg-background-primary">
 			<div className="w-full max-w-screen-xl px-4 py-12 sm:px-6 md:px-8 xl:px-20">
 				<div className="mb-8 text-center font-montserrat text-lg font-normal leading-snug sm:text-xl">
-					Как работает наш сервис
+					{t('landing.how.title')}
 				</div>
 
 				<div className="flex flex-col items-center justify-center gap-10 xs:flex-row xs:flex-nowrap xs:items-center xs:justify-center">
@@ -48,7 +49,7 @@ export const HowOurServiceWorks = () => {
 											selectedStep === index ? 'text-primary' : 'text-black',
 										)}
 									>
-										{index + 1}. {step}
+										{index + 1}. {t(step)}
 									</div>
 									<div className="flex">
 										<Chevron
@@ -80,22 +81,22 @@ export const HowOurServiceWorks = () => {
 								isHover ? 'opacity-0' : 'opacity-100',
 							)}
 						>
-							{/* Картинка на заднем фоне */}
+							{/* Background number image */}
 							<div className="absolute inset-0 flex justify-end p-5 text-[#0F6CAF38]">
 								<div className="size-auto">{numberImages[selectedStep]}</div>
 							</div>
 
-							{/* Контент поверх картинки */}
+							{/* Content over image */}
 							<div className="relative z-10 flex flex-col gap-6">
 								<div className="flex flex-row items-start justify-between gap-4 sm:gap-6">
 									<div className="font-montserrat text-base font-semibold leading-snug sm:text-lg">
-										{steps[selectedStep]}
+										{t(steps[selectedStep])}
 									</div>
-									{/* Можно оставить или убрать - если убрать, то картинка будет только на фоне */}
+									{/* Optional: show number on top as well */}
 									{/* <div className="shrink-0">{numberImages[selectedStep]}</div> */}
 								</div>
 								<div className="whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed sm:text-base">
-									{stepDescriptions[selectedStep]}
+									{t(stepDescriptions[selectedStep])}
 								</div>
 							</div>
 						</div>
@@ -113,7 +114,7 @@ export const HowOurServiceWorks = () => {
 									isHover ? 'opacity-100' : 'invisible opacity-0',
 								)}
 							>
-								{stepDetailDescriptions[selectedStep]}
+								{t(stepDetailDescriptions[selectedStep])}
 							</div>
 						</div>
 					</div>

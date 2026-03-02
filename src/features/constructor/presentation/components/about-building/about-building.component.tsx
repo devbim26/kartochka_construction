@@ -11,6 +11,7 @@ import {
 	TextArea,
 	useAppDispatch,
 	useAppNavigate,
+	useI18n,
 } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import {
@@ -27,6 +28,7 @@ import {
 } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
 import {
+	EnPurposeBuildingSelectValues,
 	ReportCategory,
 	RuPurposeBuildingSelectValues,
 	type AboutBuildingData,
@@ -37,25 +39,51 @@ import {
 	getRegulatoryRequirementDocuments,
 } from '@features/guidbooks/services';
 import {
+	BuildingType,
+	CategoryClass,
 	Country,
-	country2title,
+	EnBuildingTypeSelectValues,
+	EnCategoryClassSelectValues,
+	EnCountryNamesSelectValues,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
 	RuCountryNamesSelectValues,
 } from '@features/guidbooks/types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, map } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
+// Функция для получения названия страны по ключу (используется в подсказке)
+const getCountryKey = (country: Country): string => {
+	switch (country) {
+		case Country.None:
+			return 'country.none';
+		case Country.Belarus:
+			return 'country.belarus';
+		case Country.Russia:
+			return 'country.russia';
+		default:
+			return '';
+	}
+};
+
+// Вспомогательная функция для форматирования значения enum в читаемый текст (если нет английского массива)
+const formatEnumValue = (value: string): string => {
+	// Пример: "ResidentialBuildings" -> "Residential Buildings"
+	return value.replace(/([A-Z])/g, ' $1').trim();
+};
+
 const AboutBuildingScreen = () => {
+	const { t, locale } = useI18n();
+	const currentLanguage = locale; // 'ru' или 'en'
+
 	const form = useForm<AboutBuildingData>({
 		defaultValues: AboutBuildingConfig.defaultValues,
 		resolver: zodResolver(AboutBuildingConfig.schema),
@@ -71,6 +99,7 @@ const AboutBuildingScreen = () => {
 		SelectOption[]
 	>([]);
 
+	// Загрузка документов (без изменений)
 	const handleGetRequirementDocuments = () => {
 		from(getRegulatoryRequirementDocuments())
 			.pipe(
@@ -146,7 +175,7 @@ const AboutBuildingScreen = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					toast.success('Успещное полчеие отчета');
+					toast.success(t('aboutBuilding.report.fetchSuccess'));
 					const data = convertToClientReportInfo(response.data);
 					if (data)
 						form.reset({
@@ -186,7 +215,7 @@ const AboutBuildingScreen = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					toast.success('Отчет успешно создан');
+					toast.success(t('aboutBuilding.report.createSuccess'));
 					if (response?.data?.id) {
 						const reportId = response.data.id;
 						sessionStorage.setItem('reportId', reportId);
@@ -225,7 +254,7 @@ const AboutBuildingScreen = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					toast.success('Отчет успешно отредактирован');
+					toast.success(t('aboutBuilding.report.updateSuccess'));
 					if (response.status === 200)
 						from(
 							search.get('reportType') == ReportCategory.Floor
@@ -255,14 +284,61 @@ const AboutBuildingScreen = () => {
 			});
 	};
 
+	const countryOptions = useMemo(() => {
+		if (currentLanguage === 'ru') {
+			return RuCountryNamesSelectValues;
+		} else {
+			return (
+				EnCountryNamesSelectValues ||
+				Object.values(Country).map((value) => ({ label: formatEnumValue(value), value }))
+			);
+		}
+	}, [currentLanguage]);
+
+	const buildingTypeOptions = useMemo(() => {
+		if (currentLanguage === 'ru') {
+			return RuBuildingTypeSelectValues;
+		} else {
+			return (
+				EnBuildingTypeSelectValues ||
+				Object.values(BuildingType).map((value) => ({
+					label: formatEnumValue(value),
+					value,
+				}))
+			);
+		}
+	}, [currentLanguage]);
+
+	const buildingPurposeOptions = useMemo(() => {
+		if (currentLanguage === 'ru') {
+			return RuPurposeBuildingSelectValues;
+		} else {
+			return EnPurposeBuildingSelectValues || []; // предположим, есть
+		}
+	}, [currentLanguage]);
+
+	const comfortClassOptions = useMemo(() => {
+		if (currentLanguage === 'ru') {
+			return RuCategoryClassSelectValues;
+		} else {
+			return (
+				EnCategoryClassSelectValues ||
+				Object.values(CategoryClass).map((value) => ({ label: value, value }))
+			);
+		}
+	}, [currentLanguage]);
+
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
 			<div className="flex border-b px-[24px] py-[18px]">
-				<p className="font-sans text-lg font-semibold leading-4">О здании</p>
+				<p className="font-sans text-lg font-semibold leading-4">
+					{t('aboutBuilding.title')}
+				</p>
 			</div>
 			<div className="flex flex-col border-b px-[24px] py-[11px]">
 				<FormProvider {...form}>
 					<div className="flex flex-col gap-[20px]">
+						{/* Поле "Название" */}
 						<div className="flex w-full items-center gap-2">
 							<Input
 								{...register('name')}
@@ -272,66 +348,70 @@ const AboutBuildingScreen = () => {
 								)}
 								wrapperClassName="flex-row items-center gap-[50px]"
 								inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-								error={formState.errors.name?.message}
+								error={
+									formState.errors.name?.message
+										? t(formState.errors.name.message as any)
+										: undefined
+								}
 								containerClassName="w-[226px]"
-								label={formState.errors?.name?.message || 'Название*'}
-								placeholder="Введите название"
+								label={
+									formState.errors?.name?.message
+										? t(formState.errors.name.message as any)
+										: t('aboutBuilding.name.label')
+								}
+								placeholder={t('aboutBuilding.name.placeholder')}
 								maxLength={50}
 							/>
 							{name && (
 								<p className="text-[14px] text-gray-additionalText">
-									Введенное название будет использоваться для определения Объекта
-									в отчете
+									{t('aboutBuilding.name.hint')}
 								</p>
 							)}
 						</div>
 
+						{/* Общее описание */}
 						<TextArea
 							{...register('commonDescription')}
-							labelClassName={
-								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]'
-							}
+							labelClassName="font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]"
 							wrapperClassName="flex-row items-center gap-[50px]"
 							inputClassName="w-full py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							containerClassName="w-[700px]"
-							label={'Общее описание'}
-							placeholder="Введите описание"
+							label={t('aboutBuilding.commonDescription.label')}
+							placeholder={t('aboutBuilding.commonDescription.placeholder')}
 						/>
+
+						{/* Страна */}
 						<div className="flex w-full items-center gap-2">
 							<Controller
 								control={control}
 								name="region"
 								render={({ field }) => (
 									<Select
-										options={[
-											{ label: 'Нет', value: Country.None },
-											{ label: 'Беларусь', value: Country.Belarus },
-											{ label: 'Россия', value: Country.Russia },
-											...RuCountryNamesSelectValues.filter(
-												(reg) =>
-													!['Беларусь', 'Россия', 'Нет'].includes(
-														reg.label,
-													),
-											).sort((a, b) => a.label.localeCompare(b.label)),
-										]}
+										options={countryOptions}
 										disabled={!!search.get('edit')}
 										{...field}
 										value={field.value || ''}
 										onChange={(val) => {
-											field.onChange(val),
-												form.reset({
-													...form.getValues(),
-												});
+											field.onChange(val);
+											form.reset({ ...form.getValues() });
 										}}
-										label={formState.errors?.region?.message || 'Страна*'}
-										error={formState.errors.region?.message}
+										label={
+											formState.errors?.region?.message
+												? t(formState.errors.region.message as any)
+												: t('aboutBuilding.region.label')
+										}
+										error={
+											formState.errors.region?.message
+												? t(formState.errors.region.message as any)
+												: undefined
+										}
 										isSearchable
 										highlightOnlyRussiaBelarus
 										labelClassName={twMerge(
 											'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 											formState.errors.region?.message ? 'text-error' : '',
 										)}
-										placeholder="Выберите страну"
+										placeholder={t('aboutBuilding.region.placeholder')}
 										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 									/>
@@ -339,12 +419,12 @@ const AboutBuildingScreen = () => {
 							/>
 							{selectedRegion && selectedRegion !== Country.None && (
 								<p className="text-[14px] text-gray-additionalText">
-									Расчет и определение допустимых значений будет произведен в
-									соответствии с ТНПА {country2title[selectedRegion as Country]}
+									{t('aboutBuilding.region.hint')}
 								</p>
 							)}
 						</div>
 
+						{/* Тип здания и назначение */}
 						<div className="flex items-center gap-x-[50px]">
 							<div className="w-[145px]">
 								<label
@@ -357,8 +437,8 @@ const AboutBuildingScreen = () => {
 								>
 									{formState.errors.buildingPurpose ||
 									formState.errors.buildingType
-										? 'Поле обязательно для заполнения'
-										: 'Тип здания*'}
+										? t('validation.required')
+										: t('aboutBuilding.buildingType.label')}
 								</label>
 							</div>
 							<div className="flex gap-x-[12px]">
@@ -367,17 +447,24 @@ const AboutBuildingScreen = () => {
 									name="buildingType"
 									render={({ field }) => (
 										<Select
-											options={RuBuildingTypeSelectValues}
+											options={buildingTypeOptions}
 											onChange={(val) => {
-												field.onChange(val),
-													form.reset({
-														...form.getValues(),
-													});
+												field.onChange(val);
+												form.reset({ ...form.getValues() });
 											}}
-											error={formState.errors.buildingType?.message}
+											error={
+												formState.errors.buildingType?.message
+													? t(
+															formState.errors.buildingType
+																.message as any,
+														)
+													: undefined
+											}
 											value={field.value || ''}
 											disabled={!!search.get('edit')}
-											placeholder="Выберите тип"
+											placeholder={t(
+												'aboutBuilding.buildingType.placeholder',
+											)}
 											isSearchable
 											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 											wrapperClassname="shadow-none ring-input-border-primary"
@@ -389,12 +476,21 @@ const AboutBuildingScreen = () => {
 									name="buildingPurpose"
 									render={({ field }) => (
 										<Select
-											options={RuPurposeBuildingSelectValues}
+											options={buildingPurposeOptions}
 											{...field}
-											error={formState.errors.buildingPurpose?.message}
+											error={
+												formState.errors.buildingPurpose?.message
+													? t(
+															formState.errors.buildingPurpose
+																.message as any,
+														)
+													: undefined
+											}
 											value={field.value || ''}
 											disabled={!!search.get('edit')}
-											placeholder="Выберите назначение"
+											placeholder={t(
+												'aboutBuilding.buildingPurpose.placeholder',
+											)}
 											isSearchable
 											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 											wrapperClassname="shadow-none ring-input-border-primary"
@@ -403,91 +499,120 @@ const AboutBuildingScreen = () => {
 								/>
 							</div>
 						</div>
+
+						{/* Высота */}
 						<Input
 							{...register('maxHeight')}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[170px]',
-								formState.errors.name?.message ? 'text-error' : '',
+								formState.errors.maxHeight?.message ? 'text-error' : '',
 							)}
 							wrapperClassName="flex-row items-center gap-[24px]"
 							inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-							error={formState.errors.maxHeight?.message}
+							error={
+								formState.errors.maxHeight?.message
+									? t(formState.errors.maxHeight.message as any)
+									: undefined
+							}
 							containerClassName="w-[226px]"
 							disabled={!!search.get('edit')}
 							label={
-								formState.errors?.maxHeight?.message ||
-								'Наибольшая допустимая высота здания, м'
+								formState.errors?.maxHeight?.message
+									? t(formState.errors.maxHeight.message as any)
+									: t('aboutBuilding.maxHeight.label')
 							}
 							type="number"
-							placeholder="Введите высоту"
+							placeholder={t('aboutBuilding.maxHeight.placeholder')}
 							max={3}
 						/>
+
+						{/* Класс комфортности */}
 						<Controller
 							control={control}
-							name={'comfortClass'}
+							name="comfortClass"
 							render={({ field }) => (
 								<Select
-									options={RuCategoryClassSelectValues}
+									options={comfortClassOptions}
 									onChange={(val) => {
-										field.onChange(val),
-											form.reset({
-												...form.getValues(),
-											});
+										field.onChange(val);
+										form.reset({ ...form.getValues() });
 									}}
 									value={field.value || ''}
 									label={
-										formState.errors?.comfortClass?.message ||
-										'Класс комфортности'
+										formState.errors?.comfortClass?.message
+											? t(formState.errors.comfortClass.message as any)
+											: t('aboutBuilding.comfortClass.label')
 									}
 									isSearchable
 									disabled={!!search.get('edit')}
-									error={formState.errors.comfortClass?.message}
+									error={
+										formState.errors.comfortClass?.message
+											? t(formState.errors.comfortClass.message as any)
+											: undefined
+									}
 									labelClassName={twMerge(
 										'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
 										formState.errors.comfortClass?.message ? 'text-error' : '',
 									)}
-									placeholder="Выберите класс"
+									placeholder={t('aboutBuilding.comfortClass.placeholder')}
 									buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 									wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 								/>
 							)}
 						/>
+
+						{/* Требования: заголовки колонок */}
 						<div className="flex w-full items-center gap-[50px]">
 							<FormElementLabel className="w-[145px] font-sans text-lg font-semibold leading-4 text-primary">
-								Требования
+								{t('aboutBuilding.requirements.title')}
 							</FormElementLabel>
 							<div className="flex w-full items-center gap-[12px]">
 								<FormElementLabel className="w-[226px] text-center font-sans text-lg font-semibold leading-4 text-input-label-primary">
-									Расчет
+									{t('aboutBuilding.requirements.calculation')}
 								</FormElementLabel>
 								<FormElementLabel className="w-[226px] text-center font-sans text-lg font-semibold leading-4 text-input-label-primary">
-									Допустимые значения
+									{t('aboutBuilding.requirements.regulation')}
 								</FormElementLabel>
 							</div>
 						</div>
+
+						{/* Документы требований */}
 						<div className="flex gap-[12px]">
 							<Controller
 								control={control}
-								name={'calculationDocumentId'}
+								name="calculationDocumentId"
 								render={({ field }) => (
 									<Select
 										{...field}
 										options={calculationRequirementDocuments ?? []}
 										value={field.value || ''}
 										label={
-											formState.errors?.calculationDocumentId?.message ||
-											'Звукоизоляция*'
+											formState.errors?.calculationDocumentId?.message
+												? t(
+														formState.errors.calculationDocumentId
+															.message as any,
+													)
+												: t('aboutBuilding.requirements.sound.label')
 										}
 										isSearchable
 										disabled={!!search.get('edit')}
-										error={formState.errors.calculationDocumentId?.message}
+										error={
+											formState.errors.calculationDocumentId?.message
+												? t(
+														formState.errors.calculationDocumentId
+															.message as any,
+													)
+												: undefined
+										}
 										labelClassName={twMerge(
 											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
 											formState.errors.calculationDocumentId?.message
 												? 'text-error'
 												: '',
 										)}
-										placeholder="Выберите расч. документ"
+										placeholder={t(
+											'aboutBuilding.requirements.sound.placeholder',
+										)}
 										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 									/>
@@ -495,7 +620,7 @@ const AboutBuildingScreen = () => {
 							/>
 							<Controller
 								control={control}
-								name={'regulatoryDocumentId'}
+								name="regulatoryDocumentId"
 								render={({ field }) => (
 									<Select
 										{...field}
@@ -503,67 +628,34 @@ const AboutBuildingScreen = () => {
 										value={field.value || ''}
 										isSearchable
 										disabled={!!search.get('edit')}
-										error={formState.errors.regulatoryDocumentId?.message}
-										placeholder="Выберите норм. документ"
+										error={
+											formState.errors.regulatoryDocumentId?.message
+												? t(
+														formState.errors.regulatoryDocumentId
+															.message as any,
+													)
+												: undefined
+										}
+										placeholder={t(
+											'aboutBuilding.requirements.regulation.placeholder',
+										)}
 										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
 										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 									/>
 								)}
 							/>
 						</div>
-						{/* <div className="flex gap-[12px]">
-							<Controller
-								control={control}
-								name={'requirement'}
-								render={({ field }) => (
-									<Select
-										{...field}
-										options={filteredRequirements ?? []}
-										value={field.value || ''}
-										label={
-											formState.errors?.requirement?.message ||
-											'Теплоизоляция*'
-										}
-										isSearchable
-										disabled
-										error={formState.errors.requirement?.message}
-										labelClassName={twMerge(
-											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
-											formState.errors.requirement?.message
-												? 'text-error'
-												: '',
-										)}
-										placeholder="Выберите требование"
-										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
-									/>
-								)}
-							/>
-							<Controller
-								control={control}
-								name={'requirement'}
-								render={({ field }) => (
-									<Select
-										disabled
-										{...field}
-										options={filteredRequirements ?? []}
-										value={field.value || ''}
-										isSearchable
-										error={formState.errors.requirement?.message}
-										placeholder="Выберите требование"
-										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
-									/>
-								)}
-							/>
-						</div> */}
+
 						<Separator className="h-[2px] w-full bg-primary" />
+
+						{/* Ввод информации о конструкциях */}
 						<FormElementLabel className="font-sans text-lg font-semibold leading-4 text-primary">
-							Ввод информации о конструкциях здания
+							{t('aboutBuilding.constructionInfo.title')}
 						</FormElementLabel>
+
 						<div className="flex items-center gap-x-[10px]">
 							<label className="w-[250px] font-sans text-sm font-semibold leading-6">
-								Конструкции
+								{t('aboutBuilding.constructionInfo.constructions')}
 							</label>
 							<Controller
 								control={control}
@@ -584,9 +676,10 @@ const AboutBuildingScreen = () => {
 								)}
 							/>
 						</div>
+
 						<div className="flex items-center gap-x-[10px]">
 							<label className="w-[250px] font-sans text-sm font-semibold leading-6">
-								Поэтажные планы (pdf)
+								{t('aboutBuilding.constructionInfo.floorPlans')}
 							</label>
 							<Controller
 								control={control}
@@ -610,7 +703,7 @@ const AboutBuildingScreen = () => {
 
 						<div className="flex items-center gap-x-[10px]">
 							<label className="w-[250px] font-sans text-sm font-semibold leading-6">
-								BIM модель (ifc) в разработке
+								{t('aboutBuilding.constructionInfo.bim')}
 							</label>
 							<Controller
 								control={control}
@@ -633,14 +726,16 @@ const AboutBuildingScreen = () => {
 								)}
 							/>
 						</div>
+
+						{/* Кнопка */}
 						<div className="flex justify-end px-[16px] py-[13px]">
 							<Button
-								type={'submit'}
+								type="submit"
 								onClick={handleSubmit}
 								className="h-[40px] w-fit px-[16px]"
 							>
 								<p className="font-sans text-sm font-semibold leading-4">
-									{!!search.get('edit') ? 'Сохранить' : 'Далее'}
+									{!!search.get('edit') ? t('common.save') : t('common.continue')}
 								</p>
 							</Button>
 						</div>

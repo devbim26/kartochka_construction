@@ -1,4 +1,4 @@
-import { Button, CleanUpIcon, useAppNavigate } from '@core';
+import { Button, CleanUpIcon, useAppNavigate, useI18n } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type { HeaderFormElements, HeaderFormTitles } from '@features/guidbooks/types';
 import { HeaderFormTypes } from '@features/guidbooks/types';
@@ -20,6 +20,7 @@ interface SubscriptionPageHeaderWrapperProps {
 
 export const SubscriptionPageHeaderWrapper = memoize(
 	({ titles, forms, formElements, onSave }: SubscriptionPageHeaderWrapperProps) => {
+		const { t } = useI18n();
 		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
 		const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
@@ -89,18 +90,20 @@ export const SubscriptionPageHeaderWrapper = memoize(
 		const subTitle = useMemo(() => {
 			switch (currentHeaderFormType) {
 				case HeaderFormTypes.add:
-					return titles.addTitle;
+					return t(titles.addTitleKey);
 				case HeaderFormTypes.edit:
-					return titles.editTitle;
+					return t(titles.editTitleKey);
 				default:
 					return '';
 			}
-		}, [currentHeaderFormType, titles]);
+		}, [currentHeaderFormType, titles, t]);
 
 		return (
 			<div className="flex w-full flex-col gap-[14px]">
 				<div className="flex items-center justify-between">
-					<p className="font-sans text-lg font-semibold leading-6">{titles.pageTitle}</p>
+					<p className="font-sans text-lg font-semibold leading-6">
+						{t(titles.pageTitleKey)}
+					</p>
 					{currentHeaderFormType === HeaderFormTypes.filter && (
 						<Button
 							className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
@@ -108,7 +111,7 @@ export const SubscriptionPageHeaderWrapper = memoize(
 						>
 							<FaPlus fill="white" width={'16px'} height={'16px'} />
 							<p className="font-sans text-sm font-semibold leading-[18px]">
-								Добавить
+								{t('common.add')}
 							</p>
 						</Button>
 					)}
@@ -128,8 +131,8 @@ export const SubscriptionPageHeaderWrapper = memoize(
 							>
 								<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
 									{currentHeaderFormType === HeaderFormTypes.add
-										? 'Сохранить'
-										: 'Сохранить изменения'}
+										? t('common.save')
+										: t('common.saveChanges')}
 								</p>
 							</Button>
 						)}
@@ -148,8 +151,8 @@ export const SubscriptionPageHeaderWrapper = memoize(
 							/>
 							<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
 								{currentHeaderFormType === HeaderFormTypes.filter
-									? 'Очистить'
-									: 'Отмена'}
+									? t('common.clear')
+									: t('common.cancel')}
 							</p>
 						</Button>
 					</div>

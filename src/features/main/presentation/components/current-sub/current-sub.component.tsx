@@ -1,5 +1,5 @@
 import { fetchApi } from '@api-gen';
-import { Button, convertToPaginatedType, useAppSelector } from '@core';
+import { Button, convertToPaginatedType, useAppSelector, useI18n } from '@core';
 import {
 	convertSubscriptionToClient,
 	getPaginatedSubscriptions,
@@ -15,6 +15,7 @@ export const CurrentSub = () => {
 	const [subscription, setSubscription] = useState<Subscription>();
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
 	const userData = useAppSelector((store) => store.userData);
+	const { t } = useI18n();
 	const handleGetTableData = () => {
 		from(
 			getPaginatedSubscriptions({
@@ -40,7 +41,7 @@ export const CurrentSub = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка загрузки пакетов');
+						toast.error(error.response?.data?.message || t('errors.packagesLoad'));
 					}
 					return from([null]);
 				}),
@@ -53,7 +54,6 @@ export const CurrentSub = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						//toast.error(error.response?.data?.message || 'Ошибка получения подписки');
 					}
 					return from([null]);
 				}),
@@ -61,7 +61,7 @@ export const CurrentSub = () => {
 			.subscribe((response) => {
 				if (response?.status === 200 && response.data) {
 					const activeSub = subscriptions.find(
-						(sub) => sub.id === (response.data as any).subscriptionId, //TODO: any убрать
+						(sub) => sub.id === (response.data as any).subscriptionId, // TODO: remove `any`
 					);
 					setSubscription(activeSub);
 				}
@@ -79,7 +79,9 @@ export const CurrentSub = () => {
 	return (
 		<div className="flex w-1/2 flex-col gap-[26px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]">
 			<div className="flex flex-row items-center justify-between">
-				<p className="font-sans text-2xl font-semibold leading-4">Пакет услуг</p>
+				<p className="font-sans text-2xl font-semibold leading-4">
+					{t('main.currentSub.title')}
+				</p>
 			</div>
 			{subscription ? (
 				<div className="flex flex-row justify-between">
@@ -92,18 +94,18 @@ export const CurrentSub = () => {
 							</div>
 							<div className="flex flex-row">
 								<p className="mr-[5px] font-sans text-lg font-normal leading-4">
-									осталось скачиваний: {userData.data?.expiresAt}
+									{t('main.currentSub.remainingDownloads')}: {userData.data?.expiresAt}
 								</p>
 							</div>
 							<div className="flex flex-row">
 								<p className="mr-[5px] font-sans text-lg font-normal leading-4">
-									цена: {subscription.price}
+									{t('main.currentSub.price')}: {subscription.price}
 								</p>
 							</div>
 						</div>
 						<Button className="w-min px-[16px]">
 							<p className="font-sans text-sm font-semibold leading-4">
-								Изменить пакет
+								{t('main.currentSub.changePlan')}
 							</p>
 						</Button>
 					</div>
@@ -111,7 +113,9 @@ export const CurrentSub = () => {
 				</div>
 			) : (
 				<div className="flex flex-row justify-between">
-					<div className="flex flex-col justify-between">Нет активного пакета</div>
+					<div className="flex flex-col justify-between">
+						{t('main.currentSub.noneActive')}
+					</div>
 					<SubImage />
 				</div>
 			)}

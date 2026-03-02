@@ -1,4 +1,4 @@
-import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell } from '@core';
+import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell, useI18n } from '@core';
 import type { PhysicalStandarts } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
@@ -8,12 +8,17 @@ type Props = {
 };
 
 export const GeneralInformationPhysical = ({ data }: Props) => {
+	const { t } = useI18n();
+
 	const columns = useMemo(() => {
 		const cols: ColumnDef<PhysicalStandarts>[] = [
 			{
 				accessorKey: 'physical',
 				header: () => (
-					<SimpleTableHeaderCell text="Физические" textClassName="w-[200px] text-left" />
+					<SimpleTableHeaderCell
+						text={t('physical.title')}
+						textClassName="w-[200px] text-left"
+					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
@@ -25,7 +30,10 @@ export const GeneralInformationPhysical = ({ data }: Props) => {
 			{
 				accessorKey: 'values',
 				header: () => (
-					<SimpleTableHeaderCell text="Значения" textClassName="w-[100px] text-right" />
+					<SimpleTableHeaderCell
+						text={t('physical.values')}
+						textClassName="w-[100px] text-right"
+					/>
 				),
 				cell: (info) => {
 					const value = info.getValue() as string;
@@ -36,7 +44,10 @@ export const GeneralInformationPhysical = ({ data }: Props) => {
 			{
 				accessorKey: 'requirements',
 				header: () => (
-					<SimpleTableHeaderCell text="Требования" textClassName="w-[100px] text-right" />
+					<SimpleTableHeaderCell
+						text={t('physical.requirements')}
+						textClassName="w-[100px] text-right"
+					/>
 				),
 				cell: (info) => {
 					const requirement = info.getValue() as string;
@@ -66,7 +77,7 @@ export const GeneralInformationPhysical = ({ data }: Props) => {
 			},
 		];
 		return cols;
-	}, []);
+	}, [t]);
 
 	return (
 		<div className="flex-col">

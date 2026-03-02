@@ -8,6 +8,7 @@ import {
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	useI18n,
 	type PaginationState,
 } from '@core';
 import { useHeaderForm } from '@features/guidbooks/utils';
@@ -37,6 +38,7 @@ import {
 } from '../components';
 
 const SubscriptionScreen = () => {
+	const { t } = useI18n();
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const [tableData, setTableData] = useState<Array<Subscription>>([]);
@@ -95,7 +97,7 @@ const SubscriptionScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка загрузки подписок');
+						toast.error(error.response?.data?.message || t('subscriptions.loadError'));
 					}
 					return from([null]);
 				}),
@@ -108,7 +110,9 @@ const SubscriptionScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка создания подписки');
+						toast.error(
+							error.response?.data?.message || t('subscriptions.createError'),
+						);
 					}
 					return from([null]);
 				}),
@@ -116,7 +120,7 @@ const SubscriptionScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Подписка успешно добавлена');
+					toast.success(t('subscriptions.addSuccess'));
 					navigate('');
 				}
 			});
@@ -135,7 +139,7 @@ const SubscriptionScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Подписка успешно удалена');
+					toast.success(t('subscriptions.deleteSuccess'));
 				}
 			});
 	};
@@ -145,9 +149,7 @@ const SubscriptionScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(
-							error.response?.data?.message || 'Ошибка редактирования подписки',
-						);
+						toast.error(error.response?.data?.message || t('subscriptions.editError'));
 					}
 					return from([null]);
 				}),
@@ -155,7 +157,7 @@ const SubscriptionScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Подписка успешно отредактирована');
+					toast.success(t('subscriptions.editSuccess'));
 					navigate('');
 				}
 			});
@@ -194,9 +196,9 @@ const SubscriptionScreen = () => {
 			<SubscriptionPageHeaderWrapper
 				onSave={search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
-					pageTitle: 'Конструктор пакетов',
-					editTitle: 'Редактировать пакет',
-					addTitle: 'Добавить пакет',
+					pageTitleKey: 'subscriptions.pageTitle',
+					editTitleKey: 'subscriptions.editTitle',
+					addTitleKey: 'subscriptions.addTitle',
 				}}
 				forms={form}
 				formElements={{
@@ -212,7 +214,7 @@ const SubscriptionScreen = () => {
 					{
 						id: 'actions',
 						accessorKey: 'id',
-						header: () => <SimpleTableHeaderCell text={'Действия'} />,
+						header: () => <SimpleTableHeaderCell text={t('common.actions')} />,
 						cell: (info) => (
 							<SimpleTableCell
 								content={
@@ -252,9 +254,9 @@ const SubscriptionScreen = () => {
 					handleDeleteTableData(search.get('id')!);
 					navigate('');
 				}}
-				headerTitle="Подтвердите действие"
+				headerTitle={t('guides.deleteModal.title')}
 			>
-				Вы уверены, что хотите удалить пакет?
+				{t('subscriptions.deleteConfirmation')}
 			</DeleteModal>
 		</div>
 	);

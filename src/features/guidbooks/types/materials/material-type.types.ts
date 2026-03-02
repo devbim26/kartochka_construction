@@ -4,6 +4,11 @@ export enum MaterialOriginType {
 	UserDefinedProduct = 'UserDefinedProduct',
 }
 
+export const EnMaterialOriginTypesSelectValues = [
+	{ label: 'Generic', value: MaterialOriginType.Generic },
+	{ label: 'Manufacturer', value: MaterialOriginType.Manufacturer },
+	{ label: 'UserDefinedProduct', value: MaterialOriginType.UserDefinedProduct },
+];
 export const RuMaterialOriginTypesSelectValues = [
 	{ label: 'Общий', value: MaterialOriginType.Generic },
 	{ label: 'Производитель', value: MaterialOriginType.Manufacturer },
@@ -111,6 +116,59 @@ export const MaterialTypesSelectValuesMap = {
 	],
 };
 
+export const EnMaterialTypesSelectValuesMap = {
+	[MaterialTypesSelectValuesEnum.Base]: [
+		{ label: 'Heavy', value: MaterialTypeEnum.Heavy },
+		//доп материалы
+		{ label: 'Board', value: MaterialTypeEnum.Board },
+		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
+		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	],
+	[MaterialTypesSelectValuesEnum.Glass]: [{ label: 'Glass', value: MaterialTypeEnum.Glazing }],
+	[MaterialTypesSelectValuesEnum.MultiGlass]: [
+		{ label: 'Glass', value: MaterialTypeEnum.Glazing },
+		{ label: 'AirGap', value: MaterialTypeEnum.AirGap },
+	],
+	[MaterialTypesSelectValuesEnum.Soundproofing]: [
+		{ label: 'ZPanel', value: MaterialTypeEnum.ZPanel },
+		//доп материалы
+		{ label: 'Board', value: MaterialTypeEnum.Board },
+		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
+		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	],
+	[MaterialTypesSelectValuesEnum.Facing]: [
+		{ label: 'Frame', value: MaterialTypeEnum.Frame },
+		{ label: 'AirGap', value: MaterialTypeEnum.AirGap },
+		{ label: 'Link', value: MaterialTypeEnum.Link },
+		{ label: 'Filler', value: MaterialTypeEnum.Filler },
+		{ label: 'Board', value: MaterialTypeEnum.Board },
+		//доп материалы
+		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
+		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	],
+	[MaterialTypesSelectValuesEnum.Additional]: [
+		{ label: 'Board', value: MaterialTypeEnum.Board },
+		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
+		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	],
+	[MaterialTypesSelectValuesEnum.FramePartition]: [
+		{ label: 'Frame', value: MaterialTypeEnum.Frame },
+		{ label: 'Filler', value: MaterialTypeEnum.Filler },
+		{ label: 'Board', value: MaterialTypeEnum.Board },
+		//доп материалы
+		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
+		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	],
+	[MaterialTypesSelectValuesEnum.AirGapFiller]: [
+		{ label: 'AirGap', value: MaterialTypeEnum.AirGap },
+		{ label: 'Filler', value: MaterialTypeEnum.Filler },
+		//доп материалы
+		{ label: 'Board', value: MaterialTypeEnum.Board },
+		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
+		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	],
+};
+
 export const RuMaterialTypesSelectValues = [
 	{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
 	{ label: 'Древесно-стружечные плиты', value: MaterialTypeEnum.WoodBasedBoard },
@@ -126,6 +184,23 @@ export const RuMaterialTypesSelectValues = [
 	{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
 	{ label: 'Зазоры', value: MaterialTypeEnum.GapDistance },
 	{ label: 'Штукатурка', value: MaterialTypeEnum.Plaster },
+];
+
+export const EnMaterialTypesSelectValues = [
+	{ label: 'Frame', value: MaterialTypeEnum.Frame },
+	{ label: 'WoodBasedBoard', value: MaterialTypeEnum.WoodBasedBoard },
+	{ label: 'MineralBondedBoards', value: MaterialTypeEnum.MineralBondedBoards },
+	{ label: 'Glazing', value: MaterialTypeEnum.Glazing },
+	{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
+	{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	{ label: 'AirGap', value: MaterialTypeEnum.AirGap },
+	{ label: 'Link', value: MaterialTypeEnum.Link },
+	{ label: 'Filler', value: MaterialTypeEnum.Filler },
+	{ label: 'Heavy', value: MaterialTypeEnum.Heavy },
+	{ label: 'Board', value: MaterialTypeEnum.Board },
+	{ label: 'ZPanel', value: MaterialTypeEnum.ZPanel },
+	{ label: 'GapDistance', value: MaterialTypeEnum.GapDistance },
+	{ label: 'Plaster', value: MaterialTypeEnum.Plaster },
 ];
 
 export interface MaterialType {

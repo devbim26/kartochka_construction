@@ -1,4 +1,4 @@
-import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell } from '@core';
+import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell, useI18n } from '@core';
 import type { SoundproofingStandarts } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
@@ -8,13 +8,15 @@ type Props = {
 };
 
 export const GeneralInformationSoundproofing = ({ data }: Props) => {
+	const { t } = useI18n();
+
 	const columns = useMemo(() => {
 		const cols: ColumnDef<SoundproofingStandarts>[] = [
 			{
 				accessorKey: 'soundproofing',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="Звукоизоляционные"
+						text={t('soundproofing.title')}
 						textClassName="w-[200px] text-left"
 					/>
 				),
@@ -48,7 +50,10 @@ export const GeneralInformationSoundproofing = ({ data }: Props) => {
 			{
 				accessorKey: 'requirements',
 				header: () => (
-					<SimpleTableHeaderCell text="Требования" textClassName="w-[100px] text-right" />
+					<SimpleTableHeaderCell
+						text={t('soundproofing.requirements')}
+						textClassName="w-[100px] text-right"
+					/>
 				),
 				cell: (info) => {
 					const requirement = info.getValue() as string;
@@ -78,7 +83,7 @@ export const GeneralInformationSoundproofing = ({ data }: Props) => {
 			},
 		];
 		return cols;
-	}, []);
+	}, [t]);
 
 	return (
 		<div className="flex-col">

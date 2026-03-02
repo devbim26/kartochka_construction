@@ -1,4 +1,4 @@
-import { FormElementLabel, useAppDispatch, useAppSelector } from '@core';
+import { FormElementLabel, useAppDispatch, useAppSelector, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import {
 	convertToClientFloorConstruction,
@@ -16,7 +16,11 @@ import type { ReportInfoShort } from '@features/constructor/utils';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
-import { Guidebooks, RuConstructionTypesMap } from '@features/guidbooks/types';
+import {
+	EnConstructionTypesMap,
+	Guidebooks,
+	RuConstructionTypesMap,
+} from '@features/guidbooks/types';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -30,6 +34,7 @@ import {
 } from './general-information-tables';
 
 export const GeneralInformationForm = () => {
+	const { t, locale } = useI18n();
 	const [search] = useSearchParams();
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 	const [constructionType, setConstructionType] = useState<ConstructionsEditData>();
@@ -42,6 +47,9 @@ export const GeneralInformationForm = () => {
 	const reportType = search.get('reportType');
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
+
+	// Выбор маппинга типов конструкций в зависимости от языка
+	const constructionTypeMap = locale === 'ru' ? RuConstructionTypesMap : EnConstructionTypesMap;
 
 	useEffect(() => {
 		if (reportType === ReportCategory.Floor && reportId)
@@ -97,7 +105,7 @@ export const GeneralInformationForm = () => {
 				}),
 				catchError((error) => {
 					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации об отчете');
+					toast.error(t('generalInfo.error.fetchReport'));
 					return of(null);
 				}),
 			)
@@ -115,7 +123,7 @@ export const GeneralInformationForm = () => {
 				}),
 				catchError((error) => {
 					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации об отчете');
+					toast.error(t('generalInfo.error.fetchReport'));
 					return of(null);
 				}),
 			)
@@ -131,7 +139,7 @@ export const GeneralInformationForm = () => {
 			.pipe(
 				switchMap((singleResponse) => {
 					if (singleResponse.status !== 200 || !singleResponse.data) {
-						throw new Error('Ошибка при получении конструкции');
+						throw new Error(t('generalInfo.error.fetchConstruction'));
 					}
 
 					setCurrentConstruction(
@@ -142,7 +150,7 @@ export const GeneralInformationForm = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || 'Ошибка при загрузке');
+						toast.error(error.response?.data || t('generalInfo.error.load'));
 					} else {
 						toast.error((error as Error).message);
 					}
@@ -167,7 +175,7 @@ export const GeneralInformationForm = () => {
 				}),
 				catchError((error) => {
 					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации о конструкции');
+					toast.error(t('generalInfo.error.fetchConstruction'));
 					dispatch(stopLoading());
 					return of(null);
 				}),
@@ -186,11 +194,11 @@ export const GeneralInformationForm = () => {
 				}),
 				catchError((error) => {
 					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации о конструкции');
+					toast.error(t('generalInfo.error.fetchConstruction'));
 					return of(null);
 				}),
 			)
-			.subscribe();
+			.subscribe(() => dispatch(stopLoading()));
 	};
 
 	useEffect(() => {
@@ -219,12 +227,12 @@ export const GeneralInformationForm = () => {
 				))}
 			<div className="flex flex-col gap-[24px]">
 				<FormElementLabel className="text-left font-sans font-semibold leading-6">
-					Общая информация
+					{t('generalInfo.title')}
 				</FormElementLabel>
 
 				<div className="flex flex-row gap-[20px]">
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						Название
+						{t('generalInfo.name')}
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						{constructionType?.name}
@@ -232,11 +240,11 @@ export const GeneralInformationForm = () => {
 				</div>
 				<div className="flex flex-row gap-[20px]">
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">
-						Тип конструкции
+						{t('generalInfo.constructionType')}
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						{constructionType
-							? RuConstructionTypesMap[
+							? constructionTypeMap[
 									constructionType.constructionType as ConstructionTypeEnum
 								]
 							: ''}
@@ -244,7 +252,7 @@ export const GeneralInformationForm = () => {
 				</div>
 				<div className="flex flex-row gap-[20px]">
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">
-						Конструкция разделяет
+						{t('generalInfo.divides')}
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						{currentConstruction?.reportConstructionHeader.firstPlacemetnRoom?.name ??
@@ -256,7 +264,7 @@ export const GeneralInformationForm = () => {
 				</div>
 				<div className="flex flex-row gap-[20px]">
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">
-						Длина, м
+						{t('generalInfo.length')}
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						{currentConstruction?.reportConstructionHeader.length}
@@ -264,7 +272,7 @@ export const GeneralInformationForm = () => {
 				</div>
 				<div className="flex flex-row gap-[20px]">
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">
-						Ширина (высота), м
+						{t('generalInfo.width')}
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						{currentConstruction?.reportConstructionHeader.width}
@@ -272,7 +280,7 @@ export const GeneralInformationForm = () => {
 				</div>
 				<div className="flex flex-row gap-[20px]">
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">
-						Площадь, м2
+						{t('generalInfo.area')}
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						{currentConstruction?.reportConstructionHeader.square ?? '—'}
@@ -280,7 +288,7 @@ export const GeneralInformationForm = () => {
 				</div>
 				<div className="flex flex-row gap-[20px]">
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">
-						Общая толщина, мм
+						{t('generalInfo.totalThickness')}
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						{thickness?.toFixed(0) ?? '-'}
@@ -288,7 +296,7 @@ export const GeneralInformationForm = () => {
 				</div>
 				<div className="flex flex-row gap-[20px]">
 					<p className="w-[200px] pl-[24px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">
-						Общая масса, кг
+						{t('generalInfo.totalMass')}
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
 						{mass?.toFixed(0) ?? '-'}
@@ -297,22 +305,22 @@ export const GeneralInformationForm = () => {
 			</div>
 			<div className="flex flex-col gap-[10px]">
 				<FormElementLabel className="text-left font-sans font-semibold leading-6">
-					Соответствие нормам
+					{t('generalInfo.complianceTitle')}
 				</FormElementLabel>
 				<GeneralInformationPhysical
 					data={[
 						{
-							physical: 'Толщина, мм',
+							physical: t('generalInfo.totalThickness'),
 							values: String(thickness) || '-',
 							requirements: '-',
 						},
 						{
-							physical: 'Масса, кг/м²',
+							physical: t('generalInfo.totalMass').replace('кг', 'кг/м²'), // можно уточнить
 							values: String(mass) || '-',
 							requirements: '-',
 						},
 						{
-							physical: 'Высота, м',
+							physical: t('generalInfo.width'),
 							values:
 								String(currentConstruction?.reportConstructionHeader.width) || '-',
 							requirements: String(constructionType?.maxHeight) || '-',
@@ -322,7 +330,7 @@ export const GeneralInformationForm = () => {
 				<GeneralInformationSoundproofing
 					data={[
 						{
-							label: 'Расчёт',
+							label: t('soundproofing.calculation'), // нужно добавить ключ
 							soundproofing: 'Rw, dB',
 							values: String(constructionType?.labIndexValue) || '-',
 							requirements:
@@ -330,7 +338,7 @@ export const GeneralInformationForm = () => {
 									?.noizeIsolationIndex || '-',
 						},
 						{
-							label: 'Лаб.тест',
+							label: t('soundproofing.labTest'), // нужно добавить ключ
 							soundproofing: 'Rw, dB',
 							values: String(constructionType?.RCalcs) || '-',
 							requirements:

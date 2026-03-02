@@ -1,3 +1,4 @@
+import { useI18n } from '@core';
 import { formatMaterial } from '@features/constructor/utils';
 import type { UserMaterials } from '@features/guidbooks/types';
 
@@ -16,6 +17,8 @@ export const ConstructionImageModal = ({
 	rightMaterials,
 	onClose,
 }: Props) => {
+	const { locale } = useI18n();
+
 	return (
 		<div
 			className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
@@ -40,7 +43,7 @@ export const ConstructionImageModal = ({
 								key={material.materialId ?? `left-${index}`}
 								className="text-sm font-normal leading-5 tracking-[0.1px] text-black"
 							>
-								- {formatMaterial(material)}
+								- {formatMaterial(material, locale)}
 							</p>
 						))}
 
@@ -52,7 +55,7 @@ export const ConstructionImageModal = ({
 								key={material.materialId ?? `center-${index}`}
 								className="text-sm font-normal leading-5 tracking-[0.1px] text-black"
 							>
-								- {formatMaterial(material)}
+								- {formatMaterial(material, locale)}
 							</p>
 						))}
 
@@ -64,7 +67,7 @@ export const ConstructionImageModal = ({
 								key={material.materialId ?? `right-${index}`}
 								className="text-sm font-normal leading-5 tracking-[0.1px] text-black"
 							>
-								- {formatMaterial(material)}
+								- {formatMaterial(material, locale)}
 							</p>
 						))}
 				</div>

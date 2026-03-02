@@ -1,5 +1,5 @@
 import type { ArticleDto } from '@api-gen';
-import { Button, useAppNavigate } from '@core';
+import { Button, useAppNavigate, useI18n } from '@core';
 import { getPaginatedArticles } from '@features/news/services';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -12,6 +12,7 @@ export const News = () => {
 	const navigate = useAppNavigate();
 	const [articles, setArticles] = useState<ArticleDto[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
+	const { t } = useI18n();
 
 	useEffect(() => {
 		from(
@@ -28,7 +29,7 @@ export const News = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка получения новостей');
+						toast.error(error.response?.data?.message || t('errors.newsLoad'));
 					}
 					return from([null]);
 				}),
@@ -48,7 +49,7 @@ export const News = () => {
 
 	return (
 		<div className="flex w-1/2 flex-col justify-between gap-[15px] rounded-xl border border-gray-border bg-white px-[18px] pb-[15px] pt-[20px]">
-			<p className="font-sans text-2xl font-semibold leading-4">Новости</p>
+			<p className="font-sans text-2xl font-semibold leading-4">{t('main.news.title')}</p>
 
 			<div className="flex min-h-[140px] flex-col gap-3">
 				{currentArticle && (
@@ -60,7 +61,7 @@ export const News = () => {
 							{currentArticle.imageUrl && (
 								<img
 									src={currentArticle.imageUrl}
-									alt={currentArticle.title || 'Изображение новости'}
+									alt={currentArticle.title || t('main.news.imageAltFallback')}
 									className="h-[100px] w-[150px] shrink-0 rounded-lg object-cover"
 								/>
 							)}
@@ -97,7 +98,7 @@ export const News = () => {
 						className="cursor-pointer font-sans text-base leading-5 text-primary hover:underline"
 						onClick={() => navigate(`/news/${currentArticle.id}`)}
 					>
-						читать полностью...
+						{t('common.readMore')}
 					</p>
 				)}
 			</div>

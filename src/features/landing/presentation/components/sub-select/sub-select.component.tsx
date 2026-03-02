@@ -1,4 +1,11 @@
-import { APP_ROUTES, Carousel, CarouselSlide, convertToPaginatedType, useAppNavigate } from '@core';
+import {
+	APP_ROUTES,
+	Carousel,
+	CarouselSlide,
+	convertToPaginatedType,
+	useAppNavigate,
+	useI18n,
+} from '@core';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { LandingSections } from '@features/landing/constants';
 import type { Subscription } from '@features/subscriptions';
@@ -18,6 +25,7 @@ interface SubSelectProps {
 export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelectProps) => {
 	const [isPerMonth, setIsPerMonth] = useState(true);
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
+	const { t } = useI18n();
 
 	const navigate = useAppNavigate();
 
@@ -46,7 +54,7 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка загрузки подписок');
+						toast.error(error.response?.data?.message || t('errors.subscriptionsLoad'));
 					}
 					return from([null]);
 				}),
@@ -77,24 +85,11 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 		>
 			{location.pathname.startsWith(`/${APP_ROUTES.landing.route}`) && (
 				<div className="mb-6 font-montserrat text-base font-normal leading-snug sm:text-lg">
-					Пакеты
+					{t('landing.subscriptions.title')}
 				</div>
 			)}
 
 			<div className="flex flex-col items-center text-center">
-				{/* <Switch
-					onText="год"
-					offText="месяц"
-					wrapperClassName="mb-3 h-[30px] w-[180px] p-[3px] bg-primary"
-					textClassName="font-semibold font-montserrat text-sm sm:text-base leading-5"
-					unactiveTextClassName="text-white"
-					activeTextClassName="text-primary"
-					onChange={handleToggle}
-				/>
-				<div className="mb-3 font-montserrat text-xs font-normal sm:text-sm">
-					При покупке на год первые 3 месяца бесплатно
-				</div> */}
-
 				<Carousel
 					options={{
 						align: 'start',

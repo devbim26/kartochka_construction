@@ -32,7 +32,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 		{
 			params: {
 				id: DESIGNING_ROUTES.main.id,
-				label: 'Главная',
+				labelKey: 'sidebar.home',
 				icon: BiSolidHome,
 				path: DESIGNING_ROUTES.main.route,
 				permission: [UserRoles.Admin, UserRoles.User],
@@ -41,7 +41,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 		{
 			params: {
 				id: DESIGNING_ROUTES.visualization.id,
-				label: 'AI ассистент',
+				labelKey: 'sidebar.aiAssistant',
 				icon: GiCloudRing,
 				path: DESIGNING_ROUTES.visualization.route,
 				permission: [UserRoles.Admin, UserRoles.User],
@@ -50,7 +50,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 		{
 			params: {
 				id: DESIGNING_ROUTES.constructor.id,
-				label: 'Конструктор',
+				labelKey: 'sidebar.constructor',
 				icon: RiPencilRulerLine,
 				path: DESIGNING_ROUTES.constructor.route,
 				isMutltiPathItem: true,
@@ -66,7 +66,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 									reportType,
 									edit: true,
 								}),
-								label: 'О здании',
+								labelKey: 'sidebar.aboutBuilding',
 								permission: [UserRoles.Admin, UserRoles.User],
 							},
 							{
@@ -75,7 +75,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 									reportId,
 									reportType,
 								}),
-								label: 'Поэтажные планы',
+								labelKey: 'sidebar.floorPlans',
 								permission: [UserRoles.Admin, UserRoles.User],
 							},
 						]
@@ -83,7 +83,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 							{
 								id: CONSTRUCTOR_ROUTES.aboutBuilding.id,
 								path: CONSTRUCTOR_ROUTES.aboutBuilding.route,
-								label: 'О здании',
+								labelKey: 'sidebar.aboutBuilding',
 								permission: [UserRoles.Admin, UserRoles.User],
 							},
 						],
@@ -91,7 +91,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 		{
 			params: {
 				id: DESIGNING_ROUTES.account.id,
-				label: 'Личный кабинет',
+				labelKey: 'sidebar.account',
 				icon: FaUser,
 				path: DESIGNING_ROUTES.account.route,
 				permission: [UserRoles.Admin, UserRoles.User],
@@ -100,7 +100,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 		{
 			params: {
 				id: DESIGNING_ROUTES.subscribes_constructor.id,
-				label: 'Конструктор пакетов',
+				labelKey: 'sidebar.subscriptionsConstructor',
 				icon: BiSolidCalendarEdit,
 				path: DESIGNING_ROUTES.subscribes_constructor.route,
 				permission: UserRoles.Admin,
@@ -109,7 +109,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 		{
 			params: {
 				id: DESIGNING_ROUTES.accounts.id,
-				label: 'Счета',
+				labelKey: 'sidebar.bills',
 				icon: RiWallet3Fill,
 				path: DESIGNING_ROUTES.accounts.route,
 				permission: UserRoles.Admin,
@@ -119,7 +119,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 		{
 			params: {
 				id: DESIGNING_ROUTES.users_list.id,
-				label: 'Список пользователей',
+				labelKey: 'sidebar.usersList',
 				icon: HiOutlineUsers,
 				path: DESIGNING_ROUTES.users_list.route,
 				permission: UserRoles.Admin,
@@ -128,13 +128,13 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 				{
 					id: USERS_LIST_ROUTES.manager.id,
 					path: USERS_LIST_ROUTES.manager.route,
-					label: 'Менеджер',
+					labelKey: 'sidebar.manager',
 					permission: UserRoles.Admin,
 				},
 				{
 					id: USERS_LIST_ROUTES.client.id,
 					path: USERS_LIST_ROUTES.client.route,
-					label: 'Клиент',
+					labelKey: 'sidebar.client',
 					permission: UserRoles.Admin,
 				},
 			],
@@ -142,7 +142,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 		{
 			params: {
 				id: DESIGNING_ROUTES.guidbooks.id,
-				label: 'Справочники',
+				labelKey: 'sidebar.guides',
 				icon: RiFileList3Line,
 				path: DESIGNING_ROUTES.guidbooks.route,
 				permission: UserRoles.Admin,
@@ -151,25 +151,25 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 				{
 					id: GUIDBOOKS_ROUTES.materials.id,
 					path: GUIDBOOKS_ROUTES.materials.route,
-					label: 'Материалы',
+					labelKey: 'sidebar.materials',
 					permission: UserRoles.Admin,
 				},
 				{
 					id: GUIDBOOKS_ROUTES.constructions.id,
 					path: GUIDBOOKS_ROUTES.constructions.route,
-					label: 'Конструкции',
+					labelKey: 'sidebar.constructions',
 					permission: UserRoles.Admin,
 				},
 				{
 					id: GUIDBOOKS_ROUTES.requirements.id,
 					path: GUIDBOOKS_ROUTES.requirements.route,
-					label: 'Требования',
+					labelKey: 'sidebar.requirements',
 					permission: UserRoles.Admin,
 				},
 				{
 					id: GUIDBOOKS_ROUTES.issuers.id,
 					path: GUIDBOOKS_ROUTES.issuers.route,
-					label: 'Производители',
+					labelKey: 'sidebar.manufacturers',
 					permission: UserRoles.Admin,
 				},
 			],
@@ -179,7 +179,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 				id: DESIGNING_ROUTES.news.id,
 				path: DESIGNING_ROUTES.news.route,
 				icon: BiNews,
-				label: 'Новости',
+				labelKey: 'sidebar.news',
 				permission: UserRoles.Admin,
 			},
 		},
@@ -188,7 +188,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 				id: DESIGNING_ROUTES.reports.id,
 				path: DESIGNING_ROUTES.reports.route,
 				icon: TiDocumentText,
-				label: 'Отчеты',
+				labelKey: 'sidebar.reports',
 				permission: UserRoles.Admin,
 			},
 		},

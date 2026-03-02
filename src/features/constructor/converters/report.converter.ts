@@ -20,7 +20,7 @@ import type {
 	CategoryClass,
 	ConstructionsEditData,
 } from '@features/guidbooks/types';
-import { ConstructionTypeEnum, Country, RuConstructionTypesMap } from '@features/guidbooks/types';
+import { ConstructionTypeEnum, Country } from '@features/guidbooks/types';
 
 import type {
 	AboutBuildingData,
@@ -232,8 +232,7 @@ export const convertFloorDataToClientConstructionSheet = (
 			data.reportConstructionHeader.firstPlacemetnRoom.name +
 			'/' +
 			data.reportConstructionHeader.secondPlacementRoom.name,
-		constructionType:
-			RuConstructionTypesMap[constructionHeader.constructionType as ConstructionTypeEnum],
+		constructionType: constructionHeader.constructionType,
 		constructionInfoImage: data.documentImageUrl || '',
 		square: String(data.reportConstructionHeader?.square) || '',
 		constructionId: data.reportConstructionHeader?.constructionHeaderId || '',

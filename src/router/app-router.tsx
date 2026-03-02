@@ -115,7 +115,7 @@ export const AppRouter = () => {
 					<Route path={USERS_LIST_ROUTES.client.route} element={<UserScreen />} />
 					<Route
 						path={USERS_LIST_ROUTES.manager.route}
-						element={<DevScreen title="Менеджер" />}
+						element={<DevScreen titleKey="sidebar.manager" />}
 					/>
 				</Route>
 			</Route>

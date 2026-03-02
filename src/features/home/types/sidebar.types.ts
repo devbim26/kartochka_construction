@@ -1,11 +1,12 @@
 import type { UserRoles } from '@core';
+import type { TranslationKey } from '@core';
 import type { IconType } from 'react-icons';
 
 export interface SidebarItemProps {
 	id: string;
 	icon?: IconType;
 	currentPath?: string;
-	label: string;
+	labelKey: TranslationKey;
 	path: string;
 	isMutltiPathItem?: boolean;
 	permission: UserRoles | UserRoles[];

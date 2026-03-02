@@ -1,4 +1,4 @@
-import { APP_ROUTES, Button, DeleteIcon, DeleteModal } from '@core';
+import { APP_ROUTES, Button, DeleteIcon, DeleteModal, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { useAppDispatch, useAppNavigate, useAppSelector } from '@core/utils';
 import { memoize } from '@core/utils/hoc/memo.utils';
@@ -43,7 +43,9 @@ import {
 } from '../modals';
 import { ConstructionSheets } from './constructions-sheet.component';
 import { FloorPlanViewer } from './floor-plan-viewer.component';
+
 export const FloorPlans = memoize(() => {
+	const { t } = useI18n();
 	const navigate = useAppNavigate();
 	const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
 	const [currentReportFloorInfo, setCurrentReportFloorInfo] = useState<string[]>([]);
@@ -69,7 +71,7 @@ export const FloorPlans = memoize(() => {
 				}),
 				catchError((error) => {
 					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации о конструкции');
+					toast.error(t('floorPlans.toast.fetchConstructionInfoError'));
 					return of(null);
 				}),
 			)
@@ -78,7 +80,7 @@ export const FloorPlans = memoize(() => {
 
 	const handleDeleteDocument = () => {
 		if (!currentReportFloorId || !reportId) {
-			toast.info('Поэтажный план не загружен');
+			toast.info(t('floorPlans.toast.noFloorPlan'));
 			return;
 		}
 
@@ -100,7 +102,7 @@ export const FloorPlans = memoize(() => {
 						setCurrentReportConstruction(undefined);
 						setCurrentConstructionHeader(undefined);
 
-						toast.success('Поэтажный план успешно удален');
+						toast.success(t('floorPlans.toast.deleteSuccess'));
 
 						// Если это отчет с типом Floor, обновляем данные
 						if (reportType === ReportCategory.Floor && reportId) {
@@ -110,9 +112,9 @@ export const FloorPlans = memoize(() => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || 'Ошибка при удалении поэтажного плана');
+						toast.error(error.response?.data || t('floorPlans.toast.deleteError'));
 					} else {
-						toast.error('Произошла ошибка при удалении');
+						toast.error(t('floorPlans.toast.deleteGenericError'));
 					}
 					return of(null);
 				}),
@@ -122,11 +124,12 @@ export const FloorPlans = memoize(() => {
 			)
 			.subscribe();
 	};
+
 	const handleUploadPdf = (event: React.ChangeEvent<HTMLInputElement>): void => {
 		const file = event.target.files?.[0];
 
 		if (!file || file.type !== 'application/pdf') {
-			toast.error('Выберите PDF-файл');
+			toast.error(t('floorPlans.toast.selectPdf'));
 			return;
 		}
 
@@ -145,7 +148,7 @@ export const FloorPlans = memoize(() => {
 			.pipe(
 				switchMap((uploadResponse) => {
 					if (uploadResponse.status !== 200 || !uploadResponse.data) {
-						throw new Error('Ошибка при загрузке файла');
+						throw new Error(t('floorPlans.toast.uploadError'));
 					}
 					const uploadedFloorId = uploadResponse.data as string;
 					return from(getFloorById({ id: uploadedFloorId }));
@@ -153,7 +156,7 @@ export const FloorPlans = memoize(() => {
 				filter(Boolean),
 				switchMap((floorResponse) => {
 					if (floorResponse.status !== 200 || !floorResponse.data) {
-						throw new Error('Ошибка получения данных этажа');
+						throw new Error(t('floorPlans.toast.fetchFloorDataError'));
 					}
 					const { floorDocumentUrl, reportFloorInfos } = convertToClientFloorInfo(
 						floorResponse.data,
@@ -167,11 +170,11 @@ export const FloorPlans = memoize(() => {
 				switchMap((arrayBuffer) => from(pdfjs.getDocument({ data: arrayBuffer }).promise)),
 				tap((pdf) => {
 					setPdfDoc(pdf);
-					toast.success('Файл успешно загружен');
+					toast.success(t('floorPlans.toast.uploadSuccess'));
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || 'Ошибка при загрузке');
+						toast.error(error.response?.data || t('floorPlans.toast.loadError'));
 					} else {
 						toast.error((error as Error).message);
 					}
@@ -181,6 +184,7 @@ export const FloorPlans = memoize(() => {
 			)
 			.subscribe();
 	};
+
 	useEffect(() => {
 		if (!currentReportConstruction?.reportConstructionHeader.id) return;
 		handleGetConstructionByHeaderId(
@@ -197,11 +201,11 @@ export const FloorPlans = memoize(() => {
 			.pipe(
 				switchMap((infosResponse) => {
 					if (infosResponse.status !== 200 || !infosResponse.data) {
-						throw new Error('Ошибка при получении отчета');
+						throw new Error(t('floorPlans.toast.fetchReportError'));
 					}
 
 					if (infosResponse.data.length === 0) {
-						toast.info('Нет данных по поэтажному плану отчета');
+						toast.info(t('floorPlans.toast.noReportData'));
 						dispatch(stopLoading());
 						return of(null);
 					}
@@ -211,7 +215,7 @@ export const FloorPlans = memoize(() => {
 				filter(Boolean),
 				switchMap((floorResponse) => {
 					if (floorResponse?.status !== 200) {
-						throw new Error('Ошибка получения данных этажа');
+						throw new Error(t('floorPlans.toast.fetchFloorDataError'));
 					}
 
 					const result = convertToClientFloorInfo(floorResponse.data);
@@ -255,7 +259,7 @@ export const FloorPlans = memoize(() => {
 				),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || 'Ошибка при загрузке');
+						toast.error(error.response?.data || t('floorPlans.toast.loadError'));
 					} else {
 						toast.error((error as Error).message);
 					}
@@ -273,7 +277,7 @@ export const FloorPlans = memoize(() => {
 			.pipe(
 				switchMap((singleResponse) => {
 					if (singleResponse.status !== 200 || !singleResponse.data) {
-						throw new Error('Ошибка при получении конструкции');
+						throw new Error(t('floorPlans.toast.fetchConstructionError'));
 					}
 
 					setCurrentReportConstruction(
@@ -284,7 +288,7 @@ export const FloorPlans = memoize(() => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || 'Ошибка при загрузке');
+						toast.error(error.response?.data || t('floorPlans.toast.loadError'));
 					} else {
 						toast.error((error as Error).message);
 					}
@@ -313,7 +317,7 @@ export const FloorPlans = memoize(() => {
 				dispatch(stopLoading());
 				if (!reportId) return;
 				if (response?.status === 200) {
-					toast.success('Успешное удаление');
+					toast.success(t('floorPlans.toast.deleteConstructionSuccess'));
 					if (reportType === ReportCategory.Floor) {
 						handleGetCurrentReportFloorInfos(reportId);
 					} else if (reportType === ReportCategory.Single) {
@@ -345,14 +349,14 @@ export const FloorPlans = memoize(() => {
 						<div className="flex flex-col gap-[18px] border-b px-[24px] py-[18px]">
 							<div className="flex w-full items-center gap-[10px]">
 								<p className="font-sans text-lg font-semibold leading-4">
-									Добавить уровень
+									{t('floorPlans.addLevel')}
 								</p>
 
 								<div className="group relative">
 									<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
 
 									<div className="pointer-events-none absolute left-1/2 top-full z-10 w-[260px] -translate-x-1/2 translate-y-2 rounded bg-black px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-										Добавление уровней находится в разработке
+										{t('floorPlans.addLevelTooltip')}
 									</div>
 								</div>
 							</div>
@@ -393,7 +397,7 @@ export const FloorPlans = memoize(() => {
 															?.click()
 													}
 												>
-													Загрузить план этажа
+													{t('floorPlans.uploadFloorPlan')}
 												</Button>
 												<input
 													type="file"
@@ -420,7 +424,7 @@ export const FloorPlans = memoize(() => {
 												}
 												className="h-[40px] w-[190px] bg-white px-[16px] text-[16px] text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
 											>
-												Создать конструкцию
+												{t('floorPlans.createConstruction')}
 											</Button>
 										)}
 									</div>
@@ -437,7 +441,7 @@ export const FloorPlans = memoize(() => {
 							onConfirm={() => {
 								window.history.back();
 							}}
-							headerTitle="Добавление конструкции"
+							headerTitle={t('floorPlans.modal.createTitle')}
 							className="!w-[1000px] md:!w-[900px]"
 						>
 							<CreateConstructionForm />
@@ -447,7 +451,7 @@ export const FloorPlans = memoize(() => {
 							onCancel={() => window.history.back()}
 							onClose={() => window.history.back()}
 							className="!w-[1000px] md:!w-[900px]"
-							headerTitle=""
+							headerTitle="" // Пустой заголовок — оставляем как есть
 						>
 							<GeneralInformationForm />
 						</GeneralInformationModal>
@@ -456,7 +460,7 @@ export const FloorPlans = memoize(() => {
 							onCancel={() => window.history.back()}
 							onClose={() => window.history.back()}
 							onConfirm={() => window.history.back()}
-							headerTitle="Редактирование конструкцию"
+							headerTitle={t('floorPlans.modal.editTitle')}
 							className="!w-[1000px] md:!w-[900px]"
 							currentConstructionHeader={currentConstructionHeader}
 							currentReportFloorInfo={currentReportConstruction}
@@ -475,9 +479,9 @@ export const FloorPlans = memoize(() => {
 										.constructionHeaderId || '',
 								);
 							}}
-							headerTitle="Подтвердите действие"
+							headerTitle={t('floorPlans.modal.deleteTitle')}
 						>
-							Вы уверены, что хотите удалить конструкцию?
+							{t('floorPlans.modal.deleteConfirm')}
 						</DeleteModal>
 					</div>
 					<ConstructionSheets
@@ -512,7 +516,7 @@ export const FloorPlans = memoize(() => {
 						variant="primary"
 						className="h-[50px] self-end text-[20px]"
 					>
-						Сформировать отчет
+						{t('floorPlans.generateReport')}
 					</Button>
 				</div>
 			}

@@ -9,6 +9,7 @@ import {
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	useI18n,
 } from '@core';
 
 import { EditIcon } from '@core/presentation/icons/edit.icon';
@@ -60,6 +61,7 @@ import {
 
 const RequirementsScreen = () => {
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 	const [search] = useSearchParams();
 	const [singleRequirement, setSingleRequirement] = useState<FormRequirement>();
 	const [tableData, setTableData] = useState<Array<Requirement>>([]);
@@ -175,7 +177,7 @@ const RequirementsScreen = () => {
 						form.filterForm.getValues() as RequirementFilter,
 						paginationState,
 					);
-					toast.success('Требование успешно добавлено');
+					toast.success(t('guides.requirements.addSuccess'));
 					setPaginationState(paginationStateDefault);
 					navigate('');
 				}
@@ -203,7 +205,7 @@ const RequirementsScreen = () => {
 						form.filterForm.getValues() as RequirementFilter,
 						paginationState,
 					);
-					toast.success('Требование успешно отредактировано');
+					toast.success(t('guides.requirements.editSuccess'));
 					setPaginationState(paginationStateDefault);
 					navigate('');
 				}
@@ -245,7 +247,7 @@ const RequirementsScreen = () => {
 						paginationState,
 					);
 					setPaginationState(paginationStateDefault);
-					toast.success('Требование успешно удалено');
+					toast.success(t('guides.requirements.deleteSuccess'));
 				}
 			});
 	};
@@ -262,7 +264,9 @@ const RequirementsScreen = () => {
 		const cols: ColumnDef<Requirement>[] = [
 			{
 				accessorKey: 'countryType',
-				header: () => <SimpleTableHeaderCell text={'Регион'} />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.requirements.columns.region')} />
+				),
 				cell: (info) => {
 					return (
 						<SimpleTableCell content={RuCountryNamesMap[info.getValue() as Country]} />
@@ -271,7 +275,9 @@ const RequirementsScreen = () => {
 			},
 			{
 				accessorKey: 'buildingType',
-				header: () => <SimpleTableHeaderCell text={'Тип здания'} />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.requirements.columns.buildingType')} />
+				),
 				cell: (info) => {
 					return (
 						<SimpleTableCell
@@ -282,14 +288,20 @@ const RequirementsScreen = () => {
 			},
 			{
 				accessorKey: 'regularyDocumentName',
-				header: () => <SimpleTableHeaderCell text={'Документ'} />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.requirements.columns.document')} />
+				),
 				cell: (info) => {
 					return <SimpleTableCell content={info.getValue() as string} />;
 				},
 			},
 			{
 				accessorKey: 'constructionType',
-				header: () => <SimpleTableHeaderCell text={'Тип конструкции'} />,
+				header: () => (
+					<SimpleTableHeaderCell
+						text={t('guides.requirements.columns.constructionType')}
+					/>
+				),
 				cell: (info) => {
 					return (
 						<SimpleTableCell
@@ -302,36 +314,48 @@ const RequirementsScreen = () => {
 			},
 			{
 				accessorKey: 'standartFullName',
-				header: () => <SimpleTableHeaderCell text={'Стандарт полное'} />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.requirements.columns.standardFull')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'standartShortName',
-				header: () => <SimpleTableHeaderCell text={'Стандарт краткое'} />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.requirements.columns.standardShort')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'standartValidityPeriod',
-				header: () => <SimpleTableHeaderCell text={'Срок дейстия стандарта'} />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.requirements.columns.validity')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'firstPlacementRoom',
-				header: () => <SimpleTableHeaderCell text={'Первое помещение'} />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.requirements.columns.firstRoom')} />
+				),
 				cell: (info) => {
 					return <SimpleTableCell content={info.getValue() as string} />;
 				},
 			},
 			{
 				accessorKey: 'secondPlacementRoom',
-				header: () => <SimpleTableHeaderCell text={'Второе помещение'} />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.requirements.columns.secondRoom')} />
+				),
 				cell: (info) => {
 					return <SimpleTableCell content={info.getValue() as string} />;
 				},
 			},
 			{
 				accessorKey: 'id',
-				header: () => <SimpleTableHeaderCell text={'Действия'} />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.requirements.columns.actions')} />
+				),
 				cell: (info) => {
 					return (
 						<SimpleTableCell
@@ -371,9 +395,9 @@ const RequirementsScreen = () => {
 			<GuidbookPageHeaderWrapper
 				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
-					pageTitle: 'Требования',
-					editTitle: 'Редактировать требования',
-					addTitle: 'Добавить требования',
+					pageTitleKey: 'guides.requirements.pageTitle',
+					editTitleKey: 'guides.requirements.editTitle',
+					addTitleKey: 'guides.requirements.addTitle',
 				}}
 				forms={form}
 				formElements={{
@@ -400,9 +424,9 @@ const RequirementsScreen = () => {
 					handleDeleteTableData(itemToDelete.id);
 					setIsModalOpen(false);
 				}}
-				headerTitle="Подтвердите действие"
+				headerTitle={t('guides.deleteModal.title')}
 			>
-				Вы уверены, что хотите удалить требование {itemToDelete.name}?
+				{t('guides.deleteModal.requirementQuestion')} {itemToDelete.name}
 			</DeleteModal>
 		</div>
 	);

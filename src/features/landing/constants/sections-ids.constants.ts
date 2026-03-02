@@ -5,18 +5,18 @@ export const LandingSections: {
 } = {
 	aboutUs: {
 		id: 'about_us_section_id',
-		text: 'О нас',
+		textKey: 'nav.aboutUs',
 	},
 	subscription: {
 		id: 'subscription_section_id',
-		text: 'Пакеты',
+		textKey: 'nav.subscription',
 	},
 	contacts: {
 		id: 'contacts_section_id',
-		text: 'Контакты',
+		textKey: 'nav.contacts',
 	},
 	designing: {
 		id: 'designing_section_id',
-		text: 'Проектирование',
+		textKey: 'nav.designing',
 	},
 };

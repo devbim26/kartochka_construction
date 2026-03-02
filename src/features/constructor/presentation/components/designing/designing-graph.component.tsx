@@ -8,7 +8,16 @@ interface GraphProps {
 }
 
 const DesigningGraph = ({ graphData, regulatoryDocName, calculationDocName }: GraphProps) => {
-	const abcdRaw = graphData?.find((g) => g.name === 'abcd')?.namedDots ?? [];
+	// Имена графиков для основной серии: приоритет — efklmnp, запасной — abcd
+	const primaryName = 'efklmnp';
+	const fallbackName = 'abcd';
+
+	// Выбираем основной график: efklmnp, если есть, иначе abcd
+	const primaryGraph =
+		graphData?.find((g) => g.name === primaryName) ||
+		graphData?.find((g) => g.name === fallbackName);
+	const primaryRaw = primaryGraph?.namedDots ?? [];
+
 	const laboratoryRaw = graphData?.find((g) => g.name === 'LaboratoryDots')?.namedDots ?? [];
 
 	console.log(graphData);
@@ -18,13 +27,18 @@ const DesigningGraph = ({ graphData, regulatoryDocName, calculationDocName }: Gr
 			.filter((d) => d.dot?.f != null && d.dot?.r != null)
 			.map((d) => ({ x: d.dot!.f!, y: d.dot!.r!, label: d.name }));
 
-	const handledNames = ['abcd', 'LaboratoryDots', 'deviationDotsList'];
+	// Формируем список имён, которые нужно исключить из дополнительных серий
+	const handledNames = ['LaboratoryDots', 'deviationDotsList'];
+	if (primaryGraph?.name) {
+		handledNames.push(primaryGraph.name);
+	}
+
 	const graphSeries = [];
 
 	if (graphData) {
 		graphSeries.push({
-			label: 'R (lab)',
-			data: mapWithLabels(abcdRaw).sort((a, b) => a.x - b.x),
+			label: primaryGraph?.name || 'R (lab)',
+			data: mapWithLabels(primaryRaw).sort((a, b) => a.x - b.x),
 		});
 
 		graphSeries.push({

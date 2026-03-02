@@ -1,5 +1,5 @@
 import { fetchApi } from '@api-gen';
-import { Button, useAppNavigate } from '@core';
+import { Button, useAppNavigate, useI18n } from '@core';
 import { convertBillToClient, deleteBill, type Bill } from '@features/bills';
 import { LandingSections } from '@features/landing/constants';
 import type { Subscription } from '@features/subscriptions';
@@ -15,12 +15,13 @@ export const FormSubscription = () => {
 	const [currentSub, setCurrentSub] = useState<Subscription>();
 	const [bill, setBill] = useState<Bill>();
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 	const handleSubscribe = (id: string) => {
 		from(fetchApi.api.billCreate({ subscriptionId: id }))
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || 'Ошибка оформления пакета');
+						toast.error(error.response?.data || t('subscription.checkout.error'));
 					}
 					return from([null]);
 				}),
@@ -28,7 +29,7 @@ export const FormSubscription = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					setBill(convertBillToClient(response.data));
-					toast.success('Пакет успешно оформлена');
+					toast.success(t('subscription.checkout.success'));
 				}
 			});
 	};
@@ -45,7 +46,7 @@ export const FormSubscription = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					toast.success('Счет успешно удален');
+					toast.success(t('bill.delete.success'));
 				}
 			});
 	};
@@ -80,13 +81,13 @@ export const FormSubscription = () => {
 		if (bill) {
 			const link = document.createElement('a');
 			link.href = bill.fileUrl;
-			const fileName = `Счет#${bill.number}`;
+			const fileName = `${t('bill.filePrefix')}${bill.number}`;
 			link.download = fileName;
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
 		} else {
-			toast.error('Счет не найден');
+			toast.error(t('bill.notFound'));
 		}
 	};
 
@@ -108,7 +109,7 @@ export const FormSubscription = () => {
 							</div>
 						</div>
 						<div className="mb-4 font-montserrat text-lg font-medium text-primary sm:text-xl">
-							{!!+currentSub.price ? currentSub.price : 'Бесплатно'}
+							{!!+currentSub.price ? currentSub.price : t('subscription.free')}
 						</div>
 						<Button
 							onClick={() => {
@@ -118,7 +119,7 @@ export const FormSubscription = () => {
 							className="mb-4 h-10 w-fit"
 						>
 							<p className="font-sans text-sm font-semibold leading-5 text-white sm:text-base">
-								Изменить пакет
+								{t('main.currentSub.changePlan')}
 							</p>
 						</Button>
 					</div>
@@ -126,7 +127,7 @@ export const FormSubscription = () => {
 					<div className="flex items-center justify-between">
 						<div className={'flex w-full flex-col justify-between'}>
 							<div className="mb-4 font-montserrat text-lg font-medium text-black sm:text-xl">
-								Данные для платежа
+								{t('subscription.paymentData')}
 							</div>
 							<Button
 								onClick={handleDownloadFile}
@@ -134,7 +135,7 @@ export const FormSubscription = () => {
 								variant="primary"
 							>
 								<p className="font-sans text-sm font-semibold leading-5 sm:text-base">
-									Скачать счет на оплату
+									{t('bill.downloadInvoice')}
 								</p>
 							</Button>
 						</div>
@@ -147,7 +148,7 @@ export const FormSubscription = () => {
 							variant="outline"
 						>
 							<p className="font-sans text-sm font-semibold leading-5 sm:text-base">
-								Отменить оформление
+								{t('subscription.checkout.cancel')}
 							</p>
 						</Button>
 					</div>

@@ -1,10 +1,11 @@
-import { Switch } from '@core';
+import { Switch, useI18n } from '@core';
 import { LandingSections } from '@features/landing/constants';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export const AboutUsComponent = () => {
 	const [isPlatformSwitch, setIsPlatformSwitch] = useState<boolean>(true);
+	const { t } = useI18n();
 
 	return (
 		<div
@@ -21,7 +22,7 @@ export const AboutUsComponent = () => {
 									isPlatformSwitch && 'text-primary',
 								)}
 							>
-								ПЛАТФОРМА
+								{t('landing.about.platformTitle')}
 							</span>
 							<span
 								className={twMerge(
@@ -29,7 +30,7 @@ export const AboutUsComponent = () => {
 									isPlatformSwitch && 'text-primary',
 								)}
 							>
-								Проектирование и расчеты конструкций
+								{t('landing.about.platformSubtitle')}
 							</span>
 						</div>
 						<span
@@ -38,9 +39,7 @@ export const AboutUsComponent = () => {
 								isPlatformSwitch && 'text-black',
 							)}
 						>
-							Автоматизирует звукоизоляционные расчёты по СН 2.04.01.-2020.Предлагает
-							оптимальные конструкции и экономит бюджет.Формирует отчёт в PDF для
-							передачи в экспертизу.
+							{t('landing.about.platformDesc')}
 						</span>
 					</div>
 					<div className="flex flex-col items-center justify-center gap-[15px]">
@@ -55,7 +54,7 @@ export const AboutUsComponent = () => {
 									!isPlatformSwitch && 'text-primary',
 								)}
 							>
-								AI mode
+								{t('landing.about.aiTitle')}
 							</span>
 							<span
 								className={twMerge(
@@ -63,7 +62,7 @@ export const AboutUsComponent = () => {
 									!isPlatformSwitch && 'text-primary',
 								)}
 							>
-								Визуализация и консультирование
+								{t('landing.about.aiSubtitle')}
 							</span>
 						</div>
 						<span
@@ -72,9 +71,7 @@ export const AboutUsComponent = () => {
 								!isPlatformSwitch && 'text-black',
 							)}
 						>
-							Создает изображений фасадов и интерьеров. Анализирует документы, нормы и
-							расчёты в чате. Проверяет соответствие проектных решений требованиям.
-							Глубокий поиск информации в интернете.
+							{t('landing.about.aiDesc')}
 						</span>
 					</div>
 				</div>

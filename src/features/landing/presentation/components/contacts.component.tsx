@@ -1,25 +1,28 @@
 import { LandingSections } from '@features/landing/constants';
+import { useI18n } from '@core';
 import { EmailImage, PhoneImage } from '../images';
 
 export const Contacts = () => {
+	const { t } = useI18n();
+
 	return (
 		<div
 			className="mx-auto w-full px-4 py-[50px] xs:w-[90%] sm:w-4/5 md:w-[73.18%]"
 			id={LandingSections.contacts.id}
 		>
 			<div className="mb-[36px] font-montserrat text-[18px] font-normal leading-[24px] xs:text-[20px]">
-				Контакты
+				{t('landing.contacts.title')}
 			</div>
 			<div className="flex flex-col gap-6 sm:flex-row sm:justify-between">
 				<div className="flex flex-col gap-[12px]">
 					<span className="font-montserrat text-[20px] font-medium leading-[24px] text-primary sm:text-[25px] sm:leading-[30px] md:text-[25px] md:leading-[30px] lg:text-[30px] lg:leading-[36px] xl:text-[35px] xl:leading-[42px]">
-						ООО&quot;Акустиком&quot;
+						{t('landing.contacts.company')}
 					</span>
 					<span className="font-montserrat text-[16px] leading-[20px] xs:text-[18px] xs:leading-[22px] sm:text-[22px] sm:leading-[27px]">
-						Беларусь, Минск
+						{t('landing.contacts.location')}
 					</span>
 					<span className="font-montserrat text-[16px] leading-[20px] xs:text-[18px] xs:leading-[22px] sm:text-[22px] sm:leading-[27px]">
-						ул. Матусевича 35, офис 36
+						{t('landing.contacts.address')}
 					</span>
 					<div className="flex flex-row gap-[7px]">
 						<PhoneImage />

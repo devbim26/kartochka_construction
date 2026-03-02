@@ -1,10 +1,11 @@
-import { Chevron } from '@core';
+import { Chevron, useI18n } from '@core';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { descriptions, questions } from '../../constants';
 
 export const FAQ = () => {
 	const [selectedQuestions, setSelectedQuestions] = useState<number[]>([0]);
+	const { t } = useI18n();
 
 	const handleQuestionClick = (index: number) => {
 		setSelectedQuestions((prevSelected) =>
@@ -18,7 +19,7 @@ export const FAQ = () => {
 		<div className="flex w-full justify-center bg-background-primary px-4 sm:px-6 lg:px-10">
 			<div className="flex w-3/4 max-w-screen-xl flex-col py-[40px] sm:py-[50px]">
 				<div className="mb-[20px] font-montserrat text-[18px] font-normal leading-[22px] sm:mb-[30px] sm:text-[20px] sm:leading-[24px]">
-					Часто задаваемые вопросы
+					{t('landing.faq.title')}
 				</div>
 				<div className="flex flex-col gap-[10px] sm:gap-[15px]">
 					{questions.map((question, index) => (
@@ -32,14 +33,14 @@ export const FAQ = () => {
 						>
 							<div className="flex flex-col gap-[20px] sm:gap-[40px]">
 								<div className="font-montserrat text-[18px] font-semibold leading-[22px] sm:text-[20px] sm:leading-[24px]">
-									{question}
+									{t(question)}
 								</div>
 								<div
 									key={index}
 									className="whitespace-pre-wrap font-montserrat text-[16px] font-normal leading-[22px] sm:text-[20px] sm:leading-[24px]"
 								>
 									<span
-										dangerouslySetInnerHTML={{ __html: descriptions[index] }}
+										dangerouslySetInnerHTML={{ __html: t(descriptions[index]) }}
 									/>
 								</div>
 							</div>

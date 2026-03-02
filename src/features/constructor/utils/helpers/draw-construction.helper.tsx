@@ -1,7 +1,7 @@
 import { convertBase64ToFile } from '@core';
 import type { FloorConstruction } from '@features/constructor/types';
 import type { ConstructionTypeEnum } from '@features/guidbooks/types';
-import { RuConstructionTypesMap } from '@features/guidbooks/types';
+import { EnConstructionTypesMap, RuConstructionTypesMap } from '@features/guidbooks/types'; // предполагаем наличие английского маппинга
 
 const measureTextWidth = (ctx: CanvasRenderingContext2D, text: string, font: string) => {
 	ctx.font = font;
@@ -12,18 +12,19 @@ export const drawConstruction = (
 	canvas: HTMLCanvasElement,
 	x: number,
 	y: number,
-	constructionName: string,
-	guidebookConstructionName: string,
-	dividedRooms: string,
+	constructionName: string, // отображаемое название типа (переведённое)
+	guidebookConstructionName: string, // название конструкции из справочника (уже может быть переведено)
+	dividedRooms: string, // строка с помещениями (обычно не переводится, т.к. это имена)
+	labels: { construction: string; divides: string }, // объект с переведёнными метками
 ) => {
 	const context = canvas.getContext('2d');
 	if (!context) return;
 
 	const widths = [
 		measureTextWidth(context, constructionName, '300 16px Source Sans Pro'),
-		measureTextWidth(context, 'Конструкция:', '600 16px Source Sans Pro') +
+		measureTextWidth(context, labels.construction + ' ', '600 16px Source Sans Pro') +
 			measureTextWidth(context, guidebookConstructionName, '800 16px Source Sans Pro'),
-		measureTextWidth(context, 'разделяет:', '600 16px Source Sans Pro') +
+		measureTextWidth(context, labels.divides + ' ', '600 16px Source Sans Pro') +
 			measureTextWidth(context, dividedRooms, '800 16px Source Sans Pro'),
 	];
 
@@ -63,18 +64,26 @@ export const drawConstruction = (
 	context.fillText(constructionName, boxX + 10, boxY + 20);
 
 	context.font = '600 16px Source Sans Pro';
-	context.fillText('Конструкция:', boxX + 10, boxY + 35);
+	context.fillText(labels.construction, boxX + 10, boxY + 35);
 
 	context.fillStyle = '#2175F3';
 	context.font = '800 16px Source Sans Pro';
-	context.fillText(guidebookConstructionName, boxX + 110, boxY + 35);
+	context.fillText(
+		guidebookConstructionName,
+		boxX + 10 + measureTextWidth(context, labels.construction, '600 16px Source Sans Pro'),
+		boxY + 35,
+	);
 
 	context.fillStyle = 'black';
 	context.font = '600 16px Source Sans Pro';
-	context.fillText('разделяет:', boxX + 10, boxY + 50);
+	context.fillText(labels.divides, boxX + 10, boxY + 50);
 
 	context.font = '800 16px Source Sans Pro';
-	context.fillText(dividedRooms, boxX + 90, boxY + 50);
+	context.fillText(
+		dividedRooms,
+		boxX + 10 + measureTextWidth(context, labels.divides, '600 16px Source Sans Pro'),
+		boxY + 50,
+	);
 };
 
 export const drawConstructionOnCanvas = async (
@@ -83,20 +92,27 @@ export const drawConstructionOnCanvas = async (
 	scale: number,
 	constructionType?: ConstructionTypeEnum,
 	constructionName?: string,
+	labels?: { construction: string; divides: string }, // добавили параметр с метками
 ): Promise<void> => {
 	const { coordinates, reportConstructionHeader } = info;
 	const x = coordinates.x * scale;
 	const y = coordinates.y * scale;
 
+	// Определяем маппинг в зависимости от языка (можно передавать готовое название из компонента)
+	const typeDisplayName = constructionType
+		? labels?.construction === 'Construction:'
+			? EnConstructionTypesMap[constructionType]
+			: RuConstructionTypesMap[constructionType]
+		: '';
+
 	drawConstruction(
 		canvas,
 		x,
 		y,
-		constructionType ? RuConstructionTypesMap[constructionType] : '',
+		typeDisplayName,
 		constructionName || 'Placeholder',
-		reportConstructionHeader.firstPlacemetnRoom.name +
-			'/' +
-			reportConstructionHeader.secondPlacementRoom.name,
+		`${reportConstructionHeader.firstPlacemetnRoom.name}/${reportConstructionHeader.secondPlacementRoom.name}`,
+		labels || { construction: 'Конструкция:', divides: 'разделяет:' }, // fallback на русский
 	);
 
 	return Promise.resolve();

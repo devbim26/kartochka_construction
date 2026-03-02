@@ -1,5 +1,5 @@
 import type { AppDispatch } from '@core';
-import { Button, ChevronIcon, useAppDispatch, useAppNavigate } from '@core';
+import { Button, ChevronIcon, useAppDispatch, useAppNavigate, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { uploadImage, uploadScreenshot } from '@features/constructor/services';
 import { constructorSlice, stopLoading } from '@features/constructor/store';
@@ -17,6 +17,7 @@ import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { TbZoomReset } from 'react-icons/tb';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@5.1.91/build/pdf.worker.min.mjs`;
 
 type Props = {
@@ -36,6 +37,7 @@ export const FloorPlanViewer = ({
 	getData,
 	currentConstructionHeader,
 }: Props) => {
+	const { t, locale } = useI18n();
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [pageNum, setPageNum] = useState(1);
 	const [numPages, setNumPages] = useState(0);
@@ -48,10 +50,15 @@ export const FloorPlanViewer = ({
 
 	const { renderPage, isRendering } = useRenderPage(pdfFile, canvasRef, scale);
 
+	const constructionLabels = {
+		construction: t('construction.labels.construction'),
+		divides: t('construction.labels.divides'),
+	};
+
 	useEffect(() => {
 		setNumPages(pdfFile.numPages);
 		setPageNum(1);
-	}, []);
+	}, [pdfFile]);
 
 	const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
 		event.preventDefault();
@@ -101,7 +108,9 @@ export const FloorPlanViewer = ({
 			}
 		} catch (error) {
 			if (error instanceof AxiosError) {
-				toast.error(error.response?.data);
+				toast.error(error.response?.data || t('floorPlanViewer.uploadError'));
+			} else {
+				toast.error(t('floorPlanViewer.uploadError'));
 			}
 			dispatch(stopLoading());
 		}
@@ -125,12 +134,14 @@ export const FloorPlanViewer = ({
 				await renderPage(pageNum);
 
 				if (currentConstruction?.page === pageNum && currentConstructionHeader) {
+					// В useEffect, где вызывается drawConstructionOnCanvas:
 					await drawConstructionOnCanvas(
 						canvas,
 						currentConstruction,
 						scale,
 						currentConstructionHeader?.constructionType as ConstructionTypeEnum,
 						currentConstructionHeader?.name || 'Placeholder',
+						constructionLabels, // передаём метки
 					);
 
 					const prev = previousConstructionRef.current;
@@ -156,13 +167,13 @@ export const FloorPlanViewer = ({
 					}
 				}
 			} catch (error) {
-				console.error('Ошибка при отрисовке PDF или конструкции:', error);
+				console.error(t('pdf.error'), error);
 				dispatch(stopLoading());
 			}
 		};
 
 		renderAndDraw();
-	}, [pdfFile, pageNum, scale, currentConstruction, currentConstructionHeader]);
+	}, [pdfFile, pageNum, scale, currentConstruction, currentConstructionHeader, locale]);
 
 	return (
 		<div className="flex items-center justify-center rounded-[20px] py-[30px]">
@@ -201,8 +212,7 @@ export const FloorPlanViewer = ({
 							</Button>
 						</div>
 						<p className="text-[18px] text-primary">
-							Для создания конструкции нажмите правую кнопку мыши над требуемой к
-							расчету конструкцией
+							{t('floorPlanViewer.instruction')}
 						</p>
 						<div className="flex items-center gap-[10px]">
 							<Button
@@ -213,7 +223,9 @@ export const FloorPlanViewer = ({
 							>
 								<ChevronIcon className="rotate-90" fill="white" />
 							</Button>
-							<span className="text-[16px] font-bold">{pageNum} страница </span>
+							<span className="text-[16px] font-bold">
+								{pageNum} {t('floorPlanViewer.page')}
+							</span>
 							<Button
 								onClick={handleNext}
 								disabled={pageNum >= numPages}

@@ -1,9 +1,12 @@
 import { withGuardedBlock } from '@core/utils/permissions';
+import { useI18n } from '@core';
 import type { SidebarItemProps } from '@features/home/types';
 import { Link } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
 const SidebarListItemBase = (props: SidebarItemProps) => {
+	const { t } = useI18n();
+
 	return (
 		<Link to={props.path}>
 			<div
@@ -14,7 +17,7 @@ const SidebarListItemBase = (props: SidebarItemProps) => {
 						: '',
 				)}
 			>
-				{props.label}
+				{t(props.labelKey)}
 			</div>
 		</Link>
 	);

@@ -1,4 +1,4 @@
-import { Button, Modal, type ModalProps } from '@core';
+import { Button, Modal, type ModalProps, useI18n } from '@core';
 import { twJoin } from 'tailwind-merge';
 import { FormSubscription } from './form-sub-form.component';
 
@@ -18,6 +18,8 @@ export const FormSubModal = ({
 	children,
 	...props
 }: Props) => {
+	const { t } = useI18n();
+
 	return (
 		<Modal
 			className="w-full max-w-fit md:w-fit"
@@ -29,7 +31,7 @@ export const FormSubModal = ({
 							className="flex h-[40px] w-fit flex-row items-center px-4 py-1.5"
 							variant="outline"
 						>
-							<p className="font-sans text-sm font-semibold">Отмена</p>
+							<p className="font-sans text-sm font-semibold">{t('common.cancel')}</p>
 						</Button>
 					)}
 					{hasSubmitButton && (

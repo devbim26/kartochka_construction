@@ -12,3 +12,8 @@ export const RuConstructionTypeSelectValues = [
 	{ label: 'Стены и перегородки', value: ConstructionClass.Wall },
 	{ label: 'Перекрытия', value: ConstructionClass.Floor },
 ];
+
+export const EnConstructionTypeSelectValues = [
+	{ label: 'Wall', value: ConstructionClass.Wall },
+	{ label: 'Floor', value: ConstructionClass.Floor },
+];

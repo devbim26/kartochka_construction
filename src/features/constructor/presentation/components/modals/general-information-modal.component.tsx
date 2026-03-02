@@ -1,5 +1,5 @@
 import type { ModalProps } from '@core';
-import { Button, Modal } from '@core';
+import { Button, Modal, useI18n } from '@core';
 import { twJoin } from 'tailwind-merge';
 
 interface CreateConstructionModalProps extends Omit<ModalProps, 'Footer'> {
@@ -8,6 +8,8 @@ interface CreateConstructionModalProps extends Omit<ModalProps, 'Footer'> {
 }
 
 export const GeneralInformationModal = ({ onCancel, ...props }: CreateConstructionModalProps) => {
+	const { t } = useI18n();
+
 	return (
 		<Modal
 			Footer={() => (
@@ -16,7 +18,7 @@ export const GeneralInformationModal = ({ onCancel, ...props }: CreateConstructi
 						onClick={onCancel}
 						className="flex w-fit flex-row items-center px-4 py-1.5"
 					>
-						<p className="font-sans text-sm font-semibold">Закрыть</p>
+						<p className="font-sans text-sm font-semibold">{t('common.cancel')}</p>
 					</Button>
 				</div>
 			)}

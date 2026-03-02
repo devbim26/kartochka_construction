@@ -9,6 +9,7 @@ import {
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	useI18n,
 	type PaginationState,
 } from '@core';
 import { useHeaderForm } from '@features/guidbooks/utils';
@@ -36,6 +37,7 @@ import { toast } from 'sonner';
 import { NewsAddEdit, NewsFilter, NewsPageHeaderWrapper } from '../components';
 
 const NewsScreen = () => {
+	const { t } = useI18n();
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const [singleArticle, setSingleArticle] = useState<Article>();
@@ -104,7 +106,7 @@ const NewsScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка загрузки новостей');
+						toast.error(error.response?.data?.message || t('news.loadError'));
 					}
 					return from([null]);
 				}),
@@ -117,7 +119,7 @@ const NewsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка создания новости');
+						toast.error(error.response?.data?.message || t('news.createError'));
 					}
 					return from([null]);
 				}),
@@ -125,7 +127,7 @@ const NewsScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Новость успешно добавлена');
+					toast.success(t('news.addSuccess'));
 					navigate('');
 				}
 			});
@@ -144,7 +146,7 @@ const NewsScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Новость успешно удалена');
+					toast.success(t('news.deleteSuccess'));
 				}
 			});
 	};
@@ -154,9 +156,7 @@ const NewsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(
-							error.response?.data?.message || 'Ошибка редактирования новости',
-						);
+						toast.error(error.response?.data?.message || t('news.editError'));
 					}
 					return from([null]);
 				}),
@@ -164,7 +164,7 @@ const NewsScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Новость успешно отредактирована');
+					toast.success(t('news.editSuccess'));
 					navigate('');
 				}
 			});
@@ -200,7 +200,7 @@ const NewsScreen = () => {
 		const cols: ColumnDef<Article>[] = [
 			{
 				accessorKey: 'imageUrl',
-				header: () => <SimpleTableHeaderCell text={'Изображение'} />,
+				header: () => <SimpleTableHeaderCell text={t('news.columns.image')} />,
 				cell: (info) => (
 					<SimpleTableCell
 						contentClassName="flex items-center size-[80px]"
@@ -209,7 +209,7 @@ const NewsScreen = () => {
 								<img
 									src={info.getValue() as string}
 									className="size-fit rounded-lg object-cover"
-									alt="news image"
+									alt={t('news.columns.image')}
 								/>
 							) : (
 								''
@@ -220,17 +220,17 @@ const NewsScreen = () => {
 			},
 			{
 				accessorKey: 'title',
-				header: () => <SimpleTableHeaderCell text={'Заголовок'} />,
+				header: () => <SimpleTableHeaderCell text={t('news.columns.title')} />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'publishDate',
-				header: () => <SimpleTableHeaderCell text={'Дата публикации'} />,
+				header: () => <SimpleTableHeaderCell text={t('news.columns.publishDate')} />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'id',
-				header: () => <SimpleTableHeaderCell text={'Действия'} />,
+				header: () => <SimpleTableHeaderCell text={t('common.actions')} />,
 				cell: (info) => (
 					<SimpleTableCell
 						content={
@@ -259,16 +259,16 @@ const NewsScreen = () => {
 			},
 		];
 		return cols;
-	}, [navigate]);
+	}, [navigate, t]);
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<NewsPageHeaderWrapper
 				onSave={search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
-					pageTitle: 'Новости',
-					editTitle: 'Редактировать новость',
-					addTitle: 'Добавить новость',
+					pageTitleKey: 'news.pageTitle',
+					editTitleKey: 'news.editTitle',
+					addTitleKey: 'news.addTitle',
 				}}
 				forms={form}
 				formElements={{
@@ -293,9 +293,9 @@ const NewsScreen = () => {
 					handleDeleteTableData(itemToDelete.id);
 					setIsModalOpen(false);
 				}}
-				headerTitle="Подтвердите действие"
+				headerTitle={t('guides.deleteModal.title')}
 			>
-				Вы уверены, что хотите удалить новость «{itemToDelete.name}»?
+				{t('guides.deleteModal.newsQuestion')} {itemToDelete.name}
 			</DeleteModal>
 		</div>
 	);

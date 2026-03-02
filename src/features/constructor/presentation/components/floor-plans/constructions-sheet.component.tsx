@@ -11,10 +11,13 @@ import {
 	SimpleTableHeaderCell,
 	useAppDispatch,
 	useAppNavigate,
+	useI18n,
 } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { ReportCategory } from '@features/constructor/types';
 import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
+import type { ConstructionTypeEnum } from '@features/guidbooks/types';
+import { EnConstructionTypesMap, RuConstructionTypesMap } from '@features/guidbooks/types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
@@ -27,6 +30,7 @@ type Props = {
 };
 
 export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Props) => {
+	const { t, locale } = useI18n();
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
@@ -38,22 +42,34 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 		const cols: ColumnDef<ConstructionSheet>[] = [
 			{
 				accessorKey: 'title',
-				header: () => <SimpleTableHeaderCell text="Название" />,
+				header: () => <SimpleTableHeaderCell text={t('constructionSheets.title')} />,
 				cell: (info) => (
 					<SimpleTableCell
 						contentClassName="w-[350px] text-[15px]"
 						content={
 							<div className="flex flex-col items-center gap-1 text-center font-sans text-[20px]">
 								<div>
-									<p className="font-semibold">Название</p>
+									<p className="font-semibold">{t('constructionSheets.title')}</p>
 									<p>{info.getValue() as string}</p>
 								</div>
 								<div>
-									<p className="font-semibold">Тип</p>
-									<p>{info.row.original.constructionType}</p>
+									<p className="font-semibold">{t('constructionSheets.type')}</p>
+									<p>
+										{locale === 'ru'
+											? RuConstructionTypesMap[
+													info.row.original
+														.constructionType as ConstructionTypeEnum
+												]
+											: EnConstructionTypesMap[
+													info.row.original
+														.constructionType as ConstructionTypeEnum
+												]}
+									</p>
 								</div>
 								<div>
-									<p className="font-semibold">Разделяет</p>
+									<p className="font-semibold">
+										{t('constructionSheets.divides')}
+									</p>
 									<p>{info.row.original.constructionDivide}</p>
 								</div>
 							</div>
@@ -63,7 +79,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 			},
 			{
 				accessorKey: 'floorPlanImage',
-				header: () => <SimpleTableHeaderCell text="План" />,
+				header: () => <SimpleTableHeaderCell text={t('constructionSheets.plan')} />,
 				cell: (info) => {
 					const src = info.getValue() as string;
 					return (
@@ -90,7 +106,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 			},
 			{
 				accessorKey: 'constructionInfoImage',
-				header: () => <SimpleTableHeaderCell text="Конструкция" />,
+				header: () => <SimpleTableHeaderCell text={t('constructionSheets.construction')} />,
 				cell: (info) => (
 					<SimpleTableCell
 						content={
@@ -104,7 +120,12 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 			},
 			{
 				accessorKey: 'square',
-				header: () => <SimpleTableHeaderCell textClassName="w-[100px]" text="Площадь,м²" />,
+				header: () => (
+					<SimpleTableHeaderCell
+						textClassName="w-[100px]"
+						text={t('constructionSheets.area')}
+					/>
+				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={
@@ -117,7 +138,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 			},
 			{
 				accessorKey: 'actions',
-				header: () => <SimpleTableHeaderCell text="Действия" />,
+				header: () => <SimpleTableHeaderCell text={t('constructionSheets.actions')} />,
 				cell: (info) => {
 					return (
 						<SimpleTableCell
@@ -145,10 +166,10 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 												}
 												className="h-[50px] w-[250px] p-[6px] text-[20px]"
 											>
-												Проектирование
+												{t('constructionSheets.designing')}
 											</Button>{' '}
 											<p className="text-[15px] font-semibold text-input-label-primary">
-												Расчет звукоизоляции конструкции
+												{t('constructionSheets.designingHint')}
 											</p>
 										</div>
 										<div className="flex w-full items-center gap-[10px]">
@@ -172,10 +193,10 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 													)
 												}
 											>
-												Выбор из каталога
+												{t('constructionSheets.selectFromCatalog')}
 											</Button>
 											<p className="text-[15px] font-semibold text-input-label-primary">
-												Выбор из каталога производителей
+												{t('constructionSheets.selectFromCatalogHint')}
 											</p>
 										</div>
 									</div>
@@ -201,7 +222,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 												}}
 											/>
 											<p className="text-[15px] font-semibold text-input-label-primary">
-												Свойства конструкции
+												{t('constructionSheets.properties')}
 											</p>
 										</div>
 										<div className="flex items-center gap-[10px]">
@@ -235,7 +256,8 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 			},
 		];
 		return cols;
-	}, [reportFloorInfoId]);
+	}, [reportFloorInfoId, t, navigate, search, reportType]);
+
 	return (
 		<div className="flex-col overflow-x-auto">
 			{previewSrc && (
@@ -243,7 +265,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 			)}
 
 			<FormElementLabel className="font-[18px] text-primary">
-				Ведомость конструкций
+				{t('constructionSheets.sheetTitle')}
 			</FormElementLabel>
 			<DesigningTable
 				classNames={{

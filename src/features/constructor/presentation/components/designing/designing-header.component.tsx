@@ -1,4 +1,4 @@
-import { APP_ROUTES, Button, useAppNavigate } from '@core';
+import { APP_ROUTES, Button, useAppNavigate, useI18n } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -8,12 +8,15 @@ export const DesigningHeader = () => {
 	const navigate = useAppNavigate();
 	const location = useLocation();
 	const [search] = useSearchParams();
+	const { t } = useI18n();
 
 	const isActive = (route: string) => location.pathname.endsWith(route);
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
-			<p className="font-sans text-lg font-semibold leading-6">Конструкции</p>
+			<p className="font-sans text-lg font-semibold leading-6">
+				{t('constructor.designingHeader.title')}
+			</p>
 			<div className="flex flex-row gap-[20px]">
 				<Button
 					className={twMerge(
@@ -38,7 +41,7 @@ export const DesigningHeader = () => {
 						)
 					}
 				>
-					Редактирование конструкции
+					{t('constructor.designingHeader.editConstruction')}
 				</Button>
 				<Button
 					className={twMerge(
@@ -63,7 +66,7 @@ export const DesigningHeader = () => {
 						)
 					}
 				>
-					Мои конструкции
+					{t('constructor.designingHeader.myConstructions')}
 				</Button>
 			</div>
 		</div>

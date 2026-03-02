@@ -1,4 +1,4 @@
-import { Button, Modal, type ModalProps } from '@core';
+import { Button, Modal, useI18n, type ModalProps } from '@core';
 import { twJoin } from 'tailwind-merge';
 
 interface DeleteModalProps extends Omit<ModalProps, 'Footer'> {
@@ -8,6 +8,7 @@ interface DeleteModalProps extends Omit<ModalProps, 'Footer'> {
 }
 
 export const DeleteModal = ({ onCancel, onConfirm, children, ...props }: DeleteModalProps) => {
+	const { t } = useI18n();
 	return (
 		<Modal
 			Footer={() => (
@@ -16,13 +17,13 @@ export const DeleteModal = ({ onCancel, onConfirm, children, ...props }: DeleteM
 						onClick={onConfirm}
 						className="flex w-fit flex-row items-center px-4 py-1.5"
 					>
-						<p className="font-sans text-sm font-semibold">Удалить</p>
+						<p className="font-sans text-sm font-semibold">{t('common.delete')}</p>
 					</Button>
 					<Button
 						onClick={onCancel}
 						className="flex w-fit flex-row items-center px-4 py-1.5"
 					>
-						<p className="font-sans text-sm font-semibold">Отмена</p>
+						<p className="font-sans text-sm font-semibold">{t('common.cancel')}</p>
 					</Button>
 				</div>
 			)}

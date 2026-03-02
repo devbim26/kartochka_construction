@@ -1,4 +1,4 @@
-import { Chevron, FormElementLabel, Switch } from '@core';
+import { Chevron, FormElementLabel, Switch, useI18n } from '@core';
 import type { FormReportSchemaType } from '@features/constructor/utils';
 import { useState } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
@@ -9,6 +9,7 @@ export const DocumentFlags = () => {
 	const [showSoundInfo, setShowSoundInfo] = useState(true);
 
 	const [showThermalInfo, setShowThermalInfo] = useState(true);
+	const { t } = useI18n();
 
 	const generalCharacteristics = watch('floorDocumentFlags.generalCharacteristics');
 	const isGeneralEnabled =
@@ -29,7 +30,7 @@ export const DocumentFlags = () => {
 		<div className="flex w-full flex-col gap-[20px] px-[300px] font-semibold">
 			<div className="flex w-full items-center justify-start gap-[10px]">
 				<FormElementLabel className="w-[120px] text-[#383838]">
-					Титульный лист
+					{t('constructor.reportForm.docs.titleList')}
 				</FormElementLabel>
 				<Controller
 					control={control}
@@ -44,7 +45,9 @@ export const DocumentFlags = () => {
 				/>
 			</div>
 			<div className="flex w-full items-center justify-start gap-[10px]">
-				<FormElementLabel className="w-[120px] text-[#383838]">Содержание</FormElementLabel>
+				<FormElementLabel className="w-[120px] text-[#383838]">
+					{t('constructor.reportForm.docs.contents')}
+				</FormElementLabel>
 				<Controller
 					control={control}
 					name="floorDocumentFlags.takeContent"
@@ -58,7 +61,9 @@ export const DocumentFlags = () => {
 				/>
 			</div>
 			<div className="flex w-full items-center justify-start gap-[10px]">
-				<FormElementLabel className="w-[120px] text-[#383838]">Введение</FormElementLabel>
+				<FormElementLabel className="w-[120px] text-[#383838]">
+					{t('constructor.reportForm.docs.introduction')}
+				</FormElementLabel>
 				<Controller
 					control={control}
 					name="floorDocumentFlags.takeIntroduction"
@@ -73,7 +78,7 @@ export const DocumentFlags = () => {
 			</div>
 			<div className="flex w-full items-center justify-start gap-[10px]">
 				<FormElementLabel className="w-[200px] text-[#383838]">
-					1. Общая характеристика
+					{t('constructor.reportForm.docs.general.section')}
 				</FormElementLabel>
 				<Switch
 					isEnabledProp={isGeneralEnabled}
@@ -96,7 +101,7 @@ export const DocumentFlags = () => {
 				<div className="flex w-full flex-col gap-[20px] pl-[50px] font-semibold text-input-label-primary">
 					<div className="flex w-full items-center justify-start gap-[10px]">
 						<FormElementLabel className="w-[350px]">
-							1.1 Характеристика помещений
+							{t('constructor.reportForm.docs.general.room')}
 						</FormElementLabel>
 						<Controller
 							control={control}
@@ -115,7 +120,7 @@ export const DocumentFlags = () => {
 					</div>
 					<div className="flex w-full items-center justify-start gap-[10px]">
 						<FormElementLabel className="w-[350px]">
-							1.2 Расчет объемов материалов стен
+							{t('constructor.reportForm.docs.general.wallVolumes')}
 						</FormElementLabel>
 						<Controller
 							control={control}
@@ -134,7 +139,7 @@ export const DocumentFlags = () => {
 					</div>
 					<div className="flex w-full items-center justify-start gap-[10px]">
 						<FormElementLabel className="w-[350px]">
-							1.3 Расчет объемов материалов перекрытий
+							{t('constructor.reportForm.docs.general.floorVolumes')}
 						</FormElementLabel>
 						<Controller
 							control={control}
@@ -155,7 +160,7 @@ export const DocumentFlags = () => {
 			)}
 			<div className="flex w-full items-center justify-start gap-[10px]">
 				<FormElementLabel className="w-[400px] text-[#383838]">
-					2. Расчет звукоизоляции ограждающих конструкций
+					{t('constructor.reportForm.docs.sound.section')}
 				</FormElementLabel>
 				<Switch
 					isEnabledProp={isGeneralEnabled}
@@ -177,7 +182,7 @@ export const DocumentFlags = () => {
 					<div className="flex w-full flex-col gap-[20px] pl-[50px] font-semibold text-input-label-primary">
 						<div className="flex w-full items-center justify-start gap-[10px]">
 							<FormElementLabel className="w-[350px]">
-								2.1 Расчет звукоизоляции ограждающих конструкций
+								{t('constructor.reportForm.docs.sound.calc')}
 							</FormElementLabel>
 							<Controller
 								control={control}
@@ -204,8 +209,7 @@ export const DocumentFlags = () => {
 										className="flex w-full items-center justify-start gap-[10px]"
 									>
 										<FormElementLabel className="w-[350px]">
-											2.1.{baseIndex + 1} Конструкции на отметке{' '}
-											{baseFlag.floorNumber}.000
+											{`2.1.${baseIndex + 1} ${t('constructor.reportForm.docs.sound.constructionsAt')} ${baseFlag.floorNumber}.000`}
 										</FormElementLabel>
 										<Controller
 											control={control}
@@ -230,8 +234,7 @@ export const DocumentFlags = () => {
 													className="flex w-full items-center justify-start gap-[10px]"
 												>
 													<FormElementLabel className="w-[350px]">
-														2.1.{baseIndex + 1}.{index + 1} Конструкция{' '}
-														{namedConst.constructionName}
+														{`2.1.${baseIndex + 1}.${index + 1} ${t('constructor.reportForm.docs.sound.construction')} ${namedConst.constructionName}`}
 													</FormElementLabel>
 													<Controller
 														control={control}
@@ -250,8 +253,7 @@ export const DocumentFlags = () => {
 												</div>
 												<div className="flex w-full items-center justify-start gap-[10px] pl-[80px]">
 													<FormElementLabel className="w-[350px]">
-														2.1.{baseIndex + 1}.{index + 1}.1 Расчет
-														звукоизоляции
+														{`2.1.${baseIndex + 1}.${index + 1}.1 ${t('constructor.reportForm.docs.sound.calcItem')}`}
 													</FormElementLabel>
 													<Controller
 														control={control}
@@ -270,8 +272,7 @@ export const DocumentFlags = () => {
 												</div>
 												<div className="flex w-full items-center justify-start gap-[10px] pl-[80px]">
 													<FormElementLabel className="w-[350px]">
-														2.1.{baseIndex + 1}.{index + 1}.2 Анализ
-														лабораторных данных
+														{`2.1.${baseIndex + 1}.${index + 1}.2 ${t('constructor.reportForm.docs.sound.labAnalysis')}`}
 													</FormElementLabel>
 													<Controller
 														control={control}
@@ -299,7 +300,7 @@ export const DocumentFlags = () => {
 			)}
 			<div className="flex w-full items-center justify-start gap-[10px]">
 				<FormElementLabel className="w-[400px] text-[#383838]">
-					3. Расчет теплоизоляции ограждающих конструкций
+					{t('constructor.reportForm.docs.thermal.section')}
 				</FormElementLabel>
 				<Switch
 					isEnabledProp={isGeneralEnabled}
@@ -322,7 +323,7 @@ export const DocumentFlags = () => {
 					<div className="flex w-full flex-col gap-[20px] pl-[50px] font-semibold text-input-label-primary">
 						<div className="flex w-full items-center justify-start gap-[10px]">
 							<FormElementLabel className="w-[350px]">
-								3.1 Детальный метод расчета приведенного сопротивления теплопередаче
+								{t('constructor.reportForm.docs.thermal.detailMethod')}
 							</FormElementLabel>
 							<Controller
 								control={control}
@@ -341,7 +342,7 @@ export const DocumentFlags = () => {
 						</div>
 					</div>
 					<div className="flex w-full flex-col gap-[20px] pl-[100px] font-semibold text-input-label-primary">
-						{soundBaseReportInfoFlags?.map((baseFlag, baseIndex) => {
+						{thermalBaseReportInfoFlags?.map((baseFlag, baseIndex) => {
 							return (
 								<div
 									key={baseFlag.floorNumber}
@@ -349,8 +350,7 @@ export const DocumentFlags = () => {
 								>
 									<div className="flex w-full items-center justify-start gap-[10px]">
 										<FormElementLabel className="w-[350px]">
-											3.1.{baseIndex + 1} Конструкции на отметке{' '}
-											{baseFlag.floorNumber}.000
+											{`3.1.${baseIndex + 1} ${t('constructor.reportForm.docs.thermal.constructionsAt')} ${baseFlag.floorNumber}.000`}
 										</FormElementLabel>
 										<Controller
 											control={control}
@@ -375,8 +375,7 @@ export const DocumentFlags = () => {
 											>
 												<div className="flex w-full items-center justify-start gap-[10px]">
 													<FormElementLabel className="w-[350px]">
-														3.1.{baseIndex + 1}.{index + 1} Конструкция{' '}
-														{namedConst.constructionName}
+														{`3.1.${baseIndex + 1}.${index + 1} ${t('constructor.reportForm.docs.thermal.construction')} ${namedConst.constructionName}`}
 													</FormElementLabel>
 													<Controller
 														control={control}
@@ -403,7 +402,9 @@ export const DocumentFlags = () => {
 				</>
 			)}
 			<div className="flex w-full items-center justify-start gap-[10px]">
-				<FormElementLabel className="w-[120px] text-[#383838]">Выводы</FormElementLabel>
+				<FormElementLabel className="w-[120px] text-[#383838]">
+					{t('constructor.reportForm.docs.conclusion')}
+				</FormElementLabel>
 				<Controller
 					control={control}
 					name="floorDocumentFlags.takeConclusion"
@@ -418,7 +419,7 @@ export const DocumentFlags = () => {
 			</div>
 			<div className="flex w-full items-center justify-start gap-[10px]">
 				<FormElementLabel className="w-[250px] text-[#383838]">
-					Список используемой литературы
+					{t('constructor.reportForm.docs.literature')}
 				</FormElementLabel>
 				<Controller
 					control={control}
@@ -434,7 +435,7 @@ export const DocumentFlags = () => {
 			</div>
 			<div className="flex w-full items-center justify-start gap-[10px]">
 				<FormElementLabel className="w-[410px] text-[#383838]">
-					ПРИЛОЖЕНИЕ 1. Звукоизоляция. Протоколы с расчетом
+					{t('constructor.reportForm.docs.appendix1')}
 				</FormElementLabel>
 				<Controller
 					control={control}
@@ -450,7 +451,7 @@ export const DocumentFlags = () => {
 			</div>
 			<div className="flex w-full items-center justify-start gap-[10px]">
 				<FormElementLabel className="w-[410px] text-[#383838]">
-					ПРИЛОЖЕНИЕ 2. Теплоизоляция. Протоколы с расчетом
+					{t('constructor.reportForm.docs.appendix2')}
 				</FormElementLabel>
 				<Controller
 					control={control}

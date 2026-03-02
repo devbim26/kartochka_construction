@@ -8,6 +8,7 @@ import {
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	useI18n,
 	type PaginationState,
 } from '@core';
 import {
@@ -29,6 +30,7 @@ import { toast } from 'sonner';
 import { UserAddEdit, UserFilter, UserPageHeaderWrapper } from '../components';
 
 export const UserScreen = () => {
+	const { t } = useI18n();
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const [tableData, setTableData] = useState<Array<AccountData>>([]);
@@ -83,9 +85,7 @@ export const UserScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(
-							error.response?.data?.message || 'Ошибка загрузки пользователей',
-						);
+						toast.error(error.response?.data?.message || t('users.loadError'));
 					}
 					return from([null]);
 				}),
@@ -99,7 +99,7 @@ export const UserScreen = () => {
 		// 		catchError((error) => {
 		// 			if (error instanceof AxiosError) {
 		// 				toast.error(
-		// 					error.response?.data?.message || 'Ошибка создания пользователя',
+		// 					error.response?.data?.message || t('users.createError'),
 		// 				);
 		// 			}
 		// 			return from([null]);
@@ -108,7 +108,7 @@ export const UserScreen = () => {
 		// 	.subscribe((response) => {
 		// 		if (response?.status === 200) {
 		// 			handleGetTableData(form.filterForm.getValues(), paginationState);
-		// 			toast.success('Пользователь успешно добавлен');
+		// 			toast.success(t('users.addSuccess'));
 		// 			navigate('');
 		// 		}
 		// 	});
@@ -127,7 +127,7 @@ export const UserScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Пользователь успешно удален');
+					toast.success(t('users.deleteSuccess'));
 				}
 			});
 	};
@@ -137,9 +137,7 @@ export const UserScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(
-							error.response?.data?.message || 'Ошибка редактирования пользователя',
-						);
+						toast.error(error.response?.data?.message || t('users.editError'));
 					}
 					return from([null]);
 				}),
@@ -147,7 +145,7 @@ export const UserScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Пользователь успешно отредактирован');
+					toast.success(t('users.editSuccess'));
 					navigate('');
 				}
 			});
@@ -184,9 +182,9 @@ export const UserScreen = () => {
 			<UserPageHeaderWrapper
 				onSave={search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
-					pageTitle: 'Клиенты',
-					editTitle: 'Редактировать Клиента',
-					addTitle: 'Добавить Клиента',
+					pageTitleKey: 'users.pageTitle',
+					editTitleKey: 'users.editTitle',
+					addTitleKey: 'users.addTitle',
 				}}
 				forms={form}
 				formElements={{
@@ -201,7 +199,7 @@ export const UserScreen = () => {
 					...userColumns,
 					{
 						accessorKey: 'id',
-						header: () => <SimpleTableHeaderCell text={'Действия'} />,
+						header: () => <SimpleTableHeaderCell text={t('common.actions')} />,
 						cell: (info) => (
 							<SimpleTableCell
 								content={
@@ -241,9 +239,9 @@ export const UserScreen = () => {
 					handleDeleteTableData(search.get('entityId')!);
 					navigate('');
 				}}
-				headerTitle="Подтвердите действие"
+				headerTitle={t('guides.deleteModal.title')}
 			>
-				Вы уверены, что хотите удалить пользователя ?
+				{t('users.deleteConfirmation')}
 			</DeleteModal>
 		</div>
 	);

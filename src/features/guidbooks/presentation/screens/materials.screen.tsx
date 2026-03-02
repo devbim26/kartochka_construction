@@ -9,6 +9,7 @@ import {
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	useI18n,
 	type PaginationState,
 } from '@core';
 import { GuidbookPageHeaderWrapper, MaterialsAddAndEdit, MaterialsFilter } from '@features';
@@ -49,6 +50,7 @@ import { toast } from 'sonner';
 
 const MaterialsScreen = () => {
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 	const [search] = useSearchParams();
 	const [singleMaterial, setSingleMaterial] = useState<MaterialsAddAndEditData>();
 	const [tableData, setTableData] = useState<Array<MaterialsAddAndEditData>>([]);
@@ -76,7 +78,7 @@ const MaterialsScreen = () => {
 		const cols: ColumnDef<MaterialsAddAndEditData>[] = [
 			{
 				accessorKey: 'imageUrl',
-				header: () => <SimpleTableHeaderCell text="Изображение" />,
+				header: () => <SimpleTableHeaderCell text={t('guides.materials.columns.image')} />,
 				cell: (info) => {
 					return (
 						<SimpleTableCell
@@ -97,17 +99,21 @@ const MaterialsScreen = () => {
 			},
 			{
 				accessorKey: 'name',
-				header: () => <SimpleTableHeaderCell text="Название" />,
+				header: () => <SimpleTableHeaderCell text={t('guides.materials.columns.name')} />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'shortName',
-				header: () => <SimpleTableHeaderCell text="Краткое название" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.shortName')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'description',
-				header: () => <SimpleTableHeaderCell text="Описание" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.description')} />
+				),
 				cell: (info) => (
 					<ShortenedTextCell
 						classNames={{
@@ -120,7 +126,7 @@ const MaterialsScreen = () => {
 			},
 			{
 				accessorKey: 'materialType',
-				header: () => <SimpleTableHeaderCell text="Тип материала" />,
+				header: () => <SimpleTableHeaderCell text={t('guides.materials.columns.type')} />,
 				cell: (info) => (
 					<SimpleTableCell
 						content={
@@ -133,7 +139,9 @@ const MaterialsScreen = () => {
 			},
 			{
 				accessorKey: 'country',
-				header: () => <SimpleTableHeaderCell text="Страна" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.country')} />
+				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.row.original.country
@@ -144,47 +152,65 @@ const MaterialsScreen = () => {
 			},
 			{
 				accessorKey: 'density',
-				header: () => <SimpleTableHeaderCell text="Плотность" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.density')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'thickness',
-				header: () => <SimpleTableHeaderCell text="Толщина" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.thickness')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'velocity',
-				header: () => <SimpleTableHeaderCell text="Скорость звука" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.velocity')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'materialCoefficient',
-				header: () => <SimpleTableHeaderCell text="Коэффициент материала" />,
+				header: () => (
+					<SimpleTableHeaderCell
+						text={t('guides.materials.columns.materialCoefficient')}
+					/>
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'lossFactor',
-				header: () => <SimpleTableHeaderCell text="Коэффициент потерь" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.lossFactor')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'youngModulus',
-				header: () => <SimpleTableHeaderCell text="Модуль Юнга материала, ГПа" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.youngModulus')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'damping',
-				header: () => <SimpleTableHeaderCell text="Коэффициент демпфирования" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.damping')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'solid',
-				header: () => <SimpleTableHeaderCell text="Полнотелость %" />,
+				header: () => <SimpleTableHeaderCell text={t('guides.materials.columns.solid')} />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'actions',
-				header: () => <SimpleTableHeaderCell text="Действия" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.actions')} />
+				),
 				cell: (info) => {
 					return (
 						<SimpleTableCell
@@ -302,7 +328,7 @@ const MaterialsScreen = () => {
 					});
 
 					handleGetTableData(forms.filterForm.getValues(), paginationState);
-					toast.success('Материал успешно добавлен');
+					toast.success(t('guides.materials.addSuccess'));
 					navigate('');
 				}
 			});
@@ -326,7 +352,7 @@ const MaterialsScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(forms.filterForm.getValues(), paginationState);
-					toast.success('Материал успешно отредактирован');
+					toast.success(t('guides.materials.editSuccess'));
 					navigate('');
 				}
 			});
@@ -345,7 +371,7 @@ const MaterialsScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(forms.filterForm.getValues(), paginationState);
-					toast.success('Материал успешно удален ');
+					toast.success(t('guides.materials.deleteSuccess'));
 				}
 			});
 	};
@@ -377,9 +403,9 @@ const MaterialsScreen = () => {
 			<GuidbookPageHeaderWrapper
 				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
-					pageTitle: 'Материалы',
-					editTitle: 'Редактирование материала',
-					addTitle: 'Добавление материала',
+					pageTitleKey: 'guides.materials.pageTitle',
+					editTitleKey: 'guides.materials.editTitle',
+					addTitleKey: 'guides.materials.addTitle',
 				}}
 				forms={forms}
 				formElements={{
@@ -409,9 +435,9 @@ const MaterialsScreen = () => {
 					handleDeleteTableData(itemToDelete.id);
 					setIsModalOpen(false);
 				}}
-				headerTitle="Подтвердите действие"
+				headerTitle={t('guides.deleteModal.title')}
 			>
-				Вы уверены, что хотите удалить материал {itemToDelete.name}?
+				{t('guides.deleteModal.materialQuestion')} {itemToDelete.name}
 			</DeleteModal>
 		</div>
 	);

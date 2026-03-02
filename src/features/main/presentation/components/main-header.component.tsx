@@ -1,4 +1,4 @@
-import { APP_ROUTES, Carousel, CarouselSlide, MainSliderLogo, useAppNavigate } from '@core';
+import { APP_ROUTES, Carousel, CarouselSlide, MainSliderLogo, useAppNavigate, useI18n } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useCallback } from 'react';
@@ -18,6 +18,7 @@ interface FeatureCard {
 
 export const MainHeader = () => {
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 
 	const reportType = sessionStorage.getItem('reportType');
 	const reportId = sessionStorage.getItem('reportId');
@@ -45,50 +46,50 @@ export const MainHeader = () => {
 	const AIFeatures: FeatureCard[] = [
 		{
 			id: 'ai-assistant',
-			title: 'Визуализация',
-			description: 'Визуализация фасадов и интерьеров',
+			title: t('main.ai.visualization.title'),
+			description: t('main.ai.visualization.desc'),
 			features: [
-				'AI-генерация изображений с кастомными настройками.',
-				'Меняйте материалы, мебель, положение камеры и др.',
+				t('main.ai.visualization.feature0'),
+				t('main.ai.visualization.feature1'),
 			],
 			price: 'PRO',
-			buttonText: 'Начать PRO',
+			buttonText: t('common.startPro'),
 			active: true,
 		},
 		{
 			id: 'norm-control',
-			title: 'Нормоконтроль',
-			description: 'Проверка на соответствия действующим ТНПА Беларуси',
-			features: ['Генерация отчетов'],
+			title: t('main.ai.normControl.title'),
+			description: t('main.ai.normControl.desc'),
+			features: [t('main.ai.normControl.feature0')],
 			price: 'PRO',
-			buttonText: 'Начать PRO',
+			buttonText: t('common.startPro'),
 			active: true,
 		},
 		{
 			id: 'document-analytics',
-			title: 'Аналитика документов',
-			description: 'AI проверяет, суммирует и структурирует документы',
-			features: ['Выдает готовый отчет в DOC/Excel для смет, ТЗ, протоколов.'],
+			title: t('main.ai.docAnalytics.title'),
+			description: t('main.ai.docAnalytics.desc'),
+			features: [t('main.ai.docAnalytics.feature0')],
 			price: 'PRO',
-			buttonText: 'Начать PRO',
+			buttonText: t('common.startPro'),
 			active: true,
 		},
 		{
 			id: 'internet-search',
-			title: 'Поиск в интернете. deep research',
-			description: 'Проверка на соответствия действующим ТНПА Беларуси',
-			features: ['Генерация отчетов'],
+			title: t('main.ai.internetSearch.title'),
+			description: t('main.ai.internetSearch.desc'),
+			features: [t('main.ai.internetSearch.feature0')],
 			price: 'PRO',
-			buttonText: 'Начать PRO',
+			buttonText: t('common.startPro'),
 			active: true,
 		},
 		{
 			id: 'ifc-analytics',
-			title: 'Аналитика IFC модели',
-			description: 'Проверка на соответствия действующим ТНПА Беларуси',
-			features: ['Генерация отчетов'],
+			title: t('main.ai.ifc.title'),
+			description: t('main.ai.ifc.desc'),
+			features: [t('main.ai.ifc.feature0')],
 			price: 'PRO',
-			buttonText: 'Начать PRO',
+			buttonText: t('common.startPro'),
 			active: true,
 		},
 	];
@@ -96,21 +97,21 @@ export const MainHeader = () => {
 	const features: FeatureCard[] = [
 		{
 			id: 'sound-isolation',
-			title: 'Расчет звукоизоляции',
-			description: 'стен и перекрытий по СП 02.03.01-2023.',
-			features: ['Генератор PDF-отчет с формулами, готовый к подаче на экспертизу.'],
+			title: t('main.cards.sound.title'),
+			description: t('main.cards.sound.desc'),
+			features: [t('main.cards.sound.feature0')],
 			price: 'FREE',
-			buttonText: reportId && reportType ? 'Продолжить' : 'Начать',
+			buttonText: reportId && reportType ? t('common.continue') : t('common.start'),
 			active: true,
 			onClick: handleRedirect,
 		},
 		{
 			id: 'heat-isolation',
-			title: 'Расчет теплоизоляции',
-			description: 'стен и перекрытий по СП 02.03.01-2023.',
-			features: ['Генератор PDF-отчет с формулами, готовый к подаче на экспертизу.'],
+			title: t('main.cards.heat.title'),
+			description: t('main.cards.heat.desc'),
+			features: [t('main.cards.heat.feature0')],
 			price: 'PRO',
-			buttonText: 'Начать PRO',
+			buttonText: t('common.startPro'),
 		},
 	];
 
@@ -124,19 +125,12 @@ export const MainHeader = () => {
 	return (
 		<div className="w-full">
 			<div className="mb-6 flex w-full items-center justify-between">
-				<p className="font-sans text-lg font-semibold leading-6">Главная</p>
-				{/* <button
-					onClick={handleRedirect}
-					className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-				>
-					{reportId && reportType ? 'Продолжить проектирование' : 'Создать новый проект'}
-					<FaArrowRight className="size-4" />
-				</button> */}
+				<p className="font-sans text-lg font-semibold leading-6">{t('main.pageTitle')}</p>
 			</div>
 
 			<div className="mb-6 flex w-full items-center gap-[10px]">
 				<h2 className="min-w-fit text-[15px] font-bold text-gray-400">
-					Проектирование и расчеты
+					{t('main.section.design')}
 				</h2>
 				<div className="h-px w-full bg-gray-400"></div>
 			</div>
@@ -198,7 +192,7 @@ export const MainHeader = () => {
 										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
 									)}
 								>
-									{'FREE'}
+									{t('common.free')}
 								</button>
 								<button
 									onClick={feature.onClick}
@@ -217,7 +211,9 @@ export const MainHeader = () => {
 			</Carousel>
 
 			<div className="my-6 flex w-full items-center gap-[10px]">
-				<h2 className="min-w-fit text-[15px] font-bold text-gray-400">AI ассистент</h2>
+				<h2 className="min-w-fit text-[15px] font-bold text-gray-400">
+					{t('main.section.aiAssistant')}
+				</h2>
 				<div className="h-px w-full bg-gray-400"></div>
 			</div>
 
@@ -278,7 +274,7 @@ export const MainHeader = () => {
 										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
 									)}
 								>
-									{'FREE'}
+									{t('common.free')}
 								</button>
 								<button
 									onClick={() => handleFeatureClick(feature.id)}
@@ -288,7 +284,7 @@ export const MainHeader = () => {
 										'cursor-pointer bg-primary hover:bg-blue-700',
 									)}
 								>
-									{'Начать PRO'}
+									{t('common.startPro')}
 								</button>
 							</div>
 						</div>

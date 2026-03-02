@@ -1,4 +1,5 @@
-import { Button, CleanUpIcon, useAppNavigate } from '@core';
+import type { TranslationKey } from '@core';
+import { Button, CleanUpIcon, useAppNavigate, useI18n } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type { HeaderFormElements, HeaderFormTitles } from '@features/guidbooks/types';
 import { HeaderFormTypes } from '@features/guidbooks/types';
@@ -19,6 +20,7 @@ interface NewsPageHeaderWrapperProps {
 
 export const UserPageHeaderWrapper = memoize(
 	({ titles, forms, formElements, onSave }: NewsPageHeaderWrapperProps) => {
+		const { t } = useI18n();
 		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
 		const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
@@ -88,9 +90,9 @@ export const UserPageHeaderWrapper = memoize(
 		const subTitle = useMemo(() => {
 			switch (currentHeaderFormType) {
 				case HeaderFormTypes.add:
-					return titles.addTitle;
+					return titles.addTitleKey;
 				case HeaderFormTypes.edit:
-					return titles.editTitle;
+					return titles.editTitleKey;
 				default:
 					return '';
 			}
@@ -99,7 +101,9 @@ export const UserPageHeaderWrapper = memoize(
 		return (
 			<div className="flex w-full flex-col gap-[14px]">
 				<div className="flex items-center justify-between">
-					<p className="font-sans text-lg font-semibold leading-6">{titles.pageTitle}</p>
+					<p className="font-sans text-lg font-semibold leading-6">
+						{t(titles.pageTitleKey as unknown as TranslationKey)}
+					</p>
 				</div>
 				<div className="flex flex-col rounded-xl border border-solid bg-white">
 					<p className="flex justify-center pt-[16px] font-sans text-base font-semibold leading-4">

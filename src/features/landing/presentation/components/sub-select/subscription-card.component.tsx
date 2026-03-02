@@ -1,4 +1,4 @@
-import { Button } from '@core';
+import { Button, useI18n } from '@core';
 import type { Subscription } from '@features/subscriptions';
 import { CheckMarkImage } from './images';
 
@@ -8,6 +8,12 @@ type Props = {
 };
 
 export const SubscriptionCard = ({ subscription, onClick }: Props) => {
+	const { locale, t } = useI18n();
+	const reportsCount = Number(subscription.numberOfReports);
+	const reportLabelKey =
+		locale === 'ru' ? (reportsCount === 1 ? 'subscription.reportPerMonth.one' : 'subscription.reportPerMonth.many')
+		: reportsCount === 1 ? 'subscription.reportPerMonth.one' : 'subscription.reportPerMonth.many';
+
 	return (
 		<div
 			key={subscription.id}
@@ -22,11 +28,11 @@ export const SubscriptionCard = ({ subscription, onClick }: Props) => {
 				{subscription.description}
 			</div>
 			<div className="mb-4 font-montserrat text-lg font-medium text-primary sm:text-xl">
-				{!!+subscription.price ? subscription.price : 'Бесплатно'}
+				{!!+subscription.price ? subscription.price : t('subscription.free')}
 			</div>
 			<Button onClick={() => onClick(subscription.id!)} className="mb-4 h-10 w-full">
 				<p className="font-sans text-sm font-semibold leading-5 text-white sm:text-base">
-					Оформить пакет
+					{t('subscription.buyPlan')}
 				</p>
 			</Button>
 			<div className="flex flex-col">
@@ -35,8 +41,7 @@ export const SubscriptionCard = ({ subscription, onClick }: Props) => {
 						<CheckMarkImage />
 					</span>
 					<span className="text-start font-montserrat text-sm leading-[145%] sm:text-base">
-						{subscription.numberOfReports}{' '}
-						{subscription.numberOfReports == '1' ? 'отчет в месяц' : 'отчетов в месяц'}
+						{subscription.numberOfReports} {t(reportLabelKey)}
 					</span>
 				</div>
 			</div>

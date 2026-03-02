@@ -27,3 +27,15 @@ export const RuBuildingTypeSelectValues = [
 		value: BuildingType.PreschoolEducationalInstitutions,
 	},
 ];
+
+export const EnBuildingTypeSelectValues = [
+	{ label: 'Residential buildings', value: BuildingType.ResidentialBuildings },
+	{ label: 'Hotel', value: BuildingType.Hotel },
+	{ label: 'Administrative buildings', value: BuildingType.AdministrativeBuildings },
+	{ label: 'Hospital', value: BuildingType.Hospital },
+	{ label: 'Educational institutions', value: BuildingType.EducationalInstitutions },
+	{
+		label: 'Preschool educational institutions',
+		value: BuildingType.PreschoolEducationalInstitutions,
+	},
+];

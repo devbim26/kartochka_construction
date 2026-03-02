@@ -1,4 +1,4 @@
-import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell } from '@core';
+import { DesigningTable, SimpleTableCell, SimpleTableHeaderCell, useI18n } from '@core';
 import type { FireResistanceStandart } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
@@ -6,13 +6,15 @@ import { useMemo } from 'react';
 const dataFireResistance: FireResistanceStandart[] = [];
 
 export const GeneralInformationFireResistance = () => {
+	const { t } = useI18n();
+
 	const columns = useMemo(() => {
 		const cols: ColumnDef<FireResistanceStandart>[] = [
 			{
 				accessorKey: 'fire',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="Огнестойкость"
+						text={t('fireResistance.title')}
 						textClassName="w-[200px] text-left text-[#6F7276]"
 					/>
 				),
@@ -58,7 +60,7 @@ export const GeneralInformationFireResistance = () => {
 			},
 		];
 		return cols;
-	}, []);
+	}, [t]);
 
 	return (
 		<div className="flex-col text-[#6F7276]">

@@ -78,6 +78,62 @@ export const RuConstructionTypesMap = {
 	ElasticBaseFloor: 'Пол с эластичным основанием',
 };
 
+export const EnConstructionTypesMap = {
+	HeavySingleLayerWall: 'Heavy single-layer wall',
+	HeavySingleLayerWallFacingOneSide: 'Heavy single-layer wall + facing on one side',
+	HeavySingleLayerWallFacingBothSide: 'Heavy single-layer wall + facing on both sides',
+	HeavySingleLayerWallSoundproofingOneSide:
+		'Heavy single-layer wall + soundproofing panel on one side',
+	HeavySingleLayerWallSoundproofingBothSide:
+		'Heavy single-layer wall + soundproofing panel on both sides',
+	HeavyMultiLayerWall: 'Heavy multi-layer wall',
+	HeavyMultiLayerWallFacingOneSide: 'Heavy multi-layer wall + facing on one side',
+	HeavyMultiLayerWallFacingBothSide: 'Heavy multi-layer wall + facing on both sides',
+	HeavyMultiLayerWallSoundproofingOneSide:
+		'Heavy multi-layer wall + soundproofing panel on one side',
+	HeavyMultiLayerWallSoundproofingBothSide:
+		'Heavy multi-layer wall + soundproofing panel on both sides',
+	OneFramePartition: 'Frame partition (1 frame)',
+	TwoFramePartition: 'Frame partition (2 frames)',
+	HeavySingleWallFacing: 'Heavy single-layer wall + facing',
+	OneGlassFrame: 'Multi-layer glass',
+	DoubleGlazedFrame: 'Double-glazed window',
+	HomogeneousFloor: 'Homogeneous floor',
+	ElasticBaseFloor: 'Floor with elastic base',
+};
+
+export const EnConstructionTypesSelectValues = [
+	{
+		label: EnConstructionTypesMap.HeavySingleLayerWall,
+		value: ConstructionTypeEnum.HeavySingleLayerWall,
+	},
+	{
+		label: EnConstructionTypesMap.HeavySingleLayerWallFacingOneSide,
+		value: ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
+	},
+	{
+		label: EnConstructionTypesMap.HeavyMultiLayerWall,
+		value: ConstructionTypeEnum.HeavyMultiLayerWall,
+	},
+	{
+		label: EnConstructionTypesMap.OneFramePartition,
+		value: ConstructionTypeEnum.OneFramePartition,
+	},
+	{ label: EnConstructionTypesMap.OneGlassFrame, value: ConstructionTypeEnum.OneGlassFrame },
+	{
+		label: EnConstructionTypesMap.DoubleGlazedFrame,
+		value: ConstructionTypeEnum.DoubleGlazedFrame,
+	},
+	{
+		label: EnConstructionTypesMap.HomogeneousFloor,
+		value: ConstructionTypeEnum.HomogeneousFloor,
+	},
+	// {
+	// 	label: EnConstructionTypesMap.ElasticBaseFloor,
+	// 	value: ConstructionTypeEnum.ElasticBaseFloor,
+	// },
+];
+
 export const RuConstructionTypesSelectValues = [
 	{ label: 'Тяжелая однослойная стена', value: ConstructionTypeEnum.HeavySingleLayerWall },
 	{
@@ -112,8 +168,8 @@ export const RuConstructionTypesSelectValues = [
 		label: 'Однородный пол',
 		value: ConstructionTypeEnum.HomogeneousFloor,
 	},
-	{
-		label: 'Пол с эластичным основанием',
-		value: ConstructionTypeEnum.ElasticBaseFloor,
-	},
+	// {
+	// 	label: 'Пол с эластичным основанием',
+	// 	value: ConstructionTypeEnum.ElasticBaseFloor,
+	// },
 ];

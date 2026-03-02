@@ -8,6 +8,7 @@ import {
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	useI18n,
 	type PaginationState,
 } from '@core';
 import {
@@ -56,6 +57,7 @@ import { toast } from 'sonner';
 
 const ConstructionsScreen = () => {
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 	const [search] = useSearchParams();
 	const [singleMaterial, setSingleMaterial] = useState<ConstructionsEditData>();
 	const [tableData, setTableData] = useState<ConstructionsAddData[]>([]);
@@ -83,32 +85,44 @@ const ConstructionsScreen = () => {
 		const cols: ColumnDef<ConstructionsAddData>[] = [
 			{
 				accessorKey: 'name',
-				header: () => <SimpleTableHeaderCell text="Код" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.code')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'description',
-				header: () => <SimpleTableHeaderCell text="Название" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.name')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'descriptionSource',
-				header: () => <SimpleTableHeaderCell text="Источник" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.source')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'maxHeight',
-				header: () => <SimpleTableHeaderCell text="Максимальная высота" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.maxHeight')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'issuerName',
-				header: () => <SimpleTableHeaderCell text="Производитель" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.issuer')} />
+				),
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'constructionType',
-				header: () => <SimpleTableHeaderCell text="Тип конструкции" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.type')} />
+				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={RuConstructionTypesMap[info.getValue() as ConstructionTypeEnum]}
@@ -117,7 +131,9 @@ const ConstructionsScreen = () => {
 			},
 			{
 				accessorKey: 'country',
-				header: () => <SimpleTableHeaderCell text="Страна" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.country')} />
+				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.row.original.country
@@ -128,7 +144,9 @@ const ConstructionsScreen = () => {
 			},
 			{
 				accessorKey: 'id',
-				header: () => <SimpleTableHeaderCell text="Действия" />,
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.actions')} />
+				),
 				cell: (info) => {
 					return (
 						<SimpleTableCell
@@ -250,7 +268,7 @@ const ConstructionsScreen = () => {
 						forms.filterForm.getValues() as ConstructionsFilterData,
 						paginationState,
 					);
-					toast.success('Конструкция успешно добавлена');
+					toast.success(t('guides.constructions.addSuccess'));
 					navigate('');
 				}
 			});
@@ -277,7 +295,7 @@ const ConstructionsScreen = () => {
 						forms.filterForm.getValues() as ConstructionsFilterData,
 						paginationState,
 					);
-					toast.success('Конструкция успешно отредактирована');
+					toast.success(t('guides.constructions.editSuccess'));
 					navigate('');
 				}
 			});
@@ -299,7 +317,7 @@ const ConstructionsScreen = () => {
 						forms.filterForm.getValues() as ConstructionsFilterData,
 						paginationState,
 					);
-					toast.success('Конструкция успешно удалена');
+					toast.success(t('guides.constructions.deleteSuccess'));
 				}
 			});
 	};
@@ -327,9 +345,9 @@ const ConstructionsScreen = () => {
 			<GuidbookPageHeaderWrapper
 				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
-					pageTitle: 'Конструкции',
-					editTitle: 'Редактирование конструкции',
-					addTitle: 'Добавление конструкции',
+					pageTitleKey: 'guides.constructions.pageTitle',
+					editTitleKey: 'guides.constructions.editTitle',
+					addTitleKey: 'guides.constructions.addTitle',
 				}}
 				forms={forms}
 				formElements={{
@@ -357,9 +375,9 @@ const ConstructionsScreen = () => {
 					handleDeleteTableData(itemToDelete.id);
 					setIsModalOpen(false);
 				}}
-				headerTitle="Подтвердите действие"
+				headerTitle={t('guides.deleteModal.title')}
 			>
-				Вы уверены, что хотите удалить конструкцию {itemToDelete.name}?
+				{t('guides.deleteModal.constructionQuestion')} {itemToDelete.name}
 			</DeleteModal>
 		</div>
 	);

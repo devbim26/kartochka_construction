@@ -1,5 +1,5 @@
 import type { ModalProps } from '@core';
-import { Button, Modal } from '@core';
+import { Button, Modal, useI18n } from '@core';
 import { useRef } from 'react';
 import { toast } from 'sonner';
 import { twJoin } from 'tailwind-merge';
@@ -18,13 +18,14 @@ export const AddConstructionModal = ({
 	...props
 }: AddConstructionModalProps) => {
 	const formRef = useRef<AddConstructionFormHandle>(null);
+	const { t } = useI18n();
 
 	const handleConfirm = () => {
 		formRef.current?.submit();
 	};
 
 	const handleSuccess = () => {
-		toast.success('Конструкция успешно добавлена!');
+		toast.success(t('guides.constructions.addSuccess'));
 		onConfirm();
 	};
 	return (
@@ -35,13 +36,15 @@ export const AddConstructionModal = ({
 						onClick={onCancel}
 						className="flex w-fit flex-row items-center px-4 py-1.5"
 					>
-						<p className="font-sans text-sm font-semibold">Отмена</p>
+						<p className="font-sans text-sm font-semibold">{t('common.cancel')}</p>
 					</Button>
 					<Button
 						onClick={handleConfirm}
 						className="flex w-fit flex-row items-center px-4 py-1.5"
 					>
-						<p className="font-sans text-sm font-semibold">Добавить конструкцию</p>
+						<p className="font-sans text-sm font-semibold">
+							{t('guides.constructions.addTitle')}
+						</p>
 					</Button>
 				</div>
 			)}

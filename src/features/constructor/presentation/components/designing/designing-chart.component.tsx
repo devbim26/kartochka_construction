@@ -1,3 +1,4 @@
+import { useI18n } from '@core';
 import type { ChartData, ChartOptions } from 'chart.js';
 import {
 	CategoryScale,
@@ -10,7 +11,7 @@ import {
 	Tooltip,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import zoomPlugin from 'chartjs-plugin-zoom'; // Убрали ChartDataLabels
+import zoomPlugin from 'chartjs-plugin-zoom';
 import { useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 
@@ -22,7 +23,7 @@ ChartJS.register(
 	Title,
 	Tooltip,
 	Legend,
-	zoomPlugin, // Убрали ChartDataLabels
+	zoomPlugin,
 	ChartDataLabels,
 );
 
@@ -50,10 +51,11 @@ const DesigningChart = ({
 	calculationDocName,
 }: DesigningChartProps) => {
 	const chartRef = useRef<ChartJS<'line'>>(null);
+	const { t } = useI18n();
 
 	const legendLabels: Record<string, string> = {
-		Laboratory: regulatoryDocName,
-		'R (lab)': calculationDocName,
+		Laboratory: calculationDocName,
+		abcd: regulatoryDocName,
 	};
 
 	// Собираем все частоты из всех графиков
@@ -83,11 +85,11 @@ const DesigningChart = ({
 			const colors = [
 				'#3b82f6', // blue
 				'#ef4444', // red
-				'#10b981', // green
-				'#f59e0b', // yellow
-				'#8b5cf6', // purple
-				'#ec4899', // pink
-				'#06b6d4', // cyan
+				'#808080', // green
+				'#808080', // yellow
+				'#808080', // purple
+				'#808080', // pink
+				'#808080', // cyan
 			];
 
 			const color = colors[index % colors.length];
@@ -257,7 +259,7 @@ const DesigningChart = ({
 					},
 					title: (tooltipItems) => {
 						const label = tooltipItems[0].label;
-						return `Частота: ${label} Hz`;
+						return `${t('constructor.chart.frequencyLabel')}: ${label} Hz`;
 					},
 				},
 			},
@@ -268,7 +270,7 @@ const DesigningChart = ({
 				type: 'category',
 				title: {
 					display: true,
-					text: 'Частота (Hz)',
+					text: t('constructor.chart.frequencyAxis'),
 					font: {
 						size: 12,
 						weight: 'bold',
@@ -324,7 +326,7 @@ const DesigningChart = ({
 	};
 
 	return (
-		<div className="relative w-[790px]">
+		<div className="relative min-w-[700px]">
 			<div className="h-[500px] w-full">
 				<Line ref={chartRef} data={chartData} options={options} />
 			</div>

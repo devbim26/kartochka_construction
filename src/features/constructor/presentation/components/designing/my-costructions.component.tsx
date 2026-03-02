@@ -1,4 +1,4 @@
-import { Button, ChevronIcon, useAppDispatch, useAppSelector } from '@core';
+import { Button, ChevronIcon, useAppDispatch, useAppSelector, useI18n } from '@core';
 import type { FloorConstruction, GraphDetailResponse, ReportInfoShort } from '@features';
 import { formatMaterial, ReportCategory, startLoading, stopLoading } from '@features';
 
@@ -22,8 +22,8 @@ import {
 } from '@features/guidbooks/converters';
 import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import type { ConstructionsEditData, Country, Issuer } from '@features/guidbooks/types';
-import { Guidebooks, RuCountryNamesMap } from '@features/guidbooks/types';
+import type { ConstructionsEditData, Issuer } from '@features/guidbooks/types';
+import { Guidebooks } from '@features/guidbooks/types';
 
 import type { IssuerDto } from '@api-gen';
 import { AxiosError } from 'axios';
@@ -38,13 +38,13 @@ const MyConstructions = () => {
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
 	const [graphData, setGraphData] = useState<GraphDetailResponse[] | null>(null);
-	const [isRelevant, setIsRelevant] = useState<boolean>(false);
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
 	const [issuer, setIssuer] = useState<Issuer | null>(null);
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
-
+	const [compIsRelevant, setCompIsRelevant] = useState<boolean>(false);
+	const [labIsRelevant, setLabIsRelevant] = useState<boolean>(false);
 	const reportFloorInfoId = search.get('reportFloorInfoId');
 
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
@@ -53,6 +53,7 @@ const MyConstructions = () => {
 
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const dispatch = useAppDispatch();
+	const { t, locale } = useI18n();
 
 	const handleGetCurrentConstructionReportHeader = (id: string) => {
 		dispatch(startLoading());
@@ -65,8 +66,8 @@ const MyConstructions = () => {
 					dispatch(stopLoading());
 				}),
 				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации о конструкции');
+					console.error('Request error:', error);
+					toast.error(t('errors.constructionLoad'));
 					dispatch(stopLoading());
 					return of(null);
 				}),
@@ -81,7 +82,7 @@ const MyConstructions = () => {
 			.pipe(
 				switchMap((singleResponse) => {
 					if (singleResponse.status !== 200 || !singleResponse.data) {
-						throw new Error('Ошибка при получении конструкции');
+						throw new Error(t('errors.constructionLoad'));
 					}
 
 					setCurrentConstruction(
@@ -92,7 +93,7 @@ const MyConstructions = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || 'Ошибка при загрузке');
+						toast.error(error.response?.data || t('errors.upload'));
 					} else {
 						toast.error((error as Error).message);
 					}
@@ -126,8 +127,8 @@ const MyConstructions = () => {
 					}
 				}),
 				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации об отчете');
+					console.error('Request error:', error);
+					toast.error(t('errors.reportInfoLoad'));
 					return of(null);
 				}),
 			)
@@ -149,8 +150,8 @@ const MyConstructions = () => {
 					}
 				}),
 				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации об отчете');
+					console.error('Request error:', error);
+					toast.error(t('errors.reportInfoLoad'));
 					return of(null);
 				}),
 			)
@@ -167,8 +168,8 @@ const MyConstructions = () => {
 					}
 				}),
 				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации о конструкции');
+					console.error('Request error:', error);
+					toast.error(t('errors.constructionLoad'));
 					return of(null);
 				}),
 			)
@@ -190,8 +191,8 @@ const MyConstructions = () => {
 					}
 				}),
 				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации об отчете');
+					console.error('Request error:', error);
+					toast.error(t('errors.reportInfoLoad'));
 					return of(null);
 				}),
 			)
@@ -206,12 +207,17 @@ const MyConstructions = () => {
 	}, [reportType, reportId]);
 
 	useEffect(() => {
-		const rwValue = +(constructionHeader?.RCalcs || 0);
-		setIsRelevant(
-			rwValue >= +(currentReportInfo?.regulatoryRequirement?.noizeIsolationIndex || 55),
-		);
-		if (constructionHeader) handleGetIssuerByHeaderId(constructionHeader.issuer);
-	}, [constructionHeader?.RCalcs, currentReportInfo]);
+		if (!!constructionHeader && !!currentConstruction?.reportConstructionHeader.requirement) {
+			const rwValue = +(constructionHeader.RCalcs || 0);
+			const labRwValue = +(constructionHeader.labIndexValue || 0);
+
+			const requiredRw = +(
+				currentConstruction?.reportConstructionHeader.requirement?.noizeIsolationIndex || 50
+			);
+			setLabIsRelevant(labRwValue >= requiredRw);
+			setCompIsRelevant(rwValue >= requiredRw);
+		}
+	}, [constructionHeader, currentReportInfo]);
 
 	const handleGetIssuerByHeaderId = (id: string) => {
 		dispatch(startLoading());
@@ -223,8 +229,8 @@ const MyConstructions = () => {
 					}
 				}),
 				catchError((error) => {
-					console.error('Ошибка запроса:', error);
-					toast.error('Ошибка при получении информации о производителе');
+					console.error('Request error:', error);
+					toast.error(t('errors.constructionLoad'));
 					return of(null);
 				}),
 			)
@@ -237,7 +243,7 @@ const MyConstructions = () => {
 		from(graphDetail({ constructionHeaderId }))
 			.pipe(
 				catchError((error) => {
-					toast.error('Не удалось загрузить данные графика');
+					toast.error(t('errors.graphDataLoad'));
 					dispatch(stopLoading());
 					return [];
 				}),
@@ -252,7 +258,6 @@ const MyConstructions = () => {
 			});
 	}, [constructionHeaderId]);
 
-	const relevantText = isRelevant ? 'Соответствует' : 'Не соответствует';
 	const leftMaterials = constructionHeader?.constructionTypeObject?.leftConstruction || [];
 	const centerMaterials = constructionHeader?.constructionTypeObject?.centerConstruction || [];
 	const rightMaterials = constructionHeader?.constructionTypeObject?.rightConstruction || [];
@@ -270,20 +275,20 @@ const MyConstructions = () => {
 				<div className="flex gap-[60px]">
 					<div className="flex flex-col">
 						<Button className="h-[40px] w-[190px] px-[16px] text-[16px]">
-							Конструкция 1
+							{t('constructor.myConstructions.construction1')}
 						</Button>
 					</div>
 					<div className="rounded-lg border border-blue-500 p-[20px]">
-						<FormSubTitle text="Конструкция 1" />
+						<FormSubTitle text={t('constructor.myConstructions.construction1')} />
 						<div className="rounded-lg border border-blue-500 p-[20px]">
-							<FormSubTitle text="Конструкция 1" />
+							<FormSubTitle text={t('constructor.myConstructions.construction1')} />
 							<div className="flex flex-col">
 								{leftMaterials
 									?.slice()
 									.sort((a, b) => Number(a.positionId) - Number(b.positionId))
 									.map((material, index) => (
 										<p key={`left-${index}`} className="text-[16px]">
-											- {formatMaterial(material)}
+											- {formatMaterial(material, locale)}
 										</p>
 									))}
 
@@ -292,7 +297,7 @@ const MyConstructions = () => {
 									.sort((a, b) => Number(a.positionId) - Number(b.positionId))
 									.map((material, index) => (
 										<p key={`center-${index}`} className="text-[16px]">
-											- {formatMaterial(material)}
+											- {formatMaterial(material, locale)}
 										</p>
 									))}
 
@@ -301,7 +306,7 @@ const MyConstructions = () => {
 									.sort((a, b) => Number(a.positionId) - Number(b.positionId))
 									.map((material, index) => (
 										<p key={`right-${index}`} className="text-[16px]">
-											- {formatMaterial(material)}
+											- {formatMaterial(material, locale)}
 										</p>
 									))}
 							</div>
@@ -311,7 +316,7 @@ const MyConstructions = () => {
 						{issuer?.logoUrl && (
 							<img
 								src={issuer?.logoUrl}
-								alt="Превью изображения"
+								alt={t('constructor.myConstructions.imagePreview')}
 								className="h-[66px] w-[140px] rounded-md object-cover"
 							/>
 						)}
@@ -330,33 +335,58 @@ const MyConstructions = () => {
 				</div>
 			</div>
 			<div className="flex w-full gap-[72px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				<div className="flex flex-col gap-[10px] px-[24px] py-[10px]">
+				<div className="flex w-full flex-col gap-[10px] px-[24px] py-[10px]">
 					{currentReportInfo ? (
 						<>
+							<div className="flex flex-col gap-1">
+								<p className="text-[30px] font-extrabold text-black">
+									{t('constructor.designing.calcValue')}
+								</p>
+								<p className="font-sans text-[14px]">
+									{currentReportInfo?.calculationDocument?.fullName}
+								</p>
+								<div className="flex w-full items-center gap-1">
+									<p className="font-sans text-[25px] font-semibold leading-4">
+										Rw = {constructionHeader?.RCalcs} dB
+									</p>
+									<p className={compIsRelevant ? 'text-green-600' : 'text-error'}>
+										{compIsRelevant
+											? t('constructor.relevant.yes')
+											: t('constructor.relevant.no')}
+									</p>
+								</div>
+							</div>
+							<div className="flex flex-col gap-2">
+								<p className="text-[30px] font-extrabold text-black">
+									{t('constructor.designing.labValue')}
+								</p>
+								<p className="font-sans text-[14px]">
+									{currentReportInfo?.calculationDocument?.fullName}
+								</p>
+								<div className="flex w-full items-center gap-1">
+									<p className="font-sans text-[25px] font-semibold leading-4">
+										Rw = {constructionHeader?.labIndexValue} dB
+									</p>
+									<p className={labIsRelevant ? 'text-green-600' : 'text-error'}>
+										{labIsRelevant
+											? t('constructor.relevant.yes')
+											: t('constructor.relevant.no')}
+									</p>
+								</div>
+							</div>
+							<p className="text-[30px] font-extrabold text-primary">
+								{t('constructor.designing.allowedValue')}
+							</p>
 							<p className="font-sans text-[14px]">
-								{currentReportInfo?.calculationDocument?.fullName},
-								{currentReportInfo?.calculationDocument?.country &&
-									RuCountryNamesMap[
-										currentReportInfo?.calculationDocument?.country as Country
-									]}
+								{currentReportInfo?.regulatoryDocument?.fullName}
 							</p>
 							<p className="font-sans text-[30px] font-semibold leading-4">
-								Rw={constructionHeader?.RCalcs}
-							</p>
-							<p className={isRelevant ? 'text-green-600' : 'text-error'}>
-								{isRelevant ? 'Соответствует' : 'Не соответствует'}
-							</p>
-							<p className="font-sans text-[14px]">
-								{currentReportInfo?.regulatoryDocument?.fullName},
-								{currentReportInfo?.regulatoryDocument?.country &&
-									RuCountryNamesMap[
-										currentReportInfo?.regulatoryDocument?.country as Country
-									]}
-							</p>
-							<p className="font-sans text-[30px] font-semibold leading-4">
-								Rw⩾
-								{currentConstruction?.reportConstructionHeader.requirement
-									?.noizeIsolationIndex || 50}
+								Rw ⩾{' '}
+								{
+									currentConstruction?.reportConstructionHeader.requirement
+										?.noizeIsolationIndex
+								}{' '}
+								dB
 							</p>
 						</>
 					) : (

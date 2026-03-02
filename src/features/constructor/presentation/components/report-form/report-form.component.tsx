@@ -1,4 +1,4 @@
-import { APP_ROUTES, Button, useAppDispatch, useAppNavigate, useAppSelector } from '@core';
+import { APP_ROUTES, Button, useAppDispatch, useAppNavigate, useAppSelector, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { convertToClientReportFormFlags } from '@features/constructor/converters';
 import {
@@ -31,6 +31,7 @@ const ReportFromComponent = () => {
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { t } = useI18n();
 
 	const form = useForm<FormReportSchemaType>({
 		resolver: zodResolver(FormReportConfig.schema),
@@ -58,7 +59,7 @@ const ReportFromComponent = () => {
 
 	const submitReportWithLogo = async (action: 'download' | 'save') => {
 		if (Object.keys(form.formState.errors).length) {
-			toast.error('Заполните форму');
+			toast.error(t('constructor.reportForm.fillForm'));
 			return;
 		}
 
@@ -77,7 +78,7 @@ const ReportFromComponent = () => {
 				});
 
 				if (logoResponse.status !== 200) {
-					toast.error('Ошибка при загрузке логотипа');
+					toast.error(t('constructor.reportForm.logoUploadError'));
 					setIsSubmitting(false);
 					return;
 				}
@@ -131,7 +132,7 @@ const ReportFromComponent = () => {
 				});
 		} catch (error) {
 			console.error('Error in submission:', error);
-			toast.error('Произошла ошибка при отправке');
+			toast.error(t('constructor.reportForm.submitError'));
 			setIsSubmitting(false);
 			dispatch(stopLoading());
 		}
@@ -154,16 +155,20 @@ const ReportFromComponent = () => {
 					</div>
 				)}
 				<div className="flex size-full flex-col items-center gap-[50px] rounded-lg bg-white p-[50px]">
-					<p className="font-sans text-lg font-semibold leading-4">Формирование отчета</p>
+					<p className="font-sans text-lg font-semibold leading-4">
+						{t('constructor.reportForm.title')}
+					</p>
 					<GeneralInfoForm />
 					<DocumentFlags />
 					<div className="flex w-full items-center justify-end gap-[50px]">
-						<p>Осталось отчетов: {userData.data?.expiresAt || 0}</p>
+						<p>
+							{t('constructor.reportForm.remainingReports')}: {userData.data?.expiresAt || 0}
+						</p>
 						<Button onClick={handleDownloadReport} disabled={isLoading || isSubmitting}>
-							Скачать
+							{t('common.download')}
 						</Button>
 						<Button onClick={handleSaveReport} disabled={isLoading || isSubmitting}>
-							Сохранить
+							{t('common.save')}
 						</Button>
 					</div>
 				</div>

@@ -9,6 +9,7 @@ import {
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	useI18n,
 	type PaginationState,
 } from '@core';
 import { GuidbookPageHeaderWrapper, IssuersAddEdit, IssuersFilter } from '@features';
@@ -46,6 +47,7 @@ import { toast } from 'sonner';
 
 const IssuersScreen = () => {
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 	const [search] = useSearchParams();
 	const [singleIssuer, setSingleIssuer] = useState<Issuer>();
 	const [tableData, setTableData] = useState<Array<Issuer>>([]);
@@ -137,7 +139,7 @@ const IssuersScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Производитель успешно добавлен');
+					toast.success(t('guides.issuers.addSuccess'));
 					navigate('');
 				}
 			});
@@ -156,7 +158,7 @@ const IssuersScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Производитель успешно удалён');
+					toast.success(t('guides.issuers.deleteSuccess'));
 				}
 			});
 	};
@@ -179,7 +181,7 @@ const IssuersScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(form.filterForm.getValues(), paginationState);
-					toast.success('Производитель успешно отредактирован');
+					toast.success(t('guides.issuers.editSuccess'));
 					navigate('');
 				}
 			});
@@ -215,7 +217,7 @@ const IssuersScreen = () => {
 		const cols: ColumnDef<Issuer>[] = [
 			{
 				accessorKey: 'logoUrl',
-				header: () => <SimpleTableHeaderCell text={'Логотип'} />,
+				header: () => <SimpleTableHeaderCell text={t('guides.issuers.columns.logo')} />,
 				cell: (info) => {
 					return (
 						<SimpleTableCell
@@ -236,12 +238,12 @@ const IssuersScreen = () => {
 			},
 			{
 				accessorKey: 'name',
-				header: () => <SimpleTableHeaderCell text={'Производитель'} />,
+				header: () => <SimpleTableHeaderCell text={t('guides.issuers.columns.name')} />,
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
 				accessorKey: 'countries',
-				header: () => <SimpleTableHeaderCell text={'Страна'} />,
+				header: () => <SimpleTableHeaderCell text={t('guides.issuers.columns.country')} />,
 				cell: (info) => {
 					return (
 						<SimpleTableCell
@@ -254,7 +256,7 @@ const IssuersScreen = () => {
 			},
 			{
 				accessorKey: 'webSite',
-				header: () => <SimpleTableHeaderCell text={'Сайт'} />,
+				header: () => <SimpleTableHeaderCell text={t('guides.issuers.columns.site')} />,
 				cell: (info) => (
 					<SimpleTableCell
 						content={
@@ -272,7 +274,7 @@ const IssuersScreen = () => {
 			},
 			{
 				accessorKey: 'id',
-				header: () => <SimpleTableHeaderCell text={'Действия'} />,
+				header: () => <SimpleTableHeaderCell text={t('guides.issuers.columns.actions')} />,
 				cell: (info) => {
 					return (
 						<SimpleTableCell
@@ -312,9 +314,9 @@ const IssuersScreen = () => {
 			<GuidbookPageHeaderWrapper
 				onSave={search.get('add') ? onSaveHandle : onEditHandle}
 				titles={{
-					pageTitle: 'Производители',
-					editTitle: 'Редактировать производителя',
-					addTitle: 'Добавить производителя',
+					pageTitleKey: 'guides.issuers.pageTitle',
+					editTitleKey: 'guides.issuers.editTitle',
+					addTitleKey: 'guides.issuers.addTitle',
 				}}
 				forms={form}
 				formElements={{
@@ -339,9 +341,9 @@ const IssuersScreen = () => {
 					handleDeleteTableData(itemToDelete.id);
 					setIsModalOpen(false);
 				}}
-				headerTitle="Подтвердите действие"
+				headerTitle={t('guides.deleteModal.title')}
 			>
-				Вы уверены, что хотите удалить производителя {itemToDelete.name}?
+				{t('guides.deleteModal.issuerQuestion')} {itemToDelete.name}
 			</DeleteModal>
 		</div>
 	);

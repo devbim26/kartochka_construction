@@ -1,4 +1,4 @@
-import { useAppNavigate } from '@core';
+import { useAppNavigate, useI18n } from '@core';
 import { SubSelect } from '@features/landing';
 import { ReportScreen } from '@features/reports';
 import { useEffect, useRef } from 'react';
@@ -9,6 +9,7 @@ import { FormSubModal } from '../components/modals';
 const MainScreen = () => {
 	const [search] = useSearchParams();
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 
 	const sectionId = search.get('sectionId');
 	const pageContentWrapperRef = useRef<HTMLDivElement>(null);
@@ -32,8 +33,8 @@ const MainScreen = () => {
 				isOpen={!!search.get('subId') && !!search.get('subModal')}
 				onConfirm={() => navigate('')}
 				onClose={() => navigate('')}
-				confirmTitle="Оплачено по счетам"
-				headerTitle="Оформление пакета"
+				confirmTitle={t('main.subModal.confirmTitle')}
+				headerTitle={t('main.subModal.headerTitle')}
 				contentClassName="visible"
 				hasUndoButton={false}
 			/>

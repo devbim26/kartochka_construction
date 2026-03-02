@@ -1,4 +1,4 @@
-import { store } from '@core';
+import { I18nProvider, useI18n, store } from '@core';
 import { AppRouter } from '@router';
 import { Helmet } from 'react-helmet';
 import { Provider } from 'react-redux';
@@ -6,23 +6,16 @@ import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import faviconUrl from '@assets/favicon.svg';
 
-export const App = () => {
+const AppShell = () => {
+	const { t } = useI18n();
+
 	return (
 		<BrowserRouter>
 			<Provider store={store}>
 				<Helmet>
-					<title>
-						AI для проектирования | Звукоизоляция, нормоконтроль, визуализация —
-						Беларусь и Россия
-					</title>
-					<meta
-						name="description"
-						content="AI-сервис для архитекторов и проектировщиков: расчёт звукоизоляции по СП, проверка на соответствие ТНПА Беларуси и России, генерация фасадов и анализ документов. Отчёты для экспертизы за минуты."
-					/>
-					<meta
-						name="keywords"
-						content="AI проектирование, звукоизоляция СП 02.03.01-2023, нормоконтроль Беларусь, нормоконтроль Россия, ТНПА проверка, визуализация фасадов, AI архитектура, анализ смет, техническое задание AI, строительный AI, отчёт для экспертизы, проектная документация, строительные нормы Беларусии"
-					/>
+					<title>{t('meta.title')}</title>
+					<meta name="description" content={t('meta.description')} />
+					<meta name="keywords" content={t('meta.keywords')} />
 					<link rel="icon" href={faviconUrl} type="image/svg+xml" />
 					<link rel="alternate icon" href={faviconUrl} type="image/svg+xml" />
 					<link rel="apple-touch-icon" href={faviconUrl} />
@@ -37,5 +30,13 @@ export const App = () => {
 				/>
 			</Provider>
 		</BrowserRouter>
+	);
+};
+
+export const App = () => {
+	return (
+		<I18nProvider>
+			<AppShell />
+		</I18nProvider>
 	);
 };
