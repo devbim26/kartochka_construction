@@ -33,7 +33,7 @@ export const en = {
 	'nav.contacts': 'Contacts',
 	'nav.designing': 'Design',
 	'lang.switch': 'Switch language',
-	'ai.assistant.title': 'AI assistant',
+	'ai.assistant.title': 'AI mode',
 	'common.actions': 'Actions',
 
 	'users.pageTitle': 'Users',
@@ -107,32 +107,43 @@ export const en = {
 	'landing.footer.subscriptions': 'Subscriptions',
 
 	'landing.faq.title': 'Frequently asked questions',
-	'landing.faq.q0': 'How accurate are your calculations?',
-	'landing.faq.q1': 'Can your calculations be used for official expert review?',
-	'landing.faq.q2': 'Which standards do you use for calculations?',
-	'landing.faq.q3': 'Does your service support non-standard constructions?',
-	'landing.faq.q4': 'Can you integrate with CAD/BIM software?',
-	'landing.faq.q5': 'What are the limitations of the free version?',
-	'landing.faq.q6': 'How often is the materials and standards database updated?',
-	'landing.faq.q7': 'How can I get technical support?',
-	'landing.faq.q8': 'What is the difference between tariff plans?',
+
+	// en
+	'landing.faq.q0': 'How accurate are DevBIM calculations?',
 	'landing.faq.a0':
-		'Our algorithms are regularly verified in the lab and comply with current standards, which ensures high accuracy.',
+		'All algorithms are validated using laboratory data and comply with the requirements of SP and GOST standards. The error margin is minimal and confirmed by independent tests.',
+
+	'landing.faq.q1': 'Can the results be used for official expert review?',
 	'landing.faq.a1':
-		'Yes, our calculations are accepted for expert review. For extra confidence you can order verification by our certified engineers.',
+		'Yes. DevBIM reports are generated according to regulatory methods and contain references to standards. The PDF format is suitable for submission to project and state expert review.',
+
+	'landing.faq.q2': 'Which standards does the platform support?',
 	'landing.faq.a2':
-		'We calculate in strict accordance with building codes, including:\nHeat engineering, sound insulation and fire safety standards.\nThis ensures reliability and safety of your projects.',
+		'The system uses current editions of SN 2.04.01-2020 "Noise Protection", SP 2.03.-2025 "Sound Insulation and Sound Absorption of Building Structures" and other documents for Belarus. The regulatory database is regularly updated.',
+
+	'landing.faq.q3': 'Can I calculate my own (non-standard) construction?',
 	'landing.faq.a3':
-		'Yes, our service supports non-standard constructions (PRO plan may be required depending on complexity).',
+		'Yes. The user can assemble their own construction from the material database or add individual parameters for precise analysis.',
+
+	'landing.faq.q4': 'Is there integration with BIM and CAD systems?',
 	'landing.faq.a4':
-		'Yes, CAD/BIM integration is available in the PRO plan (optionally), which simplifies design and documentation.',
+		'A module for IFC files is under development, but a viewer is already available.',
+
+	'landing.faq.q5': 'How does the AI consultant work?',
 	'landing.faq.a5':
-		'The free version includes calculations for a limited set of constructions, limited materials database access, and comparison of up to two constructions.',
-	'landing.faq.a6': 'We monitor changes in regulations and update the database monthly.',
+		'The AI Consultant analyzes your calculations, documents, and standards, helps verify compliance with requirements, and offers optimal solutions.',
+
+	'landing.faq.q6': 'What does the free version include?',
+	'landing.faq.a6':
+		'Free access allows a limited number of calculations and testing of basic functions. Extended features are available by subscription.',
+
+	'landing.faq.q7': 'How often is the materials and standards database updated?',
 	'landing.faq.a7':
-		'Support is available to all users. The PRO plan includes priority premium support.',
+		'The database is updated quarterly. New materials, laboratory test results, and updated editions of SP are added.',
+
+	'landing.faq.q8': 'Where can I get support?',
 	'landing.faq.a8':
-		'Free: for evaluation and small projects.\nStandard: for regular work with extended materials access.\nPRO: maximum capabilities, including non-standard calculations and CAD/BIM integration.',
+		'You can contact technical support directly from your personal account or via Telegram bot. Average response time is up to 24 hours.',
 
 	'landing.news.title': 'News',
 	'errors.newsLoad': 'Failed to load news',
@@ -196,7 +207,7 @@ export const en = {
 	'landing.subText.crossed.0.1': 'Report signing',
 
 	'sidebar.home': 'Home',
-	'sidebar.aiAssistant': 'AI assistant',
+	'sidebar.aiAssistant': 'AI mode',
 	'sidebar.constructor': 'Constructor',
 	'sidebar.aboutBuilding': 'About building',
 	'sidebar.floorPlans': 'Floor plans',
@@ -427,6 +438,8 @@ export const en = {
 	'constructor.header.title': 'Constructor',
 	'constructor.header.aboutBuilding': 'About building',
 	'constructor.header.floorPlans': 'Floor plans',
+	'constructor.header.floorPlans.deletePDF': 'Delete PDF',
+
 	'constructor.header.designing': 'Design',
 	'constructor.header.constructionPick': 'Construction selection',
 	'constructor.header.ifcModel': 'IFC model',
@@ -609,6 +622,8 @@ export const en = {
 export type TranslationKey = keyof typeof en;
 
 export const ru: Record<TranslationKey, string> = {
+	'constructor.header.floorPlans.deletePDF': 'Удалить PDF',
+
 	// Physical table
 	'physical.title': 'Физические',
 	'physical.values': 'Значения',
@@ -782,7 +797,7 @@ export const ru: Record<TranslationKey, string> = {
 	'nav.designing': 'Проектирование',
 	'lang.switch': 'Сменить язык',
 
-	'ai.assistant.title': 'AI ассистент',
+	'ai.assistant.title': 'AI mode',
 	'common.actions': 'Действия',
 
 	'users.pageTitle': 'Пользователи',
@@ -856,33 +871,42 @@ export const ru: Record<TranslationKey, string> = {
 	'landing.footer.subscriptions': 'Подписки',
 
 	'landing.faq.title': 'Часто задаваемые вопросы',
-	'landing.faq.q0': 'Насколько точны ваши расчеты?',
-	'landing.faq.q1': 'Можно ли использовать ваши расчеты для официальной экспертизы?',
-	'landing.faq.q2': 'Какие нормы вы используете для расчетов?',
-	'landing.faq.q3': 'Поддерживает ли ваш cервис расчеты для нестандартных конструкций',
-	'landing.faq.q4': 'Можно ли интегрировать ваши расчеты с программами CAD/BIM?',
-	'landing.faq.q5': 'Каковы ограничения бесплатной версии?',
-	'landing.faq.q6': 'Как часто обновляется база данных материалов и нормативов?',
-	'landing.faq.q7': 'Как можно получить техническую поддержку?',
-	'landing.faq.q8': 'В чем разница между тарифными планами?',
+
+	// ru
+	'landing.faq.q0': 'Насколько точны расчёты DevBIM?',
 	'landing.faq.a0':
-		'Наши алгоритмы регулярно проходят проверку в лаборатории БелНИИС и соответствуют всем актуальным нормативам, что гарантирует их высокую точность.',
+		'Все алгоритмы проходят валидацию на базе лабораторных данных и соответствуют требованиям СП и ГОСТ. Погрешность результатов минимальна и подтверждена независимыми испытаниями.',
+
+	'landing.faq.q1': 'Можно ли использовать результаты для официальной экспертизы?',
 	'landing.faq.a1':
-		'Да, наши расчеты принимаются экспертизой. Для дополнительной уверенности вы можете заказать проверку у наших сертифицированных инженеров.',
+		'Да. Отчёты DevBIM формируются по нормативным методикам и содержат ссылки на стандарты. Формат PDF подходит для передачи в проектную и государственную экспертизу.',
+
+	'landing.faq.q2': 'Какие нормативы поддерживает платформа?',
 	'landing.faq.a2':
-		'Мы выполняем расчёты в строгом соответствии с действующими строительными нормами, включая: \nТеплотехника: СП 50.13330.2012 <i>«Тепловая защита зданий»</i> \nЗвукоизоляция: СП 51.13330.2011 <i>«Защита от шума»</i> и СП 275.1325800.2016 <i>«Здания и сооружения. Метод расчета звукоизоляции ограждающих конструкций от воздушного шума»</i> \nПожарная безопасность: СП 2.13130.2020 <i>«Системы противопожарной защиты. \nОбеспечение огнестойкости объектов защиты. Общие требования»</i> и СП 12.13130.2009 <i>«Определение категорий помещений, зданий и наружных установок по взрывопожарной и пожарной опасности»</i> \nГеометрические параметры: СП 70.13330.2012 <i>«Несущие и ограждающие конструкции. Актуализированная редакция СНиП 3.03.01-87»</i> \nЭто гарантирует надёжность и безопасность ваших проектов.',
+		'Система использует актуальные редакции СН 2.04.01-2020 "Защита от шума", СП 2.03.-2025 "Звукоизоляция и звукопоглощение конструкций зданий и сооружений" и другие документы для Беларуси. Нормативная база регулярно обновляется.',
+
+	'landing.faq.q3': 'Можно ли рассчитать собственную (нестандартную) конструкцию?',
 	'landing.faq.a3':
-		'Да, наши расчеты принимаются экспертизой. Для дополнительной уверенности вы можете заказать проверку у наших сертифицированных инженеров.',
-	'landing.faq.a4':
-		'Да, интеграция с CAD/BIM доступна в PRO версии (опционально), что упрощает процесс проектирования и документации.',
+		'Да. Пользователь может собрать свою конструкцию из материалов базы или добавить индивидуальные параметры для точного анализа.',
+
+	'landing.faq.q4': 'Есть ли интеграция с BIM и CAD-системами?',
+	'landing.faq.a4': 'В разработке модуль для IFC файлов, но уже сейчас доступен вьювер.',
+
+	'landing.faq.q5': 'Как работает ИИ-консультант?',
 	'landing.faq.a5':
-		'Бесплатная версия включает расчёты для ограниченного числа конструкций, базу материалов с ограниченным доступом и возможность сравнения до двух конструкций.',
+		'AI Consultant анализирует ваши расчёты, документы и нормативы, помогает проверять соответствие требованиям и предлагает оптимальные решения.',
+
+	'landing.faq.q6': 'Что включает бесплатная версия?',
 	'landing.faq.a6':
-		'Мы следим за всеми изменениями в законодательстве и обновляем базу ежемесячно.',
+		'Бесплатный доступ позволяет выполнить ограниченное количество расчётов и протестировать базовые функции. Расширенные возможности доступны по подписке.',
+
+	'landing.faq.q7': 'Как часто обновляется база данных материалов и нормативов?',
 	'landing.faq.a7':
-		'Техническая поддержка доступна для всех пользователей, однако в PRO версии предусмотрена приоритетная премиум-поддержка.',
+		'База актуализируется ежеквартально. Добавляются новые материалы, результаты лабораторных испытаний и обновлённые редакции СП.',
+
+	'landing.faq.q8': 'Где получить поддержку?',
 	'landing.faq.a8':
-		'Бесплатная: Идеально для ознакомления и небольших проектов. Подходит для выполнения базовых расчётов и тестирования функционала. \nСтандарт: Оптимальный выбор для регулярного использования. Подходит для тех, кто выполняет расчёты на постоянной основе и нуждается в расширенном доступе к базе материалов. \nPRO: Максимальные возможности для крупных компаний. Полный доступ ко всем функциям, включая расчёты нестандартных конструкций и интеграцию с CAD/BIM программами.',
+		'Вы можете связаться с технической поддержкой прямо из личного кабинета или написать в Telegram-бот. Среднее время ответа — до 24 часов.',
 
 	'landing.news.title': 'Новости',
 	'errors.newsLoad': 'Ошибка загрузки новостей',
@@ -950,7 +974,7 @@ export const ru: Record<TranslationKey, string> = {
 	'landing.subText.crossed.0.1': 'Подпись отчета',
 
 	'sidebar.home': 'Главная',
-	'sidebar.aiAssistant': 'AI ассистент',
+	'sidebar.aiAssistant': 'AI mode',
 	'sidebar.constructor': 'Конструктор',
 	'sidebar.aboutBuilding': 'О здании',
 	'sidebar.floorPlans': 'Поэтажные планы',

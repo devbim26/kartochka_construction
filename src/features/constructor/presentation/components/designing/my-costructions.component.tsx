@@ -356,8 +356,9 @@ const MyConstructions = () => {
 									</p>
 								</div>
 							</div>
+							<div></div>
 							<div className="flex flex-col gap-2">
-								<p className="text-[30px] font-extrabold text-black">
+								<p className="text-[30px] font-extrabold leading-none text-black">
 									{t('constructor.designing.labValue')}
 								</p>
 								<p className="font-sans text-[14px]">
@@ -374,6 +375,7 @@ const MyConstructions = () => {
 									</p>
 								</div>
 							</div>
+							<div></div>
 							<p className="text-[30px] font-extrabold text-primary">
 								{t('constructor.designing.allowedValue')}
 							</p>

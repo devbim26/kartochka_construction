@@ -1,4 +1,4 @@
-import { LandingGif } from '@assets';
+import { LandingImage } from '@assets';
 import { APP_ROUTES, Button, useAppSelector, useI18n } from '@core';
 import { AUTH_ROUTES } from '@features/auth/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
@@ -18,12 +18,12 @@ export const PageTop = () => {
 	};
 
 	return (
-		<div className="relative flex min-h-[500px] w-full items-center overflow-hidden">
+		<div className="relative flex min-h-fit w-full items-center overflow-hidden">
 			{/* Animation on the right */}
 			<img
-				src={LandingGif}
+				src={LandingImage}
 				alt={t('landing.pageTop.gifAlt')}
-				className="absolute right-0 h-full w-3/4"
+				className="absolute right-0 object-contain"
 			/>
 
 			{/* Translucent card overlay */}

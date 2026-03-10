@@ -2,6 +2,7 @@
 import { Switch, useAppDispatch, useAppSelector } from '@core';
 import {
 	convertToClientAlternateConstruction,
+	convertToClientSingleToFloorConstruction,
 	convertToClientReportInfoShort,
 } from '@features/constructor/converters';
 import {
@@ -14,7 +15,10 @@ import { startLoading, stopLoading } from '@features/constructor/store';
 import type { ConstructionSelectRestrictions } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
 import type { ReportInfoShort } from '@features/constructor/utils';
-import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
+import {
+	convertToClientConstructionsEditData,
+	convertToClientRequirementTableData,
+} from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { AlternateConstruction, ConstructionsEditData } from '@features/guidbooks/types';
 import { Guidebooks } from '@features/guidbooks/types';
@@ -54,7 +58,16 @@ const ContructionPick = () => {
 			.pipe(
 				tap((response) => {
 					if (response.status === 200) {
-						setCurrentReportInfo(convertToClientReportInfoShort(response.data));
+						const reportInfo = convertToClientReportInfoShort(response.data as any);
+						const currentConstruction =
+							convertToClientSingleToFloorConstruction(response.data as any);
+						const requirement = currentConstruction?.reportConstructionHeader?.requirement;
+
+						setCurrentReportInfo({
+							...reportInfo,
+							regulatoryRequirement: requirement,
+							calculationRequirement: requirement,
+						});
 					}
 				}),
 				catchError((error) => {
@@ -72,7 +85,31 @@ const ContructionPick = () => {
 			.pipe(
 				tap((response) => {
 					if (response.status === 200) {
-						setCurrentReportInfo(convertToClientReportInfoShort(response.data));
+						const reportInfo = convertToClientReportInfoShort(response.data as any);
+
+						const floorConstructionInfos =
+							(response.data as any)?.floorConstructionInfos ?? [];
+						const reportFloorInfos = floorConstructionInfos.flatMap(
+							(fci: any) => fci?.reportFloorInfos ?? [],
+						);
+
+						const currentReportFloorInfo = reportFloorInfos.find(
+							(rfi: any) =>
+								rfi?.reportConstructionHeader?.constructionHeaderId ===
+								constructionHeaderId,
+						);
+
+						const requirementDto =
+							currentReportFloorInfo?.reportConstructionHeader?.requirement;
+						const requirement = requirementDto
+							? convertToClientRequirementTableData(requirementDto)
+							: undefined;
+
+						setCurrentReportInfo({
+							...reportInfo,
+							regulatoryRequirement: requirement,
+							calculationRequirement: requirement,
+						});
 					}
 				}),
 				catchError((error) => {
@@ -133,12 +170,16 @@ const ContructionPick = () => {
 	}, [constructionHeaderId, svgUrl]);
 
 	const handleAlternateConstructions = (data: ConstructionSelectRestrictions) => {
-		if (!currentReportInfo) return;
+		const requirementId = currentReportInfo?.regulatoryRequirement?.id;
+		if (!requirementId) {
+			toast.error('Не удалось определить требование для подбора альтернатив');
+			return;
+		}
 		from(
 			getAlternateConstructions({
 				...data,
 				pageSize: 2,
-				requirementId: currentReportInfo?.regulatoryRequirement?.id!,
+				requirementId,
 				pageNumber: pageNumber,
 			}),
 		)

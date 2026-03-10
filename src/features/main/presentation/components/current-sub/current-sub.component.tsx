@@ -1,5 +1,5 @@
 import { fetchApi } from '@api-gen';
-import { Button, convertToPaginatedType, useAppSelector, useI18n } from '@core';
+import { Button, convertToPaginatedType, useAppNavigate, useAppSelector, useI18n } from '@core';
 import {
 	convertSubscriptionToClient,
 	getPaginatedSubscriptions,
@@ -7,6 +7,7 @@ import {
 } from '@features/subscriptions';
 import { AxiosError } from 'axios';
 import { useEffect, useLayoutEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { SubImage } from './images';
@@ -14,8 +15,10 @@ import { SubImage } from './images';
 export const CurrentSub = () => {
 	const [subscription, setSubscription] = useState<Subscription>();
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
+	const [search] = useSearchParams();
 	const userData = useAppSelector((store) => store.userData);
 	const { t } = useI18n();
+	const navigate = useAppNavigate();
 	const handleGetTableData = () => {
 		from(
 			getPaginatedSubscriptions({
@@ -70,7 +73,7 @@ export const CurrentSub = () => {
 
 	useEffect(() => {
 		handleGetCurrentSubscription();
-	}, [subscriptions]);
+	}, [subscriptions, search.get('changePlanFlow')]);
 
 	useLayoutEffect(() => {
 		handleGetTableData();
@@ -94,7 +97,8 @@ export const CurrentSub = () => {
 							</div>
 							<div className="flex flex-row">
 								<p className="mr-[5px] font-sans text-lg font-normal leading-4">
-									{t('main.currentSub.remainingDownloads')}: {userData.data?.expiresAt}
+									{t('main.currentSub.remainingDownloads')}:{' '}
+									{userData.data?.expiresAt}
 								</p>
 							</div>
 							<div className="flex flex-row">
@@ -103,7 +107,12 @@ export const CurrentSub = () => {
 								</p>
 							</div>
 						</div>
-						<Button className="w-min px-[16px]">
+						<Button
+							className="w-min px-[16px]"
+							onClick={() =>
+								navigate('', { subSelectModal: 'true', changePlanFlow: 'true' })
+							}
+						>
 							<p className="font-sans text-sm font-semibold leading-4">
 								{t('main.currentSub.changePlan')}
 							</p>

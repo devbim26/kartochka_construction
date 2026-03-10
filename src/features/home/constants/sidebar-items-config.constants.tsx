@@ -38,15 +38,7 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 				permission: [UserRoles.Admin, UserRoles.User],
 			},
 		},
-		{
-			params: {
-				id: DESIGNING_ROUTES.visualization.id,
-				labelKey: 'sidebar.aiAssistant',
-				icon: GiCloudRing,
-				path: DESIGNING_ROUTES.visualization.route,
-				permission: [UserRoles.Admin, UserRoles.User],
-			},
-		},
+
 		{
 			params: {
 				id: DESIGNING_ROUTES.constructor.id,
@@ -87,6 +79,15 @@ export const sidebarItemsConfig: SidebarItemsConfig = {
 								permission: [UserRoles.Admin, UserRoles.User],
 							},
 						],
+		},
+		{
+			params: {
+				id: DESIGNING_ROUTES.visualization.id,
+				labelKey: 'sidebar.aiAssistant',
+				icon: GiCloudRing,
+				path: DESIGNING_ROUTES.visualization.route,
+				permission: [UserRoles.Admin, UserRoles.User],
+			},
 		},
 		{
 			params: {

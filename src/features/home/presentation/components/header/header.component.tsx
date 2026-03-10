@@ -1,4 +1,4 @@
-import { APP_ROUTES, LogoIcon } from '@core';
+import { APP_ROUTES, LogoIcon, LogoTextIcon } from '@core';
 import { useState } from 'react';
 import { ImMenu } from 'react-icons/im';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -30,7 +30,7 @@ export const HomeHeader = () => {
 						className="flex cursor-pointer flex-row items-center gap-[12px]"
 					>
 						<LogoIcon className="xs:size-[30px] md:size-[50px]" />
-						{/* <LogoTextIcon className="h-[64px] w-[170px] xs:h-[44px] xs:w-[120px]" /> */}
+						<LogoTextIcon className="h-[64px] w-[170px] xs:h-[44px] xs:w-[120px]" />
 					</div>
 				</div>
 
@@ -62,7 +62,7 @@ export const HomeHeader = () => {
 						<div className="mb-4 flex items-center justify-between">
 							<div className="flex flex-row items-center gap-[12px]">
 								<LogoIcon className="h-[32px] w-[31px]" />
-								{/* <LogoTextIcon className="h-[48px] w-[130px]" /> */}
+								<LogoTextIcon className="h-[48px] w-[130px]" />
 							</div>
 							<div className="flex items-center gap-2">
 								<LanguageToggle />

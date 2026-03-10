@@ -1,14 +1,21 @@
-import { APP_ROUTES, Carousel, CarouselSlide, MainSliderLogo, useAppNavigate, useI18n } from '@core';
+import {
+	APP_ROUTES,
+	Carousel,
+	CarouselSlide,
+	MainSliderLogo,
+	useAppNavigate,
+	useI18n,
+} from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { DESIGNING_ROUTES } from '@features/home/constants';
-import { useCallback } from 'react';
+import { useCallback, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface FeatureCard {
 	id: string;
-	title: string;
-	description: string;
-	features: string[];
+	title: ReactNode;
+	description: ReactNode;
+	features: ReactNode[];
 	price: 'FREE' | 'PRO';
 	buttonText: string;
 	isPro?: boolean;
@@ -46,48 +53,97 @@ export const MainHeader = () => {
 	const AIFeatures: FeatureCard[] = [
 		{
 			id: 'ai-assistant',
-			title: t('main.ai.visualization.title'),
-			description: t('main.ai.visualization.desc'),
+			title: 'AI ассистент (3 режима)',
+			description: (
+				<span className="text-gray-700">
+					Доступ к новейшим моделям ИИ (от Open AI, Antropic, Google, китайские модели).
+				</span>
+			),
 			features: [
-				t('main.ai.visualization.feature0'),
-				t('main.ai.visualization.feature1'),
+				<span key="ai-mode-1">
+					<span className="font-semibold text-gray-800">Общий</span>
+				</span>,
+				<span key="ai-mode-2">
+					<span className="font-semibold text-gray-800">Аналитика документов PDF</span>
+					<span className="text-gray-600">
+						{' '}
+						— AI проверяет, суммаризирует и структурирует документы. Выдаёт готовый
+						отчёт в DOC/Excel — для смет, ТЗ, протоколов.
+					</span>
+				</span>,
+				<span key="ai-mode-3">
+					<span className="font-semibold text-gray-800">DeepResearch</span>
+					<span className="text-gray-600"> (Perplexity Sonar Pro Search)</span>
+					<span className="text-gray-600">
+						{' '}
+						— глубокий поиск информации в интернете со ссылками на первоисточник.
+					</span>
+				</span>,
 			],
 			price: 'PRO',
 			buttonText: t('common.startPro'),
 			active: true,
 		},
 		{
-			id: 'norm-control',
-			title: t('main.ai.normControl.title'),
-			description: t('main.ai.normControl.desc'),
-			features: [t('main.ai.normControl.feature0')],
+			id: 'ai-visualization',
+			title: 'Визуализация фасадов и интерьеров',
+			description: (
+				<span className="text-gray-700">
+					AI-генерация изображений{' '}
+					<span className="font-semibold text-gray-800">(nano banano 2 pro)</span> с
+					кастомными настройками.
+				</span>
+			),
+			features: [
+				<span key="ai-viz-feature">
+					Меняйте материалы, мебель, положение камеры и др.{' '}
+					<span className="font-semibold">в один клик</span>.
+				</span>,
+			],
 			price: 'PRO',
 			buttonText: t('common.startPro'),
 			active: true,
 		},
 		{
-			id: 'document-analytics',
-			title: t('main.ai.docAnalytics.title'),
-			description: t('main.ai.docAnalytics.desc'),
-			features: [t('main.ai.docAnalytics.feature0')],
+			id: 'project-expertise',
+			title: 'Экспертиза проекта (2 режима)',
+			description: (
+				<span className="text-gray-700">Проверка проекта по выбранному сценарию.</span>
+			),
+			features: [
+				<div key="expertise-general" className="text-gray-700">
+					<span className="font-semibold text-gray-800">Общая экспертиза</span>
+					<ul className="mt-1 list-disc space-y-1 pl-4 text-gray-600">
+						<li>Проверяет общую структуру проекта</li>
+						<li>Проверяет проект на соответствие актуальным ТНПА</li>
+						<li>Проверка проекта по внутренним требованиям</li>
+					</ul>
+				</div>,
+				<div key="expertise-sound" className="text-gray-700">
+					<span className="font-semibold text-gray-800">Экспертиза звукоизоляции</span>
+					<div className="mt-1 text-gray-600">
+						Анализ заложенных в проекте решений по звукоизоляции.
+					</div>
+				</div>,
+			],
 			price: 'PRO',
 			buttonText: t('common.startPro'),
 			active: true,
 		},
 		{
-			id: 'internet-search',
-			title: t('main.ai.internetSearch.title'),
-			description: t('main.ai.internetSearch.desc'),
-			features: [t('main.ai.internetSearch.feature0')],
-			price: 'PRO',
-			buttonText: t('common.startPro'),
-			active: true,
-		},
-		{
-			id: 'ifc-analytics',
-			title: t('main.ai.ifc.title'),
-			description: t('main.ai.ifc.desc'),
-			features: [t('main.ai.ifc.feature0')],
+			id: 'normative-analytics',
+			title: 'Аналитика нормативной документации',
+			description: (
+				<span className="text-gray-700">
+					Выполняет глубокий анализ нормативных документов (СН, СП и др.).
+				</span>
+			),
+			features: [
+				<span key="norm-analytics-feature" className="text-gray-700">
+					Задавайте любые вопросы — система создаст отчёт с прямыми ссылками на пункты и
+					страницы документов.
+				</span>,
+			],
 			price: 'PRO',
 			buttonText: t('common.startPro'),
 			active: true,
@@ -175,7 +231,7 @@ export const MainHeader = () => {
 												{feature.features.map((item, index) => (
 													<li
 														key={index}
-														className="text-xs text-gray-600"
+														className="text-xs leading-snug text-gray-600"
 													>
 														• {item}
 													</li>
@@ -257,7 +313,7 @@ export const MainHeader = () => {
 												{feature.features.map((item, index) => (
 													<li
 														key={index}
-														className="text-xs text-gray-600"
+														className="text-xs leading-snug text-gray-600"
 													>
 														• {item}
 													</li>
@@ -266,26 +322,6 @@ export const MainHeader = () => {
 										</div>
 									</div>
 								</div>
-							</div>
-							<div className="flex w-full justify-between">
-								<button
-									onClick={() => handleFeatureClick(feature.id)}
-									className={twMerge(
-										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
-									)}
-								>
-									{t('common.free')}
-								</button>
-								<button
-									onClick={() => handleFeatureClick(feature.id)}
-									className={twMerge(
-										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
-
-										'cursor-pointer bg-primary hover:bg-blue-700',
-									)}
-								>
-									{t('common.startPro')}
-								</button>
 							</div>
 						</div>
 					</CarouselSlide>

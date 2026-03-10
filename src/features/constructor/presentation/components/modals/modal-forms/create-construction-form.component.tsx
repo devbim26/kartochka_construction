@@ -31,6 +31,7 @@ import { CreateConstructionConfig } from '@features/constructor/utils';
 import {
 	convertToClientConstructionsAddData,
 	convertToClientConstructionsEditData,
+	convertToClientIssuerData,
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksPaginated } from '@features/guidbooks/services';
 import type {
@@ -39,6 +40,7 @@ import type {
 	ConstructionClass,
 	ConstructionsAddData,
 	ConstructionsEditData,
+	Issuer,
 } from '@features/guidbooks/types';
 import {
 	EnConstructionTypeSelectValues,
@@ -46,6 +48,7 @@ import {
 	RuConstructionTypeSelectValues,
 } from '@features/guidbooks/types';
 
+import type { IssuerDto } from '@api-gen';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
@@ -92,6 +95,8 @@ export const CreateConstructionForm = memoize(
 			const [constructionDetail, setConstructionDetail] =
 				useState<ConstructionsEditData | null>(null);
 			const [svgUrl, setSvgUrl] = useState<string | null>(null);
+			const [issuer, setIssuer] = useState<Issuer | null>(null);
+			const [issuerIsLoading, setIssuerIsLoading] = useState(false);
 
 			const [roomRequirementsMap, setRoomRequirementsMap] = useState<RoomRequirementMap>({});
 			const [secondRoomOptions, setSecondRoomOptions] = useState<
@@ -139,7 +144,6 @@ export const CreateConstructionForm = memoize(
 
 				roomRequirementsData.forEach((item) => {
 					const firstRoomId = item.firstPlacementRoom.id;
-					const firstRoomName = item.firstPlacementRoom.name;
 
 					item.secondRequirementRooms.forEach((requirement: any) => {
 						const secondRoomId = requirement.secondPlacementRoom.id;
@@ -425,6 +429,42 @@ export const CreateConstructionForm = memoize(
 			}, [construction]);
 
 			useEffect(() => {
+				const issuerId = constructionDetail?.issuer;
+				if (!issuerId) {
+					setIssuer(null);
+					return;
+				}
+
+				setIssuer(null);
+				setIssuerIsLoading(true);
+
+				const subscription = from(
+					getGuidebooksDetail({ id: issuerId, guidebookType: Guidebooks.ISSUER }),
+				)
+					.pipe(
+						tap((response) => {
+							if (response?.status === 200 && response.data) {
+								setIssuer(convertToClientIssuerData(response.data as IssuerDto));
+							}
+						}),
+						catchError((error) => {
+							console.error('Ошибка загрузки производителя:', error);
+							return of(null);
+						}),
+						finalize(() => setIssuerIsLoading(false)),
+					)
+					.subscribe();
+
+				return () => subscription.unsubscribe();
+			}, [constructionDetail?.issuer]);
+
+			const normalizeWebsite = (value?: string) => {
+				const trimmed = value?.trim();
+				if (!trimmed) return null;
+				return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+			};
+
+			useEffect(() => {
 				handleGetConstructionData();
 			}, [construction]);
 
@@ -678,23 +718,23 @@ export const CreateConstructionForm = memoize(
 								{t('createConstruction.selectedConstruction') ||
 									'Выбранная конструкция'}
 							</p>
-							<div className="flex flex-row gap-4">
+							<div className="grid grid-cols-3 gap-4">
 								{/* Изображение */}
-								<div className="w-1/2">
+								<div>
 									{svgUrl ? (
 										<img
-											className="h-auto max-h-[100px] w-full object-contain"
+											className="h-auto max-h-[200px] w-full object-contain"
 											src={svgUrl}
 											alt={'constr'}
 										/>
 									) : (
-										<div className="flex h-[100px] w-full items-center justify-center">
+										<div className="flex h-[200px] w-full items-center justify-center">
 											<Loader />
 										</div>
 									)}
 								</div>
 								{/* Список материалов */}
-								<div className="w-1/2">
+								<div>
 									{constructionDetail?.constructionTypeObject?.leftConstruction
 										?.slice()
 										.sort((a, b) => Number(a.positionId) - Number(b.positionId))
@@ -719,6 +759,44 @@ export const CreateConstructionForm = memoize(
 												- {formatMaterial(material, locale)}
 											</p>
 										))}
+								</div>
+								{/* Производитель */}
+								<div className="flex flex-col gap-2">
+									<p className="text-sm font-semibold text-gray-800">
+										{locale === 'ru' ? 'Производитель' : 'Manufacturer'}
+									</p>
+									{issuerIsLoading ? (
+										<div className="flex h-[66px] items-center">
+											<Loader />
+										</div>
+									) : (
+										<>
+											{issuer?.logoUrl && (
+												<img
+													src={issuer.logoUrl}
+													alt={issuer.name || 'issuer logo'}
+													className="h-[66px] w-full max-w-[160px] rounded-md object-contain"
+												/>
+											)}
+											<p className="text-left text-[14px] text-gray-800">
+												{issuer?.name ||
+													constructionDetail?.issuerName ||
+													(locale === 'ru'
+														? 'Не указан'
+														: 'Not specified')}
+											</p>
+											{normalizeWebsite(issuer?.webSite) && (
+												<a
+													href={normalizeWebsite(issuer?.webSite)!}
+													target="_blank"
+													rel="noreferrer noopener"
+													className="break-all text-left text-[14px] text-primary underline"
+												>
+													{issuer?.webSite}
+												</a>
+											)}
+										</>
+									)}
 								</div>
 							</div>
 						</div>

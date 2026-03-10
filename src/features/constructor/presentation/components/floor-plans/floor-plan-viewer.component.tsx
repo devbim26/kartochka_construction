@@ -27,6 +27,9 @@ type Props = {
 	floorId?: string;
 	currentConstructionHeader?: ConstructionsEditData;
 	getData: () => void;
+	// Новые пропсы для управления страницей из родителя
+	currentPage?: number;
+	onPageChange?: (page: number) => void;
 };
 
 export const FloorPlanViewer = ({
@@ -36,10 +39,12 @@ export const FloorPlanViewer = ({
 	floorId,
 	getData,
 	currentConstructionHeader,
+	currentPage = 1, // значение по умолчанию
+	onPageChange,
 }: Props) => {
 	const { t, locale } = useI18n();
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [pageNum, setPageNum] = useState(1);
+	// Внутреннее состояние для количества страниц (только для чтения)
 	const [numPages, setNumPages] = useState(0);
 	const [scale, setScale] = useState(1.5);
 	const navigate = useAppNavigate();
@@ -48,6 +53,7 @@ export const FloorPlanViewer = ({
 
 	const previousConstructionRef = useRef<FloorConstruction | null>(null);
 
+	// Хук рендера использует текущую страницу из пропсов
 	const { renderPage, isRendering } = useRenderPage(pdfFile, canvasRef, scale);
 
 	const constructionLabels = {
@@ -55,9 +61,9 @@ export const FloorPlanViewer = ({
 		divides: t('construction.labels.divides'),
 	};
 
+	// Устанавливаем общее количество страниц при загрузке PDF
 	useEffect(() => {
 		setNumPages(pdfFile.numPages);
-		setPageNum(1);
 	}, [pdfFile]);
 
 	const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -77,7 +83,7 @@ export const FloorPlanViewer = ({
 			layerId: floorId || '',
 			x: (x / scale).toString(),
 			y: (y / scale).toString(),
-			page: pageNum.toString(),
+			page: currentPage.toString(), // используем пропс
 		});
 	};
 
@@ -117,13 +123,18 @@ export const FloorPlanViewer = ({
 	};
 
 	const handlePrev = () => {
-		if (pageNum > 1) setPageNum(pageNum - 1);
+		if (currentPage > 1 && onPageChange) {
+			onPageChange(currentPage - 1);
+		}
 	};
 
 	const handleNext = () => {
-		if (pdfFile && pageNum < numPages) setPageNum(pageNum + 1);
+		if (pdfFile && currentPage < numPages && onPageChange) {
+			onPageChange(currentPage + 1);
+		}
 	};
 
+	// Эффект для рендера страницы и отрисовки конструкции
 	useEffect(() => {
 		if (!pdfFile || !canvasRef.current) return;
 
@@ -131,17 +142,18 @@ export const FloorPlanViewer = ({
 
 		const renderAndDraw = async () => {
 			try {
-				await renderPage(pageNum);
+				// Рендерим текущую страницу (из пропсов)
+				await renderPage(currentPage);
 
-				if (currentConstruction?.page === pageNum && currentConstructionHeader) {
-					// В useEffect, где вызывается drawConstructionOnCanvas:
+				// Если есть конструкция на этой странице, отрисовываем её
+				if (currentConstruction?.page === currentPage && currentConstructionHeader) {
 					await drawConstructionOnCanvas(
 						canvas,
 						currentConstruction,
 						scale,
 						currentConstructionHeader?.constructionType as ConstructionTypeEnum,
 						currentConstructionHeader?.name || 'Placeholder',
-						constructionLabels, // передаём метки
+						constructionLabels,
 					);
 
 					const prev = previousConstructionRef.current;
@@ -173,7 +185,8 @@ export const FloorPlanViewer = ({
 		};
 
 		renderAndDraw();
-	}, [pdfFile, pageNum, scale, currentConstruction, currentConstructionHeader, locale]);
+		// Зависимости: currentPage, scale, currentConstruction, currentConstructionHeader, locale
+	}, [pdfFile, currentPage, scale, currentConstruction, currentConstructionHeader, locale]);
 
 	return (
 		<div className="flex items-center justify-center rounded-[20px] py-[30px]">
@@ -217,18 +230,18 @@ export const FloorPlanViewer = ({
 						<div className="flex items-center gap-[10px]">
 							<Button
 								onClick={handlePrev}
-								disabled={pageNum <= 1}
+								disabled={currentPage <= 1}
 								variant="primary"
 								className="p-[10px]"
 							>
 								<ChevronIcon className="rotate-90" fill="white" />
 							</Button>
 							<span className="text-[16px] font-bold">
-								{pageNum} {t('floorPlanViewer.page')}
+								{currentPage} {t('floorPlanViewer.page')} {numPages}
 							</span>
 							<Button
 								onClick={handleNext}
-								disabled={pageNum >= numPages}
+								disabled={currentPage >= numPages}
 								variant="primary"
 								className="p-[10px]"
 							>

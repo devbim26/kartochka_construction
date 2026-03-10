@@ -20,9 +20,10 @@ import { SubscriptionCard } from './subscription-card.component';
 interface SubSelectProps {
 	wrapperClassName?: string;
 	subContainerClassName?: string;
+	onSubscribe?: (id: string) => void;
 }
 
-export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelectProps) => {
+export const SubSelect = ({ wrapperClassName, subContainerClassName, onSubscribe }: SubSelectProps) => {
 	const [isPerMonth, setIsPerMonth] = useState(true);
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
 	const { t } = useI18n();
@@ -63,6 +64,11 @@ export const SubSelect = ({ wrapperClassName, subContainerClassName }: SubSelect
 	};
 
 	const handleSubscribe = (id: string) => {
+		if (onSubscribe) {
+			onSubscribe(id);
+			return;
+		}
+
 		navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.main.route, {
 			subId: id,
 			subModal: 'true',

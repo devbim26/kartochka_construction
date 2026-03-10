@@ -172,7 +172,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 							content={info.getValue() as string}
 							contentClassName={twMerge(
 								'w-[80px] border-r border-[#EDEFF2] text-[18px] text-center',
-								isRw && 'text-blue-600  font-bold',
+								isRw && 'text-blue-600  text-[25px] font-bold',
 							)}
 							noPadding={noPadding}
 						/>
@@ -195,7 +195,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 							content={info.getValue() as string}
 							contentClassName={twMerge(
 								'w-[80px] border-r text-[18px] border-[#EDEFF2] text-center',
-								isRw && 'text-blue-600 text-[20px] font-bold',
+								isRw && 'text-blue-600 text-[25px] font-bold',
 							)}
 							noPadding={noPadding}
 						/>
@@ -218,7 +218,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 							content={info.getValue() as string}
 							contentClassName={twMerge(
 								'w-[80px] border-r text-[18px] border-[#EDEFF2] text-center',
-								isRw && 'text-blue-600  font-bold',
+								isRw && 'text-blue-600 text-[25px] font-bold',
 							)}
 							noPadding={noPadding}
 						/>

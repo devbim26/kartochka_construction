@@ -1,7 +1,8 @@
+import { AboutUs1, AboutUs2, AboutUs3, AboutUs4, AboutUs5 } from '@assets';
 import { Chevron, useI18n } from '@core';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { stepDescriptions, stepDetailDescriptions, steps } from '../../constants';
+import { stepDescriptions, steps } from '../../constants';
 import {
 	FifthNumberImage,
 	FirstNumberImage,
@@ -17,6 +18,8 @@ const numberImages = [
 	<FourthNumberImage key="fourth" />,
 	<FifthNumberImage key="fifth" />,
 ];
+
+const aboutImages = [AboutUs1, AboutUs2, AboutUs3, AboutUs4, AboutUs5];
 
 export const HowOurServiceWorks = () => {
 	const [selectedStep, setSelectedStep] = useState(0);
@@ -89,7 +92,7 @@ export const HowOurServiceWorks = () => {
 							{/* Content over image */}
 							<div className="relative z-10 flex flex-col gap-6">
 								<div className="flex flex-row items-start justify-between gap-4 sm:gap-6">
-									<div className="font-montserrat text-base font-semibold leading-snug sm:text-lg">
+									<div className="font-montserrat font-semibold leading-snug text-primary sm:text-lg">
 										{t(steps[selectedStep])}
 									</div>
 									{/* Optional: show number on top as well */}
@@ -103,18 +106,22 @@ export const HowOurServiceWorks = () => {
 
 						<div
 							className={twMerge(
-								'absolute left-0 top-0 flex h-full w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-700 ease-in-out',
+								'absolute left-0 top-0 flex h-full w-full min-h-[260px] flex-col gap-4 overflow-hidden rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-700 ease-in-out',
 								'md:h-[408px]',
 								isHover ? 'opacity-100' : 'opacity-0',
 							)}
 						>
-							<div
-								className={twMerge(
-									'mt-6 whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed transition-opacity delay-700 duration-300 ease-in-out sm:text-base',
-									isHover ? 'opacity-100' : 'invisible opacity-0',
-								)}
-							>
-								{t(stepDetailDescriptions[selectedStep])}
+							<div className="font-montserrat font-semibold leading-snug text-primary sm:text-lg">
+								{t(steps[selectedStep])}
+							</div>
+							<div className="flex flex-1 min-h-0 items-center justify-center">
+								<img
+									src={aboutImages[selectedStep]}
+									alt=""
+									aria-hidden="true"
+									loading="lazy"
+									className="max-h-full max-w-full object-contain"
+								/>
 							</div>
 						</div>
 					</div>
