@@ -615,9 +615,11 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	shortName?: string | null;
 	constructionType?: ConstructionTypeEnum;
 	countryType?: CountryType;
-	isReportConstruction?: boolean | null;
+	isReportConstruction?: boolean;
 	/** @format uuid */
 	constructionIdToUpdate?: string | null;
+	/** @format uuid */
+	userId?: string | null;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -947,6 +949,8 @@ export interface PaginatedConstructionHeaderDto {
 	issuer?: NamedEntity;
 	issuerLogo?: string | null;
 	shortName?: string | null;
+	/** @format uuid */
+	userId?: string | null;
 }
 
 export interface PaginatedConstructionHeaderDtoPaginatedList {
@@ -1104,6 +1108,11 @@ export interface RegulatoryRequirementDocumentDto {
 	country?: CountryType;
 	shortName?: string | null;
 	fullName?: string | null;
+}
+
+export interface RemoveFavoriteFromConstructionCommand {
+	/** @format uuid */
+	constructionHeaderId?: string;
 }
 
 export enum ReportCategory {
@@ -2122,6 +2131,58 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionFavoriteConstructionUpdate
+		 * @request PUT:/api/Construction/favoriteConstruction/{constructionId}
+		 */
+		constructionFavoriteConstructionUpdate: (
+			constructionId: string,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/Construction/favoriteConstruction/${constructionId}`,
+				method: 'PUT',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionFavoriteConstructionDelete
+		 * @request DELETE:/api/Construction/favoriteConstruction/{constructionId}
+		 */
+		constructionFavoriteConstructionDelete: (
+			constructionId: string,
+			data: RemoveFavoriteFromConstructionCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/Construction/favoriteConstruction/${constructionId}`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionFavoriteConstructionList
+		 * @request GET:/api/Construction/favoriteConstruction
+		 */
+		constructionFavoriteConstructionList: (params: RequestParams = {}) =>
+			this.request<PaginatedConstructionHeaderDtoPaginatedList, any>({
+				path: `/api/Construction/favoriteConstruction`,
+				method: 'GET',
 				format: 'json',
 				...params,
 			}),

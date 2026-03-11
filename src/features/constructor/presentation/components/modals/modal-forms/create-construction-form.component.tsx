@@ -6,6 +6,7 @@ import {
 	useAppDispatch,
 	useAppSelector,
 	useI18n,
+	type SelectOption,
 } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { memoize } from '@core/utils/hoc/memo.utils';
@@ -91,6 +92,9 @@ export const CreateConstructionForm = memoize(
 			const [constructionData, setConstructionData] = useState<Array<ConstructionsAddData>>(
 				[],
 			);
+			const [favoriteConstructionIds, setFavoriteConstructionIds] = useState<Set<string>>(
+				new Set(),
+			);
 			const [reportInfoData, setReportInfoData] = useState<ReportInfoShort>();
 			const [constructionDetail, setConstructionDetail] =
 				useState<ConstructionsEditData | null>(null);
@@ -133,6 +137,7 @@ export const CreateConstructionForm = memoize(
 			const layerId = search.get('layerId');
 
 			const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
+			const userId = useAppSelector((state) => state.userData.data?.id);
 			const dispatch = useAppDispatch();
 
 			// Выбор массива типов конструкций в зависимости от языка
@@ -354,12 +359,81 @@ export const CreateConstructionForm = memoize(
 				dispatch(startLoading());
 				from(
 					getGuidebooksPaginated({
-						data: { constructionIdToUpdate: construction || undefined },
+						data: {
+							constructionIdToUpdate: construction || undefined,
+							userId: userId || undefined,
+						},
 						guidebookType: Guidebooks.CONSTRUCTION,
 						pagination: { pageNumber: 1, pageSize: 99999 },
 					}),
 				)
 					.pipe(
+						tap((response: AxiosResponse) => {
+							const items = response?.data?.items || [];
+							const grouped: Map<
+								string,
+								{
+									displayItem: any;
+									hasFavorite: boolean;
+								}
+							> = items.reduce(
+								(
+									acc: Map<
+										string,
+										{
+											displayItem: any;
+											hasFavorite: boolean;
+										}
+									>,
+									item: any,
+								) => {
+									const uniqueKey = item?.constructionId || item?.id;
+									if (!uniqueKey) return acc;
+
+									const existing = acc.get(uniqueKey);
+									if (!existing) {
+										acc.set(uniqueKey, {
+											displayItem: item,
+											hasFavorite: !!item?.userId,
+										});
+										return acc;
+									}
+
+									// For UI text/value prefer base/common record (without userId).
+									if (existing.displayItem?.userId && !item?.userId) {
+										existing.displayItem = item;
+									}
+
+									existing.hasFavorite = existing.hasFavorite || !!item?.userId;
+									acc.set(uniqueKey, existing);
+									return acc;
+								},
+								new Map<
+									string,
+									{
+										displayItem: any;
+										hasFavorite: boolean;
+									}
+								>(),
+							);
+
+							const groupedValues = Array.from(grouped.values()) as Array<{
+								displayItem: any;
+								hasFavorite: boolean;
+							}>;
+
+							const normalizedItems = groupedValues.map((group) => group.displayItem);
+
+							const favoriteIds = new Set<string>(
+								groupedValues
+									.filter((group) => group.hasFavorite)
+									.map((group) => group.displayItem?.id)
+									.filter(Boolean),
+							);
+							setFavoriteConstructionIds(favoriteIds);
+
+							response.data.items = normalizedItems;
+						}),
 						switchMap((response: AxiosResponse) => {
 							const resData = convertToPaginatedType(
 								convertToClientConstructionsAddData,
@@ -376,6 +450,25 @@ export const CreateConstructionForm = memoize(
 					)
 					.subscribe(() => dispatch(stopLoading()));
 			};
+
+			const constructionSelectOptions: SelectOption[] =
+				convertToSelectValues(
+					constructionData.map((construction) => ({
+						...construction,
+						name: `${construction.description}(${construction.name})`,
+					})),
+				)
+					?.sort((a, b) => {
+						const aIsFavorite = favoriteConstructionIds.has(String(a.value));
+						const bIsFavorite = favoriteConstructionIds.has(String(b.value));
+						return Number(bIsFavorite) - Number(aIsFavorite);
+					})
+					.map((option) => ({
+						...option,
+						icon: favoriteConstructionIds.has(String(option.value)) ? (
+							<span className="text-[14px] leading-none text-green-600">★</span>
+						) : undefined,
+					})) ?? [];
 
 			// Получение детальной информации о выбранной конструкции
 			const handleGetConstructionDetail = (id: string) => {
@@ -466,7 +559,7 @@ export const CreateConstructionForm = memoize(
 
 			useEffect(() => {
 				handleGetConstructionData();
-			}, [construction]);
+			}, [construction, userId]);
 
 			return (
 				<div className="relative flex w-full flex-col border-b">
@@ -548,14 +641,7 @@ export const CreateConstructionForm = memoize(
 								name={'construction'}
 								render={({ field }) => (
 									<Select
-										options={
-											convertToSelectValues(
-												constructionData.map((construction) => ({
-													...construction,
-													name: `${construction.description}(${construction.name})`,
-												})),
-											) ?? []
-										}
+										options={constructionSelectOptions}
 										{...field}
 										value={field.value || ''}
 										label={

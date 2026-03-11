@@ -207,11 +207,11 @@ export const MainHeader = () => {
 					>
 						<div
 							className={twMerge(
-								'flex h-full flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md',
+								'flex h-[300px] flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md',
 								!feature.active && 'bg-gray-text/30',
 							)}
 						>
-							<div className="mb-3">
+							<div className="mb-3 flex-1 overflow-hidden">
 								<div className="mb-2 flex items-start justify-between">
 									<h3 className="text-[15px] font-bold text-gray-800">
 										{feature.title}
@@ -226,8 +226,8 @@ export const MainHeader = () => {
 										<p className="text-xs text-gray-600">
 											{feature.description}
 										</p>
-										<div className="mb-4 flex-1">
-											<ul className="space-y-1">
+										<div className="mb-4 flex-1 overflow-auto">
+											<ul className="space-y-1 pr-1">
 												{feature.features.map((item, index) => (
 													<li
 														key={index}
@@ -289,11 +289,11 @@ export const MainHeader = () => {
 					>
 						<div
 							className={twMerge(
-								'flex h-full flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md',
+								'flex h-[300px] flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md',
 								!feature.active && 'bg-gray-text/30',
 							)}
 						>
-							<div className="mb-3 h-full">
+							<div className="mb-3 flex-1 overflow-hidden">
 								<div className="mb-2 flex items-start justify-between">
 									<h3 className="text-[15px] font-bold text-gray-800">
 										{feature.title}
@@ -308,8 +308,8 @@ export const MainHeader = () => {
 										<p className="text-xs text-gray-600">
 											{feature.description}
 										</p>
-										<div className="mb-4 flex-1">
-											<ul className="space-y-1">
+										<div className="mb-4 flex-1 overflow-auto">
+											<ul className="space-y-1 pr-1">
 												{feature.features.map((item, index) => (
 													<li
 														key={index}

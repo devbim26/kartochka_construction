@@ -1,4 +1,11 @@
-import { Button, ChevronIcon, useAppDispatch, useAppSelector, useI18n } from '@core';
+import {
+	Button,
+	ChevronIcon,
+	useAppDispatch,
+	useAppNavigate,
+	useAppSelector,
+	useI18n,
+} from '@core';
 import type { FloorConstruction, GraphDetailResponse, ReportInfoShort } from '@features';
 import { formatMaterial, ReportCategory, startLoading, stopLoading } from '@features';
 
@@ -10,11 +17,14 @@ import {
 	graphDotsConverterToClient,
 } from '@features/constructor/converters';
 import {
+	addFavoriteConstruction,
+	getFavoriteConstructions,
 	getFloorConstructionById,
 	getReportConstruction,
 	getReportFloorById,
 	getReportSingleById,
 	graphDetail,
+	removeFavoriteConstruction,
 } from '@features/constructor/services';
 import {
 	convertToClientConstructionsEditData,
@@ -27,12 +37,19 @@ import { Guidebooks } from '@features/guidbooks/types';
 
 import type { IssuerDto } from '@api-gen';
 import { AxiosError } from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import DesigningGraph from './designing-graph.component';
 import { DesigningHeader } from './designing-header.component';
+
+type FavoriteConstruction = {
+	id?: string | null;
+	constructionId?: string | null;
+	name?: string | null;
+	description?: string | null;
+};
 
 const MyConstructions = () => {
 	const [search] = useSearchParams();
@@ -50,10 +67,37 @@ const MyConstructions = () => {
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const reportType = search.get('reportType');
 	const constructionHeaderId = search.get('constructionHeaderId');
+	const [favoriteConstructions, setFavoriteConstructions] = useState<FavoriteConstruction[]>([]);
+	const [favoritesOffset, setFavoritesOffset] = useState(0);
+	const navigate = useAppNavigate();
 
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
+	const userId = useAppSelector((state) => state.userData.data?.id);
 	const dispatch = useAppDispatch();
 	const { t, locale } = useI18n();
+
+	const favoritesPerSlide = 4;
+	const favoritesCount = favoriteConstructions.length;
+	const favoriteMaxOffset = Math.max(0, favoritesCount - favoritesPerSlide);
+
+	const getFavoriteHeaderId = (item: FavoriteConstruction) =>
+		item.constructionId || item.id || '';
+
+	const currentHeaderId = constructionHeaderId || '';
+
+	const isCurrentFavorite = useMemo(
+		() => favoriteConstructions.some((item) => getFavoriteHeaderId(item) === currentHeaderId),
+		[favoriteConstructions, currentHeaderId],
+	);
+
+	const currentFavoriteSlice = useMemo(
+		() => favoriteConstructions.slice(favoritesOffset, favoritesOffset + favoritesPerSlide),
+		[favoriteConstructions, favoritesOffset],
+	);
+
+	useEffect(() => {
+		setFavoritesOffset((prev) => Math.min(prev, favoriteMaxOffset));
+	}, [favoriteMaxOffset]);
 
 	const handleGetCurrentConstructionReportHeader = (id: string) => {
 		dispatch(startLoading());
@@ -136,7 +180,7 @@ const MyConstructions = () => {
 	};
 
 	useEffect(() => {
-		if (!constructionHeader?.id || graphData) return;
+		if (!constructionHeader?.id) return;
 		handleGetReportConstruction(constructionHeader!.id!);
 	}, [constructionHeader]);
 
@@ -176,10 +220,40 @@ const MyConstructions = () => {
 			.subscribe(() => dispatch(stopLoading()));
 	};
 
+	const handleGetFavoriteConstructions = () => {
+		dispatch(startLoading());
+		from(getFavoriteConstructions())
+			.pipe(
+				tap((response) => {
+					if (response?.status === 200) {
+						setFavoriteConstructions(
+							(response.data?.items as FavoriteConstruction[]) || [],
+						);
+					}
+				}),
+				catchError((error) => {
+					console.error('Request error:', error);
+					return of(null);
+				}),
+				finalize(() => dispatch(stopLoading())),
+			)
+			.subscribe();
+	};
+
 	useEffect(() => {
 		if (!reportId || !constructionHeaderId) return;
 		handleGetConstructionByHeaderId(constructionHeaderId);
 	}, [reportId, constructionHeaderId]);
+
+	useEffect(() => {
+		if (!constructionHeader?.issuer) return;
+		handleGetIssuerByHeaderId(constructionHeader.issuer);
+	}, [constructionHeader?.issuer]);
+
+	useEffect(() => {
+		if (!userId) return;
+		handleGetFavoriteConstructions();
+	}, [userId]);
 
 	const handleGetCurrentReportShortSingleInfo = (id: string) => {
 		dispatch(startLoading());
@@ -238,7 +312,8 @@ const MyConstructions = () => {
 	};
 
 	useEffect(() => {
-		if (!constructionHeaderId || graphData) return;
+		if (!constructionHeaderId) return;
+		setGraphData(null);
 		dispatch(startLoading());
 		from(graphDetail({ constructionHeaderId }))
 			.pipe(
@@ -258,6 +333,45 @@ const MyConstructions = () => {
 			});
 	}, [constructionHeaderId]);
 
+	const openFavoriteConstruction = (id: string) => {
+		if (!id) return;
+		const params: Record<string, string> = {};
+		if (reportId) params.reportId = reportId;
+		if (reportType) params.reportType = reportType;
+		if (reportFloorInfoId) params.reportFloorInfoId = reportFloorInfoId;
+		params.constructionHeaderId = id;
+		navigate(window.location.pathname, params);
+	};
+
+	const handleToggleFavorite = (id: string, shouldRemove: boolean) => {
+		if (!id) return;
+		dispatch(startLoading());
+		from(shouldRemove ? removeFavoriteConstruction(id) : addFavoriteConstruction(id))
+			.pipe(
+				tap((response) => {
+					if (response.status === 200) {
+						toast.success(
+							shouldRemove
+								? locale === 'ru'
+									? 'Конструкция удалена из избранного'
+									: 'Construction removed from favorites'
+								: locale === 'ru'
+									? 'Конструкция добавлена в избранное'
+									: 'Construction added to favorites',
+						);
+						handleGetFavoriteConstructions();
+					}
+				}),
+				catchError((error) => {
+					console.error('Request error:', error);
+					toast.error(t('errors.request'));
+					return of(null);
+				}),
+				finalize(() => dispatch(stopLoading())),
+			)
+			.subscribe();
+	};
+
 	const leftMaterials = constructionHeader?.constructionTypeObject?.leftConstruction || [];
 	const centerMaterials = constructionHeader?.constructionTypeObject?.centerConstruction || [];
 	const rightMaterials = constructionHeader?.constructionTypeObject?.rightConstruction || [];
@@ -271,11 +385,21 @@ const MyConstructions = () => {
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
 			<DesigningHeader />
-			<div className="flex h-[428px] w-full flex-row gap-[72px] rounded-[20px] bg-white px-[44px] py-[34px]">
+			<div className="flex h-[428px] w-full flex-row gap-[20px] rounded-[20px] bg-white px-[44px] py-[34px]">
 				<div className="flex gap-[60px]">
 					<div className="flex flex-col">
-						<Button className="h-[40px] w-[190px] px-[16px] text-[16px]">
-							{t('constructor.myConstructions.construction1')}
+						<Button
+							className="h-[40px] w-[190px] px-[16px] text-[16px]"
+							onClick={() => handleToggleFavorite(currentHeaderId, isCurrentFavorite)}
+							disabled={!currentHeaderId}
+						>
+							{isCurrentFavorite
+								? locale === 'ru'
+									? 'Удалить из избранного'
+									: 'Remove from favorites'
+								: locale === 'ru'
+									? 'Добавить в избранное'
+									: 'Add to favorites'}
 						</Button>
 					</div>
 					<div className="rounded-lg border border-blue-500 p-[20px]">
@@ -324,13 +448,66 @@ const MyConstructions = () => {
 							{issuer?.name}: {issuer?.webSite}
 						</p>
 						<div className="flex items-center gap-[20px]">
-							<Button variant="primary" className="p-[10px]">
+							<Button
+								variant="primary"
+								className="p-[10px]"
+								disabled={favoritesOffset <= 0}
+								onClick={() => setFavoritesOffset((prev) => Math.max(0, prev - 1))}
+							>
 								<ChevronIcon className="rotate-90" fill="white" />
 							</Button>
-							<Button variant="primary" className="p-[10px]">
+							<Button
+								variant="primary"
+								className="p-[10px]"
+								disabled={favoritesOffset >= favoriteMaxOffset}
+								onClick={() =>
+									setFavoritesOffset((prev) =>
+										Math.min(favoriteMaxOffset, prev + 1),
+									)
+								}
+							>
 								<ChevronIcon className="-rotate-90" fill="white" />
 							</Button>
 						</div>
+					</div>
+				</div>
+				<div className="min-w-[320px] border-l border-gray-200 pl-[20px]">
+					<p className="mb-[12px] text-[18px] font-semibold">
+						{locale === 'ru' ? 'Избранные конструкции' : 'Favorite constructions'}
+					</p>
+					<div className="flex max-h-[330px] flex-col gap-[8px] overflow-auto pr-[4px]">
+						{currentFavoriteSlice.map((favorite) => {
+							const favoriteHeaderId = getFavoriteHeaderId(favorite);
+							const selected = favoriteHeaderId === currentHeaderId;
+							return (
+								<div
+									key={favoriteHeaderId}
+									className="flex items-center justify-between gap-[8px] rounded-md border border-gray-200 p-[8px]"
+								>
+									<button
+										type="button"
+										className={`text-left text-[14px] ${selected ? 'font-semibold text-primary' : ''}`}
+										onClick={() => openFavoriteConstruction(favoriteHeaderId)}
+									>
+										{favorite.description || favorite.name || favoriteHeaderId}
+									</button>
+									<Button
+										variant="primary"
+										className="h-[30px] px-[10px] text-[12px]"
+										onClick={() => handleToggleFavorite(favoriteHeaderId, true)}
+									>
+										{locale === 'ru' ? 'Удалить' : 'Remove'}
+									</Button>
+								</div>
+							);
+						})}
+						{!currentFavoriteSlice.length && (
+							<p className="text-[14px] text-input-label-primary">
+								{locale === 'ru'
+									? 'Избранных конструкций пока нет'
+									: 'No favorite constructions yet'}
+							</p>
+						)}
 					</div>
 				</div>
 			</div>

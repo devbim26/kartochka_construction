@@ -66,62 +66,63 @@ export const HowOurServiceWorks = () => {
 					</div>
 
 					<div
-						className={twMerge(
-							'relative flex w-[299px] sm:w-[299px] md:w-[479px] lg:w-[555px] xl:w-[839px]',
-							isHover !== null
-								? isHover
-									? 'animate-turnOverTo'
-									: 'animate-turnOverFrom'
-								: '',
-						)}
+						className="relative w-[299px] [perspective:1200px] sm:w-[299px] md:w-[479px] lg:w-[555px] xl:w-[839px]"
 						onMouseEnter={() => setIsHover(true)}
 						onMouseLeave={() => setIsHover(false)}
 					>
 						<div
 							className={twMerge(
-								'relative flex min-h-[260px] w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-200',
-								'md:h-[408px]',
-								isHover ? 'opacity-0' : 'opacity-100',
+								'relative min-h-[260px] w-full md:h-[408px]',
+								'transition-transform duration-700 ease-in-out [transform-style:preserve-3d]',
+								isHover
+									? '[transform:rotateY(180deg)]'
+									: '[transform:rotateY(0deg)]',
 							)}
 						>
-							{/* Background number image */}
-							<div className="absolute inset-0 flex justify-end p-5 text-[#0F6CAF38]">
-								<div className="size-auto">{numberImages[selectedStep]}</div>
-							</div>
+							<div
+								className={twMerge(
+									'absolute inset-0 flex min-h-[260px] w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue',
+									'[backface-visibility:hidden]',
+								)}
+							>
+								{/* Background number image */}
+								<div className="absolute inset-0 flex justify-end p-5 text-[#0F6CAF38]">
+									<div className="size-auto">{numberImages[selectedStep]}</div>
+								</div>
 
-							{/* Content over image */}
-							<div className="relative z-10 flex flex-col gap-6">
-								<div className="flex flex-row items-start justify-between gap-4 sm:gap-6">
-									<div className="font-montserrat font-semibold leading-snug text-primary sm:text-lg">
-										{t(steps[selectedStep])}
+								{/* Content over image */}
+								<div className="relative z-10 flex flex-col gap-6">
+									<div className="flex flex-row items-start justify-between gap-4 sm:gap-6">
+										<div className="font-montserrat font-semibold leading-snug text-primary sm:text-lg">
+											{t(steps[selectedStep])}
+										</div>
+										{/* Optional: show number on top as well */}
+										{/* <div className="shrink-0">{numberImages[selectedStep]}</div> */}
 									</div>
-									{/* Optional: show number on top as well */}
-									{/* <div className="shrink-0">{numberImages[selectedStep]}</div> */}
-								</div>
-								<div className="whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed sm:text-base">
-									{t(stepDescriptions[selectedStep])}
+									<div className="whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed sm:text-base">
+										{t(stepDescriptions[selectedStep])}
+									</div>
 								</div>
 							</div>
-						</div>
 
-						<div
-							className={twMerge(
-								'absolute left-0 top-0 flex h-full w-full min-h-[260px] flex-col gap-4 overflow-hidden rounded-2xl bg-white p-5 shadow-blue transition-opacity duration-700 ease-in-out',
-								'md:h-[408px]',
-								isHover ? 'opacity-100' : 'opacity-0',
-							)}
-						>
-							<div className="font-montserrat font-semibold leading-snug text-primary sm:text-lg">
-								{t(steps[selectedStep])}
-							</div>
-							<div className="flex flex-1 min-h-0 items-center justify-center">
-								<img
-									src={aboutImages[selectedStep]}
-									alt=""
-									aria-hidden="true"
-									loading="lazy"
-									className="max-h-full max-w-full object-contain"
-								/>
+							<div
+								className={twMerge(
+									'absolute inset-0 flex h-full min-h-[260px] w-full flex-col gap-4 overflow-hidden rounded-2xl bg-white p-5 shadow-blue',
+									'[backface-visibility:hidden] [transform:rotateY(180deg)]',
+								)}
+							>
+								<div className="font-montserrat font-semibold leading-snug text-primary sm:text-lg">
+									{t(steps[selectedStep])}
+								</div>
+								<div className="flex min-h-0 flex-1 items-center justify-center">
+									<img
+										src={aboutImages[selectedStep]}
+										alt=""
+										aria-hidden="true"
+										loading="lazy"
+										className="max-h-full max-w-full object-contain"
+									/>
+								</div>
 							</div>
 						</div>
 					</div>

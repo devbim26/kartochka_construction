@@ -176,6 +176,25 @@ export const getAlternateConstructions = async (data: AlternateConstructionsType
 		),
 	);
 };
+
+export const getFavoriteConstructions = async () => {
+	return await withConstructorLoader(() => fetchApi.api.constructionFavoriteConstructionList());
+};
+
+export const addFavoriteConstruction = async (constructionId: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.constructionFavoriteConstructionUpdate(constructionId),
+	);
+};
+
+export const removeFavoriteConstruction = async (constructionId: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.constructionFavoriteConstructionDelete(constructionId, {
+			constructionHeaderId: constructionId,
+		}),
+	);
+};
+
 export const reportReceiveFloor = async (id: string) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.reportReceivingFloorCreate({ reportInfoId: id }),
