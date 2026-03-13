@@ -39,7 +39,22 @@ export const SubscriptionAddEdit = () => {
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.numberOfReports?.message ? 'text-error' : '',
 				)}
-				label={formState.errors?.numberOfReports?.message || 'Количество скачиваний'}
+				label={formState.errors?.numberOfReports?.message || 'Количество отчетов'}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				type="number"
+				placeholder="Введите количество"
+			/>
+			<Input
+				{...register('numberOfDowloadReports')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.numberOfDowloadReports?.message ? 'text-error' : '',
+				)}
+				label={
+					formState.errors?.numberOfDowloadReports?.message ||
+					'Количество скачиваний'
+				}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
 				type="number"

@@ -2,8 +2,8 @@
 import { Switch, useAppDispatch, useAppSelector } from '@core';
 import {
 	convertToClientAlternateConstruction,
-	convertToClientSingleToFloorConstruction,
 	convertToClientReportInfoShort,
+	convertToClientSingleToFloorConstruction,
 } from '@features/constructor/converters';
 import {
 	getAlternateConstructions,
@@ -37,7 +37,7 @@ import { ConstructionFilters } from './construction-filters.component';
 const ContructionPick = () => {
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
-	const [showAlternate, setShowAlternate] = useState(false);
+	const [showAlternate, setShowAlternate] = useState(true);
 	const [pageNumber, setPageNumber] = useState(1);
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const reportType = search.get('reportType');
@@ -48,6 +48,7 @@ const ContructionPick = () => {
 	const [alternateConstructions, setAlternateConstructions] = useState<AlternateConstruction[]>();
 	const form = useForm<ConstructionSelectRestrictions>();
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
+	const [reportConstructionId, setReportConstructionId] = useState<string | null>(null);
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
@@ -59,9 +60,14 @@ const ContructionPick = () => {
 				tap((response) => {
 					if (response.status === 200) {
 						const reportInfo = convertToClientReportInfoShort(response.data as any);
-						const currentConstruction =
-							convertToClientSingleToFloorConstruction(response.data as any);
-						const requirement = currentConstruction?.reportConstructionHeader?.requirement;
+						const currentConstruction = convertToClientSingleToFloorConstruction(
+							response.data as any,
+						);
+						const requirement =
+							currentConstruction?.reportConstructionHeader?.requirement;
+						setReportConstructionId(
+							currentConstruction?.reportConstructionHeader?.id || null,
+						);
 
 						setCurrentReportInfo({
 							...reportInfo,
@@ -97,6 +103,9 @@ const ContructionPick = () => {
 							(rfi: any) =>
 								rfi?.reportConstructionHeader?.constructionHeaderId ===
 								constructionHeaderId,
+						);
+						setReportConstructionId(
+							currentReportFloorInfo?.reportConstructionHeader?.id || null,
 						);
 
 						const requirementDto =
@@ -270,6 +279,7 @@ const ContructionPick = () => {
 					<AlternateConstructionList
 						alternateConstructions={alternateConstructions || []}
 						reportInfo={currentReportInfo}
+						reportConstructionId={reportConstructionId}
 					/>
 				</div>
 			)}

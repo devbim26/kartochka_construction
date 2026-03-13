@@ -50,56 +50,58 @@ export const MainHeader = () => {
 			);
 	}, [reportId, reportType, navigate]);
 
+	const handleAiVisualizationRedirect = useCallback(() => {
+		navigate(
+			APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.visualization.route,
+		);
+	}, [navigate]);
+
 	const AIFeatures: FeatureCard[] = [
 		{
 			id: 'ai-assistant',
-			title: 'AI ассистент (3 режима)',
+			title: 'AI mode (3 режима)',
 			description: (
-				<span className="text-gray-700">
-					Доступ к новейшим моделям ИИ (от Open AI, Antropic, Google, китайские модели).
-				</span>
+				<div className="flex flex-col gap-3 text-gray-700">
+					<p>
+						<span className="font-semibold text-gray-800">Общий</span>
+						<br />
+						Доступ к новейшим моделям ИИ
+					</p>
+					<p>
+						<span className="font-semibold text-gray-800">Аналитика документов PDF</span>
+						<br />
+						AI проверяет, суммаризирует и структурирует документы.
+					</p>
+					<p>
+						<span className="font-semibold text-gray-800">DeepResearch</span> глубокий
+						поиск в интернете
+					</p>
+				</div>
 			),
-			features: [
-				<span key="ai-mode-1">
-					<span className="font-semibold text-gray-800">Общий</span>
-				</span>,
-				<span key="ai-mode-2">
-					<span className="font-semibold text-gray-800">Аналитика документов PDF</span>
-					<span className="text-gray-600">
-						{' '}
-						— AI проверяет, суммаризирует и структурирует документы. Выдаёт готовый
-						отчёт в DOC/Excel — для смет, ТЗ, протоколов.
-					</span>
-				</span>,
-				<span key="ai-mode-3">
-					<span className="font-semibold text-gray-800">DeepResearch</span>
-					<span className="text-gray-600"> (Perplexity Sonar Pro Search)</span>
-					<span className="text-gray-600">
-						{' '}
-						— глубокий поиск информации в интернете со ссылками на первоисточник.
-					</span>
-				</span>,
-			],
+			features: [],
 			price: 'PRO',
-			buttonText: t('common.startPro'),
+			buttonText: t('common.start'),
 			active: true,
+			onClick: handleAiVisualizationRedirect,
 		},
 		{
 			id: 'ai-visualization',
 			title: 'Визуализация фасадов и интерьеров',
 			description: (
-				<span className="text-gray-700">
-					AI-генерация изображений{' '}
-					<span className="font-semibold text-gray-800">(nano banano 2 pro)</span> с
-					кастомными настройками.
-				</span>
+				<div className="flex flex-col gap-3 text-gray-700">
+					<p>
+						<span className="font-semibold text-gray-800">AI-генерация</span> изображений
+						<br />с кастомными настройками.
+					</p>
+					<p className="italic">
+						Меняйте фасады, мебель,
+						<br />
+						положение камеры и др.
+						<br />в один клик.
+					</p>
+				</div>
 			),
-			features: [
-				<span key="ai-viz-feature">
-					Меняйте материалы, мебель, положение камеры и др.{' '}
-					<span className="font-semibold">в один клик</span>.
-				</span>,
-			],
+			features: [],
 			price: 'PRO',
 			buttonText: t('common.startPro'),
 			active: true,
@@ -108,24 +110,25 @@ export const MainHeader = () => {
 			id: 'project-expertise',
 			title: 'Экспертиза проекта (2 режима)',
 			description: (
-				<span className="text-gray-700">Проверка проекта по выбранному сценарию.</span>
-			),
-			features: [
-				<div key="expertise-general" className="text-gray-700">
-					<span className="font-semibold text-gray-800">Общая экспертиза</span>
-					<ul className="mt-1 list-disc space-y-1 pl-4 text-gray-600">
-						<li>Проверяет общую структуру проекта</li>
-						<li>Проверяет проект на соответствие актуальным ТНПА</li>
-						<li>Проверка проекта по внутренним требованиям</li>
-					</ul>
-				</div>,
-				<div key="expertise-sound" className="text-gray-700">
-					<span className="font-semibold text-gray-800">Экспертиза звукоизоляции</span>
-					<div className="mt-1 text-gray-600">
-						Анализ заложенных в проекте решений по звукоизоляции.
+				<div className="flex flex-col gap-3 text-gray-700">
+					<div>
+						<span className="font-semibold text-gray-800">"Общая экспертиза"</span>
+						<div className="italic text-gray-600">
+							- Проверяет общую структуру проекта;
+							<br />- Проверяет проект на соответствие актуальным ТНПА.
+						</div>
 					</div>
-				</div>,
-			],
+					<div>
+						<span className="font-semibold text-gray-800">
+							"Экспертиза звукоизоляции"
+						</span>
+						<div className="italic text-gray-600">
+							Анализ заложенных в проекте решений по звукоизоляции.
+						</div>
+					</div>
+				</div>
+			),
+			features: [],
 			price: 'PRO',
 			buttonText: t('common.startPro'),
 			active: true,
@@ -134,16 +137,17 @@ export const MainHeader = () => {
 			id: 'normative-analytics',
 			title: 'Аналитика нормативной документации',
 			description: (
-				<span className="text-gray-700">
-					Выполняет глубокий анализ нормативных документов (СН, СП и др.).
-				</span>
+				<div className="flex flex-col gap-3 text-gray-700">
+					<p className="font-semibold text-gray-800">
+						Выполняет глубокий анализ нормативных документов (СН, СП и др.)
+					</p>
+					<p className="italic">
+						Задавайте любые вопросы, система создаст отчет с прямыми ссылками на пункты
+						и страницы документов
+					</p>
+				</div>
 			),
-			features: [
-				<span key="norm-analytics-feature" className="text-gray-700">
-					Задавайте любые вопросы — система создаст отчёт с прямыми ссылками на пункты и
-					страницы документов.
-				</span>,
-			],
+			features: [],
 			price: 'PRO',
 			buttonText: t('common.startPro'),
 			active: true,
@@ -153,9 +157,16 @@ export const MainHeader = () => {
 	const features: FeatureCard[] = [
 		{
 			id: 'sound-isolation',
-			title: t('main.cards.sound.title'),
-			description: t('main.cards.sound.desc'),
-			features: [t('main.cards.sound.feature0')],
+			title: 'Расчет звукоизоляции стен и перекрытий',
+			description: (
+				<div className="flex flex-col gap-1">
+					<p>по СП 02.04.03-2023</p>
+					<p className="italic">
+						Генерирует PDF-отчет с формулами, готовый к подаче на экспертизу.
+					</p>
+				</div>
+			),
+			features: [],
 			price: 'FREE',
 			buttonText: reportId && reportType ? t('common.continue') : t('common.start'),
 			active: true,
@@ -163,9 +174,16 @@ export const MainHeader = () => {
 		},
 		{
 			id: 'heat-isolation',
-			title: t('main.cards.heat.title'),
-			description: t('main.cards.heat.desc'),
-			features: [t('main.cards.heat.feature0')],
+			title: 'Расчет теплоизоляции стен',
+			description: (
+				<div className="flex flex-col gap-1">
+					<p>по СП 2.04.01-2020</p>
+					<p className="italic">
+						Генерирует PDF-отчет с формулами, готовый к подаче на экспертизу.
+					</p>
+				</div>
+			),
+			features: [],
 			price: 'PRO',
 			buttonText: t('common.startPro'),
 		},
@@ -213,7 +231,7 @@ export const MainHeader = () => {
 						>
 							<div className="mb-3 flex-1 overflow-hidden">
 								<div className="mb-2 flex items-start justify-between">
-									<h3 className="text-[15px] font-bold text-gray-800">
+									<h3 className="text-[20px] font-bold text-gray-800">
 										{feature.title}
 									</h3>
 								</div>
@@ -223,15 +241,15 @@ export const MainHeader = () => {
 										<MainSliderLogo className="size-20" />
 									</div>
 									<div className="flex flex-col">
-										<p className="text-xs text-gray-600">
+										<div className="text-[17px] text-gray-600">
 											{feature.description}
-										</p>
+										</div>
 										<div className="mb-4 flex-1 overflow-auto">
 											<ul className="space-y-1 pr-1">
 												{feature.features.map((item, index) => (
 													<li
 														key={index}
-														className="text-xs leading-snug text-gray-600"
+														className="text-[17px] leading-snug text-gray-600"
 													>
 														• {item}
 													</li>
@@ -241,21 +259,14 @@ export const MainHeader = () => {
 									</div>
 								</div>
 							</div>
-							<div className="flex w-full justify-between">
-								<button
-									onClick={() => handleFeatureClick(feature.id)}
-									className={twMerge(
-										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
-									)}
-								>
-									{t('common.free')}
-								</button>
+							<div className="flex w-full justify-end">
 								<button
 									onClick={feature.onClick}
 									className={twMerge(
-										'mt-auto w-fit cursor-default self-end rounded-lg bg-gray-text px-3 py-2 text-xs font-semibold text-white transition-colors',
-
-										'cursor-pointer bg-primary hover:bg-blue-700',
+										'mt-auto w-fit self-end rounded-lg px-3 py-2 text-xs font-semibold text-white transition-colors',
+										feature.id === 'heat-isolation'
+											? 'cursor-default bg-gray-text'
+											: 'cursor-pointer bg-primary hover:bg-blue-700',
 									)}
 								>
 									{feature.buttonText}
@@ -295,7 +306,7 @@ export const MainHeader = () => {
 						>
 							<div className="mb-3 flex-1 overflow-hidden">
 								<div className="mb-2 flex items-start justify-between">
-									<h3 className="text-[15px] font-bold text-gray-800">
+									<h3 className="text-[20px] font-bold text-gray-800">
 										{feature.title}
 									</h3>
 								</div>
@@ -305,15 +316,15 @@ export const MainHeader = () => {
 										<MainSliderLogo className="size-20" />
 									</div>
 									<div className="flex flex-col">
-										<p className="text-xs text-gray-600">
+										<div className="text-[17px] text-gray-600">
 											{feature.description}
-										</p>
+										</div>
 										<div className="mb-4 flex-1 overflow-auto">
 											<ul className="space-y-1 pr-1">
 												{feature.features.map((item, index) => (
 													<li
 														key={index}
-														className="text-xs leading-snug text-gray-600"
+														className="text-[17px] leading-snug text-gray-600"
 													>
 														• {item}
 													</li>
@@ -323,6 +334,16 @@ export const MainHeader = () => {
 									</div>
 								</div>
 							</div>
+							{feature.id === 'ai-assistant' && (
+								<div className="flex w-full justify-end">
+									<button
+										onClick={feature.onClick}
+										className="mt-auto w-fit self-end rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+									>
+										{feature.buttonText}
+									</button>
+								</div>
+							)}
 						</div>
 					</CarouselSlide>
 				))}

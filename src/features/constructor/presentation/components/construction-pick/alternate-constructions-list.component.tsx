@@ -5,15 +5,23 @@ import { AlternateConstructionCard } from './alternate-construction-card.compone
 type Props = {
 	alternateConstructions: AlternateConstruction[];
 	reportInfo: ReportInfoShort;
+	reportConstructionId: string | null;
 };
 
-export const AlternateConstructionList = ({ alternateConstructions, reportInfo }: Props) => {
+export const AlternateConstructionList = ({
+	alternateConstructions,
+	reportInfo,
+	reportConstructionId,
+}: Props) => {
 	return (
 		<div className="flex h-fit w-full gap-[10px]">
 			{alternateConstructions.map((altConst) => (
-				<>
-					<AlternateConstructionCard construction={altConst} reportInfo={reportInfo} />
-				</>
+				<AlternateConstructionCard
+					key={altConst.id}
+					construction={altConst}
+					reportInfo={reportInfo}
+					reportConstructionId={reportConstructionId}
+				/>
 			))}
 		</div>
 	);

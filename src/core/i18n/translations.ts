@@ -359,6 +359,7 @@ export const en = {
 
 	'main.currentSub.title': 'Service plan',
 	'main.currentSub.remainingDownloads': 'downloads left',
+	'main.currentSub.remainingReports': 'reports left',
 	'main.currentSub.price': 'price',
 	'main.currentSub.changePlan': 'Change plan',
 	'main.currentSub.noneActive': 'No active plan',
@@ -1124,6 +1125,7 @@ export const ru: Record<TranslationKey, string> = {
 
 	'main.currentSub.title': 'Пакет услуг',
 	'main.currentSub.remainingDownloads': 'осталось скачиваний',
+	'main.currentSub.remainingReports': 'осталось отчетов',
 	'main.currentSub.price': 'цена',
 	'main.currentSub.changePlan': 'Изменить пакет',
 	'main.currentSub.noneActive': 'Нет активного пакета',

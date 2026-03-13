@@ -3,7 +3,13 @@ import { SubscriptionFiltersSchema, SubscriptionSchema } from './validation';
 
 export const SubscriptionAddAndEditConfig: EntityConfig = {
 	schema: SubscriptionSchema,
-	defaultValues: { name: '', price: '', numberOfReports: '', description: '' },
+	defaultValues: {
+		name: '',
+		price: '',
+		numberOfReports: '',
+		numberOfDowloadReports: '',
+		description: '',
+	},
 };
 
 export const SubscriptionFilterConfig: EntityConfig = {

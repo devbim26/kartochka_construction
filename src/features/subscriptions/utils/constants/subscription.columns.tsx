@@ -19,6 +19,12 @@ export const subscriptionColumns: ColumnDef<Subscription>[] = [
 	{
 		id: 'numberOfReports',
 		accessorKey: 'numberOfReports',
+		header: () => <SimpleTableHeaderCell text={'Количество отчетов'} />,
+		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+	},
+	{
+		id: 'numberOfDowloadReports',
+		accessorKey: 'numberOfDowloadReports',
 		header: () => <SimpleTableHeaderCell text={'Количество скачиваний'} />,
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 	},

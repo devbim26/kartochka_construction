@@ -63,8 +63,9 @@ export const CurrentSub = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200 && response.data) {
+					const activeSubscriptionId = (response.data as any).userSubscriptionId;
 					const activeSub = subscriptions.find(
-						(sub) => sub.id === (response.data as any).subscriptionId, // TODO: remove `any`
+						(sub) => sub.id === activeSubscriptionId, // TODO: remove `any`
 					);
 					setSubscription(activeSub);
 				}
@@ -97,12 +98,6 @@ export const CurrentSub = () => {
 							</div>
 							<div className="flex flex-row">
 								<p className="mr-[5px] font-sans text-lg font-normal leading-4">
-									{t('main.currentSub.remainingDownloads')}:{' '}
-									{userData.data?.expiresAt}
-								</p>
-							</div>
-							<div className="flex flex-row">
-								<p className="mr-[5px] font-sans text-lg font-normal leading-4">
 									{t('main.currentSub.price')}: {subscription.price}
 								</p>
 							</div>
@@ -118,7 +113,18 @@ export const CurrentSub = () => {
 							</p>
 						</Button>
 					</div>
-					<SubImage />
+					<div className="flex flex-col items-end justify-between">
+						<SubImage />
+						<div className="mt-[20px] flex flex-col items-end gap-[8px] text-sm">
+							<div className="rounded-md bg-background-secondary px-[10px] py-[6px]">
+								{t('main.currentSub.remainingReports')}: {userData.data?.reportsNumber ?? 0}
+							</div>
+							<div className="rounded-md bg-background-secondary px-[10px] py-[6px]">
+								{t('main.currentSub.remainingDownloads')}:{' '}
+								{userData.data?.dowloadReportsNumber ?? 0}
+							</div>
+						</div>
+					</div>
 				</div>
 			) : (
 				<div className="flex flex-row justify-between">

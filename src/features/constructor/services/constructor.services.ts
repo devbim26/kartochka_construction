@@ -130,6 +130,14 @@ export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {
 export const updateReportFloor = async ({ data }: UpdateFloorReportProps) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorConstructionUpdate(data));
 };
+export const swapToAlternateFloorConstruction = async (data: {
+	reportConstructionId?: string;
+	alternativeConstructionHeaderId?: string;
+}) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoFloorSwapByAlternativeUpdate(data),
+	);
+};
 export const uploadDocument = async ({ data }: FloorDocumentUpload) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorDocumentUpdate(data));
 };

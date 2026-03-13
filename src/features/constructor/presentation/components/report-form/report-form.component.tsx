@@ -162,7 +162,8 @@ const ReportFromComponent = () => {
 					<DocumentFlags />
 					<div className="flex w-full items-center justify-end gap-[50px]">
 						<p>
-							{t('constructor.reportForm.remainingReports')}: {userData.data?.expiresAt || 0}
+							{t('constructor.reportForm.remainingReports')}:{' '}
+							{userData.data?.reportsNumber || 0}
 						</p>
 						<Button onClick={handleDownloadReport} disabled={isLoading || isSubmitting}>
 							{t('common.download')}

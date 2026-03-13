@@ -1,5 +1,8 @@
 import { Button, FormElementLabel, useAppDispatch } from '@core';
-import { svgConstructionDetail } from '@features/constructor/services';
+import {
+	svgConstructionDetail,
+	swapToAlternateFloorConstruction,
+} from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
 import type { ReportInfoShort } from '@features/constructor/utils';
 import { formatMaterial } from '@features/constructor/utils';
@@ -24,9 +27,14 @@ import {
 type Props = {
 	construction: AlternateConstruction;
 	reportInfo: ReportInfoShort;
+	reportConstructionId: string | null;
 };
 
-export const AlternateConstructionCard = ({ construction, reportInfo }: Props) => {
+export const AlternateConstructionCard = ({
+	construction,
+	reportInfo,
+	reportConstructionId,
+}: Props) => {
 	const dispatch = useAppDispatch();
 
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
@@ -112,6 +120,30 @@ export const AlternateConstructionCard = ({ construction, reportInfo }: Props) =
 			});
 	}, [construction, svgUrl]);
 
+	const handleUseInReport = () => {
+		if (!reportConstructionId || !construction?.id) return;
+		dispatch(startLoading());
+		from(
+			swapToAlternateFloorConstruction({
+				reportConstructionId,
+				alternativeConstructionHeaderId: construction.id,
+			}),
+		)
+			.pipe(
+				tap((response) => {
+					if (response?.status === 200) {
+						toast.success('Конструкция установлена как базовая');
+					}
+				}),
+				catchError((error) => {
+					console.error('Ошибка запроса:', error);
+					toast.error('Не удалось использовать конструкцию в отчете');
+					return of(null);
+				}),
+			)
+			.subscribe(() => dispatch(stopLoading()));
+	};
+
 	return (
 		<div className="flex w-1/2 flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
 			<div className="flex w-full items-center justify-between">
@@ -120,12 +152,11 @@ export const AlternateConstructionCard = ({ construction, reportInfo }: Props) =
 				</p>
 				<Button
 					className="h-[40px] w-fit self-end bg-white px-[16px] font-sans text-sm font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-primary enabled:hover:text-white"
-					onClick={() => {}}
+					onClick={handleUseInReport}
 				>
-					Сделать базовой
+					Использовать в отчете
 				</Button>
 			</div>
-
 			<div className="flex w-full items-center gap-[20px]">
 				<div className="flex items-center gap-[20px]">
 					<img
@@ -138,7 +169,6 @@ export const AlternateConstructionCard = ({ construction, reportInfo }: Props) =
 					{construction.issuer.name}
 				</p>
 			</div>
-
 			<div className="flex size-fit">
 				{svgUrl && <img className="h-full w-[200px]" src={svgUrl} alt="SVG Construction" />}
 				<div className="flex w-fit flex-col">
@@ -153,7 +183,6 @@ export const AlternateConstructionCard = ({ construction, reportInfo }: Props) =
 					))}
 				</div>
 			</div>
-
 			<div className="flex w-full flex-col gap-[10px]">
 				<FormElementLabel className="text-left font-sans font-semibold leading-6 text-primary">
 					Технические параметры
@@ -198,10 +227,6 @@ export const AlternateConstructionCard = ({ construction, reportInfo }: Props) =
 				<GeneralInformationThermal />
 				<GeneralInformationFireResistance />
 			</div>
-
-			<Button variant="primary" className="self-end" onClick={() => {}}>
-				Добавить в отчет
-			</Button>
 		</div>
 	);
 };

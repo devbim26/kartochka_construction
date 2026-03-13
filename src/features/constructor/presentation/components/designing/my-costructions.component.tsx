@@ -1,13 +1,13 @@
 import {
-	Button,
-	ChevronIcon,
+	Carousel,
+	CarouselSlide,
 	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
 	useI18n,
 } from '@core';
 import type { FloorConstruction, GraphDetailResponse, ReportInfoShort } from '@features';
-import { formatMaterial, ReportCategory, startLoading, stopLoading } from '@features';
+import { ReportCategory, startLoading, stopLoading } from '@features';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
 import {
@@ -25,30 +25,28 @@ import {
 	getReportSingleById,
 	graphDetail,
 	removeFavoriteConstruction,
+	swapToAlternateFloorConstruction,
 } from '@features/constructor/services';
-import {
-	convertToClientConstructionsEditData,
-	convertToClientIssuerData,
-} from '@features/guidbooks/converters';
-import { FormSubTitle } from '@features/guidbooks/presentation/components/header/form-sub-title.component';
+import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import type { ConstructionsEditData, Issuer } from '@features/guidbooks/types';
+import type { ConstructionsEditData } from '@features/guidbooks/types';
 import { Guidebooks } from '@features/guidbooks/types';
 
-import type { IssuerDto } from '@api-gen';
 import { AxiosError } from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
+import { CurrentConstructionCard } from './current-construction-card.component';
 import DesigningGraph from './designing-graph.component';
 import { DesigningHeader } from './designing-header.component';
+import { FavoriteConstructionCard } from './favorite-construction-card.component';
 
 type FavoriteConstruction = {
 	id?: string | null;
-	constructionId?: string | null;
 	name?: string | null;
 	description?: string | null;
+	issuerLogo?: string | null;
 };
 
 const MyConstructions = () => {
@@ -58,7 +56,6 @@ const MyConstructions = () => {
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
-	const [issuer, setIssuer] = useState<Issuer | null>(null);
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 	const [compIsRelevant, setCompIsRelevant] = useState<boolean>(false);
 	const [labIsRelevant, setLabIsRelevant] = useState<boolean>(false);
@@ -68,7 +65,6 @@ const MyConstructions = () => {
 	const reportType = search.get('reportType');
 	const constructionHeaderId = search.get('constructionHeaderId');
 	const [favoriteConstructions, setFavoriteConstructions] = useState<FavoriteConstruction[]>([]);
-	const [favoritesOffset, setFavoritesOffset] = useState(0);
 	const navigate = useAppNavigate();
 
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
@@ -76,12 +72,7 @@ const MyConstructions = () => {
 	const dispatch = useAppDispatch();
 	const { t, locale } = useI18n();
 
-	const favoritesPerSlide = 4;
-	const favoritesCount = favoriteConstructions.length;
-	const favoriteMaxOffset = Math.max(0, favoritesCount - favoritesPerSlide);
-
-	const getFavoriteHeaderId = (item: FavoriteConstruction) =>
-		item.constructionId || item.id || '';
+	const getFavoriteHeaderId = (item: FavoriteConstruction) => item.id || '';
 
 	const currentHeaderId = constructionHeaderId || '';
 
@@ -90,14 +81,14 @@ const MyConstructions = () => {
 		[favoriteConstructions, currentHeaderId],
 	);
 
-	const currentFavoriteSlice = useMemo(
-		() => favoriteConstructions.slice(favoritesOffset, favoritesOffset + favoritesPerSlide),
-		[favoriteConstructions, favoritesOffset],
+	const visibleFavoriteConstructions = useMemo(
+		() =>
+			favoriteConstructions.filter(
+				(item) =>
+					!!getFavoriteHeaderId(item) && getFavoriteHeaderId(item) !== currentHeaderId,
+			),
+		[favoriteConstructions, currentHeaderId],
 	);
-
-	useEffect(() => {
-		setFavoritesOffset((prev) => Math.min(prev, favoriteMaxOffset));
-	}, [favoriteMaxOffset]);
 
 	const handleGetCurrentConstructionReportHeader = (id: string) => {
 		dispatch(startLoading());
@@ -157,7 +148,7 @@ const MyConstructions = () => {
 			if (!reportFloorInfoId) return;
 			handleGetCurrentConstructionReportHeader(reportFloorInfoId);
 		}
-	}, [search]);
+	}, [reportType, reportId, reportFloorInfoId]);
 
 	const handleGetReportConstruction = (id: string) => {
 		dispatch(startLoading());
@@ -182,7 +173,7 @@ const MyConstructions = () => {
 	useEffect(() => {
 		if (!constructionHeader?.id) return;
 		handleGetReportConstruction(constructionHeader!.id!);
-	}, [constructionHeader]);
+	}, [constructionHeader?.id]);
 
 	const handleGetCurrentReportFloorInfo = (id: string) => {
 		dispatch(startLoading());
@@ -246,11 +237,6 @@ const MyConstructions = () => {
 	}, [reportId, constructionHeaderId]);
 
 	useEffect(() => {
-		if (!constructionHeader?.issuer) return;
-		handleGetIssuerByHeaderId(constructionHeader.issuer);
-	}, [constructionHeader?.issuer]);
-
-	useEffect(() => {
 		if (!userId) return;
 		handleGetFavoriteConstructions();
 	}, [userId]);
@@ -291,25 +277,7 @@ const MyConstructions = () => {
 			setLabIsRelevant(labRwValue >= requiredRw);
 			setCompIsRelevant(rwValue >= requiredRw);
 		}
-	}, [constructionHeader, currentReportInfo]);
-
-	const handleGetIssuerByHeaderId = (id: string) => {
-		dispatch(startLoading());
-		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.ISSUER }))
-			.pipe(
-				tap((response) => {
-					if (response.status === 200) {
-						setIssuer(convertToClientIssuerData(response.data as IssuerDto));
-					}
-				}),
-				catchError((error) => {
-					console.error('Request error:', error);
-					toast.error(t('errors.constructionLoad'));
-					return of(null);
-				}),
-			)
-			.subscribe(() => dispatch(stopLoading()));
-	};
+	}, [constructionHeader, currentConstruction]);
 
 	useEffect(() => {
 		if (!constructionHeaderId) return;
@@ -372,143 +340,102 @@ const MyConstructions = () => {
 			.subscribe();
 	};
 
-	const leftMaterials = constructionHeader?.constructionTypeObject?.leftConstruction || [];
-	const centerMaterials = constructionHeader?.constructionTypeObject?.centerConstruction || [];
-	const rightMaterials = constructionHeader?.constructionTypeObject?.rightConstruction || [];
-	if (isLoading) {
-		return (
-			<div className="flex size-full items-center justify-center">
-				<Loader />
-			</div>
-		);
-	}
+	const handleSwapByAlternative = (alternativeConstructionHeaderId: string) => {
+		const reportConstructionId = currentConstruction?.reportConstructionHeader?.id;
+		if (!reportConstructionId || !alternativeConstructionHeaderId) return;
+		if (reportType !== ReportCategory.Floor) {
+			toast.error(
+				locale === 'ru'
+					? 'Смена базовой через альтернативу доступна только для этажного отчета'
+					: 'Swap by alternative is available only for floor report',
+			);
+			return;
+		}
+
+		dispatch(startLoading());
+		from(
+			swapToAlternateFloorConstruction({
+				reportConstructionId,
+				alternativeConstructionHeaderId,
+			}),
+		)
+			.pipe(
+				tap((response) => {
+					if (response?.status === 200) {
+						toast.success(
+							locale === 'ru'
+								? 'Конструкция установлена как базовая'
+								: 'Construction set as base',
+						);
+						openFavoriteConstruction(alternativeConstructionHeaderId);
+					}
+				}),
+				catchError((error) => {
+					console.error('Request error:', error);
+					toast.error(t('errors.request'));
+					return of(null);
+				}),
+				finalize(() => dispatch(stopLoading())),
+			)
+			.subscribe();
+	};
+
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
 			<DesigningHeader />
-			<div className="flex h-[428px] w-full flex-row gap-[20px] rounded-[20px] bg-white px-[44px] py-[34px]">
-				<div className="flex gap-[60px]">
-					<div className="flex flex-col">
-						<Button
-							className="h-[40px] w-[190px] px-[16px] text-[16px]"
-							onClick={() => handleToggleFavorite(currentHeaderId, isCurrentFavorite)}
-							disabled={!currentHeaderId}
-						>
-							{isCurrentFavorite
-								? locale === 'ru'
-									? 'Удалить из избранного'
-									: 'Remove from favorites'
-								: locale === 'ru'
-									? 'Добавить в избранное'
-									: 'Add to favorites'}
-						</Button>
-					</div>
-					<div className="rounded-lg border border-blue-500 p-[20px]">
-						<FormSubTitle text={t('constructor.myConstructions.construction1')} />
-						<div className="rounded-lg border border-blue-500 p-[20px]">
-							<FormSubTitle text={t('constructor.myConstructions.construction1')} />
-							<div className="flex flex-col">
-								{leftMaterials
-									?.slice()
-									.sort((a, b) => Number(a.positionId) - Number(b.positionId))
-									.map((material, index) => (
-										<p key={`left-${index}`} className="text-[16px]">
-											- {formatMaterial(material, locale)}
-										</p>
-									))}
-
-								{centerMaterials
-									?.slice()
-									.sort((a, b) => Number(a.positionId) - Number(b.positionId))
-									.map((material, index) => (
-										<p key={`center-${index}`} className="text-[16px]">
-											- {formatMaterial(material, locale)}
-										</p>
-									))}
-
-								{rightMaterials
-									?.slice()
-									.sort((a, b) => Number(a.positionId) - Number(b.positionId))
-									.map((material, index) => (
-										<p key={`right-${index}`} className="text-[16px]">
-											- {formatMaterial(material, locale)}
-										</p>
-									))}
-							</div>
-						</div>
-					</div>
-					<div className="flex flex-col">
-						{issuer?.logoUrl && (
-							<img
-								src={issuer?.logoUrl}
-								alt={t('constructor.myConstructions.imagePreview')}
-								className="h-[66px] w-[140px] rounded-md object-cover"
-							/>
-						)}
-						<p>
-							{issuer?.name}: {issuer?.webSite}
-						</p>
-						<div className="flex items-center gap-[20px]">
-							<Button
-								variant="primary"
-								className="p-[10px]"
-								disabled={favoritesOffset <= 0}
-								onClick={() => setFavoritesOffset((prev) => Math.max(0, prev - 1))}
-							>
-								<ChevronIcon className="rotate-90" fill="white" />
-							</Button>
-							<Button
-								variant="primary"
-								className="p-[10px]"
-								disabled={favoritesOffset >= favoriteMaxOffset}
-								onClick={() =>
-									setFavoritesOffset((prev) =>
-										Math.min(favoriteMaxOffset, prev + 1),
-									)
-								}
-							>
-								<ChevronIcon className="-rotate-90" fill="white" />
-							</Button>
-						</div>
-					</div>
+			{isLoading && (
+				<div className="flex w-full items-center justify-center">
+					<Loader />
 				</div>
-				<div className="min-w-[320px] border-l border-gray-200 pl-[20px]">
+			)}
+			<div className="flex w-full flex-row gap-[24px] rounded-[20px] bg-white px-[24px] py-[20px]">
+				<div className="w-[560px]">
+					<p className="mb-[10px] text-[18px] font-semibold">
+						{locale === 'ru' ? 'Текущая конструкция' : 'Current construction'}
+					</p>
+					<CurrentConstructionCard
+						constructionHeaderId={currentHeaderId}
+						locale={locale}
+						isFavorite={isCurrentFavorite}
+						onToggleFavorite={handleToggleFavorite}
+					/>
+				</div>
+				<div className="min-w-[620px] border-l border-gray-200 pl-[20px]">
 					<p className="mb-[12px] text-[18px] font-semibold">
 						{locale === 'ru' ? 'Избранные конструкции' : 'Favorite constructions'}
 					</p>
-					<div className="flex max-h-[330px] flex-col gap-[8px] overflow-auto pr-[4px]">
-						{currentFavoriteSlice.map((favorite) => {
-							const favoriteHeaderId = getFavoriteHeaderId(favorite);
-							const selected = favoriteHeaderId === currentHeaderId;
-							return (
-								<div
-									key={favoriteHeaderId}
-									className="flex items-center justify-between gap-[8px] rounded-md border border-gray-200 p-[8px]"
-								>
-									<button
-										type="button"
-										className={`text-left text-[14px] ${selected ? 'font-semibold text-primary' : ''}`}
-										onClick={() => openFavoriteConstruction(favoriteHeaderId)}
+					{visibleFavoriteConstructions.length ? (
+						<Carousel options={{ align: 'start', loop: true, active: true }}>
+							{visibleFavoriteConstructions.map((favorite) => {
+								const favoriteHeaderId = getFavoriteHeaderId(favorite);
+								const selected = favoriteHeaderId === currentHeaderId;
+
+								return (
+									<CarouselSlide
+										key={favoriteHeaderId}
+										className="basis-1/1 px-2"
 									>
-										{favorite.description || favorite.name || favoriteHeaderId}
-									</button>
-									<Button
-										variant="primary"
-										className="h-[30px] px-[10px] text-[12px]"
-										onClick={() => handleToggleFavorite(favoriteHeaderId, true)}
-									>
-										{locale === 'ru' ? 'Удалить' : 'Remove'}
-									</Button>
-								</div>
-							);
-						})}
-						{!currentFavoriteSlice.length && (
-							<p className="text-[14px] text-input-label-primary">
-								{locale === 'ru'
-									? 'Избранных конструкций пока нет'
-									: 'No favorite constructions yet'}
-							</p>
-						)}
-					</div>
+										<FavoriteConstructionCard
+											id={favoriteHeaderId}
+											name={favorite.name}
+											description={favorite.description}
+											locale={locale}
+											isSelected={selected}
+											onOpen={openFavoriteConstruction}
+											onRemove={(id) => handleToggleFavorite(id, true)}
+											onMakeBase={handleSwapByAlternative}
+										/>
+									</CarouselSlide>
+								);
+							})}
+						</Carousel>
+					) : (
+						<p className="text-[14px] text-input-label-primary">
+							{locale === 'ru'
+								? 'Избранных конструкций пока нет'
+								: 'No favorite constructions yet'}
+						</p>
+					)}
 				</div>
 			</div>
 			<div className="flex w-full gap-[72px] rounded-[20px] bg-white px-[25px] py-[27px]">

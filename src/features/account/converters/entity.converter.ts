@@ -21,4 +21,6 @@ export const convertToClientAccountData = (data: AccountDto): AccountData => ({
 	bankIdNumber: data.bankIdNumber!,
 	role: { id: data.role!.id!, name: data.role!.name! },
 	roleId: data.role!.id!,
+	reportsNumber: data.reportsNumber ?? 0,
+	dowloadReportsNumber: data.dowloadReportsNumber ?? 0,
 });

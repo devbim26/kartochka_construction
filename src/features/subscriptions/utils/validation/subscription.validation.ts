@@ -9,6 +9,11 @@ export const SubscriptionSchema = z.object({
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => Number.isInteger(+value), 'Значение должно быть целым числом')
 		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	numberOfDowloadReports: z
+		.string()
+		.min(1, 'Поле обязательно для заполнения')
+		.refine((value) => Number.isInteger(+value), 'Значение должно быть целым числом')
+		.refine((value) => +value >= 0, 'Значение должно быть больше или равно нулю'),
 	price: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')

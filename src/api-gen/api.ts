@@ -26,7 +26,9 @@ export interface AccountDto {
 	logoUrl?: string | null;
 	role?: UserRole;
 	/** @format int32 */
-	expiresAt?: number;
+	reportsNumber?: number;
+	/** @format int32 */
+	dowloadReportsNumber?: number;
 }
 
 export interface AdditionalGraphParametersDto {
@@ -395,7 +397,8 @@ export interface CreateSubscriptionCommand {
 	price?: number;
 	/** @format int32 */
 	numberOfReports?: number;
-	shortDescriptions?: ShortDescriptionDto[] | null;
+	/** @format int32 */
+	numberOfDowloadReports?: number;
 }
 
 export interface CreateUserMaterialDto {
@@ -1311,11 +1314,6 @@ export interface SendSmsCommand {
 	phoneNumber: string | null;
 }
 
-export interface ShortDescriptionDto {
-	name?: string | null;
-	dashed?: boolean;
-}
-
 export interface SingleConstructionInfoDto {
 	reportConstructionHeader?: ReportConstructionDto;
 }
@@ -1349,7 +1347,8 @@ export interface SubscriptionDto {
 	price?: number;
 	/** @format int32 */
 	numberOfReports?: number;
-	shortDescriptions?: ShortDescriptionDto[] | null;
+	/** @format int32 */
+	numberOfDowloadReports?: number;
 }
 
 export interface SubscriptionDtoPaginatedList {
@@ -1364,6 +1363,13 @@ export interface SubscriptionDtoPaginatedList {
 	pageSize?: number;
 	hasPreviousPage?: boolean;
 	hasNextPage?: boolean;
+}
+
+export interface SwapConstructionHeaderCommand {
+	/** @format uuid */
+	reportConstructionId?: string;
+	/** @format uuid */
+	alternativeConstructionHeaderId?: string;
 }
 
 export interface ThermalInsulationFloorReportInfoFlagsDto {
@@ -1474,7 +1480,8 @@ export interface UpdateSubscriptionCommand {
 	price?: number;
 	/** @format int32 */
 	numberOfReports?: number;
-	shortDescriptions?: ShortDescriptionDto[] | null;
+	/** @format int32 */
+	numberOfDownloadReports?: number;
 }
 
 export interface UserMaterialDto {
@@ -2955,6 +2962,26 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				method: 'PUT',
 				body: data,
 				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoFloorSwapByAlternativeUpdate
+		 * @request PUT:/api/ReportInfo/floor/swapByAlternative
+		 */
+		reportInfoFloorSwapByAlternativeUpdate: (
+			data: SwapConstructionHeaderCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<FloorConstructionInfoDto, any>({
+				path: `/api/ReportInfo/floor/swapByAlternative`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
 				format: 'json',
 				...params,
 			}),
