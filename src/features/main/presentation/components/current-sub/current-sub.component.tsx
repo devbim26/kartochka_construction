@@ -12,6 +12,11 @@ import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { SubImage } from './images';
 
+type ActiveSubscriptionResponse = {
+	subscriptionId?: string;
+	userSubscriptionId?: string;
+};
+
 export const CurrentSub = () => {
 	const [subscription, setSubscription] = useState<Subscription>();
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
@@ -63,9 +68,11 @@ export const CurrentSub = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200 && response.data) {
-					const activeSubscriptionId = (response.data as any).userSubscriptionId;
+					const activeData = response.data as ActiveSubscriptionResponse;
+					const activeSubscriptionId =
+						activeData.subscriptionId || activeData.userSubscriptionId || '';
 					const activeSub = subscriptions.find(
-						(sub) => sub.id === activeSubscriptionId, // TODO: remove `any`
+						(sub) => sub.id === activeSubscriptionId,
 					);
 					setSubscription(activeSub);
 				}
