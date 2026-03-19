@@ -26,10 +26,9 @@ import { ConstructionImage } from './construction-info-image.component';
 
 type Props = {
 	constructionSheets?: ConstructionSheet[];
-	reportFloorInfoId?: string;
 };
 
-export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Props) => {
+export const ConstructionSheets = ({ constructionSheets }: Props) => {
 	const { t, locale } = useI18n();
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
@@ -160,7 +159,8 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 															reportType: search.get('reportType')!,
 															constructionHeaderId:
 																info.row.original.constructionId,
-															reportFloorInfoId: reportFloorInfoId!,
+															reportFloorInfoId:
+																info.row.original.reportFloorInfoId!,
 														},
 													)
 												}
@@ -189,6 +189,8 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 															reportType: search.get('reportType')!,
 															constructionHeaderId:
 																info.row.original.constructionId,
+															reportFloorInfoId:
+																info.row.original.reportFloorInfoId!,
 														},
 													)
 												}
@@ -211,7 +213,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 																reportType:
 																	search.get('reportType')!,
 																reportFloorInfoId:
-																	reportFloorInfoId!,
+																	info.row.original.reportFloorInfoId!,
 															})
 														: navigate('', {
 																info: 'true',
@@ -232,6 +234,8 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 														edit: 'true',
 														reportId: search.get('reportId')!,
 														reportType: search.get('reportType')!,
+														reportFloorInfoId:
+															info.row.original.reportFloorInfoId!,
 													});
 												}}
 											/>
@@ -256,7 +260,7 @@ export const ConstructionSheets = ({ constructionSheets, reportFloorInfoId }: Pr
 			},
 		];
 		return cols;
-	}, [reportFloorInfoId, t, navigate, search, reportType]);
+	}, [t, navigate, search, reportType]);
 
 	return (
 		<div className="flex-col overflow-x-auto">

@@ -68,8 +68,12 @@ interface CreateConstructionFormProps {
 	onSuccess?: () => void;
 	x?: number;
 	y?: number;
+	x2?: number;
+	y2?: number;
 	page?: number;
 	floorId?: string;
+	reportFloorInfoId?: string;
+	floorNumber?: string;
 }
 
 interface RoomRequirementMap {
@@ -82,7 +86,7 @@ interface RoomRequirementMap {
 
 export const CreateConstructionForm = memoize(
 	forwardRef<CreateConstructionFormHandle, CreateConstructionFormProps>(
-		({ onSuccess, x, y, page, floorId }, ref) => {
+		({ onSuccess, x, y, x2, y2, page, floorId, reportFloorInfoId, floorNumber }, ref) => {
 			const { t, locale } = useI18n();
 			const form = useForm<CreateConstructionData>({
 				defaultValues: CreateConstructionConfig.defaultValues,
@@ -294,36 +298,79 @@ export const CreateConstructionForm = memoize(
 				dispatch(startLoading());
 
 				const command = convertToUpdateReportCommand(reportId, data);
-				from(
-					reportType === ReportCategory.Floor
-						? updateReportFloor({
-								data: {
-									reportFloorInfoId: id || '',
-									floorConstructionInfoId: floorId ? floorId : layerId || '',
-									'floorInfo.coordinates.x': x
-										? +String(x).split('.')[0]
-										: +search.get('x')!.split('.')[0]!,
-									'floorInfo.coordinates.y': y
-										? +String(y).split('.')[0]
-										: +search.get('y')!.split('.')[0]!,
-									'floorInfo.page': page ? +page : +search.get('page')!,
-									'floorInfo.reportConstructionHeader.constructionHeaderId':
-										construction,
-									'floorInfo.reportConstructionHeader.square': +area,
-									'floorInfo.reportConstructionHeader.width': +width,
-									'floorInfo.reportConstructionHeader.length': +length,
-									'floorInfo.reportConstructionHeader.firstPlacementRoomId':
-										getValues('firstPlacementRoom'),
-									'floorInfo.reportConstructionHeader.secondPlacementRoomId':
-										getValues('secondPlacementRoom'),
-									'floorInfo.floorNumber': '1',
-									'floorInfo.reportConstructionHeader.name': name,
-									reportInfoId: reportId,
-									requirementId: getValues('requirementId'),
-								},
-							})
-						: updateReportSingle({ data: command }),
-				)
+				const optionalGuid = (value?: string | null) => {
+					if (!value) return undefined;
+					const normalized = value.trim();
+					return normalized.length ? normalized : undefined;
+				};
+
+				const resolvedFloorConstructionInfoId = optionalGuid(floorId || layerId);
+				const resolvedReportFloorInfoId = optionalGuid(
+					reportFloorInfoId ||
+						search.get('reportFloorInfoId') ||
+						search.get('activeLevelId') ||
+						id,
+				);
+				const selectedFloorNumber = floorNumber || search.get('floorNumber') || '1';
+				if (reportType === ReportCategory.Floor && !resolvedFloorConstructionInfoId) {
+					toast.error('Не удалось определить уровень этажа');
+					return;
+				}
+				if (reportType === ReportCategory.Floor && !resolvedReportFloorInfoId) {
+					toast.error('Не удалось определить reportFloorInfoId (id этажа)');
+					return;
+				}
+
+				const baseX = x ? +String(x).split('.')[0] : +search.get('x')!.split('.')[0]!;
+				const baseY = y ? +String(y).split('.')[0] : +search.get('y')!.split('.')[0]!;
+				const searchX2 = search.get('x2');
+				const searchY2 = search.get('y2');
+				const diagonalX =
+					typeof x2 === 'number'
+						? +String(x2).split('.')[0]
+						: searchX2
+							? +String(searchX2).split('.')[0]
+							: baseX + Math.max(1, Math.round(Number(width || 0)));
+				const diagonalY =
+					typeof y2 === 'number'
+						? +String(y2).split('.')[0]
+						: searchY2
+							? +String(searchY2).split('.')[0]
+							: baseY + Math.max(1, Math.round(Number(length || 0)));
+			from(
+				reportType === ReportCategory.Floor
+					? updateReportFloor({
+							data: {
+								...(editMode
+									? { floorConstructionInfoId: resolvedReportFloorInfoId }
+									: {
+											reportFloorInfoId: resolvedReportFloorInfoId,
+											floorInfoId:
+												resolvedFloorConstructionInfoId ||
+												resolvedReportFloorInfoId,
+										}),
+								'floorInfo.coordinates1.x': baseX,
+								'floorInfo.coordinates1.y': baseY,
+								'floorInfo.coordinates2.x': diagonalX,
+								'floorInfo.coordinates2.y': diagonalY,
+								'floorInfo.page': page ? +page : +search.get('page')!,
+								'floorInfo.reportConstructionHeader.constructionHeaderId':
+									construction,
+								'floorInfo.reportConstructionHeader.square': +area,
+								'floorInfo.reportConstructionHeader.width': +width,
+								'floorInfo.reportConstructionHeader.length': +length,
+								'floorInfo.reportConstructionHeader.firstPlacementRoomId':
+									getValues('firstPlacementRoom'),
+								'floorInfo.reportConstructionHeader.secondPlacementRoomId':
+									getValues('secondPlacementRoom'),
+								'floorInfo.floorNumber': selectedFloorNumber,
+								'floorInfo.reportConstructionHeader.name': name,
+								reportInfoId: reportId,
+								requirementId: getValues('requirementId'),
+							},
+						})
+					: updateReportSingle({ data: command }),
+			)
 					.pipe(
 						catchError((error) => {
 							if (error instanceof AxiosError) {

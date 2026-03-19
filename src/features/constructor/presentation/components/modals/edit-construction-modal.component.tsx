@@ -82,10 +82,13 @@ export const EditConstructionModal = ({
 		>
 			<CreateConstructionForm
 				x={currentReportFloorInfo?.coordinates.x}
+				x2={currentReportFloorInfo?.coordinates2.x}
 				page={currentReportFloorInfo?.page}
 				y={currentReportFloorInfo?.coordinates.y}
+				y2={currentReportFloorInfo?.coordinates2.y}
 				ref={formRef}
 				floorId={floorId}
+				reportFloorInfoId={reportFloorInfoId}
 				onSuccess={handleSuccess}
 			/>
 		</Modal>

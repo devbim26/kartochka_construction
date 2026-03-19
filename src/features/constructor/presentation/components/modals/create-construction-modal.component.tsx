@@ -9,11 +9,17 @@ interface CreateConstructionModalProps extends Omit<ModalProps, 'Footer'> {
 	onCancel: () => void;
 	onConfirm: () => void;
 	wrapperClassName?: string;
+	floorId?: string;
+	reportFloorInfoId?: string;
+	floorNumber?: string;
 }
 
 export const CreateConstructionModal = ({
 	onCancel,
 	onConfirm,
+	floorId,
+	reportFloorInfoId,
+	floorNumber,
 	...props
 }: CreateConstructionModalProps) => {
 	const formRef = useRef<CreateConstructionFormHandle>(null);
@@ -51,7 +57,13 @@ export const CreateConstructionModal = ({
 			contentClassName={twJoin('text-center', props.contentClassName ?? '')}
 			{...props}
 		>
-			<CreateConstructionForm ref={formRef} onSuccess={handleSuccess} />
+			<CreateConstructionForm
+				ref={formRef}
+				onSuccess={handleSuccess}
+				floorId={floorId}
+				reportFloorInfoId={reportFloorInfoId}
+				floorNumber={floorNumber}
+			/>
 		</Modal>
 	);
 };

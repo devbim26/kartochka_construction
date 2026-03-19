@@ -6,15 +6,16 @@ import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import {
 	convertFloorDataToClientConstructionSheet,
 	convertToClientFloorConstruction,
-	convertToClientFloorInfo,
 	convertToClientSingleToFloorConstruction,
 } from '@features/constructor/converters';
 import {
+	createReportFloorInfo,
+	deleteFloorPlan,
 	deleteConstruction,
-	getFloorById,
-	getFloorConstructionById,
 	getReportInfoIds,
+	getReportFloorById,
 	getReportSingleById,
+	updateReportFloorInfo,
 	uploadDocument,
 } from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
@@ -34,7 +35,6 @@ import { useSearchParams } from 'react-router-dom';
 import { catchError, filter, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import {
-	CreateConstructionForm,
 	CreateConstructionModal,
 	EditConstructionModal,
 	GeneralInformationForm,
@@ -47,6 +47,9 @@ interface Level {
 	id: string;
 	code: string;
 	pageNumber: number;
+	reportFloorInfoIds: string[];
+	constructions: FloorConstruction[];
+	serverId?: string;
 }
 
 export const FloorPlans = memoize(() => {
@@ -68,12 +71,17 @@ export const FloorPlans = memoize(() => {
 	const [editingLevelId, setEditingLevelId] = useState<string | null>(null);
 	const [editCodeValue, setEditCodeValue] = useState('');
 
-	// Старые состояния для совместимости (пока не переписана логика конструкций)
 	const [currentReportFloorInfo, setCurrentReportFloorInfo] = useState<string[]>([]);
 	const [currentReportFloorId, setCurrentReportFloorId] = useState<string>();
+	const [currentReportConstructions, setCurrentReportConstructions] = useState<FloorConstruction[]>(
+		[],
+	);
 	const [currentReportConstruction, setCurrentReportConstruction] = useState<FloorConstruction>();
 	const [currentConstructionHeader, setCurrentConstructionHeader] =
 		useState<ConstructionsEditData>();
+	const [constructionHeadersById, setConstructionHeadersById] = useState<
+		Record<string, ConstructionsEditData>
+	>({});
 
 	const handleGetConstructionByHeaderId = (id: string) => {
 		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.CONSTRUCTION }))
@@ -94,18 +102,82 @@ export const FloorPlans = memoize(() => {
 			.subscribe();
 	};
 
+	const mapServerLevels = (data: any): Level[] => {
+		const floorLevels = (data?.floorConstructionInfos ?? []) as any[];
+		return floorLevels
+			.map((level, index) => ({
+				id:
+					level?.id ||
+					(crypto.randomUUID
+						? crypto.randomUUID()
+						: Math.random().toString(36).substring(2)),
+				serverId: level?.id || undefined,
+				code: level?.floorNumber || `${index + 1}`,
+				pageNumber: Number(level?.reportFloorConstructionInfos?.[0]?.page || index + 1),
+				reportFloorInfoIds: (level?.reportFloorConstructionInfos ?? [])
+					.map((info: any) => info?.id)
+					.filter(Boolean),
+				constructions: (level?.reportFloorConstructionInfos ?? []).map((info: any) =>
+					convertToClientFloorConstruction(
+						{
+							...info,
+							coordinates1: info?.coordinates ?? info?.coordinates1,
+							coordinates2: info?.coordinates2,
+						},
+						info?.id || '',
+					),
+				),
+			}))
+			.sort((a, b) => a.pageNumber - b.pageNumber);
+	};
+
+	const mergeLevels = (serverLevels: Level[], prevLevels: Level[]): Level[] => {
+		// Keep local-only levels (without server id) on pages
+		// that are not returned by backend yet.
+		const serverPages = new Set(serverLevels.map((level) => level.pageNumber));
+		const localOnly = prevLevels.filter(
+			(level) => !level.serverId && !serverPages.has(level.pageNumber),
+		);
+		return [...serverLevels, ...localOnly].sort((a, b) => a.pageNumber - b.pageNumber);
+	};
+
 	const handleDeleteDocument = () => {
-		// Очищаем все локальные данные
-		setLevels([]);
-		setPdfDoc(null);
-		setActiveLevelId(null);
-		setCurrentPage(1);
-		setCurrentReportFloorInfo([]);
-		setCurrentReportFloorId(undefined);
-		setCurrentReportConstruction(undefined);
-		setCurrentConstructionHeader(undefined);
-		toast.success(t('floorPlans.toast.deleteSuccess'));
-		// TODO: при реальном API здесь будет вызов deleteFloorPlan
+		if (!reportId) return;
+		dispatch(startLoading());
+		from(
+			uploadDocument({
+				reportInfoId: reportId,
+				data: { floorDocument: null as any },
+			}),
+		)
+			.pipe(
+				tap((response) => {
+					if (response.status !== 200) {
+						throw new Error(t('floorPlans.toast.loadError'));
+					}
+					setLevels([]);
+					setPdfDoc(null);
+					setActiveLevelId(null);
+					setCurrentPage(1);
+					setCurrentReportFloorInfo([]);
+					setCurrentReportFloorId(undefined);
+					setCurrentReportConstructions([]);
+					setCurrentReportConstruction(undefined);
+					setCurrentConstructionHeader(undefined);
+					setConstructionHeadersById({});
+					toast.success(t('floorPlans.toast.deleteSuccess'));
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || t('floorPlans.toast.loadError'));
+					} else {
+						toast.error((error as Error).message);
+					}
+					return of(null);
+				}),
+				tap(() => dispatch(stopLoading())),
+			)
+			.subscribe();
 	};
 
 	const handleUploadPdf = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -120,43 +192,57 @@ export const FloorPlans = memoize(() => {
 
 		from(
 			uploadDocument({
+				reportInfoId: reportId!,
 				data: {
-					reportInfoId: reportId!,
-					floorNumber: '0',
 					floorDocument: file,
-					floorConstructionInfoId: '',
 				},
 			}),
 		)
 			.pipe(
 				switchMap((uploadResponse) => {
-					if (uploadResponse.status !== 200 || !uploadResponse.data) {
+					if (uploadResponse.status !== 200 || !reportId) {
 						throw new Error(t('floorPlans.toast.uploadError'));
 					}
-					const uploadedFloorId = uploadResponse.data as string;
-					return from(getFloorById({ id: uploadedFloorId }));
+					return from(getReportInfoIds(reportId)).pipe(
+						switchMap((idsResponse) => {
+							const ids =
+								idsResponse.data?.map((item) => item.id).filter(Boolean) ?? [];
+							return from(getReportFloorById({ id: reportId })).pipe(
+								tap((floorResponse) => {
+									if (!floorResponse.data) return;
+									const nextLevels = mapServerLevels(floorResponse.data).map(
+										(level, index) => ({
+											...level,
+											serverId: ids[index] || level.serverId,
+										}),
+									);
+									setLevels((prev) => mergeLevels(nextLevels, prev));
+								}),
+							);
+						}),
+					);
 				}),
-				filter(Boolean),
 				switchMap((floorResponse) => {
 					if (floorResponse.status !== 200 || !floorResponse.data) {
 						throw new Error(t('floorPlans.toast.fetchFloorDataError'));
 					}
-					const { floorDocumentUrl, reportFloorInfos } = convertToClientFloorInfo(
-						floorResponse.data,
-					);
-					// Временно сохраняем старые данные
-					setCurrentReportFloorInfo(reportFloorInfos);
-					setCurrentReportFloorId(floorResponse.data.id);
-					return from(fetch(floorDocumentUrl));
+					const nextLevels = mapServerLevels(floorResponse.data);
+					const levelForCurrentPage =
+						nextLevels.find((level) => level.pageNumber === currentPage) ||
+						nextLevels[0] ||
+						null;
+					setActiveLevelId(levelForCurrentPage?.id || null);
+					if (!floorResponse.data.floorDocumentUrl) {
+						throw new Error(t('floorPlans.toast.fetchFloorDataError'));
+					}
+					return from(fetch(floorResponse.data.floorDocumentUrl));
 				}),
+				filter((fileResponse): fileResponse is Response => fileResponse instanceof Response),
 				switchMap((fileResponse) => from(fileResponse.blob())),
 				switchMap((blob) => from(blob.arrayBuffer())),
 				switchMap((arrayBuffer) => from(pdfjs.getDocument({ data: arrayBuffer }).promise)),
 				tap((pdf) => {
 					setPdfDoc(pdf);
-					// Сбрасываем уровни при загрузке нового PDF
-					setLevels([]);
-					setActiveLevelId(null);
 					setCurrentPage(1);
 					toast.success(t('floorPlans.toast.uploadSuccess'));
 				}),
@@ -180,75 +266,79 @@ export const FloorPlans = memoize(() => {
 		);
 	}, [currentReportConstruction]);
 
-	const handleGetCurrentReportFloorInfos = (id: string) => {
-		// Заглушка: при реальном API здесь будет загрузка уровней
-		// Пока оставляем старую логику для совместимости
-		dispatch(startLoading());
-		let firstReportFloorInfoId: string | undefined;
+	useEffect(() => {
+		if (reportType !== ReportCategory.Floor || !currentReportConstructions.length) return;
+		const missingIds = Array.from(
+			new Set(
+				currentReportConstructions
+					.map((c) => c.reportConstructionHeader.constructionHeaderId)
+					.filter((id) => id && !constructionHeadersById[id]),
+			),
+		);
+		if (!missingIds.length) return;
 
+		Promise.all(
+			missingIds.map((id) =>
+				getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION })
+					.then((response) =>
+						response.status === 200
+							? convertToClientConstructionsEditData(response.data)
+							: null,
+					)
+					.then((header) => ({ id, header }))
+					.catch(() => ({ id, header: null })),
+			),
+		).then((items) => {
+			setConstructionHeadersById((prev) => {
+				const next = { ...prev };
+				items.forEach(({ id, header }) => {
+					if (header) next[id] = header;
+				});
+				return next;
+			});
+		});
+	}, [reportType, currentReportConstructions, constructionHeadersById]);
+
+	const handleGetCurrentReportFloorInfos = (id: string) => {
+		dispatch(startLoading());
 		from(getReportInfoIds(id))
 			.pipe(
-				switchMap((infosResponse) => {
-					if (infosResponse.status !== 200 || !infosResponse.data) {
+				switchMap((idsResponse) => {
+					const ids = idsResponse.data?.map((item) => item.id).filter(Boolean) ?? [];
+					return from(getReportFloorById({ id })).pipe(
+						tap((floorResponse) => {
+							if (!floorResponse.data) return;
+							const nextLevels = mapServerLevels(floorResponse.data).map(
+								(level, index) => ({
+									...level,
+									serverId: ids[index] || level.serverId,
+								}),
+							);
+							setLevels((prev) => mergeLevels(nextLevels, prev));
+						}),
+					);
+				}),
+				switchMap((floorResponse) => {
+					if (floorResponse.status !== 200 || !floorResponse.data) {
 						throw new Error(t('floorPlans.toast.fetchReportError'));
 					}
-
-					if (infosResponse.data.length === 0) {
+					if (!floorResponse.data.floorDocumentUrl) {
 						toast.info(t('floorPlans.toast.noReportData'));
-						dispatch(stopLoading());
 						return of(null);
 					}
-
-					return from(getFloorById({ id: infosResponse.data[0].id! }));
+					const nextLevels = mapServerLevels(floorResponse.data);
+					const levelForCurrentPage =
+						nextLevels.find((level) => level.pageNumber === currentPage) ||
+						nextLevels[0] ||
+						null;
+					setActiveLevelId(levelForCurrentPage?.id || null);
+					return from(fetch(floorResponse.data.floorDocumentUrl));
 				}),
-				filter(Boolean),
-				switchMap((floorResponse) => {
-					if (floorResponse?.status !== 200) {
-						throw new Error(t('floorPlans.toast.fetchFloorDataError'));
-					}
-
-					const result = convertToClientFloorInfo(floorResponse.data);
-					const reportFloorInfos = result.reportFloorInfos;
-					firstReportFloorInfoId = reportFloorInfos[0];
-
-					setCurrentReportFloorInfo(reportFloorInfos);
-					setCurrentReportFloorId(floorResponse.data.id);
-
-					return from(fetch(result.floorDocumentUrl));
-				}),
+				filter((fileResponse): fileResponse is Response => fileResponse instanceof Response),
 				switchMap((fileResponse) => from(fileResponse.blob())),
 				switchMap((blob) => from(blob.arrayBuffer())),
-				switchMap((arrayBuffer) =>
-					from(pdfjs.getDocument({ data: arrayBuffer }).promise).pipe(
-						switchMap((pdf) => {
-							setPdfDoc(pdf);
-
-							if (firstReportFloorInfoId) {
-								return from(
-									getFloorConstructionById(firstReportFloorInfoId),
-								).pipe(
-									tap((constructionResponse) => {
-										if (
-											constructionResponse.status === 200 &&
-											constructionResponse.data
-										) {
-											setCurrentReportConstruction(
-												convertToClientFloorConstruction(
-													constructionResponse.data,
-												),
-											);
-										} else {
-											setCurrentReportConstruction(undefined);
-										}
-									}),
-								);
-							}
-
-							setCurrentReportConstruction(undefined);
-							return of(null);
-						}),
-					),
-				),
+				switchMap((arrayBuffer) => from(pdfjs.getDocument({ data: arrayBuffer }).promise)),
+				tap((pdf) => setPdfDoc(pdf)),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data || t('floorPlans.toast.loadError'));
@@ -326,7 +416,7 @@ export const FloorPlans = memoize(() => {
 		} else if (reportType === ReportCategory.Single && !!reportId) {
 			handleGetSingleConstruction(reportId);
 		}
-	}, [search]);
+	}, [reportType, reportId]);
 
 	// Функции для работы с уровнями
 	const addLevel = () => {
@@ -338,10 +428,15 @@ export const FloorPlans = memoize(() => {
 
 		// Создаём новый уровень с кодом по умолчанию
 		const defaultCode = '0.000';
+		const generatedReportFloorInfoId = crypto.randomUUID
+			? crypto.randomUUID()
+			: Math.random().toString(36).substring(2);
 		const newLevel: Level = {
 			id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
 			code: defaultCode,
 			pageNumber: currentPage,
+			reportFloorInfoIds: [generatedReportFloorInfoId],
+			constructions: [],
 		};
 
 		setLevels((prev) => [...prev, newLevel]);
@@ -349,6 +444,21 @@ export const FloorPlans = memoize(() => {
 		// Сразу включаем режим редактирования для нового уровня
 		setEditingLevelId(newLevel.id);
 		setEditCodeValue(defaultCode);
+
+		if (!reportId) return;
+		from(createReportFloorInfo({ reportInfoId: reportId, floorName: defaultCode }))
+			.pipe(
+				tap((response) => {
+					if (response.status >= 200 && response.status < 300) {
+						handleGetCurrentReportFloorInfos(reportId);
+					}
+				}),
+				catchError(() => {
+					toast.error(t('floorPlans.toast.uploadError'));
+					return of(null);
+				}),
+			)
+			.subscribe();
 	};
 
 	const startEditLevel = (level: Level) => {
@@ -362,17 +472,47 @@ export const FloorPlans = memoize(() => {
 			prev.map((l) => (l.id === levelId ? { ...l, code: editCodeValue } : l)),
 		);
 		setEditingLevelId(null);
-	};
 
-	const cancelEdit = () => {
-		setEditingLevelId(null);
+		const level = levels.find((l) => l.id === levelId);
+		const resolvedLevelId = level?.serverId || level?.id;
+		if (!resolvedLevelId) return;
+		from(updateReportFloorInfo({ reportFloorInfoId: resolvedLevelId, floorName: editCodeValue }))
+			.pipe(
+				tap((response) => {
+					if (response.status >= 200 && response.status < 300 && reportId) {
+						handleGetCurrentReportFloorInfos(reportId);
+					}
+				}),
+				catchError(() => {
+					toast.error(t('floorPlans.toast.loadError'));
+					return of(null);
+				}),
+			)
+			.subscribe();
 	};
 
 	const deleteLevel = (levelId: string) => {
+		const level = levels.find((l) => l.id === levelId);
+		const resolvedLevelId = level?.serverId || level?.id;
 		setLevels((prev) => prev.filter((l) => l.id !== levelId));
 		if (activeLevelId === levelId) {
-			setActiveLevelId(levels.length > 1 ? levels[0].id : null);
+			const next = levels.find((l) => l.id !== levelId);
+			setActiveLevelId(next?.id || null);
 		}
+		if (!resolvedLevelId) return;
+		from(deleteFloorPlan({ floorConstructionInfoToDeleteId: resolvedLevelId }))
+			.pipe(
+				tap((response) => {
+					if (response.status >= 200 && response.status < 300 && reportId) {
+						handleGetCurrentReportFloorInfos(reportId);
+					}
+				}),
+				catchError(() => {
+					toast.error(t('floorPlans.toast.loadError'));
+					return of(null);
+				}),
+			)
+			.subscribe();
 	};
 
 	// Синхронизация активного уровня с текущей страницей PDF
@@ -391,11 +531,35 @@ export const FloorPlans = memoize(() => {
 		}
 	}, [currentPage, levels, activeLevelId]);
 
-	// Активный уровень
 	const activeLevel = levels.find((l) => l.id === activeLevelId) || levels[0];
-	// ID этажа из бэкенда для текущей страницы PDF (1-indexed)
-	const selectedReportFloorInfoId =
-		currentReportFloorInfo[currentPage - 1] || currentReportFloorInfo[0];
+	const selectedReportFloorInfoId = currentReportConstruction?.id || currentReportFloorInfo[0];
+	const selectedLevelReportFloorInfoId = activeLevel?.serverId || activeLevel?.id;
+	const hasLevelOnCurrentPage = levels.some((level) => level.pageNumber === currentPage);
+
+	useEffect(() => {
+		if (!activeLevel) {
+			setCurrentReportFloorInfo([]);
+			setCurrentReportFloorId(undefined);
+			setCurrentReportConstructions([]);
+			setCurrentReportConstruction(undefined);
+			return;
+		}
+		setCurrentReportFloorInfo(activeLevel.reportFloorInfoIds);
+		setCurrentReportFloorId(activeLevel.serverId || activeLevel.id);
+		setCurrentReportConstructions(activeLevel.constructions);
+	}, [activeLevel]);
+
+	useEffect(() => {
+		const reportFloorInfoIdFromSearch = search.get('reportFloorInfoId');
+		if (reportType !== ReportCategory.Floor || !currentReportConstructions.length) {
+			if (reportType !== ReportCategory.Single) setCurrentReportConstruction(undefined);
+			return;
+		}
+		const current =
+			currentReportConstructions.find((c) => c.id === reportFloorInfoIdFromSearch) ||
+			currentReportConstructions[currentReportConstructions.length - 1];
+		setCurrentReportConstruction(current);
+	}, [reportType, currentReportConstructions, search]);
 
 	return (
 		<div className="relative">
@@ -423,7 +587,12 @@ export const FloorPlans = memoize(() => {
 							{pdfDoc && (
 								<Button
 									onClick={addLevel}
-									className="flex size-[28px] items-center justify-center bg-white p-0 text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
+									disabled={hasLevelOnCurrentPage}
+									className={`flex size-[28px] items-center justify-center bg-white p-0 ring-2 ring-inset enabled:hover:bg-white ${
+										hasLevelOnCurrentPage
+											? 'cursor-not-allowed text-gray-400 ring-gray-300'
+											: 'text-primary ring-primary'
+									}`}
 								>
 									<FaPlus />
 								</Button>
@@ -448,7 +617,11 @@ export const FloorPlans = memoize(() => {
 								{levels.map((level) => (
 									<div
 										key={level.id}
-										className={`flex items-center gap-1 rounded-md border px-2 py-1 ${
+										onClick={() => {
+											setActiveLevelId(level.id);
+											setCurrentPage(level.pageNumber);
+										}}
+										className={`flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 ${
 											activeLevelId === level.id
 												? 'border-primary'
 												: 'border-gray-300'
@@ -470,22 +643,25 @@ export const FloorPlans = memoize(() => {
 											<>
 												<button
 													className="text-sm font-medium"
-													onClick={() => {
-														setActiveLevelId(level.id);
-														setCurrentPage(level.pageNumber);
-													}}
+													onClick={(e) => e.stopPropagation()}
 												>
 													{level.code}
 												</button>
 												<button
-													onClick={() => startEditLevel(level)}
+													onClick={(e) => {
+														e.stopPropagation();
+														startEditLevel(level);
+													}}
 													className="text-gray-500 hover:text-primary"
 												>
 													<FaPencilAlt size={12} />
 												</button>
 											</>
 										)}
-										<button className="hover:text-red-500 text-gray-500">
+										<button
+											onClick={(e) => e.stopPropagation()}
+											className="hover:text-red-500 text-gray-500"
+										>
 											<DeleteIcon
 												onClick={() => deleteLevel(level.id)}
 												withoutBg
@@ -511,8 +687,11 @@ export const FloorPlans = memoize(() => {
 											: () => {}
 									}
 									currentConstruction={currentReportConstruction}
-									reportFloorInfoId={selectedReportFloorInfoId}
+									currentConstructions={currentReportConstructions}
+									constructionHeadersById={constructionHeadersById}
+									reportFloorInfoId={selectedLevelReportFloorInfoId}
 									floorId={currentReportFloorId}
+									floorNumber={activeLevel?.code}
 									currentConstructionHeader={currentConstructionHeader}
 								/>
 							) : (
@@ -562,18 +741,24 @@ export const FloorPlans = memoize(() => {
 
 					<div className="flex py-[30px]"></div>
 
-					<CreateConstructionModal
-						isOpen={!!search.get('create')}
-						onCancel={() => window.history.back()}
-						onClose={() => window.history.back()}
-						onConfirm={() => {
-							window.history.back();
-						}}
-						headerTitle={t('floorPlans.modal.createTitle')}
-						className="!w-[1000px] md:!w-[900px]"
-					>
-						<CreateConstructionForm />
-					</CreateConstructionModal>
+				<CreateConstructionModal
+					isOpen={!!search.get('create')}
+					onCancel={() => window.history.back()}
+					onClose={() => window.history.back()}
+					onConfirm={() => {
+						if (reportType === ReportCategory.Floor && reportId) {
+							handleGetCurrentReportFloorInfos(reportId);
+						} else if (reportType === ReportCategory.Single && reportId) {
+							handleGetSingleConstruction(reportId);
+						}
+						window.history.back();
+					}}
+					headerTitle={t('floorPlans.modal.createTitle')}
+					className="!w-[1000px] md:!w-[900px]"
+					floorId={currentReportFloorId}
+					reportFloorInfoId={selectedLevelReportFloorInfoId}
+					floorNumber={activeLevel?.code}
+				/>
 					<GeneralInformationModal
 						isOpen={!!search.get('info')}
 						onCancel={() => window.history.back()}
@@ -583,20 +768,25 @@ export const FloorPlans = memoize(() => {
 					>
 						<GeneralInformationForm />
 					</GeneralInformationModal>
-					<EditConstructionModal
-						isOpen={!!search.get('edit')}
-						onCancel={() => window.history.back()}
-						onClose={() => window.history.back()}
-						onConfirm={() => window.history.back()}
-						headerTitle={t('floorPlans.modal.editTitle')}
+				<EditConstructionModal
+					isOpen={!!search.get('edit')}
+					onCancel={() => window.history.back()}
+					onClose={() => window.history.back()}
+					onConfirm={() => {
+						if (reportType === ReportCategory.Floor && reportId) {
+							handleGetCurrentReportFloorInfos(reportId);
+						} else if (reportType === ReportCategory.Single && reportId) {
+							handleGetSingleConstruction(reportId);
+						}
+						window.history.back();
+					}}
+					headerTitle={t('floorPlans.modal.editTitle')}
 						className="!w-[1000px] md:!w-[900px]"
 						currentConstructionHeader={currentConstructionHeader}
 						currentReportFloorInfo={currentReportConstruction}
 						reportFloorInfoId={selectedReportFloorInfoId}
 						floorId={currentReportFloorId}
-					>
-						<CreateConstructionForm />
-					</EditConstructionModal>
+					/>
 					<DeleteModal
 						isOpen={!!search.get('delete')}
 						onCancel={() => window.history.back()}
@@ -615,17 +805,31 @@ export const FloorPlans = memoize(() => {
 
 				<ConstructionSheets
 					constructionSheets={
-						currentReportConstruction?.reportConstructionHeader.id &&
-						currentConstructionHeader
-							? [
-									convertFloorDataToClientConstructionSheet(
-										currentReportConstruction,
-										currentConstructionHeader,
-									),
-								]
-							: []
+						reportType === ReportCategory.Floor
+							? currentReportConstructions.reduce((acc, construction) => {
+									const header =
+										constructionHeadersById[
+											construction.reportConstructionHeader.constructionHeaderId
+										];
+									if (!header) return acc;
+									acc.push(
+										convertFloorDataToClientConstructionSheet(
+											construction,
+											header,
+										),
+									);
+									return acc;
+								}, [] as import('@features/constructor/types').ConstructionSheet[])
+							: currentReportConstruction?.reportConstructionHeader.id &&
+								  currentConstructionHeader
+								? [
+										convertFloorDataToClientConstructionSheet(
+											currentReportConstruction,
+											currentConstructionHeader,
+										),
+									]
+								: []
 					}
-					reportFloorInfoId={selectedReportFloorInfoId}
 				/>
 
 				<Button

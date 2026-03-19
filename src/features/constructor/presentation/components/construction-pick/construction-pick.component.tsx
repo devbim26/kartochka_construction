@@ -96,7 +96,7 @@ const ContructionPick = () => {
 						const floorConstructionInfos =
 							(response.data as any)?.floorConstructionInfos ?? [];
 						const reportFloorInfos = floorConstructionInfos.flatMap(
-							(fci: any) => fci?.reportFloorInfos ?? [],
+							(fci: any) => fci?.reportFloorConstructionInfos ?? [],
 						);
 
 						const currentReportFloorInfo = reportFloorInfos.find(

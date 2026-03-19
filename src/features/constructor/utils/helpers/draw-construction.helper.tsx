@@ -8,6 +8,26 @@ const measureTextWidth = (ctx: CanvasRenderingContext2D, text: string, font: str
 	return ctx.measureText(text).width;
 };
 
+const resolveConstructionTypeDisplayName = (
+	constructionType?: ConstructionTypeEnum,
+	labels?: { construction: string; divides: string },
+) => {
+	if (!constructionType) return '';
+	return labels?.construction === 'Construction:'
+		? EnConstructionTypesMap[constructionType]
+		: RuConstructionTypesMap[constructionType];
+};
+
+export type ConstructionCanvasBounds = {
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+	centerX: number;
+	centerY: number;
+	hasMissingCoordinates: boolean;
+};
+
 export const drawConstruction = (
 	canvas: HTMLCanvasElement,
 	x: number,
@@ -93,29 +113,101 @@ export const drawConstructionOnCanvas = async (
 	constructionType?: ConstructionTypeEnum,
 	constructionName?: string,
 	labels?: { construction: string; divides: string }, // добавили параметр с метками
+	showLabel = true,
 ): Promise<void> => {
-	const { coordinates, reportConstructionHeader } = info;
-	const x = coordinates.x * scale;
-	const y = coordinates.y * scale;
+	const bounds = resolveConstructionBounds(canvas, info, scale);
+	const { coordinates, coordinates2, reportConstructionHeader } = info;
+	const { left, top, width, height } = bounds;
 
 	// Определяем маппинг в зависимости от языка (можно передавать готовое название из компонента)
-	const typeDisplayName = constructionType
-		? labels?.construction === 'Construction:'
-			? EnConstructionTypesMap[constructionType]
-			: RuConstructionTypesMap[constructionType]
-		: '';
+	const typeDisplayName = resolveConstructionTypeDisplayName(constructionType, labels);
+
+	const context = canvas.getContext('2d');
+	if (!context) return Promise.resolve();
+
+	context.fillStyle = 'rgba(195, 244, 186, 0.5)';
+	context.strokeStyle = '#65B764';
+	context.lineWidth = 2;
+	context.fillRect(left, top, width, height);
+	context.strokeRect(left, top, width, height);
+
+	if (showLabel) {
+		drawConstruction(
+			canvas,
+			left + width / 2,
+			top + height / 2,
+			typeDisplayName,
+			constructionName || 'Placeholder',
+			`${reportConstructionHeader.firstPlacemetnRoom.name}/${reportConstructionHeader.secondPlacementRoom.name}`,
+			labels || { construction: 'Конструкция:', divides: 'разделяет:' }, // fallback на русский
+		);
+	}
+
+	return Promise.resolve();
+};
+
+export const drawConstructionLabelOnCanvas = (
+	canvas: HTMLCanvasElement,
+	info: FloorConstruction,
+	scale: number,
+	constructionType?: ConstructionTypeEnum,
+	constructionName?: string,
+	labels?: { construction: string; divides: string },
+) => {
+	const { reportConstructionHeader } = info;
+	const bounds = resolveConstructionBounds(canvas, info, scale);
+	const typeDisplayName = resolveConstructionTypeDisplayName(constructionType, labels);
 
 	drawConstruction(
 		canvas,
-		x,
-		y,
+		bounds.centerX,
+		bounds.centerY,
 		typeDisplayName,
 		constructionName || 'Placeholder',
 		`${reportConstructionHeader.firstPlacemetnRoom.name}/${reportConstructionHeader.secondPlacementRoom.name}`,
-		labels || { construction: 'Конструкция:', divides: 'разделяет:' }, // fallback на русский
+		labels || { construction: 'Конструкция:', divides: 'разделяет:' },
 	);
+};
 
-	return Promise.resolve();
+export const resolveConstructionBounds = (
+	canvas: HTMLCanvasElement,
+	info: FloorConstruction,
+	scale: number,
+): ConstructionCanvasBounds => {
+	const { coordinates, coordinates2 } = info;
+	const x1 = coordinates.x * scale;
+	const y1 = coordinates.y * scale;
+	const x2 = coordinates2.x * scale;
+	const y2 = coordinates2.y * scale;
+	const hasMissingCoordinates =
+		![coordinates.x, coordinates.y, coordinates2.x, coordinates2.y].every((value) =>
+			Number.isFinite(value),
+		) ||
+		(coordinates.x === 0 &&
+			coordinates.y === 0 &&
+			coordinates2.x === 0 &&
+			coordinates2.y === 0);
+
+	const defaultWidth = Math.max(160, Math.round(canvas.width * 0.18));
+	const defaultHeight = Math.max(90, Math.round(canvas.height * 0.14));
+	const left = hasMissingCoordinates
+		? Math.max(0, Math.round(canvas.width / 2 - defaultWidth / 2))
+		: Math.min(x1, x2);
+	const top = hasMissingCoordinates
+		? Math.max(0, Math.round(canvas.height / 2 - defaultHeight / 2))
+		: Math.min(y1, y2);
+	const width = hasMissingCoordinates ? defaultWidth : Math.abs(x2 - x1) || 2;
+	const height = hasMissingCoordinates ? defaultHeight : Math.abs(y2 - y1) || 2;
+
+	return {
+		left,
+		top,
+		width,
+		height,
+		centerX: left + width / 2,
+		centerY: top + height / 2,
+		hasMissingCoordinates,
+	};
 };
 
 export const cropCanvasToFile = (

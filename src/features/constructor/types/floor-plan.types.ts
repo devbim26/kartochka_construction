@@ -12,7 +12,6 @@ type FloorFromReport = {
 	id: string;
 	reportFloorInfos: string[];
 	floorNumber: string;
-	floorDocumentUrl: string;
 };
 
 type ReportConstructionHeader = {
@@ -27,8 +26,13 @@ type ReportConstructionHeader = {
 };
 
 type FloorConstruction = {
+	id: string;
 	documentImageUrl: string;
 	coordinates: {
+		x: number;
+		y: number;
+	};
+	coordinates2: {
 		x: number;
 		y: number;
 	};

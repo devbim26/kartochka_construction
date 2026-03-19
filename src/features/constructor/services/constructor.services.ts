@@ -23,30 +23,22 @@ type UpdateSingleReportProps = {
 	data: UpdateReportInfoWithSingleConstructionCommand;
 };
 type FloorDocumentUpload = {
+	reportInfoId?: string;
 	data: {
-		reportInfoId?: string;
-		floorConstructionInfoId?: string;
 		floorDocument?: File;
-		floorNumber?: string;
 	};
 };
 
 type FloorDocumentImage = {
 	data: {
-		reportFloorInfoId?: string;
+		reportFloorConstructionInfoId?: string;
 		floorDocumentImage?: File;
-	};
-};
-
-type FloorDocumentScreenshot = {
-	data: {
-		floorConstructionInfoId?: string;
-		floorScreenshot?: File;
 	};
 };
 
 type UpdateFloorReportProps = {
 	data: {
+		floorInfoId?: string;
 		reportFloorInfoId?: string;
 		reportInfoId?: string;
 		requirementId?: string;
@@ -57,14 +49,15 @@ type UpdateFloorReportProps = {
 		'floorInfo.reportConstructionHeader.secondPlacementRoomId'?: string;
 		'floorInfo.reportConstructionHeader.firstPlacementRoomId'?: string;
 		'floorInfo.documentImage'?: File;
-		'floorInfo.coordinates.x'?: number;
-		'floorInfo.coordinates.y'?: number;
+		'floorInfo.coordinates1.x'?: number;
+		'floorInfo.coordinates1.y'?: number;
+		'floorInfo.coordinates2.x'?: number;
+		'floorInfo.coordinates2.y'?: number;
 		'floorInfo.page'?: number;
-		'floorInfo.floorDocument'?: File;
-		'floorInfo.floorNumber'?: string;
 		'floorInfo.reportConstructionHeader.name'?: string;
 		'floorInfo.reportConstructionHeader.width'?: number;
 		'floorInfo.reportConstructionHeader.length'?: number;
+		'floorInfo.floorNumber'?: string;
 	};
 };
 type GetGraphParams = {
@@ -81,7 +74,9 @@ export const deleteFloorPlan = async (data: {
 	reportInfoId?: string;
 	floorConstructionInfoToDeleteId?: string;
 }) => {
-	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorDocumentDelete(data));
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoReportFloorInfoDelete({ id: data.floorConstructionInfoToDeleteId }),
+	);
 };
 
 export const createReport = async ({ data }: ReportCreateProps) => {
@@ -97,7 +92,7 @@ export const updateReport = async (data: ReportInfoUpdate) => {
 
 export const getReportInfoIds = async (id: string) => {
 	return await withConstructorLoader(() =>
-		fetchApi.api.reportInfoGetReportFloorConstructionInfoIdsRenewDetail(id),
+		fetchApi.api.reportInfoGetReportFloorInfoIdsRenewDetail(id),
 	);
 };
 
@@ -110,14 +105,25 @@ export const getReportFloorById = async ({ id }: GetReportByIdParams) => {
 
 export const getFloorById = async ({ id }: GetReportByIdParams) => {
 	return await withConstructorLoader(() =>
-		fetchApi.api.reportInfoGetReportFloorConstructionInfoRenewDetail(id),
+		fetchApi.api.reportInfoGetReportFloorInfoRenewDetail(id),
 	);
 };
 
 export const getFloorConstructionById = async (id: string) => {
 	return await withConstructorLoader(() =>
-		fetchApi.api.reportInfoGetReportFloorInfoRenewDetail(id),
+		fetchApi.api.reportInfoGetReportFloorConstructionInfoRenewDetail(id),
 	);
+};
+
+export const createReportFloorInfo = async (data: { reportInfoId?: string; floorName?: string }) => {
+	return await withConstructorLoader(() => fetchApi.api.reportInfoReportFloorInfoCreate(data));
+};
+
+export const updateReportFloorInfo = async (data: {
+	reportFloorInfoId?: string;
+	floorName?: string;
+}) => {
+	return await withConstructorLoader(() => fetchApi.api.reportInfoReportFloorInfoUpdate(data));
 };
 
 export const getReportConstruction = async (id: string) => {
@@ -138,16 +144,17 @@ export const swapToAlternateFloorConstruction = async (data: {
 		fetchApi.api.reportInfoFloorSwapByAlternativeUpdate(data),
 	);
 };
-export const uploadDocument = async ({ data }: FloorDocumentUpload) => {
-	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorDocumentUpdate(data));
+export const uploadDocument = async ({ data, reportInfoId }: FloorDocumentUpload) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoDocumentUpdate(data as any, {
+			reportInfoId,
+		}),
+	);
 };
 export const uploadImage = async ({ data }: FloorDocumentImage) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.reportInfoFloorConstructionImageUpdate(data),
 	);
-};
-export const uploadScreenshot = async ({ data }: FloorDocumentScreenshot) => {
-	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorScreenshotUpdate(data));
 };
 export const getReportFormInfo = async (id: string) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoReportInfoFlagsDetail(id));

@@ -1,8 +1,8 @@
 import type {
 	CountryType,
 	CreateReportInfoCommand,
-	NewFloorConstructionIfoDto,
-	NewReportFloorInfoDto,
+	NewFloorIfoDto,
+	NewReportConstructionFloorInfoDto,
 	PaginatedConstructionHeaderDto,
 	ReportInfoShortDto,
 	ReportInfoSingleConstructionDto,
@@ -135,22 +135,24 @@ export const convertToUpdateReportInfoCommand = (
 	};
 };
 
-export const convertToClientFloorInfo = (data: NewFloorConstructionIfoDto): FloorFromReport => {
+export const convertToClientFloorInfo = (data: NewFloorIfoDto): FloorFromReport => {
 	return {
 		id: data.id || '',
-		floorDocumentUrl: data.floorDocumentUrl || '',
 		floorNumber: data.floorNumber || '',
-		reportFloorInfos: data.reportFloorInfos?.map((data) => data.id || '') || [],
+		reportFloorInfos: data.reportFloorConstructionInfoIds || [],
 	};
 };
 
 export const convertToClientFloorConstruction = (
-	data: NewReportFloorInfoDto,
+	data: NewReportConstructionFloorInfoDto,
+	reportFloorInfoId = '',
 ): FloorConstruction => {
 	return {
+		id: reportFloorInfoId,
 		documentImageUrl: data.documentImageUrl || '',
 		page: data.page || 0,
-		coordinates: { x: data.coordinates?.x || 0, y: data.coordinates?.y || 0 },
+		coordinates: { x: data.coordinates1?.x || 0, y: data.coordinates1?.y || 0 },
+		coordinates2: { x: data.coordinates2?.x || 0, y: data.coordinates2?.y || 0 },
 		reportConstructionHeader: {
 			constructionHeaderId: data.reportConstructionHeader?.constructionHeaderId || '',
 			square: data.reportConstructionHeader?.square || 0,
@@ -178,9 +180,11 @@ export const convertToClientSingleToFloorConstruction = (
 	const headerFromSingle = data.singleConstructionInfos?.[0]?.reportConstructionHeader;
 
 	return {
+		id: '',
 		documentImageUrl: '',
 		page: 0,
 		coordinates: { x: 0, y: 0 },
+		coordinates2: { x: 0, y: 0 },
 		reportConstructionHeader: {
 			constructionHeaderId: headerFromSingle?.constructionHeaderId ?? '',
 			square: headerFromSingle?.square ?? 0,
@@ -228,6 +232,7 @@ export const convertFloorDataToClientConstructionSheet = (
 	constructionHeader: ConstructionsEditData,
 ): ConstructionSheet => {
 	return {
+		reportFloorInfoId: 'id' in data ? data.id : undefined,
 		constructionDivide:
 			data.reportConstructionHeader.firstPlacemetnRoom.name +
 			'/' +
