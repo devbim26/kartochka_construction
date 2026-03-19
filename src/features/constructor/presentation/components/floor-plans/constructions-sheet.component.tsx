@@ -71,6 +71,14 @@ export const ConstructionSheets = ({ constructionSheets }: Props) => {
 									</p>
 									<p>{info.row.original.constructionDivide}</p>
 								</div>
+								{info.row.original.levelMark && (
+									<div>
+										<p className="font-semibold">
+											{locale === 'ru' ? 'Отметка уровня' : 'Level mark'}
+										</p>
+										<p>{info.row.original.levelMark}</p>
+									</div>
+								)}
 							</div>
 						}
 					/>

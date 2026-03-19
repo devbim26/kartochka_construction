@@ -18,6 +18,48 @@ const resolveConstructionTypeDisplayName = (
 		: RuConstructionTypesMap[constructionType];
 };
 
+const constructionTypeColors: Record<string, { fill: string; stroke: string }> = {
+	HeavySingleLayerWall: { fill: 'rgba(33, 117, 243, 0.28)', stroke: '#0E57C2' },
+	HeavyMultiLayerWall: { fill: 'rgba(128, 91, 255, 0.28)', stroke: '#5B3CC4' },
+	HeavySingleLayerWallFacingOneSide: { fill: 'rgba(36, 156, 108, 0.28)', stroke: '#1C8A5F' },
+	HeavySingleLayerWallFacingBothSide: { fill: 'rgba(0, 163, 178, 0.28)', stroke: '#007985' },
+	HeavySingleLayerWallSoundproofingOneSide: {
+		fill: 'rgba(45, 128, 255, 0.28)',
+		stroke: '#245EB8',
+	},
+	HeavySingleLayerWallSoundproofingBothSide: {
+		fill: 'rgba(120, 72, 255, 0.28)',
+		stroke: '#5F39C2',
+	},
+	HeavyMultiLayerWallFacingOneSide: { fill: 'rgba(38, 166, 154, 0.28)', stroke: '#1B8D80' },
+	HeavyMultiLayerWallFacingBothSide: { fill: 'rgba(55, 125, 255, 0.28)', stroke: '#1D5ACC' },
+	HeavyMultiLayerWallSoundproofingOneSide: {
+		fill: 'rgba(123, 104, 238, 0.28)',
+		stroke: '#5E51B8',
+	},
+	HeavyMultiLayerWallSoundproofingBothSide: {
+		fill: 'rgba(0, 150, 136, 0.28)',
+		stroke: '#006B62',
+	},
+	OneFramePartition: { fill: 'rgba(229, 57, 53, 0.25)', stroke: '#B02421' },
+	TwoFramePartition: { fill: 'rgba(156, 39, 176, 0.25)', stroke: '#7B1FA2' },
+	HeavySingleWallFacing: { fill: 'rgba(84, 110, 122, 0.25)', stroke: '#37474F' },
+	OneGlassFrame: { fill: 'rgba(0, 188, 212, 0.25)', stroke: '#008CA0' },
+	DoubleGlazedFrame: { fill: 'rgba(0, 105, 192, 0.25)', stroke: '#004E8F' },
+	HomogeneousFloor: { fill: 'rgba(67, 160, 71, 0.25)', stroke: '#2E7D32' },
+	ElasticBaseFloor: { fill: 'rgba(255, 112, 67, 0.25)', stroke: '#D95A27' },
+};
+
+const resolveConstructionColor = (constructionType?: ConstructionTypeEnum) => {
+	if (!constructionType) {
+		return { fill: 'rgba(195, 244, 186, 0.5)', stroke: '#65B764' };
+	}
+	return constructionTypeColors[constructionType] || {
+		fill: 'rgba(195, 244, 186, 0.5)',
+		stroke: '#65B764',
+	};
+};
+
 export type ConstructionCanvasBounds = {
 	left: number;
 	top: number;
@@ -121,12 +163,13 @@ export const drawConstructionOnCanvas = async (
 
 	// Определяем маппинг в зависимости от языка (можно передавать готовое название из компонента)
 	const typeDisplayName = resolveConstructionTypeDisplayName(constructionType, labels);
+	const color = resolveConstructionColor(constructionType);
 
 	const context = canvas.getContext('2d');
 	if (!context) return Promise.resolve();
 
-	context.fillStyle = 'rgba(195, 244, 186, 0.5)';
-	context.strokeStyle = '#65B764';
+	context.fillStyle = color.fill;
+	context.strokeStyle = color.stroke;
 	context.lineWidth = 2;
 	context.fillRect(left, top, width, height);
 	context.strokeRect(left, top, width, height);

@@ -1,25 +1,95 @@
 import { AboutUs1, AboutUs2, AboutUs3, AboutUs4, AboutUs5 } from '@assets';
 import { Chevron, useI18n } from '@core';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { stepDescriptions, steps } from '../../constants';
-import {
-	FifthNumberImage,
-	FirstNumberImage,
-	FourthNumberImage,
-	SecondNumberImage,
-	ThirdNumberImage,
-} from '../images';
-
-const numberImages = [
-	<FirstNumberImage key="first" />,
-	<SecondNumberImage key="second" />,
-	<ThirdNumberImage key="third" />,
-	<FourthNumberImage key="fourth" />,
-	<FifthNumberImage key="fifth" />,
-];
 
 const aboutImages = [AboutUs1, AboutUs2, AboutUs3, AboutUs4, AboutUs5];
+const cardAccentColors = ['#B1C9E3', '#EED0C5', '#F3F2BA', '#DFA4C2', '#B2CAA0'];
+const stepTitles = [
+	'Проектирование. Звукоизоляция',
+	'AI ассистент (3 режима)',
+	'Визуализация фасадов и интерьеров',
+	'Экспертиза проекта (2 режима)',
+	'Аналитика нормативной документации',
+];
+
+const cardContents: Array<{ title: ReactNode; body: ReactNode }> = [
+	{
+		title: <span className="font-bold">Расчет звукоизоляции стен и перекрытий</span>,
+		body: (
+			<span className="whitespace-pre-line italic">
+				{'по СП 02.04.03-2023.\n\nГенерирует PDF-отчет с формулами, готовый к подаче на экспертизу.'}
+			</span>
+		),
+	},
+	{
+		title: (
+			<div className="whitespace-pre-line">
+				<span className="font-bold">Общий</span>
+				{'\n'}
+				<span className="italic">
+					Доступ к новейшим моделям ИИ (от Open AI, Antropic, Google, Китайские модели)
+				</span>
+				{'\n\n'}
+				<span className="font-bold">Аналитика документов PDF</span>
+			</div>
+		),
+		body: (
+			<div className="whitespace-pre-line italic">
+				AI проверяет, суммаризирует и структурирует документы. Выдает готовый отчет в DOC/Excel
+				— для смет, ТЗ, протоколов.
+				{'\n\n'}
+				<span className="not-italic font-bold">DeepResearch (Perplexity Sonar Pro Search)</span>
+				{'\n'}
+				глубокий поиск информации в интернете со ссылками на первоисточник
+			</div>
+		),
+	},
+	{
+		title: (
+			<div className="whitespace-pre-line">
+				<span className="font-bold">AI-генерация изображений</span>
+				{'\n'}
+				<span className="italic">с кастомными настройками.</span>
+			</div>
+		),
+		body: (
+			<div className="whitespace-pre-line italic">
+				Меняйте фасады, мебель,{'\n'}положение камеры и др.{'\n'}в один клик.
+			</div>
+		),
+	},
+	{
+		title: (
+			<div className="whitespace-pre-line">
+				<span className="font-bold">Общая экспертиза</span>
+				{'\n'}
+				<span className="italic">
+					- Проверяет общую структуру проекта;{'\n'}- Проверяет проект на соответствие
+					актуальным ТНПА.{'\n'}- Проверка проекта по внутренним требованиям
+				</span>
+				{'\n\n'}
+				<span className="font-bold">Экспертиза звукоизоляции</span>
+			</div>
+		),
+		body: <span className="italic">Анализ заложенных в проекте решений по звукоизоляции</span>,
+	},
+	{
+		title: (
+			<div className="whitespace-pre-line">
+				<span className="font-bold">Общая экспертиза</span>
+				{'\n'}
+				<span className="italic">
+					- Проверяет общую структуру проекта;{'\n'}- Проверяет проект на соответствие
+					актуальным ТНПА.{'\n'}- Проверка проекта по внутренним требованиям
+				</span>
+				{'\n\n'}
+				<span className="font-bold">Экспертиза звукоизоляции</span>
+			</div>
+		),
+		body: <span className="italic">Анализ заложенных в проекте решений по звукоизоляции</span>,
+	},
+];
 
 export const HowOurServiceWorks = () => {
 	const [selectedStep, setSelectedStep] = useState(0);
@@ -40,7 +110,7 @@ export const HowOurServiceWorks = () => {
 				<div className="flex flex-col items-center justify-center gap-10 xs:flex-row xs:flex-nowrap xs:items-center xs:justify-center">
 					<div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
 						<div className="mt-10 flex flex-col gap-6">
-							{steps.map((step, index) => (
+							{stepTitles.map((stepTitle, index) => (
 								<div
 									key={index}
 									className="flex cursor-pointer flex-row justify-between gap-4 sm:gap-6"
@@ -52,7 +122,7 @@ export const HowOurServiceWorks = () => {
 											selectedStep === index ? 'text-primary' : 'text-black',
 										)}
 									>
-										{index + 1}. {t(step)}
+										{index + 1}. {stepTitle}
 									</div>
 									<div className="flex">
 										<Chevron
@@ -85,22 +155,21 @@ export const HowOurServiceWorks = () => {
 									'[backface-visibility:hidden]',
 								)}
 							>
-								{/* Background number image */}
-								<div className="absolute inset-0 flex justify-end p-5 text-[#0F6CAF38]">
-									<div className="size-auto">{numberImages[selectedStep]}</div>
-								</div>
-
 								{/* Content over image */}
 								<div className="relative z-10 flex flex-col gap-6">
-									<div className="flex flex-row items-start justify-between gap-4 sm:gap-6">
-										<div className="font-montserrat font-semibold leading-snug text-primary sm:text-lg">
-											{t(steps[selectedStep])}
+									<div
+										className="flex w-full flex-row items-start justify-between gap-4 rounded-xl px-3 py-2 sm:gap-6"
+										style={{ backgroundColor: cardAccentColors[selectedStep] }}
+									>
+										<div className="font-montserrat font-bold leading-snug text-black sm:text-lg">
+											{stepTitles[selectedStep]}
 										</div>
-										{/* Optional: show number on top as well */}
-										{/* <div className="shrink-0">{numberImages[selectedStep]}</div> */}
 									</div>
-									<div className="whitespace-pre-wrap px-2 font-montserrat text-sm leading-relaxed sm:text-base">
-										{t(stepDescriptions[selectedStep])}
+									<div className="px-2 font-montserrat text-sm leading-relaxed text-black sm:text-base">
+										{cardContents[selectedStep]?.title}
+									</div>
+									<div className="px-2 font-montserrat text-sm leading-relaxed text-black sm:text-base">
+										{cardContents[selectedStep]?.body}
 									</div>
 								</div>
 							</div>
@@ -111,8 +180,8 @@ export const HowOurServiceWorks = () => {
 									'[backface-visibility:hidden] [transform:rotateY(180deg)]',
 								)}
 							>
-								<div className="font-montserrat font-semibold leading-snug text-primary sm:text-lg">
-									{t(steps[selectedStep])}
+								<div className="font-montserrat font-semibold leading-snug text-black sm:text-lg">
+									{stepTitles[selectedStep]}
 								</div>
 								<div className="flex min-h-0 flex-1 items-center justify-center">
 									<img

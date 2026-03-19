@@ -63,6 +63,7 @@ export const FloorPlanViewer = ({
 
 	const previousConstructionRef = useRef<FloorConstruction | null>(null);
 	const hoveredConstructionIdRef = useRef<string | null>(null);
+	const attemptedImageUploadIdsRef = useRef<Set<string>>(new Set());
 	const constructionsOnPageRef = useRef<
 		Array<{
 			construction: FloorConstruction;
@@ -209,18 +210,21 @@ export const FloorPlanViewer = ({
 		drawHoveredLabelOnOverlay(null);
 	};
 
-	const uploadImagesAndRefresh = async (imageFile: File, dispatch: AppDispatch): Promise<void> => {
+	const uploadImageForConstruction = async (
+		constructionId: string | undefined,
+		imageFile: File,
+		dispatch: AppDispatch,
+	): Promise<boolean> => {
+		if (!constructionId) return false;
 		try {
 			const imageResponse = await uploadImage({
 				data: {
-					reportFloorConstructionInfoId: currentConstruction?.id,
+					reportFloorConstructionInfoId: constructionId,
 					floorDocumentImage: imageFile,
 				},
 			});
 
-			if (imageResponse.status === 200) {
-				getData();
-			}
+			return imageResponse.status === 200;
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				toast.error(error.response?.data || t('floorPlanViewer.uploadError'));
@@ -228,6 +232,7 @@ export const FloorPlanViewer = ({
 				toast.error(t('floorPlanViewer.uploadError'));
 			}
 			dispatch(stopLoading());
+			return false;
 		}
 	};
 
@@ -265,6 +270,7 @@ export const FloorPlanViewer = ({
 				const constructionsOnPage = currentConstructions.filter(
 					(construction) => construction.page === currentPage,
 				);
+				let shouldRefreshData = false;
 				const nextConstructionItems: Array<{
 					construction: FloorConstruction;
 					header?: ConstructionsEditData;
@@ -300,6 +306,35 @@ export const FloorPlanViewer = ({
 				}
 				constructionsOnPageRef.current = nextConstructionItems;
 
+				// Для каждой конструкции без скрина формируем и загружаем изображение.
+				for (const item of nextConstructionItems) {
+					const constructionId = item.construction.id;
+					if (!constructionId) continue;
+					if (item.construction.documentImageUrl) {
+						attemptedImageUploadIdsRef.current.delete(constructionId);
+						continue;
+					}
+					if (attemptedImageUploadIdsRef.current.has(constructionId)) continue;
+
+					const imageFile = cropCanvasToFile(
+						canvas,
+						item.bounds.left + item.bounds.width / 2,
+						item.bounds.top + item.bounds.height / 2,
+						900,
+						400,
+					);
+					const uploaded = await uploadImageForConstruction(
+						constructionId,
+						imageFile,
+						dispatch,
+					);
+					if (uploaded) {
+						shouldRefreshData = true;
+					} else {
+						attemptedImageUploadIdsRef.current.add(constructionId);
+					}
+				}
+
 				// Для генерации мини-изображения ориентируемся на текущую активную конструкцию
 				if (currentConstruction?.page === currentPage) {
 					const bounds = resolveConstructionBounds(canvas, currentConstruction, scale);
@@ -323,10 +358,20 @@ export const FloorPlanViewer = ({
 							400,
 						);
 
-						await uploadImagesAndRefresh(imageFile, dispatch);
+						const uploaded = await uploadImageForConstruction(
+							currentConstruction.id,
+							imageFile,
+							dispatch,
+						);
+						if (uploaded) {
+							shouldRefreshData = true;
+						}
 
 						previousConstructionRef.current = currentConstruction;
 					}
+				}
+				if (shouldRefreshData) {
+					getData();
 				}
 			} catch (error) {
 				console.error(t('pdf.error'), error);
@@ -350,6 +395,10 @@ export const FloorPlanViewer = ({
 	useEffect(() => {
 		setFirstPoint(null);
 	}, [currentPage, search.get('create')]);
+
+	useEffect(() => {
+		attemptedImageUploadIdsRef.current.clear();
+	}, [currentConstructions]);
 
 	return (
 		<div className="flex items-center justify-center rounded-[20px] py-[30px]">

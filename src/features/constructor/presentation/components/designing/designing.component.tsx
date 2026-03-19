@@ -315,6 +315,14 @@ const DesigningScreen = () => {
 
 				return {
 					...prev,
+					issuer: '',
+					issuerName: '',
+					labRTotal: '',
+					labIndex: '',
+					labIndexValue: '',
+					laboratoryC: '',
+					laboratoryCtr: '',
+					laboratoryTestSource: '',
 					constructionTypeObject: {
 						...prev.constructionTypeObject,
 						constructionTypeEnum: constructionType,
@@ -325,6 +333,12 @@ const DesigningScreen = () => {
 				};
 			});
 
+			// If laboratory graph is dropped after construction change,
+			// brand affiliation should be dropped as well.
+			setGraphData(null);
+			setGraphAdditionalData(null);
+			setLabIsRelevant(false);
+			setCompIsRelevant(false);
 			setSvgUrl(null);
 
 			if (constructionHeaderId) {

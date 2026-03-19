@@ -75,7 +75,15 @@ export const deleteFloorPlan = async (data: {
 	floorConstructionInfoToDeleteId?: string;
 }) => {
 	return await withConstructorLoader(() =>
-		fetchApi.api.reportInfoReportFloorInfoDelete({ id: data.floorConstructionInfoToDeleteId }),
+		fetchApi.api.reportInfoFloorConstructionDelete({
+			id: data.floorConstructionInfoToDeleteId,
+		}),
+	);
+};
+
+export const deleteReportFloorInfo = async (reportFloorInfoId?: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoFloorConstructionDelete({ id: reportFloorInfoId }),
 	);
 };
 

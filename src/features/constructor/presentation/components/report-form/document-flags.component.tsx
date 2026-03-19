@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
 export const DocumentFlags = () => {
-	const { setValue, control, watch } = useFormContext<FormReportSchemaType>();
+	const { setValue, control, watch, getValues } = useFormContext<FormReportSchemaType>();
 	const [showGeneralInfo, setShowGeneralInfo] = useState(true);
 	const [showSoundInfo, setShowSoundInfo] = useState(true);
 
@@ -25,6 +25,87 @@ export const DocumentFlags = () => {
 		control,
 		name: 'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags',
 	});
+	const isSoundEnabled =
+		!!watch(
+			'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
+		) ||
+		(soundBaseReportInfoFlags ?? []).some(
+			(baseFlag) =>
+				!!baseFlag?.takeFloor ||
+				(baseFlag?.namedConstructionFlags ?? []).some(
+					(namedFlag) =>
+						!!namedFlag?.takeConstruction ||
+						!!namedFlag?.takeSoundInsulationCalculation ||
+						!!namedFlag?.takeLaboratoryDataAnalisys,
+				),
+		);
+	const isThermalEnabled =
+		!!watch('floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod') ||
+		(thermalBaseReportInfoFlags ?? []).some(
+			(baseFlag) =>
+				!!baseFlag?.takeFloor ||
+				(baseFlag?.namedConstructionFlags ?? []).some(
+					(namedFlag) => !!namedFlag?.takeConstruction,
+				),
+		);
+
+	const toggleSoundSection = (isEnabled: boolean) => {
+		setValue(
+			'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
+			isEnabled,
+		);
+		const baseFlags = getValues(
+			'floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags',
+		);
+		(baseFlags ?? []).forEach((_, baseIndex) => {
+			setValue(
+				`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.takeFloor` as const,
+				isEnabled,
+			);
+			const namedFlags = getValues(
+				`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags` as const,
+			);
+			(namedFlags ?? []).forEach((__, namedIndex) => {
+				setValue(
+					`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${namedIndex}.takeConstruction` as const,
+					isEnabled,
+				);
+				setValue(
+					`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${namedIndex}.takeSoundInsulationCalculation` as const,
+					isEnabled,
+				);
+				setValue(
+					`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${namedIndex}.takeLaboratoryDataAnalisys` as const,
+					isEnabled,
+				);
+			});
+		});
+	};
+
+	const toggleThermalSection = (isEnabled: boolean) => {
+		setValue(
+			'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod',
+			isEnabled,
+		);
+		const baseFlags = getValues(
+			'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags',
+		);
+		(baseFlags ?? []).forEach((_, baseIndex) => {
+			setValue(
+				`floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags.${baseIndex}.takeFloor` as const,
+				isEnabled,
+			);
+			const namedFlags = getValues(
+				`floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags` as const,
+			);
+			(namedFlags ?? []).forEach((__, namedIndex) => {
+				setValue(
+					`floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${namedIndex}.takeConstruction` as const,
+					isEnabled,
+				);
+			});
+		});
+	};
 
 	return (
 		<div className="flex w-full flex-col gap-[20px] px-[300px] font-semibold">
@@ -37,6 +118,7 @@ export const DocumentFlags = () => {
 					name="floorDocumentFlags.takeTitleList"
 					render={({ field }) => (
 						<Switch
+							isEnabledProp={!!field.value}
 							onChange={(isEnabled) => {
 								field.onChange(isEnabled);
 							}}
@@ -53,6 +135,7 @@ export const DocumentFlags = () => {
 					name="floorDocumentFlags.takeContent"
 					render={({ field }) => (
 						<Switch
+							isEnabledProp={!!field.value}
 							onChange={(isEnabled) => {
 								field.onChange(isEnabled);
 							}}
@@ -69,6 +152,7 @@ export const DocumentFlags = () => {
 					name="floorDocumentFlags.takeIntroduction"
 					render={({ field }) => (
 						<Switch
+							isEnabledProp={!!field.value}
 							onChange={(isEnabled) => {
 								field.onChange(isEnabled);
 							}}
@@ -81,7 +165,7 @@ export const DocumentFlags = () => {
 					{t('constructor.reportForm.docs.general.section')}
 				</FormElementLabel>
 				<Switch
-					isEnabledProp={isGeneralEnabled}
+					isEnabledProp={!!isGeneralEnabled}
 					onChange={(isEnabled) => {
 						setValue('floorDocumentFlags.generalCharacteristics', {
 							takeFloorMaterialsVolumesCalculation: isEnabled,
@@ -163,17 +247,13 @@ export const DocumentFlags = () => {
 					{t('constructor.reportForm.docs.sound.section')}
 				</FormElementLabel>
 				<Switch
-					isEnabledProp={isGeneralEnabled}
-					onChange={(isEnabled) => {
-						setValue('floorDocumentFlags.soundInsulationCalculation', {
-							takeEnclosingStructuresSoundInsulationCalculation: isEnabled,
-						});
-					}}
+					isEnabledProp={isSoundEnabled}
+					onChange={toggleSoundSection}
 				/>
 				<Chevron
 					color="#383838"
 					className="pl-[50px]"
-					direction={showGeneralInfo ? 'down' : 'up'}
+					direction={showSoundInfo ? 'down' : 'up'}
 					onClick={() => setShowSoundInfo(!showSoundInfo)}
 				/>
 			</div>
@@ -203,9 +283,8 @@ export const DocumentFlags = () => {
 					<div className="flex w-full flex-col gap-[20px] pl-[100px] font-semibold text-input-label-primary">
 						{soundBaseReportInfoFlags?.map((baseFlag, baseIndex) => {
 							return (
-								<>
+								<div key={baseFlag.floorNumber || `sound-floor-${baseIndex}`}>
 									<div
-										key={baseFlag.floorNumber}
 										className="flex w-full items-center justify-start gap-[10px]"
 									>
 										<FormElementLabel className="w-[350px]">
@@ -213,12 +292,10 @@ export const DocumentFlags = () => {
 										</FormElementLabel>
 										<Controller
 											control={control}
-											name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+											name={`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.takeFloor` as const}
 											render={({ field }) => (
 												<Switch
-													isEnabledProp={watch(
-														'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
-													)}
+													isEnabledProp={!!field.value}
 													onChange={(isEnabled) => {
 														field.onChange(isEnabled);
 													}}
@@ -228,9 +305,10 @@ export const DocumentFlags = () => {
 									</div>
 									{baseFlag.namedConstructionFlags?.map((namedConst, index) => {
 										return (
-											<>
+											<div
+												key={namedConst.reportConstructionId || `sound-construction-${baseIndex}-${index}`}
+											>
 												<div
-													key={namedConst.reportConstructionId}
 													className="flex w-full items-center justify-start gap-[10px]"
 												>
 													<FormElementLabel className="w-[350px]">
@@ -238,12 +316,10 @@ export const DocumentFlags = () => {
 													</FormElementLabel>
 													<Controller
 														control={control}
-														name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+														name={`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${index}.takeConstruction` as const}
 														render={({ field }) => (
 															<Switch
-																isEnabledProp={watch(
-																	'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
-																)}
+																isEnabledProp={!!field.value}
 																onChange={(isEnabled) => {
 																	field.onChange(isEnabled);
 																}}
@@ -257,12 +333,10 @@ export const DocumentFlags = () => {
 													</FormElementLabel>
 													<Controller
 														control={control}
-														name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+														name={`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${index}.takeSoundInsulationCalculation` as const}
 														render={({ field }) => (
 															<Switch
-																isEnabledProp={watch(
-																	'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
-																)}
+																isEnabledProp={!!field.value}
 																onChange={(isEnabled) => {
 																	field.onChange(isEnabled);
 																}}
@@ -276,12 +350,10 @@ export const DocumentFlags = () => {
 													</FormElementLabel>
 													<Controller
 														control={control}
-														name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+														name={`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${index}.takeLaboratoryDataAnalisys` as const}
 														render={({ field }) => (
 															<Switch
-																isEnabledProp={watch(
-																	'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
-																)}
+																isEnabledProp={!!field.value}
 																onChange={(isEnabled) => {
 																	field.onChange(isEnabled);
 																}}
@@ -289,10 +361,10 @@ export const DocumentFlags = () => {
 														)}
 													/>
 												</div>
-											</>
+											</div>
 										);
 									})}
-								</>
+								</div>
 							);
 						})}
 					</div>
@@ -303,18 +375,13 @@ export const DocumentFlags = () => {
 					{t('constructor.reportForm.docs.thermal.section')}
 				</FormElementLabel>
 				<Switch
-					isEnabledProp={isGeneralEnabled}
-					onChange={(isEnabled) => {
-						setValue(
-							'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod',
-							isEnabled,
-						);
-					}}
+					isEnabledProp={isThermalEnabled}
+					onChange={toggleThermalSection}
 				/>
 				<Chevron
 					color="#383838"
 					className="pl-[50px]"
-					direction={showGeneralInfo ? 'down' : 'up'}
+					direction={showThermalInfo ? 'down' : 'up'}
 					onClick={() => setShowThermalInfo(!showThermalInfo)}
 				/>
 			</div>
@@ -354,12 +421,10 @@ export const DocumentFlags = () => {
 										</FormElementLabel>
 										<Controller
 											control={control}
-											name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+											name={`floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags.${baseIndex}.takeFloor` as const}
 											render={({ field }) => (
 												<Switch
-													isEnabledProp={watch(
-														'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
-													)}
+													isEnabledProp={!!field.value}
 													onChange={(isEnabled) => {
 														field.onChange(isEnabled);
 													}}
@@ -379,12 +444,10 @@ export const DocumentFlags = () => {
 													</FormElementLabel>
 													<Controller
 														control={control}
-														name="floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation"
+														name={`floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${index}.takeConstruction` as const}
 														render={({ field }) => (
 															<Switch
-																isEnabledProp={watch(
-																	'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
-																)}
+																isEnabledProp={!!field.value}
 																onChange={(isEnabled) => {
 																	field.onChange(isEnabled);
 																}}
@@ -410,6 +473,7 @@ export const DocumentFlags = () => {
 					name="floorDocumentFlags.takeConclusion"
 					render={({ field }) => (
 						<Switch
+							isEnabledProp={!!field.value}
 							onChange={(isEnabled) => {
 								field.onChange(isEnabled);
 							}}
@@ -426,6 +490,7 @@ export const DocumentFlags = () => {
 					name="floorDocumentFlags.takeUsedLiteratureList"
 					render={({ field }) => (
 						<Switch
+							isEnabledProp={!!field.value}
 							onChange={(isEnabled) => {
 								field.onChange(isEnabled);
 							}}
@@ -442,6 +507,7 @@ export const DocumentFlags = () => {
 					name="floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation"
 					render={({ field }) => (
 						<Switch
+							isEnabledProp={!!field.value}
 							onChange={(isEnabled) => {
 								field.onChange(isEnabled);
 							}}
@@ -458,6 +524,7 @@ export const DocumentFlags = () => {
 					name="floorDocumentFlags.takeSupplementThermalInsulationProtocolsWithCalculation"
 					render={({ field }) => (
 						<Switch
+							isEnabledProp={!!field.value}
 							onChange={(isEnabled) => {
 								field.onChange(isEnabled);
 							}}

@@ -4,8 +4,39 @@ import type { FloorDocumentsFlagsSchemaType, FormReportSchemaType } from '../uti
 export const convertToClientReportFormFlags = (
 	data: DocumentReportFlagsDto,
 ): FloorDocumentsFlagsSchemaType => {
+	const soundBaseFlags = (data.soundInsulationCalculation?.baseReportInfoFlags ?? []).map(
+		(baseFlag) => ({
+			...baseFlag,
+			namedConstructionFlags: baseFlag?.namedConstructionFlags ?? [],
+		}),
+	);
+	const thermalBaseFlags = (data.thermalInsulationCalculation?.baseReportInfoFlags ?? []).map(
+		(baseFlag) => ({
+			...baseFlag,
+			namedConstructionFlags: baseFlag?.namedConstructionFlags ?? [],
+		}),
+	);
+
 	return {
 		...data,
+		generalCharacteristics: {
+			takeRoomCharacteristic: data.generalCharacteristics?.takeRoomCharacteristic ?? false,
+			takeWallMaterialsVolumesCalculation:
+				data.generalCharacteristics?.takeWallMaterialsVolumesCalculation ?? false,
+			takeFloorMaterialsVolumesCalculation:
+				data.generalCharacteristics?.takeFloorMaterialsVolumesCalculation ?? false,
+		},
+		soundInsulationCalculation: {
+			takeEnclosingStructuresSoundInsulationCalculation:
+				data.soundInsulationCalculation
+					?.takeEnclosingStructuresSoundInsulationCalculation ?? false,
+			baseReportInfoFlags: soundBaseFlags,
+		},
+		thermalInsulationCalculation: {
+			takeDetailedCalculatingMethod:
+				data.thermalInsulationCalculation?.takeDetailedCalculatingMethod ?? false,
+			baseReportInfoFlags: thermalBaseFlags,
+		},
 	};
 };
 

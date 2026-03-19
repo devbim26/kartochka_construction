@@ -58,7 +58,8 @@ const ReportFromComponent = () => {
 	}, [reportId]);
 
 	const submitReportWithLogo = async (action: 'download' | 'save') => {
-		if (Object.keys(form.formState.errors).length) {
+		const isValid = await form.trigger();
+		if (!isValid) {
 			toast.error(t('constructor.reportForm.fillForm'));
 			return;
 		}

@@ -230,9 +230,12 @@ export const convertToClientSingleConstruction = (
 export const convertFloorDataToClientConstructionSheet = (
 	data: FloorConstruction | SingleConstruction,
 	constructionHeader: ConstructionsEditData,
+	meta?: { levelMark?: string; pageNumber?: number },
 ): ConstructionSheet => {
 	return {
 		reportFloorInfoId: 'id' in data ? data.id : undefined,
+		levelMark: meta?.levelMark,
+		pageNumber: meta?.pageNumber,
 		constructionDivide:
 			data.reportConstructionHeader.firstPlacemetnRoom.name +
 			'/' +

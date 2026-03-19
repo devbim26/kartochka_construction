@@ -10,9 +10,8 @@ import {
 } from '@features/constructor/converters';
 import {
 	createReportFloorInfo,
-	deleteFloorPlan,
+	deleteReportFloorInfo,
 	deleteConstruction,
-	getReportInfoIds,
 	getReportFloorById,
 	getReportSingleById,
 	updateReportFloorInfo,
@@ -203,22 +202,11 @@ export const FloorPlans = memoize(() => {
 					if (uploadResponse.status !== 200 || !reportId) {
 						throw new Error(t('floorPlans.toast.uploadError'));
 					}
-					return from(getReportInfoIds(reportId)).pipe(
-						switchMap((idsResponse) => {
-							const ids =
-								idsResponse.data?.map((item) => item.id).filter(Boolean) ?? [];
-							return from(getReportFloorById({ id: reportId })).pipe(
-								tap((floorResponse) => {
-									if (!floorResponse.data) return;
-									const nextLevels = mapServerLevels(floorResponse.data).map(
-										(level, index) => ({
-											...level,
-											serverId: ids[index] || level.serverId,
-										}),
-									);
-									setLevels((prev) => mergeLevels(nextLevels, prev));
-								}),
-							);
+					return from(getReportFloorById({ id: reportId })).pipe(
+						tap((floorResponse) => {
+							if (!floorResponse.data) return;
+							const nextLevels = mapServerLevels(floorResponse.data);
+							setLevels((prev) => mergeLevels(nextLevels, prev));
 						}),
 					);
 				}),
@@ -267,10 +255,12 @@ export const FloorPlans = memoize(() => {
 	}, [currentReportConstruction]);
 
 	useEffect(() => {
-		if (reportType !== ReportCategory.Floor || !currentReportConstructions.length) return;
+		if (reportType !== ReportCategory.Floor) return;
+		const allFloorConstructions = levels.flatMap((level) => level.constructions);
+		if (!allFloorConstructions.length) return;
 		const missingIds = Array.from(
 			new Set(
-				currentReportConstructions
+				allFloorConstructions
 					.map((c) => c.reportConstructionHeader.constructionHeaderId)
 					.filter((id) => id && !constructionHeadersById[id]),
 			),
@@ -297,26 +287,16 @@ export const FloorPlans = memoize(() => {
 				return next;
 			});
 		});
-	}, [reportType, currentReportConstructions, constructionHeadersById]);
+	}, [reportType, levels, constructionHeadersById]);
 
 	const handleGetCurrentReportFloorInfos = (id: string) => {
 		dispatch(startLoading());
-		from(getReportInfoIds(id))
+		from(getReportFloorById({ id }))
 			.pipe(
-				switchMap((idsResponse) => {
-					const ids = idsResponse.data?.map((item) => item.id).filter(Boolean) ?? [];
-					return from(getReportFloorById({ id })).pipe(
-						tap((floorResponse) => {
-							if (!floorResponse.data) return;
-							const nextLevels = mapServerLevels(floorResponse.data).map(
-								(level, index) => ({
-									...level,
-									serverId: ids[index] || level.serverId,
-								}),
-							);
-							setLevels((prev) => mergeLevels(nextLevels, prev));
-						}),
-					);
+				tap((floorResponse) => {
+					if (!floorResponse.data) return;
+					const nextLevels = mapServerLevels(floorResponse.data);
+					setLevels((prev) => mergeLevels(nextLevels, prev));
 				}),
 				switchMap((floorResponse) => {
 					if (floorResponse.status !== 200 || !floorResponse.data) {
@@ -500,7 +480,7 @@ export const FloorPlans = memoize(() => {
 			setActiveLevelId(next?.id || null);
 		}
 		if (!resolvedLevelId) return;
-		from(deleteFloorPlan({ floorConstructionInfoToDeleteId: resolvedLevelId }))
+		from(deleteReportFloorInfo(resolvedLevelId))
 			.pipe(
 				tap((response) => {
 					if (response.status >= 200 && response.status < 300 && reportId) {
@@ -526,8 +506,9 @@ export const FloorPlans = memoize(() => {
 
 		if (levelForCurrentPage) {
 			setActiveLevelId(levelForCurrentPage.id);
-		} else if (activeLevelId && !levels.some((level) => level.id === activeLevelId)) {
-			setActiveLevelId(levels[0].id);
+		} else {
+			// On pages without a level, reset active selection.
+			setActiveLevelId(null);
 		}
 	}, [currentPage, levels, activeLevelId]);
 
@@ -535,6 +516,25 @@ export const FloorPlans = memoize(() => {
 	const selectedReportFloorInfoId = currentReportConstruction?.id || currentReportFloorInfo[0];
 	const selectedLevelReportFloorInfoId = activeLevel?.serverId || activeLevel?.id;
 	const hasLevelOnCurrentPage = levels.some((level) => level.pageNumber === currentPage);
+	const allFloorConstructionSheets = levels
+		.slice()
+		.sort((a, b) => a.pageNumber - b.pageNumber)
+		.reduce((acc, level) => {
+			level.constructions.forEach((construction) => {
+				const header =
+					constructionHeadersById[
+						construction.reportConstructionHeader.constructionHeaderId
+					];
+				if (!header) return;
+				acc.push(
+					convertFloorDataToClientConstructionSheet(construction, header, {
+						levelMark: level.code,
+						pageNumber: level.pageNumber,
+					}),
+				);
+			});
+			return acc;
+		}, [] as import('@features/constructor/types').ConstructionSheet[]);
 
 	useEffect(() => {
 		if (!activeLevel) {
@@ -806,20 +806,7 @@ export const FloorPlans = memoize(() => {
 				<ConstructionSheets
 					constructionSheets={
 						reportType === ReportCategory.Floor
-							? currentReportConstructions.reduce((acc, construction) => {
-									const header =
-										constructionHeadersById[
-											construction.reportConstructionHeader.constructionHeaderId
-										];
-									if (!header) return acc;
-									acc.push(
-										convertFloorDataToClientConstructionSheet(
-											construction,
-											header,
-										),
-									);
-									return acc;
-								}, [] as import('@features/constructor/types').ConstructionSheet[])
+							? allFloorConstructionSheets
 							: currentReportConstruction?.reportConstructionHeader.id &&
 								  currentConstructionHeader
 								? [

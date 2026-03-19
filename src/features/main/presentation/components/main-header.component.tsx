@@ -23,6 +23,14 @@ interface FeatureCard {
 	onClick?: () => void;
 }
 
+const featureAccentColors: Record<string, string> = {
+	'sound-isolation': '#B1C9E3',
+	'ai-assistant': '#EED0C5',
+	'ai-visualization': '#F3F2BA',
+	'project-expertise': '#DFA4C2',
+	'normative-analytics': '#B2CAA0',
+};
+
 export const MainHeader = () => {
 	const navigate = useAppNavigate();
 	const { t } = useI18n();
@@ -231,9 +239,16 @@ export const MainHeader = () => {
 						>
 							<div className="mb-3 flex-1 overflow-hidden">
 								<div className="mb-2 flex items-start justify-between">
-									<h3 className="text-[20px] font-bold text-gray-800">
-										{feature.title}
-									</h3>
+									<div
+										className="w-full rounded-xl px-3 py-1"
+										style={{
+											backgroundColor: featureAccentColors[feature.id] || '#B1C9E3',
+										}}
+									>
+										<h3 className="text-[20px] font-bold text-gray-800">
+											{feature.title}
+										</h3>
+									</div>
 								</div>
 
 								<div className="mb-3 flex items-start gap-3">
@@ -306,9 +321,16 @@ export const MainHeader = () => {
 						>
 							<div className="mb-3 flex-1 overflow-hidden">
 								<div className="mb-2 flex items-start justify-between">
-									<h3 className="text-[20px] font-bold text-gray-800">
-										{feature.title}
-									</h3>
+									<div
+										className="w-full rounded-xl px-3 py-1"
+										style={{
+											backgroundColor: featureAccentColors[feature.id] || '#B1C9E3',
+										}}
+									>
+										<h3 className="text-[20px] font-bold text-gray-800">
+											{feature.title}
+										</h3>
+									</div>
 								</div>
 
 								<div className="mb-3 flex items-start gap-3">
