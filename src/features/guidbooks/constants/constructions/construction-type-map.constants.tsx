@@ -179,6 +179,11 @@ export const ConstructionTypeMap = ({
 			action: () => {},
 		},
 
+		[ConstructionTypeEnum.Door]: {
+			component: <></>,
+			action: () => {},
+		},
+
 		[ConstructionTypeEnum.HeavySingleLayerWall]: {
 			component: <HeavySingleLayerWallComponent currentForm={currentForm} />,
 			action: () => {

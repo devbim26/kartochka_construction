@@ -1,27 +1,35 @@
 import type * as pdfjs from 'pdfjs-dist';
 import { useCallback, useRef, useState } from 'react';
 
+const isRenderingCancelled = (error: unknown): boolean =>
+	error instanceof Error && error.name === 'RenderingCancelledException';
+
 export const useRenderPage = (
 	pdfFile: pdfjs.PDFDocumentProxy,
 	canvasRef: React.RefObject<HTMLCanvasElement | null>,
 	scale: number,
 ) => {
 	const renderTaskRef = useRef<pdfjs.RenderTask | null>(null);
+	const renderGenerationRef = useRef(0);
 	const [isRendering, setIsRendering] = useState(false);
 
 	const renderPage = useCallback(
 		async (pageNum: number) => {
 			if (!pdfFile || !canvasRef.current) return;
 
+			const generation = ++renderGenerationRef.current;
+
 			if (renderTaskRef.current) {
 				try {
 					renderTaskRef.current.cancel();
-				} catch (error) {
-					console.warn('Ошибка отмены рендера:', error);
+				} catch {
+					// ignore
 				}
 			}
 
 			const page = await pdfFile.getPage(pageNum);
+			if (generation !== renderGenerationRef.current) return;
+
 			const viewport = page.getViewport({ scale });
 
 			const canvas = canvasRef.current;
@@ -33,18 +41,24 @@ export const useRenderPage = (
 
 			setIsRendering(true);
 
-			renderTaskRef.current = page.render({ canvasContext: context, viewport });
+			const task = page.render({ canvasContext: context, viewport });
+			renderTaskRef.current = task;
 
 			try {
-				await renderTaskRef.current.promise;
+				await task.promise;
 			} catch (error) {
-				console.warn('Ошибка рендера:', error);
+				if (generation !== renderGenerationRef.current) return;
+				if (!isRenderingCancelled(error)) {
+					console.warn('Ошибка рендера:', error);
+				}
 			} finally {
-				setIsRendering(false);
-				renderTaskRef.current = null;
+				if (generation === renderGenerationRef.current) {
+					renderTaskRef.current = null;
+					setIsRendering(false);
+				}
 			}
 		},
-		[pdfFile, scale],
+		[pdfFile, scale, canvasRef],
 	);
 
 	return { renderPage, isRendering };

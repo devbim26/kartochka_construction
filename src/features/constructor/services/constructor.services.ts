@@ -123,7 +123,10 @@ export const getFloorConstructionById = async (id: string) => {
 	);
 };
 
-export const createReportFloorInfo = async (data: { reportInfoId?: string; floorName?: string }) => {
+export const createReportFloorInfo = async (data: {
+	reportInfoId?: string;
+	floorName?: string;
+}) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoReportFloorInfoCreate(data));
 };
 
@@ -181,6 +184,12 @@ export const svgConstructionDetail = async (id: string) => {
 export const deleteConstruction = async (id: string) => {
 	const result = await withConstructorLoader(() => fetchApi.api.constructionDelete({ id }));
 	return result;
+};
+
+export const deleteReportConstruction = async (id: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoReportConstructionDelete({ id }),
+	);
 };
 
 export const formReport = async (data: FormReportSchemaType) => {

@@ -52,6 +52,7 @@ export enum ConstructionTypeEnum {
 
 	HomogeneousFloor = 'HomogeneousFloor',
 	ElasticBaseFloor = 'ElasticBaseFloor',
+	Door = 'Door',
 }
 
 export const RuConstructionTypesMap = {
@@ -76,6 +77,7 @@ export const RuConstructionTypesMap = {
 	DoubleGlazedFrame: 'Стеклопакет',
 	HomogeneousFloor: 'Однородный пол',
 	ElasticBaseFloor: 'Пол с эластичным основанием',
+	Door: 'Дверь',
 };
 
 export const EnConstructionTypesMap = {
@@ -100,6 +102,7 @@ export const EnConstructionTypesMap = {
 	DoubleGlazedFrame: 'Double-glazed window',
 	HomogeneousFloor: 'Homogeneous floor',
 	ElasticBaseFloor: 'Floor with elastic base',
+	Door: 'Door',
 };
 
 export const EnConstructionTypesSelectValues = [

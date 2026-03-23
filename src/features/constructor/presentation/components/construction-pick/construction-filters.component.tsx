@@ -25,7 +25,6 @@ export const ConstructionFilters = ({ onSubmit }: Props) => {
 						{...register('minThickness')}
 						type={'number'}
 						placeholder="Толщина min"
-						max={50}
 					/>
 					<Input
 						wrapperClassName="flex-row items-center gap-[10px]"
@@ -33,108 +32,42 @@ export const ConstructionFilters = ({ onSubmit }: Props) => {
 						{...register('maxThickness')}
 						type={'number'}
 						placeholder="Толщина max"
-						max={50}
 					/>
 				</div>
 				<div className="flex gap-[10px]">
-					<FormElementLabel className="w-[400px]">Масса, кг/м2</FormElementLabel>
+					<FormElementLabel className="w-[400px]">Масса, кг/м²</FormElementLabel>
 					<Input
 						wrapperClassName="flex-row items-center gap-[10px] "
 						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						{...register('minHeight')}
+						{...register('minWeight')}
 						type={'number'}
 						placeholder="Масса min"
-						max={50}
 					/>
 					<Input
 						wrapperClassName="flex-row items-center gap-[10px]"
 						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						{...register('maxHeight')}
+						{...register('maxWeight')}
 						type={'number'}
 						placeholder="Масса max"
-						max={50}
-					/>
-				</div>
-				<div className="flex gap-[10px]">
-					<FormElementLabel className="w-[400px]">Высота, м</FormElementLabel>
-					<Input
-						wrapperClassName="flex-row items-center gap-[10px] "
-						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						{...register('minHeight')}
-						type={'number'}
-						placeholder="Высота min"
-						max={50}
-					/>
-					<Input
-						wrapperClassName="flex-row items-center gap-[10px]"
-						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						{...register('maxHeight')}
-						type={'number'}
-						placeholder="Высота max"
-						max={50}
 					/>
 				</div>
 				<div className="flex gap-[10px]">
 					<FormElementLabel className="w-[400px]">
-						Звукоизоляция расчетная, дБ
-					</FormElementLabel>
-					<Input
-						wrapperClassName="flex-row items-center gap-[10px] "
-						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						{...register('minIndex')}
-						type={'number'}
-						placeholder="Звукоизоляция расчетная min"
-						max={50}
-					/>
-					<Input
-						wrapperClassName="flex-row items-center gap-[10px]"
-						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						{...register('maxIndex')}
-						type={'number'}
-						placeholder="Звукоизоляция расчетная max"
-						max={50}
-					/>
-				</div>
-				<div className="flex gap-[10px]">
-					<FormElementLabel className="w-[400px]">
-						Звукоизоляция лабораторая, дБ
+						Звукоизоляция лабораторная, дБ
 					</FormElementLabel>
 					<Input
 						wrapperClassName="flex-row items-center gap-[10px] "
 						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 						{...register('minLabIndex')}
 						type={'number'}
-						placeholder="Звукоизоляция лабораторая min"
-						max={50}
+						placeholder="Звукоизоляция лаб. min"
 					/>
 					<Input
 						wrapperClassName="flex-row items-center gap-[10px]"
 						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 						{...register('maxLabIndex')}
 						type={'number'}
-						placeholder="Звукоизоляция лабораторая max"
-						max={50}
-					/>
-				</div>
-				<div className="flex gap-[10px]">
-					<FormElementLabel className="w-[400px]">
-						Предел огнестойкости, EI
-					</FormElementLabel>
-					<Input
-						wrapperClassName="flex-row items-center gap-[10px] "
-						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						{...register('minFireresistance')}
-						type={'number'}
-						placeholder="Предел огнестойкости min"
-						max={50}
-					/>
-					<Input
-						wrapperClassName="flex-row items-center gap-[10px]"
-						inputClassName="w-[300px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-						{...register('maxFireresistance')}
-						type={'number'}
-						placeholder="Предел огнестойкости max"
-						max={50}
+						placeholder="Звукоизоляция лаб. max"
 					/>
 				</div>
 				<Button

@@ -25,7 +25,7 @@ import { Guidebooks } from '@features/guidbooks/types';
 import { AxiosError } from 'axios';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, of, tap } from 'rxjs';
@@ -46,6 +46,7 @@ const ContructionPick = () => {
 	const dispatch = useAppDispatch();
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [alternateConstructions, setAlternateConstructions] = useState<AlternateConstruction[]>();
+	const [totalPages, setTotalPages] = useState(1);
 	const form = useForm<ConstructionSelectRestrictions>();
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const [reportConstructionId, setReportConstructionId] = useState<string | null>(null);
@@ -178,42 +179,70 @@ const ContructionPick = () => {
 			});
 	}, [constructionHeaderId, svgUrl]);
 
-	const handleAlternateConstructions = (data: ConstructionSelectRestrictions) => {
-		const requirementId = currentReportInfo?.regulatoryRequirement?.id;
-		if (!requirementId) {
-			toast.error('Не удалось определить требование для подбора альтернатив');
-			return;
-		}
-		from(
-			getAlternateConstructions({
-				...data,
-				pageSize: 2,
-				requirementId,
-				pageNumber: pageNumber,
-			}),
-		)
-			.pipe(
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
-					}
-					return [];
+	const handleAlternateConstructions = useCallback(
+		(data: ConstructionSelectRestrictions, page = pageNumber) => {
+			from(
+				getAlternateConstructions({
+					...data,
+					pageSize: 2,
+					pageNumber: page,
 				}),
 			)
-			.subscribe((response) => {
-				if (response.status === 200) {
-					const items = response.data?.items ?? [];
-					const alternate = items.map(convertToClientAlternateConstruction);
-					setAlternateConstructions(alternate);
-				} else {
-					toast.error('Неверный формат');
-				}
-			});
-	};
+				.pipe(
+					catchError((error) => {
+						if (error instanceof AxiosError) {
+							toast.error(error.response?.data);
+						}
+						return [];
+					}),
+				)
+				.subscribe((response) => {
+					if (response.status === 200) {
+						const items = response.data?.items ?? [];
+						const alternate = items.map(convertToClientAlternateConstruction);
+						setAlternateConstructions(alternate);
+						setTotalPages(response.data?.totalPages ?? 1);
+					} else {
+						toast.error('Неверный формат');
+					}
+				});
+		},
+		[pageNumber],
+	);
 
 	useEffect(() => {
 		if (currentReportInfo && showAlternate) handleAlternateConstructions(form.getValues());
 	}, [currentReportInfo, showAlternate]);
+
+	const handlePageChange = useCallback(
+		(newPage: number) => {
+			setPageNumber(newPage);
+			handleAlternateConstructions(form.getValues(), newPage);
+		},
+		[handleAlternateConstructions, form],
+	);
+
+	const handleSwapSuccess = useCallback(
+		(newConstructionHeaderId: string) => {
+			setConstructionHeader(null);
+			setSvgUrl(null);
+			handleGetConstructionByHeaderId(newConstructionHeaderId);
+
+			from(svgConstructionDetail(newConstructionHeaderId))
+				.pipe(catchError(() => []))
+				.subscribe((response) => {
+					if (response.status === 200 && typeof response.data === 'string') {
+						setSvgUrl(response.data);
+					}
+				});
+
+			if (showAlternate) {
+				setPageNumber(1);
+				handleAlternateConstructions(form.getValues(), 1);
+			}
+		},
+		[showAlternate, form, handleAlternateConstructions],
+	);
 
 	return (
 		<div className="relative flex flex-col gap-[30px]">
@@ -273,13 +302,20 @@ const ContructionPick = () => {
 				<div className="flex flex-col gap-[30px]">
 					<FormProvider {...form}>
 						<ConstructionFilters
-							onSubmit={() => handleAlternateConstructions(form.getValues())}
+							onSubmit={() => {
+								setPageNumber(1);
+								handleAlternateConstructions(form.getValues(), 1);
+							}}
 						/>
 					</FormProvider>
 					<AlternateConstructionList
 						alternateConstructions={alternateConstructions || []}
 						reportInfo={currentReportInfo}
 						reportConstructionId={reportConstructionId}
+						onSwapSuccess={handleSwapSuccess}
+						pageNumber={pageNumber}
+						totalPages={totalPages}
+						onPageChange={handlePageChange}
 					/>
 				</div>
 			)}

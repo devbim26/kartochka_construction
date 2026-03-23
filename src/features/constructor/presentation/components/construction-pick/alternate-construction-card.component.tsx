@@ -28,12 +28,14 @@ type Props = {
 	construction: AlternateConstruction;
 	reportInfo: ReportInfoShort;
 	reportConstructionId: string | null;
+	onSwapSuccess: (newConstructionHeaderId: string) => void;
 };
 
 export const AlternateConstructionCard = ({
 	construction,
 	reportInfo,
 	reportConstructionId,
+	onSwapSuccess,
 }: Props) => {
 	const dispatch = useAppDispatch();
 
@@ -133,6 +135,7 @@ export const AlternateConstructionCard = ({
 				tap((response) => {
 					if (response?.status === 200) {
 						toast.success('Конструкция установлена как базовая');
+						onSwapSuccess(construction.id);
 					}
 				}),
 				catchError((error) => {

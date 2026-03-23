@@ -63,7 +63,9 @@ export const FloorPlanViewer = ({
 
 	const previousConstructionRef = useRef<FloorConstruction | null>(null);
 	const hoveredConstructionIdRef = useRef<string | null>(null);
-	const attemptedImageUploadIdsRef = useRef<Set<string>>(new Set());
+	const renderJobRef = useRef(0);
+	const imageUploadInFlightRef = useRef<Set<string>>(new Set());
+	const imageUploadFailedAtRef = useRef<Map<string, number>>(new Map());
 	const constructionsOnPageRef = useRef<
 		Array<{
 			construction: FloorConstruction;
@@ -253,11 +255,13 @@ export const FloorPlanViewer = ({
 		if (!pdfFile || !canvasRef.current) return;
 
 		const canvas = canvasRef.current;
+		const renderJobId = ++renderJobRef.current;
 
 		const renderAndDraw = async () => {
 			try {
 				// Рендерим текущую страницу (из пропсов)
 				await renderPage(currentPage);
+				if (renderJobRef.current !== renderJobId) return;
 				const overlayCanvas = overlayCanvasRef.current;
 				if (overlayCanvas) {
 					overlayCanvas.width = canvas.width;
@@ -303,19 +307,20 @@ export const FloorPlanViewer = ({
 						constructionLabels,
 						false,
 					);
+					if (renderJobRef.current !== renderJobId) return;
 				}
 				constructionsOnPageRef.current = nextConstructionItems;
 
-				// Для каждой конструкции без скрина формируем и загружаем изображение.
 				for (const item of nextConstructionItems) {
+					if (renderJobRef.current !== renderJobId) return;
 					const constructionId = item.construction.id;
 					if (!constructionId) continue;
-					if (item.construction.documentImageUrl) {
-						attemptedImageUploadIdsRef.current.delete(constructionId);
-						continue;
-					}
-					if (attemptedImageUploadIdsRef.current.has(constructionId)) continue;
+					if (item.construction.documentImageUrl) continue;
+					if (imageUploadInFlightRef.current.has(constructionId)) continue;
+					const failedAt = imageUploadFailedAtRef.current.get(constructionId);
+					if (failedAt && Date.now() - failedAt < 3000) continue;
 
+					imageUploadInFlightRef.current.add(constructionId);
 					const imageFile = cropCanvasToFile(
 						canvas,
 						item.bounds.left + item.bounds.width / 2,
@@ -328,49 +333,61 @@ export const FloorPlanViewer = ({
 						imageFile,
 						dispatch,
 					);
+					imageUploadInFlightRef.current.delete(constructionId);
 					if (uploaded) {
 						shouldRefreshData = true;
+						imageUploadFailedAtRef.current.delete(constructionId);
 					} else {
-						attemptedImageUploadIdsRef.current.add(constructionId);
+						imageUploadFailedAtRef.current.set(constructionId, Date.now());
 					}
 				}
 
-				// Для генерации мини-изображения ориентируемся на текущую активную конструкцию
-				if (currentConstruction?.page === currentPage) {
+				// Upload image for the active construction only when its coordinates changed.
+				if (currentConstruction?.page === currentPage && currentConstruction.id) {
 					const bounds = resolveConstructionBounds(canvas, currentConstruction, scale);
 
 					const prev = previousConstructionRef.current;
-					const hasChanged =
+					const coordsChanged =
+						prev &&
+						prev.reportConstructionHeader.id ===
+							currentConstruction.reportConstructionHeader.id &&
+						(prev.coordinates.x !== currentConstruction.coordinates.x ||
+							prev.coordinates.y !== currentConstruction.coordinates.y ||
+							prev.coordinates2.x !== currentConstruction.coordinates2.x ||
+							prev.coordinates2.y !== currentConstruction.coordinates2.y);
+
+					const isNewConstruction =
 						!prev ||
 						prev.reportConstructionHeader.id !==
-							currentConstruction.reportConstructionHeader.id ||
-						prev.coordinates.x !== currentConstruction.coordinates.x ||
-						prev.coordinates.y !== currentConstruction.coordinates.y ||
-						prev.coordinates2.x !== currentConstruction.coordinates2.x ||
-						prev.coordinates2.y !== currentConstruction.coordinates2.y;
+							currentConstruction.reportConstructionHeader.id;
 
-					if (hasChanged) {
-						const imageFile = cropCanvasToFile(
-							canvas,
-							bounds.centerX,
-							bounds.centerY,
-							900,
-							400,
-						);
+				const needsUpload =
+					coordsChanged ||
+					(isNewConstruction && !currentConstruction.documentImageUrl);
 
-						const uploaded = await uploadImageForConstruction(
-							currentConstruction.id,
-							imageFile,
-							dispatch,
-						);
-						if (uploaded) {
-							shouldRefreshData = true;
-						}
+				if (needsUpload) {
+					if (renderJobRef.current !== renderJobId) return;
+					const imageFile = cropCanvasToFile(
+						canvas,
+						bounds.centerX,
+						bounds.centerY,
+						900,
+						400,
+					);
 
-						previousConstructionRef.current = currentConstruction;
+					const uploaded = await uploadImageForConstruction(
+						currentConstruction.id,
+						imageFile,
+						dispatch,
+					);
+					if (uploaded) {
+						shouldRefreshData = true;
 					}
 				}
-				if (shouldRefreshData) {
+
+					previousConstructionRef.current = currentConstruction;
+				}
+				if (shouldRefreshData && renderJobRef.current === renderJobId) {
 					getData();
 				}
 			} catch (error) {
@@ -397,8 +414,9 @@ export const FloorPlanViewer = ({
 	}, [currentPage, search.get('create')]);
 
 	useEffect(() => {
-		attemptedImageUploadIdsRef.current.clear();
-	}, [currentConstructions]);
+		hoveredConstructionIdRef.current = null;
+		constructionsOnPageRef.current = [];
+	}, [currentPage, currentConstructions]);
 
 	return (
 		<div className="flex items-center justify-center rounded-[20px] py-[30px]">
@@ -438,7 +456,7 @@ export const FloorPlanViewer = ({
 								<FaPlus />
 							</Button>
 							<Button
-								onClick={() => setScale((prev) => Math.max(prev - 0.2, -10))}
+								onClick={() => setScale((prev) => Math.max(prev - 0.2, 0.4))}
 								variant="primary"
 								className="p-[10px]"
 							>

@@ -31,6 +31,14 @@ export interface AccountDto {
 	dowloadReportsNumber?: number;
 }
 
+export interface AdditionalConstructionHeaderDto {
+	constructionHeader?: ConstructionHeaderDto;
+	/** @format double */
+	lenght?: number;
+	/** @format double */
+	height?: number;
+}
+
 export interface AdditionalGraphParametersDto {
 	/** @format double */
 	delta?: number;
@@ -215,6 +223,7 @@ export enum ConstructionTypeEnum {
 	OneGlassFrame = 'OneGlassFrame',
 	HomogeneousFloor = 'HomogeneousFloor',
 	ElasticBaseFloor = 'ElasticBaseFloor',
+	Door = 'Door',
 }
 
 export interface ConstructionTypeTemplate {
@@ -405,6 +414,8 @@ export interface CreateSubscriptionCommand {
 	numberOfReports?: number;
 	/** @format int32 */
 	numberOfDowloadReports?: number;
+	/** @format double */
+	budgetForGeneration?: number;
 }
 
 export interface CreateUserMaterialDto {
@@ -412,6 +423,7 @@ export interface CreateUserMaterialDto {
 	materialId?: string;
 	/** @format int32 */
 	positionId?: number;
+	additionalName?: string | null;
 	materialTypeValue?: MaterialTypeValueDto[] | null;
 }
 
@@ -549,8 +561,6 @@ export interface GetAlternativeConstructionHeadersQuery {
 	pageSize?: number;
 	sortOrder?: SortOrder;
 	ordering?: string | null;
-	/** @format uuid */
-	requirementId?: string;
 	/** @format double */
 	minThickness?: number | null;
 	/** @format double */
@@ -560,21 +570,9 @@ export interface GetAlternativeConstructionHeadersQuery {
 	/** @format double */
 	maxMass?: number | null;
 	/** @format double */
-	minHeight?: number | null;
-	/** @format double */
-	maxHeight?: number | null;
-	/** @format double */
-	minComputingRw?: number | null;
-	/** @format double */
-	maxComputingRw?: number | null;
-	/** @format double */
 	minLabRw?: number | null;
 	/** @format double */
 	maxLabRw?: number | null;
-	/** @format double */
-	minFireResistanceLimit?: number | null;
-	/** @format double */
-	maxFireResistanceLimit?: number | null;
 }
 
 export interface GetArticlesWithPaginationParamsQuery {
@@ -1135,6 +1133,8 @@ export interface ReportConstructionDto {
 	secondPlacementRoom?: PlacementRoomDto;
 	firstPlacementRoom?: PlacementRoomDto;
 	requirement?: RequirementDto;
+	additionalDoors?: AdditionalConstructionHeaderDto[] | null;
+	additionalWindows?: AdditionalConstructionHeaderDto[] | null;
 }
 
 export interface ReportDocumentInfoDto {
@@ -1184,7 +1184,8 @@ export interface ReportFloorConstructionInfoDto {
 	id?: string;
 	reportConstructionHeader?: ReportConstructionDto;
 	documentImageUrl?: string | null;
-	coordinates?: Coordinates;
+	coordinates1?: Coordinates;
+	coordinates2?: Coordinates;
 	/** @format int32 */
 	page?: number;
 }
@@ -1356,6 +1357,8 @@ export interface SubscriptionDto {
 	numberOfReports?: number;
 	/** @format int32 */
 	numberOfDowloadReports?: number;
+	/** @format double */
+	budgetForGeneration?: number;
 }
 
 export interface SubscriptionDtoPaginatedList {
@@ -1390,6 +1393,15 @@ export interface ThermalInsulationNamedConstructionFlagsDto {
 	reportConstructionId?: string;
 	constructionName?: string | null;
 	takeConstruction?: boolean;
+}
+
+export interface UpdateAdditionalConstructionHeaderDto {
+	/** @format uuid */
+	constructionHeaderId?: string;
+	/** @format double */
+	lenght?: number;
+	/** @format double */
+	height?: number;
 }
 
 export interface UpdateBillCommand {
@@ -1437,6 +1449,13 @@ export interface UpdateReportCommand {
 	/** @format date */
 	lastUpdated?: string;
 	status?: ReportStatus;
+}
+
+export interface UpdateReportConstructionByAdditionalConstructionsCommand {
+	/** @format uuid */
+	reportConstructionId?: string;
+	additionalWindows?: UpdateAdditionalConstructionHeaderDto[] | null;
+	additionalDoors?: UpdateAdditionalConstructionHeaderDto[] | null;
 }
 
 export interface UpdateReportFloorInfoCommand {
@@ -1495,6 +1514,8 @@ export interface UpdateSubscriptionCommand {
 	numberOfReports?: number;
 	/** @format int32 */
 	numberOfDownloadReports?: number;
+	/** @format double */
+	budgetForGeneration?: number;
 }
 
 export interface UserMaterialDto {
@@ -1504,6 +1525,7 @@ export interface UserMaterialDto {
 	materialType?: MaterialTypeEnum;
 	/** @format int32 */
 	positionId?: number;
+	additionalName?: string | null;
 	materialTypeValue?: MaterialTypeValueDto[] | null;
 }
 
@@ -3025,6 +3047,45 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags ReportInfo
+		 * @name ReportInfoReportConstructionUpdate
+		 * @request PUT:/api/ReportInfo/reportConstruction
+		 */
+		reportInfoReportConstructionUpdate: (
+			data: UpdateReportConstructionByAdditionalConstructionsCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<ReportConstructionDto, any>({
+				path: `/api/ReportInfo/reportConstruction`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoReportConstructionDelete
+		 * @request DELETE:/api/ReportInfo/reportConstruction
+		 */
+		reportInfoReportConstructionDelete: (
+			data: DeleteReportConstructionCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportInfo/reportConstruction`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
 		 * @name ReportInfoFloorConstructionUpdate
 		 * @request PUT:/api/ReportInfo/floor/construction
 		 */
@@ -3132,25 +3193,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		) =>
 			this.request<void, any>({
 				path: `/api/ReportInfo/floorConstruction`,
-				method: 'DELETE',
-				body: data,
-				type: ContentType.Json,
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportInfoReportConstructionDelete
-		 * @request DELETE:/api/ReportInfo/reportConstruction
-		 */
-		reportInfoReportConstructionDelete: (
-			data: DeleteReportConstructionCommand,
-			params: RequestParams = {},
-		) =>
-			this.request<void, any>({
-				path: `/api/ReportInfo/reportConstruction`,
 				method: 'DELETE',
 				body: data,
 				type: ContentType.Json,

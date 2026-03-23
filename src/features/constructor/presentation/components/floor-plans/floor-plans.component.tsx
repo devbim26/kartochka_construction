@@ -11,7 +11,7 @@ import {
 import {
 	createReportFloorInfo,
 	deleteReportFloorInfo,
-	deleteConstruction,
+	deleteReportConstruction,
 	getReportFloorById,
 	getReportSingleById,
 	updateReportFloorInfo,
@@ -27,7 +27,7 @@ import { Guidebooks, type ConstructionsEditData } from '@features/guidbooks/type
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { AxiosError } from 'axios';
 import * as pdfjs from 'pdfjs-dist';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BsQuestionSquareFill } from 'react-icons/bs';
 import { FaPencilAlt, FaPlus } from 'react-icons/fa';
 import { useSearchParams } from 'react-router-dom';
@@ -65,6 +65,8 @@ export const FloorPlans = memoize(() => {
 	const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [activeLevelId, setActiveLevelId] = useState<string | null>(null);
+	/** Страница PDF, на которой создан новый уровень (API не передаёт page). */
+	const pendingNewLevelPageRef = useRef<number | null>(null);
 
 	// Состояния для редактирования кода уровня
 	const [editingLevelId, setEditingLevelId] = useState<string | null>(null);
@@ -130,14 +132,67 @@ export const FloorPlans = memoize(() => {
 			.sort((a, b) => a.pageNumber - b.pageNumber);
 	};
 
-	const mergeLevels = (serverLevels: Level[], prevLevels: Level[]): Level[] => {
+	const mergeLevels = (
+		serverLevels: Level[],
+		prevLevels: Level[],
+		options?: { defaultPageForNewEmptyLevel?: number },
+	): Level[] => {
+		const prevByLevelKey = new Map<string, Level>();
+		prevLevels.forEach((level) => prevByLevelKey.set(level.serverId || level.id, level));
+
+		const hydratedServerLevels = serverLevels.map((level) => {
+			const previousLevel = prevByLevelKey.get(level.serverId || level.id);
+			if (!previousLevel) {
+				if (
+					options?.defaultPageForNewEmptyLevel != null &&
+					level.constructions.length === 0
+				) {
+					return {
+						...level,
+						pageNumber: options.defaultPageForNewEmptyLevel,
+					};
+				}
+				return level;
+			}
+
+			const prevConstructionsById = new Map(
+				previousLevel.constructions.map((construction) => [construction.id, construction]),
+			);
+			const mergedConstructions = level.constructions.map((construction) => {
+				const prevConstruction = prevConstructionsById.get(construction.id);
+				if (!prevConstruction) return construction;
+				return {
+					...construction,
+					// Backend may temporarily return empty screenshot after level switches.
+					documentImageUrl:
+						construction.documentImageUrl || prevConstruction.documentImageUrl || '',
+				};
+			});
+
+			return {
+				...level,
+				constructions: mergedConstructions,
+			};
+		});
+
 		// Keep local-only levels (without server id) on pages
 		// that are not returned by backend yet.
-		const serverPages = new Set(serverLevels.map((level) => level.pageNumber));
+		const serverPages = new Set(hydratedServerLevels.map((level) => level.pageNumber));
 		const localOnly = prevLevels.filter(
 			(level) => !level.serverId && !serverPages.has(level.pageNumber),
 		);
-		return [...serverLevels, ...localOnly].sort((a, b) => a.pageNumber - b.pageNumber);
+		const merged = [...hydratedServerLevels, ...localOnly].sort(
+			(a, b) => a.pageNumber - b.pageNumber,
+		);
+		// Backend/local races may briefly duplicate levels, keep unique by serverId/id.
+		const unique = new Map<string, Level>();
+		merged.forEach((level) => {
+			const key = level.serverId || level.id;
+			if (!unique.has(key)) {
+				unique.set(key, level);
+			}
+		});
+		return Array.from(unique.values());
 	};
 
 	const handleDeleteDocument = () => {
@@ -214,12 +269,6 @@ export const FloorPlans = memoize(() => {
 					if (floorResponse.status !== 200 || !floorResponse.data) {
 						throw new Error(t('floorPlans.toast.fetchFloorDataError'));
 					}
-					const nextLevels = mapServerLevels(floorResponse.data);
-					const levelForCurrentPage =
-						nextLevels.find((level) => level.pageNumber === currentPage) ||
-						nextLevels[0] ||
-						null;
-					setActiveLevelId(levelForCurrentPage?.id || null);
 					if (!floorResponse.data.floorDocumentUrl) {
 						throw new Error(t('floorPlans.toast.fetchFloorDataError'));
 					}
@@ -294,9 +343,22 @@ export const FloorPlans = memoize(() => {
 		from(getReportFloorById({ id }))
 			.pipe(
 				tap((floorResponse) => {
-					if (!floorResponse.data) return;
+					if (!floorResponse.data) {
+						pendingNewLevelPageRef.current = null;
+						return;
+					}
 					const nextLevels = mapServerLevels(floorResponse.data);
-					setLevels((prev) => mergeLevels(nextLevels, prev));
+					const pendingPage = pendingNewLevelPageRef.current;
+					pendingNewLevelPageRef.current = null;
+					setLevels((prev) =>
+						mergeLevels(
+							nextLevels,
+							prev,
+							pendingPage != null
+								? { defaultPageForNewEmptyLevel: pendingPage }
+								: undefined,
+						),
+					);
 				}),
 				switchMap((floorResponse) => {
 					if (floorResponse.status !== 200 || !floorResponse.data) {
@@ -306,12 +368,6 @@ export const FloorPlans = memoize(() => {
 						toast.info(t('floorPlans.toast.noReportData'));
 						return of(null);
 					}
-					const nextLevels = mapServerLevels(floorResponse.data);
-					const levelForCurrentPage =
-						nextLevels.find((level) => level.pageNumber === currentPage) ||
-						nextLevels[0] ||
-						null;
-					setActiveLevelId(levelForCurrentPage?.id || null);
 					return from(fetch(floorResponse.data.floorDocumentUrl));
 				}),
 				filter((fileResponse): fileResponse is Response => fileResponse instanceof Response),
@@ -320,6 +376,7 @@ export const FloorPlans = memoize(() => {
 				switchMap((arrayBuffer) => from(pdfjs.getDocument({ data: arrayBuffer }).promise)),
 				tap((pdf) => setPdfDoc(pdf)),
 				catchError((error) => {
+					pendingNewLevelPageRef.current = null;
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data || t('floorPlans.toast.loadError'));
 					} else {
@@ -364,8 +421,9 @@ export const FloorPlans = memoize(() => {
 	};
 
 	const deleteConstructionHandle = (id: string) => {
+		if (!id) return;
 		dispatch(startLoading());
-		from(deleteConstruction(id))
+		from(deleteReportConstruction(id))
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -406,34 +464,22 @@ export const FloorPlans = memoize(() => {
 			return;
 		}
 
-		// Создаём новый уровень с кодом по умолчанию
+		// Создаём новый уровень на сервере и после этого перезагружаем уровни.
 		const defaultCode = '0.000';
-		const generatedReportFloorInfoId = crypto.randomUUID
-			? crypto.randomUUID()
-			: Math.random().toString(36).substring(2);
-		const newLevel: Level = {
-			id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
-			code: defaultCode,
-			pageNumber: currentPage,
-			reportFloorInfoIds: [generatedReportFloorInfoId],
-			constructions: [],
-		};
-
-		setLevels((prev) => [...prev, newLevel]);
-		setActiveLevelId(newLevel.id);
-		// Сразу включаем режим редактирования для нового уровня
-		setEditingLevelId(newLevel.id);
-		setEditCodeValue(defaultCode);
 
 		if (!reportId) return;
+		pendingNewLevelPageRef.current = currentPage;
 		from(createReportFloorInfo({ reportInfoId: reportId, floorName: defaultCode }))
 			.pipe(
 				tap((response) => {
 					if (response.status >= 200 && response.status < 300) {
 						handleGetCurrentReportFloorInfos(reportId);
+					} else {
+						pendingNewLevelPageRef.current = null;
 					}
 				}),
 				catchError(() => {
+					pendingNewLevelPageRef.current = null;
 					toast.error(t('floorPlans.toast.uploadError'));
 					return of(null);
 				}),
@@ -495,46 +541,35 @@ export const FloorPlans = memoize(() => {
 			.subscribe();
 	};
 
-	// Синхронизация активного уровня с текущей страницей PDF
+	// Синхронизация активного уровня с текущей страницей PDF.
+	// Несколько уровней могут иметь один и тот же pageNumber — при клике по уровню
+	// сохраняем выбранный id, если он всё ещё относится к текущей странице.
 	useEffect(() => {
 		if (!levels.length) {
 			setActiveLevelId(null);
 			return;
 		}
 
-		const levelForCurrentPage = levels.find((level) => level.pageNumber === currentPage);
-
-		if (levelForCurrentPage) {
-			setActiveLevelId(levelForCurrentPage.id);
-		} else {
-			// On pages without a level, reset active selection.
+		const matchingLevels = levels.filter((level) => level.pageNumber === currentPage);
+		if (matchingLevels.length === 0) {
 			setActiveLevelId(null);
+			return;
 		}
-	}, [currentPage, levels, activeLevelId]);
 
-	const activeLevel = levels.find((l) => l.id === activeLevelId) || levels[0];
+		setActiveLevelId((prev) => {
+			if (prev && matchingLevels.some((l) => l.id === prev)) {
+				return prev;
+			}
+			return matchingLevels[0].id;
+		});
+	}, [currentPage, levels]);
+
+	const activeLevel = levels.find((l) => l.id === activeLevelId);
 	const selectedReportFloorInfoId = currentReportConstruction?.id || currentReportFloorInfo[0];
 	const selectedLevelReportFloorInfoId = activeLevel?.serverId || activeLevel?.id;
+	const deleteConstructionQueryId =
+		search.get('reportConstructionId') || search.get('constructionId');
 	const hasLevelOnCurrentPage = levels.some((level) => level.pageNumber === currentPage);
-	const allFloorConstructionSheets = levels
-		.slice()
-		.sort((a, b) => a.pageNumber - b.pageNumber)
-		.reduce((acc, level) => {
-			level.constructions.forEach((construction) => {
-				const header =
-					constructionHeadersById[
-						construction.reportConstructionHeader.constructionHeaderId
-					];
-				if (!header) return;
-				acc.push(
-					convertFloorDataToClientConstructionSheet(construction, header, {
-						levelMark: level.code,
-						pageNumber: level.pageNumber,
-					}),
-				);
-			});
-			return acc;
-		}, [] as import('@features/constructor/types').ConstructionSheet[]);
 
 	useEffect(() => {
 		if (!activeLevel) {
@@ -792,9 +827,18 @@ export const FloorPlans = memoize(() => {
 						onCancel={() => window.history.back()}
 						onClose={() => window.history.back()}
 						onConfirm={() => {
+							const allConstructions = levels.flatMap((level) => level.constructions);
+							const matchedConstruction = allConstructions.find(
+								(construction) =>
+									construction.reportConstructionHeader.id ===
+										deleteConstructionQueryId ||
+									construction.reportConstructionHeader.constructionHeaderId ===
+										deleteConstructionQueryId,
+							);
 							deleteConstructionHandle(
-								currentReportConstruction?.reportConstructionHeader
-									.constructionHeaderId || '',
+								matchedConstruction?.reportConstructionHeader.id ||
+									currentReportConstruction?.reportConstructionHeader.id ||
+									'',
 							);
 						}}
 						headerTitle={t('floorPlans.modal.deleteTitle')}
@@ -806,7 +850,20 @@ export const FloorPlans = memoize(() => {
 				<ConstructionSheets
 					constructionSheets={
 						reportType === ReportCategory.Floor
-							? allFloorConstructionSheets
+							? currentReportConstructions.reduce((acc, construction) => {
+									const header =
+										constructionHeadersById[
+											construction.reportConstructionHeader.constructionHeaderId
+										];
+									if (!header) return acc;
+									acc.push(
+										convertFloorDataToClientConstructionSheet(
+											construction,
+											header,
+										),
+									);
+									return acc;
+								}, [] as import('@features/constructor/types').ConstructionSheet[])
 							: currentReportConstruction?.reportConstructionHeader.id &&
 								  currentConstructionHeader
 								? [
