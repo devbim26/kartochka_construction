@@ -8,6 +8,7 @@ import {
 	HeavyMultiLayerWallFacingOneSideComponent,
 	HeavyMultiLayerWallSoundproofBothSideComponent,
 	HeavyMultiLayerWallSoundproofingOneSideComponent,
+	DoorConstructionComponent,
 	HeavySingleLayerWallComponent,
 	HeavySingleLayerWallFacingBothSideComponent,
 	HeavySingleLayerWallFacingOneSideComponent,
@@ -180,8 +181,28 @@ export const ConstructionTypeMap = ({
 		},
 
 		[ConstructionTypeEnum.Door]: {
-			component: <></>,
-			action: () => {},
+			component: <DoorConstructionComponent currentForm={currentForm} />,
+			action: () => {
+				setValue(
+					'constructionTypeObject.constructionTypeEnum',
+					ConstructionTypeEnum.Door,
+				);
+
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '2',
+						materialId: '',
+						materialType: MaterialTypeEnum.Board,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
+				]);
+
+				setValue('constructionTypeObject.leftConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
+			},
 		},
 
 		[ConstructionTypeEnum.HeavySingleLayerWall]: {

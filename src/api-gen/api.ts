@@ -37,6 +37,8 @@ export interface AdditionalConstructionHeaderDto {
 	lenght?: number;
 	/** @format double */
 	height?: number;
+	/** @format int32 */
+	quantity?: number;
 }
 
 export interface AdditionalGraphParametersDto {
@@ -520,6 +522,41 @@ export interface EnclosingStructuresSoundInsulationCalculationFlagsDto {
 export interface EnclosingStructuresThermalInsulationCalculationFlagsDto {
 	takeDetailedCalculatingMethod?: boolean;
 	baseReportInfoFlags?: ThermalInsulationFloorReportInfoFlagsDto[] | null;
+}
+
+export interface ExportMaterialsQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	name?: string | null;
+	/** @format float */
+	density?: number | null;
+	/** @format float */
+	thickness?: number | null;
+	materialType?: MaterialTypeEnum;
+}
+
+export interface ExportRequirementQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	countryType?: CountryType;
+	buildingType?: BuildingType;
+	firstPlacementRoomName?: string | null;
+	secondPlacementRoomName?: string | null;
+	standartShortName?: string | null;
+	standartFullName?: string | null;
+	/** @format date */
+	standartValidityPeriod?: string | null;
+	class?: CategoryClass;
+	/** @format uuid */
+	regulatoryDocumentId?: string | null;
 }
 
 export interface FinalizeReportInfoCommand {
@@ -1402,6 +1439,8 @@ export interface UpdateAdditionalConstructionHeaderDto {
 	lenght?: number;
 	/** @format double */
 	height?: number;
+	/** @format int32 */
+	quantity?: number;
 }
 
 export interface UpdateBillCommand {
@@ -2430,6 +2469,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags Material
+		 * @name MaterialExportCreate
+		 * @request POST:/api/Material/export
+		 */
+		materialExportCreate: (data: ExportMaterialsQuery, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/Material/export`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Material
 		 * @name MaterialCreate
 		 * @request POST:/api/Material
 		 */
@@ -3248,6 +3303,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<RequirementDto, any>({
 				path: `/api/Requirement/${id}`,
 				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Requirement
+		 * @name RequirementExportCreate
+		 * @request POST:/api/Requirement/export
+		 */
+		requirementExportCreate: (data: ExportRequirementQuery, params: RequestParams = {}) =>
+			this.request<RequirementDto, any>({
+				path: `/api/Requirement/export`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
 				format: 'json',
 				...params,
 			}),

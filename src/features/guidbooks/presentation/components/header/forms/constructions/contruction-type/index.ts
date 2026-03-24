@@ -1,3 +1,4 @@
+export * from './door-construction.component';
 export * from './elastic-base-floor.component';
 export * from './frame-partition-double.component';
 export * from './frame-partition-single.component';

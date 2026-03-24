@@ -61,6 +61,8 @@ export enum MaterialTypesSelectValuesEnum {
 	AirGapFiller = 'AirGapFiller',
 	Glass = 'Glass',
 	MultiGlass = 'MultiGlass',
+	/** Стекло или плитные слои для двери (над/под базовыми плитами). */
+	DoorOptionalLayers = 'DoorOptionalLayers',
 }
 
 export const MaterialTypesSelectValuesMap = {
@@ -114,6 +116,11 @@ export const MaterialTypesSelectValuesMap = {
 		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
 		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
 	],
+	[MaterialTypesSelectValuesEnum.DoorOptionalLayers]: [
+		{ label: 'Стеклянные', value: MaterialTypeEnum.Glazing },
+		{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
+		{ label: 'Плиты', value: MaterialTypeEnum.Board },
+	],
 };
 
 export const EnMaterialTypesSelectValuesMap = {
@@ -166,6 +173,11 @@ export const EnMaterialTypesSelectValuesMap = {
 		{ label: 'Board', value: MaterialTypeEnum.Board },
 		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
 		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
+	],
+	[MaterialTypesSelectValuesEnum.DoorOptionalLayers]: [
+		{ label: 'Glazing', value: MaterialTypeEnum.Glazing },
+		{ label: 'Heavy', value: MaterialTypeEnum.Heavy },
+		{ label: 'Board', value: MaterialTypeEnum.Board },
 	],
 };
 

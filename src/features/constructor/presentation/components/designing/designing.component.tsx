@@ -23,6 +23,7 @@ import {
 	convertToClientSingleToFloorConstruction,
 	graphAdditionalValuesConverterToClient,
 	graphDotsConverterToClient,
+	mapAdditionalOpeningsToUpdateDto,
 } from '@features/constructor/converters';
 import {
 	getFloorConstructionById,
@@ -31,6 +32,7 @@ import {
 	graphAdditionalDetail,
 	graphDetail,
 	svgConstructionDetail,
+	updateReportConstructionAdditional,
 } from '@features/constructor/services';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
 import {
@@ -46,12 +48,16 @@ import {
 } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
+import {
+	AdditionalOpeningsForm,
+	type AdditionalOpeningsFormHandle,
+} from './additional-openings-form.component';
 import DesigningGraph from './designing-graph.component';
 
 const DesigningScreen = () => {
@@ -74,6 +80,8 @@ const DesigningScreen = () => {
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
+	const additionalOpeningsRef = useRef<AdditionalOpeningsFormHandle>(null);
+	const reportConstructionIdRef = useRef<string | undefined>(undefined);
 	const navigate = useAppNavigate();
 	const reportFloorInfoId = search.get('reportFloorInfoId');
 	const { t, locale } = useI18n();
@@ -265,6 +273,10 @@ const DesigningScreen = () => {
 	}, [reportType, reportId]);
 
 	useEffect(() => {
+		reportConstructionIdRef.current = currentConstruction?.reportConstructionHeader?.id;
+	}, [currentConstruction?.reportConstructionHeader?.id]);
+
+	useEffect(() => {
 		if (!!constructionHeader && !!currentConstruction?.reportConstructionHeader.requirement) {
 			const rwValue = +(constructionHeader.RCalcs || 0);
 			const labRwValue = +(constructionHeader.labIndexValue || 0);
@@ -385,9 +397,53 @@ const DesigningScreen = () => {
 
 					setGraphData(null);
 					setGraphAdditionalData(null);
+
+					const rcId = reportConstructionIdRef.current;
+					const openings = additionalOpeningsRef.current;
+					if (!rcId || !openings) return;
+					const { windows, doors } = openings.getPayload();
+					from(
+						updateReportConstructionAdditional({
+							reportConstructionId: rcId,
+							additionalWindows: mapAdditionalOpeningsToUpdateDto(windows),
+							additionalDoors: mapAdditionalOpeningsToUpdateDto(doors),
+						}),
+					)
+						.pipe(
+							catchError((error) => {
+								if (error instanceof AxiosError) {
+									const message =
+										typeof error.response?.data === 'string'
+											? error.response.data
+											: error.response?.data?.title || t('errors.request');
+									toast.error(message);
+								} else {
+									toast.error(t('errors.request'));
+								}
+								return of(null);
+							}),
+						)
+						.subscribe((addRes) => {
+							if (addRes?.status === 200) {
+								if (reportType === ReportCategory.Single && reportId) {
+									handleGetSingleConstruction(reportId);
+								} else if (reportFloorInfoId) {
+									handleGetCurrentConstructionReportHeader(reportFloorInfoId);
+								}
+							}
+						});
 				}
 			});
-	}, [form, constructionHeaderId, handleGetConstructionByHeaderId, handleGetConstructionImage]);
+	}, [
+		form,
+		constructionHeaderId,
+		handleGetConstructionByHeaderId,
+		handleGetConstructionImage,
+		reportFloorInfoId,
+		reportId,
+		reportType,
+		t,
+	]);
 
 	const onEditHandleWithRedirect = useCallback(() => {
 		const formData = form.getValues() as ConstructionsEditData;
@@ -416,17 +472,50 @@ const DesigningScreen = () => {
 				}),
 			)
 			.subscribe((response) => {
-				if (response?.status === 200) {
-					toast.success(t('success.constructionUpdated'));
+				if (response?.status !== 200) return;
+				toast.success(t('success.constructionUpdated'));
 
-					if (!constructionHeaderId) return;
+				if (!constructionHeaderId) return;
+
+				const goFloorPlans = () =>
 					navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
 						reportId: reportId!,
 						reportType: reportType!,
 					});
+
+				const rcId = reportConstructionIdRef.current;
+				const openings = additionalOpeningsRef.current;
+				if (!rcId || !openings) {
+					goFloorPlans();
+					return;
 				}
+				const { windows, doors } = openings.getPayload();
+				from(
+					updateReportConstructionAdditional({
+						reportConstructionId: rcId,
+						additionalWindows: mapAdditionalOpeningsToUpdateDto(windows),
+						additionalDoors: mapAdditionalOpeningsToUpdateDto(doors),
+					}),
+				)
+					.pipe(
+						catchError((error) => {
+							if (error instanceof AxiosError) {
+								const message =
+									typeof error.response?.data === 'string'
+										? error.response.data
+										: error.response?.data?.title || t('errors.request');
+								toast.error(message);
+							} else {
+								toast.error(t('errors.request'));
+							}
+							return of(null);
+						}),
+					)
+					.subscribe((addRes) => {
+						if (addRes?.status === 200) goFloorPlans();
+					});
 			});
-	}, [form, constructionHeaderId, navigate, reportId, reportType]);
+	}, [form, constructionHeaderId, navigate, reportId, reportType, t]);
 
 	return (
 		<div className="relative flex w-full flex-col gap-[30px]">
@@ -521,6 +610,19 @@ const DesigningScreen = () => {
 						currentConstruction: constructionType,
 						currentForm: form,
 					}).component}
+				{currentConstruction?.reportConstructionHeader?.id ? (
+					<AdditionalOpeningsForm
+						ref={additionalOpeningsRef}
+						key={currentConstruction.reportConstructionHeader.id}
+						reportConstructionId={currentConstruction.reportConstructionHeader.id}
+						initialWindows={
+							currentConstruction.reportConstructionHeader.additionalWindows ?? []
+						}
+						initialDoors={
+							currentConstruction.reportConstructionHeader.additionalDoors ?? []
+						}
+					/>
+				) : null}
 				<div className="flex items-center justify-end gap-[10px]">
 					<Button
 						onClick={onEditHandle}

@@ -1,4 +1,5 @@
 import type { ConstructionType } from '@features/guidbooks/types';
+import type { AdditionalOpeningRow } from './floor-plan.types';
 
 export type ConstructionSheet = {
 	id: string;
@@ -13,4 +14,6 @@ export type ConstructionSheet = {
 	square: string;
 	constructionId: string;
 	materials: ConstructionType[];
+	additionalWindows?: AdditionalOpeningRow[];
+	additionalDoors?: AdditionalOpeningRow[];
 };

@@ -15,7 +15,10 @@ import {
 } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { ReportCategory } from '@features/constructor/types';
-import type { ConstructionSheet } from '@features/constructor/types/constructions-sheet.types';
+import type {
+	AdditionalOpeningRow,
+	ConstructionSheet,
+} from '@features/constructor/types';
 import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import { EnConstructionTypesMap, RuConstructionTypesMap } from '@features/guidbooks/types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
@@ -27,6 +30,24 @@ import { ConstructionImage } from './construction-info-image.component';
 type Props = {
 	constructionSheets?: ConstructionSheet[];
 };
+
+const MM2_PER_M2 = 1_000_000;
+
+const sumAdditionalOpeningsAreaM2 = (rows?: AdditionalOpeningRow[]): number => {
+	if (!rows?.length) return 0;
+	return rows.reduce((total, row) => {
+		const l = row.length || 0;
+		const h = row.height || 0;
+		const q = row.quantity || 0;
+		return total + (l * h * q) / MM2_PER_M2;
+	}, 0);
+};
+
+const formatAreaM2Number = (value: number, locale: string): string =>
+	value.toLocaleString(locale === 'ru' ? 'ru-RU' : 'en-US', {
+		maximumFractionDigits: 2,
+		minimumFractionDigits: 0,
+	});
 
 export const ConstructionSheets = ({ constructionSheets }: Props) => {
 	const { t, locale } = useI18n();
@@ -116,6 +137,37 @@ export const ConstructionSheets = ({ constructionSheets }: Props) => {
 						}
 					/>
 				),
+			},
+			{
+				id: 'constructionContains',
+				header: () => (
+					<SimpleTableHeaderCell
+						textClassName="min-w-[140px] max-w-[200px]"
+						text={t('constructionSheets.constructionContains')}
+					/>
+				),
+				cell: (info) => {
+					const row = info.row.original;
+					const windowsM2 = sumAdditionalOpeningsAreaM2(row.additionalWindows);
+					const doorsM2 = sumAdditionalOpeningsAreaM2(row.additionalDoors);
+					const unit = locale === 'ru' ? 'м²' : 'm²';
+					return (
+						<SimpleTableCell
+							content={
+								<div className="flex min-w-[140px] flex-col gap-1 text-center font-sans text-[16px] leading-snug">
+									<p>
+										{t('constructionSheets.openingsWindows')}:{' '}
+										{formatAreaM2Number(windowsM2, locale)} {unit}
+									</p>
+									<p>
+										{t('constructionSheets.openingsDoors')}:{' '}
+										{formatAreaM2Number(doorsM2, locale)} {unit}
+									</p>
+								</div>
+							}
+						/>
+					);
+				},
 			},
 			{
 				accessorKey: 'square',
@@ -260,7 +312,7 @@ export const ConstructionSheets = ({ constructionSheets }: Props) => {
 			},
 		];
 		return cols;
-	}, [t, navigate, search, reportType]);
+	}, [t, locale, navigate, search, reportType]);
 
 	return (
 		<div className="flex-col overflow-x-auto">

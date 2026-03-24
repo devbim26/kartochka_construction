@@ -1,4 +1,5 @@
 import type {
+	AdditionalConstructionHeaderDto,
 	CountryType,
 	CreateReportInfoCommand,
 	NewFloorIfoDto,
@@ -7,6 +8,7 @@ import type {
 	ReportInfoShortDto,
 	ReportInfoSingleConstructionDto,
 	SingleConstructionInfoDto,
+	UpdateAdditionalConstructionHeaderDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
 import { convertToClientCountryData } from '@core';
@@ -24,6 +26,7 @@ import { ConstructionTypeEnum, Country } from '@features/guidbooks/types';
 
 import type {
 	AboutBuildingData,
+	AdditionalOpeningRow,
 	ConstructionSheet,
 	FloorConstruction,
 	FloorFromReport,
@@ -32,6 +35,30 @@ import type {
 } from '../types';
 import { ReportCategory } from '../types';
 import type { ReportInfoShort } from '../utils';
+
+export const mapAdditionalOpeningsFromDto = (
+	items?: AdditionalConstructionHeaderDto[] | null,
+): AdditionalOpeningRow[] => {
+	if (!items?.length) return [];
+	return items.map((item) => ({
+		constructionHeaderId: item.constructionHeader?.id || '',
+		length: item.lenght ?? 0,
+		height: item.height ?? 0,
+		quantity: item.quantity ?? 0,
+	}));
+};
+
+export const mapAdditionalOpeningsToUpdateDto = (
+	rows: AdditionalOpeningRow[],
+): UpdateAdditionalConstructionHeaderDto[] =>
+	rows
+		.filter((r) => r.constructionHeaderId)
+		.map((r) => ({
+			constructionHeaderId: r.constructionHeaderId,
+			lenght: r.length,
+			height: r.height,
+			quantity: Math.round(Number(r.quantity)) || 0,
+		}));
 
 export const convertToCreateReportInfoCommand = (
 	data: AboutBuildingData,
@@ -170,6 +197,12 @@ export const convertToClientFloorConstruction = (
 			requirement: !!data.reportConstructionHeader?.requirement
 				? convertToClientRequirementTableData(data.reportConstructionHeader!.requirement!)
 				: undefined,
+			additionalWindows: mapAdditionalOpeningsFromDto(
+				data.reportConstructionHeader?.additionalWindows,
+			),
+			additionalDoors: mapAdditionalOpeningsFromDto(
+				data.reportConstructionHeader?.additionalDoors,
+			),
 		},
 	};
 };
@@ -200,6 +233,8 @@ export const convertToClientSingleToFloorConstruction = (
 				name: headerFromSingle?.firstPlacementRoom?.name ?? '',
 			},
 			requirement: convertToClientRequirementTableData(headerFromSingle!.requirement!),
+			additionalWindows: mapAdditionalOpeningsFromDto(headerFromSingle?.additionalWindows),
+			additionalDoors: mapAdditionalOpeningsFromDto(headerFromSingle?.additionalDoors),
 		},
 	};
 };
@@ -223,6 +258,12 @@ export const convertToClientSingleConstruction = (
 				id: data.reportConstructionHeader?.firstPlacementRoom?.id || '',
 				name: data.reportConstructionHeader?.firstPlacementRoom?.name || '',
 			},
+			additionalWindows: mapAdditionalOpeningsFromDto(
+				data.reportConstructionHeader?.additionalWindows,
+			),
+			additionalDoors: mapAdditionalOpeningsFromDto(
+				data.reportConstructionHeader?.additionalDoors,
+			),
 		},
 	};
 };
@@ -248,6 +289,8 @@ export const convertFloorDataToClientConstructionSheet = (
 		title: constructionHeader.name || 'Placeholder',
 		materials: [],
 		floorPlanImage: data.documentImageUrl || '',
+		additionalWindows: data.reportConstructionHeader.additionalWindows,
+		additionalDoors: data.reportConstructionHeader.additionalDoors,
 	};
 };
 

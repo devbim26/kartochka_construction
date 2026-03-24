@@ -14,6 +14,14 @@ type FloorFromReport = {
 	floorNumber: string;
 };
 
+/** Строка окна/двери в отчёте (на бэкенде ширина — поле `lenght`). */
+type AdditionalOpeningRow = {
+	constructionHeaderId: string;
+	length: number;
+	height: number;
+	quantity: number;
+};
+
 type ReportConstructionHeader = {
 	id: string;
 	constructionHeaderId: string;
@@ -23,6 +31,8 @@ type ReportConstructionHeader = {
 	width: number;
 	length: number;
 	requirement?: Requirement;
+	additionalWindows?: AdditionalOpeningRow[];
+	additionalDoors?: AdditionalOpeningRow[];
 };
 
 type FloorConstruction = {
@@ -49,6 +59,7 @@ export {
 	type FloorPlansData,
 	type FloorPlanModalData,
 	type FloorFromReport,
+	type AdditionalOpeningRow,
 	type ReportConstructionHeader,
 	type FloorConstruction,
 	type SingleConstruction,

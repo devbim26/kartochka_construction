@@ -561,6 +561,9 @@ export const en = {
 	'constructionSheets.selectFromCatalogHint': 'Select from manufacturers catalog',
 	'constructionSheets.properties': 'Construction properties',
 	'constructionSheets.sheetTitle': 'Construction sheet',
+	'constructionSheets.constructionContains': 'Construction contains',
+	'constructionSheets.openingsWindows': 'Windows',
+	'constructionSheets.openingsDoors': 'Doors',
 
 	// Create Construction Form
 	'createConstruction.name.label': 'Name',
@@ -744,6 +747,9 @@ export const ru: Record<TranslationKey, string> = {
 	'constructionSheets.selectFromCatalogHint': 'Выбор из каталога производителей',
 	'constructionSheets.properties': 'Свойства конструкции',
 	'constructionSheets.sheetTitle': 'Ведомость конструкций',
+	'constructionSheets.constructionContains': 'Конструкция содержит',
+	'constructionSheets.openingsWindows': 'Окна',
+	'constructionSheets.openingsDoors': 'Двери',
 
 	'pdf.error': 'Ошибка при отрисовке PDF или конструкции:',
 	'construction.labels.construction': 'Конструкция:',

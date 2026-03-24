@@ -1,6 +1,7 @@
 import type {
 	CreateReportInfoCommand,
 	GetPlacementRoomFromRequirementsQuery,
+	UpdateReportConstructionByAdditionalConstructionsCommand,
 	UpdateReportInfoWithSingleConstructionCommand,
 } from '@api-gen';
 import { fetchApi } from '@api-gen';
@@ -139,6 +140,14 @@ export const updateReportFloorInfo = async (data: {
 
 export const getReportConstruction = async (id: string) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoReportConstructionDetail(id));
+};
+
+export const updateReportConstructionAdditional = async (
+	data: UpdateReportConstructionByAdditionalConstructionsCommand,
+) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportInfoReportConstructionUpdate(data),
+	);
 };
 
 export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {
