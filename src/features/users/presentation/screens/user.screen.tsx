@@ -17,10 +17,15 @@ import {
 } from '@features/account/converters';
 import type { AccountData } from '@features/account/types';
 import { AccountDataConfig } from '@features/account/utils';
-import type { RegistrationFormData } from '@features/auth/types';
 import { useHeaderForm } from '@features/guidbooks/utils';
 import { convertToServerUserFilterData } from '@features/users/converters';
-import { deleteUser, getPaginatedUsers, getUserById, updateUser } from '@features/users/services';
+import {
+	createUserByAdmin,
+	deleteUser,
+	getPaginatedUsers,
+	getUserById,
+	updateUser,
+} from '@features/users/services';
 import { userColumns } from '@features/users/utils';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -93,25 +98,47 @@ export const UserScreen = () => {
 			.subscribe();
 	};
 
-	const handleAddTableData = (data: RegistrationFormData) => {
-		// from(createUser(convertToServerRegistrationData(data)))
-		// 	.pipe(
-		// 		catchError((error) => {
-		// 			if (error instanceof AxiosError) {
-		// 				toast.error(
-		// 					error.response?.data?.message || t('users.createError'),
-		// 				);
-		// 			}
-		// 			return from([null]);
-		// 		}),
-		// 	)
-		// 	.subscribe((response) => {
-		// 		if (response?.status === 200) {
-		// 			handleGetTableData(form.filterForm.getValues(), paginationState);
-		// 			toast.success(t('users.addSuccess'));
-		// 			navigate('');
-		// 		}
-		// 	});
+	const handleAddTableData = (data: AccountData) => {
+		if (!data.email) {
+			toast.error('Укажите e-mail');
+			return;
+		}
+
+		from(
+			createUserByAdmin({
+				email: data.email,
+				phoneNumber: data.mainPhoneNumber?.replaceAll(' ', ''),
+				companyName: data.companyName,
+				bankIdNumber: data.bankIdNumber,
+				payersRegistrationNumber: data.payersRegistrationNumber,
+				paymentAccount: data.paymentAccount,
+				bankAddress: data.bankAddress,
+				companyAddress: data.companyAddress,
+				directorFullName: data.directorFullName,
+				companyDescription: data.compannyInfo,
+				additionalPhoneNumbers:
+					data.phoneNumbers?.map((phone) => phone.number.replaceAll(' ', '')) ?? [],
+				formFile: data.formFile,
+			}),
+		)
+			.pipe(
+				switchMap((response) => {
+					return from([response]);
+				}),
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data?.message || 'Ошибка создания пользователя');
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					handleGetTableData(form.filterForm.getValues(), paginationState);
+					toast.success(t('users.addSuccess'));
+					navigate('');
+				}
+			});
 	};
 
 	const handleDeleteTableData = (id: string) => {
@@ -170,7 +197,7 @@ export const UserScreen = () => {
 	};
 
 	const onSaveHandle = useCallback(() => {
-		handleAddTableData(form.addForm.getValues() as any);
+		handleAddTableData(form.addForm.getValues());
 	}, [handleAddTableData, form.addForm.getValues()]);
 
 	const onEditHandle = useCallback(() => {

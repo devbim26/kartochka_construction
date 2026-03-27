@@ -1,9 +1,23 @@
 import { AboutUs1, AboutUs2, AboutUs3, AboutUs4, AboutUs5 } from '@assets';
 import { Chevron, useI18n } from '@core';
+import {
+	FifthNumberImage,
+	FirstNumberImage,
+	FourthNumberImage,
+	SecondNumberImage,
+	ThirdNumberImage,
+} from '../images';
 import { useState, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 const aboutImages = [AboutUs1, AboutUs2, AboutUs3, AboutUs4, AboutUs5];
+const numberImages = [
+	<FirstNumberImage key="1" />,
+	<SecondNumberImage key="2" />,
+	<ThirdNumberImage key="3" />,
+	<FourthNumberImage key="4" />,
+	<FifthNumberImage key="5" />,
+];
 const cardAccentColors = ['#B1C9E3', '#EED0C5', '#F3F2BA', '#DFA4C2', '#B2CAA0'];
 const stepTitles = [
 	'Проектирование. Звукоизоляция',
@@ -15,79 +29,85 @@ const stepTitles = [
 
 const cardContents: Array<{ title: ReactNode; body: ReactNode }> = [
 	{
-		title: <span className="font-bold">Расчет звукоизоляции стен и перекрытий</span>,
+		title: <span className="font-bold not-italic">Расчет звукоизоляции стен и перекрытий</span>,
 		body: (
 			<span className="whitespace-pre-line italic">
-				{'по СП 02.04.03-2023.\n\nГенерирует PDF-отчет с формулами, готовый к подаче на экспертизу.'}
+				{
+					'по СП 02.04.03-2023.\n\nГенерирует PDF-отчет с формулами, готовый к подаче на экспертизу.'
+				}
 			</span>
 		),
 	},
 	{
 		title: (
 			<div className="whitespace-pre-line">
-				<span className="font-bold">Общий</span>
+				<span className="font-bold not-italic">Общий</span>
 				{'\n'}
 				<span className="italic">
-					Доступ к новейшим моделям ИИ (от Open AI, Antropic, Google, Китайские модели)
+					Доступ к новейшим моделям ИИ (от Open AI, Anthropic, Google, Китайские модели)
 				</span>
 				{'\n\n'}
-				<span className="font-bold">Аналитика документов PDF</span>
+				<span className="font-bold not-italic">Аналитика документов PDF</span>
 			</div>
 		),
 		body: (
 			<div className="whitespace-pre-line italic">
-				AI проверяет, суммаризирует и структурирует документы. Выдает готовый отчет в DOC/Excel
-				— для смет, ТЗ, протоколов.
+				AI проверяет, суммаризирует и структурирует документы. Выдает готовый отчет в
+				DOC/Excel — для смет, ТЗ, протоколов.
 				{'\n\n'}
-				<span className="not-italic font-bold">DeepResearch (Perplexity Sonar Pro Search)</span>
+				<span className="font-bold not-italic">
+					DeepResearch (Perplexity Sonar Pro Search)
+				</span>
 				{'\n'}
-				глубокий поиск информации в интернете со ссылками на первоисточник
+				глубокий поиск информации в интернете со ссылками на первоисточник.
 			</div>
 		),
 	},
 	{
 		title: (
 			<div className="whitespace-pre-line">
-				<span className="font-bold">AI-генерация изображений</span>
-				{'\n'}
-				<span className="italic">с кастомными настройками.</span>
+				<span className="font-bold not-italic">
+					AI-генерация изображений (nano banano 2 pro)
+				</span>
 			</div>
 		),
 		body: (
 			<div className="whitespace-pre-line italic">
-				Меняйте фасады, мебель,{'\n'}положение камеры и др.{'\n'}в один клик.
+				С кастомными настройками. Меняйте материалы, мебель, положение камеры и др. в один
+				клик.
 			</div>
 		),
 	},
 	{
 		title: (
 			<div className="whitespace-pre-line">
-				<span className="font-bold">Общая экспертиза</span>
+				<span className="font-bold not-italic">"Общая экспертиза"</span>
 				{'\n'}
 				<span className="italic">
 					- Проверяет общую структуру проекта;{'\n'}- Проверяет проект на соответствие
-					актуальным ТНПА.{'\n'}- Проверка проекта по внутренним требованиям
+					актуальным ТНПА;{'\n'}- Проверка проекта по внутренним требованиям.
 				</span>
 				{'\n\n'}
-				<span className="font-bold">Экспертиза звукоизоляции</span>
+				<span className="font-bold not-italic">"Экспертиза звукоизоляции"</span>
 			</div>
 		),
-		body: <span className="italic">Анализ заложенных в проекте решений по звукоизоляции</span>,
+		body: <span className="italic">Анализ заложенных в проекте решений по звукоизоляции.</span>,
 	},
 	{
 		title: (
 			<div className="whitespace-pre-line">
-				<span className="font-bold">Общая экспертиза</span>
-				{'\n'}
-				<span className="italic">
-					- Проверяет общую структуру проекта;{'\n'}- Проверяет проект на соответствие
-					актуальным ТНПА.{'\n'}- Проверка проекта по внутренним требованиям
+				<span className="font-bold not-italic">
+					Выполняет глубокий анализ нормативных документов
 				</span>
-				{'\n\n'}
-				<span className="font-bold">Экспертиза звукоизоляции</span>
 			</div>
 		),
-		body: <span className="italic">Анализ заложенных в проекте решений по звукоизоляции</span>,
+		body: (
+			<span className="whitespace-pre-line italic">
+				{
+					'(СН, СП и др.). Задавайте любые вопросы, система создаст отчет с прямыми ссылками на пункты и страницы документов.'
+				}
+			</span>
+		),
 	},
 ];
 
@@ -136,13 +156,13 @@ export const HowOurServiceWorks = () => {
 					</div>
 
 					<div
-						className="relative w-[299px] [perspective:1200px] sm:w-[299px] md:w-[479px] lg:w-[555px] xl:w-[839px]"
+						className="relative w-[320px] [perspective:1200px] sm:w-[360px] md:w-[560px] lg:w-[660px] xl:w-[900px]"
 						onMouseEnter={() => setIsHover(true)}
 						onMouseLeave={() => setIsHover(false)}
 					>
 						<div
 							className={twMerge(
-								'relative min-h-[260px] w-full md:h-[408px]',
+								'relative min-h-[320px] w-full md:h-[500px]',
 								'transition-transform duration-700 ease-in-out [transform-style:preserve-3d]',
 								isHover
 									? '[transform:rotateY(180deg)]'
@@ -151,32 +171,35 @@ export const HowOurServiceWorks = () => {
 						>
 							<div
 								className={twMerge(
-									'absolute inset-0 flex min-h-[260px] w-full flex-col gap-6 rounded-2xl bg-white p-5 shadow-blue',
+									'absolute inset-0 flex min-h-[320px] w-full flex-col gap-5 rounded-2xl bg-white p-6 shadow-blue md:p-7',
 									'[backface-visibility:hidden]',
 								)}
 							>
 								{/* Content over image */}
-								<div className="relative z-10 flex flex-col gap-6">
+								<div className="relative z-10 flex min-h-0 flex-1 flex-col gap-4">
 									<div
-										className="flex w-full flex-row items-start justify-between gap-4 rounded-xl px-3 py-2 sm:gap-6"
+										className="flex w-full flex-row items-start justify-between gap-4 rounded-xl px-3 py-2.5 sm:gap-6"
 										style={{ backgroundColor: cardAccentColors[selectedStep] }}
 									>
-										<div className="font-montserrat font-bold leading-snug text-black sm:text-lg">
+										<div className="font-montserrat text-base font-bold leading-snug text-black sm:text-lg md:text-xl">
 											{stepTitles[selectedStep]}
 										</div>
 									</div>
-									<div className="px-2 font-montserrat text-sm leading-relaxed text-black sm:text-base">
+									<div className="px-2 font-montserrat text-sm italic leading-relaxed text-black sm:text-base md:text-[17px]">
 										{cardContents[selectedStep]?.title}
 									</div>
-									<div className="px-2 font-montserrat text-sm leading-relaxed text-black sm:text-base">
+									<div className="px-2 font-montserrat text-sm italic leading-relaxed text-black sm:text-base md:text-[17px]">
 										{cardContents[selectedStep]?.body}
 									</div>
+								</div>
+								<div className="pointer-events-none absolute bottom-3 right-4 z-0 opacity-70">
+									{numberImages[selectedStep]}
 								</div>
 							</div>
 
 							<div
 								className={twMerge(
-									'absolute inset-0 flex h-full min-h-[260px] w-full flex-col gap-4 overflow-hidden rounded-2xl bg-white p-5 shadow-blue',
+									'absolute inset-0 flex h-full min-h-[320px] w-full flex-col gap-4 overflow-hidden rounded-2xl bg-white p-6 shadow-blue md:p-7',
 									'[backface-visibility:hidden] [transform:rotateY(180deg)]',
 								)}
 							>

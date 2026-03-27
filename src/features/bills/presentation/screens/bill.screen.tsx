@@ -5,14 +5,19 @@ import {
 	DownloadIcon,
 	EditIcon,
 	paginationStateDefault,
+	Select,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
+	useAccessValidator,
 	useAppNavigate,
+	UserRoles,
 } from '@core';
 import { convertBillToClient } from '@features/bills/converters';
-import { deleteBill, getPaginatedBills } from '@features/bills/services';
+import { createBillByAdmin, deleteBill, getPaginatedBills } from '@features/bills/services';
+import { getPaginatedSubscriptions } from '@features/subscriptions/services';
 import type { Bill, BillFilter } from '@features/bills/types';
+import { getPaginatedUsers } from '@features/users/services';
 import { billColumns } from '@features/bills/utils';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
@@ -37,6 +42,14 @@ export const BillScreen = () => {
 	const [tableData, setTableData] = useState<Array<Bill>>([]);
 	const [search] = useSearchParams();
 	const navigate = useAppNavigate();
+	const { validate } = useAccessValidator();
+	const isAdmin = validate(UserRoles.Admin);
+	const [selectedUserId, setSelectedUserId] = useState('');
+	const [selectedSubscriptionId, setSelectedSubscriptionId] = useState('');
+	const [userOptions, setUserOptions] = useState<Array<{ label: string; value: string }>>([]);
+	const [subscriptionOptions, setSubscriptionOptions] = useState<
+		Array<{ label: string; value: string }>
+	>([]);
 
 	const handleGetTableData = (
 		data: BillFilter,
@@ -107,9 +120,86 @@ export const BillScreen = () => {
 		}
 	};
 
+	const handleCreateBill = () => {
+		if (!selectedUserId) {
+			toast.error('Выберите пользователя');
+			return;
+		}
+		if (!selectedSubscriptionId) {
+			toast.error('Выберите подписку');
+			return;
+		}
+
+		from(
+			createBillByAdmin({
+				userId: selectedUserId,
+				subscriptionId: selectedSubscriptionId,
+			}),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data?.message || 'Ошибка создания счета');
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					toast.success('Счет успешно создан');
+					handleGetTableData(getValues(), paginationState);
+					setSelectedUserId('');
+					setSelectedSubscriptionId('');
+					navigate('');
+				}
+			});
+	};
+
 	useEffect(() => {
 		handleGetTableData(getValues(), paginationState);
 	}, [number, date, clientName, billType, search]);
+
+	useEffect(() => {
+		if (!isAdmin || !search.get('add')) return;
+
+		from(
+			Promise.all([
+				getPaginatedUsers({ pageNumber: 1, pageSize: 100 }),
+				getPaginatedSubscriptions({
+					data: { name: '', description: 'all', numberOfReports: '1', price: '0' },
+					pagination: { pageNumber: 1, pageSize: 100 },
+				}),
+			]),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data?.message || 'Ошибка загрузки данных');
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (!response) return;
+				const [usersResponse, subscriptionsResponse] = response;
+				setUserOptions(
+					(usersResponse.data.items ?? [])
+						.filter((user) => !!user.id)
+						.map((user) => ({
+							value: user.id!,
+							label: user.companyName || user.directorFullName || 'Без названия',
+						})),
+				);
+				setSubscriptionOptions(
+					(subscriptionsResponse.data.items ?? [])
+						.filter((subscription) => !!subscription.id)
+						.map((subscription) => ({
+							value: subscription.id!,
+							label: subscription.name || 'Без названия',
+						})),
+				);
+			});
+	}, [isAdmin, search]);
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
@@ -165,6 +255,37 @@ export const BillScreen = () => {
 					handleGetTableData(getValues(), newState);
 				}}
 			/>
+			<BillListActionModal
+				onConfirm={handleCreateBill}
+				confirmTitle="Создать"
+				headerTitle="Создать счет?"
+				onClose={() => {
+					setSelectedUserId('');
+					setSelectedSubscriptionId('');
+					navigate('');
+				}}
+				isOpen={!!search.get('add')}
+				contentClassName="visible min-w-[500px]"
+			>
+				<div className="flex flex-col gap-3">
+					<Select
+						label="Пользователь"
+						value={selectedUserId}
+						onChange={(value) => setSelectedUserId((value as string) || '')}
+						options={userOptions}
+						placeholder="Выберите пользователя"
+						wrapperClassname="ring-input-border-primary"
+					/>
+					<Select
+						label="Подписка"
+						value={selectedSubscriptionId}
+						onChange={(value) => setSelectedSubscriptionId((value as string) || '')}
+						options={subscriptionOptions}
+						placeholder="Выберите подписку"
+						wrapperClassname="ring-input-border-primary"
+					/>
+				</div>
+			</BillListActionModal>
 			<BillListActionModal
 				onConfirm={() => handleDeleteTableData(search.get('id')!)}
 				confirmTitle="Удалить"

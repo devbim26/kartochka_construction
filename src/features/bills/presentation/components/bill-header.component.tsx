@@ -1,14 +1,35 @@
-import { Button, CleanUpIcon, Input, Select } from '@core';
+import {
+	Button,
+	CleanUpIcon,
+	Input,
+	Select,
+	useAccessValidator,
+	useAppNavigate,
+	UserRoles,
+} from '@core';
 import { BillTypeSelectValues, type BillFilter } from '@features/bills/types';
 import { Controller, useFormContext } from 'react-hook-form';
+import { FaPlus } from 'react-icons/fa6';
 
 const BillHeaderComponent = () => {
 	const { register, reset, control } = useFormContext<BillFilter>();
+	const { validate } = useAccessValidator();
+	const navigate = useAppNavigate();
+	const isAdmin = validate(UserRoles.Admin);
 
 	return (
 		<div className="flex w-full flex-col gap-[14px]">
 			<div className="flex w-full items-center justify-between">
 				<p className="font-sans text-lg font-semibold leading-6">Счета</p>
+				{isAdmin && (
+					<Button
+						className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
+						onClick={() => navigate('', { add: 'true' })}
+					>
+						<FaPlus fill="white" width={'16px'} height={'16px'} />
+						<p className="font-sans text-sm font-semibold leading-[18px]">Создать</p>
+					</Button>
+				)}
 			</div>
 
 			<div className="flex flex-col rounded-xl border border-solid bg-white">

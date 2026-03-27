@@ -59,9 +59,7 @@ export const MainHeader = () => {
 	}, [reportId, reportType, navigate]);
 
 	const handleAiVisualizationRedirect = useCallback(() => {
-		navigate(
-			APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.visualization.route,
-		);
+		navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.visualization.route);
 	}, [navigate]);
 
 	const AIFeatures: FeatureCard[] = [
@@ -76,7 +74,9 @@ export const MainHeader = () => {
 						Доступ к новейшим моделям ИИ
 					</p>
 					<p>
-						<span className="font-semibold text-gray-800">Аналитика документов PDF</span>
+						<span className="font-semibold text-gray-800">
+							Аналитика документов PDF
+						</span>
 						<br />
 						AI проверяет, суммаризирует и структурирует документы.
 					</p>
@@ -98,7 +98,8 @@ export const MainHeader = () => {
 			description: (
 				<div className="flex flex-col gap-3 text-gray-700">
 					<p>
-						<span className="font-semibold text-gray-800">AI-генерация</span> изображений
+						<span className="font-semibold text-gray-800">AI-генерация</span>{' '}
+						изображений
 						<br />с кастомными настройками.
 					</p>
 					<p className="italic">
@@ -168,7 +169,7 @@ export const MainHeader = () => {
 			title: 'Расчет звукоизоляции стен и перекрытий',
 			description: (
 				<div className="flex flex-col gap-1">
-					<p>по СП 02.04.03-2023</p>
+					<p>Расчет звукоизоляции стен и перекрытий по СП 02.04.03-2023</p>
 					<p className="italic">
 						Генерирует PDF-отчет с формулами, готовый к подаче на экспертизу.
 					</p>
@@ -185,7 +186,7 @@ export const MainHeader = () => {
 			title: 'Расчет теплоизоляции стен',
 			description: (
 				<div className="flex flex-col gap-1">
-					<p>по СП 2.04.01-2020</p>
+					<p>Расчет теплоизоляции стен по СП 2.04.01-2020</p>
 					<p className="italic">
 						Генерирует PDF-отчет с формулами, готовый к подаче на экспертизу.
 					</p>
@@ -229,23 +230,24 @@ export const MainHeader = () => {
 				{features.map((feature) => (
 					<CarouselSlide
 						key={feature.id}
-						className="min-w-0 basis-1/3 px-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+						className="min-w-0 basis-full px-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
 					>
 						<div
 							className={twMerge(
-								'flex h-[300px] flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md',
+								'flex h-[300px] flex-col rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md',
 								!feature.active && 'bg-gray-text/30',
 							)}
 						>
 							<div className="mb-3 flex-1 overflow-hidden">
 								<div className="mb-2 flex items-start justify-between">
 									<div
-										className="w-full rounded-xl px-3 py-1"
+										className="w-full rounded-xl px-3 py-1.5"
 										style={{
-											backgroundColor: featureAccentColors[feature.id] || '#B1C9E3',
+											backgroundColor:
+												featureAccentColors[feature.id] || '#B1C9E3',
 										}}
 									>
-										<h3 className="text-[20px] font-bold text-gray-800">
+										<h3 className="truncate text-[18px] font-bold leading-6 text-gray-800 sm:text-[19px]">
 											{feature.title}
 										</h3>
 									</div>
@@ -253,10 +255,10 @@ export const MainHeader = () => {
 
 								<div className="mb-3 flex items-start gap-3">
 									<div className="shrink-0">
-										<MainSliderLogo className="size-20" />
+										<MainSliderLogo className="size-16" />
 									</div>
 									<div className="flex flex-col">
-										<div className="text-[17px] text-gray-600">
+										<div className="text-[16px] leading-6 text-gray-600">
 											{feature.description}
 										</div>
 										<div className="mb-4 flex-1 overflow-auto">
@@ -274,19 +276,16 @@ export const MainHeader = () => {
 									</div>
 								</div>
 							</div>
-							<div className="flex w-full justify-end">
-								<button
-									onClick={feature.onClick}
-									className={twMerge(
-										'mt-auto w-fit self-end rounded-lg px-3 py-2 text-xs font-semibold text-white transition-colors',
-										feature.id === 'heat-isolation'
-											? 'cursor-default bg-gray-text'
-											: 'cursor-pointer bg-primary hover:bg-blue-700',
-									)}
-								>
-									{feature.buttonText}
-								</button>
-							</div>
+							{feature.id !== 'heat-isolation' && (
+								<div className="flex w-full justify-end">
+									<button
+										onClick={feature.onClick}
+										className="mt-auto w-fit self-end rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+									>
+										{feature.buttonText}
+									</button>
+								</div>
+							)}
 						</div>
 					</CarouselSlide>
 				))}
@@ -311,23 +310,24 @@ export const MainHeader = () => {
 				{AIFeatures.map((feature) => (
 					<CarouselSlide
 						key={feature.id}
-						className="min-w-0 basis-1/3 px-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+						className="min-w-0 basis-full px-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
 					>
 						<div
 							className={twMerge(
-								'flex h-[300px] flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md',
+								'flex h-[300px] flex-col rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md',
 								!feature.active && 'bg-gray-text/30',
 							)}
 						>
 							<div className="mb-3 flex-1 overflow-hidden">
 								<div className="mb-2 flex items-start justify-between">
 									<div
-										className="w-full rounded-xl px-3 py-1"
+										className="w-full rounded-xl px-3 py-1.5"
 										style={{
-											backgroundColor: featureAccentColors[feature.id] || '#B1C9E3',
+											backgroundColor:
+												featureAccentColors[feature.id] || '#B1C9E3',
 										}}
 									>
-										<h3 className="text-[20px] font-bold text-gray-800">
+										<h3 className="truncate text-[18px] font-bold leading-6 text-gray-800 sm:text-[19px]">
 											{feature.title}
 										</h3>
 									</div>
@@ -335,10 +335,10 @@ export const MainHeader = () => {
 
 								<div className="mb-3 flex items-start gap-3">
 									<div className="shrink-0">
-										<MainSliderLogo className="size-20" />
+										<MainSliderLogo className="size-16" />
 									</div>
 									<div className="flex flex-col">
-										<div className="text-[17px] text-gray-600">
+										<div className="text-[16px] leading-6 text-gray-600">
 											{feature.description}
 										</div>
 										<div className="mb-4 flex-1 overflow-auto">

@@ -10,8 +10,8 @@ import {
 } from '@features/constructor/converters';
 import {
 	createReportFloorInfo,
-	deleteReportFloorInfo,
 	deleteReportConstruction,
+	deleteReportFloorInfo,
 	getReportFloorById,
 	getReportSingleById,
 	updateReportFloorInfo,
@@ -74,9 +74,9 @@ export const FloorPlans = memoize(() => {
 
 	const [currentReportFloorInfo, setCurrentReportFloorInfo] = useState<string[]>([]);
 	const [currentReportFloorId, setCurrentReportFloorId] = useState<string>();
-	const [currentReportConstructions, setCurrentReportConstructions] = useState<FloorConstruction[]>(
-		[],
-	);
+	const [currentReportConstructions, setCurrentReportConstructions] = useState<
+		FloorConstruction[]
+	>([]);
 	const [currentReportConstruction, setCurrentReportConstruction] = useState<FloorConstruction>();
 	const [currentConstructionHeader, setCurrentConstructionHeader] =
 		useState<ConstructionsEditData>();
@@ -274,7 +274,9 @@ export const FloorPlans = memoize(() => {
 					}
 					return from(fetch(floorResponse.data.floorDocumentUrl));
 				}),
-				filter((fileResponse): fileResponse is Response => fileResponse instanceof Response),
+				filter(
+					(fileResponse): fileResponse is Response => fileResponse instanceof Response,
+				),
 				switchMap((fileResponse) => from(fileResponse.blob())),
 				switchMap((blob) => from(blob.arrayBuffer())),
 				switchMap((arrayBuffer) => from(pdfjs.getDocument({ data: arrayBuffer }).promise)),
@@ -370,7 +372,9 @@ export const FloorPlans = memoize(() => {
 					}
 					return from(fetch(floorResponse.data.floorDocumentUrl));
 				}),
-				filter((fileResponse): fileResponse is Response => fileResponse instanceof Response),
+				filter(
+					(fileResponse): fileResponse is Response => fileResponse instanceof Response,
+				),
 				switchMap((fileResponse) => from(fileResponse.blob())),
 				switchMap((blob) => from(blob.arrayBuffer())),
 				switchMap((arrayBuffer) => from(pdfjs.getDocument({ data: arrayBuffer }).promise)),
@@ -502,7 +506,9 @@ export const FloorPlans = memoize(() => {
 		const level = levels.find((l) => l.id === levelId);
 		const resolvedLevelId = level?.serverId || level?.id;
 		if (!resolvedLevelId) return;
-		from(updateReportFloorInfo({ reportFloorInfoId: resolvedLevelId, floorName: editCodeValue }))
+		from(
+			updateReportFloorInfo({ reportFloorInfoId: resolvedLevelId, floorName: editCodeValue }),
+		)
 			.pipe(
 				tap((response) => {
 					if (response.status >= 200 && response.status < 300 && reportId) {
@@ -635,13 +641,12 @@ export const FloorPlans = memoize(() => {
 
 							{/* Кнопка удаления PDF (в конце флекса) */}
 							{reportType === ReportCategory.Floor && pdfDoc && (
-								<Button className="ml-auto flex h-[28px] w-fit flex-row items-center justify-self-end bg-white px-[10px] py-[6px] font-sans font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-white">
+								<Button
+									onClick={handleDeleteDocument}
+									className="ml-auto flex h-[28px] w-fit flex-row items-center justify-self-end bg-white px-[10px] py-[6px] font-sans font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-white"
+								>
 									{t('constructor.header.floorPlans.deletePDF')}
-									<DeleteIcon
-										onClick={handleDeleteDocument}
-										withoutBg
-										withoutBorder
-									/>
+									<DeleteIcon onClick={() => {}} withoutBg withoutBorder />
 								</Button>
 							)}
 						</div>
@@ -776,24 +781,24 @@ export const FloorPlans = memoize(() => {
 
 					<div className="flex py-[30px]"></div>
 
-				<CreateConstructionModal
-					isOpen={!!search.get('create')}
-					onCancel={() => window.history.back()}
-					onClose={() => window.history.back()}
-					onConfirm={() => {
-						if (reportType === ReportCategory.Floor && reportId) {
-							handleGetCurrentReportFloorInfos(reportId);
-						} else if (reportType === ReportCategory.Single && reportId) {
-							handleGetSingleConstruction(reportId);
-						}
-						window.history.back();
-					}}
-					headerTitle={t('floorPlans.modal.createTitle')}
-					className="!w-[1000px] md:!w-[900px]"
-					floorId={currentReportFloorId}
-					reportFloorInfoId={selectedLevelReportFloorInfoId}
-					floorNumber={activeLevel?.code}
-				/>
+					<CreateConstructionModal
+						isOpen={!!search.get('create')}
+						onCancel={() => window.history.back()}
+						onClose={() => window.history.back()}
+						onConfirm={() => {
+							if (reportType === ReportCategory.Floor && reportId) {
+								handleGetCurrentReportFloorInfos(reportId);
+							} else if (reportType === ReportCategory.Single && reportId) {
+								handleGetSingleConstruction(reportId);
+							}
+							window.history.back();
+						}}
+						headerTitle={t('floorPlans.modal.createTitle')}
+						className="!w-[1000px] md:!w-[900px]"
+						floorId={currentReportFloorId}
+						reportFloorInfoId={selectedLevelReportFloorInfoId}
+						floorNumber={activeLevel?.code}
+					/>
 					<GeneralInformationModal
 						isOpen={!!search.get('info')}
 						onCancel={() => window.history.back()}
@@ -803,19 +808,19 @@ export const FloorPlans = memoize(() => {
 					>
 						<GeneralInformationForm />
 					</GeneralInformationModal>
-				<EditConstructionModal
-					isOpen={!!search.get('edit')}
-					onCancel={() => window.history.back()}
-					onClose={() => window.history.back()}
-					onConfirm={() => {
-						if (reportType === ReportCategory.Floor && reportId) {
-							handleGetCurrentReportFloorInfos(reportId);
-						} else if (reportType === ReportCategory.Single && reportId) {
-							handleGetSingleConstruction(reportId);
-						}
-						window.history.back();
-					}}
-					headerTitle={t('floorPlans.modal.editTitle')}
+					<EditConstructionModal
+						isOpen={!!search.get('edit')}
+						onCancel={() => window.history.back()}
+						onClose={() => window.history.back()}
+						onConfirm={() => {
+							if (reportType === ReportCategory.Floor && reportId) {
+								handleGetCurrentReportFloorInfos(reportId);
+							} else if (reportType === ReportCategory.Single && reportId) {
+								handleGetSingleConstruction(reportId);
+							}
+							window.history.back();
+						}}
+						headerTitle={t('floorPlans.modal.editTitle')}
 						className="!w-[1000px] md:!w-[900px]"
 						currentConstructionHeader={currentConstructionHeader}
 						currentReportFloorInfo={currentReportConstruction}
@@ -850,20 +855,24 @@ export const FloorPlans = memoize(() => {
 				<ConstructionSheets
 					constructionSheets={
 						reportType === ReportCategory.Floor
-							? currentReportConstructions.reduce((acc, construction) => {
-									const header =
-										constructionHeadersById[
-											construction.reportConstructionHeader.constructionHeaderId
-										];
-									if (!header) return acc;
-									acc.push(
-										convertFloorDataToClientConstructionSheet(
-											construction,
-											header,
-										),
-									);
-									return acc;
-								}, [] as import('@features/constructor/types').ConstructionSheet[])
+							? currentReportConstructions.reduce(
+									(acc, construction) => {
+										const header =
+											constructionHeadersById[
+												construction.reportConstructionHeader
+													.constructionHeaderId
+											];
+										if (!header) return acc;
+										acc.push(
+											convertFloorDataToClientConstructionSheet(
+												construction,
+												header,
+											),
+										);
+										return acc;
+									},
+									[] as import('@features/constructor/types').ConstructionSheet[],
+								)
 							: currentReportConstruction?.reportConstructionHeader.id &&
 								  currentConstructionHeader
 								? [

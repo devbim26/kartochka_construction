@@ -14,6 +14,23 @@ export const createUser = async (data: RegistrationFormData) => {
 	return await fetchApi.api.accountRegisterCreate(data);
 };
 
+export const createUserByAdmin = async (data: {
+	email?: string;
+	phoneNumber?: string;
+	companyName?: string;
+	bankIdNumber?: string;
+	payersRegistrationNumber?: string;
+	paymentAccount?: string;
+	bankAddress?: string;
+	companyAddress?: string;
+	directorFullName?: string;
+	companyDescription?: string;
+	additionalPhoneNumbers?: string[];
+	formFile?: File;
+}) => {
+	return await fetchApi.api.adminCreateUserCreate(data);
+};
+
 export const updateUser = async (data: {
 	userId?: string;
 	companyName?: string;

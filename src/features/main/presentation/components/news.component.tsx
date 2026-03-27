@@ -48,10 +48,10 @@ export const News = () => {
 	const currentArticle = articles[currentIndex];
 
 	return (
-		<div className="flex w-1/2 flex-col justify-between gap-[15px] rounded-xl border border-gray-border bg-white px-[18px] pb-[15px] pt-[20px]">
+		<div className="flex min-h-[320px] flex-1 flex-col justify-between gap-[15px] rounded-xl border border-gray-border bg-white px-[18px] pb-[15px] pt-[20px]">
 			<p className="font-sans text-2xl font-semibold leading-4">{t('main.news.title')}</p>
 
-			<div className="flex min-h-[140px] flex-col gap-3">
+			<div className="flex min-h-[190px] flex-col gap-3">
 				{currentArticle && (
 					<>
 						<p className="font-sans text-xl font-semibold leading-tight">

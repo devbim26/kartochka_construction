@@ -1,5 +1,5 @@
 import { BillTypeEnum } from '@api-gen';
-import { createDataRecordConverter } from '@core';
+import { createDataRecordConverter } from '@core/utils/helpers/enum-converter.helper';
 import { BillTypeEnum as ClientBillTypeEnum } from '../types';
 
 const billTypeCategoryMap = createDataRecordConverter({

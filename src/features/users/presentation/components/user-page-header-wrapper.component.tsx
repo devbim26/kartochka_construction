@@ -1,10 +1,11 @@
 import type { TranslationKey } from '@core';
-import { Button, CleanUpIcon, useAppNavigate, useI18n } from '@core';
+import { Button, CleanUpIcon, useAccessValidator, useAppNavigate, useI18n, UserRoles } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import type { HeaderFormElements, HeaderFormTitles } from '@features/guidbooks/types';
 import { HeaderFormTypes } from '@features/guidbooks/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
+import { FaPlus } from 'react-icons/fa6';
 import { useSearchParams } from 'react-router-dom';
 
 interface NewsPageHeaderWrapperProps {
@@ -21,6 +22,8 @@ interface NewsPageHeaderWrapperProps {
 export const UserPageHeaderWrapper = memoize(
 	({ titles, forms, formElements, onSave }: NewsPageHeaderWrapperProps) => {
 		const { t } = useI18n();
+		const { validate } = useAccessValidator();
+		const isAdmin = validate(UserRoles.Admin);
 		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
 		const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
@@ -104,10 +107,21 @@ export const UserPageHeaderWrapper = memoize(
 					<p className="font-sans text-lg font-semibold leading-6">
 						{t(titles.pageTitleKey as unknown as TranslationKey)}
 					</p>
+					{currentHeaderFormType === HeaderFormTypes.filter && isAdmin && (
+						<Button
+							className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
+							onClick={onAddHandle}
+						>
+							<FaPlus fill="white" width={'16px'} height={'16px'} />
+							<p className="font-sans text-sm font-semibold leading-[18px]">
+								{t('common.add')}
+							</p>
+						</Button>
+					)}
 				</div>
 				<div className="flex flex-col rounded-xl border border-solid bg-white">
 					<p className="flex justify-center pt-[16px] font-sans text-base font-semibold leading-4">
-						{subTitle}
+						{subTitle ? t(subTitle as unknown as TranslationKey) : ''}
 					</p>
 					<div className="flex flex-wrap gap-[16px] border-b border-solid px-[16px] pb-[24px] pt-[16px]">
 						{formComponent}

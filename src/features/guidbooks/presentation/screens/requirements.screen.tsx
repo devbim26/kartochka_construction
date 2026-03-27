@@ -21,6 +21,7 @@ import {
 	convertToServerRequirementUpdateData,
 } from '@features/guidbooks/converters';
 import {
+	exportRequirements,
 	getGuidebooksCreate,
 	getGuidebooksDelete,
 	getGuidebooksDetail,
@@ -252,6 +253,35 @@ const RequirementsScreen = () => {
 			});
 	};
 
+	const handleExportTableData = () => {
+		from(
+			exportRequirements(
+				convertToServerFilterRequirementData(form.filterForm.getValues() as RequirementFilter),
+			),
+		)
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || 'Ошибка экспорта');
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (!response?.data) return;
+				const fileBlob = response.data as Blob;
+				const url = window.URL.createObjectURL(fileBlob);
+				const link = document.createElement('a');
+				link.href = url;
+				link.download = 'requirements-export.xlsx';
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				window.URL.revokeObjectURL(url);
+				toast.success('Экспорт выполнен');
+			});
+	};
+
 	const onSaveHandle = useCallback(() => {
 		handleAddTableData(form.addForm.getValues() as FormRequirement);
 	}, [handleAddTableData, form.addForm.getValues()]);
@@ -394,6 +424,7 @@ const RequirementsScreen = () => {
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper
 				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
+				onExport={handleExportTableData}
 				titles={{
 					pageTitleKey: 'guides.requirements.pageTitle',
 					editTitleKey: 'guides.requirements.editTitle',

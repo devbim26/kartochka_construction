@@ -4,6 +4,7 @@ import { AccountDataSchema } from './validation/account.validation';
 export const AccountDataConfig: EntityConfig = {
 	schema: AccountDataSchema,
 	defaultValues: {
+		email: '',
 		mainPhoneNumber: '',
 		phoneNumbers: [] as string[],
 		companyName: '',

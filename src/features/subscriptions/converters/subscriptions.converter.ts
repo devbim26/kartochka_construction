@@ -7,6 +7,7 @@ export const convertSubscriptionToClient = (data: SubscriptionDto): Subscription
 		description: data.description || '',
 		numberOfReports: String(data.numberOfReports) || '',
 		numberOfDowloadReports: String(data.numberOfDowloadReports) || '',
+		budgetForGeneration: String(data.budgetForGeneration) || '',
 		price: String(data.price) || '',
 		name: data.name || '',
 	};
@@ -19,6 +20,7 @@ export const convertSubscriptionToServer = (data: Subscription) => {
 		numberOfReports: +data.numberOfReports || 0,
 		numberOfDowloadReports: +data.numberOfDowloadReports || 0,
 		numberOfDownloadReports: +data.numberOfDowloadReports || 0,
+		budgetForGeneration: +data.budgetForGeneration || 0,
 		price: +data.price || 0,
 		name: data.name || '',
 	};

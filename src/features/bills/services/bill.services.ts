@@ -15,6 +15,10 @@ export const createBill = async (id: string) => {
 	return await fetchApi.api.billCreate({ subscriptionId: id });
 };
 
+export const createBillByAdmin = async (data: { userId?: string; subscriptionId?: string }) => {
+	return await fetchApi.api.adminCreateBillCreate(data);
+};
+
 export const updateBill = async (data: UpdateBill) => {
 	return await fetchApi.api.billUpdate(convertBillToServer(data));
 };

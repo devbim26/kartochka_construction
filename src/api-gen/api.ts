@@ -294,6 +294,13 @@ export enum CountryType {
 	Ukrain = 'Ukrain',
 }
 
+export interface CreateBillByAdminCommand {
+	/** @format uuid */
+	subscriptionId?: string;
+	/** @format uuid */
+	userId?: string;
+}
+
 export interface CreateBillCommand {
 	/** @format uuid */
 	subscriptionId?: string;
@@ -1815,6 +1822,56 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				method: 'PUT',
 				body: data,
 				type: ContentType.FormData,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Admin
+		 * @name AdminCreateUserCreate
+		 * @request POST:/api/Admin/createUser
+		 */
+		adminCreateUserCreate: (
+			data: {
+				email?: string;
+				phoneNumber?: string;
+				companyName?: string;
+				bankIdNumber?: string;
+				payersRegistrationNumber?: string;
+				paymentAccount?: string;
+				bankAddress?: string;
+				companyAddress?: string;
+				directorFullName?: string;
+				companyDescription?: string;
+				additionalPhoneNumbers?: string[];
+				/** @format binary */
+				formFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/Admin/createUser`,
+				method: 'POST',
+				body: data,
+				type: ContentType.FormData,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Admin
+		 * @name AdminCreateBillCreate
+		 * @request POST:/api/Admin/createBill
+		 */
+		adminCreateBillCreate: (data: CreateBillByAdminCommand, params: RequestParams = {}) =>
+			this.request<BillDto, any>({
+				path: `/api/Admin/createBill`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 

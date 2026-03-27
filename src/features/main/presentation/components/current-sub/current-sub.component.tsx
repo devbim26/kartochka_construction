@@ -10,6 +10,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
+import { twMerge } from 'tailwind-merge';
 import { SubImage } from './images';
 
 type ActiveSubscriptionResponse = {
@@ -17,7 +18,11 @@ type ActiveSubscriptionResponse = {
 	userSubscriptionId?: string;
 };
 
-export const CurrentSub = () => {
+type Props = {
+	className?: string;
+};
+
+export const CurrentSub = ({ className }: Props) => {
 	const [subscription, setSubscription] = useState<Subscription>();
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
 	const [search] = useSearchParams();
@@ -71,9 +76,7 @@ export const CurrentSub = () => {
 					const activeData = response.data as ActiveSubscriptionResponse;
 					const activeSubscriptionId =
 						activeData.subscriptionId || activeData.userSubscriptionId || '';
-					const activeSub = subscriptions.find(
-						(sub) => sub.id === activeSubscriptionId,
-					);
+					const activeSub = subscriptions.find((sub) => sub.id === activeSubscriptionId);
 					setSubscription(activeSub);
 				}
 			});
@@ -88,24 +91,41 @@ export const CurrentSub = () => {
 	}, []);
 
 	return (
-		<div className="flex w-1/2 flex-col gap-[26px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]">
+		<div
+			className={twMerge(
+				'flex min-h-[320px] w-full flex-col gap-[20px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]',
+				className,
+			)}
+		>
 			<div className="flex flex-row items-center justify-between">
 				<p className="font-sans text-2xl font-semibold leading-4">
 					{t('main.currentSub.title')}
 				</p>
 			</div>
 			{subscription ? (
-				<div className="flex flex-row justify-between">
-					<div className="flex flex-col justify-between">
-						<div className="flex flex-col gap-[25px]">
+				<div className="flex h-full flex-row justify-between gap-[16px]">
+					<div className="flex flex-1 flex-col justify-between">
+						<div className="flex flex-col gap-[18px]">
 							<div className="flex flex-row">
-								<p className="font-sans text-xl font-semibold leading-4 text-primary">
+								<p className="font-sans text-2xl font-bold leading-7 text-primary">
 									{subscription.name}
 								</p>
 							</div>
-							<div className="flex flex-row">
-								<p className="mr-[5px] font-sans text-lg font-normal leading-4">
-									{t('main.currentSub.price')}: {subscription.price}
+							{subscription.description ? (
+								<p className="font-sans text-base italic leading-6 text-[#374151]">
+									{subscription.description}
+								</p>
+							) : null}
+							<div className="flex flex-col gap-[10px]">
+								<p className="font-sans text-base font-bold leading-6 text-[#111827]">
+									{t('main.currentSub.price')}: {subscription.budgetForGeneration || 0}
+								</p>
+								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+									{t('main.currentSub.remainingReports')}: {userData.data?.reportsNumber ?? 0}
+								</p>
+								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+									{t('main.currentSub.remainingDownloads')}:{' '}
+									{userData.data?.dowloadReportsNumber ?? 0}
 								</p>
 							</div>
 						</div>
@@ -120,17 +140,8 @@ export const CurrentSub = () => {
 							</p>
 						</Button>
 					</div>
-					<div className="flex flex-col items-end justify-between">
+					<div className="flex shrink-0 items-start">
 						<SubImage />
-						<div className="mt-[20px] flex flex-col items-end gap-[8px] text-sm">
-							<div className="rounded-md bg-background-secondary px-[10px] py-[6px]">
-								{t('main.currentSub.remainingReports')}: {userData.data?.reportsNumber ?? 0}
-							</div>
-							<div className="rounded-md bg-background-secondary px-[10px] py-[6px]">
-								{t('main.currentSub.remainingDownloads')}:{' '}
-								{userData.data?.dowloadReportsNumber ?? 0}
-							</div>
-						</div>
 					</div>
 				</div>
 			) : (

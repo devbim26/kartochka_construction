@@ -1,7 +1,8 @@
 export const en = {
 	// Floor Plans
 	'floorPlans.addLevel': 'Add level',
-	'floorPlans.addLevelTooltip': 'Adding levels is under development',
+	'floorPlans.addLevelTooltip':
+		'To add a new tab (level), switch the page in the document',
 	'floorPlans.uploadFloorPlan': 'Upload floor plan',
 	'floorPlans.createConstruction': 'Create construction',
 	'floorPlans.generateReport': 'Generate report',
@@ -156,6 +157,10 @@ export const en = {
 	'subscription.buyPlan': 'Choose plan',
 	'subscription.reportPerMonth.one': 'report per month',
 	'subscription.reportPerMonth.many': 'reports per month',
+	'subscription.calculationsCount': 'Number of calculations, pcs',
+	'subscription.reportsCount': 'Number of reports, pcs',
+	'subscription.aiModeBalance': 'AI mode funds',
+	'subscription.subscriptionCost': 'Subscription cost',
 
 	'landing.subText.desc.0': 'Perfect for evaluation and small projects',
 	'landing.subText.desc.1': 'Optimal choice for regular use',
@@ -360,7 +365,7 @@ export const en = {
 	'main.currentSub.title': 'Service plan',
 	'main.currentSub.remainingDownloads': 'downloads left',
 	'main.currentSub.remainingReports': 'reports left',
-	'main.currentSub.price': 'price',
+	'main.currentSub.price': 'AI mode funds, BYN',
 	'main.currentSub.changePlan': 'Change plan',
 	'main.currentSub.noneActive': 'No active plan',
 
@@ -761,7 +766,7 @@ export const ru: Record<TranslationKey, string> = {
 	'floorPlanViewer.uploadError': 'Ошибка при загрузке изображения',
 	// Floor Plans
 	'floorPlans.addLevel': 'Добавить уровень',
-	'floorPlans.addLevelTooltip': 'Добавление уровней находится в разработке',
+	'floorPlans.addLevelTooltip': 'Для добавления новой закладки (уровня) измените страницу',
 	'floorPlans.uploadFloorPlan': 'Загрузить план этажа',
 	'floorPlans.createConstruction': 'Создать конструкцию',
 	'floorPlans.generateReport': 'Сформировать отчет',
@@ -879,7 +884,7 @@ export const ru: Record<TranslationKey, string> = {
 	'landing.pageTop.gifAlt': 'Анимация на лендинге',
 	'landing.pageTop.title': 'ИНЖЕНЕРНАЯ AI-ПЛАТФОРМА',
 	'landing.pageTop.subtitle':
-		'Автоматизирует расчеты. Проверяет соответствие. Оптимизирует бюджеты.\nЭкономит время проектировщиков, дизайнеров и девелоперов',
+		'Автоматизирует расчеты\nПроверяет соответствие\nОптимизирует бюджеты\nЭкономит время проектировщиков и девелоперов',
 	'landing.pageTop.start': 'Начать',
 
 	'landing.about.platformTitle': 'ПЛАТФОРМА',
@@ -978,6 +983,10 @@ export const ru: Record<TranslationKey, string> = {
 	'subscription.buyPlan': 'Оформить пакет',
 	'subscription.reportPerMonth.one': 'отчет в месяц',
 	'subscription.reportPerMonth.many': 'отчетов в месяц',
+	'subscription.calculationsCount': 'Количество расчетов, шт',
+	'subscription.reportsCount': 'Количество отчетов, шт',
+	'subscription.aiModeBalance': 'Средства AI mode, BYN',
+	'subscription.subscriptionCost': 'Стоимость подписки, BYN',
 
 	'landing.subText.desc.0': 'Идеально для ознакомления и небольших проектов',
 	'landing.subText.desc.1': 'Оптимальный выбор для регулярного использования',
@@ -1184,7 +1193,7 @@ export const ru: Record<TranslationKey, string> = {
 	'main.currentSub.title': 'Пакет услуг',
 	'main.currentSub.remainingDownloads': 'осталось скачиваний',
 	'main.currentSub.remainingReports': 'осталось отчетов',
-	'main.currentSub.price': 'цена',
+	'main.currentSub.price': 'Остаток средств AI mode, BYN',
 	'main.currentSub.changePlan': 'Изменить пакет',
 	'main.currentSub.noneActive': 'Нет активного пакета',
 

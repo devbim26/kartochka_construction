@@ -27,16 +27,16 @@ export const PageTop = () => {
 			/>
 
 			{/* Translucent card overlay */}
-			<div className="relative z-10 ml-[5%] flex h-full w-1/2 rounded-3xl bg-[#74b1f7]/20 p-[20px] backdrop-blur-sm">
-				<div className="flex h-[400px] flex-col gap-[30px]">
-					<span className="block font-montserrat text-[20px] font-bold leading-[1.2] text-black sm:text-[22px] md:text-[28px] lg:text-[28px] xl:text-[36px]">
+			<div className="relative z-10 ml-[5%] flex h-full w-1/2 rounded-3xl bg-[#74b1f7]/20 px-[44px] py-[40px] backdrop-blur-sm md:px-[56px] md:py-[48px]">
+				<div className="flex h-[400px] w-full flex-col items-center justify-center gap-[30px] text-center">
+					<span className="block w-full font-montserrat text-[20px] font-bold leading-[1.5] text-black sm:text-[22px] md:text-[28px] lg:text-[28px] xl:text-[36px]">
 						{t('landing.pageTop.title')}
 					</span>
-					<span className="block w-1/2 font-montserrat text-[16px] leading-[1.2] text-black sm:text-[18px] md:text-[22px] lg:text-[22px] xl:text-[28px]">
+					<span className="block w-full whitespace-pre-line font-montserrat text-[16px] leading-[1.5] text-black sm:text-[18px] md:text-[22px] lg:text-[22px] xl:text-[28px]">
 						{t('landing.pageTop.subtitle')}
 					</span>
 					<Button
-						className="mt-auto w-fit bg-primary text-[25px] leading-[24px]"
+						className="mt-auto min-h-[58px] w-fit rounded-xl bg-primary px-[28px] text-[30px] font-semibold leading-[1]"
 						onClick={handleStart}
 					>
 						{t('landing.pageTop.start')}

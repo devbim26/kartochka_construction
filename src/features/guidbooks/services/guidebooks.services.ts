@@ -1,4 +1,6 @@
 import type {
+	ExportMaterialsQuery,
+	ExportRequirementQuery,
 	GetPalacementRoomVariantsWithTypesQuery,
 	GetPlacementRoomVariantByAllParametersQuery,
 } from '@api-gen';
@@ -114,4 +116,12 @@ export const getSecondRoomVariant = async (data: GetPlacementRoomVariantByAllPar
 
 export const importMaterials = async (data: { formFile: File }) => {
 	return await fetchApi.api.importExcelFileCreate(data);
+};
+
+export const exportMaterials = async (data: ExportMaterialsQuery) => {
+	return await fetchApi.api.materialExportCreate(data, { format: 'blob' });
+};
+
+export const exportRequirements = async (data: ExportRequirementQuery) => {
+	return await fetchApi.api.requirementExportCreate(data, { format: 'blob' });
 };

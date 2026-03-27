@@ -20,6 +20,7 @@ import {
 	convertToServerMaterialsFilterData,
 } from '@features/guidbooks/converters';
 import {
+	exportMaterials,
 	getGuidebooksCreate,
 	getGuidebooksDelete,
 	getGuidebooksDetail,
@@ -376,6 +377,31 @@ const MaterialsScreen = () => {
 			});
 	};
 
+	const handleExportTableData = () => {
+		from(exportMaterials(convertToServerMaterialsFilterData(forms.filterForm.getValues())))
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || 'Ошибка экспорта');
+					}
+					return from([null]);
+				}),
+			)
+			.subscribe((response) => {
+				if (!response?.data) return;
+				const fileBlob = response.data as Blob;
+				const url = window.URL.createObjectURL(fileBlob);
+				const link = document.createElement('a');
+				link.href = url;
+				link.download = 'materials-export.xlsx';
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				window.URL.revokeObjectURL(url);
+				toast.success('Экспорт выполнен');
+			});
+	};
+
 	useEffect(() => {
 		handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData, paginationState);
 	}, [filterDensity, filterName, filterThickness, filterMaterialType]);
@@ -402,6 +428,7 @@ const MaterialsScreen = () => {
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper
 				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
+				onExport={handleExportTableData}
 				titles={{
 					pageTitleKey: 'guides.materials.pageTitle',
 					editTitleKey: 'guides.materials.editTitle',

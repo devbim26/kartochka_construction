@@ -10,13 +10,15 @@ import {
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	useAccessValidator,
+	UserRoles,
 } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { reportToClientConverter } from '@features/reports/converters';
 import { deleteReport, getPaginatedReports } from '@features/reports/services';
 import type { Report, ReportFilter } from '@features/reports/types';
-import { reportColumns } from '@features/reports/utils';
+import { getReportColumns } from '@features/reports/utils';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -33,6 +35,8 @@ export const ReportScreen = () => {
 	const [tableData, setTableData] = useState<Array<Report>>([]);
 	const [search] = useSearchParams();
 	const navigate = useAppNavigate();
+	const { validate } = useAccessValidator();
+	const isAdmin = validate(UserRoles.Admin);
 
 	const handleGetTableData = (
 		data: ReportFilter,
@@ -110,12 +114,12 @@ export const ReportScreen = () => {
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<FormProvider {...form}>
-				<ReportHeader />
+				<ReportHeader isAdmin={isAdmin} />
 			</FormProvider>{' '}
 			<SimpleTable
 				data={tableData}
 				columns={[
-					...reportColumns,
+					...getReportColumns(isAdmin),
 					{
 						id: 'actions',
 						accessorKey: 'id',

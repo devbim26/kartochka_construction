@@ -8,6 +8,7 @@ export const SubscriptionAddAndEditConfig: EntityConfig = {
 		price: '',
 		numberOfReports: '',
 		numberOfDowloadReports: '',
+		budgetForGeneration: '',
 		description: '',
 	},
 };

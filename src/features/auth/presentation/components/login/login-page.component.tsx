@@ -49,12 +49,17 @@ const LoginPage = () => {
 
 	return (
 		<FormProvider {...form}>
-			<div className="flex h-full w-[412px] flex-col items-center justify-center gap-[23px] rounded-[12px] border bg-white px-[32px] py-[21px]">
-				<div className="flex h-[64px] flex-row items-center justify-center gap-[10px]">
-					<LogoIcon />
-					<LogoTextIcon />
+			<div className="flex h-full w-[412px] flex-col items-center justify-center gap-[32px] rounded-[16px] border border-[#e5e7eb] bg-white px-[36px] py-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+				<div className="flex flex-col items-center justify-center gap-[14px] pt-[4px]">
+					<div className="flex h-[56px] flex-row items-center justify-center gap-[8px]">
+						<LogoIcon className="h-[44px] w-auto" />
+						<LogoTextIcon className="h-[18px] w-auto" />
+					</div>
+					<p className="font-montserrat text-[20px] font-bold tracking-[0.03em] text-[#4b5563]">
+						Инженерная AI-платформа
+					</p>
 				</div>
-				<form onSubmit={form.handleSubmit(onSubmit)}>
+				<form className="w-full pt-[10px]" onSubmit={form.handleSubmit(onSubmit)}>
 					<div className="flex flex-col gap-[24px]">
 						{/* <Input
 							label={formState.errors.phoneNumber?.message || 'Номер телефона'}
@@ -81,9 +86,9 @@ const LoginPage = () => {
 						<a
 							// href={`${API_URL}test-auth/anavarich29@gmail.com`}
 							href={`/api/Auth/login-google`}
-							className="flex h-[50px] w-full items-center gap-[10px] rounded-lg border-2 border-primary bg-primary px-[10px] font-montserrat text-[17px] text-white hover:opacity-80"
+							className="flex h-[52px] w-full items-center justify-center gap-[10px] rounded-xl border-2 border-primary bg-primary px-[14px] font-montserrat text-[17px] font-medium text-white transition-opacity hover:opacity-85"
 						>
-							<FaGoogle className="size-[30px]" />
+							<FaGoogle className="size-[24px]" />
 							продолжить с Google
 						</a>
 						{/* <Button variant="primary" type="submit" className="h-[36px]">

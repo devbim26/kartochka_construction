@@ -94,6 +94,7 @@ export const UserAddEdit = () => {
 	const [search] = useSearchParams();
 	const { setValue, watch, formState, trigger } = form;
 	const [roles, setRoles] = useState<Array<UserRole>>([]);
+	const isAddMode = !!search.get('add');
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
 		const file = event.target.files?.[0];
 		if (file) {
@@ -136,6 +137,22 @@ export const UserAddEdit = () => {
 			<div className="flex flex-col px-[24px] py-[11px]">
 				<div className="flex flex-col gap-[20px]">
 					<div className="flex gap-[20px]">
+						{isAddMode && (
+							<Input
+								label={formState.errors.email?.message || 'Email'}
+								labelClassName={twMerge(
+									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+									formState.errors.email?.message ? 'text-error' : '',
+								)}
+								wrapperClassName="flex-row items-center gap-[10px]"
+								inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+								error={formState.errors.email?.message}
+								{...form.register('email')}
+								maxLength={100}
+								type={'email'}
+								placeholder="Введите e-mail"
+							/>
+						)}
 						<Input
 							label={formState.errors.companyName?.message || 'Название'}
 							labelClassName={twMerge(

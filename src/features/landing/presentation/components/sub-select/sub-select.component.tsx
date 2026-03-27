@@ -23,7 +23,11 @@ interface SubSelectProps {
 	onSubscribe?: (id: string) => void;
 }
 
-export const SubSelect = ({ wrapperClassName, subContainerClassName, onSubscribe }: SubSelectProps) => {
+export const SubSelect = ({
+	wrapperClassName,
+	subContainerClassName,
+	onSubscribe,
+}: SubSelectProps) => {
 	const [isPerMonth, setIsPerMonth] = useState(true);
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
 	const { t } = useI18n();

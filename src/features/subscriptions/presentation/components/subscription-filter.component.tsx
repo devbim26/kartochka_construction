@@ -37,7 +37,7 @@ export const SubscriptionFilter = () => {
 				}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
-				label="Количество скачиваний"
+				label="Количество отчетов, шт"
 				type="number"
 				placeholder="Введите количество"
 			/>

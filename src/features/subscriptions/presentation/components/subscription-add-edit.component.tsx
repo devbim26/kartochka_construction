@@ -39,7 +39,7 @@ export const SubscriptionAddEdit = () => {
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.numberOfReports?.message ? 'text-error' : '',
 				)}
-				label={formState.errors?.numberOfReports?.message || 'Количество отчетов'}
+				label={formState.errors?.numberOfReports?.message || 'Количество отчетов, шт'}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
 				type="number"
@@ -53,12 +53,27 @@ export const SubscriptionAddEdit = () => {
 				)}
 				label={
 					formState.errors?.numberOfDowloadReports?.message ||
-					'Количество скачиваний'
+					'Количество расчетов, шт'
 				}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
 				type="number"
 				placeholder="Введите количество"
+			/>
+			<Input
+				{...register('budgetForGeneration')}
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
+					formState.errors.budgetForGeneration?.message ? 'text-error' : '',
+				)}
+				label={
+					formState.errors?.budgetForGeneration?.message ||
+					'Средства для AI-mode, руб'
+				}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				type="number"
+				placeholder="Введите сумму"
 			/>
 			<Input
 				{...register('description')}

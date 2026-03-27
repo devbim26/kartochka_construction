@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 const AccountDataSchema = z.object({
 	id: z.string().optional(),
+	email: z.string().email('Некорректный e-mail').optional(),
 	mainPhoneNumber: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')

@@ -3,6 +3,7 @@ import type { AccountData } from '../types';
 
 export const convertToClientAccountData = (data: AccountDto): AccountData => ({
 	...data,
+	email: data.email || '',
 	phoneNumbers: !!data.additionalPhoneNumbers?.length
 		? data.additionalPhoneNumbers?.map((ph) => ({
 				number: ph.phoneNumber!.replaceAll(' ', '')!,

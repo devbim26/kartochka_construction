@@ -3,7 +3,11 @@ import { DESIGNING_ROUTES } from '@features/home/constants';
 import type { ReportFilter } from '@features/reports/types';
 import { useFormContext } from 'react-hook-form';
 
-const ReportHeaderComponent = () => {
+type Props = {
+	isAdmin: boolean;
+};
+
+const ReportHeaderComponent = ({ isAdmin }: Props) => {
 	const { register, reset } = useFormContext<ReportFilter>();
 	const navigate = useAppNavigate();
 
@@ -39,16 +43,18 @@ const ReportHeaderComponent = () => {
 							label={'Название'}
 							placeholder="Введите название"
 						/>
-						<Input
-							{...register('client')}
-							labelClassName={
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary'
-							}
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={'Клиент'}
-							placeholder="Введите клиента"
-						/>
+						{isAdmin && (
+							<Input
+								{...register('client')}
+								labelClassName={
+									'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary'
+								}
+								inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+								containerClassName="w-[226px]"
+								label={'Клиент'}
+								placeholder="Введите клиента"
+							/>
+						)}
 					</div>
 					<div className="flex flex-row justify-end gap-[30px] px-[16px] py-[13px]">
 						<Button

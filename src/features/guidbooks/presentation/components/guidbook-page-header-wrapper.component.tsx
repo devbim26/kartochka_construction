@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 interface GuidbookPageHeaderWrapperProps {
 	titles: HeaderFormTitles;
 	onSave: () => void;
+	onExport?: () => void;
 	forms: {
 		filterForm: UseFormReturn<any, any, any>;
 		addForm: UseFormReturn<any, any, any>;
@@ -28,7 +29,7 @@ interface GuidbookPageHeaderWrapperProps {
 }
 
 export const GuidbookPageHeaderWrapper = memoize(
-	({ titles, forms, formElements, onSave }: GuidbookPageHeaderWrapperProps) => {
+	({ titles, forms, formElements, onSave, onExport }: GuidbookPageHeaderWrapperProps) => {
 		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
 		const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
@@ -163,6 +164,19 @@ export const GuidbookPageHeaderWrapper = memoize(
 										/>
 									</>
 								)}
+						</div>
+						<div className="flex items-center justify-between">
+							{currentHeaderFormType === HeaderFormTypes.filter && onExport && (
+								<Button
+									className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
+									onClick={onExport}
+								>
+									<PiExportBold fill="white" width={'16px'} height={'16px'} />
+									<p className="font-sans text-sm font-semibold leading-[18px]">
+										Экспорт
+									</p>
+								</Button>
+							)}
 						</div>
 						<div className="flex items-center justify-between">
 							{currentHeaderFormType === HeaderFormTypes.filter && (
