@@ -18,27 +18,35 @@ import {
 	uploadDocument,
 } from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
-import type { FloorConstruction } from '@features/constructor/types';
+import type { ConstructionSheet, FloorConstruction } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
+import {
+	getLayoutClassFromConstructionHeader,
+	type FloorPlanExplantationTab,
+} from '@features/constructor/utils/construction-layout.utils';
 
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import { Guidebooks, type ConstructionsEditData } from '@features/guidbooks/types';
+import { ConstructionClass } from '@features/guidbooks/types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { AxiosError } from 'axios';
 import * as pdfjs from 'pdfjs-dist';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BsQuestionSquareFill } from 'react-icons/bs';
 import { FaPencilAlt, FaPlus } from 'react-icons/fa';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, filter, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
+import { twMerge } from 'tailwind-merge';
 import {
+	AddRoomModal,
 	CreateConstructionModal,
 	EditConstructionModal,
 	GeneralInformationForm,
 	GeneralInformationModal,
 } from '../modals';
+import type { AddRoomFormValues } from '../modals/modal-forms/add-room-form.component';
 import { ConstructionSheets } from './constructions-sheet.component';
 import { FloorPlanViewer } from './floor-plan-viewer.component';
 
@@ -83,6 +91,8 @@ export const FloorPlans = memoize(() => {
 	const [constructionHeadersById, setConstructionHeadersById] = useState<
 		Record<string, ConstructionsEditData>
 	>({});
+	const [activeExplantationTab, setActiveExplantationTab] =
+		useState<FloorPlanExplantationTab>('walls');
 
 	const handleGetConstructionByHeaderId = (id: string) => {
 		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.CONSTRUCTION }))
@@ -602,6 +612,65 @@ export const FloorPlans = memoize(() => {
 		setCurrentReportConstruction(current);
 	}, [reportType, currentReportConstructions, search]);
 
+	const filteredConstructionsForTab = useMemo(() => {
+		if (!currentReportConstructions.length) return [];
+		if (activeExplantationTab === 'rooms') return [];
+		return currentReportConstructions.filter((c) => {
+			const headerId = c.reportConstructionHeader.constructionHeaderId;
+			const header = constructionHeadersById[headerId];
+			const layout = getLayoutClassFromConstructionHeader(header);
+			if (!layout) return false;
+			if (activeExplantationTab === 'walls') return layout === ConstructionClass.Wall;
+			return layout === ConstructionClass.Floor;
+		});
+	}, [activeExplantationTab, currentReportConstructions, constructionHeadersById]);
+
+	const constructionSheetsForTable = useMemo(() => {
+		if (reportType !== ReportCategory.Floor) {
+			return currentReportConstruction?.reportConstructionHeader.id && currentConstructionHeader
+				? [
+						convertFloorDataToClientConstructionSheet(
+							currentReportConstruction,
+							currentConstructionHeader,
+						),
+					]
+				: [];
+		}
+		if (activeExplantationTab === 'rooms') {
+			return [
+				{
+					id: 'mock-room-1',
+					isStub: true,
+					title: t('floorPlans.roomsTable.stubTitle'),
+					floorPlanImage: '',
+					constructionInfoImage: '',
+					constructionDivide: '—',
+					constructionType: 'RoomA',
+					square: '—',
+					constructionId: 'mock',
+					materials: [],
+				},
+			] as ConstructionSheet[];
+		}
+		return filteredConstructionsForTab.reduce((acc, construction) => {
+			const header =
+				constructionHeadersById[
+					construction.reportConstructionHeader.constructionHeaderId
+				];
+			if (!header) return acc;
+			acc.push(convertFloorDataToClientConstructionSheet(construction, header));
+			return acc;
+		}, [] as ConstructionSheet[]);
+	}, [
+		reportType,
+		activeExplantationTab,
+		filteredConstructionsForTab,
+		constructionHeadersById,
+		currentReportConstruction,
+		currentConstructionHeader,
+		t,
+	]);
+
 	return (
 		<div className="relative">
 			{isLoading && (
@@ -727,7 +796,8 @@ export const FloorPlans = memoize(() => {
 											: () => {}
 									}
 									currentConstruction={currentReportConstruction}
-									currentConstructions={currentReportConstructions}
+									currentConstructions={filteredConstructionsForTab}
+									explantationTab={activeExplantationTab}
 									constructionHeadersById={constructionHeadersById}
 									reportFloorInfoId={selectedLevelReportFloorInfoId}
 									floorId={currentReportFloorId}
@@ -793,11 +863,29 @@ export const FloorPlans = memoize(() => {
 							}
 							window.history.back();
 						}}
-						headerTitle={t('floorPlans.modal.createTitle')}
+						headerTitle={
+							search.get('floorPlanTab') === 'floors'
+								? t('floorPlans.modal.addFloor')
+								: search.get('floorPlanTab') === 'walls'
+									? t('floorPlans.modal.addWall')
+									: t('floorPlans.modal.createTitle')
+						}
 						className="!w-[1000px] md:!w-[900px]"
 						floorId={currentReportFloorId}
 						reportFloorInfoId={selectedLevelReportFloorInfoId}
 						floorNumber={activeLevel?.code}
+					/>
+					<AddRoomModal
+						isOpen={!!search.get('addRoom')}
+						onCancel={() => window.history.back()}
+						onClose={() => window.history.back()}
+						onConfirm={(_data: AddRoomFormValues) => {
+							toast.success(t('floorPlans.toast.roomSavedDemo'));
+							window.history.back();
+						}}
+						headerTitle={t('floorPlans.modal.addRoom')}
+						className="!w-[1000px] md:!w-[900px]"
+						contentClassName="visible p-4 md:p-6"
 					/>
 					<GeneralInformationModal
 						isOpen={!!search.get('info')}
@@ -852,38 +940,29 @@ export const FloorPlans = memoize(() => {
 					</DeleteModal>
 				</div>
 
-				<ConstructionSheets
-					constructionSheets={
-						reportType === ReportCategory.Floor
-							? currentReportConstructions.reduce(
-									(acc, construction) => {
-										const header =
-											constructionHeadersById[
-												construction.reportConstructionHeader
-													.constructionHeaderId
-											];
-										if (!header) return acc;
-										acc.push(
-											convertFloorDataToClientConstructionSheet(
-												construction,
-												header,
-											),
-										);
-										return acc;
-									},
-									[] as import('@features/constructor/types').ConstructionSheet[],
-								)
-							: currentReportConstruction?.reportConstructionHeader.id &&
-								  currentConstructionHeader
-								? [
-										convertFloorDataToClientConstructionSheet(
-											currentReportConstruction,
-											currentConstructionHeader,
-										),
-									]
-								: []
-					}
-				/>
+				<div className="flex flex-col gap-3">
+					<div className="flex flex-row flex-wrap gap-[20px]">
+						{(['walls', 'floors', 'rooms'] as const).map((tab) => (
+							<Button
+								key={tab}
+								type="button"
+								onClick={() => setActiveExplantationTab(tab)}
+								className={twMerge(
+									'flex h-[30px] flex-row items-center px-[16px] font-sans text-sm font-semibold shadow-none',
+									activeExplantationTab === tab
+										? ''
+										: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
+								)}
+							>
+								{t(`floorPlans.explantation.${tab}`)}
+							</Button>
+						))}
+					</div>
+					<ConstructionSheets
+						tableVariant={activeExplantationTab === 'rooms' ? 'rooms' : 'default'}
+						constructionSheets={constructionSheetsForTable}
+					/>
+				</div>
 
 				<Button
 					onClick={() =>

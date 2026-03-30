@@ -13,5 +13,6 @@ export * from './material-parametrs.types';
 export * from './modals.types';
 export * from './physical-standarts.types';
 export * from './report-category.types';
+export * from './room-placement.types';
 export * from './soundproofing-standarts.types';
 export * from './thermal-insulation.types';

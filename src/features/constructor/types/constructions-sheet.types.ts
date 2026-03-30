@@ -16,4 +16,6 @@ export type ConstructionSheet = {
 	materials: ConstructionType[];
 	additionalWindows?: AdditionalOpeningRow[];
 	additionalDoors?: AdditionalOpeningRow[];
+	/** Строка-заглушка (демо для заказчика) */
+	isStub?: boolean;
 };

@@ -32,6 +32,8 @@ type Props = {
 	currentConstructions?: FloorConstruction[];
 	constructionHeadersById?: Record<string, ConstructionsEditData>;
 	getData: () => void;
+	/** Таб экспликации: стены / полы / помещения (для помещений — отдельная модалка). */
+	explantationTab?: 'walls' | 'floors' | 'rooms';
 	// Новые пропсы для управления страницей из родителя
 	currentPage?: number;
 	onPageChange?: (page: number) => void;
@@ -47,6 +49,7 @@ export const FloorPlanViewer = ({
 	currentConstructionHeader,
 	currentConstructions = [],
 	constructionHeadersById = {},
+	explantationTab = 'walls',
 	currentPage = 1, // значение по умолчанию
 	onPageChange,
 }: Props) => {
@@ -103,6 +106,20 @@ export const FloorPlanViewer = ({
 		const normalizedX = +(x / scale).toString();
 		const normalizedY = +(y / scale).toString();
 
+		if (explantationTab === 'rooms') {
+			dispatch(constructorSlice.actions.setFile({ image: canvas.toDataURL('image/png') }));
+			navigate('', {
+				addRoom: 'true',
+				reportId: search.get('reportId')!.toString(),
+				reportType: search.get('reportType')!.toString(),
+				layerId: floorId || '',
+				floorNumber: floorNumber || '',
+				page: currentPage.toString(),
+			});
+			setFirstPoint(null);
+			return;
+		}
+
 		if (!firstPoint) {
 			setFirstPoint({ x: normalizedX, y: normalizedY });
 			toast.info('Выбрана первая точка. Укажите вторую точку.');
@@ -157,6 +174,7 @@ export const FloorPlanViewer = ({
 			x2: normalizedX.toString(),
 			y2: normalizedY.toString(),
 			page: currentPage.toString(), // используем пропс
+			floorPlanTab: explantationTab === 'floors' ? 'floors' : 'walls',
 		});
 		setFirstPoint(null);
 	};
@@ -407,6 +425,7 @@ export const FloorPlanViewer = ({
 		currentConstructions,
 		constructionHeadersById,
 		locale,
+		explantationTab,
 	]);
 
 	useEffect(() => {

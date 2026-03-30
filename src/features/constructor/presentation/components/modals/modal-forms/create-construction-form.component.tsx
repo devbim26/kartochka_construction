@@ -35,24 +35,22 @@ import {
 	convertToClientIssuerData,
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksPaginated } from '@features/guidbooks/services';
-import type {
-	BuildingType,
-	CategoryClass,
-	ConstructionClass,
-	ConstructionsAddData,
-	ConstructionsEditData,
-	Issuer,
-} from '@features/guidbooks/types';
 import {
+	type BuildingType,
+	type CategoryClass,
+	type ConstructionsAddData,
+	type ConstructionsEditData,
+	ConstructionClass,
 	EnConstructionTypeSelectValues,
 	Guidebooks,
 	RuConstructionTypeSelectValues,
+	type Issuer,
 } from '@features/guidbooks/types';
 
 import type { IssuerDto } from '@api-gen';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
@@ -81,6 +79,7 @@ interface RoomRequirementMap {
 		secondRoomId: string;
 		secondRoomName: string;
 		requirementId: string;
+		rw?: number | null;
 	}>;
 }
 
@@ -120,6 +119,7 @@ export const CreateConstructionForm = memoize(
 				id,
 				constructionType,
 				firstPlacementRoom,
+				secondPlacementRoom,
 			] = watch([
 				'length',
 				'width',
@@ -129,12 +129,23 @@ export const CreateConstructionForm = memoize(
 				'id',
 				'constructionType',
 				'firstPlacementRoom',
+				'secondPlacementRoom',
 			]);
+
+			const paginationRw = useMemo(() => {
+				if (!firstPlacementRoom || !secondPlacementRoom) return undefined;
+				const entries = roomRequirementsMap[firstPlacementRoom];
+				const match = entries?.find((e) => e.secondRoomId === secondPlacementRoom);
+				if (match?.rw == null || Number.isNaN(Number(match.rw))) return undefined;
+				return Number(match.rw);
+			}, [firstPlacementRoom, secondPlacementRoom, roomRequirementsMap]);
 
 			const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>(
 				[],
 			);
 			const [search] = useSearchParams();
+			const floorPlanTab = search.get('floorPlanTab');
+			const isLayoutFixed = floorPlanTab === 'walls' || floorPlanTab === 'floors';
 			const editMode = search.get('editMode');
 			const reportId = search.get('reportId');
 			const reportType = search.get('reportType');
@@ -158,6 +169,7 @@ export const CreateConstructionForm = memoize(
 						const secondRoomId = requirement.secondPlacementRoom.id;
 						const secondRoomName = requirement.secondPlacementRoom.name;
 						const requirementId = requirement.requirementId;
+						const rw = requirement.rw as number | null | undefined;
 
 						if (!map[firstRoomId]) {
 							map[firstRoomId] = [];
@@ -167,6 +179,7 @@ export const CreateConstructionForm = memoize(
 							secondRoomId,
 							secondRoomName,
 							requirementId,
+							rw,
 						});
 					});
 				});
@@ -178,7 +191,10 @@ export const CreateConstructionForm = memoize(
 				if (firstPlacementRoom && roomRequirementsMap[firstPlacementRoom]) {
 					const availableRooms = roomRequirementsMap[firstPlacementRoom];
 					const options = availableRooms.map((room) => ({
-						label: room.secondRoomName,
+						label:
+							room.rw != null && !Number.isNaN(Number(room.rw))
+								? `${room.secondRoomName} (Rw ${room.rw})`
+								: room.secondRoomName,
 						value: room.secondRoomId,
 					}));
 					setSecondRoomOptions(options);
@@ -197,17 +213,24 @@ export const CreateConstructionForm = memoize(
 			}, [firstPlacementRoom, roomRequirementsMap, setValue]);
 
 			useEffect(() => {
-				const secondRoomId = watch('secondPlacementRoom');
-				if (firstPlacementRoom && secondRoomId && roomRequirementsMap[firstPlacementRoom]) {
+				if (firstPlacementRoom && secondPlacementRoom && roomRequirementsMap[firstPlacementRoom]) {
 					const requirement = roomRequirementsMap[firstPlacementRoom].find(
-						(room) => room.secondRoomId === secondRoomId,
+						(room) => room.secondRoomId === secondPlacementRoom,
 					);
 
 					if (requirement) {
 						setValue('requirementId', requirement.requirementId);
 					}
 				}
-			}, [watch('secondPlacementRoom'), firstPlacementRoom, roomRequirementsMap, setValue]);
+			}, [secondPlacementRoom, firstPlacementRoom, roomRequirementsMap, setValue]);
+
+			useEffect(() => {
+				if (floorPlanTab === 'walls') {
+					setValue('constructionType', ConstructionClass.Wall);
+				} else if (floorPlanTab === 'floors') {
+					setValue('constructionType', ConstructionClass.Floor);
+				}
+			}, [floorPlanTab, setValue]);
 
 			useImperativeHandle(ref, () => ({
 				submit: () => {
@@ -216,8 +239,13 @@ export const CreateConstructionForm = memoize(
 					})();
 				},
 				reset: (data) => {
-					const currentType = form.getValues('constructionType');
-					form.reset({ constructionType: currentType, ...data });
+					const typeFromTab =
+						floorPlanTab === 'walls'
+							? ConstructionClass.Wall
+							: floorPlanTab === 'floors'
+								? ConstructionClass.Floor
+								: form.getValues('constructionType');
+					form.reset({ constructionType: typeFromTab || '', ...data });
 				},
 			}));
 
@@ -409,6 +437,11 @@ export const CreateConstructionForm = memoize(
 						data: {
 							constructionIdToUpdate: construction || undefined,
 							userId: userId || undefined,
+							...(constructionType
+								? { constructionClass: constructionType as ConstructionClass }
+								: {}),
+							...(paginationRw != null ? { rw: paginationRw } : {}),
+							orderByPriority: true,
 						},
 						guidebookType: Guidebooks.CONSTRUCTION,
 						pagination: { pageNumber: 1, pageSize: 99999 },
@@ -606,7 +639,7 @@ export const CreateConstructionForm = memoize(
 
 			useEffect(() => {
 				handleGetConstructionData();
-			}, [construction, userId]);
+			}, [construction, userId, constructionType, paginationRw]);
 
 			return (
 				<div className="relative flex w-full flex-col border-b">
@@ -644,78 +677,48 @@ export const CreateConstructionForm = memoize(
 								placeholder={t('createConstruction.name.placeholder')}
 								maxLength={50}
 							/>
-							<Controller
-								control={control}
-								name={'constructionType'}
-								render={({ field }) => (
-									<Select
-										options={constructionTypeOptions}
-										{...field}
-										value={field.value || ''}
-										label={
-											formState.errors?.constructionType?.message
-												? t(
-														formState.errors.constructionType
-															.message as any,
-													)
-												: t('createConstruction.constructionType.label')
-										}
-										isSearchable
-										error={
-											formState.errors.constructionType?.message
-												? t(
-														formState.errors.constructionType
-															.message as any,
-													)
-												: undefined
-										}
-										labelClassName={twMerge(
-											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px] text-left',
-											formState.errors.constructionType?.message
-												? 'text-error'
-												: '',
-										)}
-										placeholder={t(
-											'createConstruction.constructionType.placeholder',
-										)}
-										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-										wrapperClassname="shadow-none ring-input-border-primary flex-row gap-[20px]"
-									/>
-								)}
-							/>
-							<Controller
-								control={control}
-								name={'construction'}
-								render={({ field }) => (
-									<Select
-										options={constructionSelectOptions}
-										{...field}
-										value={field.value || ''}
-										label={
-											formState.errors?.construction?.message
-												? t(formState.errors.construction.message as any)
-												: t('createConstruction.construction.label')
-										}
-										isSearchable
-										error={
-											formState.errors.construction?.message
-												? t(formState.errors.construction.message as any)
-												: undefined
-										}
-										labelClassName={twMerge(
-											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px] text-left',
-											formState.errors.construction?.message
-												? 'text-error'
-												: '',
-										)}
-										placeholder={t(
-											'createConstruction.construction.placeholder',
-										)}
-										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-										wrapperClassname="shadow-none ring-input-border-primary flex-row gap-[20px]"
-									/>
-								)}
-							/>
+							{!isLayoutFixed && (
+								<Controller
+									control={control}
+									name={'constructionType'}
+									render={({ field }) => (
+										<Select
+											options={constructionTypeOptions}
+											{...field}
+											value={field.value || ''}
+											label={
+												formState.errors?.constructionType?.message
+													? t(
+															formState.errors.constructionType
+																.message as any,
+														)
+													: t('createConstruction.constructionType.label')
+											}
+											isSearchable
+											error={
+												formState.errors.constructionType?.message
+													? t(
+															formState.errors.constructionType
+																.message as any,
+														)
+													: undefined
+											}
+											labelClassName={twMerge(
+												'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px] text-left',
+												formState.errors.constructionType?.message
+													? 'text-error'
+													: '',
+											)}
+											placeholder={t(
+												'createConstruction.constructionType.placeholder',
+											)}
+											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+											wrapperClassname="shadow-none ring-input-border-primary flex-row gap-[20px]"
+										/>
+									)}
+								/>
+							)}
+							{isLayoutFixed && <input type="hidden" {...register('constructionType')} />}
 							<div className="flex items-center gap-x-[20px]">
 								<div className="flex w-[145px] text-left">
 									<label
@@ -774,6 +777,39 @@ export const CreateConstructionForm = memoize(
 								</div>
 							</div>
 							<input type="hidden" {...register('requirementId')} />
+							<Controller
+								control={control}
+								name={'construction'}
+								render={({ field }) => (
+									<Select
+										options={constructionSelectOptions}
+										{...field}
+										value={field.value || ''}
+										label={
+											formState.errors?.construction?.message
+												? t(formState.errors.construction.message as any)
+												: t('createConstruction.construction.label')
+										}
+										isSearchable
+										error={
+											formState.errors.construction?.message
+												? t(formState.errors.construction.message as any)
+												: undefined
+										}
+										labelClassName={twMerge(
+											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px] text-left',
+											formState.errors.construction?.message
+												? 'text-error'
+												: '',
+										)}
+										placeholder={t(
+											'createConstruction.construction.placeholder',
+										)}
+										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+										wrapperClassname="shadow-none ring-input-border-primary flex-row gap-[20px]"
+									/>
+								)}
+							/>
 							<Input
 								{...register('width')}
 								labelClassName={twMerge(

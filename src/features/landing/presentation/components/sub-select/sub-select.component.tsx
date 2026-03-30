@@ -76,6 +76,7 @@ export const SubSelect = ({
 		navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.main.route, {
 			subId: id,
 			subModal: 'true',
+			changePlanFlow: 'true',
 		});
 	};
 

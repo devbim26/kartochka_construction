@@ -663,6 +663,10 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	constructionIdToUpdate?: string | null;
 	/** @format uuid */
 	userId?: string | null;
+	constructionClass?: ConstructionClass;
+	/** @format float */
+	rw?: number | null;
+	orderByPriority?: boolean;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -1360,6 +1364,8 @@ export interface SecondRequirementPlacementRoomDto {
 	secondPlacementRoom?: PlacementRoomDto;
 	/** @format uuid */
 	requirementId?: string;
+	/** @format float */
+	rw?: number | null;
 }
 
 export interface SendSmsCommand {

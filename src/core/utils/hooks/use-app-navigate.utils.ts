@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 type SearchParams = { [key: string]: string };
 
@@ -16,13 +16,28 @@ type SearchParams = { [key: string]: string };
  */
 export const useAppNavigate = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	const appNavigate = useCallback(
 		(path?: string, searchParams?: SearchParams) => {
-			const search = new URLSearchParams(searchParams).toString();
-			navigate(`${path}?${search}`);
+			const search = searchParams
+				? new URLSearchParams(searchParams).toString()
+				: '';
+			const searchWithPrefix = search ? `?${search}` : '';
+
+			// Empty path means "stay on current route, only change query" (React Router 7 no longer
+			// reliably treats a string like "?a=b" as search-only navigation).
+			if (path === undefined || path === '') {
+				navigate({
+					pathname: location.pathname,
+					search: searchWithPrefix,
+				});
+				return;
+			}
+
+			navigate(`${path}${searchWithPrefix}`);
 		},
-		[navigate],
+		[navigate, location.pathname],
 	);
 
 	return appNavigate;
