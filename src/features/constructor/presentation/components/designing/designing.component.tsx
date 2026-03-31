@@ -98,6 +98,26 @@ const DesigningScreen = () => {
 			| undefined;
 	}, [form, constructionHeader]);
 
+	const hasComputedDots = useMemo(
+		() =>
+			(graphData ?? []).some(
+				(g) =>
+					(g.name || '').toLowerCase() === 'computeddots' &&
+					(g.namedDots?.length ?? 0) > 0,
+			),
+		[graphData],
+	);
+
+	const hasLaboratoryDots = useMemo(
+		() =>
+			(graphData ?? []).some(
+				(g) =>
+					(g.name || '').toLowerCase() === 'laboratorydots' &&
+					(g.namedDots?.length ?? 0) > 0,
+			),
+		[graphData],
+	);
+
 	const handleGetCurrentReportFloorInfo = (id: string) => {
 		dispatch(startLoading());
 		from(getReportFloorById({ id: id }))
@@ -642,44 +662,52 @@ const DesigningScreen = () => {
 				<div className="flex w-full flex-col gap-[10px] px-[24px] py-[10px]">
 					{currentReportInfo ? (
 						<>
-							<div className="flex flex-col gap-1">
-								<p className="text-[30px] font-extrabold text-black">
-									{t('constructor.designing.calcValue')}
-								</p>
-								<p className="font-sans text-[14px]">
-									{currentReportInfo?.calculationDocument?.fullName}
-								</p>
-								<div className="flex w-full items-center gap-1">
-									<p className="font-sans text-[25px] font-semibold leading-4">
-										Rw = {constructionHeader?.RCalcs} dB
-									</p>
-									<p className={compIsRelevant ? 'text-green-600' : 'text-error'}>
-										{compIsRelevant
-											? t('constructor.relevant.yes')
-											: t('constructor.relevant.no')}
-									</p>
-								</div>
-							</div>
-							<div></div>
-							<div className="flex flex-col gap-2">
-								<p className="text-[30px] font-extrabold leading-none text-black">
-									{t('constructor.designing.labValue')}
-								</p>
-								<p className="font-sans text-[14px]">
-									{currentReportInfo?.calculationDocument?.fullName}
-								</p>
-								<div className="flex w-full items-center gap-1">
-									<p className="font-sans text-[25px] font-semibold leading-4">
-										Rw = {constructionHeader?.labIndexValue} dB
-									</p>
-									<p className={labIsRelevant ? 'text-green-600' : 'text-error'}>
-										{labIsRelevant
-											? t('constructor.relevant.yes')
-											: t('constructor.relevant.no')}
-									</p>
-								</div>
-							</div>
-							<div></div>
+							{hasComputedDots && (
+								<>
+									<div className="flex flex-col gap-1">
+										<p className="text-[30px] font-extrabold text-black">
+											{t('constructor.designing.calcValue')}
+										</p>
+										<p className="font-sans text-[14px]">
+											{currentReportInfo?.calculationDocument?.fullName}
+										</p>
+										<div className="flex w-full items-center gap-1">
+											<p className="font-sans text-[25px] font-semibold leading-4">
+												Rw = {constructionHeader?.RCalcs} dB
+											</p>
+											<p className={compIsRelevant ? 'text-green-600' : 'text-error'}>
+												{compIsRelevant
+													? t('constructor.relevant.yes')
+													: t('constructor.relevant.no')}
+											</p>
+										</div>
+									</div>
+									<div></div>
+								</>
+							)}
+							{hasLaboratoryDots && (
+								<>
+									<div className="flex flex-col gap-2">
+										<p className="text-[30px] font-extrabold leading-none text-black">
+											{t('constructor.designing.labValue')}
+										</p>
+										<p className="font-sans text-[14px]">
+											{currentReportInfo?.calculationDocument?.fullName}
+										</p>
+										<div className="flex w-full items-center gap-1">
+											<p className="font-sans text-[25px] font-semibold leading-4">
+												Rw = {constructionHeader?.labIndexValue} dB
+											</p>
+											<p className={labIsRelevant ? 'text-green-600' : 'text-error'}>
+												{labIsRelevant
+													? t('constructor.relevant.yes')
+													: t('constructor.relevant.no')}
+											</p>
+										</div>
+									</div>
+									<div></div>
+								</>
+							)}
 							<p className="text-[30px] font-extrabold text-primary">
 								{t('constructor.designing.allowedValue')}
 							</p>

@@ -28,56 +28,46 @@ interface GraphTableProps {
 export const GraphDetailTable = ({ graphData, additional, noPadding = false }: GraphTableProps) => {
 	const { t } = useI18n();
 	const { freqData, extraData } = useMemo(() => {
-		const labDots = graphData?.find((g) => g.name === 'abcd')?.namedDots ?? [];
-		const deviationDots =
-			graphData?.find((g) => g.name === 'deviationDotsList')?.namedDots ?? [];
-		const laboratoryDots = graphData?.find((g) => g.name === 'LaboratoryDots')?.namedDots ?? [];
+		const getDotsByName = (targetName: string) =>
+			graphData?.find((g) => (g.name || '').toLowerCase() === targetName.toLowerCase())
+				?.namedDots ?? [];
 
-		const labExtraMap = new Map<number, string>();
+		const computedDots = getDotsByName('computedDots');
+		const laboratoryDots = getDotsByName('LaboratoryDots');
+
+		const computedMap = new Map<number, string>();
+		computedDots.forEach((dot) => {
+			if (dot.dot?.f && dot.dot?.r != null) {
+				computedMap.set(dot.dot.f, String(dot.dot.r));
+			}
+		});
+
+		const laboratoryMap = new Map<number, string>();
 		laboratoryDots.forEach((dot) => {
 			if (dot.dot?.f && dot.dot?.r != null) {
-				labExtraMap.set(dot.dot.f, String(dot.dot.r));
+				laboratoryMap.set(dot.dot.f, String(dot.dot.r));
 			}
 		});
 
-		const inSituMap = new Map<number, string>();
-		deviationDots.forEach((dot) => {
-			if (dot.dot?.f && dot.dot?.r != null && dot.dot.f >= 100) {
-				inSituMap.set(dot.dot.f, String(dot.dot.r));
-			}
-		});
+		const allFreqs = Array.from(
+			new Set(
+				Array.from(computedMap.keys()).concat(Array.from(laboratoryMap.keys())),
+			),
+		).sort((a, b) => a - b);
 
-		const freqData = labDots
-			.map((dot) => ({
-				frequency: dot.dot?.f?.toString() ?? '',
-				rLab: dot.dot?.r != null ? String(dot.dot.r) : '–',
-				rLabExtra: labExtraMap.get(dot.dot?.f ?? 0) ?? '–',
-				rInSitu: inSituMap.get(dot.dot?.f ?? 0) ?? '–',
-			}))
-			.sort((a, b) => Number(a.frequency) - Number(b.frequency));
+		const freqData = allFreqs.map((freq) => ({
+			frequency: String(freq),
+			// Для справочной конструкции тут будет "–", а LaboratoryDots заполнен.
+			rLab: computedMap.get(freq) ?? '–',
+			rLabExtra: laboratoryMap.get(freq) ?? '–',
+			rInSitu: '–',
+		}));
 
+		// Дополнительные данные больше не выводим в таблице (только график).
 		const extraData: ExtraTableRow[] = [];
-		if (additional) {
-			if (additional.computingRw !== undefined) {
-				extraData.push({
-					type: 'Rw',
-					rLab: String(additional.computingRw),
-					rLabExtra: String(additional.laboratoryIndexValue),
-					rInSitu: String(additional.computingRw),
-				});
-			}
-			if (additional.ctr !== undefined && additional.delta !== undefined) {
-				extraData.push({
-					type: 'C, Ctr',
-					rLab: `(${additional.c}, ${additional.ctr})`,
-					rLabExtra: `(${additional.laboratoryC}, ${additional.laboratoryCtr})`,
-					rInSitu: `(${additional.delta}, ${additional.ctr})`,
-				});
-			}
-		}
 
 		return { freqData, extraData };
-	}, [graphData, additional]);
+	}, [graphData]);
 
 	const columns = useMemo<ColumnDef<GraphTableRow>[]>(
 		() => [

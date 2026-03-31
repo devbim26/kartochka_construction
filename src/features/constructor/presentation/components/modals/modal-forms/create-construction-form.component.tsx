@@ -639,7 +639,7 @@ export const CreateConstructionForm = memoize(
 
 			useEffect(() => {
 				handleGetConstructionData();
-			}, [construction, userId, constructionType, paginationRw]);
+			}, [userId, constructionType, paginationRw]);
 
 			return (
 				<div className="relative flex w-full flex-col border-b">

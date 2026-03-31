@@ -54,15 +54,18 @@ const DesigningChart = ({
 	const { t } = useI18n();
 
 	const legendLabels: Record<string, string> = {
-		Laboratory: calculationDocName,
+		Computed: calculationDocName,
+		computedDots: calculationDocName,
+		Laboratory: regulatoryDocName,
+		LaboratoryDots: regulatoryDocName,
 		abcd: regulatoryDocName,
 	};
 
-	// Собираем все частоты из всех графиков
+	// Собираем все частоты из всех графиков (не только Laboratory),
+	// чтобы корректно рендерить случаи "computed + additional" без laboratory.
 	const allFrequencies = Array.from(
 		new Set(
 			graphSeries
-				.filter((ser) => ser.label.includes('Laboratory'))
 				.flatMap((series) => series.data.map((point) => point.x))
 				.filter((freq) => freq !== null && freq !== undefined)
 				.sort((a, b) => a - b),
@@ -81,18 +84,12 @@ const DesigningChart = ({
 	const chartData: ChartData<'line'> = {
 		labels: displayFrequencies.map((freq) => String(freq)),
 		datasets: graphSeries.map((series, index) => {
-			// Генерируем цвета для графиков
-			const colors = [
-				'#3b82f6', // blue
-				'#ef4444', // red
-				'#808080', // green
-				'#808080', // yellow
-				'#808080', // purple
-				'#808080', // pink
-				'#808080', // cyan
-			];
-
-			const color = colors[index % colors.length];
+			// Явная цветовая схема: main computed — красный, laboratory — синий,
+			// дополнительные серии — серые.
+			const labelLower = (series.label || '').toLowerCase();
+			let color = '#808080';
+			if (labelLower.includes('computed')) color = '#ef4444';
+			else if (labelLower.includes('laboratory')) color = '#3b82f6';
 
 			// Создаем массив данных для каждой частоты
 			const dataPoints = displayFrequencies.map((frequency) => {
