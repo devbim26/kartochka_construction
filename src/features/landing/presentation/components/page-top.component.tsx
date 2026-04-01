@@ -1,12 +1,12 @@
 import { LandingImage } from '@assets';
-import { APP_ROUTES, Button, useAppSelector, useI18n } from '@core';
+import { APP_ROUTES, Button, selectIsUserLoggedIn, useAppSelector, useI18n } from '@core';
 import { AUTH_ROUTES } from '@features/auth/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useNavigate } from 'react-router-dom';
 
 export const PageTop = () => {
 	const navigate = useNavigate();
-	const isAuthenticated = useAppSelector((store) => store.authData.data?.isAuth);
+	const isAuthenticated = useAppSelector(selectIsUserLoggedIn);
 	const { t } = useI18n();
 
 	const handleStart = () => {

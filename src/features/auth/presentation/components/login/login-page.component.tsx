@@ -3,11 +3,13 @@ import {
 	LogoIcon,
 	LogoTextIcon,
 	phoneNumberMask,
+	selectIsUserLoggedIn,
 	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
 import { getCurrentUser } from '@features/account/services';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import { useEffect, useState } from 'react';
@@ -23,11 +25,16 @@ const LoginPage = () => {
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
 	const authData = useAppSelector((store) => store.authData);
+	const isLoggedIn = useAppSelector(selectIsUserLoggedIn);
+
+	useEffect(() => {
+		dispatch(getCurrentUser());
+	}, [dispatch]);
 
 	useEffect(() => {
 		if (authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name) {
 			dispatch(getCurrentUser());
-			navigate(APP_ROUTES.landing.route);
+			navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`);
 		}
 	}, [authData.fetch_data]);
 
@@ -98,7 +105,13 @@ const LoginPage = () => {
 				</form>
 				<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
 					<p
-						onClick={() => navigate(APP_ROUTES.landing.route)}
+						onClick={() =>
+							navigate(
+								isLoggedIn
+									? `${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`
+									: APP_ROUTES.landing.route,
+							)
+						}
 						className="cursor-pointer font-semibold underline-offset-auto hover:underline"
 					>
 						На главную

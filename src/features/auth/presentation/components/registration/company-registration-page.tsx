@@ -5,12 +5,17 @@ import {
 	FormElementLabel,
 	Input,
 	phoneNumberMask,
+	selectIsUserLoggedIn,
 	useAppDispatch,
 	useAppNavigate,
+	useAppSelector,
 } from '@core';
+import { getCurrentUser } from '@features/account/services';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import type { UseFormReturn } from 'react-hook-form';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { TiDeleteOutline } from 'react-icons/ti';
@@ -58,6 +63,11 @@ const CompanyRegistrationPage = () => {
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
 	const [search] = useSearchParams();
+	const isLoggedIn = useAppSelector(selectIsUserLoggedIn);
+
+	useEffect(() => {
+		dispatch(getCurrentUser());
+	}, [dispatch]);
 
 	const form = useForm<RegistrationFormData>({
 		resolver: zodResolver(RegistrationFormDataConfig.schema),
@@ -75,7 +85,7 @@ const CompanyRegistrationPage = () => {
 		)
 			.unwrap()
 			.then(() => {
-				navigate(APP_ROUTES.designing.route);
+				navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`);
 			})
 			.catch((e) => {});
 	};
@@ -277,7 +287,13 @@ const CompanyRegistrationPage = () => {
 					</Button>
 					<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
 						<p
-							onClick={() => navigate(APP_ROUTES.landing.route)}
+							onClick={() =>
+								navigate(
+									isLoggedIn
+										? `${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`
+										: APP_ROUTES.landing.route,
+								)
+							}
 							className="cursor-pointer font-semibold underline-offset-auto hover:underline"
 						>
 							На главную

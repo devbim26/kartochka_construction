@@ -98,18 +98,19 @@ export const AccountForm = () => {
 		defaultValues: AccountDataConfig.defaultValues,
 	});
 
+	const navigate = useAppNavigate();
+	const dispatch = useAppDispatch();
+	const [search] = useSearchParams();
+
 	useEffect(() => {
 		if (userData.fetch_data?.fetch_name === ACCOUNT_FETCH_ROUTES.update.fetch_name) {
 			dispatch(getCurrentUser());
 		}
-	}, [userData.fetch_data]);
+	}, [userData.fetch_data, dispatch]);
 
 	useEffect(() => {
 		dispatch(getCurrentUser());
-	}, []);
-	const navigate = useAppNavigate();
-	const dispatch = useAppDispatch();
-	const [search] = useSearchParams();
+	}, [dispatch]);
 	const { setValue, watch, formState, trigger, reset } = form;
 
 	const onSubmit = () => {

@@ -21,11 +21,15 @@ export const LandingContent = () => {
 		if (sectionId === LandingSections.designing.id) {
 			setSearch({});
 			navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`);
-		} else
-			pageContentWrapperRef.current
-				?.querySelector(`#${sectionId}`)
-				?.scrollIntoView({ behavior: 'smooth' });
-	}, [sectionId]);
+			return;
+		}
+		if (!sectionId) {
+			return;
+		}
+		pageContentWrapperRef.current
+			?.querySelector(`#${CSS.escape(sectionId)}`)
+			?.scrollIntoView({ behavior: 'smooth' });
+	}, [sectionId, navigate, setSearch]);
 
 	return (
 		<div ref={pageContentWrapperRef}>

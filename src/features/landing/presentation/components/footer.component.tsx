@@ -57,16 +57,6 @@ export const Footer = () => {
 							}
 							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
 						>
-							{t('landing.footer.design')}
-						</span>
-						<span
-							onClick={() =>
-								navigate(
-									`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`,
-								)
-							}
-							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
-						>
 							{t('landing.footer.subscriptions')}
 						</span>
 					</div>

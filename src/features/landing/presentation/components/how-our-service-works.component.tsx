@@ -156,23 +156,25 @@ export const HowOurServiceWorks = () => {
 					</div>
 
 					<div
-						className="relative w-[320px] [perspective:1200px] sm:w-[360px] md:w-[560px] lg:w-[660px] xl:w-[900px]"
+						className="relative w-[320px] [perspective:1200px] [transform-style:preserve-3d] sm:w-[360px] md:w-[560px] lg:w-[660px] xl:w-[900px]"
 						onMouseEnter={() => setIsHover(true)}
 						onMouseLeave={() => setIsHover(false)}
 					>
 						<div
 							className={twMerge(
 								'relative min-h-[320px] w-full md:h-[500px]',
-								'transition-transform duration-700 ease-in-out [transform-style:preserve-3d]',
+								'[transform-style:preserve-3d] will-change-transform',
+								'transition-transform duration-700 ease-in-out',
 								isHover
 									? '[transform:rotateY(180deg)]'
 									: '[transform:rotateY(0deg)]',
 							)}
 						>
+							{/* translateZ separates faces for Firefox (coplanar backface bugs); avoid overflow on 3D layer */}
 							<div
 								className={twMerge(
 									'absolute inset-0 flex min-h-[320px] w-full flex-col gap-5 rounded-2xl bg-white p-6 shadow-blue md:p-7',
-									'[backface-visibility:hidden]',
+									'[backface-visibility:hidden] [transform:translateZ(1px)]',
 								)}
 							>
 								{/* Content over image */}
@@ -199,21 +201,23 @@ export const HowOurServiceWorks = () => {
 
 							<div
 								className={twMerge(
-									'absolute inset-0 flex h-full min-h-[320px] w-full flex-col gap-4 overflow-hidden rounded-2xl bg-white p-6 shadow-blue md:p-7',
-									'[backface-visibility:hidden] [transform:rotateY(180deg)]',
+									'absolute inset-0 flex h-full min-h-[320px] w-full flex-col gap-4 rounded-2xl bg-white p-6 shadow-blue md:p-7',
+									'[backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(1px)]',
 								)}
 							>
-								<div className="font-montserrat font-semibold leading-snug text-black sm:text-lg">
-									{stepTitles[selectedStep]}
-								</div>
-								<div className="flex min-h-0 flex-1 items-center justify-center">
-									<img
-										src={aboutImages[selectedStep]}
-										alt=""
-										aria-hidden="true"
-										loading="lazy"
-										className="max-h-full max-w-full object-contain"
-									/>
+								<div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
+									<div className="font-montserrat font-semibold leading-snug text-black sm:text-lg">
+										{stepTitles[selectedStep]}
+									</div>
+									<div className="flex min-h-0 flex-1 items-center justify-center">
+										<img
+											src={aboutImages[selectedStep]}
+											alt=""
+											aria-hidden="true"
+											loading="lazy"
+											className="max-h-full max-w-full object-contain"
+										/>
+									</div>
 								</div>
 							</div>
 						</div>

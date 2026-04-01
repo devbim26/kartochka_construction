@@ -2,6 +2,8 @@ import { APP_ROUTES, LogoIcon, LogoTextIcon } from '@core';
 import { useState } from 'react';
 import { ImMenu } from 'react-icons/im';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { twMerge } from 'tailwind-merge';
+import { useDesigningSidebar } from '../../context/designing-sidebar.context';
 import { HeaderNav } from './header-nav.component';
 import { LanguageToggle } from './language-toggle.component';
 import { LogoutHeader } from './logout-header.component';
@@ -10,8 +12,19 @@ export const HomeHeader = () => {
 	const { pathname } = useLocation();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const navigate = useNavigate();
+	const designingSidebar = useDesigningSidebar();
+	const isDesigning = pathname.startsWith(APP_ROUTES.designing.route);
+
 	const toggleMenu = () => {
 		setIsMenuOpen((prev) => !prev);
+	};
+
+	const handleMenuClick = () => {
+		if (isDesigning && designingSidebar) {
+			designingSidebar.toggle();
+			return;
+		}
+		toggleMenu();
 	};
 
 	return (
@@ -19,8 +32,20 @@ export const HomeHeader = () => {
 			<header className="flex w-full flex-row items-center justify-between border-b border-solid border-[#EDEFF2] bg-white px-[25px] py-[6px] xs:px-[15px]">
 				<div className="flex flex-row items-center gap-4">
 					<button
-						onClick={toggleMenu}
-						className="block p-2 text-primary hover:text-[#1a60cc] focus:outline-none sm:hidden"
+						type="button"
+						onClick={handleMenuClick}
+						className={twMerge(
+							'block p-2 text-primary hover:text-[#1a60cc] focus:outline-none',
+							!isDesigning && 'sm:hidden',
+						)}
+						aria-expanded={isDesigning ? designingSidebar?.open : isMenuOpen}
+						aria-label={
+							isDesigning
+								? designingSidebar?.open
+									? 'Закрыть меню навигации'
+									: 'Открыть меню навигации'
+								: 'Меню'
+						}
 					>
 						<ImMenu className="size-6" />
 					</button>

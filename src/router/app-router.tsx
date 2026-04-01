@@ -10,10 +10,10 @@ import {
 	ConstructorLayout,
 	CONSTRUCTOR_ROUTES,
 	DesigningScreen,
+	DesigningRequireAuth,
 	DevScreen,
 	FloorPlansScreen,
 	GuidbooksLauout,
-	HomeScreen,
 	IFCModelScreen,
 	IssuersScreen,
 	LandingContent,
@@ -57,7 +57,16 @@ export const AppRouter = () => {
 					element={<CompanyRegistrationPage />}
 				/>
 			</Route>
-			<Route path={APP_ROUTES.designing.route} element={<HomeScreen />}>
+			<Route path={APP_ROUTES.designing.route} element={<DesigningRequireAuth />}>
+				<Route
+					index
+					element={
+						<Navigate
+							to={`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`}
+							replace
+						/>
+					}
+				/>
 				<Route
 					path={DESIGNING_ROUTES.visualization.route}
 					element={<AiVisualizationScreen />}

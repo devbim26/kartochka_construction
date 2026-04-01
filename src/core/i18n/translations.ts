@@ -47,7 +47,7 @@ export const en = {
 	'nav.aboutUs': 'About us',
 	'nav.subscription': 'Plans',
 	'nav.contacts': 'Contacts',
-	'nav.designing': 'Design',
+	'nav.designing': 'Home',
 	'lang.switch': 'Switch language',
 	'ai.assistant.title': 'AI mode',
 	'common.actions': 'Actions',
@@ -119,7 +119,6 @@ export const en = {
 	'landing.footer.home': 'Home',
 	'landing.footer.about': 'About us',
 	'landing.footer.contacts': 'Contacts',
-	'landing.footer.design': 'Design',
 	'landing.footer.subscriptions': 'Subscriptions',
 
 	'landing.faq.title': 'Frequently asked questions',
@@ -886,9 +885,9 @@ export const ru: Record<TranslationKey, string> = {
 	'subscriptions.editSuccess': 'Подписка успешно отредактирована',
 
 	'nav.aboutUs': 'О нас',
-	'nav.subscription': 'Пакеты',
+	'nav.subscription': 'Тарифы',
 	'nav.contacts': 'Контакты',
-	'nav.designing': 'Проектирование',
+	'nav.designing': 'Главная',
 	'lang.switch': 'Сменить язык',
 
 	'ai.assistant.title': 'AI mode',
@@ -961,7 +960,6 @@ export const ru: Record<TranslationKey, string> = {
 	'landing.footer.home': 'Главная',
 	'landing.footer.about': 'О нас',
 	'landing.footer.contacts': 'Контакты',
-	'landing.footer.design': 'Проектирование',
 	'landing.footer.subscriptions': 'Подписки',
 
 	'landing.faq.title': 'Часто задаваемые вопросы',
@@ -1007,7 +1005,7 @@ export const ru: Record<TranslationKey, string> = {
 	'errors.unexpected': 'Произошла непредвиденная ошибка',
 	'errors.packagesLoad': 'Ошибка загрузки пакетов',
 
-	'landing.subscriptions.title': 'Пакеты',
+	'landing.subscriptions.title': 'Тарифы',
 	'errors.subscriptionsLoad': 'Ошибка загрузки подписок',
 	'subscription.free': 'Бесплатно',
 	'subscription.buyPlan': 'Оформить пакет',
