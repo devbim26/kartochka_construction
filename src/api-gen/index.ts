@@ -13,11 +13,23 @@ fetchApi.instance.interceptors.response.use(
 	async (error) => {
 		const originalRequest = error.config;
 		const loginPath = `${APP_ROUTES.auth.route}/login`;
+		const pathname = window.location.pathname || '';
+		const isPublicRoute =
+			pathname === '/' ||
+			pathname.startsWith(APP_ROUTES.landing.route) ||
+			pathname.startsWith('/news') ||
+			pathname.startsWith(APP_ROUTES.auth.route);
 		const redirectToLogin = () => {
 			if (window.location.pathname !== loginPath) {
 				window.location.replace(loginPath);
 			}
 		};
+
+		// Public pages must be accessible for anonymous users.
+		// If an optional request gets 401 there, do not start refresh/login redirect flow.
+		if (error.response?.status === 401 && isPublicRoute) {
+			return Promise.reject(error);
+		}
 
 		if (error.response?.status === 401 && originalRequest?.url?.includes('/api/Auth/refresh')) {
 			console.warn('Refresh token invalid. Redirecting to login...');
