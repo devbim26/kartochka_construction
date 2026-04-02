@@ -12,10 +12,16 @@ fetchApi.instance.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalRequest = error.config;
+		const loginPath = `${APP_ROUTES.auth.route}/login`;
+		const redirectToLogin = () => {
+			if (window.location.pathname !== loginPath) {
+				window.location.replace(loginPath);
+			}
+		};
 
 		if (error.response?.status === 401 && originalRequest?.url?.includes('/api/Auth/refresh')) {
 			console.warn('Refresh token invalid. Redirecting to login...');
-			window.location.href = '/login';
+			redirectToLogin();
 			return Promise.reject(error);
 		}
 		if (error.response?.status === 401 && !originalRequest._retry) {
@@ -26,7 +32,7 @@ fetchApi.instance.interceptors.response.use(
 				return fetchApi.instance.request(originalRequest);
 			} catch (refreshError) {
 				console.warn('Refresh failed. Redirecting to login...');
-				window.location.href = APP_ROUTES.auth.route + '/login';
+				redirectToLogin();
 				return Promise.reject(refreshError);
 			}
 		}
