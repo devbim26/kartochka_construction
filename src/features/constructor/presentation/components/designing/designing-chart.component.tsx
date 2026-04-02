@@ -67,7 +67,7 @@ const DesigningChart = ({
 	// Required "valid" frequency range.
 	// If the dataset contains frequencies outside it — shade the outside areas and
 	// draw dashed boundary lines.
-	const RANGE_MIN_HZ = 80;
+	const RANGE_MIN_HZ = 100;
 	const RANGE_MAX_HZ = 3150;
 
 	// Собираем все частоты из всех графиков (не только Laboratory),
@@ -85,14 +85,15 @@ const DesigningChart = ({
 	const minFrequency = allFrequencies.length > 0 ? Math.min(...allFrequencies) : 50;
 	const maxFrequency = allFrequencies.length > 0 ? Math.max(...allFrequencies) : 5000;
 
-	// Фильтруем частоты в диапазоне
-	const displayFrequencies = allFrequencies.filter(
-		(freq) => freq >= minFrequency && freq <= maxFrequency,
-	);
-
-	const hasOutsideRange =
-		allFrequencies.some((f) => f < RANGE_MIN_HZ) ||
-		allFrequencies.some((f) => f > RANGE_MAX_HZ);
+	// Фильтруем частоты в диапазоне, но добавляем обязательные границы,
+	// чтобы "палочки" на 100 и 3150 были отрисованы по точкам (tick’ам).
+	const displayFrequencies = (() => {
+		const base = allFrequencies.filter((freq) => freq >= minFrequency && freq <= maxFrequency);
+		const set = new Set(base);
+		set.add(RANGE_MIN_HZ);
+		set.add(RANGE_MAX_HZ);
+		return Array.from(set).sort((a, b) => a - b);
+	})();
 
 	const closestFrequency = (target: number) => {
 		if (!displayFrequencies.length) return target;
@@ -105,7 +106,6 @@ const DesigningChart = ({
 	const frequencyRangePlugin = {
 		id: 'frequencyRangeShade',
 		beforeDatasetsDraw: (chart: ChartJS<'line'>) => {
-			if (!hasOutsideRange) return;
 			if (!chart.chartArea || !chart.scales) return;
 
 			const xScale = (chart.scales as any).x;
@@ -124,9 +124,6 @@ const DesigningChart = ({
 			const xRight = chartArea.right;
 			const yTop = chartArea.top;
 			const yBottom = chartArea.bottom;
-
-			const hasBelow = allFrequencies.some((f) => f < RANGE_MIN_HZ);
-			const hasAbove = allFrequencies.some((f) => f > RANGE_MAX_HZ);
 
 			// Kostyl: поставить 2 пунктирные "палочки" по частотам 100 и 3150.
 			// Если точных меток нет в labels (категориальная ось), ставим по ближайшему tick.
@@ -162,12 +159,25 @@ const DesigningChart = ({
 				return NaN;
 			};
 
-			const leftIdx = closestIndexTo(RANGE_MIN_HZ);
-			const rightIdx = closestIndexTo(RANGE_MAX_HZ);
-			const leftBoundaryPixel =
-				Number.isFinite(leftIdx) && leftIdx >= 0 ? pixelForTickSafe(leftIdx) : NaN;
-			const rightBoundaryPixel =
-				Number.isFinite(rightIdx) && rightIdx >= 0 ? pixelForTickSafe(rightIdx) : NaN;
+			// Предпочитаем получать координату по "label value", а не по tickIndex,
+			// чтобы autoSkip/пропуски тиков не уводили палку в "50" вместо "3150".
+			const leftBoundaryPixel = (() => {
+				if (typeof xScale.getPixelForValue === 'function') {
+					const px = xScale.getPixelForValue(String(RANGE_MIN_HZ));
+					if (Number.isFinite(px)) return px;
+				}
+				const leftIdx = closestIndexTo(RANGE_MIN_HZ);
+				return Number.isFinite(leftIdx) && leftIdx >= 0 ? pixelForTickSafe(leftIdx) : NaN;
+			})();
+
+			const rightBoundaryPixel = (() => {
+				if (typeof xScale.getPixelForValue === 'function') {
+					const px = xScale.getPixelForValue(String(RANGE_MAX_HZ));
+					if (Number.isFinite(px)) return px;
+				}
+				const rightIdx = closestIndexTo(RANGE_MAX_HZ);
+				return Number.isFinite(rightIdx) && rightIdx >= 0 ? pixelForTickSafe(rightIdx) : NaN;
+			})();
 
 			if (!Number.isFinite(leftBoundaryPixel) && !Number.isFinite(rightBoundaryPixel)) return;
 

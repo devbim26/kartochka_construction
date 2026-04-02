@@ -28,10 +28,6 @@ const LoginPage = () => {
 	const isLoggedIn = useAppSelector(selectIsUserLoggedIn);
 
 	useEffect(() => {
-		dispatch(getCurrentUser());
-	}, [dispatch]);
-
-	useEffect(() => {
 		if (authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name) {
 			dispatch(getCurrentUser());
 			navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`);

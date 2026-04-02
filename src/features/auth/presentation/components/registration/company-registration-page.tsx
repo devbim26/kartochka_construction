@@ -10,12 +10,10 @@ import {
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
-import { getCurrentUser } from '@features/account/services';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import type { UseFormReturn } from 'react-hook-form';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { TiDeleteOutline } from 'react-icons/ti';
@@ -64,10 +62,6 @@ const CompanyRegistrationPage = () => {
 	const dispatch = useAppDispatch();
 	const [search] = useSearchParams();
 	const isLoggedIn = useAppSelector(selectIsUserLoggedIn);
-
-	useEffect(() => {
-		dispatch(getCurrentUser());
-	}, [dispatch]);
 
 	const form = useForm<RegistrationFormData>({
 		resolver: zodResolver(RegistrationFormDataConfig.schema),

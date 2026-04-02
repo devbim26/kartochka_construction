@@ -51,7 +51,7 @@ export const DesigningTable = memoize(
 			<div className="flex w-full flex-col gap-[10px] rounded-xl bg-none">
 				<div
 					className={twMerge(
-						'max-h-[490px] max-w-[87.17vw] overflow-auto',
+						'max-h-[490px] max-w-none overflow-auto',
 						classNames?.tableContainerClassName,
 					)}
 				>

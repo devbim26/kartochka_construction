@@ -32,7 +32,9 @@ export const Sidebar = () => {
 			<aside
 				className={twMerge(
 					'absolute left-0 top-0 z-40 flex h-full w-[248px] flex-col border-r border-solid border-[#EDEFF2] bg-white transition-transform duration-300 ease-out',
-					open ? 'translate-x-0 shadow-[4px_0_24px_rgba(0,0,0,0.08)]' : '-translate-x-full',
+					open
+						? 'translate-x-0 shadow-[4px_0_24px_rgba(0,0,0,0.08)]'
+						: '-translate-x-full',
 				)}
 				aria-hidden={!open}
 			>

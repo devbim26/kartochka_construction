@@ -27,8 +27,11 @@ import {
 
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import { Guidebooks, type ConstructionsEditData } from '@features/guidbooks/types';
-import { ConstructionClass } from '@features/guidbooks/types';
+import {
+	ConstructionClass,
+	Guidebooks,
+	type ConstructionsEditData,
+} from '@features/guidbooks/types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { AxiosError } from 'axios';
 import * as pdfjs from 'pdfjs-dist';
@@ -279,10 +282,51 @@ export const FloorPlans = memoize(() => {
 					if (floorResponse.status !== 200 || !floorResponse.data) {
 						throw new Error(t('floorPlans.toast.fetchFloorDataError'));
 					}
-					if (!floorResponse.data.floorDocumentUrl) {
-						throw new Error(t('floorPlans.toast.fetchFloorDataError'));
+
+					const defaultCode = '0.000';
+					const nextLevels = mapServerLevels(floorResponse.data);
+					// Костыль: если после загрузки PDF нет уровня на странице 1 — создаём новый 0.000.
+					// PDF "current page" в интерфейсе всегда начинается с 1.
+					const hasLevelOnPage1 = nextLevels.some((l) => l.pageNumber === 1);
+
+					if (hasLevelOnPage1) {
+						if (!floorResponse.data.floorDocumentUrl) {
+							throw new Error(t('floorPlans.toast.fetchFloorDataError'));
+						}
+						return from(fetch(floorResponse.data.floorDocumentUrl));
 					}
-					return from(fetch(floorResponse.data.floorDocumentUrl));
+
+					if (!reportId) {
+						throw new Error(t('floorPlans.toast.uploadError'));
+					}
+
+					return from(
+						createReportFloorInfo({
+							reportInfoId: reportId,
+							floorName: defaultCode,
+						}),
+					).pipe(
+						switchMap(() => from(getReportFloorById({ id: reportId }))),
+						tap((updatedFloorResponse) => {
+							if (!updatedFloorResponse?.data) return;
+							const updatedLevels = mapServerLevels(updatedFloorResponse.data);
+							// API не передаёт страницу для пустого уровня, подставляем "1".
+							setLevels((prev) =>
+								mergeLevels(updatedLevels, prev, {
+									defaultPageForNewEmptyLevel: 1,
+								}),
+							);
+						}),
+						switchMap((updatedFloorResponse) => {
+							if (
+								updatedFloorResponse.status !== 200 ||
+								!updatedFloorResponse.data?.floorDocumentUrl
+							) {
+								throw new Error(t('floorPlans.toast.fetchFloorDataError'));
+							}
+							return from(fetch(updatedFloorResponse.data.floorDocumentUrl));
+						}),
+					);
 				}),
 				filter(
 					(fileResponse): fileResponse is Response => fileResponse instanceof Response,
@@ -627,7 +671,8 @@ export const FloorPlans = memoize(() => {
 
 	const constructionSheetsForTable = useMemo(() => {
 		if (reportType !== ReportCategory.Floor) {
-			return currentReportConstruction?.reportConstructionHeader.id && currentConstructionHeader
+			return currentReportConstruction?.reportConstructionHeader.id &&
+				currentConstructionHeader
 				? [
 						convertFloorDataToClientConstructionSheet(
 							currentReportConstruction,
@@ -654,9 +699,7 @@ export const FloorPlans = memoize(() => {
 		}
 		return filteredConstructionsForTab.reduce((acc, construction) => {
 			const header =
-				constructionHeadersById[
-					construction.reportConstructionHeader.constructionHeaderId
-				];
+				constructionHeadersById[construction.reportConstructionHeader.constructionHeaderId];
 			if (!header) return acc;
 			acc.push(convertFloorDataToClientConstructionSheet(construction, header));
 			return acc;

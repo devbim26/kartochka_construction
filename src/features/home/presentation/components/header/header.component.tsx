@@ -1,6 +1,6 @@
 import { APP_ROUTES, LogoIcon, LogoTextIcon } from '@core';
 import { useState } from 'react';
-import { ImMenu } from 'react-icons/im';
+import { ChevronLandingIcon } from '@core/presentation/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useDesigningSidebar } from '../../context/designing-sidebar.context';
@@ -47,7 +47,19 @@ export const HomeHeader = () => {
 								: 'Меню'
 						}
 					>
-						<ImMenu className="size-6" />
+						{isDesigning ? (
+							<ChevronLandingIcon
+								color="#2175F3"
+								direction={designingSidebar?.open ? 'left' : 'right'}
+								className="size-6"
+							/>
+						) : (
+							// On the landing page and other non-designing routes we keep the burger icon.
+							// (mobile nav overlay uses its own close button)
+							<span className="block text-primary">
+								≡
+							</span>
+						)}
 					</button>
 
 					<div

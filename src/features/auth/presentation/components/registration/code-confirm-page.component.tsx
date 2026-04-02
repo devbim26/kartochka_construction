@@ -11,7 +11,6 @@ import {
 	useAppNavigate,
 	useAppSelector,
 } from '@core';
-import { getCurrentUser } from '@features/account/services';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
@@ -27,10 +26,6 @@ const CodeConfirmPage = () => {
 	const dispatch = useAppDispatch();
 	const authData = useAppSelector((store) => store.authData);
 	const isLoggedIn = useAppSelector(selectIsUserLoggedIn);
-
-	useEffect(() => {
-		dispatch(getCurrentUser());
-	}, [dispatch]);
 	const ApproveButton = () => {
 		return (
 			<Button
