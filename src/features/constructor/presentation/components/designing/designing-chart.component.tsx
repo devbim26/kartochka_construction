@@ -55,11 +55,20 @@ const DesigningChart = ({
 
 	const legendLabels: Record<string, string> = {
 		Computed: calculationDocName,
-		computedDots: calculationDocName,
-		Laboratory: regulatoryDocName,
-		LaboratoryDots: regulatoryDocName,
-		abcd: regulatoryDocName,
+		// "Лаб источник" показываем только у computedDots (доп. кривая).
+		computedDots: regulatoryDocName,
+		// Остальные вспомогательные линии не должны наследовать имя лабораторного источника.
+		Laboratory: 'Laboratory',
+		LaboratoryDots: 'LaboratoryDots',
+		// `abcd` is not a "source" doc (aux line only) — keep it as is.
+		abcd: 'abcd',
 	};
+
+	// Required "valid" frequency range.
+	// If the dataset contains frequencies outside it — shade the outside areas and
+	// draw dashed boundary lines.
+	const RANGE_MIN_HZ = 80;
+	const RANGE_MAX_HZ = 3150;
 
 	// Собираем все частоты из всех графиков (не только Laboratory),
 	// чтобы корректно рендерить случаи "computed + additional" без laboratory.
@@ -81,15 +90,128 @@ const DesigningChart = ({
 		(freq) => freq >= minFrequency && freq <= maxFrequency,
 	);
 
+	const hasOutsideRange =
+		allFrequencies.some((f) => f < RANGE_MIN_HZ) ||
+		allFrequencies.some((f) => f > RANGE_MAX_HZ);
+
+	const closestFrequency = (target: number) => {
+		if (!displayFrequencies.length) return target;
+		return displayFrequencies.reduce((best, curr) =>
+			Math.abs(curr - target) < Math.abs(best - target) ? curr : best,
+		);
+	};
+
+	// Canvas shading + dashed vertical lines at range boundaries.
+	const frequencyRangePlugin = {
+		id: 'frequencyRangeShade',
+		beforeDatasetsDraw: (chart: ChartJS<'line'>) => {
+			if (!hasOutsideRange) return;
+			if (!chart.chartArea || !chart.scales) return;
+
+			const xScale = (chart.scales as any).x;
+			if (!xScale) return;
+
+			const ctx = (chart as any).ctx as CanvasRenderingContext2D | undefined;
+			if (!ctx) return;
+
+			const chartArea = chart.chartArea as {
+				left: number;
+				right: number;
+				top: number;
+				bottom: number;
+			};
+			const xLeft = chartArea.left;
+			const xRight = chartArea.right;
+			const yTop = chartArea.top;
+			const yBottom = chartArea.bottom;
+
+			const hasBelow = allFrequencies.some((f) => f < RANGE_MIN_HZ);
+			const hasAbove = allFrequencies.some((f) => f > RANGE_MAX_HZ);
+
+			// Kostyl: поставить 2 пунктирные "палочки" по частотам 100 и 3150.
+			// Если точных меток нет в labels (категориальная ось), ставим по ближайшему tick.
+			const closestIndexTo = (target: number) => {
+				if (!displayFrequencies.length) return -1;
+				let bestIdx = 0;
+				let bestDist = Math.abs(displayFrequencies[0] - target);
+				for (let i = 1; i < displayFrequencies.length; i++) {
+					const d = Math.abs(displayFrequencies[i] - target);
+					if (d < bestDist) {
+						bestDist = d;
+						bestIdx = i;
+					}
+				}
+				return bestIdx;
+			};
+
+			const pixelForTickSafe = (tickIndex: number) => {
+				// 1) Пробуем по tick index.
+				if (typeof xScale.getPixelForTick === 'function') {
+					const pxByTick = xScale.getPixelForTick(tickIndex);
+					if (Number.isFinite(pxByTick)) return pxByTick;
+				}
+
+				// 2) Фолбэк: по значению label (category scale иногда капризен).
+				if (typeof xScale.getPixelForValue === 'function') {
+					const val = displayFrequencies[tickIndex];
+					if (val === undefined || val === null) return NaN;
+					const pxByValue = xScale.getPixelForValue(String(val));
+					return Number.isFinite(pxByValue) ? pxByValue : NaN;
+				}
+
+				return NaN;
+			};
+
+			const leftIdx = closestIndexTo(RANGE_MIN_HZ);
+			const rightIdx = closestIndexTo(RANGE_MAX_HZ);
+			const leftBoundaryPixel =
+				Number.isFinite(leftIdx) && leftIdx >= 0 ? pixelForTickSafe(leftIdx) : NaN;
+			const rightBoundaryPixel =
+				Number.isFinite(rightIdx) && rightIdx >= 0 ? pixelForTickSafe(rightIdx) : NaN;
+
+			if (!Number.isFinite(leftBoundaryPixel) && !Number.isFinite(rightBoundaryPixel)) return;
+
+			ctx.save();
+
+			// 2 "доп. графика": две вертикальные пунктирные линии (черные)
+			// на частотах 100 и 3150.
+			ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+			ctx.lineWidth = 1.6;
+			ctx.setLineDash([4, 4]);
+			ctx.lineCap = 'butt';
+			ctx.beginPath();
+			if (Number.isFinite(leftBoundaryPixel)) {
+				ctx.moveTo(leftBoundaryPixel, yTop);
+				ctx.lineTo(leftBoundaryPixel, yBottom);
+			}
+			if (Number.isFinite(rightBoundaryPixel)) {
+				ctx.moveTo(rightBoundaryPixel, yTop);
+				ctx.lineTo(rightBoundaryPixel, yBottom);
+			}
+			ctx.stroke();
+			ctx.restore();
+		},
+	};
+
 	const chartData: ChartData<'line'> = {
 		labels: displayFrequencies.map((freq) => String(freq)),
 		datasets: graphSeries.map((series, index) => {
 			// Явная цветовая схема: main computed — красный, laboratory — синий,
 			// дополнительные серии — серые.
 			const labelLower = (series.label || '').toLowerCase();
+			const isComputed = labelLower.includes('computed');
+			const isLaboratory = labelLower.includes('laboratory');
+			const isGreySeries = !isComputed && !isLaboratory;
+
+			const isAtalon = labelLower.includes('atalon');
+			const isAbcd = labelLower.includes('abcd');
+
 			let color = '#808080';
-			if (labelLower.includes('computed')) color = '#ef4444';
-			else if (labelLower.includes('laboratory')) color = '#3b82f6';
+			if (isComputed) color = '#ef4444';
+			else if (isLaboratory) color = '#3b82f6';
+			else if (isAtalon)
+				color = '#9ca3af'; // lighter grey for less visual noise
+			else if (isAbcd) color = '#a1a1aa';
 
 			// Создаем массив данных для каждой частоты
 			const dataPoints = displayFrequencies.map((frequency) => {
@@ -104,8 +226,16 @@ const DesigningChart = ({
 				data: dataPoints,
 				borderColor: color,
 				backgroundColor: 'transparent',
-				borderWidth: 3,
+				borderWidth: isAtalon ? 2 : 3,
+				borderDash: isAtalon ? [6, 6] : undefined,
+				// Legend should always show colored "circle" sample.
+				// Point visibility on the chart itself is controlled by `pointRadius`.
+				pointStyle: 'circle',
 				pointBackgroundColor: (context) => {
+					// Для легенды Chart.js может вызывать скрипты без `dataIndex`.
+					// В этом случае возвращаем цвет серии, чтобы кружок в легенде был виден.
+					if (context.dataIndex === undefined) return color;
+
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
 
@@ -118,6 +248,8 @@ const DesigningChart = ({
 					return hasLabel ? '#000000' : color;
 				},
 				pointBorderColor: (context) => {
+					if (context.dataIndex === undefined) return color;
+
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
 
@@ -131,6 +263,9 @@ const DesigningChart = ({
 					return hasLabel ? '#000000' : color;
 				},
 				pointRadius: (context) => {
+					// Для легенды — рисуем небольшой кружок даже у вспомогательных серий.
+					if (context.dataIndex === undefined) return isGreySeries ? 4 : 5;
+
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
 
@@ -140,10 +275,15 @@ const DesigningChart = ({
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
+
+					// Grey helper lines should be less noisy: show points only where we have labels.
+					if (isGreySeries) return hasLabel ? 4 : 0;
 
 					return hasLabel ? 6 : 3;
 				},
 				pointBorderWidth: (context) => {
+					if (context.dataIndex === undefined) return isGreySeries ? 1 : 2;
+
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
 
@@ -153,6 +293,8 @@ const DesigningChart = ({
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
+
+					if (isGreySeries) return hasLabel ? 1.5 : 0;
 
 					return hasLabel ? 2 : 1;
 				},
@@ -199,7 +341,6 @@ const DesigningChart = ({
 					const series = graphSeries[datasetIndex];
 					// Ищем метку в ваших данных
 					const pointLabel = series.data?.find((p) => p.x === frequency && p.y === value);
-					console.log(series);
 					// Возвращаем текст метки, если она найдена, иначе null (ничего не рисуем)
 					return pointLabel ? (pointLabel as any).label : null;
 				},
@@ -224,8 +365,8 @@ const DesigningChart = ({
 						size: 12,
 						weight: 'bold',
 					},
+					// Restore legend colored circles.
 					usePointStyle: true,
-					pointStyle: 'circle',
 				},
 			},
 			tooltip: {
@@ -325,7 +466,12 @@ const DesigningChart = ({
 	return (
 		<div className="relative min-w-[700px]">
 			<div className="h-[500px] w-full">
-				<Line ref={chartRef} data={chartData} options={options} />
+				<Line
+					ref={chartRef}
+					data={chartData}
+					options={options}
+					plugins={[frequencyRangePlugin]}
+				/>
 			</div>
 		</div>
 	);
