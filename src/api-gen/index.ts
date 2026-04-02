@@ -17,6 +17,7 @@ fetchApi.instance.interceptors.response.use(
 		const requestUrl: string = originalRequest?.url || '';
 		const isPublicRoute =
 			pathname === '/' ||
+			pathname === '/main' ||
 			pathname.startsWith(APP_ROUTES.landing.route) ||
 			pathname.startsWith('/news') ||
 			pathname.startsWith(APP_ROUTES.auth.route);

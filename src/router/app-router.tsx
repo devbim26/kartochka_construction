@@ -43,6 +43,7 @@ export const AppRouter = () => {
 	return (
 		<Routes>
 			<Route path="/" element={<Navigate to={APP_ROUTES.landing.route} replace />} />
+			<Route path="/main" element={<Navigate to={APP_ROUTES.landing.route} replace />} />
 			<Route path={APP_ROUTES.landing.route} element={<LandingScreen />}>
 				<Route index element={<LandingContent />} />
 			</Route>
