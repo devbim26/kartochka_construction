@@ -1,8 +1,7 @@
 export const en = {
 	// Floor Plans
 	'floorPlans.addLevel': 'Add level',
-	'floorPlans.addLevelTooltip':
-		'To add a new tab (level), switch the page in the document',
+	'floorPlans.addLevelTooltip': 'To add a new tab (level), switch the page in the document',
 	'floorPlans.uploadFloorPlan': 'Upload floor plan',
 	'floorPlans.createConstruction': 'Create construction',
 	'floorPlans.generateReport': 'Generate report',
@@ -903,8 +902,7 @@ export const ru: Record<TranslationKey, string> = {
 	'users.editError': 'Ошибка редактирования пользователя',
 	'users.editSuccess': 'Пользователь успешно отредактирован',
 
-	'meta.title':
-		'AI для проектирования | Звукоизоляция, нормоконтроль, визуализация — Беларусь и Россия',
+	'meta.title': 'AI для  | Звукоизоляция, нормоконтроль, визуализация — Беларусь и Россия',
 	'meta.description':
 		'AI-сервис для архитекторов и проектировщиков: расчёт звукоизоляции по СП, проверка на соответствие ТНПА Беларуси и России, генерация фасадов и анализ документов. Отчёты для экспертизы за минуты.',
 	'meta.keywords':
