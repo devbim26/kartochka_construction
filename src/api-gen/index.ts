@@ -14,11 +14,15 @@ fetchApi.instance.interceptors.response.use(
 		const originalRequest = error.config;
 		const loginPath = `${APP_ROUTES.auth.route}/login`;
 		const pathname = window.location.pathname || '';
+		const requestUrl: string = originalRequest?.url || '';
 		const isPublicRoute =
 			pathname === '/' ||
 			pathname.startsWith(APP_ROUTES.landing.route) ||
 			pathname.startsWith('/news') ||
 			pathname.startsWith(APP_ROUTES.auth.route);
+		const isCurrentUserRequest =
+			requestUrl.includes('/api/Account/current') || requestUrl.includes('/api/account/current');
+		const isAuthRequest = requestUrl.includes('/api/Auth/');
 		const redirectToLogin = () => {
 			if (window.location.pathname !== loginPath) {
 				window.location.replace(loginPath);
@@ -27,7 +31,7 @@ fetchApi.instance.interceptors.response.use(
 
 		// Public pages must be accessible for anonymous users.
 		// If an optional request gets 401 there, do not start refresh/login redirect flow.
-		if (error.response?.status === 401 && isPublicRoute) {
+		if (error.response?.status === 401 && (isPublicRoute || isCurrentUserRequest)) {
 			return Promise.reject(error);
 		}
 
@@ -36,7 +40,7 @@ fetchApi.instance.interceptors.response.use(
 			redirectToLogin();
 			return Promise.reject(error);
 		}
-		if (error.response?.status === 401 && !originalRequest._retry) {
+		if (error.response?.status === 401 && !isAuthRequest && !originalRequest?._retry) {
 			originalRequest._retry = true;
 
 			try {
