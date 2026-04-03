@@ -1,5 +1,5 @@
 import type { SelectOption } from '@core';
-import { Input, convertToPaginatedType, convertToSelectValues, Select } from '@core';
+import { convertToPaginatedType, convertToSelectValues, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
@@ -120,7 +120,7 @@ export const FrameMaterialType = memoize(
 						labelClassName={twMerge(
 							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
 						)}
-						placeholder="Введлите обозначение"
+						placeholder="Введите обозначение"
 						{...register(`${basePath}.additionalName`)}
 						type="text"
 					/>
