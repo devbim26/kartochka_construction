@@ -1,5 +1,5 @@
 import type { SelectOption } from '@core';
-import { convertToPaginatedType, convertToSelectValues, Select } from '@core';
+import { Input, convertToPaginatedType, convertToSelectValues, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { Controller } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
+import { useSelectableMaterialDesignation } from './selectable-material-designation.context';
 
 const positionMap: Record<'Left' | 'Center' | 'Right', string> = {
 	Left: 'leftConstruction',
@@ -29,7 +30,8 @@ export const FrameMaterialType = memoize(
 	}: Omit<ConstructionMaterialTypesProps, 'constructionIndex'> & {
 		constructionPosition: 'Left' | 'Center' | 'Right';
 	}) => {
-		const { formState, control } = currentForm;
+		const { showMaterialDesignationInput } = useSelectableMaterialDesignation();
+		const { formState, control, setValue, register } = currentForm;
 		const [materials, setMaterials] = useState<Array<SelectOption>>();
 
 		const handleGetMaterials = (data: MaterialsFilterData) => {
@@ -96,9 +98,33 @@ export const FrameMaterialType = memoize(
 							}
 							placeholder="Выберите материал"
 							isSearchable
+							onChange={(selectedOption: string) => {
+								field.onChange(selectedOption);
+								if (showMaterialDesignationInput) {
+									setValue(`${basePath}.additionalName`, '');
+								}
+							}}
 						/>
 					)}
 				/>
+
+				{showMaterialDesignationInput && (
+					<Input
+						inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+						containerClassName="w-[226px]"
+						error={
+							(formState.errors as any)?.constructionTypeObject?.[
+								positionMap[constructionPosition]
+							]?.[fieldIndex]?.additionalName?.message
+						}
+						labelClassName={twMerge(
+							'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
+						)}
+						placeholder="Введлите обозначение"
+						{...register(`${basePath}.additionalName`)}
+						type="text"
+					/>
+				)}
 			</div>
 		);
 	},

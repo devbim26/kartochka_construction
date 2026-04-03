@@ -27,6 +27,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 
 	const [hasLeftCladding, setHasLeftCladding] = useState(false);
 	const [hasRightCladding, setHasRightCladding] = useState(false);
+	const [leftCladdingType, setLeftCladdingType] = useState<'cladding' | 'panel'>('cladding');
+	const [rightCladdingType, setRightCladdingType] = useState<'cladding' | 'panel'>('cladding');
+	const [leftCladdingTitle, setLeftCladdingTitle] = useState('Облицовка');
+	const [rightCladdingTitle, setRightCladdingTitle] = useState('Облицовка');
 
 	const centerMaterials = useConstructionMaterials(control, watch, 'Center');
 	const leftMaterials = useConstructionMaterials(control, watch, 'Left');
@@ -46,7 +50,7 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		...(hasLeftCladding
 			? [
 					{
-						title: 'Облицовка ',
+						title: leftCladdingTitle,
 						constructionPosition: 'Left' as const,
 						positions: ['0', '1', '2', '3', '4', '5', '6'],
 						selectable: ['5', '6'],
@@ -75,7 +79,7 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		...(hasRightCladding
 			? [
 					{
-						title: 'Облицовка',
+						title: rightCladdingTitle,
 						constructionPosition: 'Right' as const,
 						positions: ['0', '1', '2', '3', '4', '5', '6'],
 						selectable: ['5', '6'],
@@ -117,7 +121,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		},
 	};
 
-	const addLeftCladding = () => {
+	const addLeftCladding = (type: 'cladding' | 'panel') => {
+		setLeftCladdingTitle(
+			type === 'panel' ? 'Звукоизоляционная панель' : 'Облицовка',
+		);
 		setHasLeftCladding(true);
 		setValue('constructionTypeObject.leftConstruction', [
 			{
@@ -173,7 +180,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		setValue('constructionTypeObject.leftConstruction', []);
 	};
 
-	const addRightCladding = () => {
+	const addRightCladding = (type: 'cladding' | 'panel') => {
+		setRightCladdingTitle(
+			type === 'panel' ? 'Звукоизоляционная панель' : 'Облицовка',
+		);
 		setHasRightCladding(true);
 		setValue('constructionTypeObject.rightConstruction', [
 			{
@@ -277,12 +287,21 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		<>
 			<div className="mb-4 flex justify-center">
 				{!hasLeftCladding ? (
-					<div className="flex w-full items-center justify-center gap-[10px]">
+					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
 						<AiOutlinePlusCircle
-							onClick={addLeftCladding}
-							className="size-[60px] self-center text-black"
+							onClick={() => addLeftCladding(leftCladdingType)}
+							className="size-[40px] self-center text-primary"
 						/>
-						<span className="text-sm text-gray-500">Добавить облицовку</span>
+						<select
+							value={leftCladdingType}
+							onChange={(e) =>
+								setLeftCladdingType(e.target.value === 'panel' ? 'panel' : 'cladding')
+							}
+							className="rounded-md border border-input-border-primary px-2 py-1 text-sm"
+						>
+							<option value="cladding">Облицовка</option>
+							<option value="panel">Звукоизоляционная панель</option>
+						</select>
 					</div>
 				) : (
 					<div className="flex w-full items-center justify-center gap-[10px]">
@@ -290,7 +309,9 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 							onClick={removeLeftCladding}
 							className="size-[40px] self-center"
 						/>
-						<span className="text-sm text-gray-500">Удалить облицовку</span>
+						<span className="text-sm text-gray-500">
+							Удалить {leftCladdingTitle.toLowerCase()}
+						</span>
 					</div>
 				)}
 			</div>
@@ -370,12 +391,21 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 
 			<div className="mt-4 flex justify-center">
 				{!hasRightCladding ? (
-					<div className="flex w-full items-center justify-center gap-[10px]">
+					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
 						<AiOutlinePlusCircle
-							onClick={addRightCladding}
-							className="size-[60px] self-center text-black"
+							onClick={() => addRightCladding(rightCladdingType)}
+							className="size-[40px] self-center text-primary"
 						/>
-						<span className="text-sm text-gray-500">Добавить облицовку </span>
+						<select
+							value={rightCladdingType}
+							onChange={(e) =>
+								setRightCladdingType(e.target.value === 'panel' ? 'panel' : 'cladding')
+							}
+							className="rounded-md border border-input-border-primary px-2 py-1 text-sm"
+						>
+							<option value="cladding">Облицовка</option>
+							<option value="panel">Звукоизоляционная панель</option>
+						</select>
 					</div>
 				) : (
 					<div className="flex w-full items-center justify-center gap-[10px]">
@@ -383,7 +413,9 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 							onClick={removeRightCladding}
 							className="size-[40px] self-center"
 						/>
-						<span className="text-sm text-gray-500">Удалить облицовку</span>
+						<span className="text-sm text-gray-500">
+							Удалить {rightCladdingTitle.toLowerCase()}
+						</span>
 					</div>
 				)}
 			</div>

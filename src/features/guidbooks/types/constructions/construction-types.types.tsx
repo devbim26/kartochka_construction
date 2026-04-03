@@ -26,6 +26,11 @@ export interface UserMaterials {
 	materialId: string;
 	positionId: string;
 	materialName?: string;
+	/**
+	 * Доп. свободное обозначение, которое вместе с `materialName`
+	 * формирует полное обозначение материала пользователя.
+	 */
+	additionalName?: string | null;
 	materialTypeValue?: Array<{
 		materialParameters: string;
 		value: string;

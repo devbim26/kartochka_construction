@@ -16,6 +16,7 @@ export const UserMaterial = z.object({
 	materialId: z.string().min(1, 'validation.required'),
 	materialName: z.string().optional(),
 	positionId: z.string().min(1, 'validation.required'),
+	additionalName: z.string().optional().nullable(),
 	materialTypeValue: z.array(MaterialTypeValues).optional().nullable(),
 	materialType: z.string().min(1, 'validation.required'),
 });

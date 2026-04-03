@@ -12,6 +12,7 @@ export const DesigningSchema = z.object({
 							z.object({
 								materialId: z.string().min(1, 'Поле обязательно для заполнения'),
 								positionId: z.string().min(1, 'Поле обязательно для заполнения'),
+								additionalName: z.string().optional().nullable(),
 								materialTypeValue: z
 									.array(
 										z.object({

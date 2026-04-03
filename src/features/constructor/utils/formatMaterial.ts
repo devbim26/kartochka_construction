@@ -23,5 +23,8 @@ export const formatMaterial = (material: UserMaterials, language: 'ru' | 'en' = 
 			})
 			.join(', ') || (language === 'ru' ? 'нет данных' : 'no data');
 
-	return `${material.materialName}, ${materialParams.toLowerCase()};`;
+	const baseName = (material.materialName ?? '').trim();
+	const fullMaterialName = baseName;
+
+	return `${fullMaterialName}, ${materialParams.toLowerCase()};`;
 };

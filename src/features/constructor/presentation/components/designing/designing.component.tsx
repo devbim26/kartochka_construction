@@ -59,6 +59,7 @@ import {
 	type AdditionalOpeningsFormHandle,
 } from './additional-openings-form.component';
 import DesigningGraph from './designing-graph.component';
+import { SelectableMaterialDesignationProvider } from '@features/guidbooks/presentation/components/header/forms/constructions/construction-material-types/selectable-material-designation.context';
 
 const DesigningScreen = () => {
 	const dispatch = useAppDispatch();
@@ -625,11 +626,16 @@ const DesigningScreen = () => {
 				</div>
 			</div>
 			<div className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				{constructionType &&
-					ConstructionTypeMap({
-						currentConstruction: constructionType,
-						currentForm: form,
-					}).component}
+				{constructionType && (
+					<SelectableMaterialDesignationProvider
+						value={{ showMaterialDesignationInput: true }}
+					>
+						{ConstructionTypeMap({
+							currentConstruction: constructionType,
+							currentForm: form,
+						}).component}
+					</SelectableMaterialDesignationProvider>
+				)}
 				{currentConstruction?.reportConstructionHeader?.id ? (
 					<AdditionalOpeningsForm
 						ref={additionalOpeningsRef}

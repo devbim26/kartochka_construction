@@ -85,6 +85,7 @@ export const convertToServerConstructionType = (
 						userMaterials: data.leftConstruction.map((m) => ({
 							materialId: m.materialId,
 							materialName: m.materialName || '',
+							additionalName: m.additionalName ?? null,
 							positionId: Number(m.positionId),
 							materialType: m.materialType,
 							materialTypeValue:
@@ -103,6 +104,7 @@ export const convertToServerConstructionType = (
 						userMaterials: data.centerConstruction.map((m) => ({
 							materialId: m.materialId,
 							materialName: m.materialName || '',
+							additionalName: m.additionalName ?? null,
 							positionId: Number(m.positionId),
 							materialType: m.materialType,
 							materialTypeValue:
@@ -121,6 +123,7 @@ export const convertToServerConstructionType = (
 						userMaterials: data.rightConstruction.map((m) => ({
 							materialId: m.materialId,
 							materialName: m.materialName || '',
+							additionalName: m.additionalName ?? null,
 							positionId: Number(m.positionId),
 							materialType: m.materialType,
 							materialTypeValue:
@@ -156,6 +159,7 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 		leftConstruction: left.map((userMaterial: any) => ({
 			materialId: userMaterial.materialId ?? '',
 			materialName: userMaterial.materialName || '',
+			additionalName: userMaterial.additionalName ?? null,
 			positionId: String(userMaterial.positionId ?? ''),
 			materialType: userMaterial.materialType ?? '',
 			materialTypeValue:
@@ -167,6 +171,7 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 		centerConstruction: center.map((userMaterial: any) => ({
 			materialId: userMaterial.materialId ?? '',
 			materialName: userMaterial.materialName || '',
+			additionalName: userMaterial.additionalName ?? null,
 			positionId: String(userMaterial.positionId ?? ''),
 			materialType: userMaterial.materialType ?? '',
 			materialTypeValue:
@@ -178,6 +183,7 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 		rightConstruction: right.map((userMaterial: any) => ({
 			materialId: userMaterial.materialId ?? '',
 			materialName: userMaterial.materialName || '',
+			additionalName: userMaterial.additionalName ?? null,
 			positionId: String(userMaterial.positionId ?? ''),
 			materialType: userMaterial.materialType ?? '',
 			materialTypeValue:
