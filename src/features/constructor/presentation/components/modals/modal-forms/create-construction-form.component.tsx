@@ -348,57 +348,60 @@ export const CreateConstructionForm = memoize(
 					toast.error('Не удалось определить reportFloorInfoId (id этажа)');
 					return;
 				}
+				const request$ =
+					reportType === ReportCategory.Floor
+						? (() => {
+								const baseX = x ? +String(x).split('.')[0] : +search.get('x')!.split('.')[0]!;
+								const baseY = y ? +String(y).split('.')[0] : +search.get('y')!.split('.')[0]!;
+								const searchX2 = search.get('x2');
+								const searchY2 = search.get('y2');
+								const diagonalX =
+									typeof x2 === 'number'
+										? +String(x2).split('.')[0]
+										: searchX2
+											? +String(searchX2).split('.')[0]
+											: baseX + Math.max(1, Math.round(Number(width || 0)));
+								const diagonalY =
+									typeof y2 === 'number'
+										? +String(y2).split('.')[0]
+										: searchY2
+											? +String(searchY2).split('.')[0]
+											: baseY + Math.max(1, Math.round(Number(length || 0)));
 
-				const baseX = x ? +String(x).split('.')[0] : +search.get('x')!.split('.')[0]!;
-				const baseY = y ? +String(y).split('.')[0] : +search.get('y')!.split('.')[0]!;
-				const searchX2 = search.get('x2');
-				const searchY2 = search.get('y2');
-				const diagonalX =
-					typeof x2 === 'number'
-						? +String(x2).split('.')[0]
-						: searchX2
-							? +String(searchX2).split('.')[0]
-							: baseX + Math.max(1, Math.round(Number(width || 0)));
-				const diagonalY =
-					typeof y2 === 'number'
-						? +String(y2).split('.')[0]
-						: searchY2
-							? +String(searchY2).split('.')[0]
-							: baseY + Math.max(1, Math.round(Number(length || 0)));
-			from(
-				reportType === ReportCategory.Floor
-					? updateReportFloor({
-							data: {
-								...(editMode
-									? { floorConstructionInfoId: resolvedReportFloorInfoId }
-									: {
-											reportFloorInfoId: resolvedReportFloorInfoId,
-											floorInfoId:
-												resolvedFloorConstructionInfoId ||
-												resolvedReportFloorInfoId,
-										}),
-								'floorInfo.coordinates1.x': baseX,
-								'floorInfo.coordinates1.y': baseY,
-								'floorInfo.coordinates2.x': diagonalX,
-								'floorInfo.coordinates2.y': diagonalY,
-								'floorInfo.page': page ? +page : +search.get('page')!,
-								'floorInfo.reportConstructionHeader.constructionHeaderId':
-									construction,
-								'floorInfo.reportConstructionHeader.square': +area,
-								'floorInfo.reportConstructionHeader.width': +width,
-								'floorInfo.reportConstructionHeader.length': +length,
-								'floorInfo.reportConstructionHeader.firstPlacementRoomId':
-									getValues('firstPlacementRoom'),
-								'floorInfo.reportConstructionHeader.secondPlacementRoomId':
-									getValues('secondPlacementRoom'),
-								'floorInfo.floorNumber': selectedFloorNumber,
-								'floorInfo.reportConstructionHeader.name': name,
-								reportInfoId: reportId,
-								requirementId: getValues('requirementId'),
-							},
-						})
-					: updateReportSingle({ data: command }),
-			)
+								return updateReportFloor({
+									data: {
+										...(editMode
+											? { floorConstructionInfoId: resolvedReportFloorInfoId }
+											: {
+													reportFloorInfoId: resolvedReportFloorInfoId,
+													floorInfoId:
+														resolvedFloorConstructionInfoId ||
+														resolvedReportFloorInfoId,
+												}),
+										'floorInfo.coordinates1.x': baseX,
+										'floorInfo.coordinates1.y': baseY,
+										'floorInfo.coordinates2.x': diagonalX,
+										'floorInfo.coordinates2.y': diagonalY,
+										'floorInfo.page': page ? +page : +search.get('page')!,
+										'floorInfo.reportConstructionHeader.constructionHeaderId':
+											construction,
+										'floorInfo.reportConstructionHeader.square': +area,
+										'floorInfo.reportConstructionHeader.width': +width,
+										'floorInfo.reportConstructionHeader.length': +length,
+										'floorInfo.reportConstructionHeader.firstPlacementRoomId':
+											getValues('firstPlacementRoom'),
+										'floorInfo.reportConstructionHeader.secondPlacementRoomId':
+											getValues('secondPlacementRoom'),
+										'floorInfo.floorNumber': selectedFloorNumber,
+										'floorInfo.reportConstructionHeader.name': name,
+										reportInfoId: reportId,
+										requirementId: getValues('requirementId'),
+									},
+								});
+							})()
+						: updateReportSingle({ data: command });
+
+				from(request$)
 					.pipe(
 						catchError((error) => {
 							if (error instanceof AxiosError) {

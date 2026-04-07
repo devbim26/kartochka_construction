@@ -232,7 +232,9 @@ export const convertToClientSingleToFloorConstruction = (
 				id: headerFromSingle?.firstPlacementRoom?.id ?? '',
 				name: headerFromSingle?.firstPlacementRoom?.name ?? '',
 			},
-			requirement: convertToClientRequirementTableData(headerFromSingle!.requirement!),
+			requirement: headerFromSingle?.requirement
+				? convertToClientRequirementTableData(headerFromSingle.requirement)
+				: undefined,
 			additionalWindows: mapAdditionalOpeningsFromDto(headerFromSingle?.additionalWindows),
 			additionalDoors: mapAdditionalOpeningsFromDto(headerFromSingle?.additionalDoors),
 		},
