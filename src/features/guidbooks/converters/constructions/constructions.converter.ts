@@ -85,7 +85,7 @@ export const convertToServerConstructionType = (
 						userMaterials: data.leftConstruction.map((m) => ({
 							materialId: m.materialId,
 							materialName: m.materialName || '',
-							additionalName: m.additionalName ?? null,
+							additionalName: m.additionalName ?? '',
 							positionId: Number(m.positionId),
 							materialType: m.materialType,
 							materialTypeValue:
@@ -104,7 +104,7 @@ export const convertToServerConstructionType = (
 						userMaterials: data.centerConstruction.map((m) => ({
 							materialId: m.materialId,
 							materialName: m.materialName || '',
-							additionalName: m.additionalName ?? null,
+							additionalName: m.additionalName ?? '',
 							positionId: Number(m.positionId),
 							materialType: m.materialType,
 							materialTypeValue:
@@ -123,7 +123,7 @@ export const convertToServerConstructionType = (
 						userMaterials: data.rightConstruction.map((m) => ({
 							materialId: m.materialId,
 							materialName: m.materialName || '',
-							additionalName: m.additionalName ?? null,
+							additionalName: m.additionalName ?? '',
 							positionId: Number(m.positionId),
 							materialType: m.materialType,
 							materialTypeValue:
