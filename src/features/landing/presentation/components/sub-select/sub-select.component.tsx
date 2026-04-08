@@ -3,9 +3,12 @@ import {
 	Carousel,
 	CarouselSlide,
 	convertToPaginatedType,
+	selectIsUserLoggedIn,
 	useAppNavigate,
+	useAppSelector,
 	useI18n,
 } from '@core';
+import { AUTH_ROUTES } from '@features/auth/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { LandingSections } from '@features/landing/constants';
 import type { Subscription } from '@features/subscriptions';
@@ -31,6 +34,7 @@ export const SubSelect = ({
 	const [isPerMonth, setIsPerMonth] = useState(true);
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
 	const { t } = useI18n();
+	const isLoggedIn = useAppSelector(selectIsUserLoggedIn);
 
 	const navigate = useAppNavigate();
 
@@ -70,6 +74,11 @@ export const SubSelect = ({
 	const handleSubscribe = (id: string) => {
 		if (onSubscribe) {
 			onSubscribe(id);
+			return;
+		}
+
+		if (!isLoggedIn) {
+			navigate(`${APP_ROUTES.auth.route}/${AUTH_ROUTES.login.route}`);
 			return;
 		}
 

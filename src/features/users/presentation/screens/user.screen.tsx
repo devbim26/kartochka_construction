@@ -26,7 +26,7 @@ import {
 	getUserById,
 	updateUser,
 } from '@features/users/services';
-import { userColumns } from '@features/users/utils';
+import { getUserColumns } from '@features/users/utils';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -100,7 +100,7 @@ export const UserScreen = () => {
 
 	const handleAddTableData = (data: AccountData) => {
 		if (!data.email) {
-			toast.error('Укажите e-mail');
+			toast.error(t('users.specifyEmail'));
 			return;
 		}
 
@@ -127,7 +127,7 @@ export const UserScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка создания пользователя');
+						toast.error(error.response?.data?.message || t('users.createError'));
 					}
 					return from([null]);
 				}),
@@ -223,7 +223,7 @@ export const UserScreen = () => {
 			<SimpleTable
 				data={tableData}
 				columns={[
-					...userColumns,
+					...getUserColumns(t),
 					{
 						accessorKey: 'id',
 						header: () => <SimpleTableHeaderCell text={t('common.actions')} />,

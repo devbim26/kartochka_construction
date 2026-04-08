@@ -2,10 +2,10 @@ import { ShortenedTextCell, SimpleTableCell, SimpleTableHeaderCell } from '@core
 import type { AccountData } from '@features/account/types';
 import type { ColumnDef } from '@tanstack/react-table';
 
-export const userColumns: ColumnDef<AccountData>[] = [
+export const getUserColumns = (t: any): ColumnDef<AccountData>[] => [
 	{
 		accessorKey: 'companyLogo',
-		header: () => <SimpleTableHeaderCell text="Логотип компании" />,
+		header: () => <SimpleTableHeaderCell text={t('account.form.companyLogo.label')} />,
 		cell: (info) => {
 			return (
 				<SimpleTableCell
@@ -26,27 +26,27 @@ export const userColumns: ColumnDef<AccountData>[] = [
 	},
 	{
 		accessorKey: 'mainPhoneNumber',
-		header: () => <SimpleTableHeaderCell text="Номер телефона" />,
+		header: () => <SimpleTableHeaderCell text={t('account.form.phoneNumbers.label')} />,
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 	},
 	{
 		accessorKey: 'companyName',
-		header: () => <SimpleTableHeaderCell text="Название компании" />,
+		header: () => <SimpleTableHeaderCell text={t('account.form.companyName.label')} />,
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 	},
 	{
 		accessorKey: 'directorFullName',
-		header: () => <SimpleTableHeaderCell text="ФИО Директора" />,
+		header: () => <SimpleTableHeaderCell text={t('account.form.directorFullName.label')} />,
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 	},
 	{
 		accessorKey: 'payersRegistrationNumber',
-		header: () => <SimpleTableHeaderCell text="УНП" />,
+		header: () => <SimpleTableHeaderCell text={t('account.form.unp.label')} />,
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 	},
 	{
 		accessorKey: 'paymentAccount',
-		header: () => <SimpleTableHeaderCell text="Расчетный счет" />,
+		header: () => <SimpleTableHeaderCell text={t('account.form.paymentAccount.label')} />,
 		cell: (info) => (
 			<ShortenedTextCell
 				classNames={{
@@ -59,7 +59,7 @@ export const userColumns: ColumnDef<AccountData>[] = [
 	},
 	{
 		accessorKey: 'bankIdNumber',
-		header: () => <SimpleTableHeaderCell text="БИК" />,
+		header: () => <SimpleTableHeaderCell text={t('account.form.bik.label')} />,
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 	},
 ];

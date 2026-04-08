@@ -1,6 +1,7 @@
-import { APP_ROUTES, useAppNavigate } from '@core';
+import { APP_ROUTES, useAppNavigate, useI18n } from '@core';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { LandingSections } from '@features/landing/constants';
+import { FormSubModal } from '@features/main/presentation/components/modals';
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AboutUsComponent } from './about-us.component';
@@ -16,6 +17,8 @@ export const LandingContent = () => {
 	const [search, setSearch] = useSearchParams();
 	const navigate = useAppNavigate();
 	const sectionId = search.get('sectionId');
+	const isChangePlanFlow = !!search.get('changePlanFlow');
+	const { t } = useI18n();
 
 	useEffect(() => {
 		if (sectionId === LandingSections.designing.id) {
@@ -36,10 +39,25 @@ export const LandingContent = () => {
 			<PageTop />
 			<AboutUsComponent />
 			<HowOurServiceWorks />
-			<SubSelect />
+			<SubSelect
+				onSubscribe={(id) =>
+					navigate('', {
+						subId: id,
+						subModal: 'true',
+						changePlanFlow: 'true',
+						sectionId: LandingSections.subscription.id,
+					})
+				}
+			/>
 			<FAQ />
 			<NewsSection />
 			<Contacts />
+			<FormSubModal
+				isOpen={isChangePlanFlow && !!search.get('subId') && !!search.get('subModal')}
+				onClose={() => navigate('', { sectionId: LandingSections.subscription.id })}
+				contentClassName="visible p-4 md:p-6"
+				headerTitle={t('main.subModal.headerTitle')}
+			/>
 		</div>
 	);
 };

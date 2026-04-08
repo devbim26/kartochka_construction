@@ -1,4 +1,4 @@
-import { Button, convertToBase64, dateMask, FormElementLabel, Input } from '@core';
+import { Button, convertToBase64, dateMask, FormElementLabel, Input, useI18n } from '@core';
 import type { Article } from '@features/news/types';
 import { useMask } from '@react-input/mask';
 import { useFormContext } from 'react-hook-form';
@@ -7,6 +7,7 @@ import { twMerge } from 'tailwind-merge';
 export const NewsAddEdit = () => {
 	const form = useFormContext<Article>();
 	const { setValue, register, formState, trigger, watch } = form;
+	const { t } = useI18n();
 
 	const dateRef = useMask(dateMask);
 
@@ -36,8 +37,8 @@ export const NewsAddEdit = () => {
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 					containerClassName="w-[226px]"
-					label={formState.errors?.title?.message || 'Заголовок'}
-					placeholder="Введите заголовок"
+					label={formState.errors?.title?.message || t('news.columns.title')}
+					placeholder={t('news.placeholders.title')}
 				/>
 
 				<Input
@@ -51,8 +52,8 @@ export const NewsAddEdit = () => {
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 					containerClassName="w-[226px]"
-					label={formState.errors?.publishDate?.message || 'Дата'}
-					placeholder="Введите дату"
+					label={formState.errors?.publishDate?.message || t('news.columns.publishDate')}
+					placeholder={t('news.placeholders.date')}
 					max={10}
 					ref={dateRef}
 				/>
@@ -72,7 +73,7 @@ export const NewsAddEdit = () => {
 								formState.errors.imageFile?.message?.toString()
 							}
 						>
-							Изображение
+							{t('news.columns.image')}
 						</FormElementLabel>
 						<div className="flex items-center gap-[8px]">
 							<Button
@@ -89,7 +90,7 @@ export const NewsAddEdit = () => {
 								}
 							>
 								<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
-									Выбрать изображение
+									{t('news.selectImage')}
 								</p>
 							</Button>
 							<input
@@ -105,7 +106,7 @@ export const NewsAddEdit = () => {
 						<div className="flex justify-center self-center">
 							<img
 								src={imageUrl}
-								alt="Превью изображения"
+								alt={t('account.form.companyLogo.preview')}
 								className="size-[60px] rounded-md object-cover"
 							/>
 						</div>
@@ -121,8 +122,8 @@ export const NewsAddEdit = () => {
 				)}
 				inputClassName="py-[6px] px-[12px] h-[100px] font-sans text-sm font-normal leading-5 tracking-[0.1px] align-top"
 				containerClassName="w-[700px]"
-				label={formState.errors?.bodyText?.message || 'Текст статьи'}
-				placeholder="Введите текст"
+				label={formState.errors?.bodyText?.message || t('news.bodyText')}
+				placeholder={t('news.placeholders.bodyText')}
 			/>
 		</>
 	);

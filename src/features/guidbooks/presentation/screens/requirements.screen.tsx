@@ -262,7 +262,7 @@ const RequirementsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || 'Ошибка экспорта');
+						toast.error(error.response?.data || t('guides.export.error'));
 					}
 					return from([null]);
 				}),
@@ -278,7 +278,7 @@ const RequirementsScreen = () => {
 				link.click();
 				document.body.removeChild(link);
 				window.URL.revokeObjectURL(url);
-				toast.success('Экспорт выполнен');
+				toast.success(t('guides.export.success'));
 			});
 	};
 

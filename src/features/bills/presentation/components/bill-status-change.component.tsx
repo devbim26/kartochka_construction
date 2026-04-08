@@ -1,4 +1,4 @@
-import { Checkbox, useAppNavigate } from '@core';
+import { Checkbox, useAppNavigate, useI18n } from '@core';
 import { updateBill } from '@features/bills/services';
 import { billType2title, BillTypeEnum } from '@features/bills/types';
 import { AxiosError } from 'axios';
@@ -10,6 +10,7 @@ import { twMerge } from 'tailwind-merge';
 export const BillStatusChange = () => {
 	const [search] = useSearchParams();
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 
 	const handleChangeStatus = (billType: BillTypeEnum) => {
 		from(
@@ -29,7 +30,7 @@ export const BillStatusChange = () => {
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					toast.success('Счет успешно обновлен');
+					toast.success(t('bills.updateSuccess'));
 					navigate('');
 				}
 			});

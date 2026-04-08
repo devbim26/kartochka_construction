@@ -211,13 +211,10 @@ export enum ConstructionTypeEnum {
 	HeavySingleLayerWall = 'HeavySingleLayerWall',
 	HeavySingleLayerWallFacingOneSide = 'HeavySingleLayerWallFacingOneSide',
 	HeavySingleLayerWallFacingBothSide = 'HeavySingleLayerWallFacingBothSide',
-	HeavySingleLayerWallZPanelOneSide = 'HeavySingleLayerWallZPanelOneSide',
-	HeavySingleLayerWallZPanelBothSide = 'HeavySingleLayerWallZPanelBothSide',
 	HeavyMultipleLayerWall = 'HeavyMultipleLayerWall',
 	HeavyMultipleLayerWallFacingOneSide = 'HeavyMultipleLayerWallFacingOneSide',
 	HeavyMultipleLayerWallFacingBothSide = 'HeavyMultipleLayerWallFacingBothSide',
-	HeavyMultipleLayerWallZPanelOneSide = 'HeavyMultipleLayerWallZPanelOneSide',
-	HeavyMultipleLayerWallZPanelBothSide = 'HeavyMultipleLayerWallZPanelBothSide',
+	ZPanel = 'ZPanel',
 	OneFramePartition = 'OneFramePartition',
 	TwoFramePartition = 'TwoFramePartition',
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
@@ -723,6 +720,8 @@ export interface GetReportWithPaginationQuery {
 	pageSize?: number;
 	sortOrder?: SortOrder;
 	ordering?: string | null;
+	/** @format uuid */
+	userId?: string | null;
 	name?: string | null;
 	client?: string | null;
 }
@@ -778,6 +777,14 @@ export interface GetUsersWithPaginationParamsQuery {
 export interface GraphParametrsDto {
 	name?: string | null;
 	namedDots?: NamedDotDto[] | null;
+}
+
+export interface ImportResultDto {
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	failedCount?: number;
+	fileUrl?: string | null;
 }
 
 export enum IndexType {
@@ -1365,7 +1372,7 @@ export interface SecondRequirementPlacementRoomDto {
 	/** @format uuid */
 	requirementId?: string;
 	/** @format float */
-	rw?: number | null;
+	rw?: number;
 }
 
 export interface SendSmsCommand {
@@ -2367,29 +2374,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
-		 * @tags ImportExcelFile
-		 * @name ImportExcelFileCreate
-		 * @request POST:/api/ImportExcelFile
-		 */
-		importExcelFileCreate: (
-			data: {
-				/** @format binary */
-				formFile?: File;
-			},
-			params: RequestParams = {},
-		) =>
-			this.request<CreateReportInfoDto, any>({
-				path: `/api/ImportExcelFile`,
-				method: 'POST',
-				body: data,
-				type: ContentType.FormData,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
 		 * @tags Issuer
 		 * @name IssuerDetail
 		 * @request GET:/api/Issuer/{id}
@@ -2568,6 +2552,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				/** @format float */
 				materialCoefficient?: number;
 				materialTypeEnum?: MaterialTypeEnum;
+				type?: MaterialOriginType;
 				/** @format float */
 				velocity?: number;
 				/** @format float */
@@ -2676,6 +2661,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<MaterialDto, any>({
 				path: `/api/Material`,
 				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Material
+		 * @name MaterialImportCreate
+		 * @request POST:/api/Material/import
+		 */
+		materialImportCreate: (
+			data: {
+				/** @format binary */
+				formFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<ImportResultDto, any>({
+				path: `/api/Material/import`,
+				method: 'POST',
 				body: data,
 				type: ContentType.FormData,
 				format: 'json',
@@ -3383,6 +3391,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Requirement
+		 * @name RequirementImportCreate
+		 * @request POST:/api/Requirement/import
+		 */
+		requirementImportCreate: (
+			data: {
+				/** @format binary */
+				formFile?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<ImportResultDto, any>({
+				path: `/api/Requirement/import`,
+				method: 'POST',
+				body: data,
+				type: ContentType.FormData,
 				format: 'json',
 				...params,
 			}),

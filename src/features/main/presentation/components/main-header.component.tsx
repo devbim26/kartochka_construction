@@ -65,24 +65,26 @@ export const MainHeader = () => {
 	const AIFeatures: FeatureCard[] = [
 		{
 			id: 'ai-assistant',
-			title: 'AI mode (3 режима)',
+			title: t('main.aiCards.assistant.title'),
 			description: (
 				<div className="flex flex-col gap-3 text-gray-700">
 					<p>
-						<span className="font-semibold text-gray-800">Общий</span>
+						<span className="font-semibold text-gray-800">
+							{t('main.aiCards.assistant.generalTitle')}
+						</span>
 						<br />
-						Доступ к новейшим моделям ИИ
+						{t('main.aiCards.assistant.generalDesc')}
 					</p>
 					<p>
 						<span className="font-semibold text-gray-800">
-							Аналитика документов PDF
+							{t('main.aiCards.assistant.pdfTitle')}
 						</span>
 						<br />
-						AI проверяет, суммаризирует и структурирует документы.
+						{t('main.aiCards.assistant.pdfDesc')}
 					</p>
 					<p>
-						<span className="font-semibold text-gray-800">DeepResearch</span> глубокий
-						поиск в интернете
+						<span className="font-semibold text-gray-800">DeepResearch</span>{' '}
+						{t('main.aiCards.assistant.deepResearchDesc')}
 					</p>
 				</div>
 			),
@@ -94,19 +96,23 @@ export const MainHeader = () => {
 		},
 		{
 			id: 'ai-visualization',
-			title: 'Визуализация фасадов и интерьеров',
+			title: t('main.aiCards.visualization.title'),
 			description: (
 				<div className="flex flex-col gap-3 text-gray-700">
 					<p>
-						<span className="font-semibold text-gray-800">AI-генерация</span>{' '}
-						изображений
-						<br />с кастомными настройками.
+						<span className="font-semibold text-gray-800">
+							{t('main.aiCards.visualization.genTitle')}
+						</span>{' '}
+						{t('main.aiCards.visualization.genSuffix')}
+						<br />
+						{t('main.aiCards.visualization.genDesc')}
 					</p>
 					<p className="italic">
-						Меняйте фасады, мебель,
+						{t('main.aiCards.visualization.italic1')}
 						<br />
-						положение камеры и др.
-						<br />в один клик.
+						{t('main.aiCards.visualization.italic2')}
+						<br />
+						{t('main.aiCards.visualization.italic3')}
 					</p>
 				</div>
 			),
@@ -117,22 +123,25 @@ export const MainHeader = () => {
 		},
 		{
 			id: 'project-expertise',
-			title: 'Экспертиза проекта (2 режима)',
+			title: t('main.aiCards.expertise.title'),
 			description: (
 				<div className="flex flex-col gap-3 text-gray-700">
 					<div>
-						<span className="font-semibold text-gray-800">"Общая экспертиза"</span>
+						<span className="font-semibold text-gray-800">
+							{t('main.aiCards.expertise.generalTitle')}
+						</span>
 						<div className="italic text-gray-600">
-							- Проверяет общую структуру проекта;
-							<br />- Проверяет проект на соответствие актуальным ТНПА.
+							{t('main.aiCards.expertise.generalDesc1')}
+							<br />
+							{t('main.aiCards.expertise.generalDesc2')}
 						</div>
 					</div>
 					<div>
 						<span className="font-semibold text-gray-800">
-							"Экспертиза звукоизоляции"
+							{t('main.aiCards.expertise.soundTitle')}
 						</span>
 						<div className="italic text-gray-600">
-							Анализ заложенных в проекте решений по звукоизоляции.
+							{t('main.aiCards.expertise.soundDesc')}
 						</div>
 					</div>
 				</div>
@@ -144,16 +153,13 @@ export const MainHeader = () => {
 		},
 		{
 			id: 'normative-analytics',
-			title: 'Аналитика нормативной документации',
+			title: t('main.aiCards.normative.title'),
 			description: (
 				<div className="flex flex-col gap-3 text-gray-700">
 					<p className="font-semibold text-gray-800">
-						Выполняет глубокий анализ нормативных документов (СН, СП и др.)
+						{t('main.aiCards.normative.desc1')}
 					</p>
-					<p className="italic">
-						Задавайте любые вопросы, система создаст отчет с прямыми ссылками на пункты
-						и страницы документов
-					</p>
+					<p className="italic">{t('main.aiCards.normative.desc2')}</p>
 				</div>
 			),
 			features: [],
@@ -166,13 +172,11 @@ export const MainHeader = () => {
 	const features: FeatureCard[] = [
 		{
 			id: 'sound-isolation',
-			title: 'Расчет звукоизоляции стен и перекрытий',
+			title: t('main.designCards.sound.title'),
 			description: (
 				<div className="flex flex-col gap-1">
-					<p>Расчет звукоизоляции стен и перекрытий по СП 02.04.03-2023</p>
-					<p className="italic">
-						Генерирует PDF-отчет с формулами, готовый к подаче на экспертизу.
-					</p>
+					<p>{t('main.designCards.sound.desc1')}</p>
+					<p className="italic">{t('main.designCards.sound.desc2')}</p>
 				</div>
 			),
 			features: [],
@@ -183,13 +187,11 @@ export const MainHeader = () => {
 		},
 		{
 			id: 'heat-isolation',
-			title: 'Расчет теплоизоляции стен',
+			title: t('main.designCards.heat.title'),
 			description: (
 				<div className="flex flex-col gap-1">
-					<p>Расчет теплоизоляции стен по СП 2.04.01-2020</p>
-					<p className="italic">
-						Генерирует PDF-отчет с формулами, готовый к подаче на экспертизу.
-					</p>
+					<p>{t('main.designCards.heat.desc1')}</p>
+					<p className="italic">{t('main.designCards.heat.desc2')}</p>
 				</div>
 			),
 			features: [],
@@ -197,13 +199,6 @@ export const MainHeader = () => {
 			buttonText: t('common.startPro'),
 		},
 	];
-
-	const handleFeatureClick = useCallback(
-		(featureId: string) => {
-			console.log('Selected feature:', featureId);
-		},
-		[navigate],
-	);
 
 	return (
 		<div className="w-full">

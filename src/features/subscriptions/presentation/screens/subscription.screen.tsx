@@ -23,7 +23,7 @@ import {
 import type { Subscription, SubscriptionFilters } from '@features/subscriptions/types';
 import {
 	SubscriptionAddAndEditConfig,
-	subscriptionColumns,
+	getSubscriptionColumns,
 	SubscriptionFilterConfig,
 } from '@features/subscriptions/utils';
 import { AxiosError } from 'axios';
@@ -210,7 +210,7 @@ const SubscriptionScreen = () => {
 			<SimpleTable
 				data={tableData}
 				columns={[
-					...subscriptionColumns,
+					...getSubscriptionColumns(t),
 					{
 						id: 'actions',
 						accessorKey: 'id',

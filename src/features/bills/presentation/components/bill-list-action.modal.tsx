@@ -1,5 +1,5 @@
 import type { ModalProps } from '@core';
-import { Button, Modal } from '@core';
+import { Button, Modal, useI18n } from '@core';
 import { twJoin } from 'tailwind-merge';
 
 interface Props extends Omit<ModalProps, 'Footer'> {
@@ -16,6 +16,7 @@ export const BillListActionModal = ({
 	children,
 	...props
 }: Props) => {
+	const { t } = useI18n();
 	return (
 		<Modal
 			className="max-w-fit"
@@ -26,7 +27,7 @@ export const BillListActionModal = ({
 						className="flex h-[40px] w-fit flex-row items-center px-4 py-1.5"
 						variant="outline"
 					>
-						<p className="font-sans text-sm font-semibold">Отмена</p>
+						<p className="font-sans text-sm font-semibold">{t('common.cancel')}</p>
 					</Button>
 					{hasSubmitButton && (
 						<Button

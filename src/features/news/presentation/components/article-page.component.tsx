@@ -1,3 +1,4 @@
+import { useI18n } from '@core';
 import type { ArticleDto } from '@api-gen';
 import { convertToClientArticleData } from '@features/news/converters';
 import { getArticleById } from '@features/news/services';
@@ -9,23 +10,15 @@ import { from } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { toast } from 'sonner';
 
-const formatDate = (dateString?: string) => {
-	if (!dateString) return '';
-	return new Date(dateString).toLocaleDateString('ru-RU', {
-		day: 'numeric',
-		month: 'long',
-		year: 'numeric',
-	});
-};
-
 export const ArticlePage = () => {
+	const { t, locale } = useI18n();
 	const { articleId } = useParams<{ articleId: string }>();
 	const [article, setArticle] = useState<Article | null | undefined>(null);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (!articleId) {
-			setError('ID статьи не найден в URL.');
+			setError(t('news.errors.articleIdMissing'));
 			setArticle(undefined);
 			return;
 		}
@@ -42,19 +35,19 @@ export const ArticlePage = () => {
 				catchError((err) => {
 					if (err instanceof AxiosError) {
 						const errorMessage =
-							err.response?.data?.message || 'Не удалось загрузить статью.';
+							err.response?.data?.message || t('news.errors.loadArticle');
 						toast.error(errorMessage);
 						setError(errorMessage);
 					} else {
-						toast.error('Произошла непредвиденная ошибка.');
-						setError('Произошла непредвиденная ошибка.');
+						toast.error(t('news.errors.unexpected'));
+						setError(t('news.errors.unexpected'));
 					}
 					setArticle(undefined);
 					return from([null]);
 				}),
 			)
 			.subscribe();
-	}, [articleId]);
+	}, [articleId, t]);
 
 	if (article === null) {
 		return (
@@ -72,12 +65,12 @@ export const ArticlePage = () => {
 	}
 
 	if (!article) {
-		return <div className="py-12 text-center">{error || 'Статья не найдена.'}</div>;
+		return <div className="py-12 text-center">{error || t('news.errors.notFound')}</div>;
 	}
 
 	return (
 		<div className="mx-auto max-w-4xl px-4 py-12">
-			<p className="mb-4 text-sm uppercase text-gray-500">Новости</p>
+			<p className="mb-4 text-sm uppercase text-gray-500">{t('news.pageTitle')}</p>
 			<h1 className="mb-8 text-4xl font-bold text-gray-900">{article.title}</h1>
 			<div className="mb-8 flex">
 				<img
@@ -91,7 +84,12 @@ export const ArticlePage = () => {
 				dangerouslySetInnerHTML={{ __html: article.bodyText || '' }}
 			/>
 			<p className="mt-12 text-left text-sm text-gray-400">
-				{formatDate(article.publishDate)}
+				{article.publishDate
+					? new Date(article.publishDate).toLocaleDateString(
+							locale === 'ru' ? 'ru-RU' : 'en-US',
+							{ day: 'numeric', month: 'long', year: 'numeric' },
+						)
+					: ''}
 			</p>
 		</div>
 	);

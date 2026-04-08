@@ -10,6 +10,7 @@ import {
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
+	useAppSelector,
 	useAccessValidator,
 	UserRoles,
 } from '@core';
@@ -37,6 +38,7 @@ export const ReportScreen = () => {
 	const navigate = useAppNavigate();
 	const { validate } = useAccessValidator();
 	const isAdmin = validate(UserRoles.Admin);
+	const userId = useAppSelector((state) => state.userData.data?.id);
 
 	const handleGetTableData = (
 		data: ReportFilter,
@@ -44,7 +46,10 @@ export const ReportScreen = () => {
 	) => {
 		from(
 			getPaginatedReports({
-				data,
+				data: {
+					...data,
+					userId: userId || null,
+				},
 				pagination,
 			}),
 		)
@@ -109,7 +114,7 @@ export const ReportScreen = () => {
 
 	useEffect(() => {
 		handleGetTableData(getValues(), paginationState);
-	}, [client, name]);
+	}, [client, name, userId]);
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">

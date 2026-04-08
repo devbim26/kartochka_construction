@@ -85,10 +85,44 @@ const ReportFromComponent = () => {
 				}
 			}
 
+			// Для одиночной конструкции сразу дергаем ReportReceiving/single,
+			// без отдельного заполнения параметров как для поэтажного плана.
+			if (reportType === ReportCategory.Single) {
+				from(reportReceiveSingle(reportId))
+					.pipe(
+						catchError((error) => {
+							console.error('Error submitting single report:', error);
+							return [null];
+						}),
+					)
+					.subscribe((response) => {
+						if (response?.status === 200) {
+							if (action === 'download') {
+								const link = document.createElement('a');
+								link.href = response.data!;
+								document.body.appendChild(link);
+								link.click();
+								document.body.removeChild(link);
+								sessionStorage.removeItem('reportId');
+								sessionStorage.removeItem('reportType');
+							} else if (action === 'save') {
+								navigate(
+									APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route,
+								);
+								sessionStorage.setItem('reportId', reportId);
+								sessionStorage.setItem('reportType', reportType as string);
+							}
+						}
+						dispatch(stopLoading());
+						setIsSubmitting(false);
+					});
+
+				return;
+			}
+
 			const reportData = {
 				...formData,
 				reportInfoId: reportId,
-
 				logo: undefined,
 			};
 
@@ -100,10 +134,7 @@ const ReportFromComponent = () => {
 					}),
 					switchMap((response) => {
 						if (response.status === 200) {
-							const reportRequest =
-								search.get('reportType') == ReportCategory.Floor
-									? reportReceiveFloor(reportId)
-									: reportReceiveSingle(reportId);
+							const reportRequest = reportReceiveFloor(reportId);
 
 							return from(reportRequest).pipe(catchError(() => [null]));
 						}

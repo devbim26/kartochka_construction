@@ -16,8 +16,15 @@ export const reportToClientConverter = (data: ReportDto): Report => {
 };
 
 export const reportToServerFilterConverter = (data: ReportFilter): GetReportWithPaginationQuery => {
+	const normalizeNullable = (value?: string | null): string | null => {
+		if (value == null) return null;
+		const trimmed = value.trim();
+		return trimmed.length ? trimmed : null;
+	};
+
 	return {
-		name: data.name || '',
-		client: data.client || '',
+		userId: normalizeNullable(data.userId),
+		name: normalizeNullable(data.name),
+		client: normalizeNullable(data.client),
 	};
 };

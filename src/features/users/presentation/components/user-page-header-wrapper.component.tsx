@@ -134,8 +134,8 @@ export const UserPageHeaderWrapper = memoize(
 							>
 								<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
 									{currentHeaderFormType === HeaderFormTypes.add
-										? 'Сохранить'
-										: 'Сохранить изменения'}
+										? t('common.save')
+										: t('common.saveChanges')}
 								</p>
 							</Button>
 						)}
@@ -154,8 +154,8 @@ export const UserPageHeaderWrapper = memoize(
 							/>
 							<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
 								{currentHeaderFormType === HeaderFormTypes.filter
-									? 'Очистить'
-									: 'Отмена'}
+									? t('common.clear')
+									: t('common.cancel')}
 							</p>
 						</Button>
 					</div>

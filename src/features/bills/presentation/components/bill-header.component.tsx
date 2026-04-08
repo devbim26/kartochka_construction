@@ -3,6 +3,7 @@ import {
 	CleanUpIcon,
 	Input,
 	Select,
+	useI18n,
 	useAccessValidator,
 	useAppNavigate,
 	UserRoles,
@@ -15,19 +16,22 @@ const BillHeaderComponent = () => {
 	const { register, reset, control } = useFormContext<BillFilter>();
 	const { validate } = useAccessValidator();
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 	const isAdmin = validate(UserRoles.Admin);
 
 	return (
 		<div className="flex w-full flex-col gap-[14px]">
 			<div className="flex w-full items-center justify-between">
-				<p className="font-sans text-lg font-semibold leading-6">Счета</p>
+				<p className="font-sans text-lg font-semibold leading-6">{t('bills.pageTitle')}</p>
 				{isAdmin && (
 					<Button
 						className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
 						onClick={() => navigate('', { add: 'true' })}
 					>
 						<FaPlus fill="white" width={'16px'} height={'16px'} />
-						<p className="font-sans text-sm font-semibold leading-[18px]">Создать</p>
+						<p className="font-sans text-sm font-semibold leading-[18px]">
+							{t('common.create')}
+						</p>
 					</Button>
 				)}
 			</div>
@@ -42,8 +46,8 @@ const BillHeaderComponent = () => {
 						type="number"
 						inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 						containerClassName="w-[226px]"
-						label={'Номер'}
-						placeholder="Введите номер"
+						label={t('bills.fields.number')}
+						placeholder={t('bills.placeholders.number')}
 					/>
 					<Controller
 						name="billType"
@@ -56,8 +60,8 @@ const BillHeaderComponent = () => {
 								labelClassName={'text-sm leading-5 tracking-[0.1px]'}
 								wrapperClassname="w-[226px] ring-input-border-primary"
 								buttonClassName="text-sm rounded-[8px]"
-								label={'Статус'}
-								placeholder="Выберите статус"
+								label={t('bills.fields.status')}
+								placeholder={t('bills.placeholders.status')}
 							/>
 						)}
 					/>
@@ -69,8 +73,8 @@ const BillHeaderComponent = () => {
 						type="number"
 						inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 						containerClassName="w-[226px]"
-						label={'Клиент'}
-						placeholder="Введите клиента"
+						label={t('bills.fields.client')}
+						placeholder={t('bills.placeholders.client')}
 					/>
 				</div>
 				<div className="flex flex-row justify-end gap-[30px] px-[16px] py-[13px]">
@@ -84,7 +88,7 @@ const BillHeaderComponent = () => {
 							className="fill-primary group-hover:fill-white"
 						/>
 						<p className="font-sans text-sm font-semibold leading-[18px] text-primary group-hover:text-white">
-							Очистить
+							{t('common.clear')}
 						</p>
 					</Button>
 				</div>

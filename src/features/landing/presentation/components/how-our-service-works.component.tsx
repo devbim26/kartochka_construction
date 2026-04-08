@@ -19,102 +19,23 @@ const numberImages = [
 	<FifthNumberImage key="5" />,
 ];
 const cardAccentColors = ['#B1C9E3', '#EED0C5', '#F3F2BA', '#DFA4C2', '#B2CAA0'];
-const stepTitles = [
-	'Проектирование. Звукоизоляция',
-	'AI ассистент (3 режима)',
-	'Визуализация фасадов и интерьеров',
-	'Экспертиза проекта (2 режима)',
-	'Аналитика нормативной документации',
-];
-
-const cardContents: Array<{ title: ReactNode; body: ReactNode }> = [
-	{
-		title: <span className="font-bold not-italic">Расчет звукоизоляции стен и перекрытий</span>,
-		body: (
-			<span className="whitespace-pre-line italic">
-				{
-					'по СП 02.04.03-2023.\n\nГенерирует PDF-отчет с формулами, готовый к подаче на экспертизу.'
-				}
-			</span>
-		),
-	},
-	{
-		title: (
-			<div className="whitespace-pre-line">
-				<span className="font-bold not-italic">Общий</span>
-				{'\n'}
-				<span className="italic">
-					Доступ к новейшим моделям ИИ (от Open AI, Anthropic, Google, Китайские модели)
-				</span>
-				{'\n\n'}
-				<span className="font-bold not-italic">Аналитика документов PDF</span>
-			</div>
-		),
-		body: (
-			<div className="whitespace-pre-line italic">
-				AI проверяет, суммаризирует и структурирует документы. Выдает готовый отчет в
-				DOC/Excel — для смет, ТЗ, протоколов.
-				{'\n\n'}
-				<span className="font-bold not-italic">
-					DeepResearch (Perplexity Sonar Pro Search)
-				</span>
-				{'\n'}
-				глубокий поиск информации в интернете со ссылками на первоисточник.
-			</div>
-		),
-	},
-	{
-		title: (
-			<div className="whitespace-pre-line">
-				<span className="font-bold not-italic">
-					AI-генерация изображений (nano banano 2 pro)
-				</span>
-			</div>
-		),
-		body: (
-			<div className="whitespace-pre-line italic">
-				С кастомными настройками. Меняйте материалы, мебель, положение камеры и др. в один
-				клик.
-			</div>
-		),
-	},
-	{
-		title: (
-			<div className="whitespace-pre-line">
-				<span className="font-bold not-italic">"Общая экспертиза"</span>
-				{'\n'}
-				<span className="italic">
-					- Проверяет общую структуру проекта;{'\n'}- Проверяет проект на соответствие
-					актуальным ТНПА;{'\n'}- Проверка проекта по внутренним требованиям.
-				</span>
-				{'\n\n'}
-				<span className="font-bold not-italic">"Экспертиза звукоизоляции"</span>
-			</div>
-		),
-		body: <span className="italic">Анализ заложенных в проекте решений по звукоизоляции.</span>,
-	},
-	{
-		title: (
-			<div className="whitespace-pre-line">
-				<span className="font-bold not-italic">
-					Выполняет глубокий анализ нормативных документов
-				</span>
-			</div>
-		),
-		body: (
-			<span className="whitespace-pre-line italic">
-				{
-					'(СН, СП и др.). Задавайте любые вопросы, система создаст отчет с прямыми ссылками на пункты и страницы документов.'
-				}
-			</span>
-		),
-	},
-];
+const stepKeys = [0, 1, 2, 3, 4] as const;
 
 export const HowOurServiceWorks = () => {
 	const [selectedStep, setSelectedStep] = useState(0);
 	const [isHover, setIsHover] = useState<boolean | null>(null);
 	const { t } = useI18n();
+	const stepTitles = stepKeys.map((index) => t(`landing.how.step.${index}`));
+	const cardContents: Array<{ title: ReactNode; body: ReactNode }> = stepKeys.map((index) => ({
+		title: (
+			<span className="whitespace-pre-line font-bold not-italic">
+				{t(`landing.how.desc.${index}`)}
+			</span>
+		),
+		body: (
+			<span className="whitespace-pre-line italic">{t(`landing.how.detail.${index}`)}</span>
+		),
+	}));
 
 	const handleStepClick = (index: number) => {
 		setSelectedStep(index);

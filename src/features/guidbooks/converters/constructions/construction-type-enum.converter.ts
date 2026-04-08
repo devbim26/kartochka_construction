@@ -10,9 +10,9 @@ const constructionTypeEnumMap = createDataRecordConverter({
 	[ClientConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]:
 		ServerConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
 	[ClientConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide]:
-		ServerConstructionTypeEnum.HeavySingleLayerWallZPanelOneSide,
+		ServerConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 	[ClientConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]:
-		ServerConstructionTypeEnum.HeavySingleLayerWallZPanelBothSide,
+		ServerConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
 	[ClientConstructionTypeEnum.HeavyMultiLayerWall]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWall,
 	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide]:
@@ -20,9 +20,9 @@ const constructionTypeEnumMap = createDataRecordConverter({
 	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingBothSide,
 	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide]:
-		ServerConstructionTypeEnum.HeavyMultipleLayerWallZPanelOneSide,
+		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingOneSide,
 	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide]:
-		ServerConstructionTypeEnum.HeavyMultipleLayerWallZPanelBothSide,
+		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingBothSide,
 	[ClientConstructionTypeEnum.OneFramePartition]: ServerConstructionTypeEnum.OneFramePartition,
 	[ClientConstructionTypeEnum.TwoFramePartition]: ServerConstructionTypeEnum.TwoFramePartition,
 	[ClientConstructionTypeEnum.HeavySingleWallFacing]:
@@ -42,5 +42,7 @@ export const convertToServerConstructionTypeEnumData = (
 export const convertToClientConstructionTypeEnumData = (
 	type: ServerConstructionTypeEnum,
 ): ClientConstructionTypeEnum => {
-	return constructionTypeEnumMap.toClient[type];
+	// Защита от значений, которых нет в мапе (например, новые типы на бэке)
+	const mapped = (constructionTypeEnumMap.toClient as any)[type];
+	return mapped ?? ClientConstructionTypeEnum.HeavySingleLayerWall;
 };

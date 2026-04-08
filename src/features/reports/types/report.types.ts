@@ -15,6 +15,7 @@ export type Report = {
 export type ReportFilter = {
 	name: string;
 	client: string;
+	userId?: string | null;
 };
 
 export type GetReportsCommand = {

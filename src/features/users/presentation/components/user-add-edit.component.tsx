@@ -8,6 +8,7 @@ import {
 	Input,
 	phoneNumberMask,
 	Select,
+	useI18n,
 } from '@core';
 import type { AccountData } from '@features/account/types';
 import { getRoles } from '@features/users/services';
@@ -93,6 +94,7 @@ export const UserAddEdit = () => {
 	const phoneRef = useMask(phoneNumberMask);
 	const [search] = useSearchParams();
 	const { setValue, watch, formState, trigger } = form;
+	const { t } = useI18n();
 	const [roles, setRoles] = useState<Array<UserRole>>([]);
 	const isAddMode = !!search.get('add');
 	const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
@@ -150,11 +152,14 @@ export const UserAddEdit = () => {
 								{...form.register('email')}
 								maxLength={100}
 								type={'email'}
-								placeholder="Введите e-mail"
+								placeholder={t('auth.emailPlaceholder')}
 							/>
 						)}
 						<Input
-							label={formState.errors.companyName?.message || 'Название'}
+							label={
+								formState.errors.companyName?.message ||
+								t('account.form.companyName.label')
+							}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.companyName?.message ? 'text-error' : '',
@@ -165,14 +170,15 @@ export const UserAddEdit = () => {
 							{...form.register('companyName')}
 							maxLength={50}
 							type={'text'}
-							placeholder="Введите название компании"
+							placeholder={t('account.form.companyName.placeholder')}
 							max={50}
 						/>
 						<div className="flex flex-wrap gap-[8px] text-[14px] placeholder:text-input-label-primary">
 							<Input
 								ref={phoneRef}
 								label={
-									formState.errors.mainPhoneNumber?.message || 'Номера телефонов'
+									formState.errors.mainPhoneNumber?.message ||
+									t('account.form.phoneNumbers.label')
 								}
 								labelClassName={twMerge(
 									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
@@ -204,7 +210,10 @@ export const UserAddEdit = () => {
 					</div>
 					<div className="flex flex-wrap gap-[20px]">
 						<Input
-							label={formState.errors.payersRegistrationNumber?.message || 'УНП'}
+							label={
+								formState.errors.payersRegistrationNumber?.message ||
+								t('account.form.unp.label')
+							}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.mainPhoneNumber?.message ? 'text-error' : '',
@@ -215,10 +224,13 @@ export const UserAddEdit = () => {
 							{...form.register('payersRegistrationNumber')}
 							type={'number'}
 							maxLength={9}
-							placeholder="Введите УНП"
+							placeholder={t('account.form.unp.placeholder')}
 						/>
 						<Input
-							label={formState.errors.paymentAccount?.message || 'Расчетный счет'}
+							label={
+								formState.errors.paymentAccount?.message ||
+								t('account.form.paymentAccount.label')
+							}
 							onChange={(event) => {
 								setValue('paymentAccount', event.target.value);
 							}}
@@ -231,11 +243,11 @@ export const UserAddEdit = () => {
 							inputClassName="w-[220px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 							error={formState.errors.paymentAccount?.message}
 							type={'text'}
-							placeholder="Введите расчетный счет"
+							placeholder={t('account.form.paymentAccount.placeholder')}
 							maxLength={28}
 						/>
 						<Input
-							label={formState.errors.bankIdNumber?.message || 'БИК'}
+							label={formState.errors.bankIdNumber?.message || t('account.form.bik.label')}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.bankIdNumber?.message ? 'text-error' : '',
@@ -245,11 +257,14 @@ export const UserAddEdit = () => {
 							error={formState.errors.bankIdNumber?.message}
 							{...form.register('bankIdNumber')}
 							type={'text'}
-							placeholder="Введите БИК"
+							placeholder={t('account.form.bik.placeholder')}
 							maxLength={8}
 						/>
 						<Input
-							label={formState.errors.directorFullName?.message || 'ФИО директора'}
+							label={
+								formState.errors.directorFullName?.message ||
+								t('account.form.directorFullName.label')
+							}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.directorFullName?.message ? 'text-error' : '',
@@ -260,11 +275,14 @@ export const UserAddEdit = () => {
 							{...form.register('directorFullName')}
 							maxLength={50}
 							type={'text'}
-							placeholder="Введите ФИО"
+							placeholder={t('account.form.directorFullName.placeholder')}
 							max={50}
 						/>
 						<Input
-							label={formState.errors.bankAddress?.message || 'Адрес банка'}
+							label={
+								formState.errors.bankAddress?.message ||
+								t('account.form.bankAddress.label')
+							}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.bankAddress?.message ? 'text-error' : '',
@@ -275,11 +293,14 @@ export const UserAddEdit = () => {
 							{...form.register('bankAddress')}
 							maxLength={100}
 							type={'text'}
-							placeholder="Введите адрес"
+							placeholder={t('account.form.bankAddress.placeholder')}
 							max={50}
 						/>
 						<Input
-							label={formState.errors.companyAddress?.message || 'Адрес компании'}
+							label={
+								formState.errors.companyAddress?.message ||
+								t('account.form.companyAddress.label')
+							}
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 								formState.errors.companyAddress?.message ? 'text-error' : '',
@@ -291,7 +312,7 @@ export const UserAddEdit = () => {
 							maxLength={50}
 							type={'text'}
 							max={50}
-							placeholder="Введите адрес компании"
+							placeholder={t('account.form.companyAddress.placeholder')}
 						/>
 						<Input
 							{...form.register('compannyInfo')}
@@ -305,9 +326,10 @@ export const UserAddEdit = () => {
 							maxLength={100}
 							type={'text'}
 							max={200}
-							placeholder="Введите информацию"
+							placeholder={t('account.form.companyInfo.placeholder')}
 							label={
-								formState.errors.compannyInfo?.message || 'Информация о компании'
+								formState.errors.compannyInfo?.message ||
+								t('account.form.companyInfo.label')
 							}
 							error={formState.errors.compannyInfo?.message}
 						/>
@@ -322,8 +344,8 @@ export const UserAddEdit = () => {
 							)}
 							wrapperClassname="flex-row items-center gap-[10px] ring-input-border-primary"
 							buttonClassName="text-sm w-[220px] rounded-[8px]"
-							label={formState.errors.roleId?.message || 'Роль'}
-							placeholder="Выберите роль"
+							label={formState.errors.roleId?.message || t('users.role')}
+							placeholder={t('users.rolePlaceholder')}
 						/>
 						<div className="flex flex-row items-center gap-[8px]">
 							<FormElementLabel
@@ -333,14 +355,14 @@ export const UserAddEdit = () => {
 								)}
 							>
 								{(formState.errors.formFile?.message as string) ||
-									'Логотип компании'}
+									t('account.form.companyLogo.label')}
 							</FormElementLabel>
 							<div className="flex flex-col items-center gap-[10px]">
 								{logo && (
 									<div className="flex justify-center self-center">
 										<img
 											src={logo}
-											alt="Превью изображения"
+											alt={t('account.form.companyLogo.preview')}
 											className="h-[80px] w-[220px] rounded-md object-cover"
 										/>
 									</div>
@@ -351,7 +373,7 @@ export const UserAddEdit = () => {
 									className="h-[30px] w-[220px]"
 									onClick={() => document.getElementById('file-upload')!.click()}
 								>
-									Загрузить
+									{t('account.form.companyLogo.upload')}
 								</Button>
 								<input
 									type="file"

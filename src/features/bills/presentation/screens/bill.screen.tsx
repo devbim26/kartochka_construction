@@ -11,6 +11,7 @@ import {
 	SimpleTableHeaderCell,
 	useAccessValidator,
 	useAppNavigate,
+	useI18n,
 	UserRoles,
 } from '@core';
 import { convertBillToClient } from '@features/bills/converters';
@@ -18,7 +19,7 @@ import { createBillByAdmin, deleteBill, getPaginatedBills } from '@features/bill
 import { getPaginatedSubscriptions } from '@features/subscriptions/services';
 import type { Bill, BillFilter } from '@features/bills/types';
 import { getPaginatedUsers } from '@features/users/services';
-import { billColumns } from '@features/bills/utils';
+import { getBillColumns } from '@features/bills/utils';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -42,6 +43,7 @@ export const BillScreen = () => {
 	const [tableData, setTableData] = useState<Array<Bill>>([]);
 	const [search] = useSearchParams();
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 	const { validate } = useAccessValidator();
 	const isAdmin = validate(UserRoles.Admin);
 	const [selectedUserId, setSelectedUserId] = useState('');
@@ -80,7 +82,7 @@ export const BillScreen = () => {
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка загрузки счетов');
+						toast.error(error.response?.data?.message || t('bills.loadError'));
 					}
 					return from([null]);
 				}),
@@ -101,7 +103,7 @@ export const BillScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					handleGetTableData(getValues(), paginationState);
-					toast.success('Счет успешно удален');
+					toast.success(t('bills.deleteSuccess'));
 					navigate('');
 				}
 			});
@@ -116,17 +118,17 @@ export const BillScreen = () => {
 			link.click();
 			document.body.removeChild(link);
 		} else {
-			toast.error('Счет не найден');
+			toast.error(t('bill.notFound'));
 		}
 	};
 
 	const handleCreateBill = () => {
 		if (!selectedUserId) {
-			toast.error('Выберите пользователя');
+			toast.error(t('bills.selectUser'));
 			return;
 		}
 		if (!selectedSubscriptionId) {
-			toast.error('Выберите подписку');
+			toast.error(t('bills.selectSubscription'));
 			return;
 		}
 
@@ -139,14 +141,14 @@ export const BillScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка создания счета');
+						toast.error(error.response?.data?.message || t('bills.createError'));
 					}
 					return from([null]);
 				}),
 			)
 			.subscribe((response) => {
 				if (response?.status === 200) {
-					toast.success('Счет успешно создан');
+					toast.success(t('bills.createSuccess'));
 					handleGetTableData(getValues(), paginationState);
 					setSelectedUserId('');
 					setSelectedSubscriptionId('');
@@ -174,7 +176,7 @@ export const BillScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data?.message || 'Ошибка загрузки данных');
+						toast.error(error.response?.data?.message || t('common.loadError'));
 					}
 					return from([null]);
 				}),
@@ -187,7 +189,7 @@ export const BillScreen = () => {
 						.filter((user) => !!user.id)
 						.map((user) => ({
 							value: user.id!,
-							label: user.companyName || user.directorFullName || 'Без названия',
+							label: user.companyName || user.directorFullName || t('common.noTitle'),
 						})),
 				);
 				setSubscriptionOptions(
@@ -195,7 +197,7 @@ export const BillScreen = () => {
 						.filter((subscription) => !!subscription.id)
 						.map((subscription) => ({
 							value: subscription.id!,
-							label: subscription.name || 'Без названия',
+							label: subscription.name || t('common.noTitle'),
 						})),
 				);
 			});
@@ -209,11 +211,11 @@ export const BillScreen = () => {
 			<SimpleTable
 				data={tableData}
 				columns={[
-					...billColumns,
+					...getBillColumns(t),
 					{
 						id: 'actions',
 						accessorKey: 'id',
-						header: () => <SimpleTableHeaderCell text={'Действия'} />,
+						header: () => <SimpleTableHeaderCell text={t('common.actions')} />,
 						cell: (info) => (
 							<SimpleTableCell
 								content={
@@ -257,8 +259,8 @@ export const BillScreen = () => {
 			/>
 			<BillListActionModal
 				onConfirm={handleCreateBill}
-				confirmTitle="Создать"
-				headerTitle="Создать счет?"
+				confirmTitle={t('common.create')}
+				headerTitle={t('bills.modal.createTitle')}
 				onClose={() => {
 					setSelectedUserId('');
 					setSelectedSubscriptionId('');
@@ -269,34 +271,34 @@ export const BillScreen = () => {
 			>
 				<div className="flex flex-col gap-3">
 					<Select
-						label="Пользователь"
+						label={t('bills.fields.user')}
 						value={selectedUserId}
 						onChange={(value) => setSelectedUserId((value as string) || '')}
 						options={userOptions}
-						placeholder="Выберите пользователя"
+						placeholder={t('bills.placeholders.user')}
 						wrapperClassname="ring-input-border-primary"
 					/>
 					<Select
-						label="Подписка"
+						label={t('bills.fields.subscription')}
 						value={selectedSubscriptionId}
 						onChange={(value) => setSelectedSubscriptionId((value as string) || '')}
 						options={subscriptionOptions}
-						placeholder="Выберите подписку"
+						placeholder={t('bills.placeholders.subscription')}
 						wrapperClassname="ring-input-border-primary"
 					/>
 				</div>
 			</BillListActionModal>
 			<BillListActionModal
 				onConfirm={() => handleDeleteTableData(search.get('id')!)}
-				confirmTitle="Удалить"
-				headerTitle="Удалить cчет?"
+				confirmTitle={t('common.delete')}
+				headerTitle={t('bills.modal.deleteTitle')}
 				onClose={() => navigate('')}
 				isOpen={!!search.get('id') && !!search.get('delete')}
 			/>
 			<BillListActionModal
 				onConfirm={() => handleDeleteTableData(search.get('id')!)}
-				confirmTitle="Редактировать"
-				headerTitle="Редактировать cчет?"
+				confirmTitle={t('common.edit')}
+				headerTitle={t('bills.modal.editTitle')}
 				hasSubmitButton={false}
 				onClose={() => navigate('')}
 				isOpen={!!search.get('id') && !!search.get('edit') && !!search.get('status')}
@@ -306,8 +308,8 @@ export const BillScreen = () => {
 			</BillListActionModal>
 			<BillListActionModal
 				onConfirm={handleDownloadFile}
-				confirmTitle="Скачать"
-				headerTitle="Скачать cчет?"
+				confirmTitle={t('common.download')}
+				headerTitle={t('bills.modal.downloadTitle')}
 				onClose={() => navigate('')}
 				isOpen={!!search.get('id') && !!search.get('download')}
 			/>

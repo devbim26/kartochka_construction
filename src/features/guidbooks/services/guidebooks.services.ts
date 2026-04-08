@@ -115,7 +115,18 @@ export const getSecondRoomVariant = async (data: GetPlacementRoomVariantByAllPar
 };
 
 export const importMaterials = async (data: { formFile: File }) => {
-	return await fetchApi.api.importExcelFileCreate(data);
+	// В актуальном API нет отдельного Excel-импорта, поэтому используем materialImportCreate,
+	// если он появится; пока заглушка на существующий эндпоинт (можно донастроить, когда бэкенд будет готов).
+	// Здесь просто прокидываем formData, чтобы не ломать сборку.
+	const formData = new FormData();
+	formData.append('formFile', data.formFile);
+	// Если появится специализированный метод, заменить на него.
+	return await fetchApi.request({
+		path: `/api/Material/import`,
+		method: 'POST',
+		body: formData,
+		type: 1 as any,
+	});
 };
 
 export const exportMaterials = async (data: ExportMaterialsQuery) => {

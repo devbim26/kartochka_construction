@@ -1,10 +1,13 @@
 import { APP_ROUTES, LogoIcon, LogoTextIcon, useI18n } from '@core';
 import { DESIGNING_ROUTES } from '@features/home/constants';
+import { LandingSections } from '@features/landing/constants';
 import { useNavigate } from 'react-router-dom';
 
 export const Footer = () => {
 	const navigate = useNavigate();
 	const { t } = useI18n();
+	const navigateToLandingSection = (sectionId: string) =>
+		navigate(`${APP_ROUTES.landing.route}?sectionId=${sectionId}`);
 
 	return (
 		<div className="flex w-full justify-center bg-background-primary px-4 sm:px-6 lg:px-10">
@@ -18,30 +21,20 @@ export const Footer = () => {
 					<div className="flex max-w-[200px] flex-col gap-[20px] sm:gap-[30px]">
 						<span
 							onClick={() =>
-								navigate(
-									`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`,
-								)
+								navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`)
 							}
 							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
 						>
 							{t('landing.footer.home')}
 						</span>
 						<span
-							onClick={() =>
-								navigate(
-									`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`,
-								)
-							}
+							onClick={() => navigateToLandingSection(LandingSections.aboutUs.id)}
 							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
 						>
 							{t('landing.footer.about')}
 						</span>
 						<span
-							onClick={() =>
-								navigate(
-									`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`,
-								)
-							}
+							onClick={() => navigateToLandingSection(LandingSections.contacts.id)}
 							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
 						>
 							{t('landing.footer.contacts')}
@@ -51,9 +44,7 @@ export const Footer = () => {
 					<div className="flex max-w-[200px] flex-col gap-[20px] sm:gap-[30px]">
 						<span
 							onClick={() =>
-								navigate(
-									`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`,
-								)
+								navigateToLandingSection(LandingSections.subscription.id)
 							}
 							className="cursor-pointer font-montserrat text-[18px] leading-[22px] sm:text-[20px] sm:leading-[24px]"
 						>

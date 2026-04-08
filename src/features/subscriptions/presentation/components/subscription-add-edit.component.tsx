@@ -1,4 +1,4 @@
-import { Input } from '@core';
+import { Input, useI18n } from '@core';
 import type { Subscription } from '@features/subscriptions/types';
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
@@ -6,6 +6,7 @@ import { twMerge } from 'tailwind-merge';
 export const SubscriptionAddEdit = () => {
 	const form = useFormContext<Subscription>();
 	const { register, formState } = form;
+	const { t } = useI18n();
 
 	return (
 		<div className="flex w-full items-end gap-6">
@@ -15,11 +16,11 @@ export const SubscriptionAddEdit = () => {
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.name?.message ? 'text-error' : '',
 				)}
-				label={formState.errors?.name?.message || 'Название'}
+				label={formState.errors?.name?.message || t('subscriptions.fields.name')}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
 				maxLength={200}
-				placeholder="Введите название"
+				placeholder={t('subscriptions.placeholders.name')}
 			/>
 			<Input
 				{...register('price')}
@@ -27,11 +28,11 @@ export const SubscriptionAddEdit = () => {
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.price?.message ? 'text-error' : '',
 				)}
-				label={formState.errors?.price?.message || 'Стоимость'}
+				label={formState.errors?.price?.message || t('subscriptions.fields.price')}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
 				type="number"
-				placeholder="Введите стоимость"
+				placeholder={t('subscriptions.placeholders.price')}
 			/>
 			<Input
 				{...register('numberOfReports')}
@@ -39,11 +40,14 @@ export const SubscriptionAddEdit = () => {
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.numberOfReports?.message ? 'text-error' : '',
 				)}
-				label={formState.errors?.numberOfReports?.message || 'Количество отчетов, шт'}
+				label={
+					formState.errors?.numberOfReports?.message ||
+					t('subscriptions.fields.reportsCount')
+				}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
 				type="number"
-				placeholder="Введите количество"
+				placeholder={t('subscriptions.placeholders.count')}
 			/>
 			<Input
 				{...register('numberOfDowloadReports')}
@@ -53,12 +57,12 @@ export const SubscriptionAddEdit = () => {
 				)}
 				label={
 					formState.errors?.numberOfDowloadReports?.message ||
-					'Количество расчетов, шт'
+					t('subscriptions.fields.calculationsCount')
 				}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
 				type="number"
-				placeholder="Введите количество"
+				placeholder={t('subscriptions.placeholders.count')}
 			/>
 			<Input
 				{...register('budgetForGeneration')}
@@ -68,12 +72,12 @@ export const SubscriptionAddEdit = () => {
 				)}
 				label={
 					formState.errors?.budgetForGeneration?.message ||
-					'Средства для AI-mode, руб'
+					t('subscriptions.fields.aiFunds')
 				}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
 				type="number"
-				placeholder="Введите сумму"
+				placeholder={t('subscriptions.placeholders.amount')}
 			/>
 			<Input
 				{...register('description')}
@@ -81,11 +85,11 @@ export const SubscriptionAddEdit = () => {
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
 					formState.errors.description?.message ? 'text-error' : '',
 				)}
-				label={formState.errors?.description?.message || 'Описание'}
+				label={formState.errors?.description?.message || t('common.description')}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
 				maxLength={200}
-				placeholder="Введите описание"
+				placeholder={t('common.enterDescription')}
 			/>
 		</div>
 	);
