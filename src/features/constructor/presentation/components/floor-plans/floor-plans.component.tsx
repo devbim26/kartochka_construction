@@ -14,6 +14,7 @@ import {
 	deleteReportFloorInfo,
 	getReportFloorById,
 	getReportSingleById,
+	reportReceiveSingle,
 	updateReportFloorInfo,
 	uploadDocument,
 } from '@features/constructor/services';
@@ -1008,7 +1009,38 @@ export const FloorPlans = memoize(() => {
 				</div>
 
 				<Button
-					onClick={() =>
+					onClick={() => {
+						if (!reportId) return;
+
+						if (reportType === ReportCategory.Single) {
+							dispatch(startLoading());
+							from(reportReceiveSingle(reportId))
+								.pipe(
+									catchError((error) => {
+										if (error instanceof AxiosError) {
+											toast.error(
+												error.response?.data || t('errors.request'),
+											);
+										} else {
+											toast.error(t('errors.request'));
+										}
+										return of(null);
+									}),
+									finalize(() => dispatch(stopLoading())),
+								)
+								.subscribe((response) => {
+									if (response?.status !== 200) return;
+									if (typeof response.data === 'string' && response.data) {
+										const link = document.createElement('a');
+										link.href = response.data;
+										document.body.appendChild(link);
+										link.click();
+										document.body.removeChild(link);
+									}
+								});
+							return;
+						}
+
 						navigate(
 							APP_ROUTES.designing.route +
 								'/' +
@@ -1016,11 +1048,11 @@ export const FloorPlans = memoize(() => {
 								'/' +
 								CONSTRUCTOR_ROUTES.reportForm.route,
 							{
-								reportId: search.get('reportId')!,
+								reportId,
 								reportType: search.get('reportType')!,
 							},
-						)
-					}
+						);
+					}}
 					variant="primary"
 					className="h-[50px] self-end text-[20px]"
 				>
