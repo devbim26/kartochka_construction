@@ -18,4 +18,6 @@ export type ConstructionSheet = {
 	additionalDoors?: AdditionalOpeningRow[];
 	/** Строка-заглушка (демо для заказчика) */
 	isStub?: boolean;
+	/** Демо-строка помещения: доступна кнопка «Проектирование» с режимом помещения */
+	isRoomDesignStub?: boolean;
 };

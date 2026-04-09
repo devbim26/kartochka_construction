@@ -41,6 +41,7 @@ const constructionTypeColors: Record<string, { fill: string; stroke: string }> =
 		fill: 'rgba(0, 150, 136, 0.28)',
 		stroke: '#006B62',
 	},
+	ZPanel: { fill: 'rgba(63, 81, 181, 0.28)', stroke: '#303F9F' },
 	OneFramePartition: { fill: 'rgba(229, 57, 53, 0.25)', stroke: '#B02421' },
 	TwoFramePartition: { fill: 'rgba(156, 39, 176, 0.25)', stroke: '#7B1FA2' },
 	HeavySingleWallFacing: { fill: 'rgba(84, 110, 122, 0.25)', stroke: '#37474F' },

@@ -5,6 +5,7 @@ import {
 	Input,
 	Select,
 	Switch,
+	useI18n,
 } from '@core';
 import {
 	ConstructionsEditFieldNames,
@@ -14,6 +15,7 @@ import {
 import { convertToClientIssuerData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
+	EnConstructionTypesSelectValues,
 	Guidebooks,
 	RuConstructionTypesSelectValues,
 	RuCountryNamesSelectValues,
@@ -22,6 +24,7 @@ import {
 	type ConstructionsEditData,
 	type ConstructionTypeEnum,
 	type Issuer,
+	isZPanelGuidebookConstructionType,
 } from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -31,10 +34,23 @@ import { FormSubTitle } from '../../form-sub-title.component';
 
 export const ConstructionsEdit = () => {
 	const form = useFormContext<ConstructionsEditData>();
+	const { t, locale } = useI18n();
+	const constructionTypeOptions =
+		locale === 'en' ? EnConstructionTypesSelectValues : RuConstructionTypesSelectValues;
 	const { formState, control, watch, setValue, register } = form;
+
+	const issuerErrorMessage = formState.errors.issuer?.message;
+	const issuerLabel =
+		issuerErrorMessage === 'guides.constructions.zPanelRequiresBrandIssuer'
+			? t('guides.constructions.zPanelRequiresBrandIssuer')
+			: issuerErrorMessage || 'Производитель';
 	const [displayChars, setDisplayChars] = useState(false);
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionTypeObject.constructionTypeEnum');
+	const constructionTypeField = watch('constructionType');
+	const showZPanelGuidebookHint =
+		!displayChars &&
+		isZPanelGuidebookConstructionType(constructionTypeField || currentConstruction);
 
 	const handleGetIssuerData = useCallback(async () => {
 		try {
@@ -184,16 +200,23 @@ export const ConstructionsEdit = () => {
 									{...field}
 									value={field.value || ''}
 									options={convertToSelectValues(issuers) ?? []}
-									error={formState.errors.issuer?.message}
+									error={issuerErrorMessage}
 									labelClassName={twMerge(
 										'text-sm leading-5 tracking-[0.1px]',
-										formState.errors.issuer?.message ? 'text-error' : '',
+										issuerErrorMessage ? 'text-error' : '',
 									)}
 									wrapperClassname="w-[226px] ring-input-border-primary"
 									buttonClassName="text-sm rounded-[8px]"
-									label={formState.errors.issuer?.message || 'Производитель'}
+									label={issuerLabel}
 									placeholder="Выберите производителя"
 									isSearchable
+									onChange={(value: string) => {
+										field.onChange(value);
+										const selected = issuers.find((i) => i.id === value);
+										setValue('issuerName', selected?.name ?? '', {
+											shouldValidate: true,
+										});
+									}}
 								/>
 							)}
 						/>
@@ -356,7 +379,7 @@ export const ConstructionsEdit = () => {
 											currentForm: form,
 										}).action();
 								}}
-								options={RuConstructionTypesSelectValues}
+								options={constructionTypeOptions}
 								error={formState.errors.constructionType?.message}
 								labelClassName={twMerge(
 									'text-sm leading-5 tracking-[0.1px]',
@@ -369,6 +392,11 @@ export const ConstructionsEdit = () => {
 							/>
 						)}
 					/>
+					{showZPanelGuidebookHint && (
+						<p className="max-w-[720px] font-sans text-sm leading-5 text-gray-600">
+							{t('guides.constructions.zPanelGuidebookHint')}
+						</p>
+					)}
 					{currentConstruction ? (
 						ConstructionTypeMap({
 							currentConstruction: currentConstruction as ConstructionTypeEnum,

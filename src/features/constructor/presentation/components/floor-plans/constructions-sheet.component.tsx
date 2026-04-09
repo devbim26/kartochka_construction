@@ -12,7 +12,12 @@ import {
 	useAppNavigate,
 	useI18n,
 } from '@core';
-import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
+import {
+	CONSTRUCTOR_ROUTES,
+	DESIGNING_CONTEXT_ROOM_VALUE,
+	DESIGNING_CONTEXT_SEARCH_PARAM,
+	ROOM_DESIGN_STUB_CONSTRUCTION_HEADER_ID,
+} from '@features/constructor/constants';
 import { ReportCategory } from '@features/constructor/types';
 import type {
 	AdditionalOpeningRow,
@@ -206,7 +211,51 @@ export const ConstructionSheets = ({ constructionSheets, tableVariant = 'default
 			accessorKey: 'actions',
 			header: () => <SimpleTableHeaderCell text={t('constructionSheets.actions')} />,
 			cell: (info) => {
-				if (info.row.original.isStub) {
+				const row = info.row.original;
+				if (row.isRoomDesignStub) {
+					const reportFloorInfoId =
+						row.reportFloorInfoId || search.get('reportFloorInfoId') || '';
+					return (
+						<SimpleTableCell
+							content={
+								<div className="flex w-full flex-col gap-5">
+									<div className="flex flex-col items-center gap-[5px] text-[20px]">
+										<div className="flex w-full items-center gap-[10px]">
+											<Button
+												variant="primary"
+												onClick={() =>
+													navigate(
+														APP_ROUTES.designing.route +
+															'/' +
+															DESIGNING_ROUTES.constructor.route +
+															'/' +
+															CONSTRUCTOR_ROUTES.designing.route,
+														{
+															reportId: search.get('reportId')!,
+															reportType: search.get('reportType')!,
+															constructionHeaderId:
+																ROOM_DESIGN_STUB_CONSTRUCTION_HEADER_ID,
+															reportFloorInfoId,
+															[DESIGNING_CONTEXT_SEARCH_PARAM]:
+																DESIGNING_CONTEXT_ROOM_VALUE,
+														},
+													)
+												}
+												className="h-[50px] w-[250px] p-[6px] text-[20px]"
+											>
+												{t('constructionSheets.designing')}
+											</Button>{' '}
+											<p className="text-[15px] font-semibold text-input-label-primary">
+												{t('constructionSheets.designingHint')}
+											</p>
+										</div>
+									</div>
+								</div>
+							}
+						/>
+					);
+				}
+				if (row.isStub) {
 					return (
 						<SimpleTableCell
 							content={

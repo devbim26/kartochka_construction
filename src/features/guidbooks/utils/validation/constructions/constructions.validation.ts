@@ -1,4 +1,28 @@
+import { ZPanelConstructionTypeValues } from '@features/guidbooks/types';
 import { z } from 'zod';
+
+const Z_PANEL_CONSTRUCTION_TYPES = new Set<string>(ZPanelConstructionTypeValues);
+
+const isGeneralIssuerName = (name?: string | null) => {
+	const n = (name ?? '').trim().toLowerCase();
+	return n === 'общий' || n === 'general';
+};
+
+const zPanelRequiresBrandIssuerRefine = (
+	data: { constructionType: string; issuerName?: string | null },
+	ctx: z.RefinementCtx,
+) => {
+	if (!Z_PANEL_CONSTRUCTION_TYPES.has(data.constructionType)) {
+		return;
+	}
+	if (isGeneralIssuerName(data.issuerName)) {
+		ctx.addIssue({
+			code: z.ZodIssueCode.custom,
+			message: 'guides.constructions.zPanelRequiresBrandIssuer',
+			path: ['issuer'],
+		});
+	}
+};
 
 export const ConstructionsFilterSchema = z.object({
 	name: z.string(),
@@ -42,7 +66,7 @@ export const ConstructionTypeShema = z.object({
 
 export type ConstructionTypeSchemaType = z.infer<typeof ConstructionTypeShema>;
 
-export const ConstructionsAddSchema = z.object({
+const constructionsAddShape = z.object({
 	id: z.string().optional(),
 	name: z.string().optional().nullable(),
 	description: z.string().min(1, 'validation.required'),
@@ -83,12 +107,18 @@ export const ConstructionsAddSchema = z.object({
 	reportInfoId: z.string().optional(),
 });
 
-export const ConstructionsEditSchema = ConstructionsAddSchema.merge(
-	z.object({
-		RCalcs: z.string().min(1, 'validation.required'),
-		estimatedIndexValue: z.string().min(1, 'validation.required'),
-	}),
+export const ConstructionsAddSchema = constructionsAddShape.superRefine(
+	zPanelRequiresBrandIssuerRefine,
 );
+
+export const ConstructionsEditSchema = constructionsAddShape
+	.merge(
+		z.object({
+			RCalcs: z.string().min(1, 'validation.required'),
+			estimatedIndexValue: z.string().min(1, 'validation.required'),
+		}),
+	)
+	.superRefine(zPanelRequiresBrandIssuerRefine);
 
 export type ConstructionsAddSchemaType = z.infer<typeof ConstructionsAddSchema>;
 export type ConstructionsEditSchemaType = z.infer<typeof ConstructionsEditSchema>;

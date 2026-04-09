@@ -96,6 +96,7 @@ export const ConstructionsAddConfig: EntityConfig = {
 		country: [],
 		constructionType: '',
 		issuer: '',
+		issuerName: '',
 		maxHeight: '',
 		fireResistance: '',
 		propertySource: '',

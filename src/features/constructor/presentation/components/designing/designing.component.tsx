@@ -18,6 +18,10 @@ import {
 	stopLoading,
 } from '@features';
 import {
+	DESIGNING_CONTEXT_ROOM_VALUE,
+	DESIGNING_CONTEXT_SEARCH_PARAM,
+} from '@features/constructor/constants';
+import {
 	convertToClientFloorConstruction,
 	convertToClientReportInfoShort,
 	convertToClientSingleToFloorConstruction,
@@ -59,9 +63,15 @@ import {
 	type AdditionalOpeningsFormHandle,
 } from './additional-openings-form.component';
 import DesigningGraph from './designing-graph.component';
+import { DesigningRoomStubScreen } from './designing-room-stub.component';
 import { SelectableMaterialDesignationProvider } from '@features/guidbooks/presentation/components/header/forms/constructions/construction-material-types/selectable-material-designation.context';
 
-const DesigningScreen = () => {
+const isGeneralReferenceIssuer = (issuerName?: string | null) => {
+	const n = (issuerName ?? '').trim().toLowerCase();
+	return n === 'общий' || n === 'general';
+};
+
+const DesigningConstructionScreen = () => {
 	const dispatch = useAppDispatch();
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
@@ -91,6 +101,11 @@ const DesigningScreen = () => {
 		defaultValues: DesigningConfig.defaultValues,
 		mode: 'onSubmit',
 	});
+
+	const isConstructionEditLocked = useMemo(
+		() => isGeneralReferenceIssuer(constructionHeader?.issuerName),
+		[constructionHeader?.issuerName],
+	);
 
 	const constructionType = useMemo(() => {
 		return (form.watch('constructionTypeObject.constructionTypeEnum') ||
@@ -332,8 +347,57 @@ const DesigningScreen = () => {
 		handleGetConstructionImage(constructionHeaderId);
 	}, [constructionHeaderId, handleGetConstructionImage]);
 
+	const saveAdditionalOpeningsOnly = useCallback(
+		(onSuccess?: () => void) => {
+			const rcId = reportConstructionIdRef.current;
+			const openings = additionalOpeningsRef.current;
+			if (!rcId || !openings) {
+				toast.info(t('constructor.designing.generalIssuerReadOnly'));
+				return;
+			}
+			const { windows, doors } = openings.getPayload();
+			from(
+				updateReportConstructionAdditional({
+					reportConstructionId: rcId,
+					additionalWindows: mapAdditionalOpeningsToUpdateDto(windows),
+					additionalDoors: mapAdditionalOpeningsToUpdateDto(doors),
+				}),
+			)
+				.pipe(
+					catchError((error) => {
+						if (error instanceof AxiosError) {
+							const message =
+								typeof error.response?.data === 'string'
+									? error.response.data
+									: error.response?.data?.title || t('errors.request');
+							toast.error(message);
+						} else {
+							toast.error(t('errors.request'));
+						}
+						return of(null);
+					}),
+				)
+				.subscribe((addRes) => {
+					if (addRes?.status !== 200) {
+						return;
+					}
+					toast.success(t('constructor.designing.openingsSaved'));
+					if (reportType === ReportCategory.Single && reportId) {
+						handleGetSingleConstruction(reportId);
+					} else if (reportFloorInfoId) {
+						handleGetCurrentConstructionReportHeader(reportFloorInfoId);
+					}
+					onSuccess?.();
+				});
+		},
+		[handleGetCurrentConstructionReportHeader, reportFloorInfoId, reportId, reportType, t],
+	);
+
 	const handleConstructionTypeChange = useCallback(
 		(value: string) => {
+			if (isConstructionEditLocked) {
+				return;
+			}
 			const constructionType = value as ConstructionTypeEnum;
 
 			form.setValue('constructionTypeObject.constructionTypeEnum', constructionType);
@@ -378,10 +442,14 @@ const DesigningScreen = () => {
 				handleGetConstructionImage(constructionHeaderId);
 			}
 		},
-		[form, constructionHeaderId, handleGetConstructionImage],
+		[form, constructionHeaderId, handleGetConstructionImage, isConstructionEditLocked],
 	);
 
 	const onEditHandle = useCallback(() => {
+		if (isConstructionEditLocked) {
+			saveAdditionalOpeningsOnly();
+			return;
+		}
 		const formData = form.getValues() as ConstructionsEditData;
 		const dataForServer = convertToServerConstructionsEditData({
 			...formData,
@@ -464,9 +532,20 @@ const DesigningScreen = () => {
 		reportId,
 		reportType,
 		t,
+		isConstructionEditLocked,
+		saveAdditionalOpeningsOnly,
 	]);
 
 	const onEditHandleWithRedirect = useCallback(() => {
+		if (isConstructionEditLocked) {
+			const goFloorPlans = () =>
+				navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
+					reportId: reportId!,
+					reportType: reportType!,
+				});
+			saveAdditionalOpeningsOnly(goFloorPlans);
+			return;
+		}
 		const formData = form.getValues() as ConstructionsEditData;
 		const dataForServer = convertToServerConstructionsEditData({
 			...formData,
@@ -536,7 +615,16 @@ const DesigningScreen = () => {
 						if (addRes?.status === 200) goFloorPlans();
 					});
 			});
-	}, [form, constructionHeaderId, navigate, reportId, reportType, t]);
+	}, [
+		form,
+		constructionHeaderId,
+		navigate,
+		reportId,
+		reportType,
+		t,
+		isConstructionEditLocked,
+		saveAdditionalOpeningsOnly,
+	]);
 
 	return (
 		<div className="relative flex w-full flex-col gap-[30px]">
@@ -566,6 +654,7 @@ const DesigningScreen = () => {
 						render={({ field }) => (
 							<Select
 								{...field}
+								disabled={isConstructionEditLocked}
 								isSearchable
 								value={field.value || ''}
 								onChange={handleConstructionTypeChange}
@@ -626,7 +715,12 @@ const DesigningScreen = () => {
 				</div>
 			</div>
 			<div className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				{constructionType && (
+				{isConstructionEditLocked && (
+					<p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 font-sans text-sm text-amber-950">
+						{t('constructor.designing.generalIssuerEditHint')}
+					</p>
+				)}
+				{constructionType && !isConstructionEditLocked && (
 					<SelectableMaterialDesignationProvider
 						value={{ showMaterialDesignationInput: true }}
 					>
@@ -750,4 +844,13 @@ const DesigningScreen = () => {
 		</div>
 	);
 };
+
+const DesigningScreen = () => {
+	const [search] = useSearchParams();
+	if (search.get(DESIGNING_CONTEXT_SEARCH_PARAM) === DESIGNING_CONTEXT_ROOM_VALUE) {
+		return <DesigningRoomStubScreen />;
+	}
+	return <DesigningConstructionScreen />;
+};
+
 export default DesigningScreen;

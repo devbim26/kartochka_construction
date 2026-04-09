@@ -1,5 +1,8 @@
 import { APP_ROUTES, Button, useAppNavigate, useI18n } from '@core';
-import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
+import {
+	CONSTRUCTOR_ROUTES,
+	DESIGNING_CONTEXT_SEARCH_PARAM,
+} from '@features/constructor/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
@@ -11,6 +14,17 @@ export const DesigningHeader = () => {
 	const { t } = useI18n();
 
 	const isActive = (route: string) => location.pathname.endsWith(route);
+
+	const designingNavParams = () => {
+		const ctx = search.get(DESIGNING_CONTEXT_SEARCH_PARAM);
+		return {
+			reportId: search.get('reportId')!,
+			reportType: search.get('reportType')!,
+			constructionHeaderId: search.get('constructionHeaderId')!,
+			reportFloorInfoId: search.get('reportFloorInfoId')!,
+			...(ctx ? { [DESIGNING_CONTEXT_SEARCH_PARAM]: ctx } : {}),
+		};
+	};
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
@@ -32,12 +46,7 @@ export const DesigningHeader = () => {
 								DESIGNING_ROUTES.constructor.route +
 								'/' +
 								CONSTRUCTOR_ROUTES.designing.route,
-							{
-								reportId: search.get('reportId')!,
-								reportType: search.get('reportType')!,
-								constructionHeaderId: search.get('constructionHeaderId')!,
-								reportFloorInfoId: search.get('reportFloorInfoId')!,
-							},
+							designingNavParams(),
 						)
 					}
 				>
@@ -57,12 +66,7 @@ export const DesigningHeader = () => {
 								DESIGNING_ROUTES.constructor.route +
 								'/' +
 								CONSTRUCTOR_ROUTES.myConstructions.route,
-							{
-								reportId: search.get('reportId')!,
-								reportType: search.get('reportType')!,
-								constructionHeaderId: search.get('constructionHeaderId')!,
-								reportFloorInfoId: search.get('reportFloorInfoId')!,
-							},
+							designingNavParams(),
 						)
 					}
 				>

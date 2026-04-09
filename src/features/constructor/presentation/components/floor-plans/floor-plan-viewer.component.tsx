@@ -59,13 +59,19 @@ export const FloorPlanViewer = ({
 	// Внутреннее состояние для количества страниц (только для чтения)
 	const [numPages, setNumPages] = useState(0);
 	const [scale, setScale] = useState(1.5);
-	const [firstPoint, setFirstPoint] = useState<{ x: number; y: number } | null>(null);
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
 	const dispatch = useAppDispatch();
 
 	const previousConstructionRef = useRef<FloorConstruction | null>(null);
 	const hoveredConstructionIdRef = useRef<string | null>(null);
+	const isMarqueeDraggingRef = useRef(false);
+	const marqueeStartRef = useRef<{ x: number; y: number } | null>(null);
+	const marqueeEndRef = useRef<{ x: number; y: number } | null>(null);
+	const marqueeWindowHandlersRef = useRef<{
+		move: (e: MouseEvent) => void;
+		up: (e: MouseEvent) => void;
+	} | null>(null);
 	const renderJobRef = useRef(0);
 	const imageUploadInFlightRef = useRef<Set<string>>(new Set());
 	const imageUploadFailedAtRef = useRef<Map<string, number>>(new Map());
@@ -90,47 +96,84 @@ export const FloorPlanViewer = ({
 		setNumPages(pdfFile.numPages);
 	}, [pdfFile]);
 
-	const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
-		event.preventDefault();
-		if (search.get('reportType') === 'Floor' && !floorNumber) {
-			toast.error('Сначала выберите уровень');
-			return;
-		}
+	const MIN_MARQUEE_PX = 5;
 
+	const getCanvasPointClamped = (clientX: number, clientY: number) => {
 		const canvas = canvasRef.current;
-		if (!canvas) return;
-
+		if (!canvas) return null;
 		const rect = canvas.getBoundingClientRect();
-		const x = event.clientX - rect.left;
-		const y = event.clientY - rect.top;
-		const normalizedX = +(x / scale).toString();
-		const normalizedY = +(y / scale).toString();
+		const x = Math.min(Math.max(clientX - rect.left, 0), canvas.width);
+		const y = Math.min(Math.max(clientY - rect.top, 0), canvas.height);
+		return { x, y };
+	};
 
-		if (explantationTab === 'rooms') {
-			dispatch(constructorSlice.actions.setFile({ image: canvas.toDataURL('image/png') }));
-			navigate('', {
-				addRoom: 'true',
-				reportId: search.get('reportId')!.toString(),
-				reportType: search.get('reportType')!.toString(),
-				layerId: floorId || '',
-				floorNumber: floorNumber || '',
-				page: currentPage.toString(),
-			});
-			setFirstPoint(null);
+	const detachMarqueeWindowListeners = () => {
+		const h = marqueeWindowHandlersRef.current;
+		if (!h) return;
+		window.removeEventListener('mousemove', h.move);
+		window.removeEventListener('mouseup', h.up);
+		marqueeWindowHandlersRef.current = null;
+	};
+
+	const syncOverlay = () => {
+		const overlayCanvas = overlayCanvasRef.current;
+		const canvas = canvasRef.current;
+		if (!overlayCanvas || !canvas) return;
+		const overlayContext = overlayCanvas.getContext('2d');
+		if (!overlayContext) return;
+
+		overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+		if (
+			isMarqueeDraggingRef.current &&
+			marqueeStartRef.current &&
+			marqueeEndRef.current
+		) {
+			const a = marqueeStartRef.current;
+			const b = marqueeEndRef.current;
+			const left = Math.min(a.x, b.x);
+			const top = Math.min(a.y, b.y);
+			const w = Math.abs(b.x - a.x);
+			const h = Math.abs(b.y - a.y);
+			if (w > 0 && h > 0) {
+				overlayContext.fillStyle = 'rgba(37, 99, 235, 0.14)';
+				overlayContext.strokeStyle = 'rgb(59, 130, 246)';
+				overlayContext.lineWidth = 2;
+				overlayContext.setLineDash([6, 4]);
+				overlayContext.fillRect(left, top, w, h);
+				overlayContext.strokeRect(left, top, w, h);
+				overlayContext.setLineDash([]);
+			}
 			return;
 		}
 
-		if (!firstPoint) {
-			setFirstPoint({ x: normalizedX, y: normalizedY });
-			toast.info('Выбрана первая точка. Укажите вторую точку.');
-			return;
-		}
+		const hoveredId = hoveredConstructionIdRef.current;
+		if (!hoveredId) return;
+		const hoveredItem =
+			constructionsOnPageRef.current.find((i) => i.construction.id === hoveredId) || null;
+		if (!hoveredItem) return;
 
+		drawConstructionLabelOnCanvas(
+			overlayCanvas,
+			hoveredItem.construction,
+			scale,
+			hoveredItem.header?.constructionType as ConstructionTypeEnum,
+			hoveredItem.header?.name || 'Placeholder',
+			constructionLabels,
+		);
+	};
+
+	const tryOpenCreateConstruction = (
+		normalizedX1: number,
+		normalizedY1: number,
+		normalizedX2: number,
+		normalizedY2: number,
+	) => {
 		const newRect = {
-			left: Math.min(firstPoint.x, normalizedX),
-			top: Math.min(firstPoint.y, normalizedY),
-			right: Math.max(firstPoint.x, normalizedX),
-			bottom: Math.max(firstPoint.y, normalizedY),
+			left: Math.min(normalizedX1, normalizedX2),
+			top: Math.min(normalizedY1, normalizedY2),
+			right: Math.max(normalizedX1, normalizedX2),
+			bottom: Math.max(normalizedY1, normalizedY2),
 		};
 		const intersectsExisting = currentConstructions
 			.filter((construction) => construction.page === currentPage)
@@ -157,10 +200,12 @@ export const FloorPlanViewer = ({
 			});
 
 		if (intersectsExisting) {
-			toast.error('Нельзя накладывать одну конструкцию на другую');
-			setFirstPoint(null);
+			toast.error(t('floorPlanViewer.overlapError'));
 			return;
 		}
+
+		const canvas = canvasRef.current;
+		if (!canvas) return;
 
 		dispatch(constructorSlice.actions.setFile({ image: canvas.toDataURL('image/png') }));
 		navigate('', {
@@ -169,41 +214,143 @@ export const FloorPlanViewer = ({
 			reportType: search.get('reportType')!.toString(),
 			layerId: floorId || '',
 			floorNumber: floorNumber || '',
-			x: firstPoint.x.toString(),
-			y: firstPoint.y.toString(),
-			x2: normalizedX.toString(),
-			y2: normalizedY.toString(),
-			page: currentPage.toString(), // используем пропс
+			x: newRect.left.toString(),
+			y: newRect.top.toString(),
+			x2: newRect.right.toString(),
+			y2: newRect.bottom.toString(),
+			page: currentPage.toString(),
 			floorPlanTab: explantationTab === 'floors' ? 'floors' : 'walls',
 		});
-		setFirstPoint(null);
 	};
 
-	const drawHoveredLabelOnOverlay = (
-		hoveredItem: {
-			construction: FloorConstruction;
-			header?: ConstructionsEditData;
-		} | null,
-	) => {
-		const overlayCanvas = overlayCanvasRef.current;
-		if (!overlayCanvas) return;
-		const overlayContext = overlayCanvas.getContext('2d');
-		if (!overlayContext) return;
+	const cancelMarqueeWithoutCreate = () => {
+		if (!isMarqueeDraggingRef.current) return;
+		detachMarqueeWindowListeners();
+		isMarqueeDraggingRef.current = false;
+		marqueeStartRef.current = null;
+		marqueeEndRef.current = null;
+		syncOverlay();
+	};
 
-		overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-		if (!hoveredItem) return;
+	const finishMarqueeSelection = (event: MouseEvent) => {
+		if (!isMarqueeDraggingRef.current) return;
 
-		drawConstructionLabelOnCanvas(
-			overlayCanvas,
-			hoveredItem.construction,
-			scale,
-			hoveredItem.header?.constructionType as ConstructionTypeEnum,
-			hoveredItem.header?.name || 'Placeholder',
-			constructionLabels,
-		);
+		/* Только отпускание ЛКМ завершает выделение; ПКМ/средняя — отмена (иначе modal откроется на mouseup button=2). */
+		if (event.button !== 0) {
+			cancelMarqueeWithoutCreate();
+			return;
+		}
+
+		detachMarqueeWindowListeners();
+		isMarqueeDraggingRef.current = false;
+
+		const canvas = canvasRef.current;
+		const start = marqueeStartRef.current;
+		const end = getCanvasPointClamped(event.clientX, event.clientY);
+		marqueeStartRef.current = null;
+		marqueeEndRef.current = null;
+
+		if (!canvas || !start || !end) {
+			syncOverlay();
+			return;
+		}
+
+		const wPx = Math.abs(end.x - start.x);
+		const hPx = Math.abs(end.y - start.y);
+		if (wPx < MIN_MARQUEE_PX || hPx < MIN_MARQUEE_PX) {
+			syncOverlay();
+			return;
+		}
+
+		const nx1 = +(Math.min(start.x, end.x) / scale).toString();
+		const ny1 = +(Math.min(start.y, end.y) / scale).toString();
+		const nx2 = +(Math.max(start.x, end.x) / scale).toString();
+		const ny2 = +(Math.max(start.y, end.y) / scale).toString();
+
+		tryOpenCreateConstruction(nx1, ny1, nx2, ny2);
+		syncOverlay();
+	};
+
+	const handleCanvasMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
+		/* ПКМ в начале жеста — сразу отменить рамку (до contextmenu / chord с ЛКМ). */
+		if (event.button === 2) {
+			if (isMarqueeDraggingRef.current) {
+				event.preventDefault();
+				cancelMarqueeWithoutCreate();
+				toast.info(t('floorPlanViewer.selectionCancelled'));
+			}
+			return;
+		}
+
+		if (event.button !== 0) return;
+		if (explantationTab === 'rooms') return;
+
+		if (search.get('reportType') === 'Floor' && !floorNumber) {
+			toast.error(t('floorPlanViewer.selectLevelFirst'));
+			return;
+		}
+
+		const p = getCanvasPointClamped(event.clientX, event.clientY);
+		if (!p) return;
+
+		event.preventDefault();
+		isMarqueeDraggingRef.current = true;
+		marqueeStartRef.current = p;
+		marqueeEndRef.current = p;
+		hoveredConstructionIdRef.current = null;
+		syncOverlay();
+
+		const onMove = (e: MouseEvent) => {
+			if (!isMarqueeDraggingRef.current) return;
+			const next = getCanvasPointClamped(e.clientX, e.clientY);
+			if (!next) return;
+			marqueeEndRef.current = next;
+			syncOverlay();
+		};
+		const onUp = (e: MouseEvent) => {
+			finishMarqueeSelection(e);
+		};
+
+		marqueeWindowHandlersRef.current = { move: onMove, up: onUp };
+		window.addEventListener('mousemove', onMove);
+		window.addEventListener('mouseup', onUp);
+	};
+
+	const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+		event.preventDefault();
+
+		if (isMarqueeDraggingRef.current) {
+			cancelMarqueeWithoutCreate();
+			toast.info(t('floorPlanViewer.selectionCancelled'));
+			return;
+		}
+
+		if (search.get('reportType') === 'Floor' && !floorNumber) {
+			if (explantationTab === 'rooms') {
+				toast.error(t('floorPlanViewer.selectLevelFirst'));
+			}
+			return;
+		}
+
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+
+		if (explantationTab === 'rooms') {
+			dispatch(constructorSlice.actions.setFile({ image: canvas.toDataURL('image/png') }));
+			navigate('', {
+				addRoom: 'true',
+				reportId: search.get('reportId')!.toString(),
+				reportType: search.get('reportType')!.toString(),
+				layerId: floorId || '',
+				floorNumber: floorNumber || '',
+				page: currentPage.toString(),
+			});
+		}
 	};
 
 	const handleCanvasMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+		if (isMarqueeDraggingRef.current) return;
+
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 
@@ -222,12 +369,13 @@ export const FloorPlanViewer = ({
 		if (hoveredConstructionIdRef.current === nextHoveredId) return;
 
 		hoveredConstructionIdRef.current = nextHoveredId;
-		drawHoveredLabelOnOverlay(hoveredItem);
+		syncOverlay();
 	};
 
 	const handleCanvasMouseLeave = () => {
+		if (isMarqueeDraggingRef.current) return;
 		hoveredConstructionIdRef.current = null;
-		drawHoveredLabelOnOverlay(null);
+		syncOverlay();
 	};
 
 	const uploadImageForConstruction = async (
@@ -429,13 +577,26 @@ export const FloorPlanViewer = ({
 	]);
 
 	useEffect(() => {
-		setFirstPoint(null);
+		detachMarqueeWindowListeners();
+		isMarqueeDraggingRef.current = false;
+		marqueeStartRef.current = null;
+		marqueeEndRef.current = null;
+		hoveredConstructionIdRef.current = null;
+		const overlay = overlayCanvasRef.current;
+		const ctx = overlay?.getContext('2d');
+		if (overlay && ctx) {
+			ctx.clearRect(0, 0, overlay.width, overlay.height);
+		}
 	}, [currentPage, search.get('create')]);
 
 	useEffect(() => {
 		hoveredConstructionIdRef.current = null;
 		constructionsOnPageRef.current = [];
 	}, [currentPage, currentConstructions]);
+
+	useEffect(() => {
+		return () => detachMarqueeWindowListeners();
+	}, []);
 
 	return (
 		<div className="flex items-center justify-center rounded-[20px] py-[30px]">
@@ -448,6 +609,7 @@ export const FloorPlanViewer = ({
 					)}
 					<canvas
 						ref={canvasRef}
+						onMouseDown={handleCanvasMouseDown}
 						onContextMenu={handleCanvasRightClick}
 						onMouseMove={handleCanvasMouseMove}
 						onMouseLeave={handleCanvasMouseLeave}

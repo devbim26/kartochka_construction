@@ -6,17 +6,14 @@ import {
 	HeavyMultiLayerWallComponent,
 	HeavyMultiLayerWallFacingBothSideComponent,
 	HeavyMultiLayerWallFacingOneSideComponent,
-	HeavyMultiLayerWallSoundproofBothSideComponent,
-	HeavyMultiLayerWallSoundproofingOneSideComponent,
 	DoorConstructionComponent,
 	HeavySingleLayerWallComponent,
 	HeavySingleLayerWallFacingBothSideComponent,
 	HeavySingleLayerWallFacingOneSideComponent,
-	HeavySingleLayerWallSoundproofingBothSideComponent,
-	HeavySingleLayerWallSoundproofingOneSideComponent,
 	HomogeniusFloorComponent,
 	OneGlassFrameComponent,
 	TwoGlassFrameComponent,
+	ZPanelWallComponent,
 } from '@features';
 import { ConstructionTypeEnum, MaterialTypeEnum } from '@features/guidbooks/types';
 import type { JSX } from 'react';
@@ -32,6 +29,23 @@ export const ConstructionTypeMap = ({
 	currentForm,
 }: ConstructionTypeMapProps) => {
 	const { setValue } = currentForm;
+
+	const applyZPanelWallFormDefaults = (enumValue: ConstructionTypeEnum) => {
+		setValue('constructionTypeObject.constructionTypeEnum', enumValue);
+		setValue('constructionTypeObject.centerConstruction', [
+			{
+				positionId: '2',
+				materialId: '',
+				materialType: MaterialTypeEnum.Heavy,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.Thickness, value: '' },
+					{ materialParameters: MaterialParametrs.Density, value: '' },
+				],
+			},
+		]);
+		setValue('constructionTypeObject.leftConstruction', []);
+		setValue('constructionTypeObject.rightConstruction', []);
+	};
 
 	const typeMap: Record<
 		ConstructionTypeEnum,
@@ -421,115 +435,23 @@ export const ConstructionTypeMap = ({
 		},
 
 		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide]: {
-			component: (
-				<HeavySingleLayerWallSoundproofingOneSideComponent currentForm={currentForm} />
-			),
-			action: () => {
-				setValue(
-					'constructionTypeObject.constructionTypeEnum',
+			component: <ZPanelWallComponent currentForm={currentForm} />,
+			action: () =>
+				applyZPanelWallFormDefaults(
 					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide,
-				);
-
-				setValue('constructionTypeObject.centerConstruction', [
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
-
-				setValue('constructionTypeObject.rightConstruction', [
-					{
-						positionId: '0',
-						materialId: '',
-						materialType: MaterialTypeEnum.ZPanel,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
-
-				setValue('constructionTypeObject.leftConstruction', []);
-			},
+				),
 		},
 		[ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]: {
-			component: (
-				<HeavySingleLayerWallSoundproofingBothSideComponent currentForm={currentForm} />
-			),
-			action: () => {
-				setValue(
-					'constructionTypeObject.constructionTypeEnum',
+			component: <ZPanelWallComponent currentForm={currentForm} />,
+			action: () =>
+				applyZPanelWallFormDefaults(
 					ConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide,
-				);
+				),
+		},
 
-				setValue('constructionTypeObject.leftConstruction', [
-					{
-						positionId: '0',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.ZPanel,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
-							{ materialParameters: MaterialParametrs.RackStep, value: '' },
-						],
-					},
-				]);
-
-				setValue('constructionTypeObject.centerConstruction', [
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
-
-				setValue('constructionTypeObject.rightConstruction', [
-					{
-						positionId: '0',
-						materialId: '',
-						materialType: MaterialTypeEnum.ZPanel,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
-							{ materialParameters: MaterialParametrs.RackStep, value: '' },
-						],
-					},
-				]);
-			},
+		[ConstructionTypeEnum.ZPanel]: {
+			component: <ZPanelWallComponent currentForm={currentForm} />,
+			action: () => applyZPanelWallFormDefaults(ConstructionTypeEnum.ZPanel),
 		},
 
 		[ConstructionTypeEnum.HeavyMultiLayerWall]: {
@@ -841,16 +763,23 @@ export const ConstructionTypeMap = ({
 		},
 
 		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide]: {
-			component: (
-				<HeavyMultiLayerWallSoundproofingOneSideComponent currentForm={currentForm} />
-			),
+			component: <HeavyMultiLayerWallComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
+				setValue('constructionTypeObject.centerConstruction', [
+					{
+						positionId: '1',
+						materialId: '',
+						materialType: MaterialTypeEnum.Plaster,
+						materialTypeValue: [
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
+						],
+					},
 					{
 						positionId: '2',
 						materialId: '',
@@ -863,7 +792,7 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '3',
 						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
+						materialType: MaterialTypeEnum.Board,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -872,37 +801,16 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '4',
 						materialId: '',
-						materialType: MaterialTypeEnum.Link,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-						],
-					},
-					{
-						positionId: '5',
-						materialId: '',
 						materialType: MaterialTypeEnum.Heavy,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
-				]);
-
-				setValue('constructionTypeObject.centerConstruction', [
 					{
-						positionId: '0',
+						positionId: '5',
 						materialId: '',
-						materialType: MaterialTypeEnum.ZPanel,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
+						materialType: MaterialTypeEnum.Plaster,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -910,40 +818,29 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
+				setValue('constructionTypeObject.leftConstruction', []);
 				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
 
 		[ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide]: {
-			component: <HeavyMultiLayerWallSoundproofBothSideComponent currentForm={currentForm} />,
+			component: <HeavyMultiLayerWallComponent currentForm={currentForm} />,
 			action: () => {
 				setValue(
 					'constructionTypeObject.constructionTypeEnum',
 					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
-					{
-						positionId: '0',
-						materialId: '',
-						materialType: MaterialTypeEnum.ZPanel,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
+				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '1',
 						materialId: '',
-						materialType: MaterialTypeEnum.Board,
+						materialType: MaterialTypeEnum.Plaster,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
-				]);
-
-				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
 						materialId: '',
@@ -956,7 +853,7 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '3',
 						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
+						materialType: MaterialTypeEnum.Board,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -965,16 +862,16 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '4',
 						materialId: '',
-						materialType: MaterialTypeEnum.Link,
+						materialType: MaterialTypeEnum.Heavy,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
 						positionId: '5',
 						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
+						materialType: MaterialTypeEnum.Plaster,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -982,26 +879,8 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.rightConstruction', [
-					{
-						positionId: '0',
-						materialId: '',
-						materialType: MaterialTypeEnum.ZPanel,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
+				setValue('constructionTypeObject.leftConstruction', []);
+				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
 

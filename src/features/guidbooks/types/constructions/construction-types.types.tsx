@@ -49,6 +49,8 @@ export enum ConstructionTypeEnum {
 	HeavyMultiLayerWallFacingBothSide = 'HeavyMultiLayerWallFacingBothSide',
 	HeavyMultiLayerWallSoundproofingOneSide = 'HeavyMultiLayerWallSoundproofingOneSide',
 	HeavyMultiLayerWallSoundproofingBothSide = 'HeavyMultiLayerWallSoundproofingBothSide',
+	/** ZPanel: центр — тяжёлая однослойная стена; сверху/снизу — панель «плита — плита — заполнитель». */
+	ZPanel = 'ZPanel',
 	OneFramePartition = 'OneFramePartition',
 	TwoFramePartition = 'TwoFramePartition',
 	HeavySingleWallFacing = 'HeavySingleWallFacing',
@@ -59,6 +61,14 @@ export enum ConstructionTypeEnum {
 	ElasticBaseFloor = 'ElasticBaseFloor',
 	Door = 'Door',
 }
+
+/** Тип ZPanel в справочнике (обязателен брендовый производитель, не «Общий»). */
+export const ZPanelConstructionTypeValues: ConstructionTypeEnum[] = [
+	ConstructionTypeEnum.ZPanel,
+];
+
+export const isZPanelGuidebookConstructionType = (value: string | undefined | null): boolean =>
+	Boolean(value && ZPanelConstructionTypeValues.includes(value as ConstructionTypeEnum));
 
 export const RuConstructionTypesMap = {
 	HeavySingleLayerWall: 'Тяжелая однослойная стена',
@@ -75,6 +85,7 @@ export const RuConstructionTypesMap = {
 		'Тяжелая многослойная стена + звукоизоляционная панель с одной стороны',
 	HeavyMultiLayerWallSoundproofingBothSide:
 		'Тяжелая многослойная стена + звукоизоляционная панель с двух сторон',
+	ZPanel: 'ZPanel (тяжелая однослойная стена + звукоизоляционная панель)',
 	OneFramePartition: 'Каркасная перегородка (1 каркас)',
 	TwoFramePartition: 'Каркасная перегородка (2 каркаса)',
 	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
@@ -100,6 +111,7 @@ export const EnConstructionTypesMap = {
 		'Heavy multi-layer wall + soundproofing panel on one side',
 	HeavyMultiLayerWallSoundproofingBothSide:
 		'Heavy multi-layer wall + soundproofing panel on both sides',
+	ZPanel: 'ZPanel (heavy single-layer wall + sound insulation panel)',
 	OneFramePartition: 'Frame partition (1 frame)',
 	TwoFramePartition: 'Frame partition (2 frames)',
 	HeavySingleWallFacing: 'Heavy single-layer wall + facing',
@@ -122,6 +134,10 @@ export const EnConstructionTypesSelectValues = [
 	{
 		label: EnConstructionTypesMap.HeavyMultiLayerWall,
 		value: ConstructionTypeEnum.HeavyMultiLayerWall,
+	},
+	{
+		label: EnConstructionTypesMap.ZPanel,
+		value: ConstructionTypeEnum.ZPanel,
 	},
 	{
 		label: EnConstructionTypesMap.OneFramePartition,
@@ -156,6 +172,10 @@ export const RuConstructionTypesSelectValues = [
 	{
 		label: 'Тяжелая многослойная стена',
 		value: ConstructionTypeEnum.HeavyMultiLayerWall,
+	},
+	{
+		label: RuConstructionTypesMap.ZPanel,
+		value: ConstructionTypeEnum.ZPanel,
 	},
 	{
 		label: 'Каркасная перегородка (1 каркас)',

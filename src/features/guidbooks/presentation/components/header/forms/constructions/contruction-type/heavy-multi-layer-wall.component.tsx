@@ -19,7 +19,7 @@ import type { ConstructionTypeProps } from '@features/guidbooks/types';
 import { MaterialTypeEnum, MaterialTypesSelectValuesEnum } from '@features/guidbooks/types';
 
 import { useConstructionMaterials } from '@features/guidbooks/utils';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, type ComponentType } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
 export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
@@ -27,10 +27,6 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 
 	const [hasLeftCladding, setHasLeftCladding] = useState(false);
 	const [hasRightCladding, setHasRightCladding] = useState(false);
-	const [leftCladdingType, setLeftCladdingType] = useState<'cladding' | 'panel'>('cladding');
-	const [rightCladdingType, setRightCladdingType] = useState<'cladding' | 'panel'>('cladding');
-	const [leftCladdingTitle, setLeftCladdingTitle] = useState('Облицовка');
-	const [rightCladdingTitle, setRightCladdingTitle] = useState('Облицовка');
 
 	const centerMaterials = useConstructionMaterials(control, watch, 'Center');
 	const leftMaterials = useConstructionMaterials(control, watch, 'Left');
@@ -50,10 +46,8 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		...(hasLeftCladding
 			? [
 					{
-						title: leftCladdingTitle,
+						title: 'Облицовка',
 						constructionPosition: 'Left' as const,
-						// Для левой облицовки порядок позиций:
-						// Board 0, Filler 1, Frame 2, Link 3, AirGap 4
 						positions: ['0', '1', '2', '3', '4'],
 						selectable: [],
 						materialType: MaterialTypesSelectValuesEnum.Additional,
@@ -81,10 +75,8 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		...(hasRightCladding
 			? [
 					{
-						title: rightCladdingTitle,
+						title: 'Облицовка',
 						constructionPosition: 'Right' as const,
-						// Для правой облицовки порядок позиций:
-						// AirGap 0, Link 1, Frame 2, Filler 3, Board 4
 						positions: ['0', '1', '2', '3', '4'],
 						selectable: [],
 						materialType: MaterialTypesSelectValuesEnum.Additional,
@@ -100,7 +92,7 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 
 	const materialComponentsMap: Record<
 		'Left' | 'Center' | 'Right',
-		Record<string, React.ComponentType<any>[]>
+		Record<string, ComponentType<any>[]>
 	> = {
 		Center: {
 			'1': [PlasterMaterialType, ThicknessDensityFieldsType],
@@ -110,7 +102,6 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 			'5': [PlasterMaterialType, ThicknessDensityFieldsType],
 		},
 		Left: {
-			// Board 0, Filler 1, Frame 2, Link 3, AirGap 4
 			'0': [BoardMaterialType, ThicknessDensityFieldsType],
 			'1': [FillerMaterialType, ThicknessDensityFieldsType],
 			'2': [FrameMaterialType, WidthRacksStepFieldsType],
@@ -118,7 +109,6 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 			'4': [AirGapMaterialType, ThicknessDensityFieldsType],
 		},
 		Right: {
-			// AirGap 0, Link 1, Frame 2, Filler 3, Board 4
 			'0': [AirGapMaterialType, ThicknessDensityFieldsType],
 			'1': [LinkMaterialType, PointConnectionsFieldsType],
 			'2': [FrameMaterialType, WidthRacksStepFieldsType],
@@ -127,94 +117,55 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		},
 	};
 
-	const addLeftCladding = (type: 'cladding' | 'panel') => {
-		setLeftCladdingTitle(
-			type === 'panel' ? 'Звукоизоляционная панель' : 'Облицовка',
-		);
+	const addLeftCladding = () => {
 		setHasLeftCladding(true);
-		if (type === 'panel') {
-			// ZPanel слева:
-			// Board 0, Board 1, Filler 2
-			setValue('constructionTypeObject.leftConstruction', [
-				{
-					positionId: '0',
-					materialId: '',
-					materialType: MaterialTypeEnum.Board,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-				{
-					positionId: '1',
-					materialId: '',
-					materialType: MaterialTypeEnum.Board,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-				{
-					positionId: '2',
-					materialId: '',
-					materialType: MaterialTypeEnum.Filler,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-			]);
-		} else {
-			// Обычная облицовка слева:
-			// Board 0, Filler 1, Frame 2, Link 3, AirGap 4
-			setValue('constructionTypeObject.leftConstruction', [
-				{
-					positionId: '0',
-					materialId: '',
-					materialType: MaterialTypeEnum.Board,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-				{
-					positionId: '1',
-					materialId: '',
-					materialType: MaterialTypeEnum.Filler,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-				{
-					positionId: '2',
-					materialId: '',
-					materialType: MaterialTypeEnum.Frame,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Width, value: '' },
-						{ materialParameters: MaterialParametrs.RackStep, value: '' },
-					],
-				},
-				{
-					positionId: '3',
-					materialId: '',
-					materialType: MaterialTypeEnum.Link,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-						{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-					],
-				},
-				{
-					positionId: '4',
-					materialId: '',
-					materialType: MaterialTypeEnum.AirGap,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-			]);
-		}
+		setValue('constructionTypeObject.leftConstruction', [
+			{
+				positionId: '0',
+				materialId: '',
+				materialType: MaterialTypeEnum.Board,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.Thickness, value: '' },
+					{ materialParameters: MaterialParametrs.Density, value: '' },
+				],
+			},
+			{
+				positionId: '1',
+				materialId: '',
+				materialType: MaterialTypeEnum.Filler,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.Thickness, value: '' },
+					{ materialParameters: MaterialParametrs.Density, value: '' },
+				],
+			},
+			{
+				positionId: '2',
+				materialId: '',
+				materialType: MaterialTypeEnum.Frame,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.Width, value: '' },
+					{ materialParameters: MaterialParametrs.RackStep, value: '' },
+				],
+			},
+			{
+				positionId: '3',
+				materialId: '',
+				materialType: MaterialTypeEnum.Link,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+					{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
+				],
+			},
+			{
+				positionId: '4',
+				materialId: '',
+				materialType: MaterialTypeEnum.AirGap,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.Thickness, value: '' },
+					{ materialParameters: MaterialParametrs.Density, value: '' },
+				],
+			},
+		]);
 	};
 
 	const removeLeftCladding = () => {
@@ -222,94 +173,55 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		setValue('constructionTypeObject.leftConstruction', []);
 	};
 
-	const addRightCladding = (type: 'cladding' | 'panel') => {
-		setRightCladdingTitle(
-			type === 'panel' ? 'Звукоизоляционная панель' : 'Облицовка',
-		);
+	const addRightCladding = () => {
 		setHasRightCladding(true);
-		if (type === 'panel') {
-			// ZPanel справа:
-			// Filler 0, Board 1, Board 2
-			setValue('constructionTypeObject.rightConstruction', [
-				{
-					positionId: '0',
-					materialId: '',
-					materialType: MaterialTypeEnum.Filler,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-				{
-					positionId: '1',
-					materialId: '',
-					materialType: MaterialTypeEnum.Board,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-				{
-					positionId: '2',
-					materialId: '',
-					materialType: MaterialTypeEnum.Board,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-			]);
-		} else {
-			// Обычная облицовка справа:
-			// AirGap 0, Link 1, Frame 2, Filler 3, Board 4
-			setValue('constructionTypeObject.rightConstruction', [
-				{
-					positionId: '0',
-					materialId: '',
-					materialType: MaterialTypeEnum.AirGap,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-				{
-					positionId: '1',
-					materialId: '',
-					materialType: MaterialTypeEnum.Link,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-						{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-					],
-				},
-				{
-					positionId: '2',
-					materialId: '',
-					materialType: MaterialTypeEnum.Frame,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Width, value: '' },
-						{ materialParameters: MaterialParametrs.RackStep, value: '' },
-					],
-				},
-				{
-					positionId: '3',
-					materialId: '',
-					materialType: MaterialTypeEnum.Filler,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-				{
-					positionId: '4',
-					materialId: '',
-					materialType: MaterialTypeEnum.Board,
-					materialTypeValue: [
-						{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						{ materialParameters: MaterialParametrs.Density, value: '' },
-					],
-				},
-			]);
-		}
+		setValue('constructionTypeObject.rightConstruction', [
+			{
+				positionId: '0',
+				materialId: '',
+				materialType: MaterialTypeEnum.AirGap,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.Thickness, value: '' },
+					{ materialParameters: MaterialParametrs.Density, value: '' },
+				],
+			},
+			{
+				positionId: '1',
+				materialId: '',
+				materialType: MaterialTypeEnum.Link,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+					{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
+				],
+			},
+			{
+				positionId: '2',
+				materialId: '',
+				materialType: MaterialTypeEnum.Frame,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.Width, value: '' },
+					{ materialParameters: MaterialParametrs.RackStep, value: '' },
+				],
+			},
+			{
+				positionId: '3',
+				materialId: '',
+				materialType: MaterialTypeEnum.Filler,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.Thickness, value: '' },
+					{ materialParameters: MaterialParametrs.Density, value: '' },
+				],
+			},
+			{
+				positionId: '4',
+				materialId: '',
+				materialType: MaterialTypeEnum.Board,
+				materialTypeValue: [
+					{ materialParameters: MaterialParametrs.Thickness, value: '' },
+					{ materialParameters: MaterialParametrs.Density, value: '' },
+				],
+			},
+		]);
 	};
 
 	const removeRightCladding = () => {
@@ -367,19 +279,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 				{!hasLeftCladding ? (
 					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
 						<AiOutlinePlusCircle
-							onClick={() => addLeftCladding(leftCladdingType)}
+							onClick={addLeftCladding}
 							className="size-[40px] self-center text-primary"
 						/>
-						<select
-							value={leftCladdingType}
-							onChange={(e) =>
-								setLeftCladdingType(e.target.value === 'panel' ? 'panel' : 'cladding')
-							}
-							className="rounded-md border border-input-border-primary px-2 py-1 text-sm"
-						>
-							<option value="cladding">Облицовка</option>
-							<option value="panel">Звукоизоляционная панель</option>
-						</select>
+						<span className="text-sm text-gray-600">Добавить облицовку слева</span>
 					</div>
 				) : (
 					<div className="flex w-full items-center justify-center gap-[10px]">
@@ -387,9 +290,7 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 							onClick={removeLeftCladding}
 							className="size-[40px] self-center"
 						/>
-						<span className="text-sm text-gray-500">
-							Удалить {leftCladdingTitle.toLowerCase()}
-						</span>
+						<span className="text-sm text-gray-500">Удалить облицовку слева</span>
 					</div>
 				)}
 			</div>
@@ -471,19 +372,10 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 				{!hasRightCladding ? (
 					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
 						<AiOutlinePlusCircle
-							onClick={() => addRightCladding(rightCladdingType)}
+							onClick={addRightCladding}
 							className="size-[40px] self-center text-primary"
 						/>
-						<select
-							value={rightCladdingType}
-							onChange={(e) =>
-								setRightCladdingType(e.target.value === 'panel' ? 'panel' : 'cladding')
-							}
-							className="rounded-md border border-input-border-primary px-2 py-1 text-sm"
-						>
-							<option value="cladding">Облицовка</option>
-							<option value="panel">Звукоизоляционная панель</option>
-						</select>
+						<span className="text-sm text-gray-600">Добавить облицовку справа</span>
 					</div>
 				) : (
 					<div className="flex w-full items-center justify-center gap-[10px]">
@@ -491,9 +383,7 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 							onClick={removeRightCladding}
 							className="size-[40px] self-center"
 						/>
-						<span className="text-sm text-gray-500">
-							Удалить {rightCladdingTitle.toLowerCase()}
-						</span>
+						<span className="text-sm text-gray-500">Удалить облицовку справа</span>
 					</div>
 				)}
 			</div>

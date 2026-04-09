@@ -2,7 +2,7 @@ import { APP_ROUTES, Button, DeleteIcon, DeleteModal, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { useAppDispatch, useAppNavigate, useAppSelector } from '@core/utils';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
+import { CONSTRUCTOR_ROUTES, ROOM_DESIGN_STUB_CONSTRUCTION_HEADER_ID } from '@features/constructor/constants';
 import {
 	convertFloorDataToClientConstructionSheet,
 	convertToClientFloorConstruction,
@@ -683,17 +683,21 @@ export const FloorPlans = memoize(() => {
 				: [];
 		}
 		if (activeExplantationTab === 'rooms') {
+			const roomFloorInfoId =
+				selectedReportFloorInfoId ?? activeLevel?.reportFloorInfoIds?.[0] ?? '';
 			return [
 				{
 					id: 'mock-room-1',
 					isStub: true,
+					isRoomDesignStub: true,
+					reportFloorInfoId: roomFloorInfoId,
 					title: t('floorPlans.roomsTable.stubTitle'),
 					floorPlanImage: '',
 					constructionInfoImage: '',
 					constructionDivide: '—',
 					constructionType: 'RoomA',
 					square: '—',
-					constructionId: 'mock',
+					constructionId: ROOM_DESIGN_STUB_CONSTRUCTION_HEADER_ID,
 					materials: [],
 				},
 			] as ConstructionSheet[];
@@ -712,6 +716,8 @@ export const FloorPlans = memoize(() => {
 		constructionHeadersById,
 		currentReportConstruction,
 		currentConstructionHeader,
+		selectedReportFloorInfoId,
+		activeLevel,
 		t,
 	]);
 
