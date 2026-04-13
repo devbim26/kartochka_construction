@@ -344,10 +344,10 @@ export const en = {
 	'guides.constructions.zPanelGuidebookHint':
 		'Centre: same heavy single-layer wall as the standard type. Above and/or below you can add a sound insulation panel (board — board — fill). Use a brand manufacturer — not «General» (General = read-only reference in projects).',
 	'guides.constructions.zPanelSoundPanelSection': 'Sound insulation panel',
-	'guides.constructions.zPanelAddTop': 'Add sound insulation panel above',
-	'guides.constructions.zPanelRemoveTop': 'Remove upper sound insulation panel',
-	'guides.constructions.zPanelAddBottom': 'Add sound insulation panel below',
-	'guides.constructions.zPanelRemoveBottom': 'Remove lower sound insulation panel',
+	'guides.constructions.zPanelAddTop': 'Add sound insulation panel on the left',
+	'guides.constructions.zPanelRemoveTop': 'Remove left sound insulation panel',
+	'guides.constructions.zPanelAddBottom': 'Add sound insulation panel on the right',
+	'guides.constructions.zPanelRemoveBottom': 'Remove right sound insulation panel',
 	'guides.requirements.addSuccess': 'Requirement created successfully',
 	'guides.requirements.editSuccess': 'Requirement updated successfully',
 	'guides.requirements.deleteSuccess': 'Requirement deleted successfully',
@@ -549,9 +549,9 @@ export const en = {
 	'constructor.designing.labValue': 'Laboratory value',
 	'constructor.designing.allowedValue': 'Allowed value',
 	'constructor.designing.generalIssuerEditHint':
-		'Reference construction (General manufacturer): you cannot change type or layers here. You can still update additional openings and save.',
+		'Brand constructions are read-only in designing: type and layers cannot be changed here. You can still update additional openings and save.',
 	'constructor.designing.generalIssuerReadOnly':
-		'Reference constructions cannot be edited. Add a report construction to save additional openings.',
+		'Brand constructions cannot be edited here. To edit structure, use a reference construction with General issuer.',
 	'constructor.designing.openingsSaved': 'Additional openings saved',
 
 	'constructor.designing.room.title': 'Room',
@@ -1373,10 +1373,10 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.constructions.zPanelGuidebookHint':
 		'По центру — та же тяжёлая однослойная стена, что и у обычного типа. Сверху и/или снизу можно добавить звукоизоляционную панель (плита — плита — заполнитель). Нужен брендовый производитель, не «Общий» (со «Общим» в проектировании не редактируют).',
 	'guides.constructions.zPanelSoundPanelSection': 'Звукоизоляционная панель',
-	'guides.constructions.zPanelAddTop': 'Добавить звукоизоляционную панель сверху',
-	'guides.constructions.zPanelRemoveTop': 'Удалить верхнюю звукоизоляционную панель',
-	'guides.constructions.zPanelAddBottom': 'Добавить звукоизоляционную панель снизу',
-	'guides.constructions.zPanelRemoveBottom': 'Удалить нижнюю звукоизоляционную панель',
+	'guides.constructions.zPanelAddTop': 'Добавить звукоизоляционную панель слева',
+	'guides.constructions.zPanelRemoveTop': 'Удалить левую звукоизоляционную панель',
+	'guides.constructions.zPanelAddBottom': 'Добавить звукоизоляционную панель справа',
+	'guides.constructions.zPanelRemoveBottom': 'Удалить правую звукоизоляционную панель',
 	'guides.requirements.addSuccess': 'Требование успешно добавлено',
 	'guides.requirements.editSuccess': 'Требование успешно отредактировано',
 	'guides.requirements.deleteSuccess': 'Требование успешно удалено',
@@ -1573,9 +1573,9 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.designing.labValue': 'Лабораторное значение',
 	'constructor.designing.allowedValue': 'Допустимое значение',
 	'constructor.designing.generalIssuerEditHint':
-		'Справочная конструкция (производитель «Общий»): тип и состав здесь менять нельзя. Дополнительные проёмы можно изменить и сохранить.',
+		'Брендовые конструкции в проектировании только для чтения: тип и состав здесь менять нельзя. Дополнительные проёмы можно изменить и сохранить.',
 	'constructor.designing.generalIssuerReadOnly':
-		'Справочную конструкцию здесь не редактируют. Чтобы сохранить проёмы, нужна привязка к конструкции в отчёте.',
+		'Брендовые конструкции здесь не редактируют. Для изменения состава используйте справочную конструкцию с производителем «Общий».',
 	'constructor.designing.openingsSaved': 'Дополнительные проёмы сохранены',
 
 	'constructor.designing.room.title': 'Помещение',

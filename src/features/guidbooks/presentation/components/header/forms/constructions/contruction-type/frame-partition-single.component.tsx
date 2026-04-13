@@ -4,10 +4,8 @@ import {
 	ConstructionLayer,
 	FillerMaterialType,
 	FrameMaterialType,
-	GapDistanceMaterialType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
-	ThicknessFieldsType,
 	WidthRacksStepFieldsType,
 } from '@features';
 import { ConstructionFieldsMap } from '@features/guidbooks/constants';
@@ -91,17 +89,6 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 					</>
 				)}
 
-				{positionId === '5' && (
-					<>
-						<GapDistanceMaterialType
-							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
-						/>
-						<ThicknessFieldsType
-							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
-						/>
-					</>
-				)}
-
 				{['0', '1', '7', '8'].includes(positionId) && (
 					<div className="flex gap-[8px]">
 						{ConstructionFieldsMap({
@@ -121,7 +108,7 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 		</div>
 	);
 
-	const positions = ['0', '1', '2', '3', '4', '5', '6', '7', '8'];
+	const positions = ['0', '1', '2', '3', '4', '6', '7', '8'];
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">

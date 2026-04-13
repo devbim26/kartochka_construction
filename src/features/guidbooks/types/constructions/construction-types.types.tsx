@@ -143,6 +143,10 @@ export const EnConstructionTypesSelectValues = [
 		label: EnConstructionTypesMap.OneFramePartition,
 		value: ConstructionTypeEnum.OneFramePartition,
 	},
+	{
+		label: EnConstructionTypesMap.TwoFramePartition,
+		value: ConstructionTypeEnum.TwoFramePartition,
+	},
 	{ label: EnConstructionTypesMap.OneGlassFrame, value: ConstructionTypeEnum.OneGlassFrame },
 	{
 		label: EnConstructionTypesMap.DoubleGlazedFrame,
@@ -181,10 +185,10 @@ export const RuConstructionTypesSelectValues = [
 		label: 'Каркасная перегородка (1 каркас)',
 		value: ConstructionTypeEnum.OneFramePartition,
 	},
-	// {
-	// 	label: 'Каркасная перегородка (2 каркаса)',
-	// 	value: ConstructionTypeEnum.TwoFramePartition,
-	// },
+	{
+		label: 'Каркасная перегородка (2 каркаса)',
+		value: ConstructionTypeEnum.TwoFramePartition,
+	},
 	{
 		label: 'Многослойное стекло',
 		value: ConstructionTypeEnum.OneGlassFrame,

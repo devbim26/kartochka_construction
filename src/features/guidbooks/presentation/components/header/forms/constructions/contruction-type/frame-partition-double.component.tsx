@@ -5,8 +5,6 @@ import {
 	ConstructionLayer,
 	FillerMaterialType,
 	FrameMaterialType,
-	LinkMaterialType,
-	PointConnectionsFieldsType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 	WidthRacksStepFieldsType,
@@ -28,7 +26,7 @@ export const FramePartitionDoubleComponent = ({ currentForm }: ConstructionTypeP
 	const { fields, append, remove, userMaterials } = useConstructionMaterials(
 		control,
 		watch,
-		'Left',
+		'Center',
 	);
 
 	const renderAddButton = (positionId: string) => (
@@ -49,59 +47,50 @@ export const FramePartitionDoubleComponent = ({ currentForm }: ConstructionTypeP
 	const renderMaterialBlock = (positionId: string, fieldIndex: number, fieldId: string) => (
 		<div key={fieldId} className="flex w-full items-start justify-between">
 			<div className="flex flex-1 gap-[20px]">
-				{['0', '1', '10', '11'].includes(positionId) && (
+				{['0', '1', '9', '10'].includes(positionId) && (
 					<SelectableMaterialType
 						currentForm={currentForm}
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
-						constructionPosition="Left"
+						constructionPosition="Center"
 						materialTypesSelectValues={MaterialTypesSelectValuesEnum.Additional}
 					/>
 				)}
 
-				{positionId === '2' || positionId === '9' ? (
+				{positionId === '2' || positionId === '8' ? (
 					<>
 						<BoardMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
-				) : positionId === '3' || positionId === '8' ? (
+				) : positionId === '3' || positionId === '7' ? (
 					<>
 						<FillerMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
-				) : positionId === '4' || positionId === '7' ? (
+				) : positionId === '4' || positionId === '6' ? (
 					<>
 						<FrameMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<WidthRacksStepFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				) : positionId === '5' ? (
 					<>
 						<AirGapMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
-						/>
-					</>
-				) : positionId === '6' ? (
-					<>
-						<LinkMaterialType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
-						/>
-						<PointConnectionsFieldsType
-							{...{ fieldIndex, constructionPosition: 'Left', currentForm }}
+							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 						/>
 					</>
 				) : (
@@ -109,7 +98,7 @@ export const FramePartitionDoubleComponent = ({ currentForm }: ConstructionTypeP
 						{ConstructionFieldsMap({
 							currentForm,
 							fieldIndex,
-							constructionPosition: 'Left',
+							constructionPosition: 'Center',
 							materialType: (userMaterials[fieldIndex] as any)
 								?.materialType as MaterialTypeEnum,
 						})}
@@ -117,13 +106,13 @@ export const FramePartitionDoubleComponent = ({ currentForm }: ConstructionTypeP
 				)}
 			</div>
 
-			{['0', '1', '10', '11'].includes(positionId) && (
+			{['0', '1', '9', '10'].includes(positionId) && (
 				<DeleteIcon className="shrink-0 self-start" onClick={() => remove(fieldIndex)} />
 			)}
 		</div>
 	);
 
-	const positions = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
+	const positions = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">

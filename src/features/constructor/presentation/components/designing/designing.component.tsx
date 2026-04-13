@@ -103,7 +103,7 @@ const DesigningConstructionScreen = () => {
 	});
 
 	const isConstructionEditLocked = useMemo(
-		() => isGeneralReferenceIssuer(constructionHeader?.issuerName),
+		() => !isGeneralReferenceIssuer(constructionHeader?.issuerName),
 		[constructionHeader?.issuerName],
 	);
 

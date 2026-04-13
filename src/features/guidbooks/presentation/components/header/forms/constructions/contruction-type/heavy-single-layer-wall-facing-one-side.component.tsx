@@ -53,11 +53,11 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 			'2': [HeavyMaterialType, ThicknessDensityFieldsType],
 		},
 		Left: {
-			'0': [AirGapMaterialType, ThicknessDensityFieldsType],
-			'1': [LinkMaterialType, PointConnectionsFieldsType],
+			'0': [BoardMaterialType, ThicknessDensityFieldsType],
+			'1': [FillerMaterialType, ThicknessDensityFieldsType],
 			'2': [FrameMaterialType, WidthRacksStepFieldsType],
-			'3': [FillerMaterialType, ThicknessDensityFieldsType],
-			'4': [BoardMaterialType, ThicknessDensityFieldsType],
+			'3': [LinkMaterialType, PointConnectionsFieldsType],
+			'4': [AirGapMaterialType, ThicknessDensityFieldsType],
 		},
 		Right: {},
 	};

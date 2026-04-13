@@ -93,41 +93,97 @@ export const HeavySingleLayerWallFacingBothSideComponent = ({
 
 				{positionId === '3' && constructionPosition !== 'Center' && (
 					<>
-						<FillerMaterialType
-							{...{ fieldIndex, constructionPosition, currentForm }}
-						/>
-						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition, currentForm }}
-						/>
+						{constructionPosition === 'Left' ? (
+							<>
+								<LinkMaterialType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+								<PointConnectionsFieldsType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+							</>
+						) : (
+							<>
+								<FillerMaterialType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+								<ThicknessDensityFieldsType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+							</>
+						)}
 					</>
 				)}
 
 				{positionId === '4' && constructionPosition !== 'Center' && (
 					<>
-						<BoardMaterialType {...{ fieldIndex, constructionPosition, currentForm }} />
-						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition, currentForm }}
-						/>
+						{constructionPosition === 'Left' ? (
+							<>
+								<AirGapMaterialType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+								<ThicknessDensityFieldsType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+							</>
+						) : (
+							<>
+								<BoardMaterialType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+								<ThicknessDensityFieldsType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+							</>
+						)}
 					</>
 				)}
 
 				{positionId === '1' && constructionPosition !== 'Center' && (
 					<>
-						<LinkMaterialType {...{ fieldIndex, constructionPosition, currentForm }} />
-						<PointConnectionsFieldsType
-							{...{ fieldIndex, constructionPosition, currentForm }}
-						/>
+						{constructionPosition === 'Left' ? (
+							<>
+								<FillerMaterialType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+								<ThicknessDensityFieldsType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+							</>
+						) : (
+							<>
+								<LinkMaterialType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+								<PointConnectionsFieldsType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+							</>
+						)}
 					</>
 				)}
 
 				{positionId === '0' && constructionPosition !== 'Center' && (
 					<>
-						<AirGapMaterialType
-							{...{ fieldIndex, constructionPosition, currentForm }}
-						/>
-						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition, currentForm }}
-						/>
+						{constructionPosition === 'Left' ? (
+							<>
+								<BoardMaterialType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+								<ThicknessDensityFieldsType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+							</>
+						) : (
+							<>
+								<AirGapMaterialType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+								<ThicknessDensityFieldsType
+									{...{ fieldIndex, constructionPosition, currentForm }}
+								/>
+							</>
+						)}
 					</>
 				)}
 

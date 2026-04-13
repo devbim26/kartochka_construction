@@ -5,23 +5,24 @@ import { ConstructionTypeEnum as ClientConstructionTypeEnum } from '@features/gu
 const constructionTypeEnumMap = createDataRecordConverter({
 	[ClientConstructionTypeEnum.HeavySingleLayerWall]:
 		ServerConstructionTypeEnum.HeavySingleLayerWall,
-	[ClientConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]:
-		ServerConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
-	[ClientConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]:
-		ServerConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
+	// Keep legacy soundproofing aliases first so reverse mapping resolves to facing types.
 	[ClientConstructionTypeEnum.HeavySingleLayerWallSoundproofingOneSide]:
 		ServerConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 	[ClientConstructionTypeEnum.HeavySingleLayerWallSoundproofingBothSide]:
 		ServerConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
+	[ClientConstructionTypeEnum.HeavySingleLayerWallFacingOneSide]:
+		ServerConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
+	[ClientConstructionTypeEnum.HeavySingleLayerWallFacingBothSide]:
+		ServerConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
 	[ClientConstructionTypeEnum.HeavyMultiLayerWall]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWall,
-	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide]:
-		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingOneSide,
-	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]:
-		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingBothSide,
 	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingOneSide,
 	[ClientConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide]:
+		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingBothSide,
+	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide]:
+		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingOneSide,
+	[ClientConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide]:
 		ServerConstructionTypeEnum.HeavyMultipleLayerWallFacingBothSide,
 	[ClientConstructionTypeEnum.OneFramePartition]: ServerConstructionTypeEnum.OneFramePartition,
 	[ClientConstructionTypeEnum.TwoFramePartition]: ServerConstructionTypeEnum.TwoFramePartition,

@@ -268,7 +268,7 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '0',
 						materialId: '',
-						materialType: MaterialTypeEnum.AirGap,
+						materialType: MaterialTypeEnum.Board,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -277,10 +277,10 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '1',
 						materialId: '',
-						materialType: MaterialTypeEnum.Link,
+						materialType: MaterialTypeEnum.Filler,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
@@ -295,16 +295,16 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '3',
 						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
+						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
 						positionId: '4',
 						materialId: '',
-						materialType: MaterialTypeEnum.Board,
+						materialType: MaterialTypeEnum.AirGap,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -326,7 +326,7 @@ export const ConstructionTypeMap = ({
 
 				setValue('constructionTypeObject.leftConstruction', [
 					{
-						positionId: '4',
+						positionId: '0',
 						materialId: '',
 						materialType: MaterialTypeEnum.Board,
 						materialTypeValue: [
@@ -335,7 +335,7 @@ export const ConstructionTypeMap = ({
 						],
 					},
 					{
-						positionId: '3',
+						positionId: '1',
 						materialId: '',
 						materialType: MaterialTypeEnum.Filler,
 						materialTypeValue: [
@@ -353,7 +353,7 @@ export const ConstructionTypeMap = ({
 						],
 					},
 					{
-						positionId: '1',
+						positionId: '3',
 						materialId: '',
 						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
@@ -362,7 +362,7 @@ export const ConstructionTypeMap = ({
 						],
 					},
 					{
-						positionId: '0',
+						positionId: '4',
 						materialId: '',
 						materialType: MaterialTypeEnum.AirGap,
 						materialTypeValue: [
@@ -921,14 +921,6 @@ export const ConstructionTypeMap = ({
 						],
 					},
 					{
-						positionId: '5',
-						materialId: '',
-						materialType: MaterialTypeEnum.GapDistance,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-						],
-					},
-					{
 						positionId: '6',
 						materialId: '',
 						materialType: MaterialTypeEnum.Board,
@@ -951,7 +943,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.TwoFramePartition,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
+				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
 						materialId: '',
@@ -991,15 +983,6 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '6',
 						materialId: '',
-						materialType: MaterialTypeEnum.Link,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-						],
-					},
-					{
-						positionId: '7',
-						materialId: '',
 						materialType: MaterialTypeEnum.Frame,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Width, value: '' },
@@ -1007,7 +990,7 @@ export const ConstructionTypeMap = ({
 						],
 					},
 					{
-						positionId: '8',
+						positionId: '7',
 						materialId: '',
 						materialType: MaterialTypeEnum.Filler,
 						materialTypeValue: [
@@ -1016,7 +999,7 @@ export const ConstructionTypeMap = ({
 						],
 					},
 					{
-						positionId: '9',
+						positionId: '8',
 						materialId: '',
 						materialType: MaterialTypeEnum.Board,
 						materialTypeValue: [
@@ -1026,7 +1009,7 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.centerConstruction', []);
+				setValue('constructionTypeObject.leftConstruction', []);
 				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
