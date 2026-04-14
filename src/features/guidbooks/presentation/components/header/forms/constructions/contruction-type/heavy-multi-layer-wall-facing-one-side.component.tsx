@@ -1,569 +1,183 @@
-import { type ConstructionTypeProps, type UserMaterials } from '@features/guidbooks/types';
-import { useEffect, useState } from 'react';
+import { DeleteIcon } from '@core';
+import {
+	AirGapMaterialType,
+	BoardMaterialType,
+	ConstructionLayer,
+	FillerMaterialType,
+	FrameMaterialType,
+	HeavyMaterialType,
+	LinkMaterialType,
+	PointConnectionsFieldsType,
+	SelectableMaterialType,
+	ThicknessDensityFieldsType,
+	WidthRacksStepFieldsType,
+} from '@features';
+import { ConstructionFieldsMap } from '@features/guidbooks/constants';
+import {
+	MaterialTypesSelectValuesEnum,
+	type ConstructionTypeProps,
+	type MaterialTypeEnum,
+} from '@features/guidbooks/types';
+import { useConstructionMaterials } from '@features/guidbooks/utils';
+import { AiOutlinePlusCircle } from 'react-icons/ai';
+import { Fragment } from 'react/jsx-runtime';
 
 export const HeavyMultiLayerWallFacingOneSideComponent = ({
 	currentForm,
 }: ConstructionTypeProps) => {
-	const { watch, setValue } = currentForm;
-	const [baseIndices, setBaseIndices] = useState({
-		zeroIndex: -1,
-		oneIndex: -1,
-		twoIndex: -1,
-		threeIndex: -1,
-		fourIndex: -1,
-		fiveIndex: -1,
-		sixIndex: -1,
-		sevenIndex: -1,
-	});
-	const [facingIndices, setFacingIndices] = useState({
-		zeroIndex: -1,
-		oneIndex: -1,
-		twoIndex: -1,
-		threeIndex: -1,
-		fourIndex: -1,
-		fiveIndex: -1,
-		sixIndex: -1,
-	});
-	const [currentBaseMaterialTypes, setCurrentBaseMaterialTypes] = useState({
-		zeroValue: '',
-		oneValue: '',
-		sixValue: '',
-		sevenValue: '',
-	});
-	const [currentFacingMaterialTypes, setCurrentFacingMaterialTypes] = useState({
-		fiveValue: '',
-		sixValue: '',
-	});
-	const [baseUserMaterials, facingUserMaterials, constructions] = watch([
-		'constructionTypeObject.constructions.0.userMaterials',
-		'constructionTypeObject.constructions.1.userMaterials',
-		'constructionTypeObject.constructions',
-	]);
+	const { control, watch } = currentForm;
 
-	useEffect(() => {
-		setBaseIndices({
-			zeroIndex:
-				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '0') ?? -1,
-			oneIndex:
-				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '1') ?? -1,
-			twoIndex:
-				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '2') ?? -1,
-			threeIndex:
-				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '3') ?? -1,
-			fourIndex:
-				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '4') ?? -1,
-			fiveIndex:
-				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '5') ?? -1,
-			sixIndex:
-				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '6') ?? -1,
-			sevenIndex:
-				baseUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '7') ?? -1,
-		});
-		setFacingIndices({
-			zeroIndex:
-				facingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '0') ?? -1,
-			oneIndex:
-				facingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '1') ?? -1,
-			twoIndex:
-				facingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '2') ?? -1,
-			threeIndex:
-				facingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '3') ?? -1,
-			fourIndex:
-				facingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '4') ?? -1,
-			fiveIndex:
-				facingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '5') ?? -1,
-			sixIndex:
-				facingUserMaterials?.findIndex((c: UserMaterials) => c.positionId === '6') ?? -1,
-		});
-		setCurrentBaseMaterialTypes({
-			zeroValue:
-				baseUserMaterials?.find((c: UserMaterials) => c.positionId === '0')?.materialType ??
-				'',
-			oneValue:
-				baseUserMaterials?.find((c: UserMaterials) => c.positionId === '1')?.materialType ??
-				'',
-			sixValue:
-				baseUserMaterials?.find((c: UserMaterials) => c.positionId === '6')?.materialType ??
-				'',
-			sevenValue:
-				baseUserMaterials?.find((c: UserMaterials) => c.positionId === '7')?.materialType ??
-				'',
-		});
-		setCurrentFacingMaterialTypes({
-			fiveValue:
-				facingUserMaterials?.find((c: UserMaterials) => c.positionId === '5')
-					?.materialType ?? '',
-			sixValue:
-				facingUserMaterials?.find((c: UserMaterials) => c.positionId === '6')
-					?.materialType ?? '',
-		});
-	}, [baseUserMaterials, facingUserMaterials, constructions]);
+	// Сверху вниз как в разрезе: облицовка (Left) -> базовая многослойная (Center).
+	const layerConfigs = [
+		{
+			title: '1. Облицовка',
+			constructionPosition: 'Left' as const,
+			positions: ['0', '1', '2', '3', '4', '5', '6'],
+			selectable: ['5', '6'],
+			materialType: MaterialTypesSelectValuesEnum.Facing,
+		},
+		{
+			title: '2. Базовая конструкция',
+			constructionPosition: 'Center' as const,
+			positions: ['2', '3', '4', '5'],
+			selectable: [],
+			materialType: MaterialTypesSelectValuesEnum.Base,
+		},
+	];
+
+	const materialComponentsMap: Record<
+		'Left' | 'Center' | 'Right',
+		Record<string, React.ComponentType<any>[]>
+	> = {
+		Left: {
+			'0': [AirGapMaterialType, ThicknessDensityFieldsType],
+			'1': [LinkMaterialType, PointConnectionsFieldsType],
+			'2': [FrameMaterialType, WidthRacksStepFieldsType],
+			'3': [FillerMaterialType, ThicknessDensityFieldsType],
+			'4': [BoardMaterialType, ThicknessDensityFieldsType],
+		},
+		Center: {
+			'2': [HeavyMaterialType, ThicknessDensityFieldsType],
+			'3': [FillerMaterialType, ThicknessDensityFieldsType],
+			'4': [LinkMaterialType, PointConnectionsFieldsType],
+			'5': [HeavyMaterialType, ThicknessDensityFieldsType],
+		},
+		Right: {},
+	};
+
+	const renderBlock = (
+		positionId: string,
+		fieldIndex: number,
+		fieldId: string,
+		constructionPosition: 'Left' | 'Center' | 'Right',
+		selectable: string[],
+		materialType: MaterialTypesSelectValuesEnum,
+		remove: (index: number) => void,
+		fields: any[],
+	) => (
+		<div key={fieldId} className="flex w-full items-start justify-between">
+			<div className="flex flex-1 gap-[20px]">
+				{selectable.includes(positionId) && (
+					<SelectableMaterialType
+						currentForm={currentForm}
+						fieldIndex={fieldIndex}
+						positionId={Number(positionId)}
+						constructionPosition={constructionPosition}
+						materialTypesSelectValues={materialType}
+					/>
+				)}
+
+				{materialComponentsMap[constructionPosition]?.[positionId]?.map((Comp, i) => (
+					<Comp key={i} {...{ fieldIndex, constructionPosition, currentForm }} />
+				))}
+
+				{selectable.includes(positionId) && (
+					<div className="flex gap-[8px]">
+						{ConstructionFieldsMap({
+							currentForm,
+							fieldIndex,
+							constructionPosition,
+							materialType: fields[fieldIndex]?.materialType as MaterialTypeEnum,
+						})}
+					</div>
+				)}
+			</div>
+
+			{selectable.includes(positionId) && (
+				<DeleteIcon className="shrink-0 self-start" onClick={() => remove(fieldIndex)} />
+			)}
+		</div>
+	);
 
 	return (
 		<>
-			{/* <ConstructionLayer title="1. Базовая конструкция">
-				{baseIndices.zeroIndex < 0 && baseIndices.oneIndex > 0 ? (
-					<AiOutlinePlusCircle
-						onClick={() => {
-							setValue('constructionTypeObject.constructions.0.userMaterials', [
-								...(baseUserMaterials || []),
-								{
-									positionId: '0',
-									materialId: '',
-									materialType: '',
-									materialTypeValue: [],
-								},
-							]);
-						}}
-						className="size-[40px] self-center text-primary"
-					/>
-				) : (
-					<>
-						{baseIndices.zeroIndex >= 0 && (
-							<div className="flex justify-between">
-								<div className="flex gap-[20px]">
-									<SelectableMaterialType
-										currentForm={currentForm}
-										fieldIndex={baseIndices.zeroIndex}
-										positionId={0}
-										constructionIndex={0}
-										materialTypesSelectValues={
-											MaterialTypesSelectValuesEnum.Base
-										}
-									/>
-									{ConstructionFieldsMap({
-										currentForm: currentForm,
-										fieldIndex: baseIndices.zeroIndex,
-										constructionIndex: 0,
-										materialType:
-											currentBaseMaterialTypes.zeroValue as MaterialTypeEnum,
-									})}
-								</div>
-								<DeleteIcon
-									className="self-end"
-									onClick={() => {
-										setValue(
-											'constructionTypeObject.constructions.0.userMaterials',
-											(baseUserMaterials &&
-												baseUserMaterials.filter(
-													(c: UserMaterials) => c.positionId !== '0',
-												)) ||
-												[],
-										);
-									}}
-								/>
-							</div>
-						)}
-					</>
-				)}
-				{baseIndices.oneIndex < 0 ? (
-					<AiOutlinePlusCircle
-						onClick={() => {
-							setValue('constructionTypeObject.constructions.0.userMaterials', [
-								...(baseUserMaterials || []),
-								{
-									positionId: '1',
-									materialId: '',
-									materialType: '',
-									materialTypeValue: [],
-								},
-							]);
-						}}
-						className="size-[40px] self-center text-primary"
-					/>
-				) : (
-					<>
-						{baseIndices.oneIndex >= 0 && (
-							<div className="flex justify-between">
-								<div className="flex gap-[20px]">
-									<SelectableMaterialType
-										currentForm={currentForm}
-										fieldIndex={baseIndices.oneIndex}
-										positionId={1}
-										constructionIndex={0}
-										materialTypesSelectValues={
-											MaterialTypesSelectValuesEnum.Base
-										}
-									/>
-									{ConstructionFieldsMap({
-										currentForm: currentForm,
-										fieldIndex: baseIndices.oneIndex,
-										constructionIndex: 0,
-										materialType:
-											currentBaseMaterialTypes.oneValue as MaterialTypeEnum,
-									})}
-								</div>
-								{baseIndices.zeroIndex < 0 && (
-									<DeleteIcon
-										className="self-end"
-										onClick={() => {
-											setValue(
-												'constructionTypeObject.constructions.0.userMaterials',
-												(baseUserMaterials &&
-													baseUserMaterials.filter(
-														(c: UserMaterials) => c.positionId !== '1',
-													)) ||
-													[],
-											);
-										}}
-									/>
-								)}
-							</div>
-						)}
-					</>
-				)}
+			{layerConfigs.map(
+				({ title, constructionPosition, positions, selectable, materialType }) => {
+					const { fields, insert, remove } = useConstructionMaterials(
+						control,
+						watch,
+						constructionPosition,
+					);
 
-				{baseIndices.twoIndex >= 0 && (
-					<div className="flex gap-[16px]">
-						<HeavyMaterialType
-							fieldIndex={baseIndices.twoIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={baseIndices.twoIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
-						/>
-					</div>
-				)}
-				{baseIndices.threeIndex >= 0 && (
-					<div className="flex gap-[16px]">
-						<FillerMaterialType
-							fieldIndex={baseIndices.threeIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={baseIndices.threeIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
-						/>
-					</div>
-				)}
-				{baseIndices.fourIndex >= 0 && (
-					<div className="flex gap-[16px]">
-						<LinkMaterialType
-							fieldIndex={baseIndices.fourIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
-						/>
-						<PointConnectionsFieldsType
-							fieldIndex={baseIndices.fourIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
-						/>
-					</div>
-				)}
-				{baseIndices.fiveIndex >= 0 && (
-					<div className="flex gap-[16px]">
-						<HeavyMaterialType
-							fieldIndex={baseIndices.fiveIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={baseIndices.fiveIndex}
-							constructionIndex={0}
-							currentForm={currentForm}
-						/>
-					</div>
-				)}
+					return (
+						<ConstructionLayer key={title} title={title}>
+							<div className="flex flex-col gap-[24px]">
+								{positions.map((positionId, index) => {
+									const fieldIndex = fields.findIndex(
+										(f: any) => f.positionId === positionId,
+									);
+									const field = fields[fieldIndex];
 
-				{baseIndices.sixIndex < 0 ? (
-					<AiOutlinePlusCircle
-						onClick={() => {
-							setValue('constructionTypeObject.constructions.0.userMaterials', [
-								...(baseUserMaterials || []),
-								{
-									positionId: '6',
-									materialId: '',
-									materialType: '',
-									materialTypeValue: [],
-								},
-							]);
-						}}
-						className="size-[40px] self-center text-primary"
-					/>
-				) : (
-					<>
-						{baseIndices.sixIndex >= 0 && (
-							<div className="flex justify-between">
-								<div className="flex gap-[20px]">
-									<SelectableMaterialType
-										currentForm={currentForm}
-										fieldIndex={baseIndices.sixIndex}
-										positionId={6}
-										constructionIndex={0}
-										materialTypesSelectValues={
-											MaterialTypesSelectValuesEnum.Base
-										}
-									/>
-									{ConstructionFieldsMap({
-										currentForm: currentForm,
-										fieldIndex: baseIndices.sixIndex,
-										constructionIndex: 0,
-										materialType:
-											currentBaseMaterialTypes.sixValue as MaterialTypeEnum,
-									})}
-								</div>
-								{baseIndices.sevenIndex < 0 && (
-									<DeleteIcon
-										className="self-end"
-										onClick={() => {
-											setValue(
-												'constructionTypeObject.constructions.0.userMaterials',
-												(baseUserMaterials &&
-													baseUserMaterials.filter(
-														(c: UserMaterials) => c.positionId !== '6',
-													)) ||
-													[],
-											);
-										}}
-									/>
-								)}
-							</div>
-						)}
-					</>
-				)}
-				{baseIndices.sevenIndex < 0 && baseIndices.sixIndex > 0 ? (
-					<AiOutlinePlusCircle
-						onClick={() => {
-							setValue('constructionTypeObject.constructions.0.userMaterials', [
-								...(baseUserMaterials || []),
-								{
-									positionId: '7',
-									materialId: '',
-									materialType: '',
-									materialTypeValue: [],
-								},
-							]);
-						}}
-						className="size-[40px] self-center text-primary"
-					/>
-				) : (
-					<>
-						{baseIndices.sevenIndex >= 0 && (
-							<div className="flex justify-between">
-								<div className="flex gap-[20px]">
-									<SelectableMaterialType
-										currentForm={currentForm}
-										fieldIndex={baseIndices.sevenIndex}
-										positionId={7}
-										constructionIndex={0}
-										materialTypesSelectValues={
-											MaterialTypesSelectValuesEnum.Base
-										}
-									/>
-									{ConstructionFieldsMap({
-										currentForm: currentForm,
-										fieldIndex: baseIndices.sevenIndex,
-										constructionIndex: 0,
-										materialType:
-											currentBaseMaterialTypes.sevenValue as MaterialTypeEnum,
-									})}
-								</div>
-								<DeleteIcon
-									className="self-end"
-									onClick={() => {
-										setValue(
-											'constructionTypeObject.constructions.0.userMaterials',
-											(baseUserMaterials &&
-												baseUserMaterials.filter(
-													(c: UserMaterials) => c.positionId !== '7',
-												)) ||
-												[],
-										);
-									}}
-								/>
-							</div>
-						)}
-					</>
-				)}
-			</ConstructionLayer>
+									const prevId = positions[index - 1];
+									const nextId = positions[index + 1];
 
-			<ConstructionLayer title="2. Облицовка">
-				{facingIndices.zeroIndex >= 0 && (
-					<div className="flex gap-[16px]">
-						<AirGapMaterialType
-							fieldIndex={facingIndices.zeroIndex}
-							constructionIndex={1}
-							currentForm={currentForm}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={facingIndices.zeroIndex}
-							constructionIndex={1}
-							currentForm={currentForm}
-						/>
-					</div>
-				)}
-				{facingIndices.oneIndex >= 0 && (
-					<div className="flex gap-[16px]">
-						<LinkMaterialType
-							fieldIndex={facingIndices.oneIndex}
-							constructionIndex={1}
-							currentForm={currentForm}
-						/>
-						<PointConnectionsFieldsType
-							fieldIndex={facingIndices.oneIndex}
-							constructionIndex={1}
-							currentForm={currentForm}
-						/>
-					</div>
-				)}
-				{facingIndices.twoIndex >= 0 && (
-					<div className="flex gap-[16px]">
-						<FrameMaterialType
-							fieldIndex={facingIndices.twoIndex}
-							constructionIndex={1}
-							currentForm={currentForm}
-						/>
-						<WidthRacksStepFieldsType
-							fieldIndex={facingIndices.twoIndex}
-							constructionIndex={1}
-							currentForm={currentForm}
-						/>
-					</div>
-				)}
-				{facingIndices.threeIndex >= 0 && (
-					<div className="flex gap-[16px]">
-						<FillerMaterialType
-							fieldIndex={facingIndices.threeIndex}
-							constructionIndex={1}
-							currentForm={currentForm}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={facingIndices.threeIndex}
-							constructionIndex={1}
-							currentForm={currentForm}
-						/>
-					</div>
-				)}
-				{facingIndices.fourIndex >= 0 && (
-					<div className="flex gap-[16px]">
-						<BoardMaterialType
-							fieldIndex={facingIndices.fourIndex}
-							constructionIndex={1}
-							currentForm={currentForm}
-						/>
-						<ThicknessDensityFieldsType
-							fieldIndex={facingIndices.fourIndex}
-							constructionIndex={1}
-							currentForm={currentForm}
-						/>
-					</div>
-				)}
-				{facingIndices.fiveIndex < 0 ? (
-					<AiOutlinePlusCircle
-						onClick={() => {
-							setValue('constructionTypeObject.constructions.1.userMaterials', [
-								...(facingUserMaterials || []),
-								{
-									positionId: '5',
-									materialId: '',
-									materialType: '',
-									materialTypeValue: [],
-								},
-							]);
-						}}
-						className="size-[40px] self-center text-primary"
-					/>
-				) : (
-					<>
-						{facingIndices.fiveIndex >= 0 && (
-							<div className="flex justify-between">
-								<div className="flex gap-[20px]">
-									<SelectableMaterialType
-										currentForm={currentForm}
-										fieldIndex={facingIndices.fiveIndex}
-										positionId={5}
-										constructionIndex={1}
-										materialTypesSelectValues={
-											MaterialTypesSelectValuesEnum.Facing
-										}
-									/>
-									{ConstructionFieldsMap({
-										currentForm: currentForm,
-										fieldIndex: facingIndices.fiveIndex,
-										constructionIndex: 1,
-										materialType:
-											currentFacingMaterialTypes.fiveValue as MaterialTypeEnum,
-									})}
-								</div>
-								{facingIndices.sixIndex < 0 && (
-									<DeleteIcon
-										className="self-end"
-										onClick={() => {
-											setValue(
-												'constructionTypeObject.constructions.1.userMaterials',
-												(facingUserMaterials &&
-													facingUserMaterials.filter(
-														(c: UserMaterials) => c.positionId !== '5',
-													)) ||
-													[],
-											);
-										}}
-									/>
-								)}
-							</div>
-						)}
-					</>
-				)}
-				{facingIndices.sixIndex < 0 && facingIndices.fiveIndex > 0 ? (
-					<AiOutlinePlusCircle
-						onClick={() => {
-							setValue('constructionTypeObject.constructions.1.userMaterials', [
-								...(facingUserMaterials || []),
-								{
-									positionId: '6',
-									materialId: '',
-									materialType: '',
-									materialTypeValue: [],
-								},
-							]);
-						}}
-						className="size-[40px] self-center text-primary"
-					/>
-				) : (
-					<>
-						{facingIndices.sixIndex >= 0 && (
-							<div className="flex justify-between">
-								<div className="flex gap-[20px]">
-									<SelectableMaterialType
-										currentForm={currentForm}
-										fieldIndex={facingIndices.sixIndex}
-										positionId={6}
-										constructionIndex={1}
-										materialTypesSelectValues={
-											MaterialTypesSelectValuesEnum.Facing
-										}
-									/>
-									{ConstructionFieldsMap({
-										currentForm: currentForm,
-										fieldIndex: facingIndices.sixIndex,
-										constructionIndex: 1,
-										materialType:
-											currentFacingMaterialTypes.sixValue as MaterialTypeEnum,
-									})}
-								</div>
-								<DeleteIcon
-									className="self-end"
-									onClick={() => {
-										setValue(
-											'constructionTypeObject.constructions.1.userMaterials',
-											(facingUserMaterials &&
-												facingUserMaterials.filter(
-													(c: UserMaterials) => c.positionId !== '6',
-												)) ||
-												[],
+									const showAddButton =
+										selectable.includes(positionId) &&
+										fieldIndex === -1 &&
+										(fields.some((f: any) => f.positionId === prevId) ||
+											fields.some((f: any) => f.positionId === nextId));
+
+									if (showAddButton) {
+										return (
+											<AiOutlinePlusCircle
+												key={`add-${positionId}`}
+												onClick={() =>
+													insert(index, {
+														positionId,
+														materialId: '',
+														materialType: '',
+														materialTypeValue: [],
+													})
+												}
+												className="size-[40px] self-center text-primary"
+											/>
 										);
-									}}
-								/>
+									}
+
+									if (fieldIndex !== -1) {
+										return (
+											<Fragment key={field.id}>
+												{renderBlock(
+													positionId,
+													fieldIndex,
+													field.id,
+													constructionPosition,
+													selectable,
+													materialType,
+													remove,
+													fields,
+												)}
+											</Fragment>
+										);
+									}
+
+									return null;
+								})}
 							</div>
-						)}
-					</>
-				)}
-			</ConstructionLayer> */}
+						</ConstructionLayer>
+					);
+				},
+			)}
 		</>
 	);
 };
