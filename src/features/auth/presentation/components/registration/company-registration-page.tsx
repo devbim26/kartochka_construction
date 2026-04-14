@@ -9,19 +9,23 @@ import {
 	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
+	useI18n,
 } from '@core';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
-import type { UseFormReturn } from 'react-hook-form';
+import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
+import { useMemo } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
+import { BsQuestionSquareFill } from 'react-icons/bs';
 import { TiDeleteOutline } from 'react-icons/ti';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import { authRegistration } from '../../../services';
 import type { RegistrationFormData } from '../../../types';
-import { RegistrationFormDataConfig } from '../../../utils';
+import { RegistrationFormDataConfig, RegistrationFormFullSchema } from '../../../utils';
 
 const PhoneInput = ({
 	form,
@@ -43,7 +47,7 @@ const PhoneInput = ({
 			ref={phoneRef}
 			placeholder="+375 (__) ___-__-__"
 			onChange={(e) => form.setValue(`phoneNumbers.${index}.number`, e.target.value)}
-			error={form.formState.errors.phoneNumbers?.[index]?.message}
+			error={form.formState.errors.phoneNumbers?.[index]?.number?.message}
 			iconPos="right"
 			iconClassName="w-[40px] h-[40px] text-error right-[2px]"
 			Icon={TiDeleteOutline}
@@ -62,26 +66,51 @@ const CompanyRegistrationPage = () => {
 	const dispatch = useAppDispatch();
 	const [search] = useSearchParams();
 	const isLoggedIn = useAppSelector(selectIsUserLoggedIn);
+	const { t } = useI18n();
+
+	const registrationDefaults = useMemo(
+		() => ({
+			...RegistrationFormDataConfig.defaultValues,
+			email: search.get('email') ?? '',
+		}),
+		[search],
+	);
 
 	const form = useForm<RegistrationFormData>({
 		resolver: zodResolver(RegistrationFormDataConfig.schema),
-		defaultValues: RegistrationFormDataConfig.defaultValues,
+		defaultValues: registrationDefaults,
 	});
 
-	const { formState, watch, trigger, setValue } = form;
+	const { formState, watch, trigger, setValue, clearErrors, setError, handleSubmit } = form;
 	const phoneNumbers = watch('phoneNumbers');
 
-	const onSubmit = () => {
-		dispatch(
-			authRegistration({
-				...form.getValues(),
-			}),
-		)
+	const submitRegistration = (values: RegistrationFormData) => {
+		dispatch(authRegistration(values))
 			.unwrap()
 			.then(() => {
 				navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`);
 			})
-			.catch((e) => {});
+			.catch(() => {});
+	};
+
+	const onSubmitFull = (data: RegistrationFormData) => {
+		clearErrors();
+		const parsed = RegistrationFormFullSchema.safeParse(data);
+		if (!parsed.success) {
+			for (const issue of parsed.error.issues) {
+				if (issue.path.length === 0) continue;
+				const path = issue.path.join('.') as FieldPath<RegistrationFormData>;
+				setError(path, { type: 'manual', message: issue.message ?? '' });
+			}
+			toast.error(t('auth.registration.fullFormError'));
+			return;
+		}
+		submitRegistration(data);
+	};
+
+	const onSubmitShort = (data: RegistrationFormData) => {
+		clearErrors();
+		submitRegistration(data);
 	};
 
 	// useEffect(() => {
@@ -106,20 +135,17 @@ const CompanyRegistrationPage = () => {
 	return (
 		<div className="mb-[100px] flex w-[508px] flex-col gap-[23px] rounded-[12px] border bg-white px-[32px] py-[23px]">
 			<p className="text-center font-raleway text-[28px] font-semibold text-black">
-				Регистрация компании
+				{t('auth.registration.companyTitle')}
 			</p>
-			<form onSubmit={form.handleSubmit(onSubmit)}>
+			<form onSubmit={handleSubmit(onSubmitFull)}>
 				<div className="flex flex-col gap-[20px]">
 					<div className="flex flex-col gap-[8px] text-[14px] placeholder:text-input-label-primary">
 						<Input
 							{...form.register('email')}
-							label={formState.errors.mainPhoneNumber?.message || 'Email'}
-							labelClassName={
-								formState.errors.mainPhoneNumber?.message ? 'text-error' : ''
-							}
-							error={formState.errors.mainPhoneNumber?.message}
+							label={formState.errors.email?.message || 'Email'}
+							labelClassName={formState.errors.email?.message ? 'text-error' : ''}
+							error={formState.errors.email?.message}
 							disabled
-							defaultValue={search.get('email')!}
 						/>
 						<Input
 							label={formState.errors.mainPhoneNumber?.message || 'Номер телефона'}
@@ -276,9 +302,32 @@ const CompanyRegistrationPage = () => {
 						labelClassName={formState.errors.compannyInfo?.message ? 'text-error' : ''}
 						placeholder="Введите информацию"
 					/>
-					<Button variant="primary" className="h-[36px]">
-						Зарегистрироваться
-					</Button>
+					<div className="flex flex-col items-stretch gap-3">
+						<Button variant="primary" type="submit" className="h-[36px] w-full shrink-0">
+							{t('auth.registration.register')}
+						</Button>
+						<div className="flex flex-row items-center justify-center gap-2">
+							<button
+								type="button"
+								className="font-sans text-sm font-semibold text-primary underline-offset-2 hover:underline"
+								onClick={() => void handleSubmit(onSubmitShort)()}
+							>
+								{t('auth.registration.skip')}
+							</button>
+							<div
+								className="group relative shrink-0"
+								title={t('auth.registration.skipTooltip')}
+							>
+								<BsQuestionSquareFill
+									className="size-[20px] cursor-pointer text-primary"
+									aria-label={t('auth.registration.skipTooltip')}
+								/>
+								<div className="pointer-events-none absolute left-1/2 top-full z-10 w-[min(280px,calc(100vw-2rem))] max-w-[280px] -translate-x-1/2 translate-y-2 rounded bg-black px-3 py-2 text-left text-sm font-normal leading-snug text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+									{t('auth.registration.skipTooltip')}
+								</div>
+							</div>
+						</div>
+					</div>
 					<div className="flex items-center justify-center gap-[2px] font-sans text-[14px]">
 						<p
 							onClick={() =>

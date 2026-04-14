@@ -24,42 +24,83 @@ const ApproveFormDataSchema = z.object({
 
 type ApproveFormDataSchemaType = z.infer<typeof ApproveFormDataSchema>;
 
-const RegistrationFormDataSchema = z.object({
+const phoneNumberRefine = (value: string) => !value.includes('_');
+
+const registrationPhoneRowSchema = z.object({
+	id: z.string(),
+	number: z.string(),
+});
+
+const registrationFormDataObjectSchema = z.object({
 	mainPhoneNumber: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => !value.includes('_'), 'Неверный формат номера телефона'),
-	phoneNumbers: z.array(
-		z.object({
-			number: z
-				.string()
-				.min(1, 'Поле обязательно для заполнения')
-				.refine((value) => !value.includes('_'), 'Неверный формат номера телефона'),
-			id: z.string(),
-		}),
-	),
+		.refine(phoneNumberRefine, 'Неверный формат номера телефона'),
+	phoneNumbers: z.array(registrationPhoneRowSchema).default([]),
 	email: z.string().email().min(1, 'Поле обязательно для заполнения'),
-	companyName: z.string().min(1, 'Поле обязательно для заполнения'),
-	directorFullName: z.string().min(1, 'Поле обязательно для заполнения'),
-	companyAddress: z.string().min(1, 'Поле обязательно для заполнения'),
-	payersRegistrationNumber: z.string().min(1, 'Поле обязательно для заполнения'),
-	paymentAccount: z.string().min(1, 'Поле обязательно для заполнения'),
-	bankIdNumber: z.string().min(1, 'Поле обязательно для заполнения'),
-	bankAddress: z.string().min(1, 'Поле обязательно для заполнения'),
-	companyLogo: z.string().optional(),
-	formFile: z
-		.any()
-		.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),
-	compannyInfo: z.string().min(1, 'Поле обязательно для заполнения'),
+	companyName: z.string().optional().default(''),
+	directorFullName: z.string().optional().default(''),
+	companyAddress: z.string().optional().default(''),
+	payersRegistrationNumber: z.string().optional().default(''),
+	paymentAccount: z.string().optional().default(''),
+	bankIdNumber: z.string().optional().default(''),
+	bankAddress: z.string().optional().default(''),
+	companyLogo: z.string().optional().default(''),
+	formFile: z.any().optional(),
+	compannyInfo: z.string().optional().default(''),
 });
 
+const refineRegistrationAdditionalPhones = (
+	data: z.infer<typeof registrationFormDataObjectSchema>,
+	ctx: z.RefinementCtx,
+) => {
+	data.phoneNumbers.forEach((p, index) => {
+		const trimmed = p.number.trim();
+		if (trimmed.length === 0) return;
+		if (!phoneNumberRefine(p.number)) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: 'Неверный формат номера телефона',
+				path: ['phoneNumbers', index, 'number'],
+			});
+		}
+	});
+};
+
+/** Короткая регистрация: только email и основной телефон; остальное можно заполнить в ЛК. */
+const RegistrationFormDataSchema = registrationFormDataObjectSchema.superRefine(
+	refineRegistrationAdditionalPhones,
+);
+
+/** Полная регистрация: все поля компании и логотип обязательны. */
+const RegistrationFormFullSchema = registrationFormDataObjectSchema
+	.merge(
+		z.object({
+			companyName: z.string().min(1, 'Поле обязательно для заполнения'),
+			directorFullName: z.string().min(1, 'Поле обязательно для заполнения'),
+			companyAddress: z.string().min(1, 'Поле обязательно для заполнения'),
+			payersRegistrationNumber: z.string().min(1, 'Поле обязательно для заполнения'),
+			paymentAccount: z.string().min(1, 'Поле обязательно для заполнения'),
+			bankIdNumber: z.string().min(1, 'Поле обязательно для заполнения'),
+			bankAddress: z.string().min(1, 'Поле обязательно для заполнения'),
+			compannyInfo: z.string().min(1, 'Поле обязательно для заполнения'),
+			formFile: z
+				.any()
+				.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),
+		}),
+	)
+	.superRefine(refineRegistrationAdditionalPhones);
+
 type RegistrationFormDataSchemaType = z.infer<typeof RegistrationFormDataSchema>;
+type RegistrationFormFullSchemaType = z.infer<typeof RegistrationFormFullSchema>;
 
 export {
 	ApproveFormDataSchema,
 	LoginFormDataSchema,
 	RegistrationFormDataSchema,
+	RegistrationFormFullSchema,
 	type ApproveFormDataSchemaType,
 	type LoginFormDataSchemaType,
 	type RegistrationFormDataSchemaType,
+	type RegistrationFormFullSchemaType,
 };

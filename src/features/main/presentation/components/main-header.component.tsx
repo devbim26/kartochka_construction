@@ -175,7 +175,8 @@ export const MainHeader = () => {
 			title: t('main.designCards.sound.title'),
 			description: (
 				<div className="flex flex-col gap-1">
-					<p>{t('main.designCards.sound.desc1')}</p>
+					<p className="font-bold">{t('main.designCards.sound.desc1')}</p>
+					<br />
 					<p className="italic">{t('main.designCards.sound.desc2')}</p>
 				</div>
 			),
@@ -190,7 +191,8 @@ export const MainHeader = () => {
 			title: t('main.designCards.heat.title'),
 			description: (
 				<div className="flex flex-col gap-1">
-					<p>{t('main.designCards.heat.desc1')}</p>
+					<p className="font-bold">{t('main.designCards.heat.desc1')}</p>
+					<br />
 					<p className="italic">{t('main.designCards.heat.desc2')}</p>
 				</div>
 			),
@@ -271,16 +273,25 @@ export const MainHeader = () => {
 									</div>
 								</div>
 							</div>
-							{feature.id !== 'heat-isolation' && (
-								<div className="flex w-full justify-end">
+							<div className="flex w-full justify-end">
+								{feature.id === 'heat-isolation' ? (
 									<button
+										type="button"
+										disabled
+										className="mt-auto w-fit cursor-not-allowed self-end rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-500"
+									>
+										{t('main.designCards.heat.inDevelopment')}
+									</button>
+								) : (
+									<button
+										type="button"
 										onClick={feature.onClick}
 										className="mt-auto w-fit self-end rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
 									>
 										{feature.buttonText}
 									</button>
-								</div>
-							)}
+								)}
+							</div>
 						</div>
 					</CarouselSlide>
 				))}

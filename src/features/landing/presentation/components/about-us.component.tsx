@@ -12,7 +12,7 @@ export const AboutUsComponent = () => {
 			className="w-full bg-white px-6 py-8 xs:px-8 sm:px-12 md:px-14 lg:px-20"
 			id={LandingSections.aboutUs.id}
 		>
-			<div className="mx-auto max-w-screen-xl py-[100px]">
+			<div className="mx-auto max-w-screen-xl py-[50px]">
 				<div className="flex w-full gap-[20px] bg-white">
 					<div className="flex flex-col gap-[15px]">
 						<div className="flex flex-col gap-[2px]">

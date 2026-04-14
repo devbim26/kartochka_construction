@@ -1,29 +1,18 @@
 import { AboutUs1, AboutUs2, AboutUs3, AboutUs4, AboutUs5 } from '@assets';
 import { Chevron, useI18n } from '@core';
-import {
-	FifthNumberImage,
-	FirstNumberImage,
-	FourthNumberImage,
-	SecondNumberImage,
-	ThirdNumberImage,
-} from '../images';
-import { useState, type ReactNode } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 const aboutImages = [AboutUs1, AboutUs2, AboutUs3, AboutUs4, AboutUs5];
-const numberImages = [
-	<FirstNumberImage key="1" />,
-	<SecondNumberImage key="2" />,
-	<ThirdNumberImage key="3" />,
-	<FourthNumberImage key="4" />,
-	<FifthNumberImage key="5" />,
-];
 const cardAccentColors = ['#B1C9E3', '#EED0C5', '#F3F2BA', '#DFA4C2', '#B2CAA0'];
 const stepKeys = [0, 1, 2, 3, 4] as const;
 
 export const HowOurServiceWorks = () => {
 	const [selectedStep, setSelectedStep] = useState(0);
 	const [isHover, setIsHover] = useState<boolean | null>(null);
+	const [cardHeightPx, setCardHeightPx] = useState<number | null>(null);
+	const frontFaceRef = useRef<HTMLDivElement>(null);
+	const backFaceRef = useRef<HTMLDivElement>(null);
 	const { t } = useI18n();
 	const stepTitles = stepKeys.map((index) => t(`landing.how.step.${index}`));
 	const cardContents: Array<{ title: ReactNode; body: ReactNode }> = stepKeys.map((index) => ({
@@ -40,6 +29,25 @@ export const HowOurServiceWorks = () => {
 	const handleStepClick = (index: number) => {
 		setSelectedStep(index);
 	};
+
+	const syncCardHeight = useCallback(() => {
+		const front = frontFaceRef.current;
+		const back = backFaceRef.current;
+		if (!front || !back) return;
+		const next = isHover ? back.offsetHeight : front.offsetHeight;
+		if (next > 0) setCardHeightPx(next);
+	}, [isHover]);
+
+	useLayoutEffect(() => {
+		syncCardHeight();
+		const front = frontFaceRef.current;
+		const back = backFaceRef.current;
+		if (!front || !back) return;
+		const ro = new ResizeObserver(() => syncCardHeight());
+		ro.observe(front);
+		ro.observe(back);
+		return () => ro.disconnect();
+	}, [syncCardHeight, selectedStep]);
 
 	return (
 		<div className="flex w-full justify-center bg-background-primary">
@@ -82,61 +90,64 @@ export const HowOurServiceWorks = () => {
 						onMouseLeave={() => setIsHover(false)}
 					>
 						<div
-							className={twMerge(
-								'relative min-h-[320px] w-full md:h-[500px]',
-								'[transform-style:preserve-3d] will-change-transform',
-								'transition-transform duration-700 ease-in-out',
-								isHover
-									? '[transform:rotateY(180deg)]'
-									: '[transform:rotateY(0deg)]',
-							)}
+							className="relative w-full overflow-hidden rounded-2xl transition-[height] duration-700 ease-in-out"
+							style={cardHeightPx != null ? { height: cardHeightPx } : undefined}
 						>
-							{/* translateZ separates faces for Firefox (coplanar backface bugs); avoid overflow on 3D layer */}
 							<div
 								className={twMerge(
-									'absolute inset-0 flex min-h-[320px] w-full flex-col gap-5 rounded-2xl bg-white p-6 shadow-blue md:p-7',
-									'[backface-visibility:hidden] [transform:translateZ(1px)]',
+									'relative w-full min-h-0 [transform-style:preserve-3d] will-change-transform',
+									cardHeightPx != null && 'h-full',
+									'transition-transform duration-700 ease-in-out',
+									isHover
+										? '[transform:rotateY(180deg)]'
+										: '[transform:rotateY(0deg)]',
 								)}
 							>
-								{/* Content over image */}
-								<div className="relative z-10 flex min-h-0 flex-1 flex-col gap-4">
-									<div
-										className="flex w-full flex-row items-start justify-between gap-4 rounded-xl px-3 py-2.5 sm:gap-6"
-										style={{ backgroundColor: cardAccentColors[selectedStep] }}
-									>
-										<div className="font-montserrat text-base font-bold leading-snug text-black sm:text-lg md:text-xl">
-											{stepTitles[selectedStep]}
+								{/* translateZ separates faces for Firefox (coplanar backface bugs) */}
+								<div
+									ref={frontFaceRef}
+									className={twMerge(
+										'absolute left-0 right-0 top-0 flex w-full flex-col gap-5 rounded-2xl bg-white p-6 shadow-blue md:p-7',
+										'[backface-visibility:hidden] [transform:translateZ(1px)]',
+									)}
+								>
+									<div className="relative z-10 flex flex-col gap-4">
+										<div
+											className="flex w-full flex-row items-start justify-between gap-4 rounded-xl px-3 py-2.5 sm:gap-6"
+											style={{
+												backgroundColor: cardAccentColors[selectedStep],
+											}}
+										>
+											<div className="font-montserrat text-base font-bold leading-snug text-black sm:text-lg md:text-xl">
+												{stepTitles[selectedStep]}
+											</div>
+										</div>
+										<div className="px-2 font-montserrat text-sm italic leading-relaxed text-black sm:text-base md:text-[17px]">
+											{cardContents[selectedStep]?.title}
+										</div>
+										<div className="px-2 font-montserrat text-sm italic leading-relaxed text-black sm:text-base md:text-[17px]">
+											{cardContents[selectedStep]?.body}
 										</div>
 									</div>
-									<div className="px-2 font-montserrat text-sm italic leading-relaxed text-black sm:text-base md:text-[17px]">
-										{cardContents[selectedStep]?.title}
-									</div>
-									<div className="px-2 font-montserrat text-sm italic leading-relaxed text-black sm:text-base md:text-[17px]">
-										{cardContents[selectedStep]?.body}
-									</div>
 								</div>
-								<div className="pointer-events-none absolute bottom-3 right-4 z-0 opacity-70">
-									{numberImages[selectedStep]}
-								</div>
-							</div>
 
-							<div
-								className={twMerge(
-									'absolute inset-0 flex h-full min-h-[320px] w-full flex-col gap-4 rounded-2xl bg-white p-6 shadow-blue md:p-7',
-									'[backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(1px)]',
-								)}
-							>
-								<div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
+								<div
+									ref={backFaceRef}
+									className={twMerge(
+										'absolute left-0 right-0 top-0 flex w-full flex-col gap-4 rounded-2xl bg-white p-6 shadow-blue md:p-7',
+										'[backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(1px)]',
+									)}
+								>
 									<div className="font-montserrat font-semibold leading-snug text-black sm:text-lg">
 										{stepTitles[selectedStep]}
 									</div>
-									<div className="flex min-h-0 flex-1 items-center justify-center">
+									<div className="flex justify-center">
 										<img
 											src={aboutImages[selectedStep]}
 											alt=""
 											aria-hidden="true"
 											loading="lazy"
-											className="max-h-full max-w-full object-contain"
+											className="max-h-[min(50vh,420px)] w-full max-w-full object-contain"
 										/>
 									</div>
 								</div>

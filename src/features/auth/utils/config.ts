@@ -24,18 +24,18 @@ export const ApproveFormDataConfig: EntityConfig = {
 export const RegistrationFormDataConfig: EntityConfig = {
 	schema: RegistrationFormDataSchema,
 	defaultValues: {
+		email: '',
 		mainPhoneNumber: '',
-		phoneNumbers: [] as string[],
-		password: '',
-		secondPassword: '',
+		phoneNumbers: [] as { id: string; number: string }[],
 		companyName: '',
 		directorFullName: '',
-		companyAdress: '',
+		companyAddress: '',
 		payersRegistrationNumber: '',
 		paymentAccount: '',
 		bankIdNumber: '',
-		bankAdress: '',
+		bankAddress: '',
 		companyLogo: '',
+		formFile: undefined,
 		compannyInfo: '',
 	},
 };

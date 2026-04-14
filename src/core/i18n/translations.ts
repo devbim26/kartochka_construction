@@ -71,6 +71,12 @@ export const en = {
 	'users.role': 'Role',
 	'users.rolePlaceholder': 'Select role',
 	'auth.emailPlaceholder': 'Enter e-mail',
+	'auth.registration.companyTitle': 'Company registration',
+	'auth.registration.register': 'Register',
+	'auth.registration.skip': 'Skip',
+	'auth.registration.skipTooltip':
+		'Register with email and phone only. Company details below are optional and can be completed later in your account.',
+	'auth.registration.fullFormError': 'Please fill in all required company fields and upload a logo.',
 
 	'meta.title':
 		'AI for design | Sound insulation, compliance checking, visualization — Belarus and Russia',
@@ -418,6 +424,7 @@ export const en = {
 	'main.designCards.heat.desc1': 'Calculation according to SP 2.04.01-2020.',
 	'main.designCards.heat.desc2':
 		'Generates a PDF report with formulas, ready for expert submission.',
+	'main.designCards.heat.inDevelopment': 'In development',
 	'main.aiCards.assistant.title': 'AI mode (3 modes)',
 	'main.aiCards.assistant.generalTitle': 'General',
 	'main.aiCards.assistant.generalDesc': 'Access to the latest AI models',
@@ -1098,6 +1105,13 @@ export const ru: Record<TranslationKey, string> = {
 	'users.role': 'Роль',
 	'users.rolePlaceholder': 'Выберите роль',
 	'auth.emailPlaceholder': 'Введите e-mail',
+	'auth.registration.companyTitle': 'Регистрация компании',
+	'auth.registration.register': 'Зарегистрироваться',
+	'auth.registration.skip': 'Пропустить',
+	'auth.registration.skipTooltip':
+		'Можно зарегистрироваться только по email и телефону. Данные компании ниже необязательны — их можно заполнить позже в личном кабинете.',
+	'auth.registration.fullFormError':
+		'Заполните все обязательные поля компании и загрузите логотип.',
 
 	'meta.title':
 		'AI для проектирования | Звукоизоляция, нормоконтроль, визуализация — Беларусь и Россия',
@@ -1446,6 +1460,7 @@ export const ru: Record<TranslationKey, string> = {
 	'main.designCards.heat.desc1': 'Расчет по СП 2.04.01-2020.',
 	'main.designCards.heat.desc2':
 		'Генерирует PDF-отчет с формулами, готовый к подаче на экспертизу.',
+	'main.designCards.heat.inDevelopment': 'В разработке',
 	'main.aiCards.assistant.title': 'AI mode (3 режима)',
 	'main.aiCards.assistant.generalTitle': 'Общий',
 	'main.aiCards.assistant.generalDesc': 'Доступ к новейшим моделям ИИ',

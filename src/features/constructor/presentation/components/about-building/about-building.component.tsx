@@ -56,23 +56,10 @@ import { AxiosError } from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
+import { BsQuestionSquareFill } from 'react-icons/bs';
 import { catchError, from, map } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
-
-// Функция для получения названия страны по ключу (используется в подсказке)
-const getCountryKey = (country: Country): string => {
-	switch (country) {
-		case Country.None:
-			return 'country.none';
-		case Country.Belarus:
-			return 'country.belarus';
-		case Country.Russia:
-			return 'country.russia';
-		default:
-			return '';
-	}
-};
 
 // Вспомогательная функция для форматирования значения enum в читаемый текст (если нет английского массива)
 const formatEnumValue = (value: string): string => {
@@ -151,11 +138,12 @@ const AboutBuildingScreen = () => {
 	};
 
 	const onSubmit = (data: AboutBuildingData) => {
+		const payload = { ...data, isBim: false };
 		if (!!search.get('edit')) {
-			handleUpdateReport(data);
+			handleUpdateReport(payload);
 		} else {
-			dispatch(constructorSlice.actions.setAboutBuilding(data));
-			handleCreateReport(data);
+			dispatch(constructorSlice.actions.setAboutBuilding(payload));
+			handleCreateReport(payload);
 		}
 	};
 
@@ -328,6 +316,17 @@ const AboutBuildingScreen = () => {
 		}
 	}, [currentLanguage]);
 
+	const regionCountryLabel = useMemo(() => {
+		if (!selectedRegion || selectedRegion === Country.None) return '';
+		const opt = countryOptions.find((o) => o.value === selectedRegion);
+		return opt?.label ?? '';
+	}, [countryOptions, selectedRegion]);
+
+	const regionHintText = useMemo(() => {
+		if (!regionCountryLabel) return '';
+		return t('aboutBuilding.region.hint').replace('{{country}}', regionCountryLabel);
+	}, [t, regionCountryLabel]);
+
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
 			<div className="flex border-b px-[24px] py-[18px]">
@@ -417,10 +416,13 @@ const AboutBuildingScreen = () => {
 									/>
 								)}
 							/>
-							{selectedRegion && selectedRegion !== Country.None && (
-								<p className="text-[14px] text-gray-additionalText">
-									{t('aboutBuilding.region.hint')}
-								</p>
+							{selectedRegion && selectedRegion !== Country.None && regionHintText && (
+								<div className="group relative shrink-0">
+									<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
+									<div className="pointer-events-none absolute left-1/2 top-full z-10 w-[min(320px,calc(100vw-2rem))] max-w-[320px] -translate-x-1/2 translate-y-2 rounded bg-black px-3 py-2 text-left text-sm font-normal leading-snug text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+										{regionHintText}
+									</div>
+								</div>
 							)}
 						</div>
 
@@ -702,7 +704,7 @@ const AboutBuildingScreen = () => {
 						</div>
 
 						<div className="flex items-center gap-x-[10px]">
-							<label className="w-[250px] font-sans text-sm font-semibold leading-6">
+							<label className="w-[250px] font-sans text-sm font-semibold leading-6 text-gray-500">
 								{t('aboutBuilding.constructionInfo.bim')}
 							</label>
 							<Controller
@@ -710,16 +712,10 @@ const AboutBuildingScreen = () => {
 								name="isBim"
 								render={({ field }) => (
 									<Switch
-										isEnabledProp={field.value}
-										disabled={!!search.get('edit')}
+										isEnabledProp={false}
+										disabled
 										onChange={(isEnabled) => {
 											field.onChange(isEnabled);
-											if (isEnabled) {
-												form.setValue('isConstruction', false);
-												form.setValue('isFloorPlan', false);
-											} else {
-												form.setValue('isConstruction', true);
-											}
 										}}
 										wrapperClassName="w-[36px] h-[20px]"
 									/>

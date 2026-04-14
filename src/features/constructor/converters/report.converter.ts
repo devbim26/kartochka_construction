@@ -89,7 +89,7 @@ export const convertToClientReportInfo = (data: ReportInfoShortDto): AboutBuildi
 		maxHeight: '1',
 		isFloorPlan: true,
 		isConstruction: false,
-		isBim: true,
+		isBim: false,
 	};
 };
 
@@ -107,7 +107,7 @@ export const convertToClientSingleReportInfoShort = (
 		maxHeight: '0',
 		isFloorPlan: true,
 		isConstruction: false,
-		isBim: true,
+		isBim: false,
 		calculationDocument: {
 			id: data.calculationRequirementDocument!.id || '',
 			name: data.calculationRequirementDocument!.shortName! || '',
@@ -148,7 +148,7 @@ export const convertToClientReportInfoShort = (data: ReportInfoShortDto): Report
 		maxHeight: '0',
 		isFloorPlan: true,
 		isConstruction: false,
-		isBim: true,
+		isBim: false,
 	};
 };
 

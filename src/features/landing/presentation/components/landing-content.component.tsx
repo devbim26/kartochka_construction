@@ -2,10 +2,9 @@ import { APP_ROUTES, useAppNavigate, useI18n } from '@core';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { LandingSections } from '@features/landing/constants';
 import { FormSubModal } from '@features/main/presentation/components/modals';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AboutUsComponent } from './about-us.component';
-import { Contacts } from './contacts.component';
 import { FAQ } from './faq.component';
 import { HowOurServiceWorks } from './how-our-service-works.component';
 import { NewsSection } from './news-section';
@@ -13,7 +12,6 @@ import { PageTop } from './page-top.component';
 import { SubSelect } from './sub-select';
 
 export const LandingContent = () => {
-	const pageContentWrapperRef = useRef<HTMLDivElement>(null);
 	const [search, setSearch] = useSearchParams();
 	const navigate = useAppNavigate();
 	const sectionId = search.get('sectionId');
@@ -29,13 +27,11 @@ export const LandingContent = () => {
 		if (!sectionId) {
 			return;
 		}
-		pageContentWrapperRef.current
-			?.querySelector(`#${CSS.escape(sectionId)}`)
-			?.scrollIntoView({ behavior: 'smooth' });
+		document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
 	}, [sectionId, navigate, setSearch]);
 
 	return (
-		<div ref={pageContentWrapperRef}>
+		<div>
 			<PageTop />
 			<AboutUsComponent />
 			<HowOurServiceWorks />
@@ -51,7 +47,6 @@ export const LandingContent = () => {
 			/>
 			<FAQ />
 			<NewsSection />
-			<Contacts />
 			<FormSubModal
 				isOpen={isChangePlanFlow && !!search.get('subId') && !!search.get('subModal')}
 				onClose={() => navigate('', { sectionId: LandingSections.subscription.id })}

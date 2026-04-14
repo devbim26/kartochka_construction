@@ -50,9 +50,9 @@ export const Switch = ({
 	return (
 		<div
 			className={twMerge(
-				'relative flex h-[20px] w-[36px] cursor-pointer items-center rounded-full p-[2px] transition duration-300 ease-in-out',
+				'relative flex h-[20px] w-[36px] items-center rounded-full p-[2px] transition duration-300 ease-in-out',
+				disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
 				isEnabled ? onWrapperClassName : offWrapperClassName,
-				disabled && 'opacity-50',
 				wrapperClassName,
 			)}
 			onClick={handleToggle}
