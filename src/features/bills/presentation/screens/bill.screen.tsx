@@ -235,6 +235,8 @@ export const BillScreen = () => {
 													edit: 'true',
 													status: info.row.original.billType,
 													userId: info.row.original.userId,
+													number: String(info.row.original.number),
+													date: info.row.original.date,
 												});
 											}}
 										/>

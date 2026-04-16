@@ -2,7 +2,10 @@ import { APP_ROUTES, Button, DeleteIcon, DeleteModal, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { useAppDispatch, useAppNavigate, useAppSelector } from '@core/utils';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { CONSTRUCTOR_ROUTES, ROOM_DESIGN_STUB_CONSTRUCTION_HEADER_ID } from '@features/constructor/constants';
+import {
+	CONSTRUCTOR_ROUTES,
+	ROOM_DESIGN_STUB_CONSTRUCTION_HEADER_ID,
+} from '@features/constructor/constants';
 import {
 	convertFloorDataToClientConstructionSheet,
 	convertToClientFloorConstruction,
@@ -58,6 +61,7 @@ interface Level {
 	id: string;
 	code: string;
 	pageNumber: number;
+	hasServerPage?: boolean;
 	reportFloorInfoIds: string[];
 	constructions: FloorConstruction[];
 	serverId?: string;
@@ -79,6 +83,7 @@ export const FloorPlans = memoize(() => {
 	const [activeLevelId, setActiveLevelId] = useState<string | null>(null);
 	/** Страница PDF, на которой создан новый уровень (API не передаёт page). */
 	const pendingNewLevelPageRef = useRef<number | null>(null);
+	const isCreatingLevelRef = useRef(false);
 
 	// Состояния для редактирования кода уровня
 	const [editingLevelId, setEditingLevelId] = useState<string | null>(null);
@@ -120,29 +125,38 @@ export const FloorPlans = memoize(() => {
 	const mapServerLevels = (data: any): Level[] => {
 		const floorLevels = (data?.floorConstructionInfos ?? []) as any[];
 		return floorLevels
-			.map((level, index) => ({
-				id:
-					level?.id ||
-					(crypto.randomUUID
-						? crypto.randomUUID()
-						: Math.random().toString(36).substring(2)),
-				serverId: level?.id || undefined,
-				code: level?.floorNumber || `${index + 1}`,
-				pageNumber: Number(level?.reportFloorConstructionInfos?.[0]?.page || index + 1),
-				reportFloorInfoIds: (level?.reportFloorConstructionInfos ?? [])
-					.map((info: any) => info?.id)
-					.filter(Boolean),
-				constructions: (level?.reportFloorConstructionInfos ?? []).map((info: any) =>
-					convertToClientFloorConstruction(
-						{
-							...info,
-							coordinates1: info?.coordinates ?? info?.coordinates1,
-							coordinates2: info?.coordinates2,
-						},
-						info?.id || '',
+			.map((level, index) => {
+				const serverPage = level?.reportFloorConstructionInfos?.[0]?.page;
+				const hasServerPage = serverPage != null && String(serverPage).trim() !== '';
+				const normalizedPage = Number(hasServerPage ? serverPage : index + 1);
+				return {
+					id:
+						level?.id ||
+						(crypto.randomUUID
+							? crypto.randomUUID()
+							: Math.random().toString(36).substring(2)),
+					serverId: level?.id || undefined,
+					code: level?.floorNumber || `${index + 1}`,
+					pageNumber:
+						Number.isFinite(normalizedPage) && normalizedPage > 0
+							? normalizedPage
+							: index + 1,
+					hasServerPage,
+					reportFloorInfoIds: (level?.reportFloorConstructionInfos ?? [])
+						.map((info: any) => info?.id)
+						.filter(Boolean),
+					constructions: (level?.reportFloorConstructionInfos ?? []).map((info: any) =>
+						convertToClientFloorConstruction(
+							{
+								...info,
+								coordinates1: info?.coordinates ?? info?.coordinates1,
+								coordinates2: info?.coordinates2,
+							},
+							info?.id || '',
+						),
 					),
-				),
-			}))
+				};
+			})
 			.sort((a, b) => a.pageNumber - b.pageNumber);
 	};
 
@@ -153,14 +167,18 @@ export const FloorPlans = memoize(() => {
 	): Level[] => {
 		const prevByLevelKey = new Map<string, Level>();
 		prevLevels.forEach((level) => prevByLevelKey.set(level.serverId || level.id, level));
+		let pendingPageAssigned = false;
 
 		const hydratedServerLevels = serverLevels.map((level) => {
 			const previousLevel = prevByLevelKey.get(level.serverId || level.id);
 			if (!previousLevel) {
 				if (
 					options?.defaultPageForNewEmptyLevel != null &&
-					level.constructions.length === 0
+					level.constructions.length === 0 &&
+					!level.hasServerPage &&
+					!pendingPageAssigned
 				) {
+					pendingPageAssigned = true;
 					return {
 						...level,
 						pageNumber: options.defaultPageForNewEmptyLevel,
@@ -185,6 +203,11 @@ export const FloorPlans = memoize(() => {
 
 			return {
 				...level,
+				// API may omit page for empty levels; keep local page mapping stable.
+				pageNumber:
+					!level.hasServerPage && level.constructions.length === 0
+						? previousLevel.pageNumber
+						: level.pageNumber,
 				constructions: mergedConstructions,
 			};
 		});
@@ -517,6 +540,9 @@ export const FloorPlans = memoize(() => {
 
 	// Функции для работы с уровнями
 	const addLevel = () => {
+		if (isCreatingLevelRef.current) {
+			return;
+		}
 		// Проверяем, есть ли уже уровень на текущей странице
 		const existingLevelOnPage = levels.find((l) => l.pageNumber === currentPage);
 		if (existingLevelOnPage) {
@@ -527,6 +553,7 @@ export const FloorPlans = memoize(() => {
 		const defaultCode = '0.000';
 
 		if (!reportId) return;
+		isCreatingLevelRef.current = true;
 		pendingNewLevelPageRef.current = currentPage;
 		from(createReportFloorInfo({ reportInfoId: reportId, floorName: defaultCode }))
 			.pipe(
@@ -541,6 +568,9 @@ export const FloorPlans = memoize(() => {
 					pendingNewLevelPageRef.current = null;
 					toast.error(t('floorPlans.toast.uploadError'));
 					return of(null);
+				}),
+				finalize(() => {
+					isCreatingLevelRef.current = false;
 				}),
 			)
 			.subscribe();
@@ -630,7 +660,55 @@ export const FloorPlans = memoize(() => {
 	const selectedLevelReportFloorInfoId = activeLevel?.serverId || activeLevel?.id;
 	const deleteConstructionQueryId =
 		search.get('reportConstructionId') || search.get('constructionId');
+	const createTypeTabQuery = search.get('createTypeTab');
+	const activeCreateTypeTab: 'walls' | 'floors' | 'rooms' =
+		createTypeTabQuery === 'floors' || createTypeTabQuery === 'rooms'
+			? createTypeTabQuery
+			: 'walls';
 	const hasLevelOnCurrentPage = levels.some((level) => level.pageNumber === currentPage);
+	const isAddLevelDisabled = hasLevelOnCurrentPage || isCreatingLevelRef.current;
+
+	const handleCreateTypeTabChange = (tab: 'walls' | 'floors' | 'rooms') => {
+		const params: Record<string, string> = {
+			createTypeTab: tab,
+			reportId: reportId || '',
+			reportType: search.get('reportType') || '',
+		};
+		const optionalKeys = ['layerId', 'floorNumber', 'page', 'x', 'y', 'x2', 'y2'];
+		optionalKeys.forEach((key) => {
+			const value = search.get(key);
+			if (value) params[key] = value;
+		});
+
+		if (tab === 'rooms') {
+			navigate('', { ...params, addRoom: 'true' });
+			return;
+		}
+
+		navigate('', { ...params, create: 'true' });
+	};
+
+	const closeCreateFlowModal = () => {
+		const keysToRemove = new Set([
+			'create',
+			'addRoom',
+			'createTypeTab',
+			'layerId',
+			'floorNumber',
+			'page',
+			'x',
+			'y',
+			'x2',
+			'y2',
+		]);
+		const params: Record<string, string> = {};
+		search.forEach((value, key) => {
+			if (!keysToRemove.has(key)) {
+				params[key] = value;
+			}
+		});
+		navigate('', params);
+	};
 
 	useEffect(() => {
 		if (!activeLevel) {
@@ -747,9 +825,9 @@ export const FloorPlans = memoize(() => {
 							{pdfDoc && (
 								<Button
 									onClick={addLevel}
-									disabled={hasLevelOnCurrentPage}
+									disabled={isAddLevelDisabled}
 									className={`flex size-[28px] items-center justify-center bg-white p-0 ring-2 ring-inset enabled:hover:bg-white ${
-										hasLevelOnCurrentPage
+										isAddLevelDisabled
 											? 'cursor-not-allowed text-gray-400 ring-gray-300'
 											: 'text-primary ring-primary'
 									}`}
@@ -800,12 +878,9 @@ export const FloorPlans = memoize(() => {
 											/>
 										) : (
 											<>
-												<button
-													className="text-sm font-medium"
-													onClick={(e) => e.stopPropagation()}
-												>
+												<span className="text-sm font-medium">
 													{level.code}
-												</button>
+												</span>
 												<button
 													onClick={(e) => {
 														e.stopPropagation();
@@ -881,6 +956,7 @@ export const FloorPlans = memoize(() => {
 											onClick={() =>
 												navigate(``, {
 													create: 'true',
+													createTypeTab: 'walls',
 													reportId: reportId!,
 													reportType: search.get('reportType')!,
 												})
@@ -903,39 +979,37 @@ export const FloorPlans = memoize(() => {
 
 					<CreateConstructionModal
 						isOpen={!!search.get('create')}
-						onCancel={() => window.history.back()}
-						onClose={() => window.history.back()}
+						onCancel={closeCreateFlowModal}
+						onClose={closeCreateFlowModal}
 						onConfirm={() => {
 							if (reportType === ReportCategory.Floor && reportId) {
 								handleGetCurrentReportFloorInfos(reportId);
 							} else if (reportType === ReportCategory.Single && reportId) {
 								handleGetSingleConstruction(reportId);
 							}
-							window.history.back();
+							closeCreateFlowModal();
 						}}
-						headerTitle={
-							search.get('floorPlanTab') === 'floors'
-								? t('floorPlans.modal.addFloor')
-								: search.get('floorPlanTab') === 'walls'
-									? t('floorPlans.modal.addWall')
-									: t('floorPlans.modal.createTitle')
-						}
+						headerTitle={t('floorPlans.modal.createTitle')}
 						className="!w-[1000px] md:!w-[900px]"
+						activeTab={activeCreateTypeTab}
+						onTabChange={handleCreateTypeTabChange}
 						floorId={currentReportFloorId}
 						reportFloorInfoId={selectedLevelReportFloorInfoId}
 						floorNumber={activeLevel?.code}
 					/>
 					<AddRoomModal
 						isOpen={!!search.get('addRoom')}
-						onCancel={() => window.history.back()}
-						onClose={() => window.history.back()}
+						onCancel={closeCreateFlowModal}
+						onClose={closeCreateFlowModal}
 						onConfirm={(_data: AddRoomFormValues) => {
 							toast.success(t('floorPlans.toast.roomSavedDemo'));
-							window.history.back();
+							closeCreateFlowModal();
 						}}
 						headerTitle={t('floorPlans.modal.addRoom')}
 						className="!w-[1000px] md:!w-[900px]"
 						contentClassName="visible p-4 md:p-6"
+						activeTab={activeCreateTypeTab}
+						onTabChange={handleCreateTypeTabChange}
 					/>
 					<GeneralInformationModal
 						isOpen={!!search.get('info')}

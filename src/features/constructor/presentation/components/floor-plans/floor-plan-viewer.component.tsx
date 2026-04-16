@@ -209,7 +209,13 @@ export const FloorPlanViewer = ({
 
 		dispatch(constructorSlice.actions.setFile({ image: canvas.toDataURL('image/png') }));
 		navigate('', {
-			create: 'true',
+			...(explantationTab === 'rooms' ? { addRoom: 'true' } : { create: 'true' }),
+			createTypeTab:
+				explantationTab === 'floors'
+					? 'floors'
+					: explantationTab === 'rooms'
+						? 'rooms'
+						: 'walls',
 			reportId: search.get('reportId')!.toString(),
 			reportType: search.get('reportType')!.toString(),
 			layerId: floorId || '',
@@ -219,7 +225,6 @@ export const FloorPlanViewer = ({
 			x2: newRect.right.toString(),
 			y2: newRect.bottom.toString(),
 			page: currentPage.toString(),
-			floorPlanTab: explantationTab === 'floors' ? 'floors' : 'walls',
 		});
 	};
 
@@ -283,7 +288,6 @@ export const FloorPlanViewer = ({
 		}
 
 		if (event.button !== 0) return;
-		if (explantationTab === 'rooms') return;
 
 		if (search.get('reportType') === 'Floor' && !floorNumber) {
 			toast.error(t('floorPlanViewer.selectLevelFirst'));
@@ -339,6 +343,7 @@ export const FloorPlanViewer = ({
 			dispatch(constructorSlice.actions.setFile({ image: canvas.toDataURL('image/png') }));
 			navigate('', {
 				addRoom: 'true',
+				createTypeTab: 'rooms',
 				reportId: search.get('reportId')!.toString(),
 				reportType: search.get('reportType')!.toString(),
 				layerId: floorId || '',

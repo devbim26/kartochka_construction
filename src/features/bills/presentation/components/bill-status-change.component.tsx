@@ -13,9 +13,14 @@ export const BillStatusChange = () => {
 	const { t } = useI18n();
 
 	const handleChangeStatus = (billType: BillTypeEnum) => {
+		const billNumber = search.get('number');
+		const billDate = search.get('date');
+
 		from(
 			updateBill({
 				id: search.get('id')!,
+				number: billNumber ? Number(billNumber) : undefined,
+				date: billDate || undefined,
 				billType: billType,
 				userId: search.get('userId')!,
 			}),

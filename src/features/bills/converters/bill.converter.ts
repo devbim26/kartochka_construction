@@ -27,6 +27,8 @@ export const convertBillFiltersToServer = (data: BillFilter): GetBillWithPaginat
 export const convertBillToServer = (data: UpdateBill): UpdateBillCommand => {
 	return {
 		id: data.id!,
+		number: data.number,
+		date: data.date,
 		billType: convertToServerBillType(data.billType!),
 		userId: data.userId!,
 	};

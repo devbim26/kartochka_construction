@@ -36,14 +36,12 @@ import {
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
+	ConstructionClass,
+	Guidebooks,
 	type BuildingType,
 	type CategoryClass,
 	type ConstructionsAddData,
 	type ConstructionsEditData,
-	ConstructionClass,
-	EnConstructionTypeSelectValues,
-	Guidebooks,
-	RuConstructionTypeSelectValues,
 	type Issuer,
 } from '@features/guidbooks/types';
 
@@ -72,6 +70,7 @@ interface CreateConstructionFormProps {
 	floorId?: string;
 	reportFloorInfoId?: string;
 	floorNumber?: string;
+	constructionTargetTab?: 'walls' | 'floors';
 }
 
 interface RoomRequirementMap {
@@ -85,7 +84,21 @@ interface RoomRequirementMap {
 
 export const CreateConstructionForm = memoize(
 	forwardRef<CreateConstructionFormHandle, CreateConstructionFormProps>(
-		({ onSuccess, x, y, x2, y2, page, floorId, reportFloorInfoId, floorNumber }, ref) => {
+		(
+			{
+				onSuccess,
+				x,
+				y,
+				x2,
+				y2,
+				page,
+				floorId,
+				reportFloorInfoId,
+				floorNumber,
+				constructionTargetTab = 'walls',
+			},
+			ref,
+		) => {
 			const { t, locale } = useI18n();
 			const form = useForm<CreateConstructionData>({
 				defaultValues: CreateConstructionConfig.defaultValues,
@@ -144,8 +157,6 @@ export const CreateConstructionForm = memoize(
 				[],
 			);
 			const [search] = useSearchParams();
-			const floorPlanTab = search.get('floorPlanTab');
-			const isLayoutFixed = floorPlanTab === 'walls' || floorPlanTab === 'floors';
 			const editMode = search.get('editMode');
 			const reportId = search.get('reportId');
 			const reportType = search.get('reportType');
@@ -154,10 +165,6 @@ export const CreateConstructionForm = memoize(
 			const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 			const userId = useAppSelector((state) => state.userData.data?.id);
 			const dispatch = useAppDispatch();
-
-			// Выбор массива типов конструкций в зависимости от языка
-			const constructionTypeOptions =
-				locale === 'ru' ? RuConstructionTypeSelectValues : EnConstructionTypeSelectValues;
 
 			const processRoomRequirements = (roomRequirementsData: any[]) => {
 				const map: RoomRequirementMap = {};
@@ -213,7 +220,11 @@ export const CreateConstructionForm = memoize(
 			}, [firstPlacementRoom, roomRequirementsMap, setValue]);
 
 			useEffect(() => {
-				if (firstPlacementRoom && secondPlacementRoom && roomRequirementsMap[firstPlacementRoom]) {
+				if (
+					firstPlacementRoom &&
+					secondPlacementRoom &&
+					roomRequirementsMap[firstPlacementRoom]
+				) {
 					const requirement = roomRequirementsMap[firstPlacementRoom].find(
 						(room) => room.secondRoomId === secondPlacementRoom,
 					);
@@ -225,12 +236,14 @@ export const CreateConstructionForm = memoize(
 			}, [secondPlacementRoom, firstPlacementRoom, roomRequirementsMap, setValue]);
 
 			useEffect(() => {
-				if (floorPlanTab === 'walls') {
-					setValue('constructionType', ConstructionClass.Wall);
-				} else if (floorPlanTab === 'floors') {
-					setValue('constructionType', ConstructionClass.Floor);
-				}
-			}, [floorPlanTab, setValue]);
+				setValue(
+					'constructionType',
+					constructionTargetTab === 'floors'
+						? ConstructionClass.Floor
+						: ConstructionClass.Wall,
+					{ shouldValidate: true },
+				);
+			}, [constructionTargetTab, setValue]);
 
 			useImperativeHandle(ref, () => ({
 				submit: () => {
@@ -239,13 +252,11 @@ export const CreateConstructionForm = memoize(
 					})();
 				},
 				reset: (data) => {
-					const typeFromTab =
-						floorPlanTab === 'walls'
-							? ConstructionClass.Wall
-							: floorPlanTab === 'floors'
-								? ConstructionClass.Floor
-								: form.getValues('constructionType');
-					form.reset({ constructionType: typeFromTab || '', ...data });
+					form.reset({
+						constructionType:
+							form.getValues('constructionType') || ConstructionClass.Wall,
+						...data,
+					});
 				},
 			}));
 
@@ -351,8 +362,12 @@ export const CreateConstructionForm = memoize(
 				const request$ =
 					reportType === ReportCategory.Floor
 						? (() => {
-								const baseX = x ? +String(x).split('.')[0] : +search.get('x')!.split('.')[0]!;
-								const baseY = y ? +String(y).split('.')[0] : +search.get('y')!.split('.')[0]!;
+								const baseX = x
+									? +String(x).split('.')[0]
+									: +search.get('x')!.split('.')[0]!;
+								const baseY = y
+									? +String(y).split('.')[0]
+									: +search.get('y')!.split('.')[0]!;
 								const searchX2 = search.get('x2');
 								const searchY2 = search.get('y2');
 								const diagonalX =
@@ -680,48 +695,7 @@ export const CreateConstructionForm = memoize(
 								placeholder={t('createConstruction.name.placeholder')}
 								maxLength={50}
 							/>
-							{!isLayoutFixed && (
-								<Controller
-									control={control}
-									name={'constructionType'}
-									render={({ field }) => (
-										<Select
-											options={constructionTypeOptions}
-											{...field}
-											value={field.value || ''}
-											label={
-												formState.errors?.constructionType?.message
-													? t(
-															formState.errors.constructionType
-																.message as any,
-														)
-													: t('createConstruction.constructionType.label')
-											}
-											isSearchable
-											error={
-												formState.errors.constructionType?.message
-													? t(
-															formState.errors.constructionType
-																.message as any,
-														)
-													: undefined
-											}
-											labelClassName={twMerge(
-												'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px] text-left',
-												formState.errors.constructionType?.message
-													? 'text-error'
-													: '',
-											)}
-											placeholder={t(
-												'createConstruction.constructionType.placeholder',
-											)}
-											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-											wrapperClassname="shadow-none ring-input-border-primary flex-row gap-[20px]"
-										/>
-									)}
-								/>
-							)}
-							{isLayoutFixed && <input type="hidden" {...register('constructionType')} />}
+							<input type="hidden" {...register('constructionType')} />
 							<div className="flex items-center gap-x-[20px]">
 								<div className="flex w-[145px] text-left">
 									<label

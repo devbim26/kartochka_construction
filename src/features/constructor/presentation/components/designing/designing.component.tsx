@@ -68,6 +68,8 @@ import { SelectableMaterialDesignationProvider } from '@features/guidbooks/prese
 
 const isGeneralReferenceIssuer = (issuerName?: string | null) => {
 	const n = (issuerName ?? '').trim().toLowerCase();
+	// Empty issuer means "not brand-locked" for designing flow.
+	if (!n) return true;
 	return n === 'общий' || n === 'general';
 };
 
@@ -84,6 +86,7 @@ const DesigningConstructionScreen = () => {
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
+	const [hasPendingTypeChange, setHasPendingTypeChange] = useState(false);
 	const [compIsRelevant, setCompIsRelevant] = useState<boolean>(false);
 	const [labIsRelevant, setLabIsRelevant] = useState<boolean>(false);
 
@@ -179,6 +182,7 @@ const DesigningConstructionScreen = () => {
 						const data = convertToClientConstructionsEditData(response.data);
 						setConstructionHeader(data);
 						form.reset(data);
+						setHasPendingTypeChange(false);
 					}
 				}),
 				catchError((error) => {
@@ -437,13 +441,22 @@ const DesigningConstructionScreen = () => {
 			setLabIsRelevant(false);
 			setCompIsRelevant(false);
 			setSvgUrl(null);
-
-			if (constructionHeaderId) {
-				handleGetConstructionImage(constructionHeaderId);
-			}
+			setHasPendingTypeChange(true);
 		},
-		[form, constructionHeaderId, handleGetConstructionImage, isConstructionEditLocked],
+		[form, isConstructionEditLocked],
 	);
+
+	const handleRestoreInitialConstruction = useCallback(() => {
+		if (!constructionHeaderId) return;
+		handleGetConstructionByHeaderId(constructionHeaderId);
+		handleGetConstructionImage(constructionHeaderId);
+		handleGetGraphDetail(constructionHeaderId);
+		handleGetGraphAdditionalDetail(constructionHeaderId);
+		setGraphData(null);
+		setGraphAdditionalData(null);
+		setLabIsRelevant(false);
+		setCompIsRelevant(false);
+	}, [constructionHeaderId, handleGetConstructionImage]);
 
 	const onEditHandle = useCallback(() => {
 		if (isConstructionEditLocked) {
@@ -744,6 +757,14 @@ const DesigningConstructionScreen = () => {
 					/>
 				) : null}
 				<div className="flex items-center justify-end gap-[10px]">
+					{hasPendingTypeChange && (
+						<Button
+							onClick={handleRestoreInitialConstruction}
+							className="h-[40px] w-fit bg-white px-[16px] font-sans text-sm font-semibold text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
+						>
+							{locale === 'ru' ? 'Вернуть' : 'Restore'}
+						</Button>
+					)}
 					<Button
 						onClick={onEditHandle}
 						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"

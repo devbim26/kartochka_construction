@@ -27,8 +27,16 @@ export const HeavyMultiLayerWallFacingOneSideComponent = ({
 }: ConstructionTypeProps) => {
 	const { control, watch } = currentForm;
 
+	type LayerConfig = {
+		title: string;
+		constructionPosition: 'Left' | 'Center';
+		positions: string[];
+		selectable: string[];
+		materialType: MaterialTypesSelectValuesEnum;
+	};
+
 	// Сверху вниз как в разрезе: облицовка (Left) -> базовая многослойная (Center).
-	const layerConfigs = [
+	const layerConfigs: LayerConfig[] = [
 		{
 			title: '1. Облицовка',
 			constructionPosition: 'Left' as const,
