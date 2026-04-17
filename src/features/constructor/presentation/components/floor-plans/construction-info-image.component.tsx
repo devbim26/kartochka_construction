@@ -1,11 +1,14 @@
-import { svgConstructionDetail } from '@features/constructor/services';
+import type { GraphParametrsDto } from '@api-gen';
+import { graphDotsConverterToClient } from '@features/constructor/converters';
+import { graphDetail, svgConstructionDetail } from '@features/constructor/services';
+import type { GraphDetailResponse } from '@features/constructor/types';
 import type { ConstructionsEditData } from '@features/guidbooks/types';
 import { Guidebooks } from '@features/guidbooks/types';
 
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import { useEffect, useState } from 'react';
-import { catchError, from, of, tap } from 'rxjs';
+import { catchError, finalize, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { ConstructionImageModal } from './construction-image.modal';
 
@@ -19,9 +22,11 @@ export const ConstructionImage = ({
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 	const [construction, setConstruction] = useState<ConstructionsEditData>();
+	const [previewGraphData, setPreviewGraphData] = useState<GraphDetailResponse[] | null>(null);
+	const [isGraphLoading, setIsGraphLoading] = useState(false);
 
-	const handleGetConstructionByHeaderId = (id: string) => {
-		from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
+	const handleGetConstructionByHeaderId = (headerId: string) => {
+		from(getGuidebooksDetail({ id: headerId, guidebookType: Guidebooks.CONSTRUCTION }))
 			.pipe(
 				tap((response) => {
 					if (response.status === 200) {
@@ -37,10 +42,10 @@ export const ConstructionImage = ({
 			.subscribe();
 	};
 
-	const handleGetConstructionImage = (id: string) => {
-		from(svgConstructionDetail(id))
+	const handleGetConstructionImage = (imageId: string) => {
+		from(svgConstructionDetail(imageId))
 			.pipe(
-				catchError((error) => {
+				catchError(() => {
 					toast.error('Не удалось получить картинку');
 					return [];
 				}),
@@ -64,6 +69,46 @@ export const ConstructionImage = ({
 		handleGetConstructionImage(id);
 	}, [id]);
 
+	useEffect(() => {
+		if (!isPreviewOpen || !constructionHeaderId) {
+			setPreviewGraphData(null);
+			setIsGraphLoading(false);
+			return;
+		}
+
+		let cancelled = false;
+		setPreviewGraphData(null);
+		setIsGraphLoading(true);
+
+		const sub = from(graphDetail({ constructionHeaderId }))
+			.pipe(
+				catchError(() => {
+					toast.error('Не удалось загрузить график');
+					return of(null);
+				}),
+				finalize(() => {
+					if (!cancelled) setIsGraphLoading(false);
+				}),
+			)
+			.subscribe((res) => {
+				if (cancelled) return;
+				if (res?.data && Array.isArray(res.data)) {
+					setPreviewGraphData(
+						(res.data as GraphParametrsDto[]).map((item) =>
+							graphDotsConverterToClient(item),
+						),
+					);
+				} else {
+					setPreviewGraphData([]);
+				}
+			});
+
+		return () => {
+			cancelled = true;
+			sub.unsubscribe();
+		};
+	}, [isPreviewOpen, constructionHeaderId]);
+
 	return svgUrl ? (
 		<>
 			<div
@@ -80,6 +125,11 @@ export const ConstructionImage = ({
 					centerMaterials={construction?.constructionTypeObject?.centerConstruction || []}
 					rightMaterials={construction?.constructionTypeObject?.rightConstruction || []}
 					onClose={() => setIsPreviewOpen(false)}
+					constructionHeaderId={constructionHeaderId}
+					graphData={previewGraphData}
+					isGraphLoading={isGraphLoading}
+					regulatoryDocName={construction?.laboratoryTestSource ?? ''}
+					calculationDocName=""
 				/>
 			)}
 		</>

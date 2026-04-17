@@ -8,8 +8,9 @@ export const ConstructorHeader = () => {
 	const navigate = useAppNavigate();
 	const location = useLocation();
 	const [search] = useSearchParams();
-	const reportType = search.get('reportType');
-	const reportId = search.get('reportId');
+	const reportType =
+		search.get('reportType') ?? sessionStorage.getItem('reportType') ?? undefined;
+	const reportId = search.get('reportId') ?? sessionStorage.getItem('reportId') ?? undefined;
 	const isActive = (route: string) => location.pathname.endsWith(route);
 	const { t } = useI18n();
 
@@ -91,18 +92,6 @@ export const ConstructorHeader = () => {
 					disabled
 				>
 					{t('constructor.header.constructionPick')}
-				</Button>
-				<Button
-					className={twMerge(
-						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
-						isActive(CONSTRUCTOR_ROUTES.ifcModel.route)
-							? ''
-							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
-					)}
-					onClick={() => navigate(CONSTRUCTOR_ROUTES.ifcModel.route)}
-					//disabled={!isActive(CONSTRUCTOR_ROUTES.ifcModel.route)}
-				>
-					{t('constructor.header.ifcModel')}
 				</Button>
 			</div>
 		</div>

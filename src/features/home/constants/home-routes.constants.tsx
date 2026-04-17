@@ -43,6 +43,10 @@ export const DESIGNING_ROUTES = {
 		id: 'reports-page-id',
 		route: 'reports',
 	},
+	activeReports: {
+		id: 'active-reports-page-id',
+		route: 'active-reports',
+	},
 	guidbooks: {
 		id: 'guidbooks-layout-id',
 		route: 'guidbooks',

@@ -18,8 +18,8 @@ interface ServerPaginationData<T> {
 	totalPages: number;
 	totalCount: number;
 	pageSize: number;
-	hasPreviousPage: false;
-	hasNextPage: false;
+	hasPreviousPage: boolean;
+	hasNextPage: boolean;
 }
 
 interface PaginatedData<T> {

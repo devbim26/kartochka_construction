@@ -9,7 +9,7 @@ export const DesigningRwTable = memoize(
 		const { getHeaderGroups, getRowModel } = useSimpleTable<T>(columns, data);
 
 		return (
-			<div className="flex w-full flex-col gap-[10px] rounded-xl bg-none">
+			<div className="flex w-fit max-w-full flex-col gap-[10px] rounded-xl bg-none">
 				<div
 					className={twMerge(
 						'max-h-[600px] max-w-none overflow-auto',
@@ -18,7 +18,7 @@ export const DesigningRwTable = memoize(
 				>
 					<table
 						className={twMerge(
-							'w-full border-collapse border border-[#EDEFF2]',
+							'border-collapse border border-[#EDEFF2]',
 							classNames?.tableClassName,
 						)}
 					>

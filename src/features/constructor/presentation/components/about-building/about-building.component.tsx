@@ -53,10 +53,10 @@ import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useSearchParams } from 'react-router-dom';
 import { BsQuestionSquareFill } from 'react-icons/bs';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { catchError, from, map } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
@@ -78,6 +78,7 @@ const AboutBuildingScreen = () => {
 	const { register, control, formState, watch, setValue } = form;
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
+	const navigateReplace = useNavigate();
 
 	const [regulatoryRequirementDocuments, setRegulatoryRequirementDocuments] = useState<
 		SelectOption[]
@@ -132,6 +133,15 @@ const AboutBuildingScreen = () => {
 	]);
 
 	const reportId = search.get('reportId');
+
+	useLayoutEffect(() => {
+		if (search.get('edit') && !reportId) {
+			toast.error(t('constructor.guard.reportRequiredForAboutBuilding'));
+			navigateReplace(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.reports.route}`, {
+				replace: true,
+			});
+		}
+	}, [search, reportId, navigateReplace, t]);
 
 	const handleSubmit = () => {
 		form.handleSubmit(onSubmit)();
@@ -416,14 +426,16 @@ const AboutBuildingScreen = () => {
 									/>
 								)}
 							/>
-							{selectedRegion && selectedRegion !== Country.None && regionHintText && (
-								<div className="group relative shrink-0">
-									<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
-									<div className="pointer-events-none absolute left-1/2 top-full z-10 w-[min(320px,calc(100vw-2rem))] max-w-[320px] -translate-x-1/2 translate-y-2 rounded bg-black px-3 py-2 text-left text-sm font-normal leading-snug text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-										{regionHintText}
+							{selectedRegion &&
+								selectedRegion !== Country.None &&
+								regionHintText && (
+									<div className="group relative shrink-0">
+										<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
+										<div className="pointer-events-none absolute left-1/2 top-full z-10 w-[min(320px,calc(100vw-2rem))] max-w-[320px] -translate-x-1/2 translate-y-2 rounded bg-black px-3 py-2 text-left text-sm font-normal leading-snug text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+											{regionHintText}
+										</div>
 									</div>
-								</div>
-							)}
+								)}
 						</div>
 
 						{/* Тип здания и назначение */}
@@ -703,7 +715,7 @@ const AboutBuildingScreen = () => {
 							/>
 						</div>
 
-						<div className="flex items-center gap-x-[10px]">
+						{/* <div className="flex items-center gap-x-[10px]">
 							<label className="w-[250px] font-sans text-sm font-semibold leading-6 text-gray-500">
 								{t('aboutBuilding.constructionInfo.bim')}
 							</label>
@@ -721,7 +733,7 @@ const AboutBuildingScreen = () => {
 									/>
 								)}
 							/>
-						</div>
+						</div> */}
 
 						{/* Кнопка */}
 						<div className="flex justify-end px-[16px] py-[13px]">

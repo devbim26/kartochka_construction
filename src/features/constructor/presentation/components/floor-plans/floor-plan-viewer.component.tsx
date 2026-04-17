@@ -604,9 +604,9 @@ export const FloorPlanViewer = ({
 	}, []);
 
 	return (
-		<div className="flex items-center justify-center rounded-[20px] py-[30px]">
-			<div className="flex w-fit flex-col gap-[18px] rounded-[20px] bg-white">
-				<div className="relative h-[600px] w-[1600px] overflow-auto border border-input-label-primary">
+		<div className="flex w-full max-w-full items-center justify-center rounded-[20px] py-[30px]">
+			<div className="flex w-full max-w-full flex-col gap-[18px] rounded-[20px] bg-white px-2 md:px-0">
+				<div className="relative mx-auto h-[min(70vh,720px)] w-full max-w-[min(100%,1600px)] overflow-auto border border-input-label-primary">
 					{isRendering && (
 						<div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60">
 							<Loader />

@@ -12,7 +12,7 @@ import {
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import zoomPlugin from 'chartjs-plugin-zoom';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 
 ChartJS.register(
@@ -27,66 +27,76 @@ ChartJS.register(
 	ChartDataLabels,
 );
 
-type GraphDataPoint = {
+export type GraphSeriesKind =
+	| 'computed_wall'
+	| 'laboratory_wall'
+	| 'window'
+	| 'door'
+	| 'reference'
+	| 'other';
+
+export type GraphDataPoint = {
 	x: number;
 	y: number | null;
 	pointLabel?: string;
 };
 
-type GraphDataSeries = {
-	label: string;
+export type DesigningChartSeries = {
+	key: string;
+	kind: GraphSeriesKind;
+	legendLabel: string;
 	data: GraphDataPoint[];
 	pointLabels?: Array<{ x: number; y: number; label: string }>;
 };
 
 type DesigningChartProps = {
-	graphSeries: GraphDataSeries[];
-	regulatoryDocName: string;
-	calculationDocName: string;
+	series: DesigningChartSeries[];
+	chartSize?: 'default' | 'large';
 };
 
-const DesigningChart = ({
-	graphSeries,
-	regulatoryDocName,
-	calculationDocName,
-}: DesigningChartProps) => {
+const seriesStyle = (kind: GraphSeriesKind) => {
+	switch (kind) {
+		case 'laboratory_wall':
+			return { color: '#ef4444', lineTier: 'thick' as const };
+		case 'computed_wall':
+			return { color: '#2563eb', lineTier: 'thick' as const };
+		case 'window':
+			return { color: '#22c55e', lineTier: 'thin' as const };
+		case 'door':
+			return { color: '#f97316', lineTier: 'thin' as const };
+		case 'reference':
+			return { color: '#9ca3af', lineTier: 'thin' as const };
+		default:
+			return { color: '#6b7280', lineTier: 'thin' as const };
+	}
+};
+
+const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) => {
 	const chartRef = useRef<ChartJS<'line'>>(null);
 	const { t } = useI18n();
 
-	const legendLabels: Record<string, string> = {
-		Computed: calculationDocName,
-		// "Лаб источник" показываем только у computedDots (доп. кривая).
-		computedDots: regulatoryDocName,
-		// Остальные вспомогательные линии не должны наследовать имя лабораторного источника.
-		Laboratory: 'Laboratory',
-		LaboratoryDots: 'LaboratoryDots',
-		// `abcd` is not a "source" doc (aux line only) — keep it as is.
-		abcd: 'abcd',
-	};
+	// `large` is tuned for Full HD: ~25% smaller footprint than the previous 750×1050 canvas.
+	const LARGE_SCALE = 0.75;
+	const thickWidth = chartSize === 'large' ? Math.round(5 * LARGE_SCALE) : 4;
+	const thinWidth = chartSize === 'large' ? Math.round(2.5 * LARGE_SCALE * 10) / 10 : 2;
+	const chartHeight = chartSize === 'large' ? Math.round(750 * LARGE_SCALE) : 500;
+	const chartMinWidth = chartSize === 'large' ? Math.round(1050 * LARGE_SCALE) : 700;
 
-	// Required "valid" frequency range.
-	// If the dataset contains frequencies outside it — shade the outside areas and
-	// draw dashed boundary lines.
 	const RANGE_MIN_HZ = 100;
 	const RANGE_MAX_HZ = 3150;
 
-	// Собираем все частоты из всех графиков (не только Laboratory),
-	// чтобы корректно рендерить случаи "computed + additional" без laboratory.
 	const allFrequencies = Array.from(
 		new Set(
-			graphSeries
-				.flatMap((series) => series.data.map((point) => point.x))
+			series
+				.flatMap((s) => s.data.map((point) => point.x))
 				.filter((freq) => freq !== null && freq !== undefined)
 				.sort((a, b) => a - b),
 		),
 	);
 
-	// Находим мин и макс частоты для масштабирования
 	const minFrequency = allFrequencies.length > 0 ? Math.min(...allFrequencies) : 50;
 	const maxFrequency = allFrequencies.length > 0 ? Math.max(...allFrequencies) : 5000;
 
-	// Фильтруем частоты в диапазоне, но добавляем обязательные границы,
-	// чтобы "палочки" на 100 и 3150 были отрисованы по точкам (tick’ам).
 	const displayFrequencies = (() => {
 		const base = allFrequencies.filter((freq) => freq >= minFrequency && freq <= maxFrequency);
 		const set = new Set(base);
@@ -95,14 +105,6 @@ const DesigningChart = ({
 		return Array.from(set).sort((a, b) => a - b);
 	})();
 
-	const closestFrequency = (target: number) => {
-		if (!displayFrequencies.length) return target;
-		return displayFrequencies.reduce((best, curr) =>
-			Math.abs(curr - target) < Math.abs(best - target) ? curr : best,
-		);
-	};
-
-	// Canvas shading + dashed vertical lines at range boundaries.
 	const frequencyRangePlugin = {
 		id: 'frequencyRangeShade',
 		beforeDatasetsDraw: (chart: ChartJS<'line'>) => {
@@ -120,13 +122,9 @@ const DesigningChart = ({
 				top: number;
 				bottom: number;
 			};
-			const xLeft = chartArea.left;
-			const xRight = chartArea.right;
 			const yTop = chartArea.top;
 			const yBottom = chartArea.bottom;
 
-			// Kostyl: поставить 2 пунктирные "палочки" по частотам 100 и 3150.
-			// Если точных меток нет в labels (категориальная ось), ставим по ближайшему tick.
 			const closestIndexTo = (target: number) => {
 				if (!displayFrequencies.length) return -1;
 				let bestIdx = 0;
@@ -142,25 +140,19 @@ const DesigningChart = ({
 			};
 
 			const pixelForTickSafe = (tickIndex: number) => {
-				// 1) Пробуем по tick index.
 				if (typeof xScale.getPixelForTick === 'function') {
 					const pxByTick = xScale.getPixelForTick(tickIndex);
 					if (Number.isFinite(pxByTick)) return pxByTick;
 				}
-
-				// 2) Фолбэк: по значению label (category scale иногда капризен).
 				if (typeof xScale.getPixelForValue === 'function') {
 					const val = displayFrequencies[tickIndex];
 					if (val === undefined || val === null) return NaN;
 					const pxByValue = xScale.getPixelForValue(String(val));
 					return Number.isFinite(pxByValue) ? pxByValue : NaN;
 				}
-
 				return NaN;
 			};
 
-			// Предпочитаем получать координату по "label value", а не по tickIndex,
-			// чтобы autoSkip/пропуски тиков не уводили палку в "50" вместо "3150".
 			const leftBoundaryPixel = (() => {
 				if (typeof xScale.getPixelForValue === 'function') {
 					const px = xScale.getPixelForValue(String(RANGE_MIN_HZ));
@@ -182,9 +174,6 @@ const DesigningChart = ({
 			if (!Number.isFinite(leftBoundaryPixel) && !Number.isFinite(rightBoundaryPixel)) return;
 
 			ctx.save();
-
-			// 2 "доп. графика": две вертикальные пунктирные линии (черные)
-			// на частотах 100 и 3150.
 			ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
 			ctx.lineWidth = 1.6;
 			ctx.setLineDash([4, 4]);
@@ -205,110 +194,70 @@ const DesigningChart = ({
 
 	const chartData: ChartData<'line'> = {
 		labels: displayFrequencies.map((freq) => String(freq)),
-		datasets: graphSeries.map((series, index) => {
-			// Явная цветовая схема: main computed — красный, laboratory — синий,
-			// дополнительные серии — серые.
-			const labelLower = (series.label || '').toLowerCase();
-			const isComputed = labelLower.includes('computed');
-			const isLaboratory = labelLower.includes('laboratory');
-			const isGreySeries = !isComputed && !isLaboratory;
+		datasets: series.map((s) => {
+			const { color, lineTier } = seriesStyle(s.kind);
+			const borderWidth = lineTier === 'thick' ? thickWidth : thinWidth;
+			const isReference = s.kind === 'reference';
+			const isGreyOther = s.kind === 'other';
 
-			const isAtalon = labelLower.includes('atalon');
-			const isAbcd = labelLower.includes('abcd');
-
-			let color = '#808080';
-			if (isComputed) color = '#ef4444';
-			else if (isLaboratory) color = '#3b82f6';
-			else if (isAtalon)
-				color = '#9ca3af'; // lighter grey for less visual noise
-			else if (isAbcd) color = '#a1a1aa';
-
-			// Создаем массив данных для каждой частоты
 			const dataPoints = displayFrequencies.map((frequency) => {
-				const point = series.data.find((p) => p.x === frequency);
+				const point = s.data.find((p) => p.x === frequency);
 				return point ? point.y : null;
 			});
 
-			// Собираем метки для точек этого графика
-			const pointLabels = series.pointLabels || [];
+			const pointLabels = s.pointLabels || [];
+
 			return {
-				label: legendLabels[series.label] || series.label,
+				label: s.legendLabel,
 				data: dataPoints,
 				borderColor: color,
 				backgroundColor: 'transparent',
-				borderWidth: isAtalon ? 2 : 3,
-				borderDash: isAtalon ? [6, 6] : undefined,
-				// Legend should always show colored "circle" sample.
-				// Point visibility on the chart itself is controlled by `pointRadius`.
-				pointStyle: 'circle',
-				pointBackgroundColor: (context) => {
-					// Для легенды Chart.js может вызывать скрипты без `dataIndex`.
-					// В этом случае возвращаем цвет серии, чтобы кружок в легенде был виден.
+				borderWidth,
+				borderDash: isReference ? [6, 6] : undefined,
+				pointStyle: 'circle' as const,
+				pointBackgroundColor: (context: any) => {
 					if (context.dataIndex === undefined) return color;
-
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
-
 					if (value === null || value === undefined) return 'transparent';
-
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
-
 					return hasLabel ? '#000000' : color;
 				},
-				pointBorderColor: (context) => {
+				pointBorderColor: (context: any) => {
 					if (context.dataIndex === undefined) return color;
-
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
-
 					if (value === null || value === undefined) return 'transparent';
-
-					// Проверяем, есть ли метка для этой точки
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
-
 					return hasLabel ? '#000000' : color;
 				},
-				pointRadius: (context) => {
-					// Для легенды — рисуем небольшой кружок даже у вспомогательных серий.
-					if (context.dataIndex === undefined) return isGreySeries ? 4 : 5;
-
+				pointRadius: (context: any) => {
+					if (context.dataIndex === undefined) return isGreyOther ? 4 : 5;
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
-
 					if (value === null || value === undefined) return 0;
-
-					// Проверяем, есть ли метка для этой точки
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
-
-					// Grey helper lines should be less noisy: show points only where we have labels.
-					if (isGreySeries) return hasLabel ? 4 : 0;
-
+					if (isGreyOther) return hasLabel ? 4 : 0;
 					return hasLabel ? 6 : 3;
 				},
-				pointBorderWidth: (context) => {
-					if (context.dataIndex === undefined) return isGreySeries ? 1 : 2;
-
+				pointBorderWidth: (context: any) => {
+					if (context.dataIndex === undefined) return isGreyOther ? 1 : 2;
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
-
 					if (value === null || value === undefined) return 0;
-
-					// Проверяем, есть ли метка для этой точки
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
-
-					if (isGreySeries) return hasLabel ? 1.5 : 0;
-
+					if (isGreyOther) return hasLabel ? 1.5 : 0;
 					return hasLabel ? 2 : 1;
 				},
-				pointHoverRadius: (context) => {
+				pointHoverRadius: (context: any) => {
 					const value = context.dataset.data[context.dataIndex];
 					return value !== null && value !== undefined ? 5 : 0;
 				},
@@ -319,13 +268,8 @@ const DesigningChart = ({
 		}),
 	};
 
-	const areNumbersEqual = (a: number, b: number, tolerance = 0.01): boolean => {
-		return Math.abs(a - b) <= tolerance;
-	};
-
-	// Собираем все значения Y для определения диапазона оси Y
-	const allValues = graphSeries.flatMap((series) =>
-		series.data
+	const allValues = series.flatMap((s) =>
+		s.data
 			.filter((point) => point.y !== null && point.y !== undefined)
 			.map((point) => point.y as number),
 	);
@@ -333,149 +277,154 @@ const DesigningChart = ({
 	const maxY = allValues.length > 0 ? Math.max(...allValues) : 0;
 	const minY = allValues.length > 0 ? Math.min(...allValues) : 0;
 
-	const options: ChartOptions<'line'> = {
-		responsive: true,
-		maintainAspectRatio: false,
-		plugins: {
-			datalabels: {
-				align: 'top', // Положение относительно точки (сверху)
-				anchor: 'end', // Якорь (конец вектора точки)
-				offset: 4, // Отступ в пикселях от точки
-				clip: false, // Чтобы метки не обрезались краями области графика
-
-				// Логика отображения текста
-				formatter: (value, context) => {
-					const datasetIndex = context.datasetIndex;
-					const dataIndex = context.dataIndex;
-					const frequency = displayFrequencies[dataIndex];
-					const series = graphSeries[datasetIndex];
-					// Ищем метку в ваших данных
-					const pointLabel = series.data?.find((p) => p.x === frequency && p.y === value);
-					// Возвращаем текст метки, если она найдена, иначе null (ничего не рисуем)
-					return pointLabel ? (pointLabel as any).label : null;
-				},
-				font: {
-					weight: 'bold',
-					size: 11,
-				},
-				color: (context) => {
-					// Можно сделать цвет текста таким же, как цвет линии
-					return context.dataset.borderColor as string;
-				},
-			},
-			legend: {
-				maxWidth: 200,
-				display: true,
-				position: 'right',
-				align: 'center',
-				labels: {
-					boxWidth: 100,
-					padding: 25,
-					font: {
-						size: 12,
-						weight: 'bold',
-					},
-					// Restore legend colored circles.
-					usePointStyle: true,
-				},
-			},
-			tooltip: {
-				enabled: true,
-				mode: 'index',
-				intersect: false,
-				filter: (tooltipItem) => {
-					// Фильтруем tooltip для точек без данных
-					return tooltipItem.dataset.data[tooltipItem.dataIndex] !== null;
-				},
-				callbacks: {
-					label: (context) => {
-						const value = context.raw as number | null;
+	const options: ChartOptions<'line'> = useMemo(
+		() => ({
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				datalabels: {
+					align: 'top',
+					anchor: 'end',
+					offset: 4,
+					clip: false,
+					formatter: (value, context) => {
 						const datasetIndex = context.datasetIndex;
 						const dataIndex = context.dataIndex;
 						const frequency = displayFrequencies[dataIndex];
-
-						if (value === null || value === undefined) return '';
-
-						const series = graphSeries[datasetIndex];
-						const pointLabel = series.pointLabels?.find(
-							(label) => label.x === frequency && label.y === value,
-						);
-
-						const baseLabel = `${context.dataset.label}: ${value.toFixed(1)}`;
-
-						return pointLabel ? `${baseLabel} (${pointLabel.label})` : baseLabel;
+						const s = series[datasetIndex];
+						const pointLabel = s.data?.find((p) => p.x === frequency && p.y === value);
+						return pointLabel ? (pointLabel as any).label : null;
 					},
-					title: (tooltipItems) => {
-						const label = tooltipItems[0].label;
-						return `${t('constructor.chart.frequencyLabel')}: ${label} Hz`;
-					},
-				},
-			},
-		},
-
-		scales: {
-			x: {
-				type: 'category',
-				title: {
-					display: true,
-					text: t('constructor.chart.frequencyAxis'),
 					font: {
-						size: 12,
 						weight: 'bold',
+						size: chartSize === 'large' ? 14 : 11,
+					},
+					color: (context) => context.dataset.borderColor as string,
+				},
+				legend: {
+					maxWidth: chartSize === 'large' ? 420 : 200,
+					display: true,
+					position: 'right',
+					align: 'center',
+					labels: {
+						filter: (legendItem) => {
+							const text = String(legendItem.text ?? '').trim();
+							return text.length > 0;
+						},
+						boxWidth: chartSize === 'large' ? 120 : 100,
+						padding: chartSize === 'large' ? 18 : 25,
+						font: {
+							size: chartSize === 'large' ? 13 : 12,
+							weight: 'bold',
+						},
+						usePointStyle: true,
 					},
 				},
-				grid: {
-					display: true,
-					color: 'rgba(0, 0, 0, 0.1)',
-				},
-				ticks: {
-					autoSkip: true,
-					maxTicksLimit: 15,
-					callback: (value, index) => {
-						const freq = displayFrequencies[index];
-						return freq ? String(freq) : '';
+				tooltip: {
+					enabled: true,
+					mode: 'index',
+					intersect: false,
+					filter: (tooltipItem) =>
+						tooltipItem.dataset.data[tooltipItem.dataIndex] !== null,
+					callbacks: {
+						label: (context) => {
+							const value = context.raw as number | null;
+							const datasetIndex = context.datasetIndex;
+							const dataIndex = context.dataIndex;
+							const frequency = displayFrequencies[dataIndex];
+							if (value === null || value === undefined) return '';
+							const s = series[datasetIndex];
+							const pointLabel = s.pointLabels?.find(
+								(label) => label.x === frequency && label.y === value,
+							);
+							const name =
+								(context.dataset.label as string)?.trim() || s.key;
+							const baseLabel = `${name}: ${value.toFixed(1)}`;
+							return pointLabel ? `${baseLabel} (${pointLabel.label})` : baseLabel;
+						},
+						title: (tooltipItems) => {
+							const label = tooltipItems[0].label;
+							return `${t('constructor.chart.frequencyLabel')}: ${label} Hz`;
+						},
 					},
 				},
 			},
-			y: {
-				type: 'linear',
-				title: {
-					display: true,
-					text: 'Rw',
-					font: {
-						size: 12,
-						weight: 'bold',
+			scales: {
+				x: {
+					type: 'category',
+					title: {
+						display: true,
+						text: t('constructor.chart.frequencyAxis'),
+						font: {
+							size: chartSize === 'large' ? 14 : 12,
+							weight: 'bold',
+						},
+					},
+					grid: {
+						display: true,
+						color: 'rgba(0, 0, 0, 0.1)',
+					},
+					ticks: {
+						autoSkip: true,
+						maxTicksLimit: 15,
+						callback: (_value, index) => {
+							const freq = displayFrequencies[index];
+							return freq ? String(freq) : '';
+						},
 					},
 				},
-				min: Math.max(0, minY - 5),
-				max: maxY + 10,
-				ticks: {
-					stepSize: 5,
+				y: {
+					type: 'linear',
+					title: {
+						display: true,
+						text: 'Rw',
+						font: {
+							size: chartSize === 'large' ? 14 : 12,
+							weight: 'bold',
+						},
+					},
+					min: Math.max(0, minY - 5),
+					max: maxY + 10,
+					ticks: {
+						stepSize: 5,
+					},
+					grid: {
+						display: true,
+						color: 'rgba(0, 0, 0, 0.1)',
+					},
 				},
-				grid: {
-					display: true,
-					color: 'rgba(0, 0, 0, 0.1)',
+			},
+			elements: {
+				line: {
+					tension: 0.4,
+				},
+				point: {
+					radius: 3,
+					hoverRadius: 6,
 				},
 			},
-		},
-		elements: {
-			line: {
-				tension: 0.4,
+			interaction: {
+				intersect: false,
+				mode: 'index',
 			},
-			point: {
-				radius: 3,
-				hoverRadius: 6,
-			},
-		},
-		interaction: {
-			intersect: false,
-			mode: 'index',
-		},
-	};
+		}),
+		[t, displayFrequencies, series, chartSize, minY, maxY],
+	);
+
+	if (!series.length) {
+		return (
+			<div
+				className="relative flex w-full items-center justify-center text-sm text-input-label-primary"
+				style={{ minWidth: chartMinWidth, height: chartHeight }}
+			>
+				—
+			</div>
+		);
+	}
 
 	return (
-		<div className="relative min-w-[700px]">
-			<div className="h-[500px] w-full">
+		<div className="relative flex w-full justify-center" style={{ minWidth: chartMinWidth }}>
+			<div className="w-full" style={{ height: chartHeight }}>
 				<Line
 					ref={chartRef}
 					data={chartData}

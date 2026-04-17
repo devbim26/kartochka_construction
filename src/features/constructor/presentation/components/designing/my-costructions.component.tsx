@@ -458,8 +458,8 @@ const MyConstructions = () => {
 					)}
 				</div>
 			</div>
-			<div className="flex w-full gap-[72px] rounded-[20px] bg-white px-[25px] py-[27px]">
-				<div className="flex w-full flex-col gap-[10px] px-[24px] py-[10px]">
+			<div className="flex w-full flex-col items-stretch gap-6 rounded-[20px] bg-white px-[25px] py-[27px] xl:flex-row xl:items-start">
+				<div className="flex w-full shrink-0 flex-col gap-[10px] px-[24px] py-[10px] xl:max-w-[min(100%,400px)] xl:basis-[400px]">
 					{currentReportInfo ? (
 						<>
 							{hasComputedDots && (
@@ -537,11 +537,14 @@ const MyConstructions = () => {
 						</div>
 					)}
 				</div>
-				<DesigningGraph
-					graphData={graphData}
-					regulatoryDocName={currentReportInfo?.regulatoryDocument?.name || ''}
-					calculationDocName={currentReportInfo?.calculationDocument?.name || ''}
-				/>
+				<div className="flex min-h-0 min-w-0 flex-1 justify-center overflow-x-auto px-2">
+					<DesigningGraph
+						graphData={graphData}
+						regulatoryDocName={currentReportInfo?.regulatoryDocument?.name || ''}
+						calculationDocName={currentReportInfo?.calculationDocument?.name || ''}
+						chartSize="large"
+					/>
+				</div>
 			</div>
 		</div>
 	);

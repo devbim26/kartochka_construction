@@ -25,7 +25,11 @@ export const SimpleTable = memoize(
 					<th
 						key={id}
 						colSpan={colSpan}
-						className={twMerge('group p-0', classNames?.headerCellClassName)}
+						className={twMerge(
+							'group p-0',
+							classNames?.headerCellClassName,
+							(columnDef.meta as { thClassName?: string } | undefined)?.thClassName,
+						)}
 					>
 						{flexRender(columnDef.header, getContext())}
 					</th>
@@ -42,7 +46,14 @@ export const SimpleTable = memoize(
 				key={id}
 			>
 				{getVisibleCells().map((cell) => (
-					<td key={cell.id} className="p-0">
+					<td
+						key={cell.id}
+						className={twMerge(
+							'p-0',
+							(cell.column.columnDef.meta as { tdClassName?: string } | undefined)
+								?.tdClassName,
+						)}
+					>
 						{flexRender(cell.column.columnDef.cell, cell.getContext())}
 					</td>
 				))}
@@ -64,10 +75,13 @@ export const SimpleTable = memoize(
 				</div>
 				<Pagination
 					onPageChange={(page) =>
-						onChangePaginationState({ ...paginationState, pageNumber: page })
+						onChangePaginationState({
+							pageNumber: page,
+							pageSize: paginationState.pageSize,
+						})
 					}
 					onPageSizeChange={(pageSize) => {
-						onChangePaginationState({ ...paginationState, pageSize });
+						onChangePaginationState({ pageNumber: 1, pageSize });
 					}}
 					state={paginationState}
 				/>

@@ -1,4 +1,4 @@
-import { FormElementLabel } from '@core';
+import { FormElementLabel, ImagePreviewModal, useI18n } from '@core';
 import type { ReportInfoShort } from '@features/constructor/utils';
 import { formatMaterial } from '@features/constructor/utils';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
@@ -11,6 +11,7 @@ import {
 	GeneralInformationSoundproofing,
 	GeneralInformationThermal,
 } from '../modals';
+import { CatalogLabTestGraphModal } from './catalog-lab-test-graph-modal.component';
 
 type Props = {
 	construction: ConstructionsEditData;
@@ -19,9 +20,12 @@ type Props = {
 };
 
 export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) => {
+	const { t } = useI18n();
 	const [thickness, setThickness] = useState<number>(0);
 	const [mass, setMass] = useState<number>(0);
 	const [density, setDensity] = useState<number>(0);
+	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+	const [isLabGraphOpen, setIsLabGraphOpen] = useState(false);
 
 	useEffect(() => {
 		if (!construction) return;
@@ -62,8 +66,21 @@ export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) =>
 		setMass(calculatedMass);
 	}, [thickness, density, construction]);
 
+	const constructionHeaderId = construction?.id ?? null;
+
 	return (
-		<div className="flex flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
+		<>
+			{previewSrc && (
+				<ImagePreviewModal src={previewSrc} onClose={() => setPreviewSrc(null)} />
+			)}
+			<CatalogLabTestGraphModal
+				isOpen={isLabGraphOpen}
+				onClose={() => setIsLabGraphOpen(false)}
+				constructionHeaderId={constructionHeaderId}
+				regulatoryDocName={construction?.laboratoryTestSource ?? ''}
+				calculationDocName=""
+			/>
+			<div className="flex flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
 			<p className="font-sans text-lg font-semibold leading-4">
 				{
 					RuConstructionTypesMap[
@@ -73,29 +90,50 @@ export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) =>
 				}
 			</p>
 			<div className="flex flex-row justify-between">
-				<div className="flex w-1/2 flex-col gap-[10px]">
-					<div className="flex items-center gap-[20px]">
-						<img
-							src={issuer}
-							alt="Превью изображения"
-							className="h-[66px] w-[140px] rounded-md object-cover"
-						/>
-						<p className="text-center">www.acoustic.ru</p>
+				<div className="flex w-1/2 min-w-0 flex-col gap-[10px]">
+					<div className="flex flex-row items-start justify-start gap-3 text-left">
+						<button
+							type="button"
+							className="shrink-0 cursor-pointer border-0 bg-transparent p-0"
+							onClick={() => setPreviewSrc(issuer)}
+						>
+							<img
+								src={issuer}
+								alt="Превью изображения"
+								className="h-[66px] w-[140px] shrink-0 rounded-md object-cover"
+							/>
+						</button>
+						<p className="text-left text-[14px] leading-snug">www.acoustic.ru</p>
 					</div>
-					<div className="flex size-fit">
-						{svgUrl && (
-							<img className="h-full w-[200px]" src={svgUrl} alt="SVG Construction" />
-						)}
-						<div className="flex w-fit flex-col">
-							{[
-								...(construction?.constructionTypeObject.leftConstruction || []),
-								...(construction?.constructionTypeObject.centerConstruction || []),
-								...(construction?.constructionTypeObject.rightConstruction || []),
-							].map((material: any, index: number) => (
-								<p key={index} className="text-[16px]">
-									- {formatMaterial(material)}
-								</p>
-							))}
+					<div className="flex min-w-0 flex-row items-start justify-start gap-4 text-left">
+						{svgUrl ? (
+							<button
+								type="button"
+								className="flex shrink-0 cursor-pointer items-start justify-start border-0 bg-transparent p-0"
+								onClick={() => setPreviewSrc(svgUrl)}
+							>
+								<img
+									className="block h-auto max-h-[280px] w-auto max-w-[260px] object-contain"
+									src={svgUrl}
+									alt="SVG Construction"
+								/>
+							</button>
+						) : null}
+						<div className="min-w-0 flex-1 overflow-x-auto text-left">
+							<div className="flex w-full min-w-0 flex-col items-start gap-1 text-left">
+								{[
+									...(construction?.constructionTypeObject.leftConstruction || []),
+									...(construction?.constructionTypeObject.centerConstruction || []),
+									...(construction?.constructionTypeObject.rightConstruction || []),
+								].map((material: any, index: number) => (
+									<p
+										key={index}
+										className="whitespace-nowrap text-left text-[16px] leading-snug text-gray-800"
+									>
+										- {formatMaterial(material)}
+									</p>
+								))}
+							</div>
 						</div>
 					</div>
 				</div>
@@ -125,25 +163,24 @@ export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) =>
 					<GeneralInformationSoundproofing
 						data={[
 							{
-								label: 'Расчёт',
-								soundproofing: 'Rw, dB',
-								values: String(construction?.labIndexValue) || '-',
-								requirements:
-									reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
-							},
-							{
-								label: 'Лаб.тест',
+								label: t('soundproofing.labTest'),
 								soundproofing: 'Rw, dB',
 								values: String(construction?.RCalcs) || '-',
 								requirements:
 									reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
 							},
 						]}
+						onSoundproofingLabelClick={
+							constructionHeaderId
+								? () => setIsLabGraphOpen(true)
+								: undefined
+						}
 					/>
 					<GeneralInformationThermal />
 					<GeneralInformationFireResistance />
 				</div>
 			</div>
 		</div>
+		</>
 	);
 };

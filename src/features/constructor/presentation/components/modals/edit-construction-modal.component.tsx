@@ -38,24 +38,36 @@ export const EditConstructionModal = ({
 		onConfirm();
 	};
 
+	const applyFormReset = () => {
+		if (!currentReportFloorInfo || !currentConstructionHeader) return;
+		formRef.current?.reset({
+			constructionType:
+				currentReportFloorInfo.reportConstructionHeader.requirement?.constructionType,
+			id: reportFloorInfoId,
+			length: String(currentReportFloorInfo.reportConstructionHeader.length),
+			width: String(currentReportFloorInfo.reportConstructionHeader.width),
+			construction: currentReportFloorInfo.reportConstructionHeader.constructionHeaderId,
+			name: currentConstructionHeader.name || 'Placeholder',
+			firstPlacementRoom:
+				currentReportFloorInfo.reportConstructionHeader.firstPlacemetnRoom.id,
+			secondPlacementRoom:
+				currentReportFloorInfo.reportConstructionHeader.secondPlacementRoom.id,
+			area: String(currentReportFloorInfo.reportConstructionHeader.square),
+		});
+	};
+
 	useEffect(() => {
-		if (currentReportFloorInfo && currentConstructionHeader) {
-			formRef.current?.reset({
-				constructionType:
-					currentReportFloorInfo.reportConstructionHeader.requirement?.constructionType,
-				id: reportFloorInfoId,
-				length: String(currentReportFloorInfo.reportConstructionHeader.length),
-				width: String(currentReportFloorInfo.reportConstructionHeader.width),
-				construction: currentReportFloorInfo.reportConstructionHeader.constructionHeaderId,
-				name: currentConstructionHeader.name || 'Placeholder',
-				firstPlacementRoom:
-					currentReportFloorInfo.reportConstructionHeader.firstPlacemetnRoom.id,
-				secondPlacementRoom:
-					currentReportFloorInfo.reportConstructionHeader.secondPlacementRoom.id,
-				area: String(currentReportFloorInfo.reportConstructionHeader.square),
-			});
-		}
-	}, [currentReportFloorInfo, currentConstructionHeader]);
+		if (!props.isOpen || !currentReportFloorInfo || !currentConstructionHeader) return;
+		const timer = window.setTimeout(() => {
+			applyFormReset();
+		}, 0);
+		return () => window.clearTimeout(timer);
+	}, [
+		props.isOpen,
+		currentReportFloorInfo,
+		currentConstructionHeader,
+		reportFloorInfoId,
+	]);
 
 	return (
 		<Modal

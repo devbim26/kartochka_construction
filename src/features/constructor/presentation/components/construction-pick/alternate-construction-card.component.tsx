@@ -1,4 +1,10 @@
-import { Button, FormElementLabel, useAppDispatch } from '@core';
+import {
+	Button,
+	FormElementLabel,
+	ImagePreviewModal,
+	useAppDispatch,
+	useI18n,
+} from '@core';
 import {
 	svgConstructionDetail,
 	swapToAlternateFloorConstruction,
@@ -23,6 +29,7 @@ import {
 	GeneralInformationSoundproofing,
 	GeneralInformationThermal,
 } from '../modals';
+import { CatalogLabTestGraphModal } from './catalog-lab-test-graph-modal.component';
 
 type Props = {
 	construction: AlternateConstruction;
@@ -38,6 +45,7 @@ export const AlternateConstructionCard = ({
 	onSwapSuccess,
 }: Props) => {
 	const dispatch = useAppDispatch();
+	const { t } = useI18n();
 
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
@@ -46,6 +54,8 @@ export const AlternateConstructionCard = ({
 	const [thickness, setThickness] = useState<number>(0);
 	const [mass, setMass] = useState<number>(0);
 	const [density, setDensity] = useState<number>(0);
+	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+	const [isLabGraphOpen, setIsLabGraphOpen] = useState(false);
 
 	useEffect(() => {
 		if (!constructionHeader) return;
@@ -147,8 +157,21 @@ export const AlternateConstructionCard = ({
 			.subscribe(() => dispatch(stopLoading()));
 	};
 
+	const constructionHeaderId = construction?.id ?? null;
+
 	return (
-		<div className="flex w-1/2 flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
+		<>
+			{previewSrc && (
+				<ImagePreviewModal src={previewSrc} onClose={() => setPreviewSrc(null)} />
+			)}
+			<CatalogLabTestGraphModal
+				isOpen={isLabGraphOpen}
+				onClose={() => setIsLabGraphOpen(false)}
+				constructionHeaderId={constructionHeaderId}
+				regulatoryDocName={constructionHeader?.laboratoryTestSource ?? ''}
+				calculationDocName=""
+			/>
+			<div className="flex w-1/2 flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
 			<div className="flex w-full items-center justify-between">
 				<p className="font-sans text-lg font-semibold leading-4 text-black">
 					{RuConstructionTypesMap[construction.constructionType as ConstructionTypeEnum]}
@@ -160,30 +183,58 @@ export const AlternateConstructionCard = ({
 					Использовать в отчете
 				</Button>
 			</div>
-			<div className="flex w-full items-center gap-[20px]">
-				<div className="flex items-center gap-[20px]">
-					<img
-						src={construction.issuerLogo || ''}
-						alt="Превью изображения"
-						className="h-[66px] w-[140px] rounded-md object-cover"
-					/>
-				</div>
-				<p className="font-sans text-[14px] font-semibold leading-4 text-black">
+			<div className="flex w-full min-w-0 flex-row items-start justify-start gap-3 text-left">
+				{construction.issuerLogo ? (
+					<button
+						type="button"
+						className="shrink-0 cursor-pointer border-0 bg-transparent p-0"
+						onClick={() => setPreviewSrc(construction.issuerLogo!)}
+					>
+						<img
+							src={construction.issuerLogo}
+							alt="Превью изображения"
+							className="h-[66px] w-[140px] shrink-0 rounded-md object-cover"
+						/>
+					</button>
+				) : (
+					<div className="h-[66px] w-[140px] shrink-0 rounded-md bg-background-secondary" />
+				)}
+				<p className="font-sans text-[14px] font-semibold leading-snug text-black">
 					{construction.issuer.name}
 				</p>
 			</div>
-			<div className="flex size-fit">
-				{svgUrl && <img className="h-full w-[200px]" src={svgUrl} alt="SVG Construction" />}
-				<div className="flex w-fit flex-col">
-					{[
-						...(constructionHeader?.constructionTypeObject.leftConstruction || []),
-						...(constructionHeader?.constructionTypeObject.centerConstruction || []),
-						...(constructionHeader?.constructionTypeObject.rightConstruction || []),
-					].map((material: any, index: number) => (
-						<p key={index} className="text-[16px]">
-							- {formatMaterial(material)}
-						</p>
-					))}
+			<div className="flex min-w-0 flex-row items-start justify-start gap-4 text-left">
+				{svgUrl ? (
+					<button
+						type="button"
+						className="flex shrink-0 cursor-pointer items-start justify-start border-0 bg-transparent p-0"
+						onClick={() => setPreviewSrc(svgUrl)}
+					>
+						<img
+							className="block size-auto max-h-[280px] max-w-[260px] object-contain"
+							src={svgUrl}
+							alt="SVG Construction"
+						/>
+					</button>
+				) : null}
+				<div className="min-w-0 flex-1 overflow-x-auto text-left">
+					<div className="flex w-full min-w-0 flex-col items-start gap-1 text-left">
+						{(
+							[
+								...(constructionHeader?.constructionTypeObject.leftConstruction || []),
+								...(constructionHeader?.constructionTypeObject.centerConstruction ||
+									[]),
+								...(constructionHeader?.constructionTypeObject.rightConstruction || []),
+							] as any[]
+						).map((material: any, index: number) => (
+							<p
+								key={index}
+								className="whitespace-nowrap text-left text-[16px] leading-snug text-gray-800"
+							>
+								- {formatMaterial(material)}
+							</p>
+						))}
+					</div>
 				</div>
 			</div>
 			<div className="flex w-full flex-col gap-[10px]">
@@ -212,24 +263,21 @@ export const AlternateConstructionCard = ({
 				<GeneralInformationSoundproofing
 					data={[
 						{
-							label: 'Расчёт',
-							soundproofing: 'Rw, dB',
-							values: String(constructionHeader?.labIndexValue) || '-',
-							requirements:
-								reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
-						},
-						{
-							label: 'Лаб.тест',
+							label: t('soundproofing.labTest'),
 							soundproofing: 'Rw, dB',
 							values: String(constructionHeader?.RCalcs) || '-',
 							requirements:
 								reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
 						},
 					]}
+					onSoundproofingLabelClick={
+						constructionHeaderId ? () => setIsLabGraphOpen(true) : undefined
+					}
 				/>
 				<GeneralInformationThermal />
 				<GeneralInformationFireResistance />
 			</div>
 		</div>
+		</>
 	);
 };

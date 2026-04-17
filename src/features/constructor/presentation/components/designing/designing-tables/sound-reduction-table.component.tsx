@@ -8,15 +8,13 @@ import { twMerge } from 'tailwind-merge';
 interface GraphTableRow {
 	frequency: string;
 	rLab: string;
-	rLabExtra: string; // новый столбец
-	rInSitu: string;
+	rLabExtra: string;
 }
 
 interface ExtraTableRow {
 	type: string;
 	rLab: string;
-	rLabExtra: string; // новый столбец
-	rInSitu: string;
+	rLabExtra: string;
 }
 
 interface GraphTableProps {
@@ -57,13 +55,10 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 
 		const freqData = allFreqs.map((freq) => ({
 			frequency: String(freq),
-			// Для справочной конструкции тут будет "–", а LaboratoryDots заполнен.
 			rLab: computedMap.get(freq) ?? '–',
 			rLabExtra: laboratoryMap.get(freq) ?? '–',
-			rInSitu: '–',
 		}));
 
-		// Дополнительные данные больше не выводим в таблице (только график).
 		const extraData: ExtraTableRow[] = [];
 
 		return { freqData, extraData };
@@ -216,7 +211,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				},
 			},
 		],
-		[noPadding],
+		[noPadding, t],
 	);
 
 	return (
@@ -226,7 +221,8 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 					data={extraData}
 					columns={extraColumns}
 					classNames={{
-						tableClassName: 'border border-[#EDEFF2] border-collapse',
+						tableContainerClassName: 'w-max max-w-full',
+						tableClassName: 'w-max border border-[#EDEFF2] border-collapse',
 						headerCellClassName: 'border border-[#EDEFF2]',
 						contentCellClassName: 'border text-[20px] border-[#EDEFF2] font-bold',
 					}}
@@ -236,7 +232,8 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				data={freqData}
 				columns={columns}
 				classNames={{
-					tableClassName: 'border border-[#EDEFF2] border-collapse',
+					tableContainerClassName: 'w-max max-w-full',
+					tableClassName: 'w-max border border-[#EDEFF2] border-collapse',
 					headerCellClassName: 'border border-[#EDEFF2]',
 					contentCellClassName: 'border border-[#EDEFF2]',
 				}}

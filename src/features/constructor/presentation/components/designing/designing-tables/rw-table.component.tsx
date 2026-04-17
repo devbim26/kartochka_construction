@@ -103,7 +103,8 @@ export const RwResultTable = ({
 				data={tableData}
 				columns={columns}
 				classNames={{
-					tableClassName: 'border border-[#EDEFF2] border-collapse',
+					tableContainerClassName: 'w-full',
+					tableClassName: 'w-full border border-[#EDEFF2] border-collapse',
 					headerCellClassName: 'border border-[#EDEFF2]',
 					contentCellClassName: 'border border-[#EDEFF2]',
 				}}

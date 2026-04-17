@@ -259,6 +259,26 @@ export const en = {
 	'sidebar.manufacturers': 'Manufacturers',
 	'sidebar.news': 'News',
 	'sidebar.reports': 'Reports',
+	'sidebar.activeReports': 'Active reports',
+
+	'reports.activeReports.pageTitle': 'Active reports',
+	'reports.activeReports.hint':
+		'Only reports with status In progress are listed. Continue opens About building in the constructor.',
+	'reports.activeReports.buildingName': 'Building / name',
+	'reports.activeReports.category': 'Report type',
+	'reports.activeReports.status': 'Status',
+	'reports.activeReports.statusInProgress': 'In progress',
+	'reports.activeReports.actions': 'Actions',
+	'reports.activeReports.openConstructor': 'Continue editing',
+	'reports.activeReports.delete': 'Delete report',
+	'reports.activeReports.deleteTitle': 'Delete this report?',
+	'reports.activeReports.deleteConfirm':
+		'The report and its draft data will be removed. This cannot be undone.',
+	'reports.activeReports.deleteSuccess': 'Report deleted',
+	'reports.activeReports.loadError': 'Failed to load active reports',
+
+	'reports.activeReports.categoryFloor': 'Floor plans',
+	'reports.activeReports.categorySingle': 'Single construction',
 
 	'common.start': 'Start',
 	'common.continue': 'Continue',
@@ -528,6 +548,11 @@ export const en = {
 	'constructor.header.constructionPick': 'Construction selection',
 	'constructor.header.ifcModel': 'IFC model',
 
+	'constructor.guard.reportRequiredForAboutBuilding':
+		'Editing «About building» is only available when a report is open. Open a report from the list.',
+	'constructor.guard.floorPlansRequiresReport':
+		'Floor plans require an open report. Specify reportId and reportType in the URL or open a report from the list.',
+
 	'constructor.designingHeader.title': 'Constructions',
 	'constructor.designingHeader.editConstruction': 'Edit construction',
 	'constructor.designingHeader.myConstructions': 'My constructions',
@@ -535,6 +560,10 @@ export const en = {
 	'constructor.table.data': 'Data',
 	'constructor.chart.frequencyAxis': 'Frequency (Hz)',
 	'constructor.chart.frequencyLabel': 'Frequency',
+	'constructor.chart.legendWallR': 'Construction sound insulation R, dB',
+	'constructor.chart.legendWallRlab': 'Construction sound insulation Rlab, dB',
+	'constructor.chart.legendWindowsRlab': 'Window sound insulation Rlab, dB',
+	'constructor.chart.legendDoorRlab': 'Door sound insulation Rlab, dB',
 
 	'errors.request': 'Request error',
 	'errors.reportInfoLoad': 'Failed to load report info',
@@ -548,6 +577,7 @@ export const en = {
 
 	'constructor.relevant.yes': 'Meets requirements',
 	'constructor.relevant.no': 'Does not meet requirements',
+	'constructor.catalog.labTestGraphTitle': 'Sound insulation (lab test)',
 	'constructor.myConstructions.construction1': 'Construction 1',
 	'constructor.myConstructions.imagePreview': 'Image preview',
 
@@ -788,6 +818,7 @@ export const en = {
 	'physical.values': 'Values',
 	'physical.requirements': 'Requirements',
 	'createConstruction.selectedConstruction': 'Selected Construction',
+	'createConstruction.manufacturer': 'Manufacturer',
 
 	// Account Form
 	'account.form.title': 'Company data',
@@ -843,6 +874,7 @@ export const ru: Record<TranslationKey, string> = {
 	'generalInfo.totalThickness': 'Общая толщина, мм',
 	'generalInfo.totalMass': 'Общая масса, кг',
 	'createConstruction.selectedConstruction': 'Выбранная конструкция',
+	'createConstruction.manufacturer': 'Производитель',
 
 	// Account Form
 	'account.form.title': 'Данные о компании',
@@ -1297,6 +1329,26 @@ export const ru: Record<TranslationKey, string> = {
 	'sidebar.manufacturers': 'Производители',
 	'sidebar.news': 'Новости',
 	'sidebar.reports': 'Отчеты',
+	'sidebar.activeReports': 'Активные отчёты',
+
+	'reports.activeReports.pageTitle': 'Активные отчёты',
+	'reports.activeReports.hint':
+		'Показаны отчёты со статусом «В работе». Кнопка «Продолжить» открывает раздел «О здании» в конструкторе.',
+	'reports.activeReports.buildingName': 'Здание / название',
+	'reports.activeReports.category': 'Тип отчёта',
+	'reports.activeReports.status': 'Статус',
+	'reports.activeReports.statusInProgress': 'В работе',
+	'reports.activeReports.actions': 'Действия',
+	'reports.activeReports.openConstructor': 'Продолжить редактирование',
+	'reports.activeReports.delete': 'Удалить отчёт',
+	'reports.activeReports.deleteTitle': 'Удалить этот отчёт?',
+	'reports.activeReports.deleteConfirm':
+		'Отчёт и черновые данные будут удалены. Действие необратимо.',
+	'reports.activeReports.deleteSuccess': 'Отчёт удалён',
+	'reports.activeReports.loadError': 'Не удалось загрузить активные отчёты',
+
+	'reports.activeReports.categoryFloor': 'Поэтажные планы',
+	'reports.activeReports.categorySingle': 'Одиночная конструкция',
 
 	'common.start': 'Начать',
 	'common.continue': 'Продолжить',
@@ -1560,6 +1612,11 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.header.constructionPick': 'Выбор конструкции',
 	'constructor.header.ifcModel': 'IFC модель',
 
+	'constructor.guard.reportRequiredForAboutBuilding':
+		'Раздел «О здании» в режиме редактирования доступен только при открытом отчёте. Выберите отчёт в списке.',
+	'constructor.guard.floorPlansRequiresReport':
+		'Поэтажные планы доступны только при открытом отчёте. Укажите reportId и reportType в адресе или выберите отчёт в списке.',
+
 	'constructor.designingHeader.title': 'Конструкции',
 	'constructor.designingHeader.editConstruction': 'Редактирование конструкции',
 	'constructor.designingHeader.myConstructions': 'Мои конструкции',
@@ -1567,6 +1624,10 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.table.data': 'Данные',
 	'constructor.chart.frequencyAxis': 'Частота (Hz)',
 	'constructor.chart.frequencyLabel': 'Частота',
+	'constructor.chart.legendWallR': 'Звукоизоляция конструкции R, dB',
+	'constructor.chart.legendWallRlab': 'Звукоизоляция конструкции Rlab, dB',
+	'constructor.chart.legendWindowsRlab': 'Звукоизоляция окон Rlab, dB',
+	'constructor.chart.legendDoorRlab': 'Звукоизоляция двери Rlab, dB',
 
 	'errors.request': 'Ошибка запроса',
 	'errors.reportInfoLoad': 'Ошибка при получении информации об отчете',
@@ -1580,6 +1641,7 @@ export const ru: Record<TranslationKey, string> = {
 
 	'constructor.relevant.yes': 'Соответствует',
 	'constructor.relevant.no': 'Не соответствует',
+	'constructor.catalog.labTestGraphTitle': 'Звукоизоляция (лабораторный тест)',
 	'constructor.myConstructions.construction1': 'Конструкция 1',
 	'constructor.myConstructions.imagePreview': 'Превью изображения',
 

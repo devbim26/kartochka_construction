@@ -1,4 +1,4 @@
-import { Button } from '@core';
+import { Button, ImagePreviewModal } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { formatMaterial } from '@features';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
@@ -35,6 +35,7 @@ export const FavoriteConstructionCard = ({
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isImageLoading, setIsImageLoading] = useState(false);
+	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
 	useEffect(() => {
 		let isCancelled = false;
@@ -122,9 +123,13 @@ export const FavoriteConstructionCard = ({
 	}, [header]);
 
 	return (
-		<div
-			className={`flex min-h-[320px] w-full flex-col gap-[10px] rounded-xl border border-gray-200 bg-white p-[12px] ${isSelected ? 'border-primary' : ''}`}
-		>
+		<>
+			{previewSrc && (
+				<ImagePreviewModal src={previewSrc} onClose={() => setPreviewSrc(null)} />
+			)}
+			<div
+				className={`flex min-h-[320px] w-full flex-col gap-[10px] rounded-xl border border-gray-200 bg-white p-[12px] ${isSelected ? 'border-primary' : ''}`}
+			>
 			<div className="flex items-start justify-between gap-[8px]">
 				<button
 					type="button"
@@ -154,11 +159,17 @@ export const FavoriteConstructionCard = ({
 			<div className="flex min-h-0 flex-1 gap-[12px]">
 				<div className="flex w-[170px] shrink-0 items-center justify-center rounded-md bg-background-secondary">
 					{svgUrl ? (
-						<img
-							className="size-full object-contain"
-							src={svgUrl}
-							alt="SVG Construction"
-						/>
+						<button
+							type="button"
+							className="flex size-full cursor-pointer items-center justify-center border-0 bg-transparent p-0"
+							onClick={() => setPreviewSrc(svgUrl)}
+						>
+							<img
+								className="size-full object-contain"
+								src={svgUrl}
+								alt="SVG Construction"
+							/>
+						</button>
 					) : isImageLoading ? (
 						<Loader />
 					) : (
@@ -185,5 +196,6 @@ export const FavoriteConstructionCard = ({
 				</div>
 			</div>
 		</div>
+		</>
 	);
 };

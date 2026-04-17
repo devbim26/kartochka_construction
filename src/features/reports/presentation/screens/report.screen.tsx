@@ -55,14 +55,21 @@ export const ReportScreen = () => {
 		)
 			.pipe(
 				switchMap((response) => {
+					const data = response.data;
+					const totalPages = data.totalPages ?? 0;
+					const pageNumber = pagination.pageNumber;
+					const pageSize = pagination.pageSize;
+					const hasPreviousPage = data.hasPreviousPage ?? pageNumber > 1;
+					const hasNextPage =
+						data.hasNextPage ?? (totalPages > 0 && pageNumber < totalPages);
 					const res = convertToPaginatedType(reportToClientConverter)({
-						items: response.data.items ?? [],
-						pageNumber: response.data.pageNumber ?? 1,
-						totalPages: response.data.totalPages ?? 0,
-						totalCount: response.data.totalCount ?? 0,
-						pageSize: response.data.pageSize ?? 10,
-						hasPreviousPage: false,
-						hasNextPage: false,
+						items: data.items ?? [],
+						pageNumber,
+						totalPages,
+						totalCount: data.totalCount ?? 0,
+						pageSize,
+						hasPreviousPage,
+						hasNextPage,
 					});
 					return from([res]);
 				}),
@@ -120,7 +127,7 @@ export const ReportScreen = () => {
 		<div className="flex w-full flex-col gap-[40px]">
 			<FormProvider {...form}>
 				<ReportHeader isAdmin={isAdmin} />
-			</FormProvider>{' '}
+			</FormProvider>
 			<SimpleTable
 				data={tableData}
 				columns={[

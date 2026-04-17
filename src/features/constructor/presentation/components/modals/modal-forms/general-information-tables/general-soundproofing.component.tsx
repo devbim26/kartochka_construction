@@ -5,9 +5,14 @@ import { useMemo } from 'react';
 
 type Props = {
 	data: SoundproofingStandarts[];
+	/** When set, the label in the first column is clickable (e.g. open lab-test graph). */
+	onSoundproofingLabelClick?: () => void;
 };
 
-export const GeneralInformationSoundproofing = ({ data }: Props) => {
+export const GeneralInformationSoundproofing = ({
+	data,
+	onSoundproofingLabelClick,
+}: Props) => {
 	const { t } = useI18n();
 
 	const columns = useMemo(() => {
@@ -22,13 +27,24 @@ export const GeneralInformationSoundproofing = ({ data }: Props) => {
 				),
 				cell: (info) => {
 					const row = info.row.original;
+					const labelNode = onSoundproofingLabelClick ? (
+						<button
+							type="button"
+							className="relative left-[-10px] inline cursor-pointer border-0 bg-transparent p-0 font-inherit italic text-blue-500 underline"
+							onClick={onSoundproofingLabelClick}
+						>
+							{row.label}
+						</button>
+					) : (
+						<p className="relative left-[-10px] inline italic text-blue-500 underline">
+							{row.label}
+						</p>
+					);
 					return (
 						<SimpleTableCell
 							content={
 								<div className="w-[200px]">
-									<p className="relative left-[-10px] inline italic text-blue-500 underline">
-										{row.label}
-									</p>
+									{labelNode}
 									<p className="inline">{row.soundproofing}</p>
 								</div>
 							}
@@ -83,7 +99,7 @@ export const GeneralInformationSoundproofing = ({ data }: Props) => {
 			},
 		];
 		return cols;
-	}, [t]);
+	}, [t, onSoundproofingLabelClick]);
 
 	return (
 		<div className="flex-col">

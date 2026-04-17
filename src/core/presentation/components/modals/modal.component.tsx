@@ -79,7 +79,7 @@ export const Modal = ({
 							<div
 								id="modal-body"
 								className={twMerge(
-									`p-semibold-16 flex max-h-[80vh] w-full flex-col overflow-hidden overflow-y-auto overflow-x-hidden rounded-xl bg-white p-4 px-6 py-4`,
+									'p-semibold-16 flex max-h-[80vh] w-full min-w-0 flex-col overflow-auto rounded-xl bg-white p-4 px-6 py-4',
 									contentClassName,
 								)}
 							>

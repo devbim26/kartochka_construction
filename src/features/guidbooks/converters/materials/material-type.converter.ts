@@ -24,5 +24,6 @@ export const convertToServerMaterialTypeData = (type: ClientMaterialType): Serve
 };
 
 export const convertToClientMaterialTypeData = (type: ServerMaterialType): ClientMaterialType => {
-	return materialTypeMap.toClient[type];
+	const map = materialTypeMap.toClient as Partial<Record<ServerMaterialType, ClientMaterialType>>;
+	return map[type] ?? ClientMaterialType.Plaster;
 };

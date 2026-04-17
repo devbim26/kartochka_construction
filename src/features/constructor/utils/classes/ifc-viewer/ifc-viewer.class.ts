@@ -40,6 +40,7 @@ export interface IFCViewerConstructorArgs {
 }
 
 export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructorArgs> {
+	private _resizeObserver: ResizeObserver | null = null;
 	private _onKeyDownHandlerRef: IFCViewerOnKeyDownHandler | null = null;
 	private _onDoubleClickHandlerRef: IFCViewerOnDoubleClickHandler | null = null;
 	private _onResizeHandlerRef: IFCViewerVoidFunc | null = null;
@@ -166,10 +167,12 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 		// 	'dblclick',
 		// 	this._onDoubleClickHandlerRef!,
 		// );
-		this.state.ui!.sceneContainer!.current?.removeEventListener(
-			'resize',
-			this._onResizeHandlerRef!,
-		);
+		if (this._resizeObserver) {
+			this._resizeObserver.disconnect();
+			this._resizeObserver = null;
+		} else if (this._onResizeHandlerRef) {
+			window.removeEventListener('resize', this._onResizeHandlerRef);
+		}
 
 		this.state.core?.currentWorld?.renderer?.onBeforeUpdate.remove(
 			this._onBeforeUpdateHandlerRef!,
@@ -194,7 +197,16 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 		// );
 
 		this._onResizeHandlerRef = this.onResizeHandler.bind(this);
-		sceneContainer.current?.addEventListener('resize', this._onResizeHandlerRef);
+		const sceneEl = sceneContainer.current;
+		if (sceneEl) {
+			if (typeof ResizeObserver !== 'undefined') {
+				this._resizeObserver = new ResizeObserver(() => this.onResizeHandler());
+				this._resizeObserver.observe(sceneEl);
+			} else {
+				window.addEventListener('resize', this._onResizeHandlerRef);
+			}
+			requestAnimationFrame(() => this.onResizeHandler());
+		}
 
 		this._onBeforeUpdateHandlerRef = this.onBeforeUpdateHandler.bind(this);
 		this._onAfterUpdateHandlerRef = this.onAfterUpdateHandler.bind(this);

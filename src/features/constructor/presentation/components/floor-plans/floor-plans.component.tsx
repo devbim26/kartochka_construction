@@ -39,10 +39,10 @@ import {
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { AxiosError } from 'axios';
 import * as pdfjs from 'pdfjs-dist';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { BsQuestionSquareFill } from 'react-icons/bs';
 import { FaPencilAlt, FaPlus } from 'react-icons/fa';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { catchError, filter, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
@@ -70,11 +70,22 @@ interface Level {
 export const FloorPlans = memoize(() => {
 	const { t } = useI18n();
 	const navigate = useAppNavigate();
+	const navigateReplace = useNavigate();
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
 	const reportType = search.get('reportType');
 	const dispatch = useAppDispatch();
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
+
+	useLayoutEffect(() => {
+		if (!reportId || !reportType) {
+			toast.error(t('constructor.guard.floorPlansRequiresReport'));
+			navigateReplace(
+				`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`,
+				{ replace: true },
+			);
+		}
+	}, [reportId, reportType, navigateReplace, t]);
 
 	// Состояния для уровней и PDF
 	const [levels, setLevels] = useState<Level[]>([]);
@@ -377,10 +388,10 @@ export const FloorPlans = memoize(() => {
 	};
 
 	useEffect(() => {
-		if (!currentReportConstruction?.reportConstructionHeader.id) return;
-		handleGetConstructionByHeaderId(
-			currentReportConstruction.reportConstructionHeader.constructionHeaderId,
-		);
+		const constructionHeaderId =
+			currentReportConstruction?.reportConstructionHeader.constructionHeaderId;
+		if (!constructionHeaderId) return;
+		handleGetConstructionByHeaderId(constructionHeaderId);
 	}, [currentReportConstruction]);
 
 	useEffect(() => {
@@ -656,7 +667,12 @@ export const FloorPlans = memoize(() => {
 	}, [currentPage, levels]);
 
 	const activeLevel = levels.find((l) => l.id === activeLevelId);
-	const selectedReportFloorInfoId = currentReportConstruction?.id || currentReportFloorInfo[0];
+	const reportFloorInfoIdFromQuery = search.get('reportFloorInfoId');
+	const selectedReportFloorInfoId =
+		(!!search.get('edit') && reportFloorInfoIdFromQuery) ||
+		currentReportConstruction?.id ||
+		currentReportFloorInfo[0] ||
+		'';
 	const selectedLevelReportFloorInfoId = activeLevel?.serverId || activeLevel?.id;
 	const deleteConstructionQueryId =
 		search.get('reportConstructionId') || search.get('constructionId');
@@ -724,16 +740,29 @@ export const FloorPlans = memoize(() => {
 	}, [activeLevel]);
 
 	useEffect(() => {
-		const reportFloorInfoIdFromSearch = search.get('reportFloorInfoId');
-		if (reportType !== ReportCategory.Floor || !currentReportConstructions.length) {
+		if (reportType !== ReportCategory.Floor) {
 			if (reportType !== ReportCategory.Single) setCurrentReportConstruction(undefined);
 			return;
 		}
-		const current =
-			currentReportConstructions.find((c) => c.id === reportFloorInfoIdFromSearch) ||
-			currentReportConstructions[currentReportConstructions.length - 1];
-		setCurrentReportConstruction(current);
-	}, [reportType, currentReportConstructions, search]);
+		const reportFloorInfoIdFromSearch = search.get('reportFloorInfoId');
+		const allFromLevels = levels.flatMap((level) => level.constructions);
+		if (reportFloorInfoIdFromSearch) {
+			const byUrl =
+				allFromLevels.find((c) => c.id === reportFloorInfoIdFromSearch) ||
+				currentReportConstructions.find((c) => c.id === reportFloorInfoIdFromSearch);
+			if (byUrl) {
+				setCurrentReportConstruction(byUrl);
+				return;
+			}
+		}
+		if (!currentReportConstructions.length) {
+			setCurrentReportConstruction(undefined);
+			return;
+		}
+		setCurrentReportConstruction(
+			currentReportConstructions[currentReportConstructions.length - 1],
+		);
+	}, [reportType, currentReportConstructions, search, levels]);
 
 	const filteredConstructionsForTab = useMemo(() => {
 		if (!currentReportConstructions.length) return [];
@@ -747,6 +776,13 @@ export const FloorPlans = memoize(() => {
 			return layout === ConstructionClass.Floor;
 		});
 	}, [activeExplantationTab, currentReportConstructions, constructionHeadersById]);
+
+	const constructionHeaderForEdit = useMemo(() => {
+		const constructionHeaderId =
+			currentReportConstruction?.reportConstructionHeader.constructionHeaderId;
+		if (!constructionHeaderId) return currentConstructionHeader;
+		return currentConstructionHeader ?? constructionHeadersById[constructionHeaderId];
+	}, [currentReportConstruction, currentConstructionHeader, constructionHeadersById]);
 
 	const constructionSheetsForTable = useMemo(() => {
 		if (reportType !== ReportCategory.Floor) {
@@ -798,6 +834,10 @@ export const FloorPlans = memoize(() => {
 		activeLevel,
 		t,
 	]);
+
+	if (!reportId || !reportType) {
+		return null;
+	}
 
 	return (
 		<div className="relative">
@@ -990,7 +1030,7 @@ export const FloorPlans = memoize(() => {
 							closeCreateFlowModal();
 						}}
 						headerTitle={t('floorPlans.modal.createTitle')}
-						className="!w-[1000px] md:!w-[900px]"
+						className="!max-w-[1200px] !w-[min(96vw,1180px)] md:!w-[1080px]"
 						activeTab={activeCreateTypeTab}
 						onTabChange={handleCreateTypeTabChange}
 						floorId={currentReportFloorId}
@@ -1006,7 +1046,7 @@ export const FloorPlans = memoize(() => {
 							closeCreateFlowModal();
 						}}
 						headerTitle={t('floorPlans.modal.addRoom')}
-						className="!w-[1000px] md:!w-[900px]"
+						className="!max-w-[1200px] !w-[min(96vw,1180px)] md:!w-[1080px]"
 						contentClassName="visible p-4 md:p-6"
 						activeTab={activeCreateTypeTab}
 						onTabChange={handleCreateTypeTabChange}
@@ -1015,7 +1055,7 @@ export const FloorPlans = memoize(() => {
 						isOpen={!!search.get('info')}
 						onCancel={() => window.history.back()}
 						onClose={() => window.history.back()}
-						className="!w-[1000px] md:!w-[900px]"
+						className="!max-w-[1200px] !w-[min(96vw,1180px)] md:!w-[1080px]"
 						headerTitle=""
 					>
 						<GeneralInformationForm />
@@ -1033,8 +1073,8 @@ export const FloorPlans = memoize(() => {
 							window.history.back();
 						}}
 						headerTitle={t('floorPlans.modal.editTitle')}
-						className="!w-[1000px] md:!w-[900px]"
-						currentConstructionHeader={currentConstructionHeader}
+						className="!max-w-[1200px] !w-[min(96vw,1180px)] md:!w-[1080px]"
+						currentConstructionHeader={constructionHeaderForEdit}
 						currentReportFloorInfo={currentReportConstruction}
 						reportFloorInfoId={selectedReportFloorInfoId}
 						floorId={currentReportFloorId}

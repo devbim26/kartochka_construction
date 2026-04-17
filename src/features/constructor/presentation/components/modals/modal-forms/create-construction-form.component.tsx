@@ -1,6 +1,7 @@
 import {
 	convertToPaginatedType,
 	convertToSelectValues,
+	ImagePreviewModal,
 	Input,
 	Select,
 	useAppDispatch,
@@ -117,6 +118,7 @@ export const CreateConstructionForm = memoize(
 			const [svgUrl, setSvgUrl] = useState<string | null>(null);
 			const [issuer, setIssuer] = useState<Issuer | null>(null);
 			const [issuerIsLoading, setIssuerIsLoading] = useState(false);
+			const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
 			const [roomRequirementsMap, setRoomRequirementsMap] = useState<RoomRequirementMap>({});
 			const [secondRoomOptions, setSecondRoomOptions] = useState<
@@ -158,6 +160,8 @@ export const CreateConstructionForm = memoize(
 			);
 			const [search] = useSearchParams();
 			const editMode = search.get('editMode');
+			/** Редактирование с планов этажей — `edit=true`, из других экранов может быть `editMode`. */
+			const isEditFlow = Boolean(search.get('edit') || editMode);
 			const reportId = search.get('reportId');
 			const reportType = search.get('reportType');
 			const layerId = search.get('layerId');
@@ -206,18 +210,25 @@ export const CreateConstructionForm = memoize(
 					}));
 					setSecondRoomOptions(options);
 
-					if (!editMode) {
+					if (!isEditFlow) {
 						setValue('secondPlacementRoom', '');
 						setValue('requirementId', '');
+					} else {
+						const currentSecond = getValues('secondPlacementRoom');
+						const stillValid = options.some((o) => o.value === currentSecond);
+						if (currentSecond && !stillValid) {
+							setValue('secondPlacementRoom', '');
+							setValue('requirementId', '');
+						}
 					}
 				} else {
-					if (!editMode) {
+					if (!isEditFlow) {
 						setSecondRoomOptions([]);
 						setValue('secondPlacementRoom', '');
 						setValue('requirementId', '');
 					}
 				}
-			}, [firstPlacementRoom, roomRequirementsMap, setValue]);
+			}, [firstPlacementRoom, roomRequirementsMap, setValue, isEditFlow, getValues]);
 
 			useEffect(() => {
 				if (
@@ -385,7 +396,7 @@ export const CreateConstructionForm = memoize(
 
 								return updateReportFloor({
 									data: {
-										...(editMode
+										...(isEditFlow
 											? { floorConstructionInfoId: resolvedReportFloorInfoId }
 											: {
 													reportFloorInfoId: resolvedReportFloorInfoId,
@@ -549,24 +560,47 @@ export const CreateConstructionForm = memoize(
 					.subscribe(() => dispatch(stopLoading()));
 			};
 
-			const constructionSelectOptions: SelectOption[] =
-				convertToSelectValues(
-					constructionData.map((construction) => ({
-						...construction,
-						name: `${construction.description}(${construction.name})`,
-					})),
-				)
-					?.sort((a, b) => {
+			const constructionSelectOptions: SelectOption[] = useMemo(() => {
+				const base =
+					convertToSelectValues(
+						constructionData.map((c) => ({
+							...c,
+							name: `${c.description}(${c.name})`,
+						})),
+					)?.sort((a, b) => {
 						const aIsFavorite = favoriteConstructionIds.has(String(a.value));
 						const bIsFavorite = favoriteConstructionIds.has(String(b.value));
 						return Number(bIsFavorite) - Number(aIsFavorite);
-					})
-					.map((option) => ({
+					}) ?? [];
+
+				const valueSet = new Set(base.map((o) => String(o.value)));
+				if (construction && !valueSet.has(String(construction))) {
+					const labelFromDetail =
+						constructionDetail?.id === construction
+							? `${constructionDetail.description}(${constructionDetail.name})`
+							: null;
+					const fallbackLabel = name?.trim() ? String(name) : String(construction);
+					return [
+						{
+							value: construction,
+							label: labelFromDetail ?? fallbackLabel,
+						},
+						...base,
+					].map((option) => ({
 						...option,
 						icon: favoriteConstructionIds.has(String(option.value)) ? (
 							<span className="text-[14px] leading-none text-green-600">★</span>
 						) : undefined,
-					})) ?? [];
+					}));
+				}
+
+				return base.map((option) => ({
+					...option,
+					icon: favoriteConstructionIds.has(String(option.value)) ? (
+						<span className="text-[14px] leading-none text-green-600">★</span>
+					) : undefined,
+				}));
+			}, [constructionData, construction, constructionDetail, favoriteConstructionIds, name]);
 
 			// Получение детальной информации о выбранной конструкции
 			const handleGetConstructionDetail = (id: string) => {
@@ -657,10 +691,13 @@ export const CreateConstructionForm = memoize(
 
 			useEffect(() => {
 				handleGetConstructionData();
-			}, [userId, constructionType, paginationRw]);
+			}, [userId, constructionType, paginationRw, construction]);
 
 			return (
 				<div className="relative flex w-full flex-col border-b">
+					{previewSrc && (
+						<ImagePreviewModal src={previewSrc} onClose={() => setPreviewSrc(null)} />
+					)}
 					{isLoading && (
 						<div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-[10px] bg-white/60">
 							<p className="text-[18px] text-primary">
@@ -857,74 +894,122 @@ export const CreateConstructionForm = memoize(
 						</div>
 					</FormProvider>
 
-					{/* Блок выбранной конструкции (под формой) */}
+					{/* Блок превью: ряд заголовков, под ним — схема | материалы | производитель */}
 					{construction && (
 						<div className="mt-6 flex flex-col gap-3">
-							<p className="text-lg font-semibold text-gray-800">
-								{t('createConstruction.selectedConstruction') ||
-									'Выбранная конструкция'}
-							</p>
-							<div className="grid grid-cols-3 gap-4">
-								{/* Изображение */}
-								<div>
-									{svgUrl ? (
-										<img
-											className="h-auto max-h-[200px] w-full object-contain"
-											src={svgUrl}
-											alt={'constr'}
-										/>
-									) : (
-										<div className="flex h-[200px] w-full items-center justify-center">
-											<Loader />
-										</div>
-									)}
-								</div>
-								{/* Список материалов */}
-								<div>
-									{constructionDetail?.constructionTypeObject?.leftConstruction
-										?.slice()
-										.sort((a, b) => Number(a.positionId) - Number(b.positionId))
-										.map((material, i) => (
-											<p key={`left-${i}`} className="pl-4 text-[15px]">
-												- {formatMaterial(material, locale)}
-											</p>
-										))}
-									{constructionDetail?.constructionTypeObject?.centerConstruction
-										?.slice()
-										.sort((a, b) => Number(a.positionId) - Number(b.positionId))
-										.map((material, i) => (
-											<p key={`center-${i}`} className="pl-4 text-[15px]">
-												- {formatMaterial(material, locale)}
-											</p>
-										))}
-									{constructionDetail?.constructionTypeObject?.rightConstruction
-										?.slice()
-										.sort((a, b) => Number(a.positionId) - Number(b.positionId))
-										.map((material, i) => (
-											<p key={`right-${i}`} className="pl-4 text-[15px]">
-												- {formatMaterial(material, locale)}
-											</p>
-										))}
-								</div>
-								{/* Производитель */}
-								<div className="flex flex-col gap-2">
-									<p className="text-sm font-semibold text-gray-800">
-										{locale === 'ru' ? 'Производитель' : 'Manufacturer'}
+							<div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-x-4 gap-y-3">
+								<div className="col-start-1 row-start-1" aria-hidden />
+								<div className="col-start-2 row-start-1 min-w-0 text-left">
+									<p className="text-lg font-semibold text-gray-800">
+										{t('createConstruction.selectedConstruction')}
 									</p>
+								</div>
+								<div className="col-start-3 row-start-1 min-w-0 text-left">
+									<p className="text-lg font-semibold text-gray-800">
+										{t('createConstruction.manufacturer')}
+									</p>
+								</div>
+								{/* Схема: min-w-0 — чтобы grid не обрезал; картинка w-auto + object-contain — целиком */}
+								<div className="col-start-1 row-start-2 flex min-w-0 justify-center self-start">
+									<div className="flex w-full min-w-0 max-w-full justify-center bg-white py-1">
+										{svgUrl ? (
+											<button
+												type="button"
+												className="mx-auto block w-full cursor-pointer border-0 bg-transparent p-0 text-center"
+												onClick={() => setPreviewSrc(svgUrl)}
+											>
+												<img
+													src={svgUrl}
+													alt=""
+													className="mx-auto block h-auto max-h-[min(68vh,560px)] w-auto max-w-full object-contain"
+													decoding="async"
+												/>
+											</button>
+										) : (
+											<div className="flex min-h-[200px] w-full items-center justify-center">
+												<Loader />
+											</div>
+										)}
+									</div>
+								</div>
+								<div className="col-start-2 row-start-2 min-w-0 w-full self-start justify-self-stretch text-left">
+									<div className="max-w-full overflow-x-auto text-left">
+										<div className="flex w-full min-w-0 flex-col items-start gap-0.5 text-left">
+											{constructionDetail?.constructionTypeObject?.leftConstruction
+												?.slice()
+												.sort(
+													(a, b) => Number(a.positionId) - Number(b.positionId),
+												)
+												.map((material, i) => {
+													const line = `- ${formatMaterial(material, locale)}`;
+													return (
+														<p
+															key={`left-${i}`}
+															className="whitespace-nowrap py-0.5 text-left text-[15px] leading-normal text-gray-800"
+															title={line}
+														>
+															{line}
+														</p>
+													);
+												})}
+											{constructionDetail?.constructionTypeObject?.centerConstruction
+												?.slice()
+												.sort(
+													(a, b) => Number(a.positionId) - Number(b.positionId),
+												)
+												.map((material, i) => {
+													const line = `- ${formatMaterial(material, locale)}`;
+													return (
+														<p
+															key={`center-${i}`}
+															className="whitespace-nowrap py-0.5 text-left text-[15px] leading-normal text-gray-800"
+															title={line}
+														>
+															{line}
+														</p>
+													);
+												})}
+											{constructionDetail?.constructionTypeObject?.rightConstruction
+												?.slice()
+												.sort(
+													(a, b) => Number(a.positionId) - Number(b.positionId),
+												)
+												.map((material, i) => {
+													const line = `- ${formatMaterial(material, locale)}`;
+													return (
+														<p
+															key={`right-${i}`}
+															className="whitespace-nowrap py-0.5 text-left text-[15px] leading-normal text-gray-800"
+															title={line}
+														>
+															{line}
+														</p>
+													);
+												})}
+										</div>
+									</div>
+								</div>
+								<div className="col-start-3 row-start-2 flex flex-col items-center justify-start gap-2 text-center">
 									{issuerIsLoading ? (
-										<div className="flex h-[66px] items-center">
+										<div className="flex h-[48px] items-center justify-center">
 											<Loader />
 										</div>
 									) : (
 										<>
 											{issuer?.logoUrl && (
-												<img
-													src={issuer.logoUrl}
-													alt={issuer.name || 'issuer logo'}
-													className="h-[66px] w-full max-w-[160px] rounded-md object-contain"
-												/>
+												<button
+													type="button"
+													className="cursor-pointer border-0 bg-transparent p-0"
+													onClick={() => setPreviewSrc(issuer.logoUrl!)}
+												>
+													<img
+														src={issuer.logoUrl}
+														alt={issuer.name || ''}
+														className="max-h-[72px] w-auto max-w-[180px] object-contain"
+													/>
+												</button>
 											)}
-											<p className="text-left text-[14px] text-gray-800">
+											<p className="max-w-full text-center text-[14px] text-gray-800">
 												{issuer?.name ||
 													constructionDetail?.issuerName ||
 													(locale === 'ru'
@@ -936,7 +1021,7 @@ export const CreateConstructionForm = memoize(
 													href={normalizeWebsite(issuer?.webSite)!}
 													target="_blank"
 													rel="noreferrer noopener"
-													className="break-all text-left text-[14px] text-primary underline"
+													className="whitespace-nowrap text-[14px] text-primary underline"
 												>
 													{issuer?.webSite}
 												</a>

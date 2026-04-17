@@ -33,7 +33,10 @@ export const IFCViewerComponent = () => {
 	});
 
 	return (
-		<div className="relative flex flex-1" ref={ifcViewerRef}>
+		<div
+			className="relative flex min-h-0 min-w-0 flex-1 flex-row"
+			ref={ifcViewerRef}
+		>
 			<DragElementContextWrapper>
 				<DragElement
 					initialPosition={{
@@ -72,7 +75,10 @@ export const IFCViewerComponent = () => {
 					<div ref={propertiesPanelContainerRef}></div>
 				</DragElement>
 			</DragElementContextWrapper>
-			<div className="relative z-0 flex flex-1" ref={sceneContainerRef}></div>
+			<div
+				className="relative z-0 flex min-h-0 min-w-0 flex-1 flex-col"
+				ref={sceneContainerRef}
+			/>
 		</div>
 	);
 };

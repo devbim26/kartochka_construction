@@ -1,4 +1,4 @@
-import { sidebarItemsConfig } from '@features/home/constants';
+import { getSidebarItemsConfig } from '@features/home/constants';
 import { useLocation } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useDesigningSidebar } from '../../context/designing-sidebar.context';
@@ -8,6 +8,7 @@ import { SidebarList } from './sidebar-list.component';
 
 export const Sidebar = () => {
 	const { pathname } = useLocation();
+	const sidebarItemsConfig = getSidebarItemsConfig();
 	const sidebar = useDesigningSidebar();
 
 	if (!sidebar) {

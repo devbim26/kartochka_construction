@@ -3,6 +3,6 @@ export interface PaginationState {
 	totalPages: number;
 	totalCount: number;
 	pageSize: number;
-	hasPreviousPage: false;
-	hasNextPage: false;
+	hasPreviousPage: boolean;
+	hasNextPage: boolean;
 }

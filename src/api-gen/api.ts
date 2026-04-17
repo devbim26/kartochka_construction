@@ -296,6 +296,7 @@ export interface CreateBillByAdminCommand {
 	subscriptionId?: string;
 	/** @format uuid */
 	userId?: string;
+	billType?: BillTypeEnum;
 }
 
 export interface CreateBillCommand {
@@ -713,6 +714,16 @@ export interface GetPlacementRoomVariantByAllParametersQuery {
 	placementRoomId?: string;
 }
 
+export interface GetReportInfoWithPaginationQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	status?: ReportInfoStatus;
+}
+
 export interface GetReportWithPaginationQuery {
 	/** @format int32 */
 	pageNumber?: number;
@@ -922,6 +933,7 @@ export enum MaterialTypeEnum {
 	Board = 'Board',
 	ZPanel = 'ZPanel',
 	GapDistance = 'GapDistance',
+	Screed = 'Screed',
 }
 
 export interface MaterialTypeValue {
@@ -1281,6 +1293,20 @@ export interface ReportInfoShortDto {
 	calculationRequirementDocument?: CalculationRequirementDocumentDto;
 	regulatoryRequirementDocument?: RegulatoryRequirementDocumentDto;
 	floorDocumentUrl?: string | null;
+}
+
+export interface ReportInfoShortDtoPaginatedList {
+	items?: ReportInfoShortDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
 }
 
 export interface ReportInfoSingleConstructionDto {
@@ -2842,6 +2868,26 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<ReportInfoShortDto, any>({
 				path: `/api/ReportInfo/${id}/GetReportInfoRenew`,
 				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportInfo
+		 * @name ReportInfoGetPaginatedCreate
+		 * @request POST:/api/ReportInfo/get-paginated
+		 */
+		reportInfoGetPaginatedCreate: (
+			data: GetReportInfoWithPaginationQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<ReportInfoShortDtoPaginatedList, any>({
+				path: `/api/ReportInfo/get-paginated`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
 				format: 'json',
 				...params,
 			}),

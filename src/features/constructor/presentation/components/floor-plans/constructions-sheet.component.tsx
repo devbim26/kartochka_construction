@@ -35,6 +35,8 @@ type Props = {
 	constructionSheets?: ConstructionSheet[];
 	/** Таблица помещений: без колонок «конструкция» и «конструкция содержит», колонка плана — «План». */
 	tableVariant?: 'default' | 'rooms';
+	/** Колонка SVG конструкции — только для отчёта с отдельными конструкциями (Single), не для поэтажных планов. */
+	showConstructionSvgColumn?: boolean;
 };
 
 const MM2_PER_M2 = 1_000_000;
@@ -55,7 +57,11 @@ const formatAreaM2Number = (value: number, locale: string): string =>
 		minimumFractionDigits: 0,
 	});
 
-export const ConstructionSheets = ({ constructionSheets, tableVariant = 'default' }: Props) => {
+export const ConstructionSheets = ({
+	constructionSheets,
+	tableVariant = 'default',
+	showConstructionSvgColumn = true,
+}: Props) => {
 	const { t, locale } = useI18n();
 	const navigate = useAppNavigate();
 	const [search] = useSearchParams();
@@ -385,15 +391,13 @@ export const ConstructionSheets = ({ constructionSheets, tableVariant = 'default
 		if (tableVariant === 'rooms') {
 			return [titleColumn, planColumn, squareColumn, actionsColumn];
 		}
-		return [
-			titleColumn,
-			planColumn,
-			constructionImageColumn,
-			containsColumn,
-			squareColumn,
-			actionsColumn,
-		];
-	}, [t, locale, navigate, search, reportType, tableVariant]);
+		const cols: ColumnDef<ConstructionSheet>[] = [titleColumn, planColumn];
+		if (showConstructionSvgColumn) {
+			cols.push(constructionImageColumn);
+		}
+		cols.push(containsColumn, squareColumn, actionsColumn);
+		return cols;
+	}, [t, locale, navigate, search, reportType, tableVariant, showConstructionSvgColumn]);
 
 	return (
 		<div className="flex-col overflow-x-auto">

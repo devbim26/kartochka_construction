@@ -20,12 +20,12 @@ export const Pagination = memoize(({ onPageChange, state, onPageSizeChange }: Pa
 	const [viewedPages, setViewedPages] = useState<{ id: string; page: number }[]>([]);
 
 	useEffect(() => {
-		const partNum = Math.floor(state.pageNumber / 10);
+		const partNum = Math.floor((Math.max(state.pageNumber, 1) - 1) / 10);
 		setViewedPages(
 			Array.from({ length: 10 }, (_, index) => ({
 				id: crypto.randomUUID(),
 				page: partNum * 10 + (index + 1),
-			})).filter((o) => o.page <= state.totalPages),
+			})).filter((o) => o.page <= state.totalPages && o.page >= 1),
 		);
 	}, [state.pageNumber, state.totalPages]);
 

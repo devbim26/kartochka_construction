@@ -1,26 +1,38 @@
-import { APP_ROUTES, useAppNavigate } from '@core';
+import { APP_ROUTES } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useLayoutEffect } from 'react';
-import { Outlet, useSearchParams } from 'react-router-dom';
+import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 import { ConstructorHeader } from '../components';
 
 export const ConstructorLayout = () => {
 	const [search] = useSearchParams();
-	const navigate = useAppNavigate();
+	const navigate = useNavigate();
 
 	useLayoutEffect(() => {
-		if (!search.get('reportId') && !search.get('constructionId')) {
-			navigate(
-				`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`,
-			);
+		if (search.get('reportId') || search.get('constructionId')) {
+			return;
 		}
-	}, [search]);
+		const base = `${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}`;
+		const storedId = sessionStorage.getItem('reportId');
+		const storedType = sessionStorage.getItem('reportType');
+		if (storedId && storedType) {
+			const qs = new URLSearchParams({
+				reportId: storedId,
+				reportType: storedType,
+			}).toString();
+			navigate(`${base}/${CONSTRUCTOR_ROUTES.floorPlans.route}?${qs}`, { replace: true });
+			return;
+		}
+		navigate(`${base}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`, { replace: true });
+	}, [search, navigate]);
 
 	return (
-		<div className="flex w-full flex-col gap-[30px] pb-[29px]">
+		<div className="flex min-h-0 w-full flex-1 flex-col gap-[30px] pb-[29px]">
 			<ConstructorHeader />
-			<Outlet />
+			<div className="flex min-h-0 min-w-0 flex-1 flex-col">
+				<Outlet />
+			</div>
 		</div>
 	);
 };
