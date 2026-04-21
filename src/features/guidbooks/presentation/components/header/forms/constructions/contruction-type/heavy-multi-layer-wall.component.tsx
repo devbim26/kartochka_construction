@@ -42,53 +42,44 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		setHasRightCladding(rightConstruction.length > 0);
 	}, [currentForm]);
 
-	const layerConfigs = [
-		...(hasLeftCladding
-			? [
-					{
-						title: 'Облицовка',
-						constructionPosition: 'Left' as const,
-						positions: ['0', '1', '2', '3', '4'],
-						selectable: [],
-						materialType: MaterialTypesSelectValuesEnum.Additional,
-						showAddButton: false,
-						fields: leftMaterials.fields,
-						append: leftMaterials.append,
-						insert: leftMaterials.insert,
-						remove: leftMaterials.remove,
-					},
-				]
-			: []),
-		{
-			title: 'Базовая конструкция',
-			constructionPosition: 'Center' as const,
-			positions: ['0', '1', '2', '3', '4', '5', '6'],
-			selectable: ['0', '6'],
-			fixed: ['1', '2', '3', '4', '5'],
-			materialType: MaterialTypesSelectValuesEnum.Base,
-			showAddButton: true,
-			fields: centerMaterials.fields,
-			append: centerMaterials.append,
-			insert: centerMaterials.insert,
-			remove: centerMaterials.remove,
-		},
-		...(hasRightCladding
-			? [
-					{
-						title: 'Облицовка',
-						constructionPosition: 'Right' as const,
-						positions: ['0', '1', '2', '3', '4'],
-						selectable: [],
-						materialType: MaterialTypesSelectValuesEnum.Additional,
-						showAddButton: false,
-						fields: rightMaterials.fields,
-						append: rightMaterials.append,
-						insert: rightMaterials.insert,
-						remove: rightMaterials.remove,
-					},
-				]
-			: []),
-	];
+	const centerLayerConfig = {
+		title: '1. Базовая конструкция',
+		constructionPosition: 'Center' as const,
+		positions: ['0', '1', '2', '3', '4', '5', '6'],
+		selectable: ['0', '6'],
+		materialType: MaterialTypesSelectValuesEnum.Base,
+		showAddButton: true,
+		fields: centerMaterials.fields,
+		append: centerMaterials.append,
+		insert: centerMaterials.insert,
+		remove: centerMaterials.remove,
+	};
+
+	const leftLayerConfig = {
+		title: '2. Облицовка слева',
+		constructionPosition: 'Left' as const,
+		positions: ['0', '1', '2', '3', '4'],
+		selectable: [] as string[],
+		materialType: MaterialTypesSelectValuesEnum.Additional,
+		showAddButton: false,
+		fields: leftMaterials.fields,
+		append: leftMaterials.append,
+		insert: leftMaterials.insert,
+		remove: leftMaterials.remove,
+	};
+
+	const rightLayerConfig = {
+		title: hasLeftCladding ? '3. Облицовка справа' : '2. Облицовка справа',
+		constructionPosition: 'Right' as const,
+		positions: ['0', '1', '2', '3', '4'],
+		selectable: [] as string[],
+		materialType: MaterialTypesSelectValuesEnum.Additional,
+		showAddButton: false,
+		fields: rightMaterials.fields,
+		append: rightMaterials.append,
+		insert: rightMaterials.insert,
+		remove: rightMaterials.remove,
+	};
 
 	const materialComponentsMap: Record<
 		'Left' | 'Center' | 'Right',
@@ -273,9 +264,77 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 		</div>
 	);
 
+	const renderLayer = ({
+		title,
+		constructionPosition,
+		positions,
+		selectable,
+		materialType,
+		showAddButton = true,
+		fields,
+		insert,
+		remove,
+	}: typeof centerLayerConfig | typeof leftLayerConfig | typeof rightLayerConfig) => (
+		<ConstructionLayer key={title} title={title}>
+			<div className="flex flex-col gap-[24px]">
+				{positions.map((positionId, index) => {
+					const fieldIndex = fields.findIndex((f: any) => f.positionId === positionId);
+					const field = fields[fieldIndex];
+
+					const prevId = positions[index - 1];
+					const nextId = positions[index + 1];
+
+					const showAddButtonInList =
+						showAddButton &&
+						fieldIndex === -1 &&
+						(fields.some((f: any) => f.positionId === prevId) ||
+							fields.some((f: any) => f.positionId === nextId));
+
+					if (showAddButtonInList) {
+						return (
+							<AiOutlinePlusCircle
+								key={`add-${positionId}`}
+								onClick={() =>
+									insert(index, {
+										positionId,
+										materialId: '',
+										materialType: '',
+										materialTypeValue: [],
+									})
+								}
+								className="size-[40px] self-center text-primary"
+							/>
+						);
+					}
+
+					if (fieldIndex !== -1) {
+						return (
+							<Fragment key={field.id}>
+								{renderBlock(
+									positionId,
+									fieldIndex,
+									field.id,
+									constructionPosition,
+									selectable,
+									materialType,
+									remove,
+									fields,
+								)}
+							</Fragment>
+						);
+					}
+
+					return null;
+				})}
+			</div>
+		</ConstructionLayer>
+	);
+
 	return (
 		<>
-			<div className="mb-4 flex justify-center">
+			{renderLayer(centerLayerConfig)}
+
+			<div className="mt-4 mb-4 flex justify-center">
 				{!hasLeftCladding ? (
 					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
 						<AiOutlinePlusCircle
@@ -294,79 +353,7 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 					</div>
 				)}
 			</div>
-
-			{layerConfigs.map(
-				({
-					title,
-					constructionPosition,
-					positions,
-					selectable,
-					materialType,
-					showAddButton = true,
-					fields,
-					append,
-					insert,
-					remove,
-				}) => {
-					return (
-						<ConstructionLayer key={title} title={title}>
-							<div className="flex flex-col gap-[24px]">
-								{positions.map((positionId, index) => {
-									const fieldIndex = fields.findIndex(
-										(f: any) => f.positionId === positionId,
-									);
-									const field = fields[fieldIndex];
-
-									const prevId = positions[index - 1];
-									const nextId = positions[index + 1];
-
-									const showAddButtonInList =
-										showAddButton &&
-										fieldIndex === -1 &&
-										(fields.some((f: any) => f.positionId === prevId) ||
-											fields.some((f: any) => f.positionId === nextId));
-
-									if (showAddButtonInList) {
-										return (
-											<AiOutlinePlusCircle
-												key={`add-${positionId}`}
-												onClick={() =>
-													insert(index, {
-														positionId,
-														materialId: '',
-														materialType: '',
-														materialTypeValue: [],
-													})
-												}
-												className="size-[40px] self-center text-primary"
-											/>
-										);
-									}
-
-									if (fieldIndex !== -1) {
-										return (
-											<Fragment key={field.id}>
-												{renderBlock(
-													positionId,
-													fieldIndex,
-													field.id,
-													constructionPosition,
-													selectable,
-													materialType,
-													remove,
-													fields,
-												)}
-											</Fragment>
-										);
-									}
-
-									return null;
-								})}
-							</div>
-						</ConstructionLayer>
-					);
-				},
-			)}
+			{hasLeftCladding && renderLayer(leftLayerConfig)}
 
 			<div className="mt-4 flex justify-center">
 				{!hasRightCladding ? (
@@ -387,6 +374,7 @@ export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypePr
 					</div>
 				)}
 			</div>
+			{hasRightCladding && renderLayer(rightLayerConfig)}
 		</>
 	);
 };

@@ -28,23 +28,24 @@ export const HeavySingleLayerWallFacingBothSideComponent = ({
 }: ConstructionTypeProps) => {
 	const { control, watch } = currentForm;
 
+	// База, затем облицовки. Справа порядок позиций 0… — с наружного воздушного зазора (см. positionId === '0').
 	const layerConfigs = [
 		{
-			title: '1. Облицовка',
-			constructionPosition: 'Left' as const,
-			positions: ['0', '1', '2', '3', '4', '5', '6'],
-			selectable: ['5', '6'],
-			materialType: MaterialTypesSelectValuesEnum.Additional,
-		},
-		{
-			title: '2. Базовая конструкция',
+			title: '1. Базовая конструкция',
 			constructionPosition: 'Center' as const,
 			positions: ['0', '1', '2', '3', '4'],
 			selectable: ['0', '1', '3', '4'],
 			materialType: MaterialTypesSelectValuesEnum.Base,
 		},
 		{
-			title: '3. Облицовка',
+			title: '2. Облицовка слева',
+			constructionPosition: 'Left' as const,
+			positions: ['0', '1', '2', '3', '4', '5', '6'],
+			selectable: ['5', '6'],
+			materialType: MaterialTypesSelectValuesEnum.Additional,
+		},
+		{
+			title: '3. Облицовка справа',
 			constructionPosition: 'Right' as const,
 			positions: ['0', '1', '2', '3', '4', '5', '6'],
 			selectable: ['5', '6'],

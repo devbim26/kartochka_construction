@@ -35,21 +35,21 @@ export const HeavyMultiLayerWallFacingOneSideComponent = ({
 		materialType: MaterialTypesSelectValuesEnum;
 	};
 
-	// Сверху вниз как в разрезе: облицовка (Left) -> базовая многослойная (Center).
+	// Сначала базовый слой, затем облицовка (Left). В облицовке сверху вниз как в разрезе от воздуха к базе: 0 — воздушный зазор …
 	const layerConfigs: LayerConfig[] = [
 		{
-			title: '1. Облицовка',
-			constructionPosition: 'Left' as const,
-			positions: ['0', '1', '2', '3', '4', '5', '6'],
-			selectable: ['5', '6'],
-			materialType: MaterialTypesSelectValuesEnum.Facing,
-		},
-		{
-			title: '2. Базовая конструкция',
+			title: '1. Базовая конструкция',
 			constructionPosition: 'Center' as const,
 			positions: ['2', '3', '4', '5'],
 			selectable: [],
 			materialType: MaterialTypesSelectValuesEnum.Base,
+		},
+		{
+			title: '2. Облицовка',
+			constructionPosition: 'Left' as const,
+			positions: ['0', '1', '2', '3', '4', '5', '6'],
+			selectable: ['5', '6'],
+			materialType: MaterialTypesSelectValuesEnum.Facing,
 		},
 	];
 

@@ -1,8 +1,8 @@
 import type { TranslationKey } from '@core';
 import { Button, CleanUpIcon, useAppNavigate, useI18n } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { guidbookHeaderTitlesMap } from '@features/guidbooks/constants';
-import { importMaterials } from '@features/guidbooks/services';
+import { GUIDBOOKS_ROUTES, guidbookHeaderTitlesMap } from '@features/guidbooks/constants';
+import { importMaterials, importRequirements } from '@features/guidbooks/services';
 import {
 	HeaderFormTypes,
 	type HeaderFormElements,
@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { PiExportBold } from 'react-icons/pi';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { catchError, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
 
@@ -35,7 +35,12 @@ export const GuidbookPageHeaderWrapper = memoize(
 			HeaderFormTypes.filter,
 		);
 		const fileInputRef = useRef<HTMLInputElement>(null);
+		const { pathname } = useLocation();
 		const { t } = useI18n();
+
+		const showImportButton =
+			pathname.includes(`/${GUIDBOOKS_ROUTES.materials.route}`) ||
+			pathname.includes(`/${GUIDBOOKS_ROUTES.requirements.route}`);
 
 		const handleImportClick = () => {
 			if (fileInputRef.current) {
@@ -61,13 +66,19 @@ export const GuidbookPageHeaderWrapper = memoize(
 
 		const onImportHandle = (event: React.ChangeEvent<HTMLInputElement>) => {
 			const file = event.target.files?.[0];
+			event.target.value = '';
 
 			if (!file) {
 				toast.error(t('errors.fileNotSelected'));
 				return;
 			}
 
-			from(importMaterials({ formFile: file }))
+			const isRequirements = pathname.includes(`/${GUIDBOOKS_ROUTES.requirements.route}`);
+			const importRequest = isRequirements
+				? importRequirements({ formFile: file })
+				: importMaterials({ formFile: file });
+
+			from(importRequest)
 				.pipe(
 					tap((response) => {
 						if (response.status === 200) {
@@ -139,31 +150,30 @@ export const GuidbookPageHeaderWrapper = memoize(
 					</p>
 					<div className="flex items-center gap-2">
 						<div className="flex items-center justify-between">
-							{currentHeaderFormType === HeaderFormTypes.filter &&
-								location.pathname.includes('material') && (
-									<>
-										<Button
-											className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
-											onClick={handleImportClick}
-										>
-											<PiExportBold
-												fill="white"
-												width={'16px'}
-												height={'16px'}
-											/>
-											<p className="font-sans text-sm font-semibold leading-[18px]">
-												{t('common.import')}
-											</p>
-										</Button>
-										<input
-											ref={fileInputRef}
-											type="file"
-											accept=".txt"
-											onChange={onImportHandle}
-											className="hidden"
+							{currentHeaderFormType === HeaderFormTypes.filter && showImportButton && (
+								<>
+									<Button
+										className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
+										onClick={handleImportClick}
+									>
+										<PiExportBold
+											fill="white"
+											width={'16px'}
+											height={'16px'}
 										/>
-									</>
-								)}
+										<p className="font-sans text-sm font-semibold leading-[18px]">
+											{t('common.import')}
+										</p>
+									</Button>
+									<input
+										ref={fileInputRef}
+										type="file"
+										accept=".txt,.xlsx,.xls,.csv"
+										onChange={onImportHandle}
+										className="hidden"
+									/>
+								</>
+							)}
 						</div>
 						<div className="flex items-center justify-between">
 							{currentHeaderFormType === HeaderFormTypes.filter && onExport && (
