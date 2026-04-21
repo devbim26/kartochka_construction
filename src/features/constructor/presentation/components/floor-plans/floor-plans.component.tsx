@@ -2,6 +2,7 @@ import { APP_ROUTES, Button, DeleteIcon, DeleteModal, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { useAppDispatch, useAppNavigate, useAppSelector } from '@core/utils';
 import { memoize } from '@core/utils/hoc/memo.utils';
+import { getCurrentUser } from '@features/account/services';
 import {
 	CONSTRUCTOR_ROUTES,
 	ROOM_DESIGN_STUB_CONSTRUCTION_HEADER_ID,
@@ -1156,6 +1157,7 @@ export const FloorPlans = memoize(() => {
 										document.body.appendChild(link);
 										link.click();
 										document.body.removeChild(link);
+										dispatch(getCurrentUser());
 									}
 								});
 							return;

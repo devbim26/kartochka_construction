@@ -1,3 +1,4 @@
+import { GraphType } from '@api-gen';
 import { useI18n } from '@core';
 import type { ChartData, ChartOptions } from 'chart.js';
 import {
@@ -44,6 +45,8 @@ export type GraphDataPoint = {
 export type DesigningChartSeries = {
 	key: string;
 	kind: GraphSeriesKind;
+	/** С сервера; по нему задаются цвет и толщина линии */
+	graphType?: GraphType;
 	legendLabel: string;
 	data: GraphDataPoint[];
 	pointLabels?: Array<{ x: number; y: number; label: string }>;
@@ -54,21 +57,44 @@ type DesigningChartProps = {
 	chartSize?: 'default' | 'large';
 };
 
-const seriesStyle = (kind: GraphSeriesKind) => {
+type LineTier = 'thick' | 'medium' | 'thin';
+
+const seriesStyleByKind = (kind: GraphSeriesKind) => {
 	switch (kind) {
 		case 'laboratory_wall':
-			return { color: '#ef4444', lineTier: 'thick' as const };
+			return { color: '#ef4444', lineTier: 'thick' as const, borderDash: undefined as number[] | undefined };
 		case 'computed_wall':
-			return { color: '#2563eb', lineTier: 'thick' as const };
+			return { color: '#2563eb', lineTier: 'thick' as const, borderDash: undefined };
 		case 'window':
-			return { color: '#22c55e', lineTier: 'thin' as const };
+			return { color: '#22c55e', lineTier: 'thin' as const, borderDash: undefined };
 		case 'door':
-			return { color: '#f97316', lineTier: 'thin' as const };
+			return { color: '#f97316', lineTier: 'thin' as const, borderDash: undefined };
 		case 'reference':
-			return { color: '#9ca3af', lineTier: 'thin' as const };
+			return {
+				color: '#9ca3af',
+				lineTier: 'thin' as const,
+				borderDash: [6, 6] as number[],
+			};
 		default:
-			return { color: '#6b7280', lineTier: 'thin' as const };
+			return { color: '#6b7280', lineTier: 'thin' as const, borderDash: undefined };
 	}
+};
+
+const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
+	const gt = s.graphType;
+	if (gt === GraphType.Computed)
+		return { color: '#2563eb', lineTier: 'thick' as LineTier, borderDash: undefined };
+	if (gt === GraphType.Laboratory)
+		return { color: '#ef4444', lineTier: 'thick' as LineTier, borderDash: undefined };
+	if (gt === GraphType.Atalon)
+		return { color: '#9ca3af', lineTier: 'thin' as LineTier, borderDash: [6, 6] as number[] };
+	if (gt === GraphType.AdditionalDoor)
+		return { color: '#f97316', lineTier: 'thin' as LineTier, borderDash: undefined };
+	if (gt === GraphType.AdditionalWindow)
+		return { color: '#22c55e', lineTier: 'thin' as LineTier, borderDash: undefined };
+	if (gt === GraphType.Intermediate)
+		return { color: '#a855f7', lineTier: 'medium' as LineTier, borderDash: undefined };
+	return seriesStyleByKind(s.kind);
 };
 
 const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) => {
@@ -82,26 +108,35 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 	const chartHeight = chartSize === 'large' ? Math.round(750 * LARGE_SCALE) : 500;
 	const chartMinWidth = chartSize === 'large' ? Math.round(1050 * LARGE_SCALE) : 700;
 
+	/** Пунктирные границы расчётного диапазона (Гц). */
 	const RANGE_MIN_HZ = 100;
 	const RANGE_MAX_HZ = 3150;
 
-	const allFrequencies = Array.from(
-		new Set(
-			series
-				.flatMap((s) => s.data.map((point) => point.x))
-				.filter((freq) => freq !== null && freq !== undefined)
-				.sort((a, b) => a - b),
-		),
-	);
+	/** Ось частот всегда 0…5000 Гц. */
+	const AXIS_MIN_HZ = 0;
+	const AXIS_MAX_HZ = 5000;
 
-	const minFrequency = allFrequencies.length > 0 ? Math.min(...allFrequencies) : 50;
-	const maxFrequency = allFrequencies.length > 0 ? Math.max(...allFrequencies) : 5000;
+	/** Сетка 1/3 октавы в пределах оси + любые точки данных в этом диапазоне. */
+	const THIRD_OCTAVE_ISO_HZ = [
+		50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
+		3150, 4000, 5000, 6300, 8000, 10000,
+	];
+
+	const allDataFreqs = series
+		.flatMap((s) => s.data.map((point) => point.x))
+		.filter((freq) => freq !== null && freq !== undefined);
+
+	const dataFreqsOnAxis = allDataFreqs.filter((f) => f >= AXIS_MIN_HZ && f <= AXIS_MAX_HZ);
 
 	const displayFrequencies = (() => {
-		const base = allFrequencies.filter((freq) => freq >= minFrequency && freq <= maxFrequency);
-		const set = new Set(base);
-		set.add(RANGE_MIN_HZ);
-		set.add(RANGE_MAX_HZ);
+		const fromGrid = THIRD_OCTAVE_ISO_HZ.filter((f) => f >= AXIS_MIN_HZ && f <= AXIS_MAX_HZ);
+		const set = new Set<number>([
+			AXIS_MIN_HZ,
+			...fromGrid,
+			...dataFreqsOnAxis,
+			RANGE_MIN_HZ,
+			RANGE_MAX_HZ,
+		]);
 		return Array.from(set).sort((a, b) => a - b);
 	})();
 
@@ -195,10 +230,11 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 	const chartData: ChartData<'line'> = {
 		labels: displayFrequencies.map((freq) => String(freq)),
 		datasets: series.map((s) => {
-			const { color, lineTier } = seriesStyle(s.kind);
-			const borderWidth = lineTier === 'thick' ? thickWidth : thinWidth;
-			const isReference = s.kind === 'reference';
-			const isGreyOther = s.kind === 'other';
+			const style = seriesStyleFromGraphSeries(s);
+			const { color, lineTier, borderDash: styleDash } = style;
+			const borderWidth =
+				lineTier === 'thick' ? thickWidth : lineTier === 'medium' ? (thickWidth + thinWidth) / 2 : thinWidth;
+			const isGreyOther = s.kind === 'other' && s.graphType !== GraphType.Intermediate;
 
 			const dataPoints = displayFrequencies.map((frequency) => {
 				const point = s.data.find((p) => p.x === frequency);
@@ -213,7 +249,7 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 				borderColor: color,
 				backgroundColor: 'transparent',
 				borderWidth,
-				borderDash: isReference ? [6, 6] : undefined,
+				borderDash: styleDash,
 				pointStyle: 'circle' as const,
 				pointBackgroundColor: (context: any) => {
 					if (context.dataIndex === undefined) return color;

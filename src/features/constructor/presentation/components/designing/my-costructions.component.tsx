@@ -31,6 +31,7 @@ import { convertToClientConstructionsEditData } from '@features/guidbooks/conver
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { ConstructionsEditData } from '@features/guidbooks/types';
 import { Guidebooks } from '@features/guidbooks/types';
+import { graphHasComputedData, graphHasLaboratoryData } from '@features/constructor/utils';
 
 import { AxiosError } from 'axios';
 import { useEffect, useMemo, useState } from 'react';
@@ -81,25 +82,9 @@ const MyConstructions = () => {
 		[favoriteConstructions, currentHeaderId],
 	);
 
-	const hasComputedDots = useMemo(
-		() =>
-			(graphData ?? []).some(
-				(g) =>
-					(g.name || '').toLowerCase() === 'computeddots' &&
-					(g.namedDots?.length ?? 0) > 0,
-			),
-		[graphData],
-	);
+	const hasComputedDots = useMemo(() => graphHasComputedData(graphData), [graphData]);
 
-	const hasLaboratoryDots = useMemo(
-		() =>
-			(graphData ?? []).some(
-				(g) =>
-					(g.name || '').toLowerCase() === 'laboratorydots' &&
-					(g.namedDots?.length ?? 0) > 0,
-			),
-		[graphData],
-	);
+	const hasLaboratoryDots = useMemo(() => graphHasLaboratoryData(graphData), [graphData]);
 
 	const visibleFavoriteConstructions = useMemo(
 		() =>

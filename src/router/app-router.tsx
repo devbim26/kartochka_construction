@@ -22,6 +22,7 @@ import {
 	MainScreen,
 	MaterialsScreen,
 	NotFoundScreen,
+	SomethingWentWrongScreen,
 	ReportFormScreen,
 	RequirementsScreen,
 	UserScreen,
@@ -50,6 +51,7 @@ export const AppRouter = () => {
 			<Route path="/news/:articleId" element={<LandingScreen />}>
 				<Route index element={<ArticlePage />} />
 			</Route>
+			<Route path={APP_ROUTES.error.route} element={<SomethingWentWrongScreen />} />
 			<Route path={APP_ROUTES.auth.route} element={<AuthorizationScreen />}>
 				<Route path={AUTH_ROUTES.login.route} element={<LoginPage />} />
 				<Route path={AUTH_ROUTES.code_approve.route} element={<CodeConfirmPage />} />

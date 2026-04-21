@@ -1,3 +1,4 @@
+import { GraphType } from '@api-gen';
 import { SimpleTableCell, SimpleTableHeaderCell, useI18n } from '@core';
 import { DesigningRwTable } from '@features';
 import type { AdditionalGraphParameters, GraphDetailResponse } from '@features/constructor/types';
@@ -26,12 +27,16 @@ interface GraphTableProps {
 export const GraphDetailTable = ({ graphData, additional, noPadding = false }: GraphTableProps) => {
 	const { t } = useI18n();
 	const { freqData, extraData } = useMemo(() => {
-		const getDotsByName = (targetName: string) =>
-			graphData?.find((g) => (g.name || '').toLowerCase() === targetName.toLowerCase())
-				?.namedDots ?? [];
+		const getDotsForSeries = (graphType: GraphType, legacyNameLower: string) =>
+			graphData?.find(
+				(g) =>
+					(g.namedDots?.length ?? 0) > 0 &&
+					(g.graphType === graphType ||
+						(g.name || '').toLowerCase() === legacyNameLower.toLowerCase()),
+			)?.namedDots ?? [];
 
-		const computedDots = getDotsByName('computedDots');
-		const laboratoryDots = getDotsByName('LaboratoryDots');
+		const computedDots = getDotsForSeries(GraphType.Computed, 'computeddots');
+		const laboratoryDots = getDotsForSeries(GraphType.Laboratory, 'laboratorydots');
 
 		const computedMap = new Map<number, string>();
 		computedDots.forEach((dot) => {

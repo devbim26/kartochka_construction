@@ -13,6 +13,7 @@ import {
 	useAppNavigate,
 	useI18n,
 } from '@core';
+import { getCurrentUser } from '@features/account/services';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import {
 	convertToClientReportInfo,
@@ -271,6 +272,7 @@ const AboutBuildingScreen = () => {
 									document.body.appendChild(link);
 									link.click();
 									document.body.removeChild(link);
+									dispatch(getCurrentUser());
 								}
 								navigate(
 									APP_ROUTES.designing.route +

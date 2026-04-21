@@ -27,8 +27,10 @@ const zPanelRequiresBrandIssuerRefine = (
 export const ConstructionsFilterSchema = z.object({
 	name: z.string(),
 	constructionType: z.string(),
-	description: z.string(),
 	country: z.string(),
+	priority: z.string(),
+	rw: z.string(),
+	lnw: z.string(),
 });
 
 export const MaterialTypeValues = z.object({
@@ -103,6 +105,9 @@ const constructionsAddShape = z.object({
 	laboratoryC: z.string().optional(),
 	laboratoryCtr: z.string().optional(),
 	laboratoryTestSource: z.string().min(1, 'validation.required'),
+	/** Поля списка (фильтр / таблица), при создании не отправляются на сервер */
+	rw: z.string().optional(),
+	lnw: z.string().optional(),
 	constructionTypeObject: ConstructionTypeShema,
 	reportInfoId: z.string().optional(),
 });

@@ -1,6 +1,10 @@
 import { FormElementLabel, ImagePreviewModal, useI18n } from '@core';
 import type { ReportInfoShort } from '@features/constructor/utils';
-import { formatMaterial } from '@features/constructor/utils';
+import {
+	formatMaterial,
+	getSurfaceMassKgPerM2FromMaterials,
+	getTotalThicknessMmFromMaterials,
+} from '@features/constructor/utils';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
 import { RuConstructionTypesMap } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
@@ -23,7 +27,6 @@ export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) =>
 	const { t } = useI18n();
 	const [thickness, setThickness] = useState<number>(0);
 	const [mass, setMass] = useState<number>(0);
-	const [density, setDensity] = useState<number>(0);
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 	const [isLabGraphOpen, setIsLabGraphOpen] = useState(false);
 
@@ -36,35 +39,9 @@ export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) =>
 			...(construction.constructionTypeObject.rightConstruction || []),
 		];
 
-		const thicknessValues = allMaterials
-			.flatMap((m) => m.materialTypeValue || [])
-			.filter((v) => v.materialParameters === 'Thickness')
-			.map((v) => Number(v.value) || 0);
-
-		const densityValues = allMaterials
-			.flatMap((m) => m.materialTypeValue || [])
-			.filter((v) => v.materialParameters === 'Density')
-			.map((v) => Number(v.value) || 0);
-
-		const totalThickness = thicknessValues.reduce((acc, val) => acc + val, 0);
-
-		const avgDensity = densityValues.length
-			? densityValues.reduce((acc, val) => acc + val, 0) / densityValues.length
-			: 0;
-
-		setThickness(totalThickness);
-		setDensity(avgDensity);
+		setThickness(getTotalThicknessMmFromMaterials(allMaterials));
+		setMass(getSurfaceMassKgPerM2FromMaterials(allMaterials));
 	}, [construction]);
-
-	useEffect(() => {
-		if (!thickness || !density || !construction) return;
-
-		const square = 100;
-		if (!square) return;
-
-		const calculatedMass = (square * thickness * density) / 1000;
-		setMass(calculatedMass);
-	}, [thickness, density, construction]);
 
 	const constructionHeaderId = construction?.id ?? null;
 
@@ -150,7 +127,7 @@ export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) =>
 							},
 							{
 								physical: 'Масса, кг/м²',
-								values: String(mass) || '-',
+								values: Number.isFinite(mass) ? mass.toFixed(2) : '-',
 								requirements: '?',
 							},
 							{

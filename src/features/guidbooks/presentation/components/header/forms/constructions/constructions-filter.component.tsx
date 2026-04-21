@@ -3,6 +3,7 @@ import { convertToClientConstructionTypesList } from '@features/guidbooks/conver
 import { getGuidebooksConstructionTypes } from '@features/guidbooks/services';
 import {
 	RuCountryNamesSelectValues,
+	RuPriorityNamesSelectValues,
 	type ConstructionsFilterData,
 	type ConstructionTypeTemplate,
 } from '@features/guidbooks/types';
@@ -68,19 +69,6 @@ export const ConstructionsFilter = () => {
 					/>
 				)}
 			/>
-			<Input
-				labelClassName={twMerge(
-					'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-					formState.errors.description?.message ? 'text-error' : '',
-				)}
-				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-				containerClassName="w-[226px]"
-				label={formState.errors.description?.message || 'Описание'}
-				error={formState.errors.description?.message}
-				placeholder="Введите описание"
-				{...form.register('description')}
-				type={'text'}
-			/>
 			<Controller
 				name="country"
 				control={control}
@@ -101,6 +89,53 @@ export const ConstructionsFilter = () => {
 						placeholder="Выберите страну"
 					/>
 				)}
+			/>
+			<Controller
+				name="priority"
+				control={control}
+				render={({ field }) => (
+					<Select
+						{...field}
+						isSearchable
+						value={field.value || ''}
+						options={RuPriorityNamesSelectValues}
+						error={formState.errors.priority?.message}
+						labelClassName={twMerge(
+							'text-sm leading-5 tracking-[0.1px]',
+							formState.errors.priority?.message ? 'text-error' : '',
+						)}
+						wrapperClassname="w-[226px] ring-input-border-primary"
+						buttonClassName="text-sm rounded-[8px]"
+						label={formState.errors.priority?.message || 'Приоритет'}
+						placeholder="Выберите приоритет"
+					/>
+				)}
+			/>
+			<Input
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+					formState.errors.rw?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors.rw?.message || 'Звукоизоляция Rw, дБ'}
+				error={formState.errors.rw?.message}
+				placeholder="Например, 52"
+				{...form.register('rw')}
+				type={'text'}
+			/>
+			<Input
+				labelClassName={twMerge(
+					'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+					formState.errors.lnw?.message ? 'text-error' : '',
+				)}
+				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+				containerClassName="w-[226px]"
+				label={formState.errors.lnw?.message || 'Звукоизоляция Lnw, дБ'}
+				error={formState.errors.lnw?.message}
+				placeholder="Например, 58"
+				{...form.register('lnw')}
+				type={'text'}
 			/>
 		</div>
 	);

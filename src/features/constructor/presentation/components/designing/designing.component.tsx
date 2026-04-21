@@ -37,6 +37,7 @@ import {
 	graphDotsConverterToClient,
 	mapAdditionalOpeningsToUpdateDto,
 } from '@features/constructor/converters';
+import { graphHasComputedData, graphHasLaboratoryData } from '@features/constructor/utils';
 import {
 	getFloorConstructionById,
 	getReportFloorById,
@@ -61,7 +62,8 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -114,6 +116,8 @@ const DesigningConstructionScreen = () => {
 		mode: 'onSubmit',
 	});
 
+	const constructionFormControl = form.control as unknown as Control<ConstructionsEditData>;
+
 	const isConstructionEditLocked = useMemo(
 		() => !isGeneralReferenceIssuer(constructionHeader?.issuerName),
 		[constructionHeader?.issuerName],
@@ -126,25 +130,12 @@ const DesigningConstructionScreen = () => {
 			| undefined;
 	}, [form, constructionHeader]);
 
-	const hasComputedDots = useMemo(
-		() =>
-			(graphData ?? []).some(
-				(g) =>
-					(g.name || '').toLowerCase() === 'computeddots' &&
-					(g.namedDots?.length ?? 0) > 0,
-			),
-		[graphData],
-	);
+	const hasComputedDots = useMemo(() => graphHasComputedData(graphData), [graphData]);
 
-	const hasLaboratoryDots = useMemo(
-		() =>
-			(graphData ?? []).some(
-				(g) =>
-					(g.name || '').toLowerCase() === 'laboratorydots' &&
-					(g.namedDots?.length ?? 0) > 0,
-			),
-		[graphData],
-	);
+	const hasLaboratoryDots = useMemo(() => graphHasLaboratoryData(graphData), [graphData]);
+
+	const rCalcsDisplay = useWatch({ control: constructionFormControl, name: 'RCalcs' });
+	const labIndexValueDisplay = useWatch({ control: constructionFormControl, name: 'labIndexValue' });
 
 	const handleGetCurrentReportFloorInfo = (id: string) => {
 		dispatch(startLoading());
@@ -327,8 +318,11 @@ const DesigningConstructionScreen = () => {
 
 	useEffect(() => {
 		if (!!constructionHeader && !!currentConstruction?.reportConstructionHeader.requirement) {
-			const rwValue = +(constructionHeader.RCalcs || 0);
-			const labRwValue = +(constructionHeader.labIndexValue || 0);
+			const rwValue =
+				Number(String(rCalcsDisplay ?? constructionHeader.RCalcs ?? '').trim()) || 0;
+			const labRwValue =
+				Number(String(labIndexValueDisplay ?? constructionHeader.labIndexValue ?? '').trim()) ||
+				0;
 
 			const requiredRw = +(
 				currentConstruction?.reportConstructionHeader.requirement?.noizeIsolationIndex || 50
@@ -336,7 +330,13 @@ const DesigningConstructionScreen = () => {
 			setLabIsRelevant(labRwValue >= requiredRw);
 			setCompIsRelevant(rwValue >= requiredRw);
 		}
-	}, [constructionHeader, currentReportInfo]);
+	}, [
+		constructionHeader,
+		currentConstruction?.reportConstructionHeader.requirement,
+		currentReportInfo,
+		rCalcsDisplay,
+		labIndexValueDisplay,
+	]);
 
 	const handleGetConstructionImage = useCallback((id: string) => {
 		from(svgConstructionDetail(id))
@@ -411,6 +411,30 @@ const DesigningConstructionScreen = () => {
 			if (isConstructionEditLocked) {
 				return;
 			}
+			if (!value?.trim()) {
+				form.setValue('constructionTypeObject.constructionTypeEnum', '' as ConstructionTypeEnum);
+				setConstructionHeader((prev) => {
+					if (!prev) return null;
+					return {
+						...prev,
+						constructionTypeObject: {
+							...prev.constructionTypeObject,
+							constructionTypeEnum: '' as ConstructionTypeEnum,
+							leftConstruction: undefined,
+							centerConstruction: undefined,
+							rightConstruction: undefined,
+						},
+					};
+				});
+				setGraphData(null);
+				setGraphAdditionalData(null);
+				setLabIsRelevant(false);
+				setCompIsRelevant(false);
+				setSvgUrl(null);
+				setHasPendingTypeChange(true);
+				return;
+			}
+
 			const constructionType = value as ConstructionTypeEnum;
 
 			form.setValue('constructionTypeObject.constructionTypeEnum', constructionType);
@@ -418,7 +442,7 @@ const DesigningConstructionScreen = () => {
 			ConstructionTypeMap({
 				currentConstruction: constructionType,
 				currentForm: form,
-			}).action();
+			})?.action();
 
 			setConstructionHeader((prev) => {
 				if (!prev) return null;
@@ -505,9 +529,6 @@ const DesigningConstructionScreen = () => {
 					handleGetConstructionImage(constructionHeaderId);
 					handleGetGraphDetail(constructionHeaderId);
 					handleGetGraphAdditionalDetail(constructionHeaderId);
-
-					setGraphData(null);
-					setGraphAdditionalData(null);
 
 					const rcId = reportConstructionIdRef.current;
 					const openings = additionalOpeningsRef.current;
@@ -812,7 +833,7 @@ const DesigningConstructionScreen = () => {
 										</p>
 										<div className="flex w-full items-center gap-1">
 											<p className="font-sans text-[25px] font-semibold leading-4">
-												Rw = {constructionHeader?.RCalcs} dB
+												{`Rw = ${rCalcsDisplay ?? constructionHeader?.RCalcs ?? ''} dB`}
 											</p>
 											<p className={compIsRelevant ? 'text-green-600' : 'text-error'}>
 												{compIsRelevant
@@ -835,7 +856,7 @@ const DesigningConstructionScreen = () => {
 										</p>
 										<div className="flex w-full items-center gap-1">
 											<p className="font-sans text-[25px] font-semibold leading-4">
-												Rw = {constructionHeader?.labIndexValue} dB
+												{`Rw = ${labIndexValueDisplay ?? constructionHeader?.labIndexValue ?? ''} dB`}
 											</p>
 											<p className={labIsRelevant ? 'text-green-600' : 'text-error'}>
 												{labIsRelevant

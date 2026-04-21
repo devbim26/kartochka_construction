@@ -35,6 +35,7 @@ import {
 	Guidebooks,
 	RuConstructionTypesMap,
 	RuCountryNamesMap,
+	RuPriorityNamesSelectValues,
 	type ConstructionsAddData,
 	type ConstructionsEditData,
 	type ConstructionsFilterData,
@@ -98,18 +99,34 @@ const ConstructionsScreen = () => {
 				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 			},
 			{
-				accessorKey: 'descriptionSource',
+				accessorKey: 'priority',
 				header: () => (
-					<SimpleTableHeaderCell text={t('guides.constructions.columns.source')} />
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.priority')} />
 				),
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => {
+					const v = info.getValue() as string;
+					const label =
+						RuPriorityNamesSelectValues.find((o) => o.value === v)?.label ?? v;
+					return <SimpleTableCell content={label || '—'} />;
+				},
 			},
 			{
-				accessorKey: 'maxHeight',
+				accessorKey: 'rw',
 				header: () => (
-					<SimpleTableHeaderCell text={t('guides.constructions.columns.maxHeight')} />
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.rw')} />
 				),
-				cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+				cell: (info) => (
+					<SimpleTableCell content={(info.getValue() as string) || '—'} />
+				),
+			},
+			{
+				accessorKey: 'lnw',
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.constructions.columns.lnw')} />
+				),
+				cell: (info) => (
+					<SimpleTableCell content={(info.getValue() as string) || '—'} />
+				),
 			},
 			{
 				accessorKey: 'issuerName',
@@ -179,17 +196,30 @@ const ConstructionsScreen = () => {
 			},
 		];
 		return cols;
-	}, []);
+	}, [t, navigate]);
 
-	const [filterName, filterConstructionType, filterDescription, filterRegion] =
-		forms.filterForm.watch(['name', 'constructionType', 'description', 'country']);
+	const [
+		filterName,
+		filterConstructionType,
+		filterRegion,
+		filterPriority,
+		filterRw,
+		filterLnw,
+	] = forms.filterForm.watch(['name', 'constructionType', 'country', 'priority', 'rw', 'lnw']);
 
 	useEffect(() => {
 		handleGetTableData(
 			forms.filterForm.getValues() as ConstructionsFilterData,
 			paginationState,
 		);
-	}, [filterName, filterConstructionType, filterDescription, filterRegion]);
+	}, [
+		filterName,
+		filterConstructionType,
+		filterRegion,
+		filterPriority,
+		filterRw,
+		filterLnw,
+	]);
 
 	const handleGetTableData = (
 		data: ConstructionsFilterData,

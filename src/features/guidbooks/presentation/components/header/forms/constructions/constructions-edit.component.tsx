@@ -19,7 +19,6 @@ import {
 	Guidebooks,
 	RuConstructionTypesSelectValues,
 	RuCountryNamesSelectValues,
-	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	type ConstructionsEditData,
 	type ConstructionTypeEnum,
@@ -31,6 +30,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
 import { FormSubTitle } from '../../form-sub-title.component';
+import { ConstructionLaboratoryDataFields } from './constructions-laboratory-data-fields.component';
 
 export const ConstructionsEdit = () => {
 	const form = useFormContext<ConstructionsEditData>();
@@ -239,6 +239,35 @@ export const ConstructionsEdit = () => {
 						<Input
 							labelClassName={twMerge(
 								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.RCalcs?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[226px]"
+							label={formState.errors.RCalcs?.message || 'Звукоизоляция Rw, дБ'}
+							error={formState.errors.RCalcs?.message}
+							placeholder="Введите Rw"
+							{...register('RCalcs')}
+							type={'text'}
+						/>
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
+								formState.errors.estimatedIndexValue?.message ? 'text-error' : '',
+							)}
+							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
+							containerClassName="w-[226px]"
+							label={
+								formState.errors.estimatedIndexValue?.message ||
+								'Расчётный индекс изоляции'
+							}
+							error={formState.errors.estimatedIndexValue?.message}
+							placeholder="Введите значение"
+							{...register('estimatedIndexValue')}
+							type={'text'}
+						/>
+						<Input
+							labelClassName={twMerge(
+								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
 								formState.errors.fireResistance?.message ? 'text-error' : '',
 							)}
 							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
@@ -266,99 +295,7 @@ export const ConstructionsEdit = () => {
 							type={'text'}
 						/>
 					</div>
-					<FormSubTitle text="Лабораторные тесты" />
-					<div className="flex flex-wrap gap-[16px]">
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.labRTotal?.message ? 'text-error' : '',
-							)}
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[468px]"
-							label={formState.errors.labRTotal?.message || 'R_total'}
-							error={formState.errors.labRTotal?.message}
-							placeholder="Введите через запятую"
-							{...register('labRTotal')}
-							type={'text'}
-						/>
-						<Controller
-							name="labIndex"
-							control={control}
-							render={({ field }) => (
-								<Select
-									{...field}
-									value={field.value || ''}
-									options={RuIndexTypeNamesSelectValues}
-									error={formState.errors.labIndex?.message}
-									labelClassName={twMerge(
-										'text-sm leading-5 tracking-[0.1px]',
-										formState.errors.labIndex?.message ? 'text-error' : '',
-									)}
-									wrapperClassname="w-[226px] ring-input-border-primary"
-									buttonClassName="text-sm rounded-[8px]"
-									label={formState.errors.labIndex?.message || 'Индекс'}
-									placeholder="Выберите индекс"
-									isSearchable
-								/>
-							)}
-						/>
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.labIndexValue?.message ? 'text-error' : '',
-							)}
-							disabled
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={formState.errors.labIndexValue?.message || 'Index value, dBA'}
-							error={formState.errors.labIndexValue?.message}
-							placeholder="Введите индекс"
-							{...register('labIndexValue')}
-							type={'number'}
-						/>
-
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.laboratoryTestSource?.message ? 'text-error' : '',
-							)}
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={formState.errors.laboratoryTestSource?.message || 'Источник'}
-							error={formState.errors.laboratoryTestSource?.message}
-							placeholder="Введите источник"
-							{...register('laboratoryTestSource')}
-							type={'text'}
-						/>
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.labIndexValue?.message ? 'text-error' : '',
-							)}
-							disabled
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={formState.errors.labIndexValue?.message || 'C'}
-							error={formState.errors.labIndexValue?.message}
-							placeholder="Введите C"
-							{...register('laboratoryC')}
-							type={'number'}
-						/>
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.labIndexValue?.message ? 'text-error' : '',
-							)}
-							disabled
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={formState.errors.labIndexValue?.message || 'Ctr'}
-							error={formState.errors.labIndexValue?.message}
-							placeholder="Введите Ctr"
-							{...register('laboratoryCtr')}
-							type={'number'}
-						/>
-					</div>
+					<ConstructionLaboratoryDataFields readOnly />
 				</>
 			) : (
 				<>

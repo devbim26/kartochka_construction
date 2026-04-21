@@ -103,6 +103,8 @@ export const ConstructionsAddConfig: EntityConfig = {
 		labRTotal: '',
 		labIndex: '',
 		labIndexValue: '',
+		rw: '',
+		lnw: '',
 	},
 };
 
@@ -110,6 +112,7 @@ export const ConstructionsEditConfig: EntityConfig = {
 	schema: ConstructionsEditSchema,
 	defaultValues: {
 		...ConstructionsAddConfig.defaultValues,
+		RCalcs: '',
 		comment: '',
 		estimatedIndex: '',
 		estimatedIndexValue: '',
@@ -121,8 +124,10 @@ export const ConstructionsFilterConfig: EntityConfig = {
 	schema: ConstructionsFilterSchema,
 	defaultValues: {
 		name: '',
-		constructionTypeId: '',
-		description: '',
+		constructionType: '',
 		country: '',
+		priority: '',
+		rw: '',
+		lnw: '',
 	},
 };

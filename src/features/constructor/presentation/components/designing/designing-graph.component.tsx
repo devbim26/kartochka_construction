@@ -1,23 +1,41 @@
-import type { GraphDetailResponse } from '@features/constructor/types';
-import { useI18n } from '@core';
+import { GraphType } from '@api-gen';
+import type { GraphDetailResponse, NamedDot } from '@features/constructor/types';
 import { useMemo } from 'react';
-import DesigningChart, { type DesigningChartSeries, type GraphSeriesKind } from './designing-chart.component';
+import DesigningChart, {
+	type DesigningChartSeries,
+	type GraphSeriesKind,
+} from './designing-chart.component';
 
-interface GraphProps {
-	graphData: GraphDetailResponse[] | null;
-	regulatoryDocName: string;
-	calculationDocName: string;
-	chartSize?: 'default' | 'large';
-}
-
-const mapWithLabels = (dots: any[]) =>
+const mapWithLabels = (dots: NamedDot[]) =>
 	dots
 		.filter((d) => d.dot?.f != null && d.dot?.r != null)
 		.map((d) => ({ x: d.dot!.f!, y: d.dot!.r!, label: d.name }));
 
-const getDotsByName = (graphData: GraphDetailResponse[] | null, targetName: string) =>
-	graphData?.find((g) => (g.name || '').toLowerCase() === targetName.toLowerCase())?.namedDots ??
-	[];
+const legacyNameToGraphType = (name: string | null | undefined): GraphType | undefined => {
+	const n = (name || '').toLowerCase();
+	if (n === 'computeddots') return GraphType.Computed;
+	if (n === 'laboratorydots') return GraphType.Laboratory;
+	return undefined;
+};
+
+const graphTypeToKind = (gt: GraphType | undefined): GraphSeriesKind => {
+	switch (gt) {
+		case GraphType.Computed:
+			return 'computed_wall';
+		case GraphType.Laboratory:
+			return 'laboratory_wall';
+		case GraphType.Atalon:
+			return 'reference';
+		case GraphType.AdditionalDoor:
+			return 'door';
+		case GraphType.AdditionalWindow:
+			return 'window';
+		case GraphType.Intermediate:
+			return 'other';
+		default:
+			return 'other';
+	}
+};
 
 const classifyExtraSeries = (name: string): GraphSeriesKind => {
 	const n = (name || '').toLowerCase();
@@ -39,61 +57,38 @@ const DesigningGraph = ({
 	regulatoryDocName: _regulatoryDocName,
 	calculationDocName: _calculationDocName,
 	chartSize = 'default',
-}: GraphProps) => {
-	const { t } = useI18n();
-
+}: {
+	graphData: GraphDetailResponse[] | null;
+	regulatoryDocName: string;
+	calculationDocName: string;
+	chartSize?: 'default' | 'large';
+}) => {
 	const series: DesigningChartSeries[] = useMemo(() => {
-		if (!graphData) return [];
+		if (!graphData?.length) return [];
 
-		const handledNames = ['computeddots', 'laboratorydots', 'deviationdotslist'];
 		const out: DesigningChartSeries[] = [];
+		let idx = 0;
 
-		const computedRaw = getDotsByName(graphData, 'computedDots');
-		if (computedRaw.length > 0) {
-			out.push({
-				key: 'computedDots',
-				kind: 'computed_wall',
-				legendLabel: t('constructor.chart.legendWallR'),
-				data: mapWithLabels(computedRaw).sort((a, b) => a.x - b.x),
-			});
-		}
-
-		const laboratoryRaw = getDotsByName(graphData, 'LaboratoryDots');
-		if (laboratoryRaw.length > 0) {
-			out.push({
-				key: 'LaboratoryDots',
-				kind: 'laboratory_wall',
-				legendLabel: t('constructor.chart.legendWallRlab'),
-				data: mapWithLabels(laboratoryRaw).sort((a, b) => a.x - b.x),
-			});
-		}
-
-		const extras = graphData.filter(
-			(g) => !handledNames.includes((g.name || '').toLowerCase()),
-		);
-		for (const g of extras) {
-			const rawName = g.name || 'Unknown';
-			const kind = classifyExtraSeries(rawName);
+		for (const g of graphData) {
 			const dots = g.namedDots ?? [];
 			if (!dots.length) continue;
 
-			const legendLabel =
-				kind === 'reference'
-					? ''
-					: kind === 'other'
-						? rawName
-						: kind === 'window'
-							? t('constructor.chart.legendWindowsRlab')
-							: kind === 'door'
-								? t('constructor.chart.legendDoorRlab')
-								: rawName;
+			const rawName = (g.name || '').trim();
+			if ((g.name || '').toLowerCase() === 'deviationdotslist') continue;
+
+			const resolvedType = g.graphType ?? legacyNameToGraphType(g.name);
+			const kind = resolvedType ? graphTypeToKind(resolvedType) : classifyExtraSeries(g.name || '');
+
+			const legendLabel = rawName.trim();
 
 			out.push({
-				key: rawName,
+				key: `${resolvedType ?? 'legacy'}-${idx}`,
 				kind,
+				graphType: resolvedType,
 				legendLabel,
 				data: mapWithLabels(dots).sort((a, b) => a.x - b.x),
 			});
+			idx += 1;
 		}
 
 		const drawOrder: Record<GraphSeriesKind, number> = {
@@ -106,7 +101,7 @@ const DesigningGraph = ({
 		};
 
 		return [...out].sort((a, b) => drawOrder[a.kind] - drawOrder[b.kind]);
-	}, [graphData, t]);
+	}, [graphData]);
 
 	return <DesigningChart series={series} chartSize={chartSize} />;
 };

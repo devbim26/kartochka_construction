@@ -13,6 +13,10 @@ import {
 import { startLoading, stopLoading } from '@features/constructor/store';
 import { ReportCategory, type FloorConstruction } from '@features/constructor/types';
 import type { ReportInfoShort } from '@features/constructor/utils';
+import {
+	getSurfaceMassKgPerM2FromMaterials,
+	getTotalThicknessMmFromMaterials,
+} from '@features/constructor/utils';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
@@ -39,8 +43,8 @@ export const GeneralInformationForm = () => {
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 	const [constructionType, setConstructionType] = useState<ConstructionsEditData>();
 	const [thickness, setThickness] = useState<number>();
-	const [mass, setMass] = useState<number>();
-	const [density, setDensity] = useState<number>();
+	const [surfaceMassKgPerM2, setSurfaceMassKgPerM2] = useState<number>();
+	const [totalMassKg, setTotalMassKg] = useState<number>();
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const reportFloorInfoId = search.get('reportFloorInfoId');
 	const reportId = search.get('reportId');
@@ -67,32 +71,24 @@ export const GeneralInformationForm = () => {
 			...(constructionType.constructionTypeObject.rightConstruction || []),
 		];
 
-		const thicknessValues = allMaterials
-			.flatMap((m) => m.materialTypeValue || [])
-			.filter((v) => v.materialParameters === 'Thickness')
-			.map((v) => Number(v.value) || 0);
-
-		const densityValues = allMaterials
-			.flatMap((m) => m.materialTypeValue || [])
-			.filter((v) => v.materialParameters === 'Density')
-			.map((v) => Number(v.value) || 0);
-
-		const totalThickness = thicknessValues.reduce((acc, val) => acc + val, 0);
-		const totalDensity = densityValues.reduce((acc, val) => acc + val, 0);
-
-		if (totalThickness) setThickness(totalThickness);
-		if (totalDensity) setDensity(totalDensity);
+		setThickness(getTotalThicknessMmFromMaterials(allMaterials));
+		setSurfaceMassKgPerM2(getSurfaceMassKgPerM2FromMaterials(allMaterials));
 	}, [constructionType]);
 
 	useEffect(() => {
-		if (!thickness || !density || !currentConstruction) return;
+		if (surfaceMassKgPerM2 === undefined || !currentConstruction) {
+			setTotalMassKg(undefined);
+			return;
+		}
 
 		const square = currentConstruction.reportConstructionHeader.square;
-		if (!square) return;
+		if (!square) {
+			setTotalMassKg(undefined);
+			return;
+		}
 
-		const calculatedMass = (square * thickness * density) / 1000;
-		setMass(calculatedMass);
-	}, [thickness, density, currentConstruction]);
+		setTotalMassKg(surfaceMassKgPerM2 * square);
+	}, [surfaceMassKgPerM2, currentConstruction]);
 
 	const handleGetCurrentReportShortSingleInfo = (id: string) => {
 		dispatch(startLoading());
@@ -299,7 +295,7 @@ export const GeneralInformationForm = () => {
 						{t('generalInfo.totalMass')}
 					</p>
 					<p className="w-[200px] text-left font-sans text-sm font-normal leading-5 tracking-[0.1px]">
-						{mass?.toFixed(0) ?? '-'}
+						{totalMassKg !== undefined ? totalMassKg.toFixed(0) : '-'}
 					</p>
 				</div>
 			</div>
@@ -315,8 +311,11 @@ export const GeneralInformationForm = () => {
 							requirements: '-',
 						},
 						{
-							physical: t('generalInfo.totalMass').replace('кг', 'кг/м²'), // можно уточнить
-							values: String(mass) || '-',
+							physical: t('generalInfo.massPerSquareMeter'),
+							values:
+								surfaceMassKgPerM2 !== undefined
+									? surfaceMassKgPerM2.toFixed(2)
+									: '-',
 							requirements: '-',
 						},
 						{

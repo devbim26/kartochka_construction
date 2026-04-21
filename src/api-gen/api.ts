@@ -786,8 +786,18 @@ export interface GetUsersWithPaginationParamsQuery {
 }
 
 export interface GraphParametrsDto {
+	graphType?: GraphType;
 	name?: string | null;
 	namedDots?: NamedDotDto[] | null;
+}
+
+export enum GraphType {
+	Computed = 'Computed',
+	Laboratory = 'Laboratory',
+	Atalon = 'Atalon',
+	AdditionalDoor = 'AdditionalDoor',
+	AdditionalWindow = 'AdditionalWindow',
+	Intermediate = 'Intermediate',
 }
 
 export interface ImportResultDto {
@@ -1393,12 +1403,19 @@ export interface RequirementDtoPaginatedList {
 	hasNextPage?: boolean;
 }
 
+export enum RoleType {
+	Admin = 'Admin',
+	User = 'User',
+	Manager = 'Manager',
+}
+
 export interface SecondRequirementPlacementRoomDto {
 	secondPlacementRoom?: PlacementRoomDto;
 	/** @format uuid */
 	requirementId?: string;
 	/** @format float */
 	rw?: number;
+	annotation?: string | null;
 }
 
 export interface SendSmsCommand {
@@ -1873,6 +1890,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 */
 		adminCreateUserCreate: (
 			data: {
+				roleType?: RoleType;
 				email?: string;
 				phoneNumber?: string;
 				companyName?: string;

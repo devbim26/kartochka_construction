@@ -53,6 +53,10 @@ export const en = {
 	'common.create': 'Create',
 	'common.edit': 'Edit',
 	'common.loadError': 'Failed to load data',
+	'error.somethingWentWrong.title': 'Something went wrong',
+	'error.somethingWentWrong.subtitle':
+		'Please try again later or return to the home page.',
+	'error.somethingWentWrong.backHome': 'Back to home',
 	'common.noTitle': 'Untitled',
 	'common.description': 'Description',
 	'common.enterDescription': 'Enter description',
@@ -333,6 +337,9 @@ export const en = {
 	'guides.constructions.columns.name': 'Name',
 	'guides.constructions.columns.source': 'Source',
 	'guides.constructions.columns.maxHeight': 'Max height',
+	'guides.constructions.columns.priority': 'Priority',
+	'guides.constructions.columns.rw': 'Sound insulation Rw, dB',
+	'guides.constructions.columns.lnw': 'Sound insulation Lnw, dB',
 	'guides.constructions.columns.issuer': 'Manufacturer',
 	'guides.constructions.columns.type': 'Construction type',
 	'guides.constructions.columns.country': 'Country',
@@ -486,7 +493,6 @@ export const en = {
 	'constructor.reportForm.logoUploadError': 'Failed to upload logo',
 	'constructor.reportForm.submitError': 'Failed to submit report',
 	'constructor.reportForm.title': 'Report generation',
-	'constructor.reportForm.remainingReports': 'Reports left',
 
 	'constructor.reportForm.generalInfo.titlePage': 'Title page',
 	'constructor.reportForm.generalInfo.protocol': 'Protocol',
@@ -795,6 +801,7 @@ export const en = {
 	'generalInfo.area': 'Area, m²',
 	'generalInfo.totalThickness': 'Total thickness, mm',
 	'generalInfo.totalMass': 'Total mass, kg',
+	'generalInfo.massPerSquareMeter': 'Mass, kg/m²',
 
 	// Toasts
 	'generalInfo.error.fetchReport': 'Error fetching report information',
@@ -873,6 +880,7 @@ export const ru: Record<TranslationKey, string> = {
 	'generalInfo.area': 'Площадь, м²',
 	'generalInfo.totalThickness': 'Общая толщина, мм',
 	'generalInfo.totalMass': 'Общая масса, кг',
+	'generalInfo.massPerSquareMeter': 'Масса, кг/м²',
 	'createConstruction.selectedConstruction': 'Выбранная конструкция',
 	'createConstruction.manufacturer': 'Производитель',
 
@@ -1119,6 +1127,10 @@ export const ru: Record<TranslationKey, string> = {
 	'common.create': 'Создать',
 	'common.edit': 'Редактировать',
 	'common.loadError': 'Ошибка загрузки данных',
+	'error.somethingWentWrong.title': 'Что-то пошло не так',
+	'error.somethingWentWrong.subtitle':
+		'Попробуйте позже или вернитесь на главную страницу.',
+	'error.somethingWentWrong.backHome': 'На главную',
 	'common.noTitle': 'Без названия',
 	'common.description': 'Описание',
 	'common.enterDescription': 'Введите описание',
@@ -1402,6 +1414,9 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.constructions.columns.name': 'Название',
 	'guides.constructions.columns.source': 'Источник',
 	'guides.constructions.columns.maxHeight': 'Максимальная высота',
+	'guides.constructions.columns.priority': 'Приоритет',
+	'guides.constructions.columns.rw': 'Звукоизоляция Rw, дБ',
+	'guides.constructions.columns.lnw': 'Звукоизоляция Lnw, дБ',
 	'guides.constructions.columns.issuer': 'Производитель',
 	'guides.constructions.columns.type': 'Тип конструкции',
 	'guides.constructions.columns.country': 'Страна',
@@ -1556,7 +1571,6 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.reportForm.logoUploadError': 'Ошибка при загрузке логотипа',
 	'constructor.reportForm.submitError': 'Произошла ошибка при отправке',
 	'constructor.reportForm.title': 'Формирование отчета',
-	'constructor.reportForm.remainingReports': 'Осталось отчетов',
 
 	'constructor.reportForm.generalInfo.titlePage': 'Титульный лист',
 	'constructor.reportForm.generalInfo.protocol': 'Протокол',

@@ -33,18 +33,33 @@ export const convertToClientConstructionTypesList = (data: any): ConstructionTyp
 	}));
 };
 
+const parseFilterNumber = (value: string): number | null => {
+	const t = (value ?? '').trim();
+	if (!t) return null;
+	const n = Number(t.replace(',', '.'));
+	return Number.isFinite(n) ? n : null;
+};
+
+/** Параметры пагинации конструкций; расширения сверх OpenAPI передаются как есть. */
 export const convertToServerConstructionsFilterData = (data: ConstructionsFilterData): any => ({
 	name: data.name || null,
 	shortName: data.constructionType || null,
-	description: data.description || null,
 	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
+	...(data.priority
+		? { priority: convertToServerPriorityData(data.priority as Priority) }
+		: {}),
+	rw: parseFilterNumber(data.rw),
+	lnw: parseFilterNumber(data.lnw),
 });
 
 export const convertToClientConstructionsAddData = (data: any): ConstructionsAddData => ({
 	id: data.id ?? '',
 	name: data.name ?? '',
 	description: data.description ?? '',
-	priority: (convertToClientPriorityData(data.priority!) as string) ?? '',
+	priority:
+		data.priority != null && data.priority !== ''
+			? (convertToClientPriorityData(data.priority) as string)
+			: '',
 	descriptionSource: data.descriptionSource ?? '',
 	country: (convertToClientCountryData(data.countries!) as string[]) ?? [],
 	maxHeight: String(data.maxHeight) ?? '',
@@ -60,6 +75,8 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 	issuerName: data.issuer?.name ?? '',
 	laboratoryC: String(data.laboratoryC) ?? '',
 	laboratoryCtr: String(data.laboratoryCtr) ?? '',
+	rw: data.rw != null && data.rw !== '' ? String(data.rw) : '',
+	lnw: data.lnw != null && data.lnw !== '' ? String(data.lnw) : '',
 });
 
 export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => {

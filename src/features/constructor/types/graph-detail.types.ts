@@ -1,6 +1,8 @@
+import type { GraphType } from '@api-gen';
 import type { NamedDot } from './dot.types';
 
 export type GraphDetailResponse = {
+	graphType?: GraphType;
 	name?: string | null;
 	namedDots?: NamedDot[] | null;
 };

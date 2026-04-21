@@ -1,4 +1,12 @@
-import { APP_ROUTES, Button, useAppDispatch, useAppNavigate, useAppSelector, useI18n } from '@core';
+import {
+	APP_ROUTES,
+	Button,
+	useAppDispatch,
+	useAppNavigate,
+	useAppSelector,
+	useI18n,
+} from '@core';
+import { getCurrentUser } from '@features/account/services';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { convertToClientReportFormFlags } from '@features/constructor/converters';
 import {
@@ -105,6 +113,7 @@ const ReportFromComponent = () => {
 								document.body.removeChild(link);
 								sessionStorage.removeItem('reportId');
 								sessionStorage.removeItem('reportType');
+								dispatch(getCurrentUser());
 							} else if (action === 'save') {
 								navigate(
 									APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route,
@@ -151,6 +160,7 @@ const ReportFromComponent = () => {
 							document.body.removeChild(link);
 							sessionStorage.removeItem('reportId');
 							sessionStorage.removeItem('reportType');
+							dispatch(getCurrentUser());
 						} else if (action === 'save') {
 							navigate(
 								APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route,
@@ -194,8 +204,8 @@ const ReportFromComponent = () => {
 					<DocumentFlags />
 					<div className="flex w-full items-center justify-end gap-[50px]">
 						<p>
-							{t('constructor.reportForm.remainingReports')}:{' '}
-							{userData.data?.reportsNumber || 0}
+							{t('main.currentSub.remainingDownloads')}:{' '}
+							{userData.data?.dowloadReportsNumber ?? 0}
 						</p>
 						<Button onClick={handleDownloadReport} disabled={isLoading || isSubmitting}>
 							{t('common.download')}

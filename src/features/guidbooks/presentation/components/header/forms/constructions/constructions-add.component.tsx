@@ -19,7 +19,6 @@ import {
 	Guidebooks,
 	RuConstructionTypesSelectValues,
 	RuCountryNamesSelectValues,
-	RuIndexTypeNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	type ConstructionsAddData,
 	type ConstructionTypeEnum,
@@ -31,6 +30,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
 import { FormSubTitle } from '../../form-sub-title.component';
+import { ConstructionLaboratoryDataFields } from './constructions-laboratory-data-fields.component';
 
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();
@@ -262,56 +262,7 @@ export const ConstructionsAdd = () => {
 							type={'text'}
 						/>
 					</div>
-					<FormSubTitle text="Лабораторные тесты" />
-					<div className="flex flex-wrap gap-[16px]">
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.labRTotal?.message ? 'text-error' : '',
-							)}
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[468px]"
-							label={formState.errors.labRTotal?.message || 'R_total'}
-							error={formState.errors.labRTotal?.message}
-							placeholder="Введите через запятую"
-							{...register('labRTotal')}
-							type={'text'}
-						/>
-						<Controller
-							name="labIndex"
-							control={control}
-							render={({ field }) => (
-								<Select
-									{...field}
-									isSearchable
-									value={field.value || ''}
-									options={RuIndexTypeNamesSelectValues}
-									error={formState.errors.labIndex?.message}
-									labelClassName={twMerge(
-										'text-sm leading-5 tracking-[0.1px]',
-										formState.errors.labIndex?.message ? 'text-error' : '',
-									)}
-									wrapperClassname="w-[226px] ring-input-border-primary"
-									buttonClassName="text-sm rounded-[8px]"
-									label={formState.errors.labIndex?.message || 'Индекс'}
-									placeholder="Выберите индекс"
-								/>
-							)}
-						/>
-						<Input
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-								formState.errors.laboratoryTestSource?.message ? 'text-error' : '',
-							)}
-							inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-							containerClassName="w-[226px]"
-							label={formState.errors.laboratoryTestSource?.message || 'Источник'}
-							error={formState.errors.laboratoryTestSource?.message}
-							placeholder="Введите источник"
-							{...register('laboratoryTestSource')}
-							type={'text'}
-						/>
-					</div>
+					<ConstructionLaboratoryDataFields readOnly={false} />
 				</>
 			) : (
 				<>

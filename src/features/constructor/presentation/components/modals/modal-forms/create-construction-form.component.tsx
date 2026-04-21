@@ -46,11 +46,12 @@ import {
 	type Issuer,
 } from '@features/guidbooks/types';
 
-import type { IssuerDto } from '@api-gen';
+import type { IssuerDto, SecondRequirementPlacementRoomDto } from '@api-gen';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { BsQuestionSquareFill } from 'react-icons/bs';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -80,6 +81,7 @@ interface RoomRequirementMap {
 		secondRoomName: string;
 		requirementId: string;
 		rw?: number | null;
+		annotation?: string | null;
 	}>;
 }
 
@@ -155,6 +157,22 @@ export const CreateConstructionForm = memoize(
 				return Number(match.rw);
 			}, [firstPlacementRoom, secondPlacementRoom, roomRequirementsMap]);
 
+			const selectedRequirementAnnotation = useMemo(() => {
+				if (!firstPlacementRoom || !secondPlacementRoom) return '';
+				const entries = roomRequirementsMap[firstPlacementRoom];
+				const match = entries?.find((e) => e.secondRoomId === secondPlacementRoom);
+				return (match?.annotation ?? '').trim();
+			}, [firstPlacementRoom, secondPlacementRoom, roomRequirementsMap]);
+
+			const rwDisplayText = useMemo(() => {
+				if (paginationRw == null) return 'Rw -\u00A0—';
+				const formatted = new Intl.NumberFormat('ru-RU', {
+					maximumFractionDigits: 4,
+					minimumFractionDigits: 0,
+				}).format(paginationRw);
+				return `\u00A0${formatted}, Rw`;
+			}, [paginationRw]);
+
 			const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>(
 				[],
 			);
@@ -176,23 +194,29 @@ export const CreateConstructionForm = memoize(
 				roomRequirementsData.forEach((item) => {
 					const firstRoomId = item.firstPlacementRoom.id;
 
-					item.secondRequirementRooms.forEach((requirement: any) => {
-						const secondRoomId = requirement.secondPlacementRoom.id;
-						const secondRoomName = requirement.secondPlacementRoom.name;
-						const requirementId = requirement.requirementId;
-						const rw = requirement.rw as number | null | undefined;
+					item.secondRequirementRooms.forEach(
+						(requirement: SecondRequirementPlacementRoomDto) => {
+							const secondRoomId = requirement.secondPlacementRoom?.id;
+							const secondRoomName = requirement.secondPlacementRoom?.name;
+							const requirementId = requirement.requirementId;
+							const rw = requirement.rw as number | null | undefined;
+							const annotation = requirement.annotation;
 
-						if (!map[firstRoomId]) {
-							map[firstRoomId] = [];
-						}
+							if (!secondRoomId || !secondRoomName || !requirementId) return;
 
-						map[firstRoomId].push({
-							secondRoomId,
-							secondRoomName,
-							requirementId,
-							rw,
-						});
-					});
+							if (!map[firstRoomId]) {
+								map[firstRoomId] = [];
+							}
+
+							map[firstRoomId].push({
+								secondRoomId,
+								secondRoomName,
+								requirementId,
+								rw,
+								annotation: annotation ?? null,
+							});
+						},
+					);
 				});
 
 				setRoomRequirementsMap(map);
@@ -202,10 +226,7 @@ export const CreateConstructionForm = memoize(
 				if (firstPlacementRoom && roomRequirementsMap[firstPlacementRoom]) {
 					const availableRooms = roomRequirementsMap[firstPlacementRoom];
 					const options = availableRooms.map((room) => ({
-						label:
-							room.rw != null && !Number.isNaN(Number(room.rw))
-								? `${room.secondRoomName} (Rw ${room.rw})`
-								: room.secondRoomName,
+						label: room.secondRoomName,
 						value: room.secondRoomId,
 					}));
 					setSecondRoomOptions(options);
@@ -733,8 +754,8 @@ export const CreateConstructionForm = memoize(
 								maxLength={50}
 							/>
 							<input type="hidden" {...register('constructionType')} />
-							<div className="flex items-center gap-x-[20px]">
-								<div className="flex w-[145px] text-left">
+							<div className="flex min-w-0 flex-nowrap items-center gap-x-[20px]">
+								<div className="flex w-[145px] shrink-0 text-left">
 									<label
 										className={twMerge(
 											'w-[145px] font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
@@ -749,45 +770,65 @@ export const CreateConstructionForm = memoize(
 											: t('createConstruction.rooms.label')}
 									</label>
 								</div>
-								<div className="flex gap-x-[12px]">
-									<Controller
-										control={control}
-										name="firstPlacementRoom"
-										render={({ field }) => (
-											<Select
-												options={roomOptions}
-												{...field}
-												value={field.value || ''}
-												placeholder={t(
-													'createConstruction.firstRoom.placeholder',
-												)}
-												buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-												wrapperClassname="shadow-none ring-input-border-primary"
-												onChange={(value) => {
-													field.onChange(value);
-													setValue('secondPlacementRoom', '');
-													setValue('requirementId', '');
-												}}
-											/>
-										)}
-									/>
-									<Controller
-										control={control}
-										name="secondPlacementRoom"
-										render={({ field }) => (
-											<Select
-												options={secondRoomOptions}
-												{...field}
-												value={field.value || ''}
-												placeholder={t(
-													'createConstruction.secondRoom.placeholder',
-												)}
-												buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-												wrapperClassname="shadow-none ring-input-border-primary"
-												isDisabled={!firstPlacementRoom}
-											/>
-										)}
-									/>
+								<div className="flex min-w-0 flex-1 flex-nowrap items-center">
+									<div className="flex shrink-0 gap-x-[12px]">
+										<Controller
+											control={control}
+											name="firstPlacementRoom"
+											render={({ field }) => (
+												<Select
+													options={roomOptions}
+													{...field}
+													value={field.value || ''}
+													placeholder={t(
+														'createConstruction.firstRoom.placeholder',
+													)}
+													buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+													wrapperClassname="shadow-none ring-input-border-primary"
+													onChange={(value) => {
+														field.onChange(value);
+														setValue('secondPlacementRoom', '');
+														setValue('requirementId', '');
+													}}
+												/>
+											)}
+										/>
+										<Controller
+											control={control}
+											name="secondPlacementRoom"
+											render={({ field }) => (
+												<Select
+													options={secondRoomOptions}
+													{...field}
+													value={field.value || ''}
+													placeholder={t(
+														'createConstruction.secondRoom.placeholder',
+													)}
+													buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+													wrapperClassname="shadow-none ring-input-border-primary"
+													isDisabled={!firstPlacementRoom}
+												/>
+											)}
+										/>
+									</div>
+									{firstPlacementRoom && secondPlacementRoom ? (
+										<div className="ml-[10px] flex shrink-0 flex-nowrap items-center gap-x-1.5 font-sans text-sm leading-5 text-black">
+											<span className="shrink-0 font-semibold text-black">
+												{t('guides.requirements.pageTitle') + ': '}
+											</span>
+											<span className="shrink-0 font-semibold text-black">
+												{rwDisplayText}
+											</span>
+											{selectedRequirementAnnotation ? (
+												<div className="group relative shrink-0">
+													<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
+													<div className="pointer-events-none absolute right-0 top-full z-20 mt-2 w-[min(280px,calc(100vw-48px))] rounded bg-black px-3 py-2 text-left text-sm text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+														{selectedRequirementAnnotation}
+													</div>
+												</div>
+											) : null}
+										</div>
+									) : null}
 								</div>
 							</div>
 							<input type="hidden" {...register('requirementId')} />
@@ -921,7 +962,7 @@ export const CreateConstructionForm = memoize(
 												<img
 													src={svgUrl}
 													alt=""
-													className="mx-auto block h-auto max-h-[min(68vh,560px)] w-auto max-w-full object-contain"
+													className="mx-auto block size-auto max-h-[min(68vh,560px)] max-w-full object-contain"
 													decoding="async"
 												/>
 											</button>
@@ -932,13 +973,14 @@ export const CreateConstructionForm = memoize(
 										)}
 									</div>
 								</div>
-								<div className="col-start-2 row-start-2 min-w-0 w-full self-start justify-self-stretch text-left">
+								<div className="col-start-2 row-start-2 w-full min-w-0 self-start justify-self-stretch text-left">
 									<div className="max-w-full overflow-x-auto text-left">
 										<div className="flex w-full min-w-0 flex-col items-start gap-0.5 text-left">
 											{constructionDetail?.constructionTypeObject?.leftConstruction
 												?.slice()
 												.sort(
-													(a, b) => Number(a.positionId) - Number(b.positionId),
+													(a, b) =>
+														Number(a.positionId) - Number(b.positionId),
 												)
 												.map((material, i) => {
 													const line = `- ${formatMaterial(material, locale)}`;
@@ -955,7 +997,8 @@ export const CreateConstructionForm = memoize(
 											{constructionDetail?.constructionTypeObject?.centerConstruction
 												?.slice()
 												.sort(
-													(a, b) => Number(a.positionId) - Number(b.positionId),
+													(a, b) =>
+														Number(a.positionId) - Number(b.positionId),
 												)
 												.map((material, i) => {
 													const line = `- ${formatMaterial(material, locale)}`;
@@ -972,7 +1015,8 @@ export const CreateConstructionForm = memoize(
 											{constructionDetail?.constructionTypeObject?.rightConstruction
 												?.slice()
 												.sort(
-													(a, b) => Number(a.positionId) - Number(b.positionId),
+													(a, b) =>
+														Number(a.positionId) - Number(b.positionId),
 												)
 												.map((material, i) => {
 													const line = `- ${formatMaterial(material, locale)}`;

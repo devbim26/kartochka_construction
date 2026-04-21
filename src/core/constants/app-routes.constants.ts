@@ -11,4 +11,8 @@ export const APP_ROUTES = {
 		id: 'home-layout-id',
 		route: '/designing',
 	},
+	error: {
+		id: 'something-went-wrong',
+		route: '/error',
+	},
 };

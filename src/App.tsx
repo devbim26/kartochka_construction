@@ -1,10 +1,11 @@
-import { I18nProvider, useI18n, store } from '@core';
+import faviconUrl from '@assets/favicon.svg';
+import { I18nProvider, store, useI18n } from '@core';
+import { RootErrorBoundary } from '@features/not-found';
 import { AppRouter } from '@router';
 import { Helmet } from 'react-helmet';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import faviconUrl from '@assets/favicon.svg';
 
 const AppShell = () => {
 	const { t } = useI18n();
@@ -20,7 +21,9 @@ const AppShell = () => {
 					<link rel="alternate icon" href={faviconUrl} type="image/svg+xml" />
 					<link rel="apple-touch-icon" href={faviconUrl} />
 				</Helmet>
-				<AppRouter />
+				<RootErrorBoundary>
+					<AppRouter />
+				</RootErrorBoundary>
 				<Toaster
 					richColors
 					closeButton
