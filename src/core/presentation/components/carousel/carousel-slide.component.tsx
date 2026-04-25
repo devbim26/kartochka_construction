@@ -7,7 +7,12 @@ interface CarouselSlideProps {
 }
 
 export const CarouselSlide = ({ children, className }: CarouselSlideProps) => (
-	<div className={twMerge('relative min-w-0 flex-shrink-0 flex-grow-0', className)}>
+	<div
+		className={twMerge(
+			'relative flex min-h-0 w-full min-w-0 flex-shrink-0 flex-grow-0 flex-col self-stretch',
+			className,
+		)}
+	>
 		{children}
 	</div>
 );

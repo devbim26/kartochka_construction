@@ -229,6 +229,7 @@ export const BillScreen = () => {
 											}}
 										/>
 										<EditIcon
+											className="w-[48px]"
 											onClick={() => {
 												navigate('', {
 													id: info.row.original.id,

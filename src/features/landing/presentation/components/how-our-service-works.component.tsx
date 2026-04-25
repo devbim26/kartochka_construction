@@ -6,6 +6,13 @@ import { twMerge } from 'tailwind-merge';
 const aboutImages = [AboutUs1, AboutUs2, AboutUs3, AboutUs4, AboutUs5];
 const cardAccentColors = ['#B1C9E3', '#EED0C5', '#F3F2BA', '#DFA4C2', '#B2CAA0'];
 const stepKeys = [0, 1, 2, 3, 4] as const;
+const normalizeText = (value: string) => value.replace(/\s+/g, ' ').trim().toLowerCase();
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const highlightedPhrasesByStep: Partial<Record<number, string[]>> = {
+	1: ['Общий', 'Аналитика документов PDF', 'DeepResearch'],
+	3: ['Общая экспертиза', 'Экспертиза звукоизоляции'],
+};
 
 export const HowOurServiceWorks = () => {
 	const [selectedStep, setSelectedStep] = useState(0);
@@ -15,20 +22,38 @@ export const HowOurServiceWorks = () => {
 	const backFaceRef = useRef<HTMLDivElement>(null);
 	const { t } = useI18n();
 	const stepTitles = stepKeys.map((index) => t(`landing.how.step.${index}`));
+	const stepDescriptions = stepKeys.map((index) => t(`landing.how.desc.${index}`));
+	const stepDetails = stepKeys.map((index) => t(`landing.how.detail.${index}`));
+	const renderHighlightedDescription = (text: string, stepIndex: number) => {
+		const phrases = highlightedPhrasesByStep[stepIndex];
+		if (!phrases?.length) return text;
+
+		const pattern = new RegExp(`(${phrases.map(escapeRegExp).join('|')})`, 'g');
+		return text.split(pattern).map((part, index) => {
+			const isHighlighted = phrases.some((phrase) => phrase === part);
+			if (!isHighlighted) return <span key={`${stepIndex}-${index}`}>{part}</span>;
+			return (
+				<span key={`${stepIndex}-${index}`} className="font-bold">
+					{part}
+				</span>
+			);
+		});
+	};
 	const cardContents: Array<{ title: ReactNode; body: ReactNode }> = stepKeys.map((index) => ({
 		title: (
-			<span className="whitespace-pre-line font-bold not-italic">
-				{t(`landing.how.desc.${index}`)}
+			<span className="whitespace-pre-line not-italic">
+				{renderHighlightedDescription(stepDescriptions[index], index)}
 			</span>
 		),
-		body: (
-			<span className="whitespace-pre-line italic">{t(`landing.how.detail.${index}`)}</span>
-		),
+		body: <span className="whitespace-pre-line italic">{stepDetails[index]}</span>,
 	}));
 
 	const handleStepClick = (index: number) => {
 		setSelectedStep(index);
 	};
+
+	const isDescriptionDuplicated =
+		normalizeText(stepDescriptions[selectedStep]) === normalizeText(stepTitles[selectedStep]);
 
 	const syncCardHeight = useCallback(() => {
 		const front = frontFaceRef.current;
@@ -95,7 +120,7 @@ export const HowOurServiceWorks = () => {
 						>
 							<div
 								className={twMerge(
-									'relative w-full min-h-0 [transform-style:preserve-3d] will-change-transform',
+									'relative min-h-0 w-full will-change-transform [transform-style:preserve-3d]',
 									cardHeightPx != null && 'h-full',
 									'transition-transform duration-700 ease-in-out',
 									isHover
@@ -122,12 +147,11 @@ export const HowOurServiceWorks = () => {
 												{stepTitles[selectedStep]}
 											</div>
 										</div>
-										<div className="px-2 font-montserrat text-sm italic leading-relaxed text-black sm:text-base md:text-[17px]">
-											{cardContents[selectedStep]?.title}
-										</div>
-										<div className="px-2 font-montserrat text-sm italic leading-relaxed text-black sm:text-base md:text-[17px]">
-											{cardContents[selectedStep]?.body}
-										</div>
+										{!isDescriptionDuplicated && (
+											<div className="px-2 font-montserrat text-sm italic leading-relaxed text-black sm:text-base md:text-[17px]">
+												{cardContents[selectedStep]?.title}
+											</div>
+										)}
 									</div>
 								</div>
 

@@ -1,4 +1,5 @@
 import { Chevron } from '@core';
+import type { ConstructionSelectRestrictions } from '@features/constructor/types';
 import type { ReportInfoShort } from '@features/constructor/utils';
 import type { AlternateConstruction } from '@features/guidbooks/types';
 import { AlternateConstructionCard } from './alternate-construction-card.component';
@@ -8,6 +9,7 @@ type Props = {
 	reportInfo: ReportInfoShort;
 	reportConstructionId: string | null;
 	onSwapSuccess: (newConstructionHeaderId: string) => void;
+	appliedRestrictions?: ConstructionSelectRestrictions;
 	pageNumber: number;
 	totalPages: number;
 	onPageChange: (page: number) => void;
@@ -18,6 +20,7 @@ export const AlternateConstructionList = ({
 	reportInfo,
 	reportConstructionId,
 	onSwapSuccess,
+	appliedRestrictions,
 	pageNumber,
 	totalPages,
 	onPageChange,
@@ -43,6 +46,7 @@ export const AlternateConstructionList = ({
 							reportInfo={reportInfo}
 							reportConstructionId={reportConstructionId}
 							onSwapSuccess={onSwapSuccess}
+							appliedRestrictions={appliedRestrictions}
 						/>
 					))
 				) : (

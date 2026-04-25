@@ -16,7 +16,7 @@ export const Carousel = ({ children, options, className }: CarouselProps) => {
 	return (
 		<div className={twMerge('w-full', className)}>
 			<div className="overflow-hidden" ref={emblaRef}>
-				<div className="flex">{children}</div>
+				<div className="flex items-stretch">{children}</div>
 			</div>
 			<CarouselPagination emblaApi={emblaApi} />
 		</div>

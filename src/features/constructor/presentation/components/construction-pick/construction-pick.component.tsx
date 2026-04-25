@@ -48,6 +48,9 @@ const ContructionPick = () => {
 	const [alternateConstructions, setAlternateConstructions] = useState<AlternateConstruction[]>();
 	const [totalPages, setTotalPages] = useState(1);
 	const form = useForm<ConstructionSelectRestrictions>();
+	const [appliedRestrictions, setAppliedRestrictions] = useState<ConstructionSelectRestrictions>(
+		{},
+	);
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const [reportConstructionId, setReportConstructionId] = useState<string | null>(null);
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
@@ -181,6 +184,7 @@ const ContructionPick = () => {
 
 	const handleAlternateConstructions = useCallback(
 		(data: ConstructionSelectRestrictions, page = pageNumber) => {
+			setAppliedRestrictions(data);
 			from(
 				getAlternateConstructions({
 					...data,
@@ -289,6 +293,7 @@ const ContructionPick = () => {
 					construction={constructionHeader}
 					svgUrl={svgUrl}
 					reportInfo={currentReportInfo}
+					appliedRestrictions={appliedRestrictions}
 				/>
 			)}
 			<div className="flex gap-[30px]">
@@ -313,6 +318,7 @@ const ContructionPick = () => {
 						reportInfo={currentReportInfo}
 						reportConstructionId={reportConstructionId}
 						onSwapSuccess={handleSwapSuccess}
+						appliedRestrictions={appliedRestrictions}
 						pageNumber={pageNumber}
 						totalPages={totalPages}
 						onPageChange={handlePageChange}

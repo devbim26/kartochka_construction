@@ -54,8 +54,7 @@ export const en = {
 	'common.edit': 'Edit',
 	'common.loadError': 'Failed to load data',
 	'error.somethingWentWrong.title': 'Something went wrong',
-	'error.somethingWentWrong.subtitle':
-		'Please try again later or return to the home page.',
+	'error.somethingWentWrong.subtitle': 'Please try again later or return to the home page.',
 	'error.somethingWentWrong.backHome': 'Back to home',
 	'common.noTitle': 'Untitled',
 	'common.description': 'Description',
@@ -80,7 +79,8 @@ export const en = {
 	'auth.registration.skip': 'Skip',
 	'auth.registration.skipTooltip':
 		'Register with email and phone only. Company details below are optional and can be completed later in your account.',
-	'auth.registration.fullFormError': 'Please fill in all required company fields and upload a logo.',
+	'auth.registration.fullFormError':
+		'Please fill in all required company fields and upload a logo.',
 
 	'meta.title':
 		'AI for design | Sound insulation, compliance checking, visualization — Belarus and Russia',
@@ -90,19 +90,36 @@ export const en = {
 		'AI design, sound insulation calculation, compliance checking, building codes, facade visualization, document analytics, expert report',
 
 	'landing.pageTop.gifAlt': 'Landing animation',
-	'landing.pageTop.title': 'ENGINEERING AI PLATFORM',
-	'landing.pageTop.subtitle':
-		'Automates calculations. Checks compliance. Optimizes budgets.\nSaves time for designers, architects and developers.',
+	'landing.pageTop.title': 'devBIM: engineering AI-platform',
+	'landing.pageTop.subtitle': 'For design and expert evaluation\n of construction projects',
 	'landing.pageTop.start': 'Start',
 
-	'landing.about.platformTitle': 'PLATFORM',
+	'landing.about.platformTitle': 'Calculations and design',
 	'landing.about.platformSubtitle': 'Design and structural calculations',
 	'landing.about.platformDesc':
-		'Automates sound insulation calculations. Suggests optimal constructions and saves budget. Generates a PDF report ready for expert review.',
-	'landing.about.aiTitle': 'AI mode',
+		'The system not only performs calculations, but also suggests optimal constructions and saves budget.\nGenerates a PDF report for submission to expert review.\nFor calculations, code based on the regulatory framework is used, without AI models.',
+	'landing.about.aiTitle': 'Expertise and analysis',
 	'landing.about.aiSubtitle': 'Visualization and consulting',
 	'landing.about.aiDesc':
 		'Creates facade and interior images. Analyzes documents, codes and calculations in chat. Checks design decisions for compliance. Deep internet research.',
+	'landing.about.platform.block1.title': 'Structural calculations:',
+	'landing.about.platform.block1.desc':
+		'The system not only performs calculations, but also suggests optimal constructions and saves budget. Generates a PDF report for submission to expert review.',
+	'landing.about.platform.block1.codeNote':
+		'For calculations, code based on the regulatory framework is used, without AI models.',
+	'landing.about.platform.block2.title': 'Architectural design:',
+	'landing.about.platform.block2.desc':
+		'Helps design facades and interiors with AI visualization for architectural solution albums.',
+	'landing.about.expertise.title': 'Construction project expertise',
+	'landing.about.expertise.item1.title': 'General expertise.',
+	'landing.about.expertise.item1.desc':
+		'Identifies issues in the document package and non-compliance with regulatory requirements.',
+	'landing.about.expertise.item2.title': 'Subject expertise.',
+	'landing.about.expertise.item2.desc':
+		'Analyzes solutions for compliance with specific requirements (sound insulation, thermal protection, fire safety, etc.).',
+	'landing.about.expertise.item3.title': 'AI assistant.',
+	'landing.about.expertise.item3.desc': 'Uses the best AI models for analysis and deep research.',
+	'landing.about.expertise.item3.chatBold': 'Chat with construction standards.',
 
 	'landing.how.title': 'How our service works',
 	'landing.how.step.0': 'Design. Sound insulation.',
@@ -400,8 +417,8 @@ export const en = {
 	'guides.deleteModal.issuerQuestion': 'Are you sure you want to delete manufacturer {name}?',
 
 	'main.pageTitle': 'Home',
-	'main.section.design': 'Design & calculations',
-	'main.section.aiAssistant': 'AI assistant',
+	'main.section.design': 'Calculations & design',
+	'main.section.aiAssistant': 'Expert evaluation',
 
 	'main.cards.sound.title': 'Sound insulation calculation',
 	'main.cards.sound.desc': 'for walls and slabs.',
@@ -443,10 +460,37 @@ export const en = {
 
 	'main.subModal.confirmTitle': 'Paid by bills',
 	'main.subModal.headerTitle': 'Plan checkout',
-	'main.designCards.sound.title': 'Sound insulation calculation for walls and slabs',
+	'main.designCards.sound.title': 'Sound insulation calculations',
+	'main.designCards.sound.lead': '*Calculation of air sound insulation Rw and impact sound Lnw*',
+	'main.designCards.sound.forLabel': 'Per SP 02.04.03-2023 for:',
+	'main.designCards.sound.bullets':
+		'walls;||floor structures;||windows;||walls with windows, etc.',
+	'main.designCards.sound.footer':
+		'Generates a PDF report with formulas, ready for submission to expert review.',
 	'main.designCards.sound.desc1': 'Calculation according to SP 02.04.03-2023.',
 	'main.designCards.sound.desc2':
 		'Generates a PDF report with formulas, ready for expert submission.',
+	'main.designCards.roomAcoustics.title': 'Room acoustics calculations',
+	'main.designCards.roomAcoustics.lead':
+		'*Reverberation time RT60 and speech intelligibility RASTI*',
+	'main.designCards.roomAcoustics.forLabel': 'Per SP 2.04.03-2023 for:',
+	'main.designCards.roomAcoustics.bullets': 'conference halls;||concert halls;||cinemas, etc.',
+	'main.designCards.roomAcoustics.footer':
+		'Generates a PDF report with formulas, ready for submission to expert review.',
+	'main.designCards.heatEngineering.title': 'Heat engineering calculations',
+	'main.designCards.heatEngineering.body':
+		'*Calculation of insulation performance, dew point* of enclosing structures per SP 02.04.01-2020',
+	'main.designCards.heatEngineering.footer':
+		'Generates a PDF report with formulas, ready for submission to expert review.',
+	'main.designCards.architecture.title': 'Architectural design',
+	'main.designCards.architecture.lead':
+		'*AI-generated* visualizations of facades and interiors for:',
+	'main.designCards.architecture.bullets':
+		'residential buildings;||public buildings;||commercial spaces',
+	'main.designCards.architecture.hint':
+		'Helps produce architectural solution albums for project documentation.',
+	'main.designCards.continueInConstructor': 'Continue in the constructor',
+	'main.designCards.continueInAiMode': 'Continue in AI mode',
 	'main.designCards.heat.title': 'Wall thermal insulation calculation',
 	'main.designCards.heat.desc1': 'Calculation according to SP 2.04.01-2020.',
 	'main.designCards.heat.desc2':
@@ -473,9 +517,29 @@ export const en = {
 	'main.aiCards.expertise.soundDesc':
 		'Analysis of sound insulation solutions embedded in the project.',
 	'main.aiCards.normative.title': 'Regulatory documentation analytics',
-	'main.aiCards.normative.desc1': 'Performs deep analysis of regulatory documents (SN, SP, etc.).',
+	'main.aiCards.normative.desc1':
+		'Performs deep analysis of regulatory documents (SN, SP, etc.).',
 	'main.aiCards.normative.desc2':
 		'Ask any questions and the system will prepare a report with direct links to document clauses and pages.',
+	'main.expertiseCards.general.title': 'General project review',
+	'main.expertiseCards.general.bullets':
+		'Finds errors, contradictions, and problem areas in documentation;||Verifies the relevance of regulatory requirements;||Produces a report with comments and recommendations for project revision.',
+	'main.expertiseCards.subject.title': 'Subject-matter project review.',
+	'main.expertiseCards.subject.bullet1':
+		'Verifies solutions for (sound insulation, thermal insulation, etc.) against *regulatory requirements or internal standards*',
+	'main.expertiseCards.subject.bullet2':
+		'Suggests adjustments when calculations are missing and flags problematic details.',
+	'main.expertiseCards.subject.bullet3':
+		'Produces structured responses with page-by-page analysis and references.',
+	'main.expertiseCards.documents.title': 'Document review and analytics',
+	'main.expertiseCards.documents.p1': '*General chat + DeepResearch*',
+	'main.expertiseCards.documents.p2': 'Access to the latest AI models. Deep information search on the web.',
+	'main.expertiseCards.documents.p3': '*PDF document analytics*',
+	'main.expertiseCards.documents.p4':
+		'AI reviews, summarizes, and structures documents in DOC/Excel — for estimates, ToR, and protocols.',
+	'main.expertiseCards.norms.title': 'Chat on construction standards of Belarus.',
+	'main.expertiseCards.norms.body':
+		'Performs a deep review of regulatory documents (SN, SP, etc.). Ask any question — the system will produce a report with direct links to clauses and pages in the documents.',
 
 	'bill.filePrefix': 'Bill#',
 	'bill.notFound': 'Bill not found',
@@ -1128,8 +1192,7 @@ export const ru: Record<TranslationKey, string> = {
 	'common.edit': 'Редактировать',
 	'common.loadError': 'Ошибка загрузки данных',
 	'error.somethingWentWrong.title': 'Что-то пошло не так',
-	'error.somethingWentWrong.subtitle':
-		'Попробуйте позже или вернитесь на главную страницу.',
+	'error.somethingWentWrong.subtitle': 'Попробуйте позже или вернитесь на главную страницу.',
 	'error.somethingWentWrong.backHome': 'На главную',
 	'common.noTitle': 'Без названия',
 	'common.description': 'Описание',
@@ -1165,19 +1228,37 @@ export const ru: Record<TranslationKey, string> = {
 		'AI проектирование, звукоизоляция СП 02.03.01-2023, нормоконтроль Беларусь, нормоконтроль Россия, ТНПА проверка, визуализация фасадов, AI архитектура, анализ смет, техническое задание AI, строительный AI, отчёт для экспертизы, проектная документация, строительные нормы Беларусии',
 
 	'landing.pageTop.gifAlt': 'Анимация на лендинге',
-	'landing.pageTop.title': 'ИНЖЕНЕРНАЯ AI-ПЛАТФОРМА',
-	'landing.pageTop.subtitle':
-		'Автоматизирует расчеты\nПроверяет соответствие\nОптимизирует бюджеты\nЭкономит время проектировщиков и девелоперов',
+	'landing.pageTop.title': 'devBIM: инженерная AI-платформа',
+	'landing.pageTop.subtitle': 'Для проектирования и экспертизы\n строительных проектов ',
 	'landing.pageTop.start': 'Начать',
 
-	'landing.about.platformTitle': 'ПЛАТФОРМА',
+	'landing.about.platformTitle': 'Расчеты и  проектирование ',
 	'landing.about.platformSubtitle': 'Проектирование и расчеты конструкций',
 	'landing.about.platformDesc':
-		'Автоматизирует звукоизоляционные расчёты по СН 2.04.01.-2020. Предлагает оптимальные конструкции и экономит бюджет. Формирует отчёт в PDF для передачи в экспертизу.',
-	'landing.about.aiTitle': 'AI mode',
+		'Система не только выполняет расчеты, но и предлагает оптимальные конструкции и экономит бюджет.\nФормирует отчёт в PDF для передачи в экспертизу.\nДля расчетов используется код, основанный на нормативной базе, без AI моделей.',
+	'landing.about.aiTitle': 'Экспертиза строительных проектов',
 	'landing.about.aiSubtitle': 'Визуализация и консультирование',
 	'landing.about.aiDesc':
 		'Создает изображений фасадов и интерьеров. Анализирует документы, нормы и расчёты в чате. Проверяет соответствие проектных решений требованиям. Глубокий поиск информации в интернете.',
+	'landing.about.platform.block1.title': 'Расчеты строительных конструкций:',
+	'landing.about.platform.block1.desc':
+		'Система не только выполняет расчеты, но и предлагает оптимальные конструкции и экономит бюджет. Формирует отчёт в PDF для передачи в экспертизу.',
+	'landing.about.platform.block1.codeNote':
+		'Для расчетов используется код, основанный на нормативной базе, без AI моделей.',
+	'landing.about.platform.block2.title': 'Архитектурное проектирование:',
+	'landing.about.platform.block2.desc':
+		'Помогает проектировать фасады и интерьеры с AI-визуализацией для альбомов архитектурных решений',
+	'landing.about.expertise.title': 'Экспертиза строительных проектов',
+	'landing.about.expertise.item1.title': 'Общая экспертиза.',
+	'landing.about.expertise.item1.desc':
+		'Выявляет проблемы комплекта документов и несоответствия требованиям ТНПА.',
+	'landing.about.expertise.item2.title': 'Предметная экспертиза.',
+	'landing.about.expertise.item2.desc':
+		'Анализирует решения на соответствие особым требованиям (звукоизоляция, теплозащита, пожарная безопасность и др.)',
+	'landing.about.expertise.item3.title': 'AI ассистент.',
+	'landing.about.expertise.item3.desc':
+		'Использует лучшие AI-модели для анализа + глубокие исследования.',
+	'landing.about.expertise.item3.chatBold': 'Чат со строительными нормами.',
 
 	'landing.how.title': 'Как работает наш сервис',
 	'landing.how.step.0': 'Проектирование. Звукоизоляция.',
@@ -1476,8 +1557,8 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.deleteModal.issuerQuestion': 'Вы уверены, что хотите удалить производителя {name}?',
 
 	'main.pageTitle': 'Главная',
-	'main.section.design': 'Проектирование и расчеты',
-	'main.section.aiAssistant': 'AI ассистент',
+	'main.section.design': 'Расчеты и проектирование',
+	'main.section.aiAssistant': 'Экспертиза строительных проектов',
 
 	'main.cards.sound.title': 'Расчет звукоизоляции',
 	'main.cards.sound.desc': 'стен и перекрытий по СП 02.03.01-2023.',
@@ -1519,10 +1600,36 @@ export const ru: Record<TranslationKey, string> = {
 
 	'main.subModal.confirmTitle': 'Оплачено по счетам',
 	'main.subModal.headerTitle': 'Оформление тарифа',
-	'main.designCards.sound.title': 'Расчет звукоизоляции стен и перекрытий',
+	'main.designCards.sound.title': 'Расчёты звукоизоляции',
+	'main.designCards.sound.lead': '*расчет изоляции воздушного Rw и ударного шума Lnw*',
+	'main.designCards.sound.forLabel': 'по СП 02.04.03-2023 для:',
+	'main.designCards.sound.bullets': 'стен;||конструкций полов;||окон;||стен с окнами и др.',
+	'main.designCards.sound.footer':
+		'Генерирует PDF-отчет с формулами, готовый к подаче в экспертизу',
 	'main.designCards.sound.desc1': 'Расчет по СП 02.04.03-2023.',
 	'main.designCards.sound.desc2':
 		'Генерирует PDF-отчет с формулами, готовый к подаче на экспертизу.',
+	'main.designCards.roomAcoustics.title': 'Расчёты акустики помещений',
+	'main.designCards.roomAcoustics.lead':
+		'*расчет времени реверберации RT60, разборчивости речи RASTI*',
+	'main.designCards.roomAcoustics.forLabel': 'по СП 2.04.03-2023 для:',
+	'main.designCards.roomAcoustics.bullets':
+		'конференц-залов;||концертных залов;||кинотеатров и др.',
+	'main.designCards.roomAcoustics.footer':
+		'Генерирует PDF-отчет с формулами, готовый к подаче в экспертизу',
+	'main.designCards.heatEngineering.title': 'Расчёты теплотехники',
+	'main.designCards.heatEngineering.body':
+		'*Расчет эффективности утепления, точки росы* ограждающих конструкций по СП 02.04.01-2020',
+	'main.designCards.heatEngineering.footer':
+		'Генерирует PDF-отчет с формулами, готовый к подаче в экспертизу',
+	'main.designCards.architecture.title': 'Архитектурное проектирование',
+	'main.designCards.architecture.lead': '*AI-генерация* визуализаций фасадов и интерьеров для:',
+	'main.designCards.architecture.bullets':
+		'жилых зданий;||общественных зданий;||коммерческих помещений',
+	'main.designCards.architecture.hint':
+		'Помогает формировать альбомы архитектурных решений для проектной документации',
+	'main.designCards.continueInConstructor': 'Продолжить в конструкторе',
+	'main.designCards.continueInAiMode': 'Продолжить в AI mode',
 	'main.designCards.heat.title': 'Расчет теплоизоляции стен',
 	'main.designCards.heat.desc1': 'Расчет по СП 2.04.01-2020.',
 	'main.designCards.heat.desc2':
@@ -1544,16 +1651,34 @@ export const ru: Record<TranslationKey, string> = {
 	'main.aiCards.expertise.title': 'Экспертиза проекта (2 режима)',
 	'main.aiCards.expertise.generalTitle': '"Общая экспертиза"',
 	'main.aiCards.expertise.generalDesc1': '- Проверяет общую структуру проекта;',
-	'main.aiCards.expertise.generalDesc2':
-		'- Проверяет проект на соответствие актуальным ТНПА.',
+	'main.aiCards.expertise.generalDesc2': '- Проверяет проект на соответствие актуальным ТНПА.',
 	'main.aiCards.expertise.soundTitle': '"Экспертиза звукоизоляции"',
-	'main.aiCards.expertise.soundDesc':
-		'Анализ заложенных в проекте решений по звукоизоляции.',
+	'main.aiCards.expertise.soundDesc': 'Анализ заложенных в проекте решений по звукоизоляции.',
 	'main.aiCards.normative.title': 'Аналитика нормативной документации',
 	'main.aiCards.normative.desc1':
 		'Выполняет глубокий анализ нормативных документов (СН, СП и др.).',
 	'main.aiCards.normative.desc2':
 		'Задавайте любые вопросы, система создаст отчет с прямыми ссылками на пункты и страницы документов.',
+	'main.expertiseCards.general.title': 'Общая экспертиза проекта',
+	'main.expertiseCards.general.bullets':
+		'Выявляет ошибки, противоречия и проблемные места в документации;||Проверяет актуальность ТНПА;||Формирует отчёт с замечаниями и рекомендациями для доработки проекта.',
+	'main.expertiseCards.subject.title': 'Предметная экспертиза проекта.',
+	'main.expertiseCards.subject.bullet1':
+		'Проверяет решения по (звукоизоляции, теплоизоляции и др.) на *соответствие нормативным требованиям или внутренним стандартам*',
+	'main.expertiseCards.subject.bullet2':
+		'Предлагает корректировки при отсутствии расчётов и выделяет проблемные узлы.',
+	'main.expertiseCards.subject.bullet3':
+		'Формирует структурированные ответы с постраничным анализом и ссылками.',
+	'main.expertiseCards.documents.title': 'Экспертиза и аналитика документов',
+	'main.expertiseCards.documents.p1': '*Общий чат + DeepResearch*',
+	'main.expertiseCards.documents.p2':
+		'Доступ к новейшим моделям ИИ. Глубокий поиск информации в интернете.',
+	'main.expertiseCards.documents.p3': '*Аналитика документов PDF*',
+	'main.expertiseCards.documents.p4':
+		'AI проверяет, суммирует и структурирует документы в DOC/Excel — для смет, ТЗ, протоколов.',
+	'main.expertiseCards.norms.title': 'Чат со строительными нормами Беларуси.',
+	'main.expertiseCards.norms.body':
+		'Выполняет глубокий анализ нормативных документов (СН, СП и др.). Задавайте любые вопросы, система создаст отчет с прямыми ссылками на пункты и страницы документов.',
 
 	'bill.filePrefix': 'Счет#',
 	'bill.notFound': 'Счет не найден',

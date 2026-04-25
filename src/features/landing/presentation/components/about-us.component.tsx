@@ -13,7 +13,7 @@ export const AboutUsComponent = () => {
 			id={LandingSections.aboutUs.id}
 		>
 			<div className="mx-auto max-w-screen-xl py-[50px]">
-				<div className="flex w-full gap-[20px] bg-white">
+				<div className="flex w-full items-stretch gap-[20px] bg-white">
 					<div className="flex flex-col gap-[15px]">
 						<div className="flex flex-col gap-[2px]">
 							<span
@@ -24,27 +24,27 @@ export const AboutUsComponent = () => {
 							>
 								{t('landing.about.platformTitle')}
 							</span>
-							<span
-								className={twMerge(
-									'text-right text-[20px] font-bold italic text-gray-text',
-									isPlatformSwitch && 'text-primary',
-								)}
-							>
-								{t('landing.about.platformSubtitle')}
-							</span>
 						</div>
-						<span
+						<div
 							className={twMerge(
-								'text-right text-[20px] font-bold italic text-gray-text',
+								'text-right text-[20px] text-gray-text',
 								isPlatformSwitch && 'text-black',
 							)}
 						>
-							{t('landing.about.platformDesc')}
-						</span>
+							<p className="font-bold">{t('landing.about.platform.block1.title')}</p>
+							<p className="mt-[8px]">{t('landing.about.platform.block1.desc')}</p>
+							<p className="mt-[6px] text-[20px] font-light italic">
+								{t('landing.about.platform.block1.codeNote')}
+							</p>
+							<p className="mt-[12px] font-bold">
+								{t('landing.about.platform.block2.title')}
+							</p>
+							<p className="mt-[8px]">{t('landing.about.platform.block2.desc')}</p>
+						</div>
 					</div>
-					<div className="flex flex-col items-center justify-center gap-[15px]">
+					<div className="flex flex-col items-center justify-center gap-[15px] self-stretch">
 						<Switch onChange={() => setIsPlatformSwitch((prev) => !prev)} />
-						<div className="h-[80px] w-[2px] bg-gray-text"></div>
+						<div className="h-full w-[2px] bg-gray-text"></div>
 					</div>
 					<div className="flex flex-col gap-[15px]">
 						<div className="flex flex-col gap-[2px]">
@@ -56,23 +56,37 @@ export const AboutUsComponent = () => {
 							>
 								{t('landing.about.aiTitle')}
 							</span>
-							<span
-								className={twMerge(
-									'text-[20px] font-bold italic text-gray-text',
-									!isPlatformSwitch && 'text-primary',
-								)}
-							>
-								{t('landing.about.aiSubtitle')}
-							</span>
 						</div>
-						<span
+						<div
 							className={twMerge(
-								'text-[20px] font-bold italic text-gray-text',
+								'text-[20px] text-gray-text',
 								!isPlatformSwitch && 'text-black',
 							)}
 						>
-							{t('landing.about.aiDesc')}
-						</span>
+							<ul className="mt-[8px] list-disc space-y-[8px] pl-[26px]">
+								<li>
+									<span className="font-bold">
+										{t('landing.about.expertise.item1.title')}
+									</span>{' '}
+									{t('landing.about.expertise.item1.desc')}
+								</li>
+								<li>
+									<span className="font-bold">
+										{t('landing.about.expertise.item2.title')}
+									</span>{' '}
+									{t('landing.about.expertise.item2.desc')}
+								</li>
+								<li>
+									<span className="font-bold">
+										{t('landing.about.expertise.item3.title')}
+									</span>{' '}
+									{t('landing.about.expertise.item3.desc')}{' '}
+									<span className="font-bold">
+										{t('landing.about.expertise.item3.chatBold')}
+									</span>
+								</li>
+							</ul>
+						</div>
 					</div>
 				</div>
 			</div>

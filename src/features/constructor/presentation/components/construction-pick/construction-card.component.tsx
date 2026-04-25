@@ -1,4 +1,5 @@
 import { FormElementLabel, ImagePreviewModal, useI18n } from '@core';
+import type { ConstructionSelectRestrictions } from '@features/constructor/types';
 import type { ReportInfoShort } from '@features/constructor/utils';
 import {
 	formatMaterial,
@@ -21,9 +22,28 @@ type Props = {
 	construction: ConstructionsEditData;
 	svgUrl: string | null;
 	reportInfo?: ReportInfoShort;
+	appliedRestrictions?: ConstructionSelectRestrictions;
 };
 
-export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) => {
+const toOptionalNumber = (value: unknown): number | null => {
+	if (value === null || value === undefined || value === '') return null;
+	const num = Number(value);
+	return Number.isFinite(num) ? num : null;
+};
+
+const formatRequirementLabel = (min: number | null, max: number | null): string => {
+	if (min !== null && max !== null) return `${Math.round(min)}-${Math.round(max)}`;
+	if (min !== null) return `>=${Math.round(min)}`;
+	if (max !== null) return `<=${Math.round(max)}`;
+	return '-';
+};
+
+export const ConstructionCard = ({
+	construction,
+	svgUrl,
+	reportInfo,
+	appliedRestrictions,
+}: Props) => {
 	const { t } = useI18n();
 	const [thickness, setThickness] = useState<number>(0);
 	const [mass, setMass] = useState<number>(0);
@@ -42,6 +62,11 @@ export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) =>
 		setThickness(getTotalThicknessMmFromMaterials(allMaterials));
 		setMass(getSurfaceMassKgPerM2FromMaterials(allMaterials));
 	}, [construction]);
+
+	const thicknessMin = toOptionalNumber(appliedRestrictions?.minThickness);
+	const thicknessMax = toOptionalNumber(appliedRestrictions?.maxThickness);
+	const massMin = toOptionalNumber(appliedRestrictions?.minWeight);
+	const massMax = toOptionalNumber(appliedRestrictions?.maxWeight);
 
 	const constructionHeaderId = construction?.id ?? null;
 
@@ -123,12 +148,16 @@ export const ConstructionCard = ({ construction, svgUrl, reportInfo }: Props) =>
 							{
 								physical: 'Толщина, мм',
 								values: String(thickness) || '-',
-								requirements: '?',
+								requirements: formatRequirementLabel(thicknessMin, thicknessMax),
+								requirementMin: thicknessMin,
+								requirementMax: thicknessMax,
 							},
 							{
 								physical: 'Масса, кг/м²',
 								values: Number.isFinite(mass) ? mass.toFixed(2) : '-',
-								requirements: '?',
+								requirements: formatRequirementLabel(massMin, massMax),
+								requirementMin: massMin,
+								requirementMax: massMax,
 							},
 							{
 								physical: 'Высота, м',

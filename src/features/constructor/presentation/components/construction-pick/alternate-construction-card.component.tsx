@@ -5,6 +5,7 @@ import {
 	useAppDispatch,
 	useI18n,
 } from '@core';
+import type { ConstructionSelectRestrictions } from '@features/constructor/types';
 import {
 	svgConstructionDetail,
 	swapToAlternateFloorConstruction,
@@ -40,6 +41,20 @@ type Props = {
 	reportInfo: ReportInfoShort;
 	reportConstructionId: string | null;
 	onSwapSuccess: (newConstructionHeaderId: string) => void;
+	appliedRestrictions?: ConstructionSelectRestrictions;
+};
+
+const toOptionalNumber = (value: unknown): number | null => {
+	if (value === null || value === undefined || value === '') return null;
+	const num = Number(value);
+	return Number.isFinite(num) ? num : null;
+};
+
+const formatRequirementLabel = (min: number | null, max: number | null): string => {
+	if (min !== null && max !== null) return `${Math.round(min)}-${Math.round(max)}`;
+	if (min !== null) return `>=${Math.round(min)}`;
+	if (max !== null) return `<=${Math.round(max)}`;
+	return '-';
 };
 
 export const AlternateConstructionCard = ({
@@ -47,6 +62,7 @@ export const AlternateConstructionCard = ({
 	reportInfo,
 	reportConstructionId,
 	onSwapSuccess,
+	appliedRestrictions,
 }: Props) => {
 	const dispatch = useAppDispatch();
 	const { t } = useI18n();
@@ -59,6 +75,10 @@ export const AlternateConstructionCard = ({
 	const [mass, setMass] = useState<number>(0);
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 	const [isLabGraphOpen, setIsLabGraphOpen] = useState(false);
+	const thicknessMin = toOptionalNumber(appliedRestrictions?.minThickness);
+	const thicknessMax = toOptionalNumber(appliedRestrictions?.maxThickness);
+	const massMin = toOptionalNumber(appliedRestrictions?.minWeight);
+	const massMax = toOptionalNumber(appliedRestrictions?.maxWeight);
 
 	useEffect(() => {
 		if (!constructionHeader) return;
@@ -96,7 +116,7 @@ export const AlternateConstructionCard = ({
 		handleGetConstructionByHeaderId(construction.id);
 		from(svgConstructionDetail(construction.id))
 			.pipe(
-				catchError((error) => {
+				catchError(() => {
 					toast.error('Не удалось получить картинку');
 					return [];
 				}),
@@ -150,112 +170,120 @@ export const AlternateConstructionCard = ({
 				calculationDocName=""
 			/>
 			<div className="flex w-1/2 flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
-			<div className="flex w-full items-center justify-between">
-				<p className="font-sans text-lg font-semibold leading-4 text-black">
-					{RuConstructionTypesMap[construction.constructionType as ConstructionTypeEnum]}
-				</p>
-				<Button
-					className="h-[40px] w-fit self-end bg-white px-[16px] font-sans text-sm font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-primary enabled:hover:text-white"
-					onClick={handleUseInReport}
-				>
-					Использовать в отчете
-				</Button>
-			</div>
-			<div className="flex w-full min-w-0 flex-row items-start justify-start gap-3 text-left">
-				{construction.issuerLogo ? (
-					<button
-						type="button"
-						className="shrink-0 cursor-pointer border-0 bg-transparent p-0"
-						onClick={() => setPreviewSrc(construction.issuerLogo!)}
+				<div className="flex w-full items-center justify-between">
+					<p className="font-sans text-lg font-semibold leading-4 text-black">
+						{
+							RuConstructionTypesMap[
+								construction.constructionType as ConstructionTypeEnum
+							]
+						}
+					</p>
+					<Button
+						className="h-[40px] w-fit self-end bg-white px-[16px] font-sans text-sm font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-primary enabled:hover:text-white"
+						onClick={handleUseInReport}
 					>
-						<img
-							src={construction.issuerLogo}
-							alt="Превью изображения"
-							className="h-[66px] w-[140px] shrink-0 rounded-md object-cover"
-						/>
-					</button>
-				) : (
-					<div className="h-[66px] w-[140px] shrink-0 rounded-md bg-background-secondary" />
-				)}
-				<p className="font-sans text-[14px] font-semibold leading-snug text-black">
-					{construction.issuer.name}
-				</p>
-			</div>
-			<div className="flex min-w-0 flex-row items-start justify-start gap-4 text-left">
-				{svgUrl ? (
-					<button
-						type="button"
-						className="flex shrink-0 cursor-pointer items-start justify-start border-0 bg-transparent p-0"
-						onClick={() => setPreviewSrc(svgUrl)}
-					>
-						<img
-							className="block size-auto max-h-[280px] max-w-[260px] object-contain"
-							src={svgUrl}
-							alt="SVG Construction"
-						/>
-					</button>
-				) : null}
-				<div className="min-w-0 flex-1 overflow-x-auto text-left">
-					<div className="flex w-full min-w-0 flex-col items-start gap-1 text-left">
-						{(
-							[
-								...(constructionHeader?.constructionTypeObject.leftConstruction || []),
-								...(constructionHeader?.constructionTypeObject.centerConstruction ||
-									[]),
-								...(constructionHeader?.constructionTypeObject.rightConstruction || []),
-							] as any[]
-						).map((material: any, index: number) => (
-							<p
-								key={index}
-								className="whitespace-nowrap text-left text-[16px] leading-snug text-gray-800"
-							>
-								- {formatMaterial(material)}
-							</p>
-						))}
+						Использовать в отчете
+					</Button>
+				</div>
+				<div className="flex w-full min-w-0 flex-row items-start justify-start gap-3 text-left">
+					{construction.issuerLogo ? (
+						<button
+							type="button"
+							className="shrink-0 cursor-pointer border-0 bg-transparent p-0"
+							onClick={() => setPreviewSrc(construction.issuerLogo!)}
+						>
+							<img
+								src={construction.issuerLogo}
+								alt="Превью изображения"
+								className="h-[66px] w-[140px] shrink-0 rounded-md object-cover"
+							/>
+						</button>
+					) : (
+						<div className="h-[66px] w-[140px] shrink-0 rounded-md bg-background-secondary" />
+					)}
+					<p className="font-sans text-[14px] font-semibold leading-snug text-black">
+						{construction.issuer.name}
+					</p>
+				</div>
+				<div className="flex min-w-0 flex-row items-start justify-start gap-4 text-left">
+					{svgUrl ? (
+						<button
+							type="button"
+							className="flex shrink-0 cursor-pointer items-start justify-start border-0 bg-transparent p-0"
+							onClick={() => setPreviewSrc(svgUrl)}
+						>
+							<img
+								className="block size-auto max-h-[280px] max-w-[260px] object-contain"
+								src={svgUrl}
+								alt="SVG Construction"
+							/>
+						</button>
+					) : null}
+					<div className="min-w-0 flex-1 overflow-x-auto text-left">
+						<div className="flex w-full min-w-0 flex-col items-start gap-1 text-left">
+							{(
+								[
+									...(constructionHeader?.constructionTypeObject.leftConstruction || []),
+									...(constructionHeader?.constructionTypeObject.centerConstruction ||
+										[]),
+									...(constructionHeader?.constructionTypeObject.rightConstruction || []),
+								] as any[]
+							).map((material: any, index: number) => (
+								<p
+									key={index}
+									className="whitespace-nowrap text-left text-[16px] leading-snug text-gray-800"
+								>
+									- {formatMaterial(material)}
+								</p>
+							))}
+						</div>
 					</div>
 				</div>
+				<div className="flex w-full flex-col gap-[10px]">
+					<FormElementLabel className="text-left font-sans font-semibold leading-6 text-primary">
+						Технические параметры
+					</FormElementLabel>
+					<GeneralInformationPhysical
+						data={[
+							{
+								physical: 'Толщина, мм',
+								values: String(thickness) || '-',
+								requirements: formatRequirementLabel(thicknessMin, thicknessMax),
+								requirementMin: thicknessMin,
+								requirementMax: thicknessMax,
+							},
+							{
+								physical: 'Масса, кг/м²',
+								values: Number.isFinite(mass) ? mass.toFixed(2) : '-',
+								requirements: formatRequirementLabel(massMin, massMax),
+								requirementMin: massMin,
+								requirementMax: massMax,
+							},
+							{
+								physical: 'Высота, м',
+								values: String(constructionHeader?.maxHeight) || '-',
+								requirements: String(constructionHeader?.maxHeight) || '-',
+							},
+						]}
+					/>
+					<GeneralInformationSoundproofing
+						data={[
+							{
+								label: t('soundproofing.labTest'),
+								soundproofing: 'Rw, dB',
+								values: String(constructionHeader?.RCalcs) || '-',
+								requirements:
+									reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
+							},
+						]}
+						onSoundproofingLabelClick={
+							constructionHeaderId ? () => setIsLabGraphOpen(true) : undefined
+						}
+					/>
+					<GeneralInformationThermal />
+					<GeneralInformationFireResistance />
+				</div>
 			</div>
-			<div className="flex w-full flex-col gap-[10px]">
-				<FormElementLabel className="text-left font-sans font-semibold leading-6 text-primary">
-					Технические параметры
-				</FormElementLabel>
-				<GeneralInformationPhysical
-					data={[
-						{
-							physical: 'Толщина, мм',
-							values: String(thickness) || '-',
-							requirements: '?',
-						},
-						{
-							physical: 'Масса, кг/м²',
-							values: Number.isFinite(mass) ? mass.toFixed(2) : '-',
-							requirements: '?',
-						},
-						{
-							physical: 'Высота, м',
-							values: String(constructionHeader?.maxHeight) || '-',
-							requirements: String(constructionHeader?.maxHeight) || '-',
-						},
-					]}
-				/>
-				<GeneralInformationSoundproofing
-					data={[
-						{
-							label: t('soundproofing.labTest'),
-							soundproofing: 'Rw, dB',
-							values: String(constructionHeader?.RCalcs) || '-',
-							requirements:
-								reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
-						},
-					]}
-					onSoundproofingLabelClick={
-						constructionHeaderId ? () => setIsLabGraphOpen(true) : undefined
-					}
-				/>
-				<GeneralInformationThermal />
-				<GeneralInformationFireResistance />
-			</div>
-		</div>
 		</>
 	);
 };
