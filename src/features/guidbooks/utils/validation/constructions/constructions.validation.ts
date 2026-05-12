@@ -27,6 +27,7 @@ const zPanelRequiresBrandIssuerRefine = (
 export const ConstructionsFilterSchema = z.object({
 	name: z.string(),
 	constructionType: z.string(),
+	constructionPurpose: z.string().optional(),
 	country: z.string(),
 	priority: z.string(),
 	rw: z.string(),
@@ -76,6 +77,7 @@ const constructionsAddShape = z.object({
 	descriptionSource: z.string().min(1, 'validation.required'),
 	country: z.array(z.string().min(1, 'validation.required')).min(1, 'validation.required'),
 	constructionType: z.string().min(1, 'validation.required'),
+	constructionPurpose: z.string().min(1, 'validation.required'),
 	issuer: z.string().min(1, 'validation.required'),
 	issuerName: z.string().optional(),
 	maxHeight: z

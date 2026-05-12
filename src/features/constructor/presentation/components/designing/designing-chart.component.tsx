@@ -1,6 +1,6 @@
 import { GraphType } from '@api-gen';
 import { useI18n } from '@core';
-import type { ChartData, ChartOptions } from 'chart.js';
+import type { Chart, ChartData, ChartOptions, LegendItem } from 'chart.js';
 import {
 	CategoryScale,
 	Chart as ChartJS,
@@ -80,6 +80,8 @@ const seriesStyleByKind = (kind: GraphSeriesKind) => {
 	}
 };
 
+const seriesColor = (s: DesigningChartSeries) => seriesStyleFromGraphSeries(s).color;
+
 const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 	const gt = s.graphType;
 	if (gt === GraphType.Computed)
@@ -111,6 +113,11 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 	/** Пунктирные границы расчётного диапазона (Гц). */
 	const RANGE_MIN_HZ = 100;
 	const RANGE_MAX_HZ = 3150;
+
+	const yValuesClose = (a: number | null | undefined, b: number | null | undefined) => {
+		if (a === null || a === undefined || b === null || b === undefined) return false;
+		return Math.abs(Number(a) - Number(b)) < 0.02;
+	};
 
 	/** Ось частот всегда 0…5000 Гц. */
 	const AXIS_MIN_HZ = 0;
@@ -247,7 +254,8 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 				label: s.legendLabel,
 				data: dataPoints,
 				borderColor: color,
-				backgroundColor: 'transparent',
+				// Не «transparent»: при legend.labels.usePointStyle маркер легенды берёт fill из backgroundColor.
+				backgroundColor: color,
 				borderWidth,
 				borderDash: styleDash,
 				pointStyle: 'circle' as const,
@@ -328,28 +336,62 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 						const dataIndex = context.dataIndex;
 						const frequency = displayFrequencies[dataIndex];
 						const s = series[datasetIndex];
-						const pointLabel = s.data?.find((p) => p.x === frequency && p.y === value);
-						return pointLabel ? (pointLabel as any).label : null;
+						const pointLabel = s.data?.find(
+							(p) => p.x === frequency && yValuesClose(p.y, value as number | null),
+						);
+						return pointLabel ? (pointLabel as { label?: string }).label ?? null : null;
 					},
 					font: {
+						family: 'Source Sans Pro, system-ui, sans-serif',
 						weight: 'bold',
 						size: chartSize === 'large' ? 14 : 11,
 					},
-					color: (context) => context.dataset.borderColor as string,
+					color: (context) => {
+						const s = series[context.datasetIndex];
+						return s ? seriesColor(s) : '#14181f';
+					},
 				},
 				legend: {
-					maxWidth: chartSize === 'large' ? 420 : 200,
+					maxWidth: chartSize === 'large' ? 520 : 320,
 					display: true,
 					position: 'right',
 					align: 'center',
 					labels: {
-						filter: (legendItem) => {
-							const text = String(legendItem.text ?? '').trim();
-							return text.length > 0;
+						color: '#14181f',
+						/** Явные цвета маркера: иначе при длинных подписях / line chart маркер в легенде не рисуется */
+						generateLabels: (chart: Chart<'line'>): LegendItem[] => {
+							return chart.data.datasets
+								.map((dataset, datasetIndex) => {
+									const text = String(dataset.label ?? '').trim();
+									if (!text.length) return null;
+									const s = series[datasetIndex];
+									const fill =
+										s != null
+											? seriesColor(s)
+											: typeof dataset.borderColor === 'string'
+												? dataset.borderColor
+												: '#6b7280';
+									const item: LegendItem = {
+										text,
+										fillStyle: fill,
+										strokeStyle: fill,
+										lineWidth: 2,
+										hidden: !chart.isDatasetVisible(datasetIndex),
+										datasetIndex: datasetIndex,
+										pointStyle: 'circle',
+									};
+									if (Array.isArray(dataset.borderDash) && dataset.borderDash.length) {
+										item.lineDash = [...dataset.borderDash] as number[];
+									}
+									return item;
+								})
+								.filter((x): x is LegendItem => x !== null);
 						},
-						boxWidth: chartSize === 'large' ? 120 : 100,
-						padding: chartSize === 'large' ? 18 : 25,
+						boxWidth: chartSize === 'large' ? 16 : 14,
+						boxHeight: chartSize === 'large' ? 16 : 14,
+						padding: chartSize === 'large' ? 14 : 12,
 						font: {
+							family: 'Source Sans Pro, system-ui, sans-serif',
 							size: chartSize === 'large' ? 13 : 12,
 							weight: 'bold',
 						},
@@ -391,7 +433,9 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 					title: {
 						display: true,
 						text: t('constructor.chart.frequencyAxis'),
+						color: '#14181f',
 						font: {
+							family: 'Source Sans Pro, system-ui, sans-serif',
 							size: chartSize === 'large' ? 14 : 12,
 							weight: 'bold',
 						},
@@ -403,6 +447,11 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 					ticks: {
 						autoSkip: true,
 						maxTicksLimit: 15,
+						color: '#14181f',
+						font: {
+							family: 'Source Sans Pro, system-ui, sans-serif',
+							size: chartSize === 'large' ? 12 : 11,
+						},
 						callback: (_value, index) => {
 							const freq = displayFrequencies[index];
 							return freq ? String(freq) : '';
@@ -414,7 +463,9 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 					title: {
 						display: true,
 						text: 'Rw',
+						color: '#14181f',
 						font: {
+							family: 'Source Sans Pro, system-ui, sans-serif',
 							size: chartSize === 'large' ? 14 : 12,
 							weight: 'bold',
 						},
@@ -423,6 +474,11 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 					max: maxY + 10,
 					ticks: {
 						stepSize: 5,
+						color: '#14181f',
+						font: {
+							family: 'Source Sans Pro, system-ui, sans-serif',
+							size: chartSize === 'large' ? 12 : 11,
+						},
 					},
 					grid: {
 						display: true,

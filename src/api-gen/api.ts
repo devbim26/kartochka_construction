@@ -168,6 +168,7 @@ export interface ConstructionHeaderDto {
 	/** @format uuid */
 	issuerId?: string;
 	issuer?: Issuer;
+	constructionPurpose?: ConstructionPurpose;
 	/** @format double */
 	maxHeight?: number;
 	propertySource?: string | null;
@@ -195,6 +196,12 @@ export enum ConstructionPosition {
 	Left = 'Left',
 	Center = 'Center',
 	Right = 'Right',
+}
+
+export enum ConstructionPurpose {
+	Soundproofing = 'Soundproofing',
+	Acoustic = 'Acoustic',
+	ThermalInsulation = 'ThermalInsulation',
 }
 
 export interface ConstructionTemplate {
@@ -323,6 +330,7 @@ export interface CreateConstructionHeaderCommand {
 	rTotal?: number[] | null;
 	laboratoryTestSource?: string | null;
 	index?: IndexType;
+	constructionPurpose?: ConstructionPurpose;
 	constructionType?: CreateConstructionTypeDto;
 }
 
@@ -378,8 +386,6 @@ export interface CreateReportInfoDto {
 	id?: string;
 	buildingName?: string | null;
 	description?: string | null;
-	calculationRequirements?: Requirement[] | null;
-	regulatoryRequirements?: Requirement[] | null;
 	category?: ReportCategory;
 	buildingType?: BuildingType;
 	class?: CategoryClass;
@@ -665,6 +671,7 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	/** @format float */
 	rw?: number | null;
 	orderByPriority?: boolean;
+	constructionPurpose?: ConstructionPurpose;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -692,6 +699,7 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	/** @format float */
 	thickness?: number | null;
 	materialType?: MaterialTypeEnum;
+	materialPurpose?: MaterialPurpose;
 }
 
 export interface GetPalacementRoomVariantsWithTypesQuery {
@@ -858,6 +866,7 @@ export interface MaterialDto {
 	/** @format float */
 	thickness?: number;
 	materialType?: MaterialTypeEnum;
+	materialPurpose?: MaterialPurpose;
 	type?: MaterialOriginType;
 	countries?: CountryType[] | null;
 	issuer?: IssuerDto;
@@ -906,6 +915,12 @@ export enum MaterialParametrs {
 	Length = 'Length',
 	Square = 'Square',
 	Filler = 'Filler',
+}
+
+export enum MaterialPurpose {
+	Any = 'Any',
+	ForWall = 'ForWall',
+	ForFloor = 'ForFloor',
 }
 
 export interface MaterialType {
@@ -1022,6 +1037,7 @@ export interface PaginatedConstructionHeaderDto {
 	description?: string | null;
 	countries?: CountryType[] | null;
 	constructionType?: ConstructionTypeEnum;
+	constructionPurpose?: ConstructionPurpose;
 	issuer?: NamedEntity;
 	issuerLogo?: string | null;
 	shortName?: string | null;
@@ -1055,6 +1071,7 @@ export interface PaginatedMaterialDto {
 	/** @format float */
 	thickness?: number;
 	materialType?: MaterialTypeEnum;
+	materialPurpose?: MaterialPurpose;
 	type?: MaterialOriginType;
 	countries?: CountryType[] | null;
 	imageUrl?: string | null;
@@ -1209,7 +1226,10 @@ export interface ReportConstructionDto {
 	length?: number;
 	secondPlacementRoom?: PlacementRoomDto;
 	firstPlacementRoom?: PlacementRoomDto;
-	requirement?: RequirementDto;
+	/** @format float */
+	requirementNoizeIsolationIndex?: number;
+	/** @format float */
+	requirementNoizeImpactIndex?: number | null;
 	additionalDoors?: AdditionalConstructionHeaderDto[] | null;
 	additionalWindows?: AdditionalConstructionHeaderDto[] | null;
 }
@@ -1527,6 +1547,7 @@ export interface UpdateConstructionHeaderCommand {
 	countries?: CountryType[] | null;
 	descriptionSource?: string | null;
 	notation?: string | null;
+	constructionPurpose?: ConstructionPurpose;
 	/** @format uuid */
 	issuerId?: string;
 	propertySource?: string | null;
@@ -2596,6 +2617,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				/** @format float */
 				materialCoefficient?: number;
 				materialTypeEnum?: MaterialTypeEnum;
+				materialPurpose?: MaterialPurpose;
 				type?: MaterialOriginType;
 				/** @format float */
 				velocity?: number;
@@ -2697,6 +2719,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				/** @format float */
 				rc?: number;
 				editFile?: boolean;
+				materialPurpose?: MaterialPurpose;
 				/** @format binary */
 				formFile?: File;
 			},

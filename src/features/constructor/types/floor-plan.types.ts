@@ -1,5 +1,4 @@
 import type { NamedEntity } from '@core';
-import type { Requirement } from '@features/guidbooks/types';
 import type { FloorPlansSchemaType } from '../utils';
 
 type FloorPlansData = FloorPlansSchemaType;
@@ -30,7 +29,9 @@ type ReportConstructionHeader = {
 	firstPlacemetnRoom: NamedEntity;
 	width: number;
 	length: number;
-	requirement?: Requirement;
+	/** Индексы требования по звукоизоляции, сохранённые в конструкции отчёта (без справочника Requirement). */
+	requirementNoizeIsolationIndex?: number;
+	requirementNoizeImpactIndex?: number | null;
 	additionalWindows?: AdditionalOpeningRow[];
 	additionalDoors?: AdditionalOpeningRow[];
 };

@@ -1,4 +1,6 @@
+import { ConstructionPurpose, MaterialPurpose } from '@api-gen';
 import { type EntityConfig } from '@core';
+import { getDesignCalculationConstructionPurpose } from '@core/utils/helpers/design-calculation-mode.helper';
 import { getSessionStorageData } from '@core/utils/helpers/session.helper';
 import {
 	ConstructionsAddSchema,
@@ -20,6 +22,7 @@ export const MaterialsAddAndEditConfig: EntityConfig = {
 		density: '',
 		thickness: '',
 		materialType: '',
+		materialPurpose: MaterialPurpose.Any,
 		country: [],
 		type: '',
 		issuer: '',
@@ -37,7 +40,13 @@ export const MaterialsAddAndEditConfig: EntityConfig = {
 
 export const MaterialsFilterConfig: EntityConfig = {
 	schema: MaterialsFilterSchema,
-	defaultValues: { name: '', density: '', thickness: '', materialType: '' },
+	defaultValues: {
+		name: '',
+		density: '',
+		thickness: '',
+		materialType: '',
+		materialPurpose: '',
+	},
 };
 
 export const IssuersAddAndEditConfig: EntityConfig = {
@@ -95,6 +104,8 @@ export const ConstructionsAddConfig: EntityConfig = {
 		descriptionSource: '',
 		country: [],
 		constructionType: '',
+		constructionPurpose:
+			getDesignCalculationConstructionPurpose() ?? ConstructionPurpose.Soundproofing,
 		issuer: '',
 		issuerName: '',
 		maxHeight: '',
@@ -125,6 +136,7 @@ export const ConstructionsFilterConfig: EntityConfig = {
 	defaultValues: {
 		name: '',
 		constructionType: '',
+		constructionPurpose: '',
 		country: '',
 		priority: '',
 		rw: '',

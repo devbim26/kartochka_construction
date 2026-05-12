@@ -11,6 +11,9 @@ import {
 	useI18n,
 	type PaginationState,
 } from '@core';
+import { getDesignCalculationConstructionPurpose } from '@core/utils/helpers/design-calculation-mode.helper';
+import { ConstructionPurpose } from '@api-gen';
+import { RuConstructionPurposeLabels } from '@features/guidbooks/constants';
 import {
 	ConstructionsAdd,
 	ConstructionsEdit,
@@ -51,7 +54,7 @@ import {
 import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -81,6 +84,16 @@ const ConstructionsScreen = () => {
 			add: ConstructionsAddConfig.schema,
 		},
 	);
+
+	const didApplySessionConstructionPurpose = useRef(false);
+	useEffect(() => {
+		if (didApplySessionConstructionPurpose.current) return;
+		didApplySessionConstructionPurpose.current = true;
+		const purpose = getDesignCalculationConstructionPurpose();
+		if (purpose) {
+			forms.filterForm.setValue('constructionPurpose', purpose);
+		}
+	}, [forms.filterForm]);
 
 	const columns = useMemo(() => {
 		const cols: ColumnDef<ConstructionsAddData>[] = [
@@ -147,6 +160,22 @@ const ConstructionsScreen = () => {
 				),
 			},
 			{
+				accessorKey: 'constructionPurpose',
+				header: () => (
+					<SimpleTableHeaderCell
+						text={t('guides.constructions.columns.constructionPurpose')}
+					/>
+				),
+				cell: (info) => {
+					const v = info.getValue() as string;
+					const label =
+						v && v in RuConstructionPurposeLabels
+							? RuConstructionPurposeLabels[v as ConstructionPurpose]
+							: '—';
+					return <SimpleTableCell content={label} />;
+				},
+			},
+			{
 				accessorKey: 'country',
 				header: () => (
 					<SimpleTableHeaderCell text={t('guides.constructions.columns.country')} />
@@ -201,11 +230,20 @@ const ConstructionsScreen = () => {
 	const [
 		filterName,
 		filterConstructionType,
+		filterConstructionPurpose,
 		filterRegion,
 		filterPriority,
 		filterRw,
 		filterLnw,
-	] = forms.filterForm.watch(['name', 'constructionType', 'country', 'priority', 'rw', 'lnw']);
+	] = forms.filterForm.watch([
+		'name',
+		'constructionType',
+		'constructionPurpose',
+		'country',
+		'priority',
+		'rw',
+		'lnw',
+	]);
 
 	useEffect(() => {
 		handleGetTableData(
@@ -215,6 +253,7 @@ const ConstructionsScreen = () => {
 	}, [
 		filterName,
 		filterConstructionType,
+		filterConstructionPurpose,
 		filterRegion,
 		filterPriority,
 		filterRw,

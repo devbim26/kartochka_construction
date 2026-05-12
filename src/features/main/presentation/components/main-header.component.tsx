@@ -6,6 +6,7 @@ import {
 	useAppNavigate,
 	useI18n,
 } from '@core';
+import { setDesignCalculationModeFromFeatureId } from '@core/utils/helpers/design-calculation-mode.helper';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { Fragment, useCallback, type ReactNode } from 'react';
@@ -138,6 +139,11 @@ export const MainHeader = () => {
 			);
 	}, [reportId, reportType, navigate]);
 
+	const handleSoundIsolationDesignRedirect = useCallback(() => {
+		setDesignCalculationModeFromFeatureId('sound-isolation');
+		handleRedirect();
+	}, [handleRedirect]);
+
 	const handleAiVisualizationRedirect = useCallback(() => {
 		navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.visualization.route);
 	}, [navigate]);
@@ -242,7 +248,7 @@ export const MainHeader = () => {
 			price: 'FREE',
 			buttonText: t('main.designCards.continueInConstructor'),
 			active: true,
-			onClick: handleRedirect,
+			onClick: handleSoundIsolationDesignRedirect,
 		},
 		{
 			id: 'room-acoustics',

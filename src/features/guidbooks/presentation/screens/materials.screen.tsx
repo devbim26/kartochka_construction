@@ -27,6 +27,8 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
+import { MaterialPurpose } from '@api-gen';
+import { RuMaterialPurposeLabels } from '@features/guidbooks/constants';
 import {
 	Guidebooks,
 	RuCountryNamesMap,
@@ -137,6 +139,20 @@ const MaterialsScreen = () => {
 						}
 					/>
 				),
+			},
+			{
+				accessorKey: 'materialPurpose',
+				header: () => (
+					<SimpleTableHeaderCell text={t('guides.materials.columns.materialPurpose')} />
+				),
+				cell: (info) => {
+					const v = info.getValue() as string;
+					const label =
+						v && v in RuMaterialPurposeLabels
+							? RuMaterialPurposeLabels[v as MaterialPurpose]
+							: '—';
+					return <SimpleTableCell content={label} />;
+				},
 			},
 			{
 				accessorKey: 'country',

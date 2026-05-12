@@ -1,4 +1,5 @@
 import { Button, CheckboxSelect, convertToBase64, FormElementLabel, Input, Select } from '@core';
+import { RuMaterialPurposeSelectValues } from '@features/guidbooks/constants';
 import { convertToPaginatedType, convertToSelectValues } from '@core/converters';
 import { convertToClientIssuerData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
@@ -156,6 +157,27 @@ export const MaterialsAddAndEdit = () => {
 							buttonClassName="text-sm rounded-[8px]"
 							label={formState.errors.materialType?.message || 'Тип материала'}
 							placeholder="Выберите тип материала"
+						/>
+					)}
+				/>
+				<Controller
+					name="materialPurpose"
+					control={control}
+					render={({ field }) => (
+						<Select
+							{...field}
+							value={field.value || ''}
+							isSearchable
+							options={RuMaterialPurposeSelectValues}
+							error={formState.errors.materialPurpose?.message}
+							labelClassName={twMerge(
+								'text-sm leading-5 tracking-[0.1px]',
+								formState.errors.materialPurpose?.message ? 'text-error' : '',
+							)}
+							wrapperClassname="w-[226px] ring-input-border-primary"
+							buttonClassName="text-sm rounded-[8px]"
+							label={formState.errors.materialPurpose?.message || 'Применение'}
+							placeholder="Выберите применение"
 						/>
 					)}
 				/>

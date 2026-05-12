@@ -4,6 +4,7 @@ export const ConstructionsAddFieldNames = [
 	'priority',
 	'descriptionSource',
 	'country',
+	'constructionPurpose',
 	'issuer',
 	'maxHeight',
 	'fireResistance',

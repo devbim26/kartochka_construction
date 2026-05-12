@@ -1,18 +1,11 @@
-import { convertToPaginatedType, convertToSelectValues, Input, Select } from '@core';
+import { convertToSelectValues, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
-import { getGuidebooksPaginated } from '@features/guidbooks/services';
+import { useConstructionMaterialsCatalog } from '@features/guidbooks/utils';
 import {
-	Guidebooks,
 	MaterialTypeEnum,
 	type ConstructionMaterialTypesProps,
-	type MaterialsAddAndEditData,
-	type MaterialsFilterData,
 } from '@features/guidbooks/types';
-import type { AxiosResponse } from 'axios';
-import { useEffect, useState } from 'react';
 import { Controller } from 'react-hook-form';
-import { catchError, from, switchMap, tap } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 import { useSelectableMaterialDesignation } from './selectable-material-designation.context';
 
@@ -32,37 +25,7 @@ export const GapDistanceMaterialType = memoize(
 	}) => {
 		const { showMaterialDesignationInput } = useSelectableMaterialDesignation();
 		const { formState, control, setValue, register } = currentForm;
-		const [materials, setMaterials] = useState<MaterialsAddAndEditData[]>();
-
-		const handleGetMaterials = (data: MaterialsFilterData) => {
-			from(
-				getGuidebooksPaginated({
-					data,
-					pagination: { pageSize: 999999, pageNumber: 1 },
-					guidebookType: Guidebooks.MATERIAL,
-				}),
-			)
-				.pipe(
-					switchMap((response: AxiosResponse) => {
-						const items = convertToPaginatedType(
-							convertToClientMaterialsAddAndEditData,
-						)(response.data);
-						return from([items]);
-					}),
-					tap((items) => setMaterials(items.items || [])),
-					catchError((error) => {
-						console.log('Error:', error);
-						return from([null]);
-					}),
-				)
-				.subscribe();
-		};
-
-		useEffect(() => {
-			handleGetMaterials({
-				materialType: MaterialTypeEnum.GapDistance,
-			});
-		}, []);
+		const materials = useConstructionMaterialsCatalog(MaterialTypeEnum.GapDistance, currentForm);
 
 		const basePath = `constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}`;
 
@@ -75,7 +38,7 @@ export const GapDistanceMaterialType = memoize(
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={convertToSelectValues(materials) || []}
+							options={convertToSelectValues(materials ?? []) || []}
 							error={
 								(formState.errors as any)?.constructionTypeObject?.[
 									positionMap[constructionPosition]

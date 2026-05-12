@@ -332,17 +332,19 @@ export const GeneralInformationForm = () => {
 							label: t('soundproofing.calculation'), // нужно добавить ключ
 							soundproofing: 'Rw, dB',
 							values: String(constructionType?.labIndexValue) || '-',
-							requirements:
-								currentConstruction?.reportConstructionHeader.requirement
-									?.noizeIsolationIndex || '-',
+							requirements: String(
+								currentConstruction?.reportConstructionHeader
+									.requirementNoizeIsolationIndex ?? '-',
+							),
 						},
 						{
 							label: t('soundproofing.labTest'), // нужно добавить ключ
 							soundproofing: 'Rw, dB',
 							values: String(constructionType?.RCalcs) || '-',
-							requirements:
-								currentConstruction?.reportConstructionHeader.requirement
-									?.noizeIsolationIndex || '-',
+							requirements: String(
+								currentConstruction?.reportConstructionHeader
+									.requirementNoizeIsolationIndex ?? '-',
+							),
 						},
 					]}
 				/>

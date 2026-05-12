@@ -339,6 +339,7 @@ export const en = {
 	'guides.materials.columns.shortName': 'Short name',
 	'guides.materials.columns.description': 'Description',
 	'guides.materials.columns.type': 'Material type',
+	'guides.materials.columns.materialPurpose': 'Application (wall / floor)',
 	'guides.materials.columns.country': 'Country',
 	'guides.materials.columns.density': 'Density',
 	'guides.materials.columns.thickness': 'Thickness',
@@ -359,6 +360,7 @@ export const en = {
 	'guides.constructions.columns.lnw': 'Sound insulation Lnw, dB',
 	'guides.constructions.columns.issuer': 'Manufacturer',
 	'guides.constructions.columns.type': 'Construction type',
+	'guides.constructions.columns.constructionPurpose': 'Design purpose',
 	'guides.constructions.columns.country': 'Country',
 	'guides.constructions.columns.actions': 'Actions',
 
@@ -1480,6 +1482,7 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.materials.columns.shortName': 'Краткое название',
 	'guides.materials.columns.description': 'Описание',
 	'guides.materials.columns.type': 'Тип материала',
+	'guides.materials.columns.materialPurpose': 'Применение (стены / перекрытия)',
 	'guides.materials.columns.country': 'Страна',
 	'guides.materials.columns.density': 'Плотность',
 	'guides.materials.columns.thickness': 'Толщина',
@@ -1500,6 +1503,7 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.constructions.columns.lnw': 'Звукоизоляция Lnw, дБ',
 	'guides.constructions.columns.issuer': 'Производитель',
 	'guides.constructions.columns.type': 'Тип конструкции',
+	'guides.constructions.columns.constructionPurpose': 'Назначение (режим расчёта)',
 	'guides.constructions.columns.country': 'Страна',
 	'guides.constructions.columns.actions': 'Действия',
 

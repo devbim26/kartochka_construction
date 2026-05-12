@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { Switch, useAppDispatch, useAppSelector } from '@core';
 import {
+	buildRequirementDisplaySnapshot,
 	convertToClientAlternateConstruction,
 	convertToClientReportInfoShort,
 	convertToClientSingleToFloorConstruction,
@@ -15,13 +16,10 @@ import { startLoading, stopLoading } from '@features/constructor/store';
 import type { ConstructionSelectRestrictions } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
 import type { ReportInfoShort } from '@features/constructor/utils';
-import {
-	convertToClientConstructionsEditData,
-	convertToClientRequirementTableData,
-} from '@features/guidbooks/converters';
+import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { AlternateConstruction, ConstructionsEditData } from '@features/guidbooks/types';
-import { Guidebooks } from '@features/guidbooks/types';
+import { ConstructionClass, Guidebooks } from '@features/guidbooks/types';
 import { AxiosError } from 'axios';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
@@ -67,16 +65,29 @@ const ContructionPick = () => {
 						const currentConstruction = convertToClientSingleToFloorConstruction(
 							response.data as any,
 						);
-						const requirement =
-							currentConstruction?.reportConstructionHeader?.requirement;
+						const header = currentConstruction.reportConstructionHeader;
+						const constructionType =
+							constructionHeader?.constructionType ?? ConstructionClass.Wall;
+						const calcSnap = buildRequirementDisplaySnapshot(
+							reportInfo,
+							header,
+							constructionType,
+							'calculation',
+						);
+						const regSnap = buildRequirementDisplaySnapshot(
+							reportInfo,
+							header,
+							constructionType,
+							'regulatory',
+						);
 						setReportConstructionId(
 							currentConstruction?.reportConstructionHeader?.id || null,
 						);
 
 						setCurrentReportInfo({
 							...reportInfo,
-							regulatoryRequirement: requirement,
-							calculationRequirement: requirement,
+							regulatoryRequirement: regSnap,
+							calculationRequirement: calcSnap,
 						});
 					}
 				}),
@@ -112,16 +123,36 @@ const ContructionPick = () => {
 							currentReportFloorInfo?.reportConstructionHeader?.id || null,
 						);
 
-						const requirementDto =
-							currentReportFloorInfo?.reportConstructionHeader?.requirement;
-						const requirement = requirementDto
-							? convertToClientRequirementTableData(requirementDto)
-							: undefined;
+						const h = currentReportFloorInfo?.reportConstructionHeader;
+						const headerForSound = h && {
+							firstPlacemetnRoom: { name: h.firstPlacementRoom?.name },
+							secondPlacementRoom: { name: h.secondPlacementRoom?.name },
+							requirementNoizeIsolationIndex: h.requirementNoizeIsolationIndex,
+							requirementNoizeImpactIndex: h.requirementNoizeImpactIndex,
+						};
+						const constructionType =
+							constructionHeader?.constructionType ?? ConstructionClass.Wall;
+						const calcSnap =
+							headerForSound &&
+							buildRequirementDisplaySnapshot(
+								reportInfo,
+								headerForSound,
+								constructionType,
+								'calculation',
+							);
+						const regSnap =
+							headerForSound &&
+							buildRequirementDisplaySnapshot(
+								reportInfo,
+								headerForSound,
+								constructionType,
+								'regulatory',
+							);
 
 						setCurrentReportInfo({
 							...reportInfo,
-							regulatoryRequirement: requirement,
-							calculationRequirement: requirement,
+							regulatoryRequirement: regSnap || undefined,
+							calculationRequirement: calcSnap || undefined,
 						});
 					}
 				}),

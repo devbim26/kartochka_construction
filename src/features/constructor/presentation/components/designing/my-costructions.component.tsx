@@ -272,12 +272,15 @@ const MyConstructions = () => {
 	}, [reportType, reportId]);
 
 	useEffect(() => {
-		if (!!constructionHeader && !!currentConstruction?.reportConstructionHeader.requirement) {
+		if (
+			!!constructionHeader &&
+			currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex != null
+		) {
 			const rwValue = +(constructionHeader.RCalcs || 0);
 			const labRwValue = +(constructionHeader.labIndexValue || 0);
 
 			const requiredRw = +(
-				currentConstruction?.reportConstructionHeader.requirement?.noizeIsolationIndex || 50
+				currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex || 50
 			);
 			setLabIsRelevant(labRwValue >= requiredRw);
 			setCompIsRelevant(rwValue >= requiredRw);
@@ -510,8 +513,8 @@ const MyConstructions = () => {
 							<p className="font-sans text-[30px] font-semibold leading-4">
 								Rw ⩾{' '}
 								{
-									currentConstruction?.reportConstructionHeader.requirement
-										?.noizeIsolationIndex
+									currentConstruction?.reportConstructionHeader
+										.requirementNoizeIsolationIndex
 								}{' '}
 								dB
 							</p>

@@ -1,4 +1,8 @@
-import { Input, Select } from '@core';
+import { Input, Select, useI18n } from '@core';
+import {
+	EnConstructionPurposeSelectValues,
+	RuConstructionPurposeSelectValues,
+} from '@features/guidbooks/constants';
 import { convertToClientConstructionTypesList } from '@features/guidbooks/converters';
 import { getGuidebooksConstructionTypes } from '@features/guidbooks/services';
 import {
@@ -14,6 +18,7 @@ import { twMerge } from 'tailwind-merge';
 export const ConstructionsFilter = () => {
 	const form = useFormContext<ConstructionsFilterData>();
 	const { formState, control } = form;
+	const { locale } = useI18n();
 	const [constructionTypes, setConstructionTypes] = useState<ConstructionTypeTemplate[]>([]);
 
 	const handleGetConstructionTypesData = useCallback(async () => {
@@ -66,6 +71,32 @@ export const ConstructionsFilter = () => {
 						buttonClassName="text-sm rounded-[8px]"
 						label={formState.errors.constructionType?.message || 'Тип конструкции'}
 						placeholder="Выберите тип"
+					/>
+				)}
+			/>
+			<Controller
+				name="constructionPurpose"
+				control={control}
+				render={({ field }) => (
+					<Select
+						{...field}
+						isSearchable
+						value={field.value || ''}
+						options={[
+							{ label: locale === 'en' ? 'All' : 'Все', value: '' },
+							...(locale === 'en'
+								? EnConstructionPurposeSelectValues
+								: RuConstructionPurposeSelectValues),
+						]}
+						error={formState.errors.constructionPurpose?.message}
+						labelClassName={twMerge(
+							'text-sm leading-5 tracking-[0.1px]',
+							formState.errors.constructionPurpose?.message ? 'text-error' : '',
+						)}
+						wrapperClassname="w-[226px] ring-input-border-primary"
+						buttonClassName="text-sm rounded-[8px]"
+						label={formState.errors.constructionPurpose?.message || 'Назначение'}
+						placeholder="Все"
 					/>
 				)}
 			/>

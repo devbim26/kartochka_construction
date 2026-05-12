@@ -317,7 +317,10 @@ const DesigningConstructionScreen = () => {
 	}, [currentConstruction?.reportConstructionHeader?.id]);
 
 	useEffect(() => {
-		if (!!constructionHeader && !!currentConstruction?.reportConstructionHeader.requirement) {
+		if (
+			!!constructionHeader &&
+			currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex != null
+		) {
 			const rwValue =
 				Number(String(rCalcsDisplay ?? constructionHeader.RCalcs ?? '').trim()) || 0;
 			const labRwValue =
@@ -325,14 +328,14 @@ const DesigningConstructionScreen = () => {
 				0;
 
 			const requiredRw = +(
-				currentConstruction?.reportConstructionHeader.requirement?.noizeIsolationIndex || 50
+				currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex || 50
 			);
 			setLabIsRelevant(labRwValue >= requiredRw);
 			setCompIsRelevant(rwValue >= requiredRw);
 		}
 	}, [
 		constructionHeader,
-		currentConstruction?.reportConstructionHeader.requirement,
+		currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex,
 		currentReportInfo,
 		rCalcsDisplay,
 		labIndexValueDisplay,
@@ -877,8 +880,8 @@ const DesigningConstructionScreen = () => {
 							<p className="font-sans text-[30px] font-semibold leading-4">
 								Rw ⩾{' '}
 								{
-									currentConstruction?.reportConstructionHeader.requirement
-										?.noizeIsolationIndex
+									currentConstruction?.reportConstructionHeader
+										.requirementNoizeIsolationIndex
 								}{' '}
 								dB
 							</p>

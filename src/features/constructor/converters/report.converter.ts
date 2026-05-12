@@ -12,15 +12,13 @@ import type {
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
 import { convertToClientCountryData } from '@core';
-import {
-	convertToClientConstructionTypeEnumData,
-	convertToClientRequirementTableData,
-} from '@features/guidbooks/converters';
+import { convertToClientConstructionTypeEnumData } from '@features/guidbooks/converters';
 import type {
 	AlternateConstruction,
 	BuildingType,
 	CategoryClass,
 	ConstructionsEditData,
+	Requirement,
 } from '@features/guidbooks/types';
 import { ConstructionTypeEnum, Country } from '@features/guidbooks/types';
 
@@ -35,6 +33,46 @@ import type {
 } from '../types';
 import { ReportCategory } from '../types';
 import type { ReportInfoShort } from '../utils';
+
+const SNAPSHOT_STANDART_DATE = '2000-01-01';
+
+export type ReportConstructionSoundIndices = {
+	firstPlacemetnRoom: { name?: string | null };
+	secondPlacementRoom: { name?: string | null };
+	requirementNoizeIsolationIndex?: number;
+	requirementNoizeImpactIndex?: number | null;
+};
+
+/** Снимок для UI там, где раньше было вложенное RequirementDto в шапке конструкции отчёта. */
+export function buildRequirementDisplaySnapshot(
+	reportInfo: ReportInfoShort,
+	header: ReportConstructionSoundIndices,
+	constructionType: string,
+	role: 'calculation' | 'regulatory',
+): Requirement | undefined {
+	const rw = header.requirementNoizeIsolationIndex;
+	if (rw === undefined || rw === null || Number.isNaN(Number(rw))) return undefined;
+
+	const doc =
+		role === 'calculation' ? reportInfo.calculationDocument : reportInfo.regulatoryDocument;
+	const rwi = header.requirementNoizeImpactIndex ?? rw;
+
+	return {
+		countryType: reportInfo.region,
+		constructionType,
+		class: reportInfo.comfortClass,
+		secondPlacementRoom: header.secondPlacementRoom.name ?? '',
+		firstPlacementRoom: header.firstPlacemetnRoom.name ?? '',
+		buildingType: reportInfo.buildingType,
+		standartValidityPeriod: SNAPSHOT_STANDART_DATE,
+		standartShortName: doc?.name ?? '—',
+		standartFullName: doc?.fullName ?? '—',
+		regularyDocumentName: reportInfo.regulatoryDocument?.name ?? '—',
+		noizeIsolationIndex: String(rw),
+		noizeImpactIndex: String(rwi),
+		notice: '',
+	};
+}
 
 export const mapAdditionalOpeningsFromDto = (
 	items?: AdditionalConstructionHeaderDto[] | null,
@@ -194,9 +232,9 @@ export const convertToClientFloorConstruction = (
 				id: data.reportConstructionHeader?.firstPlacementRoom?.id || '',
 				name: data.reportConstructionHeader?.firstPlacementRoom?.name || '',
 			},
-			requirement: !!data.reportConstructionHeader?.requirement
-				? convertToClientRequirementTableData(data.reportConstructionHeader!.requirement!)
-				: undefined,
+			requirementNoizeIsolationIndex:
+				data.reportConstructionHeader?.requirementNoizeIsolationIndex,
+			requirementNoizeImpactIndex: data.reportConstructionHeader?.requirementNoizeImpactIndex,
 			additionalWindows: mapAdditionalOpeningsFromDto(
 				data.reportConstructionHeader?.additionalWindows,
 			),
@@ -232,9 +270,8 @@ export const convertToClientSingleToFloorConstruction = (
 				id: headerFromSingle?.firstPlacementRoom?.id ?? '',
 				name: headerFromSingle?.firstPlacementRoom?.name ?? '',
 			},
-			requirement: headerFromSingle?.requirement
-				? convertToClientRequirementTableData(headerFromSingle.requirement)
-				: undefined,
+			requirementNoizeIsolationIndex: headerFromSingle?.requirementNoizeIsolationIndex,
+			requirementNoizeImpactIndex: headerFromSingle?.requirementNoizeImpactIndex,
 			additionalWindows: mapAdditionalOpeningsFromDto(headerFromSingle?.additionalWindows),
 			additionalDoors: mapAdditionalOpeningsFromDto(headerFromSingle?.additionalDoors),
 		},
@@ -260,6 +297,9 @@ export const convertToClientSingleConstruction = (
 				id: data.reportConstructionHeader?.firstPlacementRoom?.id || '',
 				name: data.reportConstructionHeader?.firstPlacementRoom?.name || '',
 			},
+			requirementNoizeIsolationIndex:
+				data.reportConstructionHeader?.requirementNoizeIsolationIndex,
+			requirementNoizeImpactIndex: data.reportConstructionHeader?.requirementNoizeImpactIndex,
 			additionalWindows: mapAdditionalOpeningsFromDto(
 				data.reportConstructionHeader?.additionalWindows,
 			),

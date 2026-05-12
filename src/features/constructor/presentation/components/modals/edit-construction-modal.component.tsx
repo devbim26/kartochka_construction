@@ -41,8 +41,7 @@ export const EditConstructionModal = ({
 	const applyFormReset = () => {
 		if (!currentReportFloorInfo || !currentConstructionHeader) return;
 		formRef.current?.reset({
-			constructionType:
-				currentReportFloorInfo.reportConstructionHeader.requirement?.constructionType,
+			constructionType: currentConstructionHeader.constructionType,
 			id: reportFloorInfoId,
 			length: String(currentReportFloorInfo.reportConstructionHeader.length),
 			width: String(currentReportFloorInfo.reportConstructionHeader.width),

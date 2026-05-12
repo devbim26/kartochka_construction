@@ -1,4 +1,5 @@
 import type { GetMaterialsWithPaginationParamsQuery } from '@api-gen';
+import { MaterialPurpose } from '@api-gen';
 import { convertToClientCountryData, convertToServerCountryData } from '@core';
 import type {
 	Country,
@@ -23,6 +24,9 @@ export const convertToServerMaterialsFilterData = (
 	materialType: convertToServerMaterialTypeData(data.materialType as MaterialTypeEnum) || null,
 	density: data.density ? +data.density : null,
 	thickness: data.thickness ? +data.thickness : null,
+	...(data.materialPurpose
+		? { materialPurpose: data.materialPurpose as MaterialPurpose }
+		: {}),
 });
 
 export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddAndEditData => ({
@@ -39,6 +43,7 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	imageUrl: data.imageUrl ?? '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',
 	materialType: convertToClientMaterialTypeData(data.materialType!) ?? '',
+	materialPurpose: (data.materialPurpose as string) || MaterialPurpose.Any,
 	velocity: String(data.velocity) ?? '',
 	lossFactor: String(data.lossFactor) ?? '',
 	youngModulus: String(data.youngModulus) ?? '',
@@ -65,6 +70,7 @@ export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): 
 	formFile: data.imageFile,
 	materialCoefficient: +data.materialCoefficient || null,
 	materialTypeEnum: data.materialType || null,
+	materialPurpose: (data.materialPurpose as MaterialPurpose) || null,
 	velocity: +data.velocity || null,
 	lossFactor: +data.lossFactor || null,
 	youngModulus: +data.youngModulus || null,

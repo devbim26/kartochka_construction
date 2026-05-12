@@ -1,4 +1,5 @@
 import { Input, Select } from '@core';
+import { RuMaterialPurposeSelectValues } from '@features/guidbooks/constants';
 import { RuMaterialTypesSelectValues, type MaterialsFilterData } from '@features/guidbooks/types';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
@@ -37,6 +38,24 @@ export const MaterialsFilter = () => {
 						buttonClassName="text-sm rounded-[8px]"
 						label="Тип материала"
 						placeholder="Выберите тип материала"
+					/>
+				)}
+			/>
+			<Controller
+				name="materialPurpose"
+				control={control}
+				render={({ field }) => (
+					<Select
+						{...field}
+						isSearchable
+						value={field.value || ''}
+						options={RuMaterialPurposeSelectValues}
+						error={formState.errors.materialPurpose?.message}
+						labelClassName="text-sm leading-5 tracking-[0.1px]"
+						wrapperClassname="w-[226px] ring-input-border-primary"
+						buttonClassName="text-sm rounded-[8px]"
+						label="Применение"
+						placeholder="Все / стены / перекрытия"
 					/>
 				)}
 			/>

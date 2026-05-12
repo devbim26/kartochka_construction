@@ -11,6 +11,8 @@ import {
 	ConstructionsEditFieldNames,
 	ConstructionTypeFieldNames,
 	ConstructionTypeMap,
+	EnConstructionPurposeSelectValues,
+	RuConstructionPurposeSelectValues,
 } from '@features/guidbooks/constants';
 import { convertToClientIssuerData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
@@ -189,6 +191,34 @@ export const ConstructionsEdit = () => {
 									}}
 									label={formState.errors.country?.message || 'Страна'}
 									placeholder="Выберите страну"
+								/>
+							)}
+						/>
+						<Controller
+							name="constructionPurpose"
+							control={control}
+							render={({ field }) => (
+								<Select
+									{...field}
+									isSearchable
+									value={field.value || ''}
+									options={
+										locale === 'en'
+											? EnConstructionPurposeSelectValues
+											: RuConstructionPurposeSelectValues
+									}
+									error={formState.errors.constructionPurpose?.message}
+									labelClassName={twMerge(
+										'text-sm leading-5 tracking-[0.1px]',
+										formState.errors.constructionPurpose?.message ? 'text-error' : '',
+									)}
+									wrapperClassname="w-[226px] ring-input-border-primary"
+									buttonClassName="text-sm rounded-[8px]"
+									label={
+										formState.errors.constructionPurpose?.message ||
+										'Назначение конструкции'
+									}
+									placeholder="Выберите назначение"
 								/>
 							)}
 						/>

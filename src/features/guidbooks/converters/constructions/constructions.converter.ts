@@ -1,5 +1,6 @@
 import {
 	ConstructionPosition,
+	ConstructionPurpose,
 	type ConstructionTypeEnum as ServerConstructionTypeEnum,
 	type CountryType,
 	type CreateConstructionTypeDto,
@@ -50,6 +51,9 @@ export const convertToServerConstructionsFilterData = (data: ConstructionsFilter
 		: {}),
 	rw: parseFilterNumber(data.rw),
 	lnw: parseFilterNumber(data.lnw),
+	...(data.constructionPurpose
+		? { constructionPurpose: data.constructionPurpose as ConstructionPurpose }
+		: {}),
 });
 
 export const convertToClientConstructionsAddData = (data: any): ConstructionsAddData => ({
@@ -69,6 +73,8 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 	labIndex: (convertToClientIndexTypeData(data.index!) as string) ?? '',
 	labIndexValue: String(data.laboratoryIndexValue) ?? '',
 	constructionType: convertToClientConstructionTypeEnumData(data.constructionType) ?? '',
+	constructionPurpose:
+		(data.constructionPurpose as string) || ConstructionPurpose.Soundproofing,
 	constructionTypeObject: convertToClientConstructionType(data.constructionType!) ?? '',
 	laboratoryTestSource: data.laboratoryTestSource ?? '',
 	issuer: data.issuerId ?? '',
@@ -225,6 +231,7 @@ export const convertToServerConstructionsAddData = (data: ConstructionsAddData):
 	rTotal: data.labRTotal.split(',').map((split) => +split) || null,
 	index: (data.labIndex as IndexType) || null,
 	laboratoryTestSource: data.laboratoryTestSource || null,
+	constructionPurpose: (data.constructionPurpose as ConstructionPurpose) || undefined,
 	constructionType: convertToServerConstructionType(data.constructionTypeObject) || null,
 });
 
