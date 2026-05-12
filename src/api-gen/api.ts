@@ -3450,11 +3450,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/api/Requirement/export
 		 */
 		requirementExportCreate: (data: ExportRequirementQuery, params: RequestParams = {}) =>
-			this.request<void, any>({
+			this.request<RequirementDto, any>({
 				path: `/api/Requirement/export`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 

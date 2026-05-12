@@ -50,6 +50,8 @@ import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import {
+	createBlobFromExportResponse,
+	getFilenameFromExportHeaders,
 	RequirementsFilterDataConfig,
 	RequirementsFormDataConfig,
 	useHeaderForm,
@@ -269,11 +271,15 @@ const RequirementsScreen = () => {
 			)
 			.subscribe((response) => {
 				if (!response?.data) return;
-				const fileBlob = response.data as Blob;
+				const fileBlob = createBlobFromExportResponse(response);
+				const filename = getFilenameFromExportHeaders(
+					response.headers,
+					'requirements-export.xlsx',
+				);
 				const url = window.URL.createObjectURL(fileBlob);
 				const link = document.createElement('a');
 				link.href = url;
-				link.download = 'requirements-export.xlsx';
+				link.download = filename;
 				document.body.appendChild(link);
 				link.click();
 				document.body.removeChild(link);
