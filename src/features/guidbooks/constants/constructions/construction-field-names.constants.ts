@@ -9,10 +9,8 @@ export const ConstructionsAddFieldNames = [
 	'maxHeight',
 	'fireResistance',
 	'propertySource',
-	'labRTotal',
-	'labIndex',
-	'labIndexValue',
-	'laboratoryTestSource',
+	'airLaboratory',
+	'impactLaboratory',
 ];
 export const ConstructionsEditFieldNames = [
 	...ConstructionsAddFieldNames,

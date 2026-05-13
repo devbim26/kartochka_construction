@@ -1,4 +1,7 @@
-import { ZPanelConstructionTypeValues } from '@features/guidbooks/types';
+import {
+	isFloorConstructionType,
+	ZPanelConstructionTypeValues,
+} from '@features/guidbooks/types';
 import { z } from 'zod';
 
 const Z_PANEL_CONSTRUCTION_TYPES = new Set<string>(ZPanelConstructionTypeValues);
@@ -60,6 +63,39 @@ export const subConstructionSchema = z.object({
 
 export type SubConstructionTypeSchemaType = z.infer<typeof subConstructionSchema>;
 
+const labRTotalFieldSchema = z
+	.string()
+	.min(1, 'validation.required')
+	.refine((value) => {
+		const numbers = value.split(',').map((num) => num.trim());
+		const isValidCount = numbers.length === 16 || numbers.length === 21;
+		return isValidCount;
+	}, 'validation.labRTotalCount')
+	.refine((value) => {
+		const numbers = value.split(',').map((num) => num.trim());
+		const areNumbers = numbers.every((num) => !isNaN(parseFloat(num)) && isFinite(+num));
+		return areNumbers;
+	}, 'validation.labRTotalNumbers');
+
+export const laboratoryDataBlockSchema = z.object({
+	labRTotal: labRTotalFieldSchema,
+	labIndex: z.string().min(1, 'validation.required'),
+	labIndexValue: z.string().optional(),
+	laboratoryC: z.string().optional(),
+	laboratoryCtr: z.string().optional(),
+	laboratoryTestSource: z.string().min(1, 'validation.required'),
+});
+
+/** Для ударного блока на стенах поля могут быть пустыми — строгая проверка только для перекрытий. */
+const laboratoryDataBlockLooseSchema = z.object({
+	labRTotal: z.string(),
+	labIndex: z.string(),
+	labIndexValue: z.string().optional(),
+	laboratoryC: z.string().optional(),
+	laboratoryCtr: z.string().optional(),
+	laboratoryTestSource: z.string(),
+});
+
 export const ConstructionTypeShema = z.object({
 	constructionTypeEnum: z.string().min(1, 'validation.required'),
 	leftConstruction: z.array(UserMaterial).optional().nullable(),
@@ -89,24 +125,8 @@ const constructionsAddShape = z.object({
 		.min(1, 'validation.required')
 		.refine((value) => +value > 0, 'validation.positiveNumber'),
 	propertySource: z.string().min(1, 'validation.required'),
-	labRTotal: z
-		.string()
-		.min(1, 'validation.required')
-		.refine((value) => {
-			const numbers = value.split(',').map((num) => num.trim());
-			const isValidCount = numbers.length === 16 || numbers.length === 21;
-			return isValidCount;
-		}, 'validation.labRTotalCount')
-		.refine((value) => {
-			const numbers = value.split(',').map((num) => num.trim());
-			const areNumbers = numbers.every((num) => !isNaN(parseFloat(num)) && isFinite(+num));
-			return areNumbers;
-		}, 'validation.labRTotalNumbers'),
-	labIndex: z.string().min(1, 'validation.required'),
-	labIndexValue: z.string().optional(),
-	laboratoryC: z.string().optional(),
-	laboratoryCtr: z.string().optional(),
-	laboratoryTestSource: z.string().min(1, 'validation.required'),
+	airLaboratory: laboratoryDataBlockSchema,
+	impactLaboratory: laboratoryDataBlockLooseSchema,
 	/** Поля списка (фильтр / таблица), при создании не отправляются на сервер */
 	rw: z.string().optional(),
 	lnw: z.string().optional(),
@@ -114,9 +134,21 @@ const constructionsAddShape = z.object({
 	reportInfoId: z.string().optional(),
 });
 
-export const ConstructionsAddSchema = constructionsAddShape.superRefine(
-	zPanelRequiresBrandIssuerRefine,
-);
+const impactLaboratoryRequiredForFloorsRefine = (
+	data: z.infer<typeof constructionsAddShape>,
+	ctx: z.RefinementCtx,
+) => {
+	if (!isFloorConstructionType(data.constructionType)) return;
+	const parsed = laboratoryDataBlockSchema.safeParse(data.impactLaboratory);
+	if (parsed.success) return;
+	for (const issue of parsed.error.issues) {
+		ctx.addIssue({ ...issue, path: ['impactLaboratory', ...issue.path] });
+	}
+};
+
+export const ConstructionsAddSchema = constructionsAddShape
+	.superRefine(zPanelRequiresBrandIssuerRefine)
+	.superRefine(impactLaboratoryRequiredForFloorsRefine);
 
 export const ConstructionsEditSchema = constructionsAddShape
 	.merge(
@@ -125,7 +157,8 @@ export const ConstructionsEditSchema = constructionsAddShape
 			estimatedIndexValue: z.string().min(1, 'validation.required'),
 		}),
 	)
-	.superRefine(zPanelRequiresBrandIssuerRefine);
+	.superRefine(zPanelRequiresBrandIssuerRefine)
+	.superRefine(impactLaboratoryRequiredForFloorsRefine);
 
 export type ConstructionsAddSchemaType = z.infer<typeof ConstructionsAddSchema>;
 export type ConstructionsEditSchemaType = z.infer<typeof ConstructionsEditSchema>;

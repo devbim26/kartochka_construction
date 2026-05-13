@@ -277,7 +277,7 @@ const MyConstructions = () => {
 			currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex != null
 		) {
 			const rwValue = +(constructionHeader.RCalcs || 0);
-			const labRwValue = +(constructionHeader.labIndexValue || 0);
+			const labRwValue = +(constructionHeader.airLaboratory?.labIndexValue || 0);
 
 			const requiredRw = +(
 				currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex || 50
@@ -488,7 +488,7 @@ const MyConstructions = () => {
 										</p>
 										<div className="flex w-full items-center gap-1">
 											<p className="font-sans text-[25px] font-semibold leading-4">
-												Rw = {constructionHeader?.labIndexValue} dB
+												Rw = {constructionHeader?.airLaboratory?.labIndexValue} dB
 											</p>
 											<p
 												className={

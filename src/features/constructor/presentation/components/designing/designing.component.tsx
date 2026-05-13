@@ -135,7 +135,10 @@ const DesigningConstructionScreen = () => {
 	const hasLaboratoryDots = useMemo(() => graphHasLaboratoryData(graphData), [graphData]);
 
 	const rCalcsDisplay = useWatch({ control: constructionFormControl, name: 'RCalcs' });
-	const labIndexValueDisplay = useWatch({ control: constructionFormControl, name: 'labIndexValue' });
+	const labIndexValueDisplay = useWatch({
+		control: constructionFormControl,
+		name: 'airLaboratory.labIndexValue',
+	});
 
 	const handleGetCurrentReportFloorInfo = (id: string) => {
 		dispatch(startLoading());
@@ -324,7 +327,13 @@ const DesigningConstructionScreen = () => {
 			const rwValue =
 				Number(String(rCalcsDisplay ?? constructionHeader.RCalcs ?? '').trim()) || 0;
 			const labRwValue =
-				Number(String(labIndexValueDisplay ?? constructionHeader.labIndexValue ?? '').trim()) ||
+				Number(
+					String(
+						labIndexValueDisplay ??
+							constructionHeader?.airLaboratory?.labIndexValue ??
+							'',
+					).trim(),
+				) ||
 				0;
 
 			const requiredRw = +(
@@ -454,12 +463,22 @@ const DesigningConstructionScreen = () => {
 					...prev,
 					issuer: '',
 					issuerName: '',
-					labRTotal: '',
-					labIndex: '',
-					labIndexValue: '',
-					laboratoryC: '',
-					laboratoryCtr: '',
-					laboratoryTestSource: '',
+					airLaboratory: {
+						labRTotal: '',
+						labIndex: '',
+						labIndexValue: '',
+						laboratoryC: '',
+						laboratoryCtr: '',
+						laboratoryTestSource: '',
+					},
+					impactLaboratory: {
+						labRTotal: '',
+						labIndex: '',
+						labIndexValue: '',
+						laboratoryC: '',
+						laboratoryCtr: '',
+						laboratoryTestSource: '',
+					},
 					constructionTypeObject: {
 						...prev.constructionTypeObject,
 						constructionTypeEnum: constructionType,
@@ -859,7 +878,7 @@ const DesigningConstructionScreen = () => {
 										</p>
 										<div className="flex w-full items-center gap-1">
 											<p className="font-sans text-[25px] font-semibold leading-4">
-												{`Rw = ${labIndexValueDisplay ?? constructionHeader?.labIndexValue ?? ''} dB`}
+												{`Rw = ${labIndexValueDisplay ?? constructionHeader?.airLaboratory?.labIndexValue ?? ''} dB`}
 											</p>
 											<p className={labIsRelevant ? 'text-green-600' : 'text-error'}>
 												{labIsRelevant
@@ -895,7 +914,7 @@ const DesigningConstructionScreen = () => {
 				<div className="flex min-h-0 min-w-0 flex-1 justify-center overflow-x-auto px-2">
 					<DesigningGraph
 						graphData={graphData}
-						regulatoryDocName={constructionHeader?.laboratoryTestSource || ''}
+						regulatoryDocName={constructionHeader?.airLaboratory?.laboratoryTestSource || ''}
 						calculationDocName={currentReportInfo?.calculationDocument?.name || ''}
 						chartSize="large"
 					/>

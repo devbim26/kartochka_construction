@@ -1,12 +1,19 @@
 import { Input, Select } from '@core';
+import type { ConstructionsAddData } from '@features/guidbooks/types';
 import { RuIndexTypeNamesSelectValues } from '@features/guidbooks/types';
+import type { FieldErrors, FieldPath } from 'react-hook-form';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 import { FormSubTitle } from '../../form-sub-title.component';
 
+export type ConstructionLaboratoryFieldsPrefix = 'airLaboratory' | 'impactLaboratory';
+
 type Props = {
 	/** При редактировании конструкции — только просмотр */
 	readOnly?: boolean;
+	namePrefix: ConstructionLaboratoryFieldsPrefix;
+	/** Подзаголовок блока (например «Воздушный шум» / «Ударный шум» для перекрытий) */
+	title?: string;
 };
 
 const fieldErrorMessage = (error: unknown): string | undefined => {
@@ -17,48 +24,63 @@ const fieldErrorMessage = (error: unknown): string | undefined => {
 	return undefined;
 };
 
+const pickNestedIssue = (
+	errors: FieldErrors<ConstructionsAddData>,
+	prefix: ConstructionLaboratoryFieldsPrefix,
+	field: keyof ConstructionsAddData['airLaboratory'],
+): unknown => {
+	const block = errors[prefix];
+	if (!block || typeof block !== 'object') return undefined;
+	return (block as Record<string, unknown>)[field as string];
+};
+
 /**
- * Общий блок «Лабораторные данные» для форм добавления и редактирования.
+ * Блок лабораторных полей (воздушный или ударный шум) для форм добавления и редактирования.
  */
-export const ConstructionLaboratoryDataFields = ({ readOnly = false }: Props) => {
-	const { formState, control, register } = useFormContext();
+export const ConstructionLaboratoryDataFields = ({ readOnly = false, namePrefix, title }: Props) => {
+	const { formState, control, register } = useFormContext<ConstructionsAddData>();
 	const ro = readOnly;
+	const p = namePrefix;
 
 	return (
 		<>
-			<FormSubTitle text="Лабораторные данные" />
+			{title ? <FormSubTitle text={title} /> : null}
 			<div className="flex flex-wrap gap-[16px]">
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-						fieldErrorMessage(formState.errors.labRTotal) ? 'text-error' : '',
+						fieldErrorMessage(pickNestedIssue(formState.errors, p, 'labRTotal'))
+							? 'text-error'
+							: '',
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 					containerClassName="w-[468px]"
-					label={fieldErrorMessage(formState.errors.labRTotal) || 'R_total'}
-					error={fieldErrorMessage(formState.errors.labRTotal)}
+					label={fieldErrorMessage(pickNestedIssue(formState.errors, p, 'labRTotal')) || 'R_total'}
+					error={fieldErrorMessage(pickNestedIssue(formState.errors, p, 'labRTotal'))}
 					placeholder="Введите через запятую"
-					{...register('labRTotal')}
+					{...register(`${p}.labRTotal` as FieldPath<ConstructionsAddData>)}
 					type={'text'}
 					disabled={ro}
 				/>
 				<Controller
-					name="labIndex"
+					name={`${p}.labIndex` as FieldPath<ConstructionsAddData>}
 					control={control}
 					render={({ field }) => (
 						<Select
 							{...field}
 							isSearchable
-							value={field.value || ''}
+							value={String(field.value ?? '')}
 							options={RuIndexTypeNamesSelectValues}
-							error={fieldErrorMessage(formState.errors.labIndex)}
+							error={fieldErrorMessage(pickNestedIssue(formState.errors, p, 'labIndex'))}
 							labelClassName={twMerge(
 								'text-sm leading-5 tracking-[0.1px]',
-								fieldErrorMessage(formState.errors.labIndex) ? 'text-error' : '',
+								fieldErrorMessage(pickNestedIssue(formState.errors, p, 'labIndex'))
+									? 'text-error'
+									: '',
 							)}
 							wrapperClassname="w-[226px] ring-input-border-primary"
 							buttonClassName="text-sm rounded-[8px]"
-							label={fieldErrorMessage(formState.errors.labIndex) || 'Индекс'}
+							label={fieldErrorMessage(pickNestedIssue(formState.errors, p, 'labIndex')) || 'Индекс'}
 							placeholder="Выберите индекс"
 							disabled={ro}
 						/>
@@ -67,56 +89,70 @@ export const ConstructionLaboratoryDataFields = ({ readOnly = false }: Props) =>
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-						fieldErrorMessage(formState.errors.labIndexValue) ? 'text-error' : '',
+						fieldErrorMessage(pickNestedIssue(formState.errors, p, 'labIndexValue'))
+							? 'text-error'
+							: '',
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 					containerClassName="w-[226px]"
-					label={fieldErrorMessage(formState.errors.labIndexValue) || 'Значение индекса, дБ'}
-					error={fieldErrorMessage(formState.errors.labIndexValue)}
+					label={
+						fieldErrorMessage(pickNestedIssue(formState.errors, p, 'labIndexValue')) ||
+						'Значение индекса, дБ'
+					}
+					error={fieldErrorMessage(pickNestedIssue(formState.errors, p, 'labIndexValue'))}
 					placeholder="—"
-					{...register('labIndexValue')}
+					{...register(`${p}.labIndexValue` as FieldPath<ConstructionsAddData>)}
 					type={'text'}
 					disabled
 				/>
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-						fieldErrorMessage(formState.errors.laboratoryTestSource) ? 'text-error' : '',
+						fieldErrorMessage(pickNestedIssue(formState.errors, p, 'laboratoryTestSource'))
+							? 'text-error'
+							: '',
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 					containerClassName="w-[226px]"
-					label={fieldErrorMessage(formState.errors.laboratoryTestSource) || 'Источник'}
-					error={fieldErrorMessage(formState.errors.laboratoryTestSource)}
+					label={
+						fieldErrorMessage(pickNestedIssue(formState.errors, p, 'laboratoryTestSource')) ||
+						'Источник'
+					}
+					error={fieldErrorMessage(pickNestedIssue(formState.errors, p, 'laboratoryTestSource'))}
 					placeholder="Введите источник"
-					{...register('laboratoryTestSource')}
+					{...register(`${p}.laboratoryTestSource` as FieldPath<ConstructionsAddData>)}
 					type={'text'}
 					disabled={ro}
 				/>
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-						fieldErrorMessage(formState.errors.laboratoryC) ? 'text-error' : '',
+						fieldErrorMessage(pickNestedIssue(formState.errors, p, 'laboratoryC'))
+							? 'text-error'
+							: '',
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 					containerClassName="w-[226px]"
-					label={fieldErrorMessage(formState.errors.laboratoryC) || 'C'}
-					error={fieldErrorMessage(formState.errors.laboratoryC)}
+					label={fieldErrorMessage(pickNestedIssue(formState.errors, p, 'laboratoryC')) || 'C'}
+					error={fieldErrorMessage(pickNestedIssue(formState.errors, p, 'laboratoryC'))}
 					placeholder="—"
-					{...register('laboratoryC')}
+					{...register(`${p}.laboratoryC` as FieldPath<ConstructionsAddData>)}
 					type={'text'}
 					disabled
 				/>
 				<Input
 					labelClassName={twMerge(
 						'font-sans text-sm font-normal leading-5 tracking-[0.1px]',
-						fieldErrorMessage(formState.errors.laboratoryCtr) ? 'text-error' : '',
+						fieldErrorMessage(pickNestedIssue(formState.errors, p, 'laboratoryCtr'))
+							? 'text-error'
+							: '',
 					)}
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 					containerClassName="w-[226px]"
-					label={fieldErrorMessage(formState.errors.laboratoryCtr) || 'Ctr'}
-					error={fieldErrorMessage(formState.errors.laboratoryCtr)}
+					label={fieldErrorMessage(pickNestedIssue(formState.errors, p, 'laboratoryCtr')) || 'Ctr'}
+					error={fieldErrorMessage(pickNestedIssue(formState.errors, p, 'laboratoryCtr'))}
 					placeholder="—"
-					{...register('laboratoryCtr')}
+					{...register(`${p}.laboratoryCtr` as FieldPath<ConstructionsAddData>)}
 					type={'text'}
 					disabled
 				/>

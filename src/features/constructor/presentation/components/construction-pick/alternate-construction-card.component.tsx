@@ -166,7 +166,7 @@ export const AlternateConstructionCard = ({
 				isOpen={isLabGraphOpen}
 				onClose={() => setIsLabGraphOpen(false)}
 				constructionHeaderId={constructionHeaderId}
-				regulatoryDocName={constructionHeader?.laboratoryTestSource ?? ''}
+				regulatoryDocName={constructionHeader?.airLaboratory?.laboratoryTestSource ?? ''}
 				calculationDocName=""
 			/>
 			<div className="flex w-1/2 flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">

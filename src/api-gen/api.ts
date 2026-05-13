@@ -173,23 +173,27 @@ export interface ConstructionHeaderDto {
 	maxHeight?: number;
 	propertySource?: string | null;
 	fireResistance?: string | null;
-	rTotal?: number[] | null;
-	laboratoryTestSource?: string | null;
-	index?: IndexType;
-	/** @format float */
-	laboratoryIndexValue?: number;
-	/** @format double */
-	laboratoryC?: number;
-	/** @format double */
-	laboratoryCtr?: number;
-	/** @format double */
-	laboratoryDelta?: number;
+	airNoiseLaboratoryData?: ConstructionLaboratoryDataDto;
+	impactNoiseLaboratoryData?: ConstructionLaboratoryDataDto;
 	constructionType?: ConstructionTypeDto;
 	/** @format double */
 	rw?: number | null;
 	/** @format double */
 	computingIndexValue?: number;
 	isReportConstruction?: boolean;
+}
+
+export interface ConstructionLaboratoryDataDto {
+	index?: IndexType;
+	/** @format float */
+	indexValue?: number;
+	laboratoryTestSource?: string | null;
+	/** @format double */
+	laboratoryC?: number;
+	/** @format double */
+	laboratoryCtr?: number;
+	/** @format double */
+	laboratoryDelta?: number;
 }
 
 export enum ConstructionPosition {
@@ -327,11 +331,16 @@ export interface CreateConstructionHeaderCommand {
 	/** @format double */
 	maxHeight?: number;
 	fireResistance?: string | null;
+	airNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
+	impactNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
+	constructionPurpose?: ConstructionPurpose;
+	constructionType?: CreateConstructionTypeDto;
+}
+
+export interface CreateConstructionLaboratoryDataDto {
 	rTotal?: number[] | null;
 	laboratoryTestSource?: string | null;
 	index?: IndexType;
-	constructionPurpose?: ConstructionPurpose;
-	constructionType?: CreateConstructionTypeDto;
 }
 
 export interface CreateConstructionTypeDto {
@@ -386,6 +395,8 @@ export interface CreateReportInfoDto {
 	id?: string;
 	buildingName?: string | null;
 	description?: string | null;
+	calculationRequirements?: Requirement[] | null;
+	regulatoryRequirements?: Requirement[] | null;
 	category?: ReportCategory;
 	buildingType?: BuildingType;
 	class?: CategoryClass;
@@ -671,7 +682,6 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	/** @format float */
 	rw?: number | null;
 	orderByPriority?: boolean;
-	constructionPurpose?: ConstructionPurpose;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -699,7 +709,6 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	/** @format float */
 	thickness?: number | null;
 	materialType?: MaterialTypeEnum;
-	materialPurpose?: MaterialPurpose;
 }
 
 export interface GetPalacementRoomVariantsWithTypesQuery {
@@ -1554,11 +1563,8 @@ export interface UpdateConstructionHeaderCommand {
 	/** @format double */
 	maxHeight?: number;
 	fireResistance?: string | null;
-	rTotal?: number[] | null;
-	laboratoryTestSource?: string | null;
-	index?: IndexType;
-	/** @format float */
-	indexValue?: number;
+	airNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
+	impactNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
 	constructionType?: CreateConstructionTypeDto;
 	/** @format uuid */
 	reportInfoId?: string | null;

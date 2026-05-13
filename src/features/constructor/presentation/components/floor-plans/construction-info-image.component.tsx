@@ -128,7 +128,7 @@ export const ConstructionImage = ({
 					constructionHeaderId={constructionHeaderId}
 					graphData={previewGraphData}
 					isGraphLoading={isGraphLoading}
-					regulatoryDocName={construction?.laboratoryTestSource ?? ''}
+					regulatoryDocName={construction?.airLaboratory?.laboratoryTestSource ?? ''}
 					calculationDocName=""
 				/>
 			)}

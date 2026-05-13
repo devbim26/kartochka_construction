@@ -79,7 +79,7 @@ export const ConstructionCard = ({
 				isOpen={isLabGraphOpen}
 				onClose={() => setIsLabGraphOpen(false)}
 				constructionHeaderId={constructionHeaderId}
-				regulatoryDocName={construction?.laboratoryTestSource ?? ''}
+				regulatoryDocName={construction?.airLaboratory?.laboratoryTestSource ?? ''}
 				calculationDocName=""
 			/>
 			<div className="flex flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">

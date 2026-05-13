@@ -1,6 +1,9 @@
 import { convertToPaginatedType } from '@core';
 import { MaterialPurpose } from '@api-gen';
-import { convertToClientMaterialsAddAndEditData } from '@features/guidbooks/converters';
+import {
+	convertToClientMaterialsAddAndEditData,
+	convertToServerMaterialsFilterData,
+} from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
 	ConstructionTypeEnum,
@@ -57,10 +60,12 @@ export function useConstructionMaterialsCatalog(
 			setMaterials([]);
 			return;
 		}
-		const data = buildFilter(materialTypeEnum, constructionType);
+		const filterPayload = convertToServerMaterialsFilterData(
+			buildFilter(materialTypeEnum, constructionType),
+		);
 		const sub = from(
 			getGuidebooksPaginated({
-				data,
+				data: filterPayload,
 				pagination: { pageSize: 999999, pageNumber: 1 },
 				guidebookType: Guidebooks.MATERIAL,
 			}),

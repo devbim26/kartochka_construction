@@ -25,6 +25,7 @@ import {
 	type ConstructionsEditData,
 	type ConstructionTypeEnum,
 	type Issuer,
+	isFloorConstructionType,
 	isZPanelGuidebookConstructionType,
 } from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
@@ -50,6 +51,7 @@ export const ConstructionsEdit = () => {
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionTypeObject.constructionTypeEnum');
 	const constructionTypeField = watch('constructionType');
+	const showImpactLaboratory = isFloorConstructionType(constructionTypeField);
 	const showZPanelGuidebookHint =
 		!displayChars &&
 		isZPanelGuidebookConstructionType(constructionTypeField || currentConstruction);
@@ -325,7 +327,15 @@ export const ConstructionsEdit = () => {
 							type={'text'}
 						/>
 					</div>
-					<ConstructionLaboratoryDataFields readOnly />
+					<FormSubTitle text="Лабораторные данные" />
+					<ConstructionLaboratoryDataFields
+						readOnly
+						namePrefix="airLaboratory"
+						title={showImpactLaboratory ? 'Воздушный шум' : undefined}
+					/>
+					{showImpactLaboratory ? (
+						<ConstructionLaboratoryDataFields readOnly namePrefix="impactLaboratory" title="Ударный шум" />
+					) : null}
 				</>
 			) : (
 				<>

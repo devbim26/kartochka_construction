@@ -70,6 +70,15 @@ export const ZPanelConstructionTypeValues: ConstructionTypeEnum[] = [
 export const isZPanelGuidebookConstructionType = (value: string | undefined | null): boolean =>
 	Boolean(value && ZPanelConstructionTypeValues.includes(value as ConstructionTypeEnum));
 
+const FLOOR_CONSTRUCTION_TYPES: ConstructionTypeEnum[] = [
+	ConstructionTypeEnum.HomogeneousFloor,
+	ConstructionTypeEnum.ElasticBaseFloor,
+];
+
+/** Перекрытия: в API отдельно воздушный и ударный шум (лабораторные блоки). */
+export const isFloorConstructionType = (value: string | undefined | null): boolean =>
+	Boolean(value && FLOOR_CONSTRUCTION_TYPES.includes(value as ConstructionTypeEnum));
+
 export const RuConstructionTypesMap = {
 	HeavySingleLayerWall: 'Тяжелая однослойная стена',
 	HeavySingleLayerWallFacingOneSide: 'Тяжелая однослойная стена + облицовка с одной стороны',

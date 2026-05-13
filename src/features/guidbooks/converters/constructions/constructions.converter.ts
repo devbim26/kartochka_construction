@@ -1,8 +1,10 @@
 import {
 	ConstructionPosition,
 	ConstructionPurpose,
+	type ConstructionLaboratoryDataDto,
 	type ConstructionTypeEnum as ServerConstructionTypeEnum,
 	type CountryType,
+	type CreateConstructionLaboratoryDataDto,
 	type CreateConstructionTypeDto,
 	type IndexType,
 } from '@api-gen';
@@ -14,7 +16,6 @@ import {
 	convertToServerPriorityData,
 } from '@core';
 import type { MaterialParametrs } from '@features/constructor';
-import type { Country, Priority } from '@features/guidbooks/types';
 import type {
 	ConstructionsAddData,
 	ConstructionsEditData,
@@ -22,7 +23,10 @@ import type {
 	ConstructionType,
 	ConstructionTypeEnum,
 	ConstructionTypeTemplate,
-} from '@features/guidbooks/types/constructions';
+	Country,
+	Priority,
+} from '@features/guidbooks/types';
+import { isFloorConstructionType } from '@features/guidbooks/types';
 import {
 	convertToClientConstructionTypeEnumData,
 	convertToServerConstructionTypeEnumData,
@@ -56,6 +60,28 @@ export const convertToServerConstructionsFilterData = (data: ConstructionsFilter
 		: {}),
 });
 
+/** Ответ детализации может содержать r_total внутри лабораторного блока (расширение поверх OpenAPI). */
+type LaboratoryReadDto = ConstructionLaboratoryDataDto & { rTotal?: number[] | null };
+
+const mapLaboratoryBlockFromApi = (
+	lab: LaboratoryReadDto | undefined | null,
+	legacyRTotal?: number[] | null,
+) => {
+	const totals = lab?.rTotal ?? legacyRTotal;
+	const labRTotal =
+		Array.isArray(totals) && totals.length ? totals.map((n) => String(n)).join(', ') : '';
+	return {
+		labRTotal,
+		labIndex:
+			lab?.index != null ? ((convertToClientIndexTypeData(lab.index) as string) ?? '') : '',
+		labIndexValue:
+			lab?.indexValue != null && Number.isFinite(lab.indexValue) ? String(lab.indexValue) : '',
+		laboratoryTestSource: lab?.laboratoryTestSource ?? '',
+		laboratoryC: lab?.laboratoryC != null ? String(lab.laboratoryC) : '',
+		laboratoryCtr: lab?.laboratoryCtr != null ? String(lab.laboratoryCtr) : '',
+	};
+};
+
 export const convertToClientConstructionsAddData = (data: any): ConstructionsAddData => ({
 	id: data.id ?? '',
 	name: data.name ?? '',
@@ -69,18 +95,19 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 	maxHeight: String(data.maxHeight) ?? '',
 	fireResistance: String(data.fireResistance) ?? '',
 	propertySource: data.propertySource ?? '',
-	labRTotal: data.rTotal ? data.rTotal.join(', ') : '',
-	labIndex: (convertToClientIndexTypeData(data.index!) as string) ?? '',
-	labIndexValue: String(data.laboratoryIndexValue) ?? '',
+	airLaboratory: mapLaboratoryBlockFromApi(
+		data.airNoiseLaboratoryData as LaboratoryReadDto | undefined,
+		data.rTotal,
+	),
+	impactLaboratory: mapLaboratoryBlockFromApi(
+		data.impactNoiseLaboratoryData as LaboratoryReadDto | undefined,
+	),
 	constructionType: convertToClientConstructionTypeEnumData(data.constructionType) ?? '',
 	constructionPurpose:
 		(data.constructionPurpose as string) || ConstructionPurpose.Soundproofing,
 	constructionTypeObject: convertToClientConstructionType(data.constructionType!) ?? '',
-	laboratoryTestSource: data.laboratoryTestSource ?? '',
 	issuer: data.issuerId ?? '',
 	issuerName: data.issuer?.name ?? '',
-	laboratoryC: String(data.laboratoryC) ?? '',
-	laboratoryCtr: String(data.laboratoryCtr) ?? '',
 	rw: data.rw != null && data.rw !== '' ? String(data.rw) : '',
 	lnw: data.lnw != null && data.lnw !== '' ? String(data.lnw) : '',
 });
@@ -218,6 +245,12 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 	};
 };
 
+const packLaboratoryCreateDto = (block: ConstructionsAddData['airLaboratory']): CreateConstructionLaboratoryDataDto => ({
+	rTotal: block.labRTotal.split(',').map((split) => +String(split).trim()),
+	laboratoryTestSource: block.laboratoryTestSource || null,
+	index: (block.labIndex as IndexType) || undefined,
+});
+
 export const convertToServerConstructionsAddData = (data: ConstructionsAddData): any => ({
 	name: data.name || null,
 	description: data.description || null,
@@ -228,9 +261,10 @@ export const convertToServerConstructionsAddData = (data: ConstructionsAddData):
 	maxHeight: +data.maxHeight || undefined,
 	fireResistance: data.fireResistance || null,
 	propertySource: data.propertySource || null,
-	rTotal: data.labRTotal.split(',').map((split) => +split) || null,
-	index: (data.labIndex as IndexType) || null,
-	laboratoryTestSource: data.laboratoryTestSource || null,
+	airNoizeLaboratoryData: packLaboratoryCreateDto(data.airLaboratory),
+	impactNoizeLaboratoryData: isFloorConstructionType(data.constructionType)
+		? packLaboratoryCreateDto(data.impactLaboratory)
+		: undefined,
 	constructionPurpose: (data.constructionPurpose as ConstructionPurpose) || undefined,
 	constructionType: convertToServerConstructionType(data.constructionTypeObject) || null,
 });

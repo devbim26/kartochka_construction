@@ -95,6 +95,15 @@ export const RequirementsFormDataConfig: EntityConfig = {
 	},
 };
 
+const emptyLaboratoryBlockDefaults = {
+	labRTotal: '',
+	labIndex: '',
+	labIndexValue: '',
+	laboratoryC: '',
+	laboratoryCtr: '',
+	laboratoryTestSource: '',
+};
+
 export const ConstructionsAddConfig: EntityConfig = {
 	schema: ConstructionsAddSchema,
 	defaultValues: {
@@ -111,9 +120,8 @@ export const ConstructionsAddConfig: EntityConfig = {
 		maxHeight: '',
 		fireResistance: '',
 		propertySource: '',
-		labRTotal: '',
-		labIndex: '',
-		labIndexValue: '',
+		airLaboratory: { ...emptyLaboratoryBlockDefaults },
+		impactLaboratory: { ...emptyLaboratoryBlockDefaults },
 		rw: '',
 		lnw: '',
 	},

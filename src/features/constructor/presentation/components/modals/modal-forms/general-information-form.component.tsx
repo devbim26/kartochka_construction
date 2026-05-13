@@ -331,7 +331,7 @@ export const GeneralInformationForm = () => {
 						{
 							label: t('soundproofing.calculation'), // нужно добавить ключ
 							soundproofing: 'Rw, dB',
-							values: String(constructionType?.labIndexValue) || '-',
+							values: String(constructionType?.airLaboratory?.labIndexValue) || '-',
 							requirements: String(
 								currentConstruction?.reportConstructionHeader
 									.requirementNoizeIsolationIndex ?? '-',
