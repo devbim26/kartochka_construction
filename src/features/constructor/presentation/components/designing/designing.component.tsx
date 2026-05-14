@@ -37,7 +37,7 @@ import {
 	graphDotsConverterToClient,
 	mapAdditionalOpeningsToUpdateDto,
 } from '@features/constructor/converters';
-import { graphHasComputedData, graphHasLaboratoryData } from '@features/constructor/utils';
+import { graphHasComputedData, graphHasImpactComputedData, graphHasImpactLaboratoryData, graphHasLaboratoryData } from '@features/constructor/utils';
 import {
 	getFloorConstructionById,
 	getReportFloorById,
@@ -57,6 +57,7 @@ import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guid
 import {
 	EnConstructionTypesSelectValues,
 	Guidebooks,
+	isFloorConstructionType,
 	RuConstructionTypesSelectValues,
 } from '@features/guidbooks/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -99,6 +100,8 @@ const DesigningConstructionScreen = () => {
 	const [hasPendingTypeChange, setHasPendingTypeChange] = useState(false);
 	const [compIsRelevant, setCompIsRelevant] = useState<boolean>(false);
 	const [labIsRelevant, setLabIsRelevant] = useState<boolean>(false);
+	const [compImpactRelevant, setCompImpactRelevant] = useState<boolean>(false);
+	const [labImpactRelevant, setLabImpactRelevant] = useState<boolean>(false);
 
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
@@ -130,14 +133,37 @@ const DesigningConstructionScreen = () => {
 			| undefined;
 	}, [form, constructionHeader]);
 
+	const isFloorConstruction = useMemo(
+		() => isFloorConstructionType(constructionType ?? constructionHeader?.constructionType),
+		[constructionType, constructionHeader?.constructionType],
+	);
+
 	const hasComputedDots = useMemo(() => graphHasComputedData(graphData), [graphData]);
 
 	const hasLaboratoryDots = useMemo(() => graphHasLaboratoryData(graphData), [graphData]);
+
+	const hasImpactComputedDots = useMemo(
+		() => graphHasImpactComputedData(graphData),
+		[graphData],
+	);
+
+	const hasImpactLaboratoryDots = useMemo(
+		() => graphHasImpactLaboratoryData(graphData),
+		[graphData],
+	);
 
 	const rCalcsDisplay = useWatch({ control: constructionFormControl, name: 'RCalcs' });
 	const labIndexValueDisplay = useWatch({
 		control: constructionFormControl,
 		name: 'airLaboratory.labIndexValue',
+	});
+	const impactLabIndexValueDisplay = useWatch({
+		control: constructionFormControl,
+		name: 'impactLaboratory.labIndexValue',
+	});
+	const estimatedLwDisplay = useWatch({
+		control: constructionFormControl,
+		name: 'estimatedIndexValue',
 	});
 
 	const handleGetCurrentReportFloorInfo = (id: string) => {
@@ -320,10 +346,17 @@ const DesigningConstructionScreen = () => {
 	}, [currentConstruction?.reportConstructionHeader?.id]);
 
 	useEffect(() => {
-		if (
-			!!constructionHeader &&
-			currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex != null
-		) {
+		const header = currentConstruction?.reportConstructionHeader;
+		const reqRw = header?.requirementNoizeIsolationIndex;
+		const reqLwRaw = header?.requirementNoizeImpactIndex;
+		const reqLw =
+			reqLwRaw != null && !Number.isNaN(Number(reqLwRaw))
+				? Number(reqLwRaw)
+				: reqRw != null && !Number.isNaN(Number(reqRw))
+					? Number(reqRw)
+					: null;
+
+		if (!!constructionHeader && reqRw != null && !Number.isNaN(Number(reqRw))) {
 			const rwValue =
 				Number(String(rCalcsDisplay ?? constructionHeader.RCalcs ?? '').trim()) || 0;
 			const labRwValue =
@@ -333,21 +366,47 @@ const DesigningConstructionScreen = () => {
 							constructionHeader?.airLaboratory?.labIndexValue ??
 							'',
 					).trim(),
-				) ||
-				0;
+				) || 0;
 
-			const requiredRw = +(
-				currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex || 50
-			);
+			const requiredRw = Number(reqRw);
 			setLabIsRelevant(labRwValue >= requiredRw);
 			setCompIsRelevant(rwValue >= requiredRw);
 		}
+
+		if (!!constructionHeader && isFloorConstruction && reqLw != null) {
+			const lwCalcStr = String(
+				estimatedLwDisplay ?? constructionHeader.estimatedIndexValue ?? '',
+			).trim();
+			const lwLabStr = String(
+				impactLabIndexValueDisplay ?? constructionHeader.impactLaboratory?.labIndexValue ?? '',
+			).trim();
+			const lwCalc = Number(lwCalcStr.replace(',', '.')) || 0;
+			const lwLab = Number(lwLabStr.replace(',', '.')) || 0;
+
+			const hasLwCalc =
+				hasImpactComputedDots || (lwCalcStr !== '' && Number.isFinite(Number(lwCalcStr.replace(',', '.'))));
+			const hasLwLab =
+				hasImpactLaboratoryDots ||
+				(lwLabStr !== '' && Number.isFinite(Number(lwLabStr.replace(',', '.'))));
+
+			setCompImpactRelevant(hasLwCalc ? lwCalc <= reqLw : false);
+			setLabImpactRelevant(hasLwLab ? lwLab <= reqLw : false);
+		} else {
+			setCompImpactRelevant(false);
+			setLabImpactRelevant(false);
+		}
 	}, [
 		constructionHeader,
-		currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex,
+		currentConstruction?.reportConstructionHeader?.requirementNoizeIsolationIndex,
+		currentConstruction?.reportConstructionHeader?.requirementNoizeImpactIndex,
 		currentReportInfo,
 		rCalcsDisplay,
 		labIndexValueDisplay,
+		estimatedLwDisplay,
+		impactLabIndexValueDisplay,
+		isFloorConstruction,
+		hasImpactComputedDots,
+		hasImpactLaboratoryDots,
 	]);
 
 	const handleGetConstructionImage = useCallback((id: string) => {
@@ -442,6 +501,8 @@ const DesigningConstructionScreen = () => {
 				setGraphAdditionalData(null);
 				setLabIsRelevant(false);
 				setCompIsRelevant(false);
+				setCompImpactRelevant(false);
+				setLabImpactRelevant(false);
 				setSvgUrl(null);
 				setHasPendingTypeChange(true);
 				return;
@@ -495,6 +556,8 @@ const DesigningConstructionScreen = () => {
 			setGraphAdditionalData(null);
 			setLabIsRelevant(false);
 			setCompIsRelevant(false);
+			setCompImpactRelevant(false);
+			setLabImpactRelevant(false);
 			setSvgUrl(null);
 			setHasPendingTypeChange(true);
 		},
@@ -511,6 +574,8 @@ const DesigningConstructionScreen = () => {
 		setGraphAdditionalData(null);
 		setLabIsRelevant(false);
 		setCompIsRelevant(false);
+		setCompImpactRelevant(false);
+		setLabImpactRelevant(false);
 	}, [constructionHeaderId, handleGetConstructionImage]);
 
 	const onEditHandle = useCallback(() => {
@@ -890,6 +955,62 @@ const DesigningConstructionScreen = () => {
 									<div></div>
 								</>
 							)}
+							{isFloorConstruction && hasImpactComputedDots && (
+								<>
+									<div className="flex flex-col gap-1">
+										<p className="text-[30px] font-extrabold text-black">
+											{locale === 'ru' ? 'Расчёт (ударный)' : 'Computed (impact)'}
+										</p>
+										<p className="font-sans text-[14px]">
+											{currentReportInfo?.calculationDocument?.fullName}
+										</p>
+										<div className="flex w-full items-center gap-1">
+											<p className="font-sans text-[25px] font-semibold leading-4">
+												{`Lw = ${estimatedLwDisplay ?? constructionHeader?.estimatedIndexValue ?? ''} dB`}
+											</p>
+											<p
+												className={
+													compImpactRelevant ? 'text-green-600' : 'text-error'
+												}
+											>
+												{compImpactRelevant
+													? t('constructor.relevant.yes')
+													: t('constructor.relevant.no')}
+											</p>
+										</div>
+									</div>
+									<div></div>
+								</>
+							)}
+							{isFloorConstruction && hasImpactLaboratoryDots && (
+								<>
+									<div className="flex flex-col gap-2">
+										<p className="text-[30px] font-extrabold leading-none text-black">
+											{locale === 'ru'
+												? 'Лаборатория (ударный)'
+												: 'Laboratory (impact)'}
+										</p>
+										<p className="font-sans text-[14px]">
+											{currentReportInfo?.calculationDocument?.fullName}
+										</p>
+										<div className="flex w-full items-center gap-1">
+											<p className="font-sans text-[25px] font-semibold leading-4">
+												{`Lw = ${impactLabIndexValueDisplay ?? constructionHeader?.impactLaboratory?.labIndexValue ?? ''} dB`}
+											</p>
+											<p
+												className={
+													labImpactRelevant ? 'text-green-600' : 'text-error'
+												}
+											>
+												{labImpactRelevant
+													? t('constructor.relevant.yes')
+													: t('constructor.relevant.no')}
+											</p>
+										</div>
+									</div>
+									<div></div>
+								</>
+							)}
 							<p className="text-[30px] font-extrabold text-primary">
 								{t('constructor.designing.allowedValue')}
 							</p>
@@ -904,6 +1025,24 @@ const DesigningConstructionScreen = () => {
 								}{' '}
 								dB
 							</p>
+							{isFloorConstruction &&
+								(() => {
+									const h = currentConstruction?.reportConstructionHeader;
+									const lwReq = h?.requirementNoizeImpactIndex;
+									const rwReq = h?.requirementNoizeIsolationIndex;
+									const lim =
+										lwReq != null && !Number.isNaN(Number(lwReq))
+											? Number(lwReq)
+											: rwReq != null && !Number.isNaN(Number(rwReq))
+												? Number(rwReq)
+												: null;
+									if (lim == null || Number.isNaN(lim)) return null;
+									return (
+										<p className="font-sans text-[30px] font-semibold leading-4">
+											Lw ⩽ {lim} dB
+										</p>
+									);
+								})()}
 						</>
 					) : (
 						<div className="flex size-full items-center justify-center">

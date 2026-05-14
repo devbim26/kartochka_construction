@@ -2,20 +2,28 @@ import { GraphType } from '@api-gen';
 import { SimpleTableCell, SimpleTableHeaderCell, useI18n } from '@core';
 import { DesigningRwTable } from '@features';
 import type { AdditionalGraphParameters, GraphDetailResponse } from '@features/constructor/types';
+import {
+	graphHasImpactComputedData,
+	graphHasImpactLaboratoryData,
+} from '@features/constructor/utils';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface GraphTableRow {
 	frequency: string;
+	rCalc: string;
 	rLab: string;
-	rLabExtra: string;
+	lwCalc: string;
+	lwLab: string;
 }
 
 interface ExtraTableRow {
 	type: string;
+	rCalc: string;
 	rLab: string;
-	rLabExtra: string;
+	lwCalc: string;
+	lwLab: string;
 }
 
 interface GraphTableProps {
@@ -24,9 +32,9 @@ interface GraphTableProps {
 	noPadding?: boolean;
 }
 
-export const GraphDetailTable = ({ graphData, additional, noPadding = false }: GraphTableProps) => {
+export const GraphDetailTable = ({ graphData, additional: _additional, noPadding = false }: GraphTableProps) => {
 	const { t } = useI18n();
-	const { freqData, extraData } = useMemo(() => {
+	const { freqData, extraData, showImpactColumns } = useMemo(() => {
 		const getDotsForSeries = (graphType: GraphType, legacyNameLower: string) =>
 			graphData?.find(
 				(g) =>
@@ -37,40 +45,56 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 
 		const computedDots = getDotsForSeries(GraphType.Computed, 'computeddots');
 		const laboratoryDots = getDotsForSeries(GraphType.Laboratory, 'laboratorydots');
+		const impactComputedDots = getDotsForSeries(GraphType.ImpactComputed, 'impactcomputeddots');
+		const impactLaboratoryDots = getDotsForSeries(
+			GraphType.ImpactLaboratory,
+			'impactlaboratorydots',
+		);
 
-		const computedMap = new Map<number, string>();
-		computedDots.forEach((dot) => {
-			if (dot.dot?.f && dot.dot?.r != null) {
-				computedMap.set(dot.dot.f, String(dot.dot.r));
-			}
-		});
+		const showImpactColumns =
+			graphHasImpactComputedData(graphData) || graphHasImpactLaboratoryData(graphData);
 
-		const laboratoryMap = new Map<number, string>();
-		laboratoryDots.forEach((dot) => {
-			if (dot.dot?.f && dot.dot?.r != null) {
-				laboratoryMap.set(dot.dot.f, String(dot.dot.r));
-			}
-		});
+		const toMap = (dots: typeof computedDots) => {
+			const m = new Map<number, string>();
+			dots.forEach((dot) => {
+				if (dot.dot?.f && dot.dot?.r != null) {
+					m.set(dot.dot.f, String(dot.dot.r));
+				}
+			});
+			return m;
+		};
+
+		const computedMap = toMap(computedDots);
+		const laboratoryMap = toMap(laboratoryDots);
+		const impactComputedMap = toMap(impactComputedDots);
+		const impactLaboratoryMap = toMap(impactLaboratoryDots);
 
 		const allFreqs = Array.from(
 			new Set(
-				Array.from(computedMap.keys()).concat(Array.from(laboratoryMap.keys())),
+				[
+					...Array.from(computedMap.keys()),
+					...Array.from(laboratoryMap.keys()),
+					...Array.from(impactComputedMap.keys()),
+					...Array.from(impactLaboratoryMap.keys()),
+				].filter((f) => Number.isFinite(f)),
 			),
 		).sort((a, b) => a - b);
 
 		const freqData = allFreqs.map((freq) => ({
 			frequency: String(freq),
-			rLab: computedMap.get(freq) ?? '–',
-			rLabExtra: laboratoryMap.get(freq) ?? '–',
+			rCalc: computedMap.get(freq) ?? '–',
+			rLab: laboratoryMap.get(freq) ?? '–',
+			lwCalc: impactComputedMap.get(freq) ?? '–',
+			lwLab: impactLaboratoryMap.get(freq) ?? '–',
 		}));
 
 		const extraData: ExtraTableRow[] = [];
 
-		return { freqData, extraData };
+		return { freqData, extraData, showImpactColumns };
 	}, [graphData]);
 
-	const columns = useMemo<ColumnDef<GraphTableRow>[]>(
-		() => [
+	const columns = useMemo<ColumnDef<GraphTableRow>[]>(() => {
+		const base: ColumnDef<GraphTableRow>[] = [
 			{
 				accessorKey: 'frequency',
 				header: () => (
@@ -80,22 +104,16 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						noPadding={noPadding}
 					/>
 				),
-				cell: (info) => {
-					const isRw = info.row.original.frequency === 'Rw';
-					return (
-						<SimpleTableCell
-							content={info.getValue() as string}
-							contentClassName={twMerge(
-								'w-[60px] border-r border-[#EDEFF2] text-center',
-								isRw && 'text-blue-600 font-bold',
-							)}
-							noPadding={noPadding}
-						/>
-					);
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName="w-[60px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
 			},
 			{
-				accessorKey: 'rLab',
+				accessorKey: 'rCalc',
 				header: () => (
 					<SimpleTableHeaderCell
 						text="R calc, dB"
@@ -103,46 +121,73 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						noPadding={noPadding}
 					/>
 				),
-				cell: (info) => {
-					const isRw = info.row.original.frequency === 'Rw';
-					return (
-						<SimpleTableCell
-							content={info.getValue() as string}
-							contentClassName={twMerge(
-								'w-[80px] border-r border-[#EDEFF2] text-center',
-								isRw && 'text-blue-600 font-bold',
-							)}
-							noPadding={noPadding}
-						/>
-					);
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName="w-[80px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
 			},
 			{
-				accessorKey: 'rLabExtra',
+				accessorKey: 'rLab',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="Rlab, dB"
+						text="R lab, dB"
 						textClassName="w-[80px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
-				cell: (info) => {
-					const isRw = info.row.original.frequency === 'Rw';
-					return (
-						<SimpleTableCell
-							content={info.getValue() as string}
-							contentClassName={twMerge(
-								'w-[80px] border-r border-[#EDEFF2] text-center',
-								isRw && 'text-blue-600 font-bold',
-							)}
-							noPadding={noPadding}
-						/>
-					);
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName="w-[80px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
 			},
-		],
-		[noPadding],
-	);
+		];
+
+		if (!showImpactColumns) return base;
+
+		return [
+			...base,
+			{
+				accessorKey: 'lwCalc',
+				header: () => (
+					<SimpleTableHeaderCell
+						text="Lw calc, dB"
+						textClassName="w-[88px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName="w-[88px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+			},
+			{
+				accessorKey: 'lwLab',
+				header: () => (
+					<SimpleTableHeaderCell
+						text="Lw lab, dB"
+						textClassName="w-[88px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName="w-[88px] border-r border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+			},
+		];
+	}, [noPadding, showImpactColumns]);
 
 	const extraColumns = useMemo<ColumnDef<ExtraTableRow>[]>(
 		() => [
@@ -170,7 +215,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				},
 			},
 			{
-				accessorKey: 'rLab',
+				accessorKey: 'rCalc',
 				header: () => (
 					<SimpleTableHeaderCell
 						text="R calc, dB"
@@ -193,10 +238,10 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				},
 			},
 			{
-				accessorKey: 'rLabExtra',
+				accessorKey: 'rLab',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="Rlab, dB"
+						text="R lab, dB"
 						textClassName="w-[80px] border-r text-[18px] border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>

@@ -30,8 +30,13 @@ import {
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { ConstructionsEditData } from '@features/guidbooks/types';
-import { Guidebooks } from '@features/guidbooks/types';
-import { graphHasComputedData, graphHasLaboratoryData } from '@features/constructor/utils';
+import { Guidebooks, isFloorConstructionType } from '@features/guidbooks/types';
+import {
+	graphHasComputedData,
+	graphHasImpactComputedData,
+	graphHasImpactLaboratoryData,
+	graphHasLaboratoryData,
+} from '@features/constructor/utils';
 
 import { AxiosError } from 'axios';
 import { useEffect, useMemo, useState } from 'react';
@@ -60,6 +65,8 @@ const MyConstructions = () => {
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 	const [compIsRelevant, setCompIsRelevant] = useState<boolean>(false);
 	const [labIsRelevant, setLabIsRelevant] = useState<boolean>(false);
+	const [compImpactRelevant, setCompImpactRelevant] = useState<boolean>(false);
+	const [labImpactRelevant, setLabImpactRelevant] = useState<boolean>(false);
 	const reportFloorInfoId = search.get('reportFloorInfoId');
 
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
@@ -85,6 +92,21 @@ const MyConstructions = () => {
 	const hasComputedDots = useMemo(() => graphHasComputedData(graphData), [graphData]);
 
 	const hasLaboratoryDots = useMemo(() => graphHasLaboratoryData(graphData), [graphData]);
+
+	const hasImpactComputedDots = useMemo(
+		() => graphHasImpactComputedData(graphData),
+		[graphData],
+	);
+
+	const hasImpactLaboratoryDots = useMemo(
+		() => graphHasImpactLaboratoryData(graphData),
+		[graphData],
+	);
+
+	const isFloorConstruction = useMemo(
+		() => isFloorConstructionType(constructionHeader?.constructionType),
+		[constructionHeader?.constructionType],
+	);
 
 	const visibleFavoriteConstructions = useMemo(
 		() =>
@@ -272,20 +294,48 @@ const MyConstructions = () => {
 	}, [reportType, reportId]);
 
 	useEffect(() => {
-		if (
-			!!constructionHeader &&
-			currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex != null
-		) {
+		const header = currentConstruction?.reportConstructionHeader;
+		const reqRw = header?.requirementNoizeIsolationIndex;
+		const reqLwRaw = header?.requirementNoizeImpactIndex;
+		const reqLw =
+			reqLwRaw != null && !Number.isNaN(Number(reqLwRaw))
+				? Number(reqLwRaw)
+				: reqRw != null && !Number.isNaN(Number(reqRw))
+					? Number(reqRw)
+					: null;
+
+		if (!!constructionHeader && reqRw != null && !Number.isNaN(Number(reqRw))) {
 			const rwValue = +(constructionHeader.RCalcs || 0);
 			const labRwValue = +(constructionHeader.airLaboratory?.labIndexValue || 0);
-
-			const requiredRw = +(
-				currentConstruction?.reportConstructionHeader.requirementNoizeIsolationIndex || 50
-			);
+			const requiredRw = Number(reqRw);
 			setLabIsRelevant(labRwValue >= requiredRw);
 			setCompIsRelevant(rwValue >= requiredRw);
 		}
-	}, [constructionHeader, currentConstruction]);
+
+		if (!!constructionHeader && isFloorConstruction && reqLw != null) {
+			const lwCalcStr = String(constructionHeader.estimatedIndexValue ?? '').trim();
+			const lwLabStr = String(constructionHeader.impactLaboratory?.labIndexValue ?? '').trim();
+			const lwCalc = Number(lwCalcStr.replace(',', '.')) || 0;
+			const lwLab = Number(lwLabStr.replace(',', '.')) || 0;
+			const hasLwCalc =
+				hasImpactComputedDots ||
+				(lwCalcStr !== '' && Number.isFinite(Number(lwCalcStr.replace(',', '.'))));
+			const hasLwLab =
+				hasImpactLaboratoryDots ||
+				(lwLabStr !== '' && Number.isFinite(Number(lwLabStr.replace(',', '.'))));
+			setCompImpactRelevant(hasLwCalc ? lwCalc <= reqLw : false);
+			setLabImpactRelevant(hasLwLab ? lwLab <= reqLw : false);
+		} else {
+			setCompImpactRelevant(false);
+			setLabImpactRelevant(false);
+		}
+	}, [
+		constructionHeader,
+		currentConstruction,
+		isFloorConstruction,
+		hasImpactComputedDots,
+		hasImpactLaboratoryDots,
+	]);
 
 	useEffect(() => {
 		if (!constructionHeaderId) return;
@@ -504,6 +554,63 @@ const MyConstructions = () => {
 									<div></div>
 								</>
 							)}
+							{isFloorConstruction && hasImpactComputedDots && (
+								<>
+									<div className="flex flex-col gap-1">
+										<p className="text-[30px] font-extrabold text-black">
+											{locale === 'ru' ? 'Расчёт (ударный)' : 'Computed (impact)'}
+										</p>
+										<p className="font-sans text-[14px]">
+											{currentReportInfo?.calculationDocument?.fullName}
+										</p>
+										<div className="flex w-full items-center gap-1">
+											<p className="font-sans text-[25px] font-semibold leading-4">
+												Lw = {constructionHeader?.estimatedIndexValue} dB
+											</p>
+											<p
+												className={
+													compImpactRelevant ? 'text-green-600' : 'text-error'
+												}
+											>
+												{compImpactRelevant
+													? t('constructor.relevant.yes')
+													: t('constructor.relevant.no')}
+											</p>
+										</div>
+									</div>
+									<div></div>
+								</>
+							)}
+							{isFloorConstruction && hasImpactLaboratoryDots && (
+								<>
+									<div className="flex flex-col gap-2">
+										<p className="text-[30px] font-extrabold leading-none text-black">
+											{locale === 'ru'
+												? 'Лаборатория (ударный)'
+												: 'Laboratory (impact)'}
+										</p>
+										<p className="font-sans text-[14px]">
+											{currentReportInfo?.calculationDocument?.fullName}
+										</p>
+										<div className="flex w-full items-center gap-1">
+											<p className="font-sans text-[25px] font-semibold leading-4">
+												Lw = {constructionHeader?.impactLaboratory?.labIndexValue}{' '}
+												dB
+											</p>
+											<p
+												className={
+													labImpactRelevant ? 'text-green-600' : 'text-error'
+												}
+											>
+												{labImpactRelevant
+													? t('constructor.relevant.yes')
+													: t('constructor.relevant.no')}
+											</p>
+										</div>
+									</div>
+									<div></div>
+								</>
+							)}
 							<p className="text-[30px] font-extrabold text-primary">
 								{t('constructor.designing.allowedValue')}
 							</p>
@@ -518,6 +625,24 @@ const MyConstructions = () => {
 								}{' '}
 								dB
 							</p>
+							{isFloorConstruction &&
+								(() => {
+									const h = currentConstruction?.reportConstructionHeader;
+									const lwReq = h?.requirementNoizeImpactIndex;
+									const rwReq = h?.requirementNoizeIsolationIndex;
+									const lim =
+										lwReq != null && !Number.isNaN(Number(lwReq))
+											? Number(lwReq)
+											: rwReq != null && !Number.isNaN(Number(rwReq))
+												? Number(rwReq)
+												: null;
+									if (lim == null || Number.isNaN(lim)) return null;
+									return (
+										<p className="font-sans text-[30px] font-semibold leading-4">
+											Lw ⩽ {lim} dB
+										</p>
+									);
+								})()}
 						</>
 					) : (
 						<div className="flex size-full items-center justify-center">

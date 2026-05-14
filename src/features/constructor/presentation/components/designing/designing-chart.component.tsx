@@ -31,6 +31,8 @@ ChartJS.register(
 export type GraphSeriesKind =
 	| 'computed_wall'
 	| 'laboratory_wall'
+	| 'computed_impact'
+	| 'laboratory_impact'
 	| 'window'
 	| 'door'
 	| 'reference'
@@ -55,6 +57,8 @@ export type DesigningChartSeries = {
 type DesigningChartProps = {
 	series: DesigningChartSeries[];
 	chartSize?: 'default' | 'large';
+	/** Подпись оси Y (по умолчанию Rw). */
+	yAxisTitle?: string;
 };
 
 type LineTier = 'thick' | 'medium' | 'thin';
@@ -65,6 +69,18 @@ const seriesStyleByKind = (kind: GraphSeriesKind) => {
 			return { color: '#ef4444', lineTier: 'thick' as const, borderDash: undefined as number[] | undefined };
 		case 'computed_wall':
 			return { color: '#2563eb', lineTier: 'thick' as const, borderDash: undefined };
+		case 'laboratory_impact':
+			return {
+				color: '#c2410c',
+				lineTier: 'thick' as const,
+				borderDash: [10, 4] as number[],
+			};
+		case 'computed_impact':
+			return {
+				color: '#0f766e',
+				lineTier: 'thick' as const,
+				borderDash: [10, 4] as number[],
+			};
 		case 'window':
 			return { color: '#22c55e', lineTier: 'thin' as const, borderDash: undefined };
 		case 'door':
@@ -88,6 +104,10 @@ const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 		return { color: '#2563eb', lineTier: 'thick' as LineTier, borderDash: undefined };
 	if (gt === GraphType.Laboratory)
 		return { color: '#ef4444', lineTier: 'thick' as LineTier, borderDash: undefined };
+	if (gt === GraphType.ImpactComputed)
+		return { color: '#0f766e', lineTier: 'thick' as LineTier, borderDash: [10, 4] as number[] };
+	if (gt === GraphType.ImpactLaboratory)
+		return { color: '#c2410c', lineTier: 'thick' as LineTier, borderDash: [10, 4] as number[] };
 	if (gt === GraphType.Atalon)
 		return { color: '#9ca3af', lineTier: 'thin' as LineTier, borderDash: [6, 6] as number[] };
 	if (gt === GraphType.AdditionalDoor)
@@ -99,7 +119,7 @@ const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 	return seriesStyleByKind(s.kind);
 };
 
-const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) => {
+const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }: DesigningChartProps) => {
 	const chartRef = useRef<ChartJS<'line'>>(null);
 	const { t } = useI18n();
 
@@ -462,7 +482,7 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 					type: 'linear',
 					title: {
 						display: true,
-						text: 'Rw',
+						text: yAxisTitle,
 						color: '#14181f',
 						font: {
 							family: 'Source Sans Pro, system-ui, sans-serif',
@@ -500,7 +520,7 @@ const DesigningChart = ({ series, chartSize = 'default' }: DesigningChartProps) 
 				mode: 'index',
 			},
 		}),
-		[t, displayFrequencies, series, chartSize, minY, maxY],
+		[t, displayFrequencies, series, chartSize, minY, maxY, yAxisTitle],
 	);
 
 	if (!series.length) {

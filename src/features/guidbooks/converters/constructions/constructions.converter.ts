@@ -7,6 +7,7 @@ import {
 	type CreateConstructionLaboratoryDataDto,
 	type CreateConstructionTypeDto,
 	type IndexType,
+	type RTotalDto,
 } from '@api-gen';
 import {
 	convertToClientCountryData,
@@ -60,14 +61,24 @@ export const convertToServerConstructionsFilterData = (data: ConstructionsFilter
 		: {}),
 });
 
-/** Ответ детализации может содержать r_total внутри лабораторного блока (расширение поверх OpenAPI). */
+/** Ответ детализации: rTotals (RTotalDto[]) и/или legacy rTotal: number[]. */
 type LaboratoryReadDto = ConstructionLaboratoryDataDto & { rTotal?: number[] | null };
+
+const rTotalsDtoToNumbers = (items?: RTotalDto[] | null): number[] | null => {
+	if (!Array.isArray(items) || !items.length) return null;
+	const rows = items
+		.filter((x) => x?.value != null && Number.isFinite(Number(x.value)))
+		.map((x, i) => ({ value: Number(x.value), index: x.index ?? i }));
+	rows.sort((a, b) => a.index - b.index);
+	return rows.map((x) => x.value);
+};
 
 const mapLaboratoryBlockFromApi = (
 	lab: LaboratoryReadDto | undefined | null,
 	legacyRTotal?: number[] | null,
 ) => {
-	const totals = lab?.rTotal ?? legacyRTotal;
+	const fromTotals = rTotalsDtoToNumbers(lab?.rTotals);
+	const totals = fromTotals ?? lab?.rTotal ?? legacyRTotal;
 	const labRTotal =
 		Array.isArray(totals) && totals.length ? totals.map((n) => String(n)).join(', ') : '';
 	return {

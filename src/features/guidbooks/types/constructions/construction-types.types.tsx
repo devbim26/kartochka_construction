@@ -169,11 +169,11 @@ export const EnConstructionTypesSelectValues = [
 		label: EnConstructionTypesMap.HomogeneousFloor,
 		value: ConstructionTypeEnum.HomogeneousFloor,
 	},
+	{
+		label: EnConstructionTypesMap.ElasticBaseFloor,
+		value: ConstructionTypeEnum.ElasticBaseFloor,
+	},
 	{ label: EnConstructionTypesMap.Door, value: ConstructionTypeEnum.Door },
-	// {
-	// 	label: EnConstructionTypesMap.ElasticBaseFloor,
-	// 	value: ConstructionTypeEnum.ElasticBaseFloor,
-	// },
 ];
 
 export const RuConstructionTypesSelectValues = [
@@ -218,9 +218,9 @@ export const RuConstructionTypesSelectValues = [
 		label: 'Однородный пол',
 		value: ConstructionTypeEnum.HomogeneousFloor,
 	},
+	{
+		label: RuConstructionTypesMap.ElasticBaseFloor,
+		value: ConstructionTypeEnum.ElasticBaseFloor,
+	},
 	{ label: 'Дверь', value: ConstructionTypeEnum.Door },
-	// {
-	// 	label: 'Пол с эластичным основанием',
-	// 	value: ConstructionTypeEnum.ElasticBaseFloor,
-	// },
 ];

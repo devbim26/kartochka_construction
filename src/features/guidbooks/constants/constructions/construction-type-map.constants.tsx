@@ -157,25 +157,7 @@ export const ConstructionTypeMap = ({
 
 				setValue('constructionTypeObject.centerConstruction', [
 					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
 						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.AcousticTreatmentMaterials,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '3',
 						materialId: '',
 						materialType: MaterialTypeEnum.Heavy,
 						materialTypeValue: [

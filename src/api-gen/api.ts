@@ -184,6 +184,7 @@ export interface ConstructionHeaderDto {
 }
 
 export interface ConstructionLaboratoryDataDto {
+	rTotals?: RTotalDto[] | null;
 	index?: IndexType;
 	/** @format float */
 	indexValue?: number;
@@ -811,6 +812,8 @@ export interface GraphParametrsDto {
 export enum GraphType {
 	Computed = 'Computed',
 	Laboratory = 'Laboratory',
+	ImpactComputed = 'ImpactComputed',
+	ImpactLaboratory = 'ImpactLaboratory',
 	Atalon = 'Atalon',
 	AdditionalDoor = 'AdditionalDoor',
 	AdditionalWindow = 'AdditionalWindow',
@@ -1193,6 +1196,13 @@ export enum Priority {
 export enum PurposeBuilding {
 	LargePanelBuilding = 'LargePanelBuilding',
 	FramePanelBuilding = 'FramePanelBuilding',
+}
+
+export interface RTotalDto {
+	/** @format double */
+	value?: number;
+	/** @format int32 */
+	index?: number;
 }
 
 export interface RegulatoryRequirementDocument {

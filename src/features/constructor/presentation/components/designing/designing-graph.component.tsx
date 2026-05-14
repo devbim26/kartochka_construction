@@ -15,6 +15,8 @@ const legacyNameToGraphType = (name: string | null | undefined): GraphType | und
 	const n = (name || '').toLowerCase();
 	if (n === 'computeddots') return GraphType.Computed;
 	if (n === 'laboratorydots') return GraphType.Laboratory;
+	if (n === 'impactcomputeddots') return GraphType.ImpactComputed;
+	if (n === 'impactlaboratorydots') return GraphType.ImpactLaboratory;
 	return undefined;
 };
 
@@ -24,6 +26,10 @@ const graphTypeToKind = (gt: GraphType | undefined): GraphSeriesKind => {
 			return 'computed_wall';
 		case GraphType.Laboratory:
 			return 'laboratory_wall';
+		case GraphType.ImpactComputed:
+			return 'computed_impact';
+		case GraphType.ImpactLaboratory:
+			return 'laboratory_impact';
 		case GraphType.Atalon:
 			return 'reference';
 		case GraphType.AdditionalDoor:
@@ -98,12 +104,26 @@ const DesigningGraph = ({
 			door: 3,
 			computed_wall: 4,
 			laboratory_wall: 5,
+			computed_impact: 6,
+			laboratory_impact: 7,
 		};
 
 		return [...out].sort((a, b) => drawOrder[a.kind] - drawOrder[b.kind]);
 	}, [graphData]);
 
-	return <DesigningChart series={series} chartSize={chartSize} />;
+	const yAxisTitle = useMemo(() => {
+		const hasAir = series.some(
+			(s) => s.kind === 'computed_wall' || s.kind === 'laboratory_wall',
+		);
+		const hasImpact = series.some(
+			(s) => s.kind === 'computed_impact' || s.kind === 'laboratory_impact',
+		);
+		if (hasAir && hasImpact) return 'dB';
+		if (hasImpact) return "Lw, dB";
+		return 'Rw, dB';
+	}, [series]);
+
+	return <DesigningChart series={series} chartSize={chartSize} yAxisTitle={yAxisTitle} />;
 };
 
 export default DesigningGraph;
