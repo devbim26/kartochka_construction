@@ -1,10 +1,62 @@
 import { GraphType } from '@api-gen';
+import { useI18n, type TranslationKey } from '@core';
 import type { GraphDetailResponse, NamedDot } from '@features/constructor/types';
 import { useMemo } from 'react';
 import DesigningChart, {
 	type DesigningChartSeries,
 	type GraphSeriesKind,
 } from './designing-chart.component';
+
+const resolveLegendLabel = (
+	rawName: string,
+	graphType: GraphType | undefined,
+	kind: GraphSeriesKind,
+	seriesIndex: number,
+	t: (key: TranslationKey) => string,
+): string => {
+	const trimmed = (rawName || '').trim();
+	if (trimmed) return trimmed;
+
+	switch (graphType) {
+		case GraphType.Computed:
+			return t('constructor.chart.legendWallR');
+		case GraphType.Laboratory:
+			return t('constructor.chart.legendWallRlab');
+		case GraphType.AdditionalWindow:
+			return t('constructor.chart.legendWindowsRlab');
+		case GraphType.AdditionalDoor:
+			return t('constructor.chart.legendDoorRlab');
+		case GraphType.Atalon:
+			return t('constructor.chart.legendReference');
+		case GraphType.Intermediate:
+			return t('constructor.chart.legendIntermediate');
+		case GraphType.ImpactComputed:
+			return t('constructor.chart.legendImpactComputed');
+		case GraphType.ImpactLaboratory:
+			return t('constructor.chart.legendImpactLaboratory');
+		default:
+			break;
+	}
+
+	switch (kind) {
+		case 'door':
+			return t('constructor.chart.legendDoorRlab');
+		case 'window':
+			return t('constructor.chart.legendWindowsRlab');
+		case 'reference':
+			return t('constructor.chart.legendReference');
+		case 'computed_wall':
+			return t('constructor.chart.legendWallR');
+		case 'laboratory_wall':
+			return t('constructor.chart.legendWallRlab');
+		case 'computed_impact':
+			return t('constructor.chart.legendImpactComputed');
+		case 'laboratory_impact':
+			return t('constructor.chart.legendImpactLaboratory');
+		default:
+			return `${t('constructor.chart.legendSeries')} ${seriesIndex + 1}`;
+	}
+};
 
 const mapWithLabels = (dots: NamedDot[]) =>
 	dots
@@ -69,6 +121,8 @@ const DesigningGraph = ({
 	calculationDocName: string;
 	chartSize?: 'default' | 'large';
 }) => {
+	const { t } = useI18n();
+
 	const series: DesigningChartSeries[] = useMemo(() => {
 		if (!graphData?.length) return [];
 
@@ -85,7 +139,7 @@ const DesigningGraph = ({
 			const resolvedType = g.graphType ?? legacyNameToGraphType(g.name);
 			const kind = resolvedType ? graphTypeToKind(resolvedType) : classifyExtraSeries(g.name || '');
 
-			const legendLabel = rawName.trim();
+			const legendLabel = resolveLegendLabel(rawName, resolvedType, kind, idx, t);
 
 			out.push({
 				key: `${resolvedType ?? 'legacy'}-${idx}`,
@@ -109,7 +163,7 @@ const DesigningGraph = ({
 		};
 
 		return [...out].sort((a, b) => drawOrder[a.kind] - drawOrder[b.kind]);
-	}, [graphData]);
+	}, [graphData, t]);
 
 	const yAxisTitle = useMemo(() => {
 		const hasAir = series.some(

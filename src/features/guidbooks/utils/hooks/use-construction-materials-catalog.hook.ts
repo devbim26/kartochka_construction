@@ -50,10 +50,20 @@ function buildFilter(
  */
 export function useConstructionMaterialsCatalog(
 	materialTypeEnum: MaterialTypeEnum | '',
-	currentForm: UseFormReturn<{ constructionType?: string }>,
+	currentForm: UseFormReturn<{
+		constructionType?: string;
+		constructionTypeObject?: { constructionTypeEnum?: string };
+	}>,
 ): MaterialsAddAndEditData[] | undefined {
 	const [materials, setMaterials] = useState<MaterialsAddAndEditData[]>();
-	const constructionType = useWatch({ control: currentForm.control, name: 'constructionType' });
+	const constructionTypeRoot = useWatch({ control: currentForm.control, name: 'constructionType' });
+	const constructionTypeEnum = useWatch({
+		control: currentForm.control,
+		name: 'constructionTypeObject.constructionTypeEnum',
+	});
+	const constructionType =
+		(typeof constructionTypeEnum === 'string' && constructionTypeEnum.trim()) ||
+		constructionTypeRoot;
 
 	useEffect(() => {
 		if (!materialTypeEnum) {

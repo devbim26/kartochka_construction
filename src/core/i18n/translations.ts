@@ -636,6 +636,11 @@ export const en = {
 	'constructor.chart.legendWallRlab': 'Construction sound insulation Rlab, dB',
 	'constructor.chart.legendWindowsRlab': 'Window sound insulation Rlab, dB',
 	'constructor.chart.legendDoorRlab': 'Door sound insulation Rlab, dB',
+	'constructor.chart.legendImpactComputed': 'Impact sound insulation Lw (computed), dB',
+	'constructor.chart.legendImpactLaboratory': 'Impact sound insulation Lw (laboratory), dB',
+	'constructor.chart.legendReference': 'Reference curve, dB',
+	'constructor.chart.legendIntermediate': 'Intermediate / additional layer, dB',
+	'constructor.chart.legendSeries': 'Series',
 
 	'errors.request': 'Request error',
 	'errors.reportInfoLoad': 'Failed to load report info',
@@ -1771,6 +1776,11 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.chart.legendWallRlab': 'Звукоизоляция конструкции Rlab, dB',
 	'constructor.chart.legendWindowsRlab': 'Звукоизоляция окон Rlab, dB',
 	'constructor.chart.legendDoorRlab': 'Звукоизоляция двери Rlab, dB',
+	'constructor.chart.legendImpactComputed': 'Звукоизоляция на ударный шум Lw (расчёт), dB',
+	'constructor.chart.legendImpactLaboratory': 'Звукоизоляция на ударный шум Lw (лаборатория), dB',
+	'constructor.chart.legendReference': 'Эталонная кривая, dB',
+	'constructor.chart.legendIntermediate': 'Промежуточная / дополнительный слой, dB',
+	'constructor.chart.legendSeries': 'Серия',
 
 	'errors.request': 'Ошибка запроса',
 	'errors.reportInfoLoad': 'Ошибка при получении информации об отчете',

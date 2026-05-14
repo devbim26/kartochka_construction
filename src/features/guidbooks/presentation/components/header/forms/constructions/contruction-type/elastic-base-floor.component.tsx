@@ -1,110 +1,136 @@
-import { DeleteIcon } from '@core';
+import { MaterialParametrs } from '@api-gen';
 import {
+	BoardMaterialType,
 	ConstructionLayer,
+	FillerMaterialType,
 	HeavyMaterialType,
-	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 } from '@features';
-import { ConstructionFieldsMap } from '@features/guidbooks/constants';
-import type { ConstructionTypeProps, MaterialTypeEnum } from '@features/guidbooks/types';
-import { MaterialTypesSelectValuesEnum } from '@features/guidbooks/types';
+import type { ConstructionTypeProps } from '@features/guidbooks/types';
+import { ConstructionTypeEnum, MaterialTypeEnum } from '@features/guidbooks/types';
 
 import { useConstructionMaterials } from '@features/guidbooks/utils';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
-import { Fragment } from 'react/jsx-runtime';
+import { useEffect } from 'react';
+import { useWatch } from 'react-hook-form';
 
-/** Как однородный пол: слой 2 — тяжёлый; прочие — только тяжёлые / наполнительные / плиты. */
+const ELASTIC_FLOOR_POSITIONS = ['1', '2', '3'] as const;
+
+const elasticFloorDefaultRows = () => [
+	{
+		positionId: '1',
+		materialId: '',
+		materialType: MaterialTypeEnum.Heavy,
+		materialTypeValue: [
+			{ materialParameters: MaterialParametrs.Thickness, value: '' },
+			{ materialParameters: MaterialParametrs.Density, value: '' },
+		],
+	},
+	{
+		positionId: '2',
+		materialId: '',
+		materialType: MaterialTypeEnum.Filler,
+		materialTypeValue: [
+			{ materialParameters: MaterialParametrs.Thickness, value: '' },
+			{ materialParameters: MaterialParametrs.Density, value: '' },
+		],
+	},
+	{
+		positionId: '3',
+		materialId: '',
+		materialType: MaterialTypeEnum.Board,
+		materialTypeValue: [
+			{ materialParameters: MaterialParametrs.Thickness, value: '' },
+			{ materialParameters: MaterialParametrs.Density, value: '' },
+		],
+	},
+];
+
 export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps) => {
 	const { control, watch } = currentForm;
+	const { fields, replace } = useConstructionMaterials(control, watch, 'Center');
 
-	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Center');
-	const renderAddButton = (positionId: string) => (
-		<AiOutlinePlusCircle
-			key={`add-${positionId}`}
-			onClick={() =>
-				append({
-					positionId,
-					materialId: '',
-					materialType: '',
-					materialTypeValue: [],
-				})
-			}
-			className="size-[40px] self-center text-primary"
-		/>
-	);
+	const enumValue = useWatch({
+		control,
+		name: 'constructionTypeObject.constructionTypeEnum',
+	});
+	const centerConstruction = useWatch({
+		control,
+		name: 'constructionTypeObject.centerConstruction',
+	});
+
+	useEffect(() => {
+		if (enumValue !== ConstructionTypeEnum.ElasticBaseFloor) return;
+		const list = (centerConstruction as any[]) || [];
+		const byPos = new Map<string, any>(
+			list.map((row: { positionId?: string }) => [String(row?.positionId), row]),
+		);
+		const row1 = byPos.get('1');
+		const row2 = byPos.get('2');
+		const row3 = byPos.get('3');
+		const typeOk =
+			String(row1?.materialType) === MaterialTypeEnum.Heavy &&
+			String(row2?.materialType) === MaterialTypeEnum.Filler &&
+			String(row3?.materialType) === MaterialTypeEnum.Board;
+		if (list.length >= 3 && typeOk) return;
+
+		replace(elasticFloorDefaultRows() as any);
+	}, [enumValue, centerConstruction, replace]);
 
 	const renderMaterialBlock = (positionId: string, fieldIndex: number, fieldId: string) => (
 		<div key={fieldId} className="flex w-full items-start justify-between">
 			<div className="flex flex-1 gap-[20px]">
-				{positionId !== '2' && (
-					<SelectableMaterialType
-						fieldIndex={fieldIndex}
-						positionId={Number(positionId)}
-						constructionPosition="Center"
-						materialTypesSelectValues={MaterialTypesSelectValuesEnum.ElasticBaseFloor}
-						currentForm={currentForm}
-					/>
-				)}
-
-				{positionId === '2' ? (
+				{positionId === '1' ? (
 					<>
 						<HeavyMaterialType
-							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
+							fieldIndex={fieldIndex}
+							constructionPosition="Center"
+							currentForm={currentForm}
 						/>
 						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
+							fieldIndex={fieldIndex}
+							constructionPosition="Center"
+							currentForm={currentForm}
+						/>
+					</>
+				) : positionId === '2' ? (
+					<>
+						<FillerMaterialType
+							fieldIndex={fieldIndex}
+							constructionPosition="Center"
+							currentForm={currentForm}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={fieldIndex}
+							constructionPosition="Center"
+							currentForm={currentForm}
 						/>
 					</>
 				) : (
-					<div className="flex gap-[8px]">
-						{ConstructionFieldsMap({
-							fieldIndex,
-							constructionPosition: 'Center',
-							materialType: (fields[fieldIndex] as any)
-								?.materialType as MaterialTypeEnum,
-							currentForm,
-						})}
-					</div>
+					<>
+						<BoardMaterialType
+							fieldIndex={fieldIndex}
+							constructionPosition="Center"
+							currentForm={currentForm}
+						/>
+						<ThicknessDensityFieldsType
+							fieldIndex={fieldIndex}
+							constructionPosition="Center"
+							currentForm={currentForm}
+						/>
+					</>
 				)}
 			</div>
-
-			{positionId !== '2' && (
-				<DeleteIcon className="shrink-0 self-start" onClick={() => remove(fieldIndex)} />
-			)}
 		</div>
 	);
-
-	const positions = ['0', '1', '2', '3', '4'];
 
 	return (
 		<ConstructionLayer title="1. Базовая конструкция">
 			<div className="flex flex-col gap-[24px]">
-				{fields.length === 0 && renderAddButton('0')}
-
-				{positions.map((positionId) => {
-					const fieldIndex = fields.findIndex((f: any) => f.positionId === positionId);
+				{ELASTIC_FLOOR_POSITIONS.map((positionId) => {
+					const fieldIndex = fields.findIndex((f: any) => String(f.positionId) === positionId);
+					if (fieldIndex === -1) return null;
 					const field = fields[fieldIndex];
-
-					const showAddButton =
-						fieldIndex === -1 &&
-						((positionId === '1' && fields.some((f: any) => f.positionId === '2')) ||
-							(positionId === '3' && fields.some((f: any) => f.positionId === '2')) ||
-							(positionId === '0' && fields.some((f: any) => f.positionId === '1')) ||
-							(positionId === '4' && fields.some((f: any) => f.positionId === '3')));
-
-					if (showAddButton) {
-						return renderAddButton(positionId);
-					}
-
-					if (fieldIndex !== -1) {
-						return (
-							<Fragment key={field.id}>
-								{renderMaterialBlock(positionId, fieldIndex, field.id)}
-							</Fragment>
-						);
-					}
-
-					return null;
+					return renderMaterialBlock(positionId, fieldIndex, field.id);
 				})}
 			</div>
 		</ConstructionLayer>
