@@ -30,10 +30,6 @@ const resolveLegendLabel = (
 			return t('constructor.chart.legendReference');
 		case GraphType.Intermediate:
 			return t('constructor.chart.legendIntermediate');
-		case GraphType.ImpactComputed:
-			return t('constructor.chart.legendImpactComputed');
-		case GraphType.ImpactLaboratory:
-			return t('constructor.chart.legendImpactLaboratory');
 		default:
 			break;
 	}
@@ -67,8 +63,13 @@ const legacyNameToGraphType = (name: string | null | undefined): GraphType | und
 	const n = (name || '').toLowerCase();
 	if (n === 'computeddots') return GraphType.Computed;
 	if (n === 'laboratorydots') return GraphType.Laboratory;
-	if (n === 'impactcomputeddots') return GraphType.ImpactComputed;
-	if (n === 'impactlaboratorydots') return GraphType.ImpactLaboratory;
+	return undefined;
+};
+
+const legacyNameToKind = (name: string | null | undefined): GraphSeriesKind | undefined => {
+	const n = (name || '').toLowerCase();
+	if (n === 'impactcomputeddots') return 'computed_impact';
+	if (n === 'impactlaboratorydots') return 'laboratory_impact';
 	return undefined;
 };
 
@@ -78,10 +79,6 @@ const graphTypeToKind = (gt: GraphType | undefined): GraphSeriesKind => {
 			return 'computed_wall';
 		case GraphType.Laboratory:
 			return 'laboratory_wall';
-		case GraphType.ImpactComputed:
-			return 'computed_impact';
-		case GraphType.ImpactLaboratory:
-			return 'laboratory_impact';
 		case GraphType.Atalon:
 			return 'reference';
 		case GraphType.AdditionalDoor:
@@ -137,7 +134,9 @@ const DesigningGraph = ({
 			if ((g.name || '').toLowerCase() === 'deviationdotslist') continue;
 
 			const resolvedType = g.graphType ?? legacyNameToGraphType(g.name);
-			const kind = resolvedType ? graphTypeToKind(resolvedType) : classifyExtraSeries(g.name || '');
+			const kind = resolvedType
+				? graphTypeToKind(resolvedType)
+				: legacyNameToKind(g.name) ?? classifyExtraSeries(g.name || '');
 
 			const legendLabel = resolveLegendLabel(rawName, resolvedType, kind, idx, t);
 

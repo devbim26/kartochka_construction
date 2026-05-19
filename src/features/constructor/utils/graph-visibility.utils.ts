@@ -19,22 +19,20 @@ export const graphHasAirborneLaboratoryData = (graphData: GraphDetailResponse[] 
 				(g.name || '').toLowerCase() === 'laboratorydots'),
 	);
 
-/** Ударный шум: расчёт. */
+/** Ударный шум: расчёт (legacy series name с бэка). */
 export const graphHasImpactComputedData = (graphData: GraphDetailResponse[] | null): boolean =>
 	(graphData ?? []).some(
 		(g) =>
 			(g.namedDots?.length ?? 0) > 0 &&
-			(g.graphType === GraphType.ImpactComputed ||
-				(g.name || '').toLowerCase() === 'impactcomputeddots'),
+			(g.name || '').toLowerCase() === 'impactcomputeddots',
 	);
 
-/** Ударный шум: лаборатория. */
+/** Ударный шум: лаборатория (legacy series name с бэка). */
 export const graphHasImpactLaboratoryData = (graphData: GraphDetailResponse[] | null): boolean =>
 	(graphData ?? []).some(
 		(g) =>
 			(g.namedDots?.length ?? 0) > 0 &&
-			(g.graphType === GraphType.ImpactLaboratory ||
-				(g.name || '').toLowerCase() === 'impactlaboratorydots'),
+			(g.name || '').toLowerCase() === 'impactlaboratorydots',
 	);
 
 /** @deprecated алиас: только воздушный расчёт (стены и Rw на графике). */

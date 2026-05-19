@@ -264,11 +264,13 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.leftConstruction', [
+				setValue('constructionTypeObject.leftConstruction', []);
+
+				setValue('constructionTypeObject.rightConstruction', [
 					{
 						positionId: '0',
 						materialId: '',
-						materialType: MaterialTypeEnum.Board,
+						materialType: MaterialTypeEnum.AirGap,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -277,10 +279,10 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '1',
 						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
+						materialType: MaterialTypeEnum.Link,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
+							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
 						],
 					},
 					{
@@ -295,24 +297,22 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '3',
 						materialId: '',
-						materialType: MaterialTypeEnum.Link,
+						materialType: MaterialTypeEnum.Filler,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
 						positionId: '4',
 						materialId: '',
-						materialType: MaterialTypeEnum.AirGap,
+						materialType: MaterialTypeEnum.Board,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 				]);
-
-				setValue('constructionTypeObject.rightConstruction', []);
 			},
 		},
 

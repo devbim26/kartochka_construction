@@ -43,13 +43,17 @@ export const GraphDetailTable = ({ graphData, additional: _additional, noPadding
 						(g.name || '').toLowerCase() === legacyNameLower.toLowerCase()),
 			)?.namedDots ?? [];
 
+		const getDotsByLegacyName = (legacyNameLower: string) =>
+			graphData?.find(
+				(g) =>
+					(g.namedDots?.length ?? 0) > 0 &&
+					(g.name || '').toLowerCase() === legacyNameLower.toLowerCase(),
+			)?.namedDots ?? [];
+
 		const computedDots = getDotsForSeries(GraphType.Computed, 'computeddots');
 		const laboratoryDots = getDotsForSeries(GraphType.Laboratory, 'laboratorydots');
-		const impactComputedDots = getDotsForSeries(GraphType.ImpactComputed, 'impactcomputeddots');
-		const impactLaboratoryDots = getDotsForSeries(
-			GraphType.ImpactLaboratory,
-			'impactlaboratorydots',
-		);
+		const impactComputedDots = getDotsByLegacyName('impactcomputeddots');
+		const impactLaboratoryDots = getDotsByLegacyName('impactlaboratorydots');
 
 		const showImpactColumns =
 			graphHasImpactComputedData(graphData) || graphHasImpactLaboratoryData(graphData);

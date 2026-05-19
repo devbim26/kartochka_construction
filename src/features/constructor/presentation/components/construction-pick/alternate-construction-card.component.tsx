@@ -80,6 +80,11 @@ export const AlternateConstructionCard = ({
 	const massMin = toOptionalNumber(appliedRestrictions?.minWeight);
 	const massMax = toOptionalNumber(appliedRestrictions?.maxWeight);
 
+	const labRwDisplay =
+		construction.rLab != null
+			? String(construction.rLab)
+			: constructionHeader?.airLaboratory?.labIndexValue || '-';
+
 	useEffect(() => {
 		if (!constructionHeader) return;
 
@@ -271,7 +276,7 @@ export const AlternateConstructionCard = ({
 							{
 								label: t('soundproofing.labTest'),
 								soundproofing: 'Rw, dB',
-								values: String(constructionHeader?.RCalcs) || '-',
+								values: labRwDisplay,
 								requirements:
 									reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
 							},

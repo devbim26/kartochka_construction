@@ -213,14 +213,20 @@ const ContructionPick = () => {
 			});
 	}, [constructionHeaderId, svgUrl]);
 
+	const replacementConstructionType =
+		constructionHeader?.constructionTypeObject?.constructionTypeEnum ||
+		constructionHeader?.constructionType;
+
 	const handleAlternateConstructions = useCallback(
 		(data: ConstructionSelectRestrictions, page = pageNumber) => {
+			if (!replacementConstructionType) return;
 			setAppliedRestrictions(data);
 			from(
 				getAlternateConstructions({
 					...data,
 					pageSize: 2,
 					pageNumber: page,
+					constructionType: replacementConstructionType,
 				}),
 			)
 				.pipe(
@@ -242,12 +248,14 @@ const ContructionPick = () => {
 					}
 				});
 		},
-		[pageNumber],
+		[pageNumber, replacementConstructionType],
 	);
 
 	useEffect(() => {
-		if (currentReportInfo && showAlternate) handleAlternateConstructions(form.getValues());
-	}, [currentReportInfo, showAlternate]);
+		if (currentReportInfo && showAlternate && replacementConstructionType) {
+			handleAlternateConstructions(form.getValues());
+		}
+	}, [currentReportInfo, showAlternate, replacementConstructionType]);
 
 	const handlePageChange = useCallback(
 		(newPage: number) => {

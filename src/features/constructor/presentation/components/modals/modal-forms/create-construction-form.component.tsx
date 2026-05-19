@@ -935,105 +935,79 @@ export const CreateConstructionForm = memoize(
 						</div>
 					</FormProvider>
 
-					{/* Блок превью: ряд заголовков, под ним — схема | материалы | производитель */}
+					{/* Блок превью: схема | описание (×1.5) | производитель — выравнивание по верхнему краю */}
 					{construction && (
 						<div className="mt-6 flex flex-col gap-3">
-							<div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-x-4 gap-y-3">
-								<div className="col-start-1 row-start-1" aria-hidden />
-								<div className="col-start-2 row-start-1 min-w-0 text-left">
-									<p className="text-lg font-semibold text-gray-800">
-										{t('createConstruction.selectedConstruction')}
-									</p>
-								</div>
-								<div className="col-start-3 row-start-1 min-w-0 text-left">
-									<p className="text-lg font-semibold text-gray-800">
-										{t('createConstruction.manufacturer')}
-									</p>
-								</div>
-								{/* Схема: min-w-0 — чтобы grid не обрезал; картинка w-auto + object-contain — целиком */}
-								<div className="col-start-1 row-start-2 flex min-w-0 justify-center self-start">
-									<div className="flex w-full min-w-0 max-w-full justify-center bg-white py-1">
-										{svgUrl ? (
-											<button
-												type="button"
-												className="mx-auto block w-full cursor-pointer border-0 bg-transparent p-0 text-center"
-												onClick={() => setPreviewSrc(svgUrl)}
-											>
-												<img
-													src={svgUrl}
-													alt=""
-													className="mx-auto block size-auto max-h-[min(68vh,560px)] max-w-full object-contain"
-													decoding="async"
-												/>
-											</button>
-										) : (
-											<div className="flex min-h-[200px] w-full items-center justify-center">
-												<Loader />
-											</div>
-										)}
-									</div>
-								</div>
-								<div className="col-start-2 row-start-2 w-full min-w-0 self-start justify-self-stretch text-left">
-									<div className="max-w-full overflow-x-auto text-left">
-										<div className="flex w-full min-w-0 flex-col items-start gap-0.5 text-left">
-											{constructionDetail?.constructionTypeObject?.leftConstruction
-												?.slice()
-												.sort(
-													(a, b) =>
-														Number(a.positionId) - Number(b.positionId),
-												)
-												.map((material, i) => {
-													const line = `- ${formatMaterial(material, locale)}`;
-													return (
-														<p
-															key={`left-${i}`}
-															className="whitespace-nowrap py-0.5 text-left text-[15px] leading-normal text-gray-800"
-															title={line}
-														>
-															{line}
-														</p>
-													);
-												})}
-											{constructionDetail?.constructionTypeObject?.centerConstruction
-												?.slice()
-												.sort(
-													(a, b) =>
-														Number(a.positionId) - Number(b.positionId),
-												)
-												.map((material, i) => {
-													const line = `- ${formatMaterial(material, locale)}`;
-													return (
-														<p
-															key={`center-${i}`}
-															className="whitespace-nowrap py-0.5 text-left text-[15px] leading-normal text-gray-800"
-															title={line}
-														>
-															{line}
-														</p>
-													);
-												})}
-											{constructionDetail?.constructionTypeObject?.rightConstruction
-												?.slice()
-												.sort(
-													(a, b) =>
-														Number(a.positionId) - Number(b.positionId),
-												)
-												.map((material, i) => {
-													const line = `- ${formatMaterial(material, locale)}`;
-													return (
-														<p
-															key={`right-${i}`}
-															className="whitespace-nowrap py-0.5 text-left text-[15px] leading-normal text-gray-800"
-															title={line}
-														>
-															{line}
-														</p>
-													);
-												})}
+							<div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)] gap-x-6">
+								<div aria-hidden />
+								<p className="text-lg font-semibold text-gray-800">
+									{t('createConstruction.selectedConstruction')}
+								</p>
+								<p className="text-center text-lg font-semibold text-gray-800">
+									{t('createConstruction.manufacturer')}
+								</p>
+							</div>
+							<div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)] items-start gap-x-6">
+							<div className="flex min-w-0 flex-col items-center self-start">
+								<div className="flex w-full min-w-0 justify-center bg-white">
+									{svgUrl ? (
+										<button
+											type="button"
+											className="cursor-pointer border-0 bg-transparent p-0"
+											onClick={() => setPreviewSrc(svgUrl)}
+										>
+											<img
+												src={svgUrl}
+												alt=""
+												className="block size-auto max-h-[min(68vh,560px)] max-w-full object-contain"
+												decoding="async"
+											/>
+										</button>
+									) : (
+										<div className="flex min-h-[200px] w-full items-center justify-center">
+											<Loader />
 										</div>
+									)}
+								</div>
+							</div>
+
+							<div className="flex min-w-0 flex-col self-start text-left">
+								<div className="max-h-[min(68vh,560px)] min-w-0 overflow-y-auto overflow-x-hidden pr-1">
+									<div className="flex flex-col items-start gap-0.5">
+										{(
+											[
+												constructionDetail?.constructionTypeObject
+													?.centerConstruction,
+												constructionDetail?.constructionTypeObject
+													?.rightConstruction,
+												constructionDetail?.constructionTypeObject
+													?.leftConstruction,
+											] as const
+										)
+											.flatMap((group) =>
+												[...(group ?? [])].sort(
+													(a, b) =>
+														Number(a.positionId) - Number(b.positionId),
+												),
+											)
+											.map((material, i) => {
+												const line = `- ${formatMaterial(material, locale)}`;
+												return (
+													<p
+														key={`material-${i}`}
+														className="py-0.5 text-left text-[15px] leading-snug text-gray-800"
+														title={line}
+													>
+														{line}
+													</p>
+												);
+											})}
 									</div>
 								</div>
-								<div className="col-start-3 row-start-2 flex flex-col items-center justify-start gap-2 text-center">
+							</div>
+
+							<div className="flex min-w-0 flex-col items-center self-start text-center">
+								<div className="flex w-full flex-col items-center gap-2">
 									{issuerIsLoading ? (
 										<div className="flex h-[48px] items-center justify-center">
 											<Loader />
@@ -1065,7 +1039,7 @@ export const CreateConstructionForm = memoize(
 													href={normalizeWebsite(issuer?.webSite)!}
 													target="_blank"
 													rel="noreferrer noopener"
-													className="whitespace-nowrap text-[14px] text-primary underline"
+													className="break-all text-center text-[14px] text-primary underline"
 												>
 													{issuer?.webSite}
 												</a>
@@ -1073,6 +1047,7 @@ export const CreateConstructionForm = memoize(
 										</>
 									)}
 								</div>
+							</div>
 							</div>
 						</div>
 					)}

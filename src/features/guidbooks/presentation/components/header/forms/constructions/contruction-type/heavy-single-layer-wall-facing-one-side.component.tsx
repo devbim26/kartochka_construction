@@ -28,7 +28,8 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 }: ConstructionTypeProps) => {
 	const { control, watch } = currentForm;
 
-	// Сначала база (Center), затем облицовка (Left). В разрезе слева направо: облицовка → база.
+	// База (Center), облицовка (Right). В разрезе слева направо: база → облицовка.
+	// Позиции 0…4 — от стены кнаружи: воздушный зазор … гипсокартон.
 	const layerConfigs = [
 		{
 			title: '1. Базовая конструкция',
@@ -39,7 +40,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 		},
 		{
 			title: '2. Облицовка',
-			constructionPosition: 'Left' as const,
+			constructionPosition: 'Right' as const,
 			positions: ['0', '1', '2', '3', '4', '5', '6'],
 			selectable: ['5', '6'],
 			materialType: MaterialTypesSelectValuesEnum.Additional,
@@ -53,14 +54,14 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 		Center: {
 			'2': [HeavyMaterialType, ThicknessDensityFieldsType],
 		},
-		Left: {
-			'0': [BoardMaterialType, ThicknessDensityFieldsType],
-			'1': [FillerMaterialType, ThicknessDensityFieldsType],
+		Right: {
+			'0': [AirGapMaterialType, ThicknessDensityFieldsType],
+			'1': [LinkMaterialType, PointConnectionsFieldsType],
 			'2': [FrameMaterialType, WidthRacksStepFieldsType],
-			'3': [LinkMaterialType, PointConnectionsFieldsType],
-			'4': [AirGapMaterialType, ThicknessDensityFieldsType],
+			'3': [FillerMaterialType, ThicknessDensityFieldsType],
+			'4': [BoardMaterialType, ThicknessDensityFieldsType],
 		},
-		Right: {},
+		Left: {},
 	};
 
 	const renderBlock = (

@@ -50,10 +50,10 @@ import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import {
-	createBlobFromExportResponse,
-	getFilenameFromExportHeaders,
 	RequirementsFilterDataConfig,
 	RequirementsFormDataConfig,
+	resolveExportDownloadAction,
+	triggerExportDownload,
 	useHeaderForm,
 } from '../../utils';
 import {
@@ -271,20 +271,16 @@ const RequirementsScreen = () => {
 			)
 			.subscribe((response) => {
 				if (!response?.data) return;
-				const fileBlob = createBlobFromExportResponse(response);
-				const filename = getFilenameFromExportHeaders(
-					response.headers,
-					'requirements-export.xlsx',
+				void resolveExportDownloadAction(response, 'requirements-export.xlsx').then(
+					(action) => {
+						if (!action) {
+							toast.error(t('guides.export.error'));
+							return;
+						}
+						triggerExportDownload(action);
+						toast.success(t('guides.export.success'));
+					},
 				);
-				const url = window.URL.createObjectURL(fileBlob);
-				const link = document.createElement('a');
-				link.href = url;
-				link.download = filename;
-				document.body.appendChild(link);
-				link.click();
-				document.body.removeChild(link);
-				window.URL.revokeObjectURL(url);
-				toast.success(t('guides.export.success'));
 			});
 	};
 

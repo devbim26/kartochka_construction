@@ -27,4 +27,6 @@ export type AlternateConstruction = {
 	maxHeight: number;
 	name: string;
 	shortName: string;
+	/** Лабораторный Rw из ответа alternativeConstructions */
+	rLab: number | null;
 };

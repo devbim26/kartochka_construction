@@ -4,7 +4,7 @@ import type {
 	GetPalacementRoomVariantsWithTypesQuery,
 	GetPlacementRoomVariantByAllParametersQuery,
 } from '@api-gen';
-import { ContentType, fetchApi } from '@api-gen';
+import { fetchApi } from '@api-gen';
 import type { PaginationState } from '@core';
 import type { GuideBooksCreateDataTypes, GuidebooksFiltersDataTypes } from '../types';
 import { Guidebooks } from '../types';
@@ -134,11 +134,5 @@ export const exportMaterials = async (data: ExportMaterialsQuery) => {
 };
 
 export const exportRequirements = async (data: ExportRequirementQuery) => {
-	return await fetchApi.request<ArrayBuffer>({
-		path: `/api/Requirement/export`,
-		method: 'POST',
-		body: data,
-		type: ContentType.Json,
-		format: 'arraybuffer',
-	});
+	return await fetchApi.api.requirementExportCreate(data, { format: 'blob' });
 };

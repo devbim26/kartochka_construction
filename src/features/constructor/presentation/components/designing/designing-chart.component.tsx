@@ -104,10 +104,6 @@ const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 		return { color: '#2563eb', lineTier: 'thick' as LineTier, borderDash: undefined };
 	if (gt === GraphType.Laboratory)
 		return { color: '#ef4444', lineTier: 'thick' as LineTier, borderDash: undefined };
-	if (gt === GraphType.ImpactComputed)
-		return { color: '#0f766e', lineTier: 'thick' as LineTier, borderDash: [10, 4] as number[] };
-	if (gt === GraphType.ImpactLaboratory)
-		return { color: '#c2410c', lineTier: 'thick' as LineTier, borderDash: [10, 4] as number[] };
 	if (gt === GraphType.Atalon)
 		return { color: '#9ca3af', lineTier: 'thin' as LineTier, borderDash: [6, 6] as number[] };
 	if (gt === GraphType.AdditionalDoor)

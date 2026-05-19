@@ -22,12 +22,15 @@ import type {
 	ConstructionsEditData,
 	ConstructionsFilterData,
 	ConstructionType,
-	ConstructionTypeEnum,
 	ConstructionTypeTemplate,
 	Country,
 	Priority,
 } from '@features/guidbooks/types';
-import { isFloorConstructionType } from '@features/guidbooks/types';
+import {
+	ConstructionTypeEnum,
+	isFloorConstructionType,
+	MaterialTypeEnum,
+} from '@features/guidbooks/types';
 import {
 	convertToClientConstructionTypeEnumData,
 	convertToServerConstructionTypeEnumData,
@@ -199,60 +202,68 @@ export const convertToServerConstructionType = (
 	],
 });
 
+const FACING_ONE_SIDE_LAYER_ORDER: MaterialTypeEnum[] = [
+	MaterialTypeEnum.AirGap,
+	MaterialTypeEnum.Link,
+	MaterialTypeEnum.Frame,
+	MaterialTypeEnum.Filler,
+	MaterialTypeEnum.Board,
+];
+
+const mapUserMaterialFromApi = (userMaterial: any) => ({
+	materialId: userMaterial.materialId ?? '',
+	materialName: userMaterial.materialName || '',
+	additionalName: userMaterial.additionalName ?? null,
+	positionId: String(userMaterial.positionId ?? ''),
+	materialType: userMaterial.materialType ?? '',
+	materialTypeValue:
+		userMaterial.materialTypeValue?.map((mtv: any) => ({
+			value: String(mtv.value ?? ''),
+			materialParameters: String(mtv.materialParametrs ?? ''),
+		})) || [],
+});
+
+/** Облицовка справа, порядок positionId 0…4 от стены кнаружи. */
+const normalizeFacingOneSideCladding = (
+	materials: ReturnType<typeof mapUserMaterialFromApi>[],
+) =>
+	FACING_ONE_SIDE_LAYER_ORDER.map((materialType, index) => {
+		const row = materials.find((m) => m.materialType === materialType);
+		if (!row) return null;
+		return { ...row, positionId: String(index) };
+	}).filter((row): row is NonNullable<typeof row> => row != null);
+
 export const convertToClientConstructionType = (data: any): ConstructionType => {
-	const left =
+	const constructionTypeEnum =
+		convertToClientConstructionTypeEnumData(
+			data.constructionTypeEnum as ServerConstructionTypeEnum,
+		) ?? '';
+
+	let left =
 		data.constructions?.find((c: any) => c.constructionPosition === 'Left')?.userMaterials ||
 		[];
 
-	const center =
+	let center =
 		data.constructions?.find((c: any) => c.constructionPosition === 'Center')?.userMaterials ||
 		[];
 
-	const right =
+	let right =
 		data.constructions?.find((c: any) => c.constructionPosition === 'Right')?.userMaterials ||
 		[];
 
+	if (constructionTypeEnum === ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide) {
+		const claddingSource = left.length ? left : right;
+		if (claddingSource.length) {
+			right = normalizeFacingOneSideCladding(claddingSource.map(mapUserMaterialFromApi));
+			left = [];
+		}
+	}
+
 	return {
-		constructionTypeEnum:
-			convertToClientConstructionTypeEnumData(
-				data.constructionTypeEnum as ServerConstructionTypeEnum,
-			) ?? '',
-		leftConstruction: left.map((userMaterial: any) => ({
-			materialId: userMaterial.materialId ?? '',
-			materialName: userMaterial.materialName || '',
-			additionalName: userMaterial.additionalName ?? null,
-			positionId: String(userMaterial.positionId ?? ''),
-			materialType: userMaterial.materialType ?? '',
-			materialTypeValue:
-				userMaterial.materialTypeValue?.map((mtv: any) => ({
-					value: String(mtv.value ?? ''),
-					materialParameters: String(mtv.materialParametrs ?? ''),
-				})) || [],
-		})),
-		centerConstruction: center.map((userMaterial: any) => ({
-			materialId: userMaterial.materialId ?? '',
-			materialName: userMaterial.materialName || '',
-			additionalName: userMaterial.additionalName ?? null,
-			positionId: String(userMaterial.positionId ?? ''),
-			materialType: userMaterial.materialType ?? '',
-			materialTypeValue:
-				userMaterial.materialTypeValue?.map((mtv: any) => ({
-					value: String(mtv.value ?? ''),
-					materialParameters: String(mtv.materialParametrs ?? ''),
-				})) || [],
-		})),
-		rightConstruction: right.map((userMaterial: any) => ({
-			materialId: userMaterial.materialId ?? '',
-			materialName: userMaterial.materialName || '',
-			additionalName: userMaterial.additionalName ?? null,
-			positionId: String(userMaterial.positionId ?? ''),
-			materialType: userMaterial.materialType ?? '',
-			materialTypeValue:
-				userMaterial.materialTypeValue?.map((mtv: any) => ({
-					value: String(mtv.value ?? ''),
-					materialParameters: String(mtv.materialParametrs ?? ''),
-				})) || [],
-		})),
+		constructionTypeEnum,
+		leftConstruction: left.map(mapUserMaterialFromApi),
+		centerConstruction: center.map(mapUserMaterialFromApi),
+		rightConstruction: right.map(mapUserMaterialFromApi),
 	};
 };
 

@@ -37,7 +37,14 @@ import {
 	graphDotsConverterToClient,
 	mapAdditionalOpeningsToUpdateDto,
 } from '@features/constructor/converters';
-import { graphHasComputedData, graphHasImpactComputedData, graphHasImpactLaboratoryData, graphHasLaboratoryData } from '@features/constructor/utils';
+import {
+	filterConstructionTypeSelectOptions,
+	getLayoutClassFromConstructionHeader,
+	graphHasComputedData,
+	graphHasImpactComputedData,
+	graphHasImpactLaboratoryData,
+	graphHasLaboratoryData,
+} from '@features/constructor/utils';
 import {
 	getFloorConstructionById,
 	getReportFloorById,
@@ -55,6 +62,7 @@ import {
 import { getGuidebooksDetail, getGuidebooksEdit } from '@features/guidbooks/services';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
 import {
+	ConstructionClass,
 	EnConstructionTypesSelectValues,
 	Guidebooks,
 	isFloorConstructionType,
@@ -137,6 +145,17 @@ const DesigningConstructionScreen = () => {
 		() => isFloorConstructionType(constructionType ?? constructionHeader?.constructionType),
 		[constructionType, constructionHeader?.constructionType],
 	);
+
+	const constructionLayoutClass = useMemo(
+		() => getLayoutClassFromConstructionHeader(constructionHeader ?? undefined),
+		[constructionHeader],
+	);
+
+	const constructionTypeSelectOptions = useMemo(() => {
+		const all =
+			locale === 'ru' ? RuConstructionTypesSelectValues : EnConstructionTypesSelectValues;
+		return filterConstructionTypeSelectOptions(all, constructionLayoutClass);
+	}, [locale, constructionLayoutClass]);
 
 	const hasComputedDots = useMemo(() => graphHasComputedData(graphData), [graphData]);
 
@@ -431,6 +450,55 @@ const DesigningConstructionScreen = () => {
 		handleGetConstructionImage(constructionHeaderId);
 	}, [constructionHeaderId, handleGetConstructionImage]);
 
+	const catchRequestError = useCallback(
+		(error: unknown) => {
+			if (error instanceof AxiosError) {
+				const message =
+					typeof error.response?.data === 'string'
+						? error.response.data
+						: error.response?.data?.title || t('errors.request');
+				toast.error(message);
+			} else {
+				toast.error(t('errors.request'));
+			}
+			return of(null);
+		},
+		[t],
+	);
+
+	const updateAdditionalOpenings$ = useCallback(() => {
+		const rcId = reportConstructionIdRef.current;
+		const openings = additionalOpeningsRef.current;
+		if (!rcId || !openings) {
+			return of(true);
+		}
+		const { windows, doors } = openings.getPayload();
+		return from(
+			updateReportConstructionAdditional({
+				reportConstructionId: rcId,
+				additionalWindows: mapAdditionalOpeningsToUpdateDto(windows),
+				additionalDoors: mapAdditionalOpeningsToUpdateDto(doors),
+			}),
+		).pipe(
+			catchError(catchRequestError),
+			switchMap((addRes) => of(addRes?.status === 200)),
+		);
+	}, [catchRequestError]);
+
+	const refreshReportConstructionData = useCallback(() => {
+		if (reportType === ReportCategory.Single && reportId) {
+			handleGetSingleConstruction(reportId);
+		} else if (reportFloorInfoId) {
+			handleGetCurrentConstructionReportHeader(reportFloorInfoId);
+		}
+	}, [
+		handleGetCurrentConstructionReportHeader,
+		handleGetSingleConstruction,
+		reportFloorInfoId,
+		reportId,
+		reportType,
+	]);
+
 	const saveAdditionalOpeningsOnly = useCallback(
 		(onSuccess?: () => void) => {
 			const rcId = reportConstructionIdRef.current;
@@ -439,47 +507,35 @@ const DesigningConstructionScreen = () => {
 				toast.info(t('constructor.designing.generalIssuerReadOnly'));
 				return;
 			}
-			const { windows, doors } = openings.getPayload();
-			from(
-				updateReportConstructionAdditional({
-					reportConstructionId: rcId,
-					additionalWindows: mapAdditionalOpeningsToUpdateDto(windows),
-					additionalDoors: mapAdditionalOpeningsToUpdateDto(doors),
-				}),
-			)
-				.pipe(
-					catchError((error) => {
-						if (error instanceof AxiosError) {
-							const message =
-								typeof error.response?.data === 'string'
-									? error.response.data
-									: error.response?.data?.title || t('errors.request');
-							toast.error(message);
-						} else {
-							toast.error(t('errors.request'));
-						}
-						return of(null);
-					}),
-				)
-				.subscribe((addRes) => {
-					if (addRes?.status !== 200) {
-						return;
-					}
-					toast.success(t('constructor.designing.openingsSaved'));
-					if (reportType === ReportCategory.Single && reportId) {
-						handleGetSingleConstruction(reportId);
-					} else if (reportFloorInfoId) {
-						handleGetCurrentConstructionReportHeader(reportFloorInfoId);
-					}
-					onSuccess?.();
-				});
+			updateAdditionalOpenings$().subscribe((ok) => {
+				if (!ok) {
+					return;
+				}
+				toast.success(t('constructor.designing.openingsSaved'));
+				refreshReportConstructionData();
+				onSuccess?.();
+			});
 		},
-		[handleGetCurrentConstructionReportHeader, reportFloorInfoId, reportId, reportType, t],
+		[refreshReportConstructionData, t, updateAdditionalOpenings$],
 	);
 
 	const handleConstructionTypeChange = useCallback(
 		(value: string) => {
 			if (isConstructionEditLocked) {
+				return;
+			}
+			if (
+				value?.trim() &&
+				constructionLayoutClass === ConstructionClass.Wall &&
+				isFloorConstructionType(value)
+			) {
+				return;
+			}
+			if (
+				value?.trim() &&
+				constructionLayoutClass === ConstructionClass.Floor &&
+				!isFloorConstructionType(value)
+			) {
 				return;
 			}
 			if (!value?.trim()) {
@@ -561,7 +617,7 @@ const DesigningConstructionScreen = () => {
 			setSvgUrl(null);
 			setHasPendingTypeChange(true);
 		},
-		[form, isConstructionEditLocked],
+		[form, isConstructionEditLocked, constructionLayoutClass],
 	);
 
 	const handleRestoreInitialConstruction = useCallback(() => {
@@ -588,82 +644,47 @@ const DesigningConstructionScreen = () => {
 			...formData,
 			reportInfoId: reportId || undefined,
 		});
-		from(
-			getGuidebooksEdit({
-				data: dataForServer,
-				guidebookType: Guidebooks.CONSTRUCTION,
-			}),
-		)
+		updateAdditionalOpenings$()
 			.pipe(
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						const message =
-							typeof error.response?.data === 'string'
-								? error.response.data
-								: error.response?.data?.title || t('errors.request');
-						toast.error(message);
+				switchMap((openingsOk) => {
+					if (!openingsOk) {
+						return of(null);
 					}
-
-					return from([null]);
+					return from(
+						getGuidebooksEdit({
+							data: dataForServer,
+							guidebookType: Guidebooks.CONSTRUCTION,
+						}),
+					).pipe(catchError(catchRequestError));
 				}),
 			)
 			.subscribe((response) => {
-				if (response?.status === 200) {
-					toast.success(t('success.constructionUpdated'));
-
-					if (!constructionHeaderId) return;
-					handleGetConstructionByHeaderId(constructionHeaderId);
-					handleGetConstructionImage(constructionHeaderId);
-					handleGetGraphDetail(constructionHeaderId);
-					handleGetGraphAdditionalDetail(constructionHeaderId);
-
-					const rcId = reportConstructionIdRef.current;
-					const openings = additionalOpeningsRef.current;
-					if (!rcId || !openings) return;
-					const { windows, doors } = openings.getPayload();
-					from(
-						updateReportConstructionAdditional({
-							reportConstructionId: rcId,
-							additionalWindows: mapAdditionalOpeningsToUpdateDto(windows),
-							additionalDoors: mapAdditionalOpeningsToUpdateDto(doors),
-						}),
-					)
-						.pipe(
-							catchError((error) => {
-								if (error instanceof AxiosError) {
-									const message =
-										typeof error.response?.data === 'string'
-											? error.response.data
-											: error.response?.data?.title || t('errors.request');
-									toast.error(message);
-								} else {
-									toast.error(t('errors.request'));
-								}
-								return of(null);
-							}),
-						)
-						.subscribe((addRes) => {
-							if (addRes?.status === 200) {
-								if (reportType === ReportCategory.Single && reportId) {
-									handleGetSingleConstruction(reportId);
-								} else if (reportFloorInfoId) {
-									handleGetCurrentConstructionReportHeader(reportFloorInfoId);
-								}
-							}
-						});
+				if (response?.status !== 200) {
+					return;
 				}
+				toast.success(t('success.constructionUpdated'));
+
+				if (!constructionHeaderId) return;
+				handleGetConstructionByHeaderId(constructionHeaderId);
+				handleGetConstructionImage(constructionHeaderId);
+				handleGetGraphDetail(constructionHeaderId);
+				handleGetGraphAdditionalDetail(constructionHeaderId);
+				refreshReportConstructionData();
 			});
 	}, [
 		form,
 		constructionHeaderId,
 		handleGetConstructionByHeaderId,
 		handleGetConstructionImage,
-		reportFloorInfoId,
+		handleGetGraphDetail,
+		handleGetGraphAdditionalDetail,
 		reportId,
-		reportType,
 		t,
 		isConstructionEditLocked,
 		saveAdditionalOpeningsOnly,
+		catchRequestError,
+		updateAdditionalOpenings$,
+		refreshReportConstructionData,
 	]);
 
 	const onEditHandleWithRedirect = useCallback(() => {
@@ -682,78 +703,43 @@ const DesigningConstructionScreen = () => {
 			reportInfoId: reportId || undefined,
 		});
 
-		from(
-			getGuidebooksEdit({
-				data: dataForServer,
-				guidebookType: Guidebooks.CONSTRUCTION,
-			}),
-		)
-			.pipe(
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						const message =
-							typeof error.response?.data === 'string'
-								? error.response.data
-								: error.response?.data?.title || t('errors.request');
-						toast.error(message);
-					}
+		const goFloorPlans = () =>
+			navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
+				reportId: reportId!,
+				reportType: reportType!,
+			});
 
-					return from([null]);
+		updateAdditionalOpenings$()
+			.pipe(
+				switchMap((openingsOk) => {
+					if (!openingsOk) {
+						return of(null);
+					}
+					return from(
+						getGuidebooksEdit({
+							data: dataForServer,
+							guidebookType: Guidebooks.CONSTRUCTION,
+						}),
+					).pipe(catchError(catchRequestError));
 				}),
 			)
 			.subscribe((response) => {
-				if (response?.status !== 200) return;
-				toast.success(t('success.constructionUpdated'));
-
-				if (!constructionHeaderId) return;
-
-				const goFloorPlans = () =>
-					navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
-						reportId: reportId!,
-						reportType: reportType!,
-					});
-
-				const rcId = reportConstructionIdRef.current;
-				const openings = additionalOpeningsRef.current;
-				if (!rcId || !openings) {
-					goFloorPlans();
+				if (response?.status !== 200) {
 					return;
 				}
-				const { windows, doors } = openings.getPayload();
-				from(
-					updateReportConstructionAdditional({
-						reportConstructionId: rcId,
-						additionalWindows: mapAdditionalOpeningsToUpdateDto(windows),
-						additionalDoors: mapAdditionalOpeningsToUpdateDto(doors),
-					}),
-				)
-					.pipe(
-						catchError((error) => {
-							if (error instanceof AxiosError) {
-								const message =
-									typeof error.response?.data === 'string'
-										? error.response.data
-										: error.response?.data?.title || t('errors.request');
-								toast.error(message);
-							} else {
-								toast.error(t('errors.request'));
-							}
-							return of(null);
-						}),
-					)
-					.subscribe((addRes) => {
-						if (addRes?.status === 200) goFloorPlans();
-					});
+				toast.success(t('success.constructionUpdated'));
+				goFloorPlans();
 			});
 	}, [
 		form,
-		constructionHeaderId,
 		navigate,
 		reportId,
 		reportType,
 		t,
 		isConstructionEditLocked,
 		saveAdditionalOpeningsOnly,
+		catchRequestError,
+		updateAdditionalOpenings$,
 	]);
 
 	return (
@@ -797,11 +783,7 @@ const DesigningConstructionScreen = () => {
 								isSearchable
 								value={field.value || ''}
 								onChange={handleConstructionTypeChange}
-								options={
-									locale === 'ru'
-										? RuConstructionTypesSelectValues
-										: EnConstructionTypesSelectValues
-								}
+								options={constructionTypeSelectOptions}
 								error={
 									form.formState.errors.constructionTypeObject
 										?.constructionTypeEnum?.message
@@ -824,29 +806,20 @@ const DesigningConstructionScreen = () => {
 						)}
 					/>
 					<div className="flex h-fit flex-col">
-						{constructionHeader?.constructionTypeObject?.leftConstruction
-							?.slice()
-							.sort((a, b) => Number(a.positionId) - Number(b.positionId))
+						{(
+							[
+								constructionHeader?.constructionTypeObject?.centerConstruction,
+								constructionHeader?.constructionTypeObject?.rightConstruction,
+								constructionHeader?.constructionTypeObject?.leftConstruction,
+							] as const
+						)
+							.flatMap((group) =>
+								[...(group ?? [])].sort(
+									(a, b) => Number(a.positionId) - Number(b.positionId),
+								),
+							)
 							.map((material, i) => (
-								<p key={`left-${i}`} className="pl-4 text-[22px]">
-									- {formatMaterial(material, locale)}
-								</p>
-							))}
-
-						{constructionHeader?.constructionTypeObject?.centerConstruction
-							?.slice()
-							.sort((a, b) => Number(a.positionId) - Number(b.positionId))
-							.map((material, i) => (
-								<p key={`center-${i}`} className="pl-4 text-[22px]">
-									- {formatMaterial(material, locale)}
-								</p>
-							))}
-
-						{constructionHeader?.constructionTypeObject?.rightConstruction
-							?.slice()
-							.sort((a, b) => Number(a.positionId) - Number(b.positionId))
-							.map((material, i) => (
-								<p key={`right-${i}`} className="pl-4 text-[22px]">
+								<p key={`layer-${i}`} className="pl-4 text-[22px]">
 									- {formatMaterial(material, locale)}
 								</p>
 							))}
