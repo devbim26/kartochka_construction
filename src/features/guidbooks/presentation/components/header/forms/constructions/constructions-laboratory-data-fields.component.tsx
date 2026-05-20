@@ -9,7 +9,7 @@ import { FormSubTitle } from '../../form-sub-title.component';
 export type ConstructionLaboratoryFieldsPrefix = 'airLaboratory' | 'impactLaboratory';
 
 type Props = {
-	/** При редактировании конструкции — только просмотр */
+	/** Если true — только просмотр (блокировка полей) */
 	readOnly?: boolean;
 	namePrefix: ConstructionLaboratoryFieldsPrefix;
 	/** Подзаголовок блока (например «Воздушный шум» / «Ударный шум» для перекрытий) */

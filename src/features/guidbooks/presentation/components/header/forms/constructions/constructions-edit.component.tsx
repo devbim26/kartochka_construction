@@ -329,12 +329,11 @@ export const ConstructionsEdit = () => {
 					</div>
 					<FormSubTitle text="Лабораторные данные" />
 					<ConstructionLaboratoryDataFields
-						readOnly
 						namePrefix="airLaboratory"
 						title={showImpactLaboratory ? 'Воздушный шум' : undefined}
 					/>
 					{showImpactLaboratory ? (
-						<ConstructionLaboratoryDataFields readOnly namePrefix="impactLaboratory" title="Ударный шум" />
+						<ConstructionLaboratoryDataFields namePrefix="impactLaboratory" title="Ударный шум" />
 					) : null}
 				</>
 			) : (
