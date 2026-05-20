@@ -7,6 +7,7 @@ import {
 	useI18n,
 } from '@core';
 import { setDesignCalculationModeFromFeatureId } from '@core/utils/helpers/design-calculation-mode.helper';
+import { getOpenWebUiModelFromFeatureId } from '@core/utils/helpers/open-webui-model.helper';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { Fragment, useCallback, type ReactNode } from 'react';
@@ -144,9 +145,19 @@ export const MainHeader = () => {
 		handleRedirect();
 	}, [handleRedirect]);
 
-	const handleAiVisualizationRedirect = useCallback(() => {
-		navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.visualization.route);
-	}, [navigate]);
+	const handleAiVisualizationRedirect = useCallback(
+		(featureId: string) => {
+			const path =
+				APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.visualization.route;
+			const modelId = getOpenWebUiModelFromFeatureId(featureId);
+			if (modelId) {
+				navigate(path, { model: modelId });
+				return;
+			}
+			navigate(path);
+		},
+		[navigate],
+	);
 
 	const AIFeatures: FeatureCard[] = [
 		{
@@ -167,7 +178,7 @@ export const MainHeader = () => {
 			price: 'PRO',
 			buttonText: t('main.designCards.continueInAiMode'),
 			active: true,
-			onClick: handleAiVisualizationRedirect,
+			onClick: () => handleAiVisualizationRedirect('expertise-general'),
 		},
 		{
 			id: 'expertise-subject',
@@ -185,7 +196,7 @@ export const MainHeader = () => {
 			price: 'PRO',
 			buttonText: t('main.designCards.continueInAiMode'),
 			active: true,
-			onClick: handleAiVisualizationRedirect,
+			onClick: () => handleAiVisualizationRedirect('expertise-subject'),
 		},
 		{
 			id: 'expertise-documents',
@@ -206,7 +217,7 @@ export const MainHeader = () => {
 			price: 'PRO',
 			buttonText: t('main.designCards.continueInAiMode'),
 			active: true,
-			onClick: handleAiVisualizationRedirect,
+			onClick: () => handleAiVisualizationRedirect('expertise-documents'),
 		},
 		{
 			id: 'expertise-norms',
@@ -218,7 +229,7 @@ export const MainHeader = () => {
 			price: 'PRO',
 			buttonText: t('main.designCards.continueInAiMode'),
 			active: true,
-			onClick: handleAiVisualizationRedirect,
+			onClick: () => handleAiVisualizationRedirect('expertise-norms'),
 		},
 	];
 
@@ -319,7 +330,7 @@ export const MainHeader = () => {
 			price: 'PRO',
 			buttonText: t('main.designCards.continueInAiMode'),
 			active: true,
-			onClick: handleAiVisualizationRedirect,
+			onClick: () => handleAiVisualizationRedirect('arch-design'),
 		},
 	];
 

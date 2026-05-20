@@ -659,6 +659,7 @@ export const en = {
 	'constructor.myConstructions.imagePreview': 'Image preview',
 
 	'constructor.designing.selectType': 'Select type',
+	'constructor.designing.calculate': 'Calculate',
 	'constructor.designing.calcValue': 'Calculated value',
 	'constructor.designing.labValue': 'Laboratory value',
 	'constructor.designing.allowedValue': 'Allowed value',
@@ -1799,6 +1800,7 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.myConstructions.imagePreview': 'Превью изображения',
 
 	'constructor.designing.selectType': 'Выберите тип',
+	'constructor.designing.calculate': 'Рассчитать',
 	'constructor.designing.calcValue': 'Расчетное значение',
 	'constructor.designing.labValue': 'Лабораторное значение',
 	'constructor.designing.allowedValue': 'Допустимое значение',

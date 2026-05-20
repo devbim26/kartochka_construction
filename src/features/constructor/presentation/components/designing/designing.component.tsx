@@ -3,7 +3,6 @@ import {
 	ImagePreviewModal,
 	Select,
 	useAppDispatch,
-	useAppNavigate,
 	useAppSelector,
 	useI18n,
 } from '@core';
@@ -16,7 +15,6 @@ import type {
 	ReportInfoShort,
 } from '@features';
 import {
-	CONSTRUCTOR_ROUTES,
 	DesigningConfig,
 	DesigningHeader,
 	formatMaterial,
@@ -118,7 +116,6 @@ const DesigningConstructionScreen = () => {
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 	const additionalOpeningsRef = useRef<AdditionalOpeningsFormHandle>(null);
 	const reportConstructionIdRef = useRef<string | undefined>(undefined);
-	const navigate = useAppNavigate();
 	const reportFloorInfoId = search.get('reportFloorInfoId');
 	const { t, locale } = useI18n();
 	const form = useForm<DesigningData>({
@@ -687,61 +684,6 @@ const DesigningConstructionScreen = () => {
 		refreshReportConstructionData,
 	]);
 
-	const onEditHandleWithRedirect = useCallback(() => {
-		if (isConstructionEditLocked) {
-			const goFloorPlans = () =>
-				navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
-					reportId: reportId!,
-					reportType: reportType!,
-				});
-			saveAdditionalOpeningsOnly(goFloorPlans);
-			return;
-		}
-		const formData = form.getValues() as ConstructionsEditData;
-		const dataForServer = convertToServerConstructionsEditData({
-			...formData,
-			reportInfoId: reportId || undefined,
-		});
-
-		const goFloorPlans = () =>
-			navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
-				reportId: reportId!,
-				reportType: reportType!,
-			});
-
-		updateAdditionalOpenings$()
-			.pipe(
-				switchMap((openingsOk) => {
-					if (!openingsOk) {
-						return of(null);
-					}
-					return from(
-						getGuidebooksEdit({
-							data: dataForServer,
-							guidebookType: Guidebooks.CONSTRUCTION,
-						}),
-					).pipe(catchError(catchRequestError));
-				}),
-			)
-			.subscribe((response) => {
-				if (response?.status !== 200) {
-					return;
-				}
-				toast.success(t('success.constructionUpdated'));
-				goFloorPlans();
-			});
-	}, [
-		form,
-		navigate,
-		reportId,
-		reportType,
-		t,
-		isConstructionEditLocked,
-		saveAdditionalOpeningsOnly,
-		catchRequestError,
-		updateAdditionalOpenings$,
-	]);
-
 	return (
 		<div className="relative flex w-full flex-col gap-[30px]">
 			{previewSrc && (
@@ -868,13 +810,7 @@ const DesigningConstructionScreen = () => {
 						onClick={onEditHandle}
 						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
 					>
-						{t('common.apply')}
-					</Button>
-					<Button
-						onClick={onEditHandleWithRedirect}
-						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
-					>
-						{t('common.save')}
+						{t('constructor.designing.calculate')}
 					</Button>
 				</div>
 			</div>

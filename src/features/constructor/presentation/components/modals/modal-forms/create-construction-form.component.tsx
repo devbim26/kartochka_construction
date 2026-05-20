@@ -935,20 +935,11 @@ export const CreateConstructionForm = memoize(
 						</div>
 					</FormProvider>
 
-					{/* Блок превью: схема | описание (×1.5) | производитель — выравнивание по верхнему краю */}
+					{/* Блок превью: заголовки в одной строке, контент и схема по центру */}
 					{construction && (
-						<div className="mt-6 flex flex-col gap-3">
-							<div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)] gap-x-6">
-								<div aria-hidden />
-								<p className="text-lg font-semibold text-gray-800">
-									{t('createConstruction.selectedConstruction')}
-								</p>
-								<p className="text-center text-lg font-semibold text-gray-800">
-									{t('createConstruction.manufacturer')}
-								</p>
-							</div>
-							<div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)] items-start gap-x-6">
-							<div className="flex min-w-0 flex-col items-center self-start">
+						<div className="mt-6">
+							<div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)_minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] gap-x-6 gap-y-1">
+							<div className="row-span-2 flex min-w-0 flex-col items-center justify-center self-center">
 								<div className="flex w-full min-w-0 justify-center bg-white">
 									{svgUrl ? (
 										<button
@@ -971,7 +962,16 @@ export const CreateConstructionForm = memoize(
 								</div>
 							</div>
 
-							<div className="flex min-w-0 flex-col self-start text-left">
+								<div className="col-span-2 col-start-2 grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-x-2 self-end pt-8">
+									<p className="text-lg font-semibold text-gray-800">
+										{t('createConstruction.selectedConstruction')}
+									</p>
+									<p className="text-center text-lg font-semibold text-gray-800">
+										{t('createConstruction.manufacturer')}
+									</p>
+								</div>
+
+								<div className="flex min-w-0 flex-col justify-center self-center text-left">
 								<div className="max-h-[min(68vh,560px)] min-w-0 overflow-y-auto overflow-x-hidden pr-1">
 									<div className="flex flex-col items-start gap-0.5">
 										{(
@@ -1004,9 +1004,9 @@ export const CreateConstructionForm = memoize(
 											})}
 									</div>
 								</div>
-							</div>
+								</div>
 
-							<div className="flex min-w-0 flex-col items-center self-start text-center">
+								<div className="flex min-w-0 flex-col items-center justify-center self-center text-center">
 								<div className="flex w-full flex-col items-center gap-2">
 									{issuerIsLoading ? (
 										<div className="flex h-[48px] items-center justify-center">
