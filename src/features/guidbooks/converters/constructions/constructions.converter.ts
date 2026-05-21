@@ -96,40 +96,58 @@ const mapLaboratoryBlockFromApi = (
 	};
 };
 
-export const convertToClientConstructionsAddData = (data: any): ConstructionsAddData => ({
-	id: data.id ?? '',
-	name: data.name ?? '',
-	description: data.description ?? '',
-	priority:
-		data.priority != null && data.priority !== ''
-			? (convertToClientPriorityData(data.priority) as string)
-			: '',
-	descriptionSource: data.descriptionSource ?? '',
-	country: (convertToClientCountryData(data.countries!) as string[]) ?? [],
-	maxHeight: String(data.maxHeight) ?? '',
-	fireResistance: String(data.fireResistance) ?? '',
-	propertySource: data.propertySource ?? '',
-	airLaboratory: mapLaboratoryBlockFromApi(
-		data.airNoiseLaboratoryData as LaboratoryReadDto | undefined,
-		data.rTotal,
-	),
-	impactLaboratory: mapLaboratoryBlockFromApi(
-		data.impactNoiseLaboratoryData as LaboratoryReadDto | undefined,
-	),
-	constructionType: convertToClientConstructionTypeEnumData(data.constructionType) ?? '',
-	constructionPurpose:
-		(data.constructionPurpose as string) || ConstructionPurpose.Soundproofing,
-	constructionTypeObject: convertToClientConstructionType(data.constructionType!) ?? '',
-	issuer: data.issuerId ?? '',
-	issuerName: data.issuer?.name ?? '',
-	rw: data.rw != null && data.rw !== '' ? String(data.rw) : '',
-	lnw: data.lnw != null && data.lnw !== '' ? String(data.lnw) : '',
-});
+const resolveClientConstructionTypeEnum = (
+	constructionTypeBlock: { constructionTypeEnum?: ServerConstructionTypeEnum } | null | undefined,
+): ConstructionTypeEnum | '' => {
+	if (!constructionTypeBlock?.constructionTypeEnum) return '';
+	return (
+		convertToClientConstructionTypeEnumData(constructionTypeBlock.constructionTypeEnum) ?? ''
+	);
+};
+
+export const convertToClientConstructionsAddData = (data: any): ConstructionsAddData => {
+	const constructionTypeObject = convertToClientConstructionType(data.constructionType!) ?? {
+		constructionTypeEnum: '' as ConstructionTypeEnum,
+	};
+	const constructionType =
+		constructionTypeObject.constructionTypeEnum ||
+		resolveClientConstructionTypeEnum(data.constructionType);
+
+	return {
+		id: data.id ?? '',
+		name: data.name ?? '',
+		description: data.description ?? '',
+		priority:
+			data.priority != null && data.priority !== ''
+				? (convertToClientPriorityData(data.priority) as string)
+				: '',
+		descriptionSource: data.descriptionSource ?? '',
+		country: (convertToClientCountryData(data.countries!) as string[]) ?? [],
+		maxHeight: String(data.maxHeight) ?? '',
+		fireResistance: String(data.fireResistance) ?? '',
+		propertySource: data.propertySource ?? '',
+		airLaboratory: mapLaboratoryBlockFromApi(
+			data.airNoiseLaboratoryData as LaboratoryReadDto | undefined,
+			data.rTotal,
+		),
+		impactLaboratory: mapLaboratoryBlockFromApi(
+			data.impactNoiseLaboratoryData as LaboratoryReadDto | undefined,
+		),
+		constructionType,
+		constructionPurpose:
+			(data.constructionPurpose as string) || ConstructionPurpose.Soundproofing,
+		constructionTypeObject,
+		issuer: data.issuerId ?? '',
+		issuerName: data.issuer?.name ?? '',
+		rw: data.rw != null && data.rw !== '' ? String(data.rw) : '',
+		lnw: data.lnw != null && data.lnw !== '' ? String(data.lnw) : '',
+	};
+};
 
 export const convertToClientConstructionsEditData = (data: any): ConstructionsEditData => {
+	const base = convertToClientConstructionsAddData(data);
 	return {
-		...convertToClientConstructionsAddData(data),
-		constructionType: data.constructionType.constructionTypeEnum ?? '',
+		...base,
 		RCalcs: String(data.rw) ?? '',
 		estimatedIndexValue: String(data.computingIndexValue) ?? '',
 	};

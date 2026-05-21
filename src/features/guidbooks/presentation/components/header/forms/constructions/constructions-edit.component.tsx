@@ -51,10 +51,16 @@ export const ConstructionsEdit = () => {
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionTypeObject.constructionTypeEnum');
 	const constructionTypeField = watch('constructionType');
-	const showImpactLaboratory = isFloorConstructionType(constructionTypeField);
+	const selectConstructionType = constructionTypeField || currentConstruction || '';
+	const showImpactLaboratory = isFloorConstructionType(selectConstructionType);
 	const showZPanelGuidebookHint =
 		!displayChars &&
-		isZPanelGuidebookConstructionType(constructionTypeField || currentConstruction);
+		isZPanelGuidebookConstructionType(selectConstructionType);
+
+	useEffect(() => {
+		if (!currentConstruction || currentConstruction === constructionTypeField) return;
+		setValue('constructionType', currentConstruction, { shouldDirty: false });
+	}, [currentConstruction, constructionTypeField, setValue]);
 
 	const handleGetIssuerData = useCallback(async () => {
 		try {
@@ -346,12 +352,14 @@ export const ConstructionsEdit = () => {
 							<Select
 								{...field}
 								isSearchable
-								value={field.value || ''}
+								value={selectConstructionType}
 								onChange={(value) => {
-									setValue('constructionType', value as string);
-									value &&
+									const next = value as ConstructionTypeEnum;
+									setValue('constructionType', next);
+									setValue('constructionTypeObject.constructionTypeEnum', next);
+									next &&
 										ConstructionTypeMap({
-											currentConstruction: value as ConstructionTypeEnum,
+											currentConstruction: next,
 											currentForm: form,
 										}).action();
 								}}

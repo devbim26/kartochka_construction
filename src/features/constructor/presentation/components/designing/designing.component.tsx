@@ -59,7 +59,10 @@ import {
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksEdit } from '@features/guidbooks/services';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
-import { flattenConstructionMaterialsTopToBottom } from '@features/guidbooks/utils';
+import {
+	applyResolvedConstructionTypeToEditData,
+	flattenConstructionMaterialsTopToBottom,
+} from '@features/guidbooks/utils';
 import {
 	ConstructionClass,
 	EnConstructionTypesSelectValues,
@@ -183,6 +186,45 @@ const DesigningConstructionScreen = () => {
 		name: 'estimatedIndexValue',
 	});
 
+	const leftCladding = useWatch({
+		control: constructionFormControl,
+		name: 'constructionTypeObject.leftConstruction',
+	});
+	const rightCladding = useWatch({
+		control: constructionFormControl,
+		name: 'constructionTypeObject.rightConstruction',
+	});
+
+	useEffect(() => {
+		if (isConstructionEditLocked) return;
+
+		const values = form.getValues() as ConstructionsEditData;
+		const currentEnum = values.constructionTypeObject?.constructionTypeEnum;
+		if (!currentEnum) return;
+
+		const patched = applyResolvedConstructionTypeToEditData(values);
+		const resolvedEnum = patched.constructionTypeObject?.constructionTypeEnum;
+		if (!resolvedEnum || resolvedEnum === currentEnum) return;
+
+		form.setValue(
+			'constructionTypeObject.constructionTypeEnum',
+			resolvedEnum as ConstructionTypeEnum,
+		);
+		setConstructionHeader((prev) =>
+			prev
+				? {
+						...prev,
+						constructionType: patched.constructionType ?? prev.constructionType,
+						constructionTypeObject: {
+							...prev.constructionTypeObject,
+							...patched.constructionTypeObject,
+							constructionTypeEnum: resolvedEnum as ConstructionTypeEnum,
+						},
+					}
+				: prev,
+		);
+	}, [form, isConstructionEditLocked, leftCladding, rightCladding]);
+
 	const handleGetCurrentReportFloorInfo = (id: string) => {
 		dispatch(startLoading());
 		from(getReportFloorById({ id: id }))
@@ -225,7 +267,9 @@ const DesigningConstructionScreen = () => {
 			.pipe(
 				tap((response) => {
 					if (response.status === 200) {
-						const data = convertToClientConstructionsEditData(response.data);
+						const data = applyResolvedConstructionTypeToEditData(
+							convertToClientConstructionsEditData(response.data),
+						);
 						setConstructionHeader(data);
 						form.reset(data);
 						setHasPendingTypeChange(false);
@@ -637,7 +681,32 @@ const DesigningConstructionScreen = () => {
 			saveAdditionalOpeningsOnly();
 			return;
 		}
-		const formData = form.getValues() as ConstructionsEditData;
+		const formData = applyResolvedConstructionTypeToEditData(
+			form.getValues() as ConstructionsEditData,
+		);
+		const resolvedEnum = formData.constructionTypeObject?.constructionTypeEnum;
+		if (
+			resolvedEnum &&
+			resolvedEnum !== form.getValues('constructionTypeObject.constructionTypeEnum')
+		) {
+			form.setValue(
+				'constructionTypeObject.constructionTypeEnum',
+				resolvedEnum as ConstructionTypeEnum,
+			);
+			setConstructionHeader((prev) =>
+				prev
+					? {
+							...prev,
+							constructionType: formData.constructionType ?? prev.constructionType,
+							constructionTypeObject: {
+								...prev.constructionTypeObject,
+								...formData.constructionTypeObject,
+								constructionTypeEnum: resolvedEnum as ConstructionTypeEnum,
+							},
+						}
+					: prev,
+			);
+		}
 		const dataForServer = convertToServerConstructionsEditData({
 			...formData,
 			reportInfoId: reportId || undefined,
