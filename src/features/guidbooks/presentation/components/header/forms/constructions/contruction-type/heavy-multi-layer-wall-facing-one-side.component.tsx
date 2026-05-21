@@ -35,7 +35,7 @@ export const HeavyMultiLayerWallFacingOneSideComponent = ({
 		materialType: MaterialTypesSelectValuesEnum;
 	};
 
-	// Сначала базовый слой, затем облицовка (Left). В облицовке сверху вниз как в разрезе от воздуха к базе: 0 — воздушный зазор …
+	// Сначала база, затем облицовка (Left). Сверху вниз к базе: плита … воздушный зазор на pos.4 у базы.
 	const layerConfigs: LayerConfig[] = [
 		{
 			title: '1. Базовая конструкция',
@@ -58,11 +58,11 @@ export const HeavyMultiLayerWallFacingOneSideComponent = ({
 		Record<string, React.ComponentType<any>[]>
 	> = {
 		Left: {
-			'0': [AirGapMaterialType, ThicknessDensityFieldsType],
-			'1': [LinkMaterialType, PointConnectionsFieldsType],
+			'0': [BoardMaterialType, ThicknessDensityFieldsType],
+			'1': [FillerMaterialType, ThicknessDensityFieldsType],
 			'2': [FrameMaterialType, WidthRacksStepFieldsType],
-			'3': [FillerMaterialType, ThicknessDensityFieldsType],
-			'4': [BoardMaterialType, ThicknessDensityFieldsType],
+			'3': [LinkMaterialType, PointConnectionsFieldsType],
+			'4': [AirGapMaterialType, ThicknessDensityFieldsType],
 		},
 		Center: {
 			'2': [HeavyMaterialType, ThicknessDensityFieldsType],

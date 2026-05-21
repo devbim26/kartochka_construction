@@ -18,6 +18,10 @@ import {
 import { ConstructionTypeEnum, MaterialTypeEnum } from '@features/guidbooks/types';
 import type { JSX } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
+import {
+	multiLayerBottomCladdingInitialRows,
+	multiLayerTopCladdingInitialRows,
+} from './multi-layer-vertical-cladding.defaults';
 
 interface ConstructionTypeMapProps {
 	currentConstruction: ConstructionTypeEnum;
@@ -324,53 +328,10 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
-					{
-						positionId: '0',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Frame,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
-							{ materialParameters: MaterialParametrs.RackStep, value: '' },
-						],
-					},
-					{
-						positionId: '3',
-						materialId: '',
-						materialType: MaterialTypeEnum.Link,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-						],
-					},
-					{
-						positionId: '4',
-						materialId: '',
-						materialType: MaterialTypeEnum.AirGap,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
+				setValue(
+					'constructionTypeObject.leftConstruction',
+					multiLayerTopCladdingInitialRows(),
+				);
 
 				setValue('constructionTypeObject.centerConstruction', [
 					{
@@ -384,53 +345,10 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				setValue('constructionTypeObject.rightConstruction', [
-					{
-						positionId: '0',
-						materialId: '',
-						materialType: MaterialTypeEnum.AirGap,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Link,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-						],
-					},
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Frame,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
-							{ materialParameters: MaterialParametrs.RackStep, value: '' },
-						],
-					},
-					{
-						positionId: '3',
-						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '4',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
+				setValue(
+					'constructionTypeObject.rightConstruction',
+					multiLayerBottomCladdingInitialRows(),
+				);
 			},
 		},
 
@@ -523,53 +441,10 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide,
 				);
 
-				setValue('constructionTypeObject.leftConstruction', [
-					{
-						positionId: '0',
-						materialId: '',
-						materialType: MaterialTypeEnum.AirGap,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Link,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-						],
-					},
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Frame,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
-							{ materialParameters: MaterialParametrs.RackStep, value: '' },
-						],
-					},
-					{
-						positionId: '3',
-						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '4',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
+				setValue(
+					'constructionTypeObject.leftConstruction',
+					multiLayerTopCladdingInitialRows(),
+				);
 
 				setValue('constructionTypeObject.centerConstruction', [
 					{
@@ -622,57 +497,21 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide,
 				);
 
-				// Left
-				setValue('constructionTypeObject.leftConstruction', [
-					{
-						positionId: '0',
-						materialId: '',
-						materialType: MaterialTypeEnum.AirGap,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
+				setValue(
+					'constructionTypeObject.leftConstruction',
+					multiLayerTopCladdingInitialRows(),
+				);
+
+				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '1',
 						materialId: '',
-						materialType: MaterialTypeEnum.Link,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-						],
-					},
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Frame,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
-							{ materialParameters: MaterialParametrs.RackStep, value: '' },
-						],
-					},
-					{
-						positionId: '3',
-						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
+						materialType: MaterialTypeEnum.Plaster,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
-					{
-						positionId: '4',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
-
-				// Center
-				setValue('constructionTypeObject.centerConstruction', [
 					{
 						positionId: '2',
 						materialId: '',
@@ -685,7 +524,7 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '3',
 						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
+						materialType: MaterialTypeEnum.Board,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -694,16 +533,16 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '4',
 						materialId: '',
-						materialType: MaterialTypeEnum.Link,
+						materialType: MaterialTypeEnum.Heavy,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
+							{ materialParameters: MaterialParametrs.Density, value: '' },
 						],
 					},
 					{
 						positionId: '5',
 						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
+						materialType: MaterialTypeEnum.Plaster,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -711,54 +550,10 @@ export const ConstructionTypeMap = ({
 					},
 				]);
 
-				// Right
-				setValue('constructionTypeObject.rightConstruction', [
-					{
-						positionId: '0',
-						materialId: '',
-						materialType: MaterialTypeEnum.AirGap,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Link,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-						],
-					},
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Frame,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
-							{ materialParameters: MaterialParametrs.RackStep, value: '' },
-						],
-					},
-					{
-						positionId: '3',
-						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '4',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
+				setValue(
+					'constructionTypeObject.rightConstruction',
+					multiLayerBottomCladdingInitialRows(),
+				);
 			},
 		},
 

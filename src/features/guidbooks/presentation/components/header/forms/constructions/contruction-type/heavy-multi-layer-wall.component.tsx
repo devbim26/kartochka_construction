@@ -1,380 +1,110 @@
 import { DeleteIcon } from '@core';
 import {
-	AirGapMaterialType,
-	BoardMaterialType,
-	ConstructionLayer,
-	FillerMaterialType,
-	FrameMaterialType,
-	HeavyMaterialType,
-	LinkMaterialType,
-	MaterialParametrs,
-	PlasterMaterialType,
-	PointConnectionsFieldsType,
-	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-	WidthRacksStepFieldsType,
-} from '@features';
-import { ConstructionFieldsMap } from '@features/guidbooks/constants';
+	multiLayerBottomCladdingInitialRows,
+	multiLayerTopCladdingInitialRows,
+} from '@features/guidbooks/constants/constructions/multi-layer-vertical-cladding.defaults';
 import type { ConstructionTypeProps } from '@features/guidbooks/types';
-import { MaterialTypeEnum, MaterialTypesSelectValuesEnum } from '@features/guidbooks/types';
-
-import { useConstructionMaterials } from '@features/guidbooks/utils';
-import { Fragment, useEffect, useState, type ComponentType } from 'react';
+import { useEffect, useState } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
+import { VerticalFacingCladdingSection } from './vertical-facing-cladding-section.component';
+import { HeavyMultiLayerWallBaseSection } from './heavy-multi-layer-wall-base-section.component';
 
+/** Многослойная стена: база по центру; облицовка сверху/снизу, воздушный зазор у базы (сверху последним, снизу первым). */
 export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
-	const { control, watch, setValue } = currentForm;
+	const { watch, setValue } = currentForm;
+	const [hasTopCladding, setHasTopCladding] = useState(false);
+	const [hasBottomCladding, setHasBottomCladding] = useState(false);
 
-	const [hasLeftCladding, setHasLeftCladding] = useState(false);
-	const [hasRightCladding, setHasRightCladding] = useState(false);
-
-	const centerMaterials = useConstructionMaterials(control, watch, 'Center');
-	const leftMaterials = useConstructionMaterials(control, watch, 'Left');
-	const rightMaterials = useConstructionMaterials(control, watch, 'Right');
+	const leftConstruction = watch('constructionTypeObject.leftConstruction');
+	const rightConstruction = watch('constructionTypeObject.rightConstruction');
 
 	useEffect(() => {
-		const leftConstruction =
-			currentForm.getValues('constructionTypeObject.leftConstruction') || [];
-		const rightConstruction =
-			currentForm.getValues('constructionTypeObject.rightConstruction') || [];
+		setHasTopCladding((leftConstruction?.length ?? 0) > 0);
+		setHasBottomCladding((rightConstruction?.length ?? 0) > 0);
+	}, [leftConstruction, rightConstruction]);
 
-		setHasLeftCladding(leftConstruction.length > 0);
-		setHasRightCladding(rightConstruction.length > 0);
-	}, [currentForm]);
-
-	const centerLayerConfig = {
-		title: '1. Базовая конструкция',
-		constructionPosition: 'Center' as const,
-		positions: ['0', '1', '2', '3', '4', '5', '6'],
-		selectable: ['0', '6'],
-		materialType: MaterialTypesSelectValuesEnum.Base,
-		showAddButton: true,
-		fields: centerMaterials.fields,
-		append: centerMaterials.append,
-		insert: centerMaterials.insert,
-		remove: centerMaterials.remove,
+	const addTopCladding = () => {
+		setHasTopCladding(true);
+		setValue('constructionTypeObject.leftConstruction', multiLayerTopCladdingInitialRows());
 	};
 
-	const leftLayerConfig = {
-		title: '2. Облицовка слева',
-		constructionPosition: 'Left' as const,
-		positions: ['0', '1', '2', '3', '4'],
-		selectable: [] as string[],
-		materialType: MaterialTypesSelectValuesEnum.Additional,
-		showAddButton: false,
-		fields: leftMaterials.fields,
-		append: leftMaterials.append,
-		insert: leftMaterials.insert,
-		remove: leftMaterials.remove,
-	};
-
-	const rightLayerConfig = {
-		title: hasLeftCladding ? '3. Облицовка справа' : '2. Облицовка справа',
-		constructionPosition: 'Right' as const,
-		positions: ['0', '1', '2', '3', '4'],
-		selectable: [] as string[],
-		materialType: MaterialTypesSelectValuesEnum.Additional,
-		showAddButton: false,
-		fields: rightMaterials.fields,
-		append: rightMaterials.append,
-		insert: rightMaterials.insert,
-		remove: rightMaterials.remove,
-	};
-
-	const materialComponentsMap: Record<
-		'Left' | 'Center' | 'Right',
-		Record<string, ComponentType<any>[]>
-	> = {
-		Center: {
-			'1': [PlasterMaterialType, ThicknessDensityFieldsType],
-			'2': [HeavyMaterialType, ThicknessDensityFieldsType],
-			'3': [FillerMaterialType, ThicknessDensityFieldsType],
-			'4': [HeavyMaterialType, ThicknessDensityFieldsType],
-			'5': [PlasterMaterialType, ThicknessDensityFieldsType],
-		},
-		Left: {
-			'0': [BoardMaterialType, ThicknessDensityFieldsType],
-			'1': [FillerMaterialType, ThicknessDensityFieldsType],
-			'2': [FrameMaterialType, WidthRacksStepFieldsType],
-			'3': [LinkMaterialType, PointConnectionsFieldsType],
-			'4': [AirGapMaterialType, ThicknessDensityFieldsType],
-		},
-		Right: {
-			'0': [AirGapMaterialType, ThicknessDensityFieldsType],
-			'1': [LinkMaterialType, PointConnectionsFieldsType],
-			'2': [FrameMaterialType, WidthRacksStepFieldsType],
-			'3': [FillerMaterialType, ThicknessDensityFieldsType],
-			'4': [BoardMaterialType, ThicknessDensityFieldsType],
-		},
-	};
-
-	const addLeftCladding = () => {
-		setHasLeftCladding(true);
-		setValue('constructionTypeObject.leftConstruction', [
-			{
-				positionId: '0',
-				materialId: '',
-				materialType: MaterialTypeEnum.Board,
-				materialTypeValue: [
-					{ materialParameters: MaterialParametrs.Thickness, value: '' },
-					{ materialParameters: MaterialParametrs.Density, value: '' },
-				],
-			},
-			{
-				positionId: '1',
-				materialId: '',
-				materialType: MaterialTypeEnum.Filler,
-				materialTypeValue: [
-					{ materialParameters: MaterialParametrs.Thickness, value: '' },
-					{ materialParameters: MaterialParametrs.Density, value: '' },
-				],
-			},
-			{
-				positionId: '2',
-				materialId: '',
-				materialType: MaterialTypeEnum.Frame,
-				materialTypeValue: [
-					{ materialParameters: MaterialParametrs.Width, value: '' },
-					{ materialParameters: MaterialParametrs.RackStep, value: '' },
-				],
-			},
-			{
-				positionId: '3',
-				materialId: '',
-				materialType: MaterialTypeEnum.Link,
-				materialTypeValue: [
-					{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-					{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-				],
-			},
-			{
-				positionId: '4',
-				materialId: '',
-				materialType: MaterialTypeEnum.AirGap,
-				materialTypeValue: [
-					{ materialParameters: MaterialParametrs.Thickness, value: '' },
-					{ materialParameters: MaterialParametrs.Density, value: '' },
-				],
-			},
-		]);
-	};
-
-	const removeLeftCladding = () => {
-		setHasLeftCladding(false);
+	const removeTopCladding = () => {
+		setHasTopCladding(false);
 		setValue('constructionTypeObject.leftConstruction', []);
 	};
 
-	const addRightCladding = () => {
-		setHasRightCladding(true);
-		setValue('constructionTypeObject.rightConstruction', [
-			{
-				positionId: '0',
-				materialId: '',
-				materialType: MaterialTypeEnum.AirGap,
-				materialTypeValue: [
-					{ materialParameters: MaterialParametrs.Thickness, value: '' },
-					{ materialParameters: MaterialParametrs.Density, value: '' },
-				],
-			},
-			{
-				positionId: '1',
-				materialId: '',
-				materialType: MaterialTypeEnum.Link,
-				materialTypeValue: [
-					{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-					{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-				],
-			},
-			{
-				positionId: '2',
-				materialId: '',
-				materialType: MaterialTypeEnum.Frame,
-				materialTypeValue: [
-					{ materialParameters: MaterialParametrs.Width, value: '' },
-					{ materialParameters: MaterialParametrs.RackStep, value: '' },
-				],
-			},
-			{
-				positionId: '3',
-				materialId: '',
-				materialType: MaterialTypeEnum.Filler,
-				materialTypeValue: [
-					{ materialParameters: MaterialParametrs.Thickness, value: '' },
-					{ materialParameters: MaterialParametrs.Density, value: '' },
-				],
-			},
-			{
-				positionId: '4',
-				materialId: '',
-				materialType: MaterialTypeEnum.Board,
-				materialTypeValue: [
-					{ materialParameters: MaterialParametrs.Thickness, value: '' },
-					{ materialParameters: MaterialParametrs.Density, value: '' },
-				],
-			},
-		]);
+	const addBottomCladding = () => {
+		setHasBottomCladding(true);
+		setValue('constructionTypeObject.rightConstruction', multiLayerBottomCladdingInitialRows());
 	};
 
-	const removeRightCladding = () => {
-		setHasRightCladding(false);
+	const removeBottomCladding = () => {
+		setHasBottomCladding(false);
 		setValue('constructionTypeObject.rightConstruction', []);
 	};
 
-	const renderBlock = (
-		positionId: string,
-		fieldIndex: number,
-		fieldId: string,
-		constructionPosition: 'Left' | 'Center' | 'Right',
-		selectable: string[],
-		materialType: MaterialTypesSelectValuesEnum,
-		remove: (index: number) => void,
-		fields: any[],
-	) => (
-		<div key={fieldId} className="flex w-full items-start justify-between">
-			<div className="flex flex-1 gap-[20px]">
-				{selectable.includes(positionId) && (
-					<SelectableMaterialType
-						currentForm={currentForm}
-						fieldIndex={fieldIndex}
-						positionId={Number(positionId)}
-						constructionPosition={constructionPosition}
-						materialTypesSelectValues={materialType}
-					/>
-				)}
-
-				{materialComponentsMap[constructionPosition]?.[positionId]?.map((Comp, i) => (
-					<Comp key={i} {...{ fieldIndex, constructionPosition, currentForm }} />
-				))}
-
-				{selectable.includes(positionId) && (
-					<div className="flex gap-[8px]">
-						{ConstructionFieldsMap({
-							currentForm,
-							fieldIndex,
-							constructionPosition,
-							materialType: fields[fieldIndex]?.materialType as MaterialTypeEnum,
-						})}
-					</div>
-				)}
-			</div>
-
-			{selectable.includes(positionId) && (
-				<DeleteIcon className="shrink-0 self-start" onClick={() => remove(fieldIndex)} />
-			)}
-		</div>
-	);
-
-	const renderLayer = ({
-		title,
-		constructionPosition,
-		positions,
-		selectable,
-		materialType,
-		showAddButton = true,
-		fields,
-		insert,
-		remove,
-	}: typeof centerLayerConfig | typeof leftLayerConfig | typeof rightLayerConfig) => (
-		<ConstructionLayer key={title} title={title}>
-			<div className="flex flex-col gap-[24px]">
-				{positions.map((positionId, index) => {
-					const fieldIndex = fields.findIndex((f: any) => f.positionId === positionId);
-					const field = fields[fieldIndex];
-
-					const prevId = positions[index - 1];
-					const nextId = positions[index + 1];
-
-					const showAddButtonInList =
-						showAddButton &&
-						fieldIndex === -1 &&
-						(fields.some((f: any) => f.positionId === prevId) ||
-							fields.some((f: any) => f.positionId === nextId));
-
-					if (showAddButtonInList) {
-						return (
-							<AiOutlinePlusCircle
-								key={`add-${positionId}`}
-								onClick={() =>
-									insert(index, {
-										positionId,
-										materialId: '',
-										materialType: '',
-										materialTypeValue: [],
-									})
-								}
-								className="size-[40px] self-center text-primary"
-							/>
-						);
-					}
-
-					if (fieldIndex !== -1) {
-						return (
-							<Fragment key={field.id}>
-								{renderBlock(
-									positionId,
-									fieldIndex,
-									field.id,
-									constructionPosition,
-									selectable,
-									materialType,
-									remove,
-									fields,
-								)}
-							</Fragment>
-						);
-					}
-
-					return null;
-				})}
-			</div>
-		</ConstructionLayer>
-	);
-
 	return (
 		<>
-			{renderLayer(centerLayerConfig)}
-
-			<div className="mt-4 mb-4 flex justify-center">
-				{!hasLeftCladding ? (
+			<div className="mb-4 flex justify-center">
+				{!hasTopCladding ? (
 					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
 						<AiOutlinePlusCircle
-							onClick={addLeftCladding}
+							onClick={addTopCladding}
 							className="size-[40px] self-center text-primary"
 						/>
-						<span className="text-sm text-gray-600">Добавить облицовку слева</span>
+						<span className="text-sm text-gray-600">Добавить облицовку сверху</span>
 					</div>
 				) : (
 					<div className="flex w-full items-center justify-center gap-[10px]">
-						<DeleteIcon
-							onClick={removeLeftCladding}
-							className="size-[40px] self-center"
-						/>
-						<span className="text-sm text-gray-500">Удалить облицовку слева</span>
+						<DeleteIcon onClick={removeTopCladding} className="size-[40px] self-center" />
+						<span className="text-sm text-gray-500">Удалить облицовку сверху</span>
 					</div>
 				)}
 			</div>
-			{hasLeftCladding && renderLayer(leftLayerConfig)}
+
+			{hasTopCladding && (
+				<VerticalFacingCladdingSection
+					currentForm={currentForm}
+					constructionPosition="Left"
+					variant="top"
+					title="1. Облицовка сверху"
+				/>
+			)}
+
+			<HeavyMultiLayerWallBaseSection
+				currentForm={currentForm}
+				title={hasTopCladding ? '2. Базовая конструкция' : '1. Базовая конструкция'}
+			/>
 
 			<div className="mt-4 flex justify-center">
-				{!hasRightCladding ? (
+				{!hasBottomCladding ? (
 					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
 						<AiOutlinePlusCircle
-							onClick={addRightCladding}
+							onClick={addBottomCladding}
 							className="size-[40px] self-center text-primary"
 						/>
-						<span className="text-sm text-gray-600">Добавить облицовку справа</span>
+						<span className="text-sm text-gray-600">Добавить облицовку снизу</span>
 					</div>
 				) : (
 					<div className="flex w-full items-center justify-center gap-[10px]">
-						<DeleteIcon
-							onClick={removeRightCladding}
-							className="size-[40px] self-center"
-						/>
-						<span className="text-sm text-gray-500">Удалить облицовку справа</span>
+						<DeleteIcon onClick={removeBottomCladding} className="size-[40px] self-center" />
+						<span className="text-sm text-gray-500">Удалить облицовку снизу</span>
 					</div>
 				)}
 			</div>
-			{hasRightCladding && renderLayer(rightLayerConfig)}
+
+			{hasBottomCladding && (
+				<VerticalFacingCladdingSection
+					currentForm={currentForm}
+					constructionPosition="Right"
+					variant="bottom"
+					title={
+						hasTopCladding
+							? '3. Облицовка снизу'
+							: '2. Облицовка снизу'
+					}
+				/>
+			)}
 		</>
 	);
 };

@@ -36,6 +36,7 @@ import {
 	convertToClientIssuerData,
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksPaginated } from '@features/guidbooks/services';
+import { flattenConstructionMaterialsTopToBottom } from '@features/guidbooks/utils';
 import {
 	ConstructionClass,
 	Guidebooks,
@@ -974,23 +975,9 @@ export const CreateConstructionForm = memoize(
 								<div className="flex min-w-0 flex-col justify-center self-center text-left">
 								<div className="max-h-[min(68vh,560px)] min-w-0 overflow-y-auto overflow-x-hidden pr-1">
 									<div className="flex flex-col items-start gap-0.5">
-										{(
-											[
-												constructionDetail?.constructionTypeObject
-													?.centerConstruction,
-												constructionDetail?.constructionTypeObject
-													?.rightConstruction,
-												constructionDetail?.constructionTypeObject
-													?.leftConstruction,
-											] as const
-										)
-											.flatMap((group) =>
-												[...(group ?? [])].sort(
-													(a, b) =>
-														Number(a.positionId) - Number(b.positionId),
-												),
-											)
-											.map((material, i) => {
+										{flattenConstructionMaterialsTopToBottom(
+											constructionDetail?.constructionTypeObject,
+										).map((material, i) => {
 												const line = `- ${formatMaterial(material, locale)}`;
 												return (
 													<p

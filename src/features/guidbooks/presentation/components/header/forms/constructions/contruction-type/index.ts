@@ -13,3 +13,5 @@ export * from './one-glass-frame.component';
 export * from './two-glass-frame.component';
 export * from './z-panel-cladding-section.component';
 export * from './z-panel-wall.component';
+export * from './vertical-facing-cladding-section.component';
+export * from './heavy-multi-layer-wall-base-section.component';

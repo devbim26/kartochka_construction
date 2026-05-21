@@ -40,7 +40,7 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 						fieldIndex={fieldIndex}
 						positionId={Number(positionId)}
 						constructionPosition="Center"
-						materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+						materialTypesSelectValues={MaterialTypesSelectValuesEnum.BaseHeavySingleLayer}
 						currentForm={currentForm}
 					/>
 				)}

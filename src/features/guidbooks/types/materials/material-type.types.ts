@@ -52,6 +52,61 @@ export enum RuMaterialTypeEnum {
 	Board = 'Плиты',
 }
 
+/** Подписи типов материалов в селектах (enum не меняем). */
+export const MaterialTypeSelectLabelsRu: Partial<Record<MaterialTypeEnum, string>> = {
+	[MaterialTypeEnum.Heavy]: 'Тяжелые материалы',
+	[MaterialTypeEnum.Board]: 'Плитные материалы',
+	[MaterialTypeEnum.Frame]: 'Каркас',
+	[MaterialTypeEnum.Glazing]: 'Стекло',
+	[MaterialTypeEnum.Link]: 'Подвес',
+	[MaterialTypeEnum.AirGap]: 'Воздушный зазор',
+	[MaterialTypeEnum.Filler]: 'Звукопоглощающие плиты',
+	[MaterialTypeEnum.Membrane]: 'Мембраны',
+	[MaterialTypeEnum.AcousticTreatmentMaterials]: 'Акустические материалы',
+	[MaterialTypeEnum.Plaster]: 'Штукатурка',
+};
+
+export const MaterialTypeSelectLabelsEn: Partial<Record<MaterialTypeEnum, string>> = {
+	[MaterialTypeEnum.Heavy]: 'Heavy materials',
+	[MaterialTypeEnum.Board]: 'Board materials',
+	[MaterialTypeEnum.Frame]: 'Frame',
+	[MaterialTypeEnum.Glazing]: 'Glass',
+	[MaterialTypeEnum.Link]: 'Suspension',
+	[MaterialTypeEnum.AirGap]: 'Air gap',
+	[MaterialTypeEnum.Filler]: 'Sound-absorbing boards',
+	[MaterialTypeEnum.Membrane]: 'Membrane',
+	[MaterialTypeEnum.AcousticTreatmentMaterials]: 'Acoustic treatment materials',
+	[MaterialTypeEnum.Plaster]: 'Plaster',
+};
+
+/** Не показывать в селектах выбора типа материала. */
+export const MATERIAL_TYPES_EXCLUDED_FROM_SELECT: MaterialTypeEnum[] = [
+	MaterialTypeEnum.WoodBasedBoard,
+	MaterialTypeEnum.MineralBondedBoards,
+	MaterialTypeEnum.ZPanel,
+	MaterialTypeEnum.GapDistance,
+];
+
+export type MaterialTypeSelectOption = { label: string; value: MaterialTypeEnum };
+
+const materialTypeSelectOption = (
+	type: MaterialTypeEnum,
+	locale: 'ru' | 'en',
+): MaterialTypeSelectOption => ({
+	label:
+		(locale === 'en' ? MaterialTypeSelectLabelsEn : MaterialTypeSelectLabelsRu)[type] ??
+		type,
+	value: type,
+});
+
+const materialTypeSelectOptions = (
+	types: MaterialTypeEnum[],
+	locale: 'ru' | 'en',
+): MaterialTypeSelectOption[] =>
+	types
+		.filter((t) => !MATERIAL_TYPES_EXCLUDED_FROM_SELECT.includes(t))
+		.map((t) => materialTypeSelectOption(t, locale));
+
 export enum MaterialTypesSelectValuesEnum {
 	Base = 'Base',
 	Facing = 'Facing',
@@ -65,167 +120,110 @@ export enum MaterialTypesSelectValuesEnum {
 	ElasticBaseFloor = 'ElasticBaseFloor',
 	/** Стекло или плитные слои для двери (над/под базовыми плитами). */
 	DoorOptionalLayers = 'DoorOptionalLayers',
+	/** Тяжелая однослойная стена: тяжёлые, плиты, штукатурка (без мембран и акустики). */
+	BaseHeavySingleLayer = 'BaseHeavySingleLayer',
 }
 
-export const MaterialTypesSelectValuesMap = {
-	[MaterialTypesSelectValuesEnum.Base]: [
-		{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
-		//доп материалы
-		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
-		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.Glass]: [{ label: 'Стекло', value: MaterialTypeEnum.Glazing }],
-	[MaterialTypesSelectValuesEnum.MultiGlass]: [
-		{ label: 'Стекло', value: MaterialTypeEnum.Glazing },
-		{ label: 'Воздушные зазоры', value: MaterialTypeEnum.AirGap },
-	],
-	[MaterialTypesSelectValuesEnum.Soundproofing]: [
-		{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
-		//доп материалы
-		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
-		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.Facing]: [
-		{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
-		{ label: 'Воздушные зазоры', value: MaterialTypeEnum.AirGap },
-		{ label: 'Связующие', value: MaterialTypeEnum.Link },
-		{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
-		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-		//доп материалы
-		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
-		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.Additional]: [
-		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
-		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.FramePartition]: [
-		{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
-		{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
-		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-		//доп материалы
-		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
-		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.AirGapFiller]: [
-		{ label: 'Воздушные зазоры', value: MaterialTypeEnum.AirGap },
-		{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
-		//доп материалы
-		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-		{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
-		{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.ElasticBaseFloor]: [
-		{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
-		{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
-		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-	],
-	[MaterialTypesSelectValuesEnum.DoorOptionalLayers]: [
-		{ label: 'Стеклянные', value: MaterialTypeEnum.Glazing },
-		{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
-		{ label: 'Плиты', value: MaterialTypeEnum.Board },
-	],
-};
-
-export const EnMaterialTypesSelectValuesMap = {
-	[MaterialTypesSelectValuesEnum.Base]: [
-		{ label: 'Heavy', value: MaterialTypeEnum.Heavy },
-		//доп материалы
-		{ label: 'Board', value: MaterialTypeEnum.Board },
-		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
-		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.Glass]: [{ label: 'Glass', value: MaterialTypeEnum.Glazing }],
-	[MaterialTypesSelectValuesEnum.MultiGlass]: [
-		{ label: 'Glass', value: MaterialTypeEnum.Glazing },
-		{ label: 'AirGap', value: MaterialTypeEnum.AirGap },
-	],
-	[MaterialTypesSelectValuesEnum.Soundproofing]: [
-		{ label: 'ZPanel', value: MaterialTypeEnum.ZPanel },
-		//доп материалы
-		{ label: 'Board', value: MaterialTypeEnum.Board },
-		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
-		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.Facing]: [
-		{ label: 'Frame', value: MaterialTypeEnum.Frame },
-		{ label: 'AirGap', value: MaterialTypeEnum.AirGap },
-		{ label: 'Link', value: MaterialTypeEnum.Link },
-		{ label: 'Filler', value: MaterialTypeEnum.Filler },
-		{ label: 'Board', value: MaterialTypeEnum.Board },
-		//доп материалы
-		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
-		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.Additional]: [
-		{ label: 'Board', value: MaterialTypeEnum.Board },
-		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
-		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.FramePartition]: [
-		{ label: 'Frame', value: MaterialTypeEnum.Frame },
-		{ label: 'Filler', value: MaterialTypeEnum.Filler },
-		{ label: 'Board', value: MaterialTypeEnum.Board },
-		//доп материалы
-		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
-		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.AirGapFiller]: [
-		{ label: 'AirGap', value: MaterialTypeEnum.AirGap },
-		{ label: 'Filler', value: MaterialTypeEnum.Filler },
-		//доп материалы
-		{ label: 'Board', value: MaterialTypeEnum.Board },
-		{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
-		{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	],
-	[MaterialTypesSelectValuesEnum.ElasticBaseFloor]: [
-		{ label: 'Heavy', value: MaterialTypeEnum.Heavy },
-		{ label: 'Filler', value: MaterialTypeEnum.Filler },
-		{ label: 'Board', value: MaterialTypeEnum.Board },
-	],
-	[MaterialTypesSelectValuesEnum.DoorOptionalLayers]: [
-		{ label: 'Glazing', value: MaterialTypeEnum.Glazing },
-		{ label: 'Heavy', value: MaterialTypeEnum.Heavy },
-		{ label: 'Board', value: MaterialTypeEnum.Board },
-	],
-};
-
-export const RuMaterialTypesSelectValues = [
-	{ label: 'Каркасные', value: MaterialTypeEnum.Frame },
-	{ label: 'Древесно-стружечные плиты', value: MaterialTypeEnum.WoodBasedBoard },
-	{ label: 'Минеральные плиты', value: MaterialTypeEnum.MineralBondedBoards },
-	{ label: 'Стеклянные', value: MaterialTypeEnum.Glazing },
-	{ label: 'Мембраны', value: MaterialTypeEnum.Membrane },
-	{ label: 'Акустические материалы', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	{ label: 'Воздушные зазоры', value: MaterialTypeEnum.AirGap },
-	{ label: 'Связующие', value: MaterialTypeEnum.Link },
-	{ label: 'Наполнительные', value: MaterialTypeEnum.Filler },
-	{ label: 'Тяжелые', value: MaterialTypeEnum.Heavy },
-	{ label: 'Плиты', value: MaterialTypeEnum.Board },
-	{ label: 'Звукоизоляционные', value: MaterialTypeEnum.ZPanel },
-	{ label: 'Зазоры', value: MaterialTypeEnum.GapDistance },
-	{ label: 'Штукатурка', value: MaterialTypeEnum.Plaster },
+/** Типы материалов, недоступные при добавлении слоя в проектировании. */
+export const DESIGNING_EXCLUDED_MATERIAL_TYPES: MaterialTypeEnum[] = [
+	MaterialTypeEnum.AcousticTreatmentMaterials,
 ];
 
-export const EnMaterialTypesSelectValues = [
-	{ label: 'Frame', value: MaterialTypeEnum.Frame },
-	{ label: 'WoodBasedBoard', value: MaterialTypeEnum.WoodBasedBoard },
-	{ label: 'MineralBondedBoards', value: MaterialTypeEnum.MineralBondedBoards },
-	{ label: 'Glazing', value: MaterialTypeEnum.Glazing },
-	{ label: 'Membrane', value: MaterialTypeEnum.Membrane },
-	{ label: 'AcousticTreatmentMaterials', value: MaterialTypeEnum.AcousticTreatmentMaterials },
-	{ label: 'AirGap', value: MaterialTypeEnum.AirGap },
-	{ label: 'Link', value: MaterialTypeEnum.Link },
-	{ label: 'Filler', value: MaterialTypeEnum.Filler },
-	{ label: 'Heavy', value: MaterialTypeEnum.Heavy },
-	{ label: 'Board', value: MaterialTypeEnum.Board },
-	{ label: 'ZPanel', value: MaterialTypeEnum.ZPanel },
-	{ label: 'GapDistance', value: MaterialTypeEnum.GapDistance },
-	{ label: 'Plaster', value: MaterialTypeEnum.Plaster },
+const supplementalMaterialTypes: MaterialTypeEnum[] = [
+	MaterialTypeEnum.Membrane,
+	MaterialTypeEnum.AcousticTreatmentMaterials,
 ];
+
+const buildMaterialTypesSelectValuesMap = (locale: 'ru' | 'en') => ({
+	[MaterialTypesSelectValuesEnum.Base]: materialTypeSelectOptions(
+		[MaterialTypeEnum.Heavy, MaterialTypeEnum.Board, ...supplementalMaterialTypes],
+		locale,
+	),
+	[MaterialTypesSelectValuesEnum.Glass]: materialTypeSelectOptions(
+		[MaterialTypeEnum.Glazing],
+		locale,
+	),
+	[MaterialTypesSelectValuesEnum.MultiGlass]: materialTypeSelectOptions(
+		[MaterialTypeEnum.Glazing, MaterialTypeEnum.AirGap],
+		locale,
+	),
+	[MaterialTypesSelectValuesEnum.Soundproofing]: materialTypeSelectOptions(
+		[MaterialTypeEnum.Board, ...supplementalMaterialTypes],
+		locale,
+	),
+	[MaterialTypesSelectValuesEnum.Facing]: materialTypeSelectOptions(
+		[
+			MaterialTypeEnum.Frame,
+			MaterialTypeEnum.AirGap,
+			MaterialTypeEnum.Link,
+			MaterialTypeEnum.Filler,
+			MaterialTypeEnum.Board,
+			...supplementalMaterialTypes,
+		],
+		locale,
+	),
+	[MaterialTypesSelectValuesEnum.Additional]: materialTypeSelectOptions(
+		[MaterialTypeEnum.Board, ...supplementalMaterialTypes],
+		locale,
+	),
+	[MaterialTypesSelectValuesEnum.FramePartition]: materialTypeSelectOptions(
+		[
+			MaterialTypeEnum.Frame,
+			MaterialTypeEnum.Filler,
+			MaterialTypeEnum.Board,
+			...supplementalMaterialTypes,
+		],
+		locale,
+	),
+	[MaterialTypesSelectValuesEnum.AirGapFiller]: materialTypeSelectOptions(
+		[
+			MaterialTypeEnum.AirGap,
+			MaterialTypeEnum.Filler,
+			MaterialTypeEnum.Board,
+			...supplementalMaterialTypes,
+		],
+		locale,
+	),
+	[MaterialTypesSelectValuesEnum.ElasticBaseFloor]: materialTypeSelectOptions(
+		[MaterialTypeEnum.Heavy, MaterialTypeEnum.Filler, MaterialTypeEnum.Board],
+		locale,
+	),
+	[MaterialTypesSelectValuesEnum.DoorOptionalLayers]: materialTypeSelectOptions(
+		[MaterialTypeEnum.Glazing, MaterialTypeEnum.Heavy, MaterialTypeEnum.Board],
+		locale,
+	),
+	[MaterialTypesSelectValuesEnum.BaseHeavySingleLayer]: materialTypeSelectOptions(
+		[MaterialTypeEnum.Heavy, MaterialTypeEnum.Board, MaterialTypeEnum.Plaster],
+		locale,
+	),
+});
+
+export const MaterialTypesSelectValuesMap = buildMaterialTypesSelectValuesMap('ru');
+
+export const EnMaterialTypesSelectValuesMap = buildMaterialTypesSelectValuesMap('en');
+
+const allSelectableMaterialTypes: MaterialTypeEnum[] = [
+	MaterialTypeEnum.Frame,
+	MaterialTypeEnum.Glazing,
+	MaterialTypeEnum.Membrane,
+	MaterialTypeEnum.AcousticTreatmentMaterials,
+	MaterialTypeEnum.AirGap,
+	MaterialTypeEnum.Link,
+	MaterialTypeEnum.Filler,
+	MaterialTypeEnum.Heavy,
+	MaterialTypeEnum.Board,
+	MaterialTypeEnum.Plaster,
+];
+
+export const RuMaterialTypesSelectValues = materialTypeSelectOptions(
+	allSelectableMaterialTypes,
+	'ru',
+);
+
+export const EnMaterialTypesSelectValues = materialTypeSelectOptions(
+	allSelectableMaterialTypes,
+	'en',
+);
 
 export interface MaterialType {
 	id: string;

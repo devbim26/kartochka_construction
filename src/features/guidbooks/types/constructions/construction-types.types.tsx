@@ -141,12 +141,20 @@ export const EnConstructionTypesSelectValues = [
 		value: ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 	},
 	{
+		label: EnConstructionTypesMap.HeavySingleLayerWallFacingBothSide,
+		value: ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
+	},
+	{
 		label: EnConstructionTypesMap.HeavyMultiLayerWall,
 		value: ConstructionTypeEnum.HeavyMultiLayerWall,
 	},
 	{
 		label: EnConstructionTypesMap.HeavyMultiLayerWallFacingOneSide,
 		value: ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide,
+	},
+	{
+		label: EnConstructionTypesMap.HeavyMultiLayerWallFacingBothSide,
+		value: ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide,
 	},
 	{
 		label: EnConstructionTypesMap.ZPanel,
@@ -182,10 +190,10 @@ export const RuConstructionTypesSelectValues = [
 		label: 'Тяжелая однослойная стена + облицовка с одной стороны',
 		value: ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 	},
-	// {
-	// 	label: 'Тяжелая однослойная стена + облицовка с двух сторон',
-	// 	value: ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
-	// },
+	{
+		label: 'Тяжелая однослойная стена + облицовка с двух сторон',
+		value: ConstructionTypeEnum.HeavySingleLayerWallFacingBothSide,
+	},
 	{
 		label: 'Тяжелая многослойная стена',
 		value: ConstructionTypeEnum.HeavyMultiLayerWall,
@@ -193,6 +201,10 @@ export const RuConstructionTypesSelectValues = [
 	{
 		label: 'Тяжелая многослойная стена + облицовка с одной стороны',
 		value: ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide,
+	},
+	{
+		label: 'Тяжелая многослойная стена + облицовка с двух сторон',
+		value: ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide,
 	},
 	{
 		label: RuConstructionTypesMap.ZPanel,

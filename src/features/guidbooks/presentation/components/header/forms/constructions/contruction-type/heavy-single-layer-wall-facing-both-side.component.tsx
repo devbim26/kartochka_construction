@@ -1,278 +1,106 @@
 import { DeleteIcon } from '@core';
 import {
-	AirGapMaterialType,
-	BoardMaterialType,
-	ConstructionLayer,
-	FillerMaterialType,
-	FrameMaterialType,
-	HeavyMaterialType,
-	LinkMaterialType,
-	PointConnectionsFieldsType,
-	SelectableMaterialType,
-	ThicknessDensityFieldsType,
-	WidthRacksStepFieldsType,
-} from '@features';
-import { ConstructionFieldsMap } from '@features/guidbooks/constants';
-import {
-	MaterialTypesSelectValuesEnum,
-	type ConstructionTypeProps,
-	type MaterialTypeEnum,
-} from '@features/guidbooks/types';
-
-import { useConstructionMaterials } from '@features/guidbooks/utils';
+	multiLayerBottomCladdingInitialRows,
+	multiLayerTopCladdingInitialRows,
+} from '@features/guidbooks/constants/constructions/multi-layer-vertical-cladding.defaults';
+import type { ConstructionTypeProps } from '@features/guidbooks/types';
+import { useEffect, useState } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
-import { Fragment } from 'react/jsx-runtime';
+import { HeavySingleLayerWallComponent } from './heavy-single-layer-wall.component';
+import { VerticalFacingCladdingSection } from './vertical-facing-cladding-section.component';
 
+/** Однослойная тяжелая стена + облицовка сверху и снизу (зеркальные слои). */
 export const HeavySingleLayerWallFacingBothSideComponent = ({
 	currentForm,
 }: ConstructionTypeProps) => {
-	const { control, watch } = currentForm;
+	const { watch, setValue } = currentForm;
+	const [hasTopCladding, setHasTopCladding] = useState(false);
+	const [hasBottomCladding, setHasBottomCladding] = useState(false);
 
-	// База, затем облицовки. Справа порядок позиций 0… — с наружного воздушного зазора (см. positionId === '0').
-	const layerConfigs = [
-		{
-			title: '1. Базовая конструкция',
-			constructionPosition: 'Center' as const,
-			positions: ['0', '1', '2', '3', '4'],
-			selectable: ['0', '1', '3', '4'],
-			materialType: MaterialTypesSelectValuesEnum.Base,
-		},
-		{
-			title: '2. Облицовка слева',
-			constructionPosition: 'Left' as const,
-			positions: ['0', '1', '2', '3', '4', '5', '6'],
-			selectable: ['5', '6'],
-			materialType: MaterialTypesSelectValuesEnum.Additional,
-		},
-		{
-			title: '3. Облицовка справа',
-			constructionPosition: 'Right' as const,
-			positions: ['0', '1', '2', '3', '4', '5', '6'],
-			selectable: ['5', '6'],
-			materialType: MaterialTypesSelectValuesEnum.Additional,
-		},
-	];
+	const leftConstruction = watch('constructionTypeObject.leftConstruction');
+	const rightConstruction = watch('constructionTypeObject.rightConstruction');
 
-	const renderBlock = (
-		positionId: string,
-		fieldIndex: number,
-		fieldId: string,
-		constructionPosition: 'Left' | 'Center' | 'Right',
-		selectable: string[],
-		materialType: MaterialTypesSelectValuesEnum,
-		remove: (index: number) => void,
-		fields: any[],
-	) => (
-		<div key={fieldId} className="flex w-full items-start justify-between">
-			<div className="flex flex-1 gap-[20px]">
-				{selectable.includes(positionId) && (
-					<SelectableMaterialType
-						currentForm={currentForm}
-						fieldIndex={fieldIndex}
-						positionId={Number(positionId)}
-						constructionPosition={constructionPosition}
-						materialTypesSelectValues={materialType}
-					/>
-				)}
+	useEffect(() => {
+		setHasTopCladding((leftConstruction?.length ?? 0) > 0);
+		setHasBottomCladding((rightConstruction?.length ?? 0) > 0);
+	}, [leftConstruction, rightConstruction]);
 
-				{positionId === '2' && constructionPosition === 'Center' && (
-					<>
-						<HeavyMaterialType {...{ fieldIndex, constructionPosition, currentForm }} />
-						<ThicknessDensityFieldsType
-							{...{ fieldIndex, constructionPosition, currentForm }}
+	const addTopCladding = () => {
+		setHasTopCladding(true);
+		setValue('constructionTypeObject.leftConstruction', multiLayerTopCladdingInitialRows());
+	};
+
+	const removeTopCladding = () => {
+		setHasTopCladding(false);
+		setValue('constructionTypeObject.leftConstruction', []);
+	};
+
+	const addBottomCladding = () => {
+		setHasBottomCladding(true);
+		setValue('constructionTypeObject.rightConstruction', multiLayerBottomCladdingInitialRows());
+	};
+
+	const removeBottomCladding = () => {
+		setHasBottomCladding(false);
+		setValue('constructionTypeObject.rightConstruction', []);
+	};
+
+	return (
+		<>
+			<div className="mb-4 flex justify-center">
+				{!hasTopCladding ? (
+					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
+						<AiOutlinePlusCircle
+							onClick={addTopCladding}
+							className="size-[40px] self-center text-primary"
 						/>
-					</>
-				)}
-				{positionId === '2' && constructionPosition !== 'Center' && (
-					<>
-						<FrameMaterialType {...{ fieldIndex, constructionPosition, currentForm }} />
-						<WidthRacksStepFieldsType
-							{...{ fieldIndex, constructionPosition, currentForm }}
-						/>
-					</>
-				)}
-
-				{positionId === '3' && constructionPosition !== 'Center' && (
-					<>
-						{constructionPosition === 'Left' ? (
-							<>
-								<LinkMaterialType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-								<PointConnectionsFieldsType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-							</>
-						) : (
-							<>
-								<FillerMaterialType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-								<ThicknessDensityFieldsType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-							</>
-						)}
-					</>
-				)}
-
-				{positionId === '4' && constructionPosition !== 'Center' && (
-					<>
-						{constructionPosition === 'Left' ? (
-							<>
-								<AirGapMaterialType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-								<ThicknessDensityFieldsType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-							</>
-						) : (
-							<>
-								<BoardMaterialType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-								<ThicknessDensityFieldsType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-							</>
-						)}
-					</>
-				)}
-
-				{positionId === '1' && constructionPosition !== 'Center' && (
-					<>
-						{constructionPosition === 'Left' ? (
-							<>
-								<FillerMaterialType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-								<ThicknessDensityFieldsType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-							</>
-						) : (
-							<>
-								<LinkMaterialType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-								<PointConnectionsFieldsType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-							</>
-						)}
-					</>
-				)}
-
-				{positionId === '0' && constructionPosition !== 'Center' && (
-					<>
-						{constructionPosition === 'Left' ? (
-							<>
-								<BoardMaterialType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-								<ThicknessDensityFieldsType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-							</>
-						) : (
-							<>
-								<AirGapMaterialType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-								<ThicknessDensityFieldsType
-									{...{ fieldIndex, constructionPosition, currentForm }}
-								/>
-							</>
-						)}
-					</>
-				)}
-
-				{selectable.includes(positionId) && (
-					<div className="flex gap-[8px]">
-						{ConstructionFieldsMap({
-							currentForm,
-							fieldIndex,
-							constructionPosition,
-							materialType: fields[fieldIndex]?.materialType as MaterialTypeEnum,
-						})}
+						<span className="text-sm text-gray-600">Добавить облицовку сверху</span>
+					</div>
+				) : (
+					<div className="flex w-full items-center justify-center gap-[10px]">
+						<DeleteIcon onClick={removeTopCladding} className="size-[40px] self-center" />
+						<span className="text-sm text-gray-500">Удалить облицовку сверху</span>
 					</div>
 				)}
 			</div>
 
-			{selectable.includes(positionId) && (
-				<DeleteIcon className="shrink-0 self-start" onClick={() => remove(fieldIndex)} />
+			{hasTopCladding && (
+				<VerticalFacingCladdingSection
+					currentForm={currentForm}
+					constructionPosition="Left"
+					variant="top"
+					title="1. Облицовка сверху"
+				/>
 			)}
-		</div>
-	);
 
-	return (
-		<>
-			{layerConfigs.map(
-				({ title, constructionPosition, positions, selectable, materialType }) => {
-					const { fields, append, remove } = useConstructionMaterials(
-						control,
-						watch,
-						constructionPosition,
-					);
+			<div className={hasTopCladding ? 'mt-4' : ''}>
+				<HeavySingleLayerWallComponent currentForm={currentForm} />
+			</div>
 
-					return (
-						<ConstructionLayer key={title} title={title}>
-							<div className="flex flex-col gap-[24px]">
-								{positions.map((positionId, index) => {
-									const fieldIndex = fields.findIndex(
-										(f: any) => f.positionId === positionId,
-									);
-									const field = fields[fieldIndex];
+			<div className="mt-4 flex justify-center">
+				{!hasBottomCladding ? (
+					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
+						<AiOutlinePlusCircle
+							onClick={addBottomCladding}
+							className="size-[40px] self-center text-primary"
+						/>
+						<span className="text-sm text-gray-600">Добавить облицовку снизу</span>
+					</div>
+				) : (
+					<div className="flex w-full items-center justify-center gap-[10px]">
+						<DeleteIcon onClick={removeBottomCladding} className="size-[40px] self-center" />
+						<span className="text-sm text-gray-500">Удалить облицовку снизу</span>
+					</div>
+				)}
+			</div>
 
-									const prevId = positions[index - 1];
-									const nextId = positions[index + 1];
-
-									const showAddButton =
-										fieldIndex === -1 &&
-										(fields.some((f: any) => f.positionId === prevId) ||
-											fields.some((f: any) => f.positionId === nextId));
-
-									if (showAddButton) {
-										return (
-											<AiOutlinePlusCircle
-												key={`add-${positionId}`}
-												onClick={() =>
-													append({
-														positionId,
-														materialId: '',
-														materialType: '',
-														materialTypeValue: [],
-													})
-												}
-												className="size-[40px] self-center text-primary"
-											/>
-										);
-									}
-
-									if (fieldIndex !== -1) {
-										return (
-											<Fragment key={field.id}>
-												{renderBlock(
-													positionId,
-													fieldIndex,
-													field.id,
-													constructionPosition,
-													selectable,
-													materialType,
-													remove,
-													fields,
-												)}
-											</Fragment>
-										);
-									}
-
-									return null;
-								})}
-							</div>
-						</ConstructionLayer>
-					);
-				},
+			{hasBottomCladding && (
+				<VerticalFacingCladdingSection
+					currentForm={currentForm}
+					constructionPosition="Right"
+					variant="bottom"
+					title="Облицовка снизу"
+				/>
 			)}
 		</>
 	);

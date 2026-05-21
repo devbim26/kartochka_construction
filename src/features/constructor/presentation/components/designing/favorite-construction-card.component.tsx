@@ -4,6 +4,7 @@ import { formatMaterial } from '@features';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { ConstructionsEditData, UserMaterials } from '@features/guidbooks/types';
+import { flattenConstructionMaterialsTopToBottom } from '@features/guidbooks/utils';
 import { Guidebooks } from '@features/guidbooks/types';
 
 import { svgConstructionDetail } from '@features/constructor/services';
@@ -115,11 +116,7 @@ export const FavoriteConstructionCard = ({
 	const allMaterials = useMemo<UserMaterials[]>(() => {
 		if (!header) return [];
 
-		return [
-			...(header.constructionTypeObject?.leftConstruction || []),
-			...(header.constructionTypeObject?.centerConstruction || []),
-			...(header.constructionTypeObject?.rightConstruction || []),
-		].sort((a, b) => Number(a.positionId) - Number(b.positionId));
+		return flattenConstructionMaterialsTopToBottom(header.constructionTypeObject);
 	}, [header]);
 
 	return (

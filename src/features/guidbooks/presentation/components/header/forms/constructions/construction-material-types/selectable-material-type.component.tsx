@@ -4,11 +4,15 @@ import { memoize } from '@core/utils/hoc/memo.utils';
 import { MaterialTypeValuesMap } from '@features/guidbooks/constants';
 import { useConstructionMaterialsCatalog } from '@features/guidbooks/utils';
 import {
+	DESIGNING_EXCLUDED_MATERIAL_TYPES,
+	EnMaterialTypesSelectValuesMap,
 	MaterialTypesSelectValuesMap,
 	type MaterialTypeEnum,
 	type MaterialTypesSelectValuesEnum,
 	type UserMaterials,
 } from '@features/guidbooks/types';
+import { useI18n } from '@core';
+import { useMemo } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
@@ -37,7 +41,20 @@ export const SelectableMaterialType = memoize(
 		currentForm,
 	}: Props) => {
 		const { showMaterialDesignationInput } = useSelectableMaterialDesignation();
+		const { locale } = useI18n();
 		const { formState, control, watch, setValue, register } = currentForm;
+
+		const materialTypeOptions = useMemo(() => {
+			const map =
+				locale === 'en' ? EnMaterialTypesSelectValuesMap : MaterialTypesSelectValuesMap;
+			const options = map[materialTypesSelectValues] ?? [];
+			if (!showMaterialDesignationInput) {
+				return options;
+			}
+			return options.filter(
+				(o) => !DESIGNING_EXCLUDED_MATERIAL_TYPES.includes(o.value),
+			);
+		}, [locale, materialTypesSelectValues, showMaterialDesignationInput]);
 
 		const [currentMaterialType, userMaterials, materialTypeValue] = watch([
 			`constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}.materialType`,
@@ -61,7 +78,7 @@ export const SelectableMaterialType = memoize(
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={[...MaterialTypesSelectValuesMap[materialTypesSelectValues]]}
+							options={materialTypeOptions}
 							error={
 								(formState.errors as any)?.constructionTypeObject?.[
 									positionMap[constructionPosition]

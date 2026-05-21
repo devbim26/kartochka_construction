@@ -101,7 +101,13 @@ export const ConstructionFieldsMap = ({
 		),
 		[MaterialTypeEnum.WoodBasedBoard]: <></>,
 		[MaterialTypeEnum.MineralBondedBoards]: <></>,
-		[MaterialTypeEnum.Plaster]: <></>,
+		[MaterialTypeEnum.Plaster]: (
+			<ThicknessDensityFieldsType
+				fieldIndex={fieldIndex}
+				constructionPosition={constructionPosition}
+				currentForm={currentForm}
+			/>
+		),
 	};
 
 	return componentsMap[materialType] || <></>;
@@ -212,6 +218,15 @@ export const MaterialTypeValuesMap = {
 		},
 	],
 	[MaterialTypeEnum.WoodBasedBoard]: [],
-	[MaterialTypeEnum.Plaster]: [],
+	[MaterialTypeEnum.Plaster]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
 	[MaterialTypeEnum.MineralBondedBoards]: [],
 };

@@ -59,6 +59,7 @@ import {
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksEdit } from '@features/guidbooks/services';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
+import { flattenConstructionMaterialsTopToBottom } from '@features/guidbooks/utils';
 import {
 	ConstructionClass,
 	EnConstructionTypesSelectValues,
@@ -748,19 +749,9 @@ const DesigningConstructionScreen = () => {
 						)}
 					/>
 					<div className="flex h-fit flex-col">
-						{(
-							[
-								constructionHeader?.constructionTypeObject?.centerConstruction,
-								constructionHeader?.constructionTypeObject?.rightConstruction,
-								constructionHeader?.constructionTypeObject?.leftConstruction,
-							] as const
-						)
-							.flatMap((group) =>
-								[...(group ?? [])].sort(
-									(a, b) => Number(a.positionId) - Number(b.positionId),
-								),
-							)
-							.map((material, i) => (
+						{flattenConstructionMaterialsTopToBottom(
+							constructionHeader?.constructionTypeObject,
+						).map((material, i) => (
 								<p key={`layer-${i}`} className="pl-4 text-[22px]">
 									- {formatMaterial(material, locale)}
 								</p>
