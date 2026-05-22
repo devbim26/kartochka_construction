@@ -27,6 +27,7 @@ import {
 	convertToServerConstructionsEditData,
 	convertToServerConstructionsFilterData,
 } from '@features/guidbooks/converters';
+import { prepareConstructionEditDataForPersistence } from '@features/guidbooks/utils';
 import {
 	getGuidebooksCreate,
 	getGuidebooksDelete,
@@ -296,7 +297,9 @@ const ConstructionsScreen = () => {
 		from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
 			.pipe(
 				switchMap((response: AxiosResponse) => {
-					const data = convertToClientConstructionsEditData(response.data);
+					const data = prepareConstructionEditDataForPersistence(
+						convertToClientConstructionsEditData(response.data),
+					);
 					return from([data]);
 				}),
 				tap((data) => setSingleMaterial(data)),
@@ -344,9 +347,10 @@ const ConstructionsScreen = () => {
 	};
 
 	const handleEditTableData = (data: ConstructionsEditData) => {
+		const prepared = prepareConstructionEditDataForPersistence(data);
 		from(
 			getGuidebooksEdit({
-				data: convertToServerConstructionsEditData(data),
+				data: convertToServerConstructionsEditData(prepared),
 				guidebookType: Guidebooks.CONSTRUCTION,
 			}),
 		)

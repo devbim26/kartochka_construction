@@ -40,10 +40,16 @@ export interface IFCViewerConstructorArgs {
 }
 
 export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructorArgs> {
+	private _sceneContainerRef: RefObject<HTMLDivElement | null> | null = null;
 	private _resizeObserver: ResizeObserver | null = null;
 	private _onKeyDownHandlerRef: IFCViewerOnKeyDownHandler | null = null;
 	private _onDoubleClickHandlerRef: IFCViewerOnDoubleClickHandler | null = null;
 	private _onResizeHandlerRef: IFCViewerVoidFunc | null = null;
+	private _addHorizontalClipHandlerRef: IFCViewerVoidFunc | null = null;
+	private _addVerticalClipXHandlerRef: IFCViewerVoidFunc | null = null;
+	private _addVerticalClipZHandlerRef: IFCViewerVoidFunc | null = null;
+	private _addClipAtCursorHandlerRef: IFCViewerVoidFunc | null = null;
+	private _clearAllClipsHandlerRef: IFCViewerVoidFunc | null = null;
 	private _onBeforeUpdateHandlerRef: IFCViewerRenderEventHandler | null = null;
 	private _onAfterUpdateHandlerRef: IFCViewerRenderEventHandler | null = null;
 	private _projectionOnChangedRef: IFCViewerProjectionOnChanged | null = null;
@@ -120,6 +126,11 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 						callbacks: {
 							loadIfcFileHandler: this._loadIfcFileHandlerRef!,
 							disposeFragmentsHandler: this._disposeFragmentsHandlerRef!,
+							addHorizontalClipHandler: this._addHorizontalClipHandlerRef!,
+							addVerticalClipXHandler: this._addVerticalClipXHandlerRef!,
+							addVerticalClipZHandler: this._addVerticalClipZHandlerRef!,
+							addClipAtCursorHandler: this._addClipAtCursorHandlerRef!,
+							clearAllClipsHandler: this._clearAllClipsHandlerRef!,
 						},
 					},
 				},
@@ -159,14 +170,15 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 	}
 
 	private destoyHandlers() {
-		// containers.sceneContainer.current?.removeEventListener(
-		// 	'keydown',
-		// 	this._onKeyDownHandlerRef!,
-		// );
-		// containers.sceneContainer.current?.removeEventListener(
-		// 	'dblclick',
-		// 	this._onDoubleClickHandlerRef!,
-		// );
+		const sceneEl = this._sceneContainerRef?.current;
+		if (sceneEl) {
+			if (this._onKeyDownHandlerRef) {
+				sceneEl.removeEventListener('keydown', this._onKeyDownHandlerRef);
+			}
+			if (this._onDoubleClickHandlerRef) {
+				sceneEl.removeEventListener('dblclick', this._onDoubleClickHandlerRef);
+			}
+		}
 		if (this._resizeObserver) {
 			this._resizeObserver.disconnect();
 			this._resizeObserver = null;
@@ -187,18 +199,18 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 	}
 
 	private setupHandlers(core: IFCViewerCore, sceneContainer: RefObject<HTMLDivElement | null>) {
-		this._onKeyDownHandlerRef = this.onKeyDownHandler.bind(this);
-		//containers.sceneContainer.current?.addEventListener('keydown', this._onKeyDownHandlerRef);
+		this._sceneContainerRef = sceneContainer;
 
+		this._onKeyDownHandlerRef = this.onKeyDownHandler.bind(this);
 		this._onDoubleClickHandlerRef = this.onDoubleClickHandler.bind(this);
-		// containers.sceneContainer.current?.addEventListener(
-		// 	'dblclick',
-		// 	this._onDoubleClickHandlerRef,
-		// );
 
 		this._onResizeHandlerRef = this.onResizeHandler.bind(this);
 		const sceneEl = sceneContainer.current;
 		if (sceneEl) {
+			sceneEl.tabIndex = 0;
+			sceneEl.classList.add('outline-none');
+			sceneEl.addEventListener('keydown', this._onKeyDownHandlerRef);
+			sceneEl.addEventListener('dblclick', this._onDoubleClickHandlerRef);
 			if (typeof ResizeObserver !== 'undefined') {
 				this._resizeObserver = new ResizeObserver(() => this.onResizeHandler());
 				this._resizeObserver.observe(sceneEl);
@@ -218,6 +230,28 @@ export class IFCViewer extends IFCViewerBase<IFCViewerState, IFCViewerConstructo
 
 		this._loadIfcFileHandlerRef = this.loadIfcFileHandler.bind(this);
 		this._disposeFragmentsHandlerRef = this.disposeFragmentsHandler.bind(this);
+		this._addHorizontalClipHandlerRef = () => {
+			const core = this.state.core;
+			if (!core) return;
+			this.state.clipper?.addSectionPlane(core, 'horizontal');
+		};
+		this._addVerticalClipXHandlerRef = () => {
+			const core = this.state.core;
+			if (!core) return;
+			this.state.clipper?.addSectionPlane(core, 'verticalX');
+		};
+		this._addVerticalClipZHandlerRef = () => {
+			const core = this.state.core;
+			if (!core) return;
+			this.state.clipper?.addSectionPlane(core, 'verticalZ');
+		};
+		this._addClipAtCursorHandlerRef = () => {
+			this._sceneContainerRef?.current?.focus();
+			this.state.clipper?.addClipperPlane(this.state.core!);
+		};
+		this._clearAllClipsHandlerRef = () => {
+			this.state.clipper?.deleteAllClipperPlanes();
+		};
 	}
 
 	private onKeyDownHandler(event: KeyboardEvent) {

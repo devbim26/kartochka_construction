@@ -31,10 +31,20 @@ import {
 	isFloorConstructionType,
 	MaterialTypeEnum,
 } from '@features/guidbooks/types';
+import { normalizeVerticalCladdingForConstructionType } from '@features/guidbooks/utils/cladding-layer-normalization.utils';
 import {
 	convertToClientConstructionTypeEnumData,
 	convertToServerConstructionTypeEnumData,
 } from './construction-type-enum.converter';
+
+const parseMaterialNumericValue = (raw: string | undefined | null): number => {
+	const text = String(raw ?? '').trim().replace(',', '.');
+	if (!text) {
+		return 0;
+	}
+	const n = Number(text);
+	return Number.isFinite(n) ? n : 0;
+};
 
 export const convertToClientConstructionTypesList = (data: any): ConstructionTypeTemplate[] => {
 	return data.map((data: any) => ({
@@ -172,9 +182,9 @@ export const convertToServerConstructionType = (
 							materialType: m.materialType,
 							materialTypeValue:
 								m.materialTypeValue?.map((mtv) => ({
-									value: Number(mtv.value),
+									value: parseMaterialNumericValue(mtv.value),
 									materialParametrs: mtv.materialParameters as MaterialParametrs,
-								})) || [],
+								})) ?? [],
 						})),
 					},
 				]
@@ -191,9 +201,9 @@ export const convertToServerConstructionType = (
 							materialType: m.materialType,
 							materialTypeValue:
 								m.materialTypeValue?.map((mtv) => ({
-									value: Number(mtv.value),
+									value: parseMaterialNumericValue(mtv.value),
 									materialParametrs: mtv.materialParameters as MaterialParametrs,
-								})) || [],
+								})) ?? [],
 						})),
 					},
 				]
@@ -210,9 +220,9 @@ export const convertToServerConstructionType = (
 							materialType: m.materialType,
 							materialTypeValue:
 								m.materialTypeValue?.map((mtv) => ({
-									value: Number(mtv.value),
+									value: parseMaterialNumericValue(mtv.value),
 									materialParametrs: mtv.materialParameters as MaterialParametrs,
-								})) || [],
+								})) ?? [],
 						})),
 					},
 				]
@@ -277,11 +287,19 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 		}
 	}
 
+	const leftConstruction = left.map(mapUserMaterialFromApi);
+	const rightConstruction = right.map(mapUserMaterialFromApi);
+	const normalized = normalizeVerticalCladdingForConstructionType(
+		constructionTypeEnum,
+		leftConstruction,
+		rightConstruction,
+	);
+
 	return {
 		constructionTypeEnum,
-		leftConstruction: left.map(mapUserMaterialFromApi),
+		leftConstruction: normalized.left,
 		centerConstruction: center.map(mapUserMaterialFromApi),
-		rightConstruction: right.map(mapUserMaterialFromApi),
+		rightConstruction: normalized.right,
 	};
 };
 

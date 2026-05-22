@@ -20,6 +20,11 @@ export interface UIControlPanelConstructorProps {
 	callbacks: {
 		loadIfcFileHandler: () => void;
 		disposeFragmentsHandler: () => void;
+		addHorizontalClipHandler: () => void;
+		addVerticalClipXHandler: () => void;
+		addVerticalClipZHandler: () => void;
+		addClipAtCursorHandler: () => void;
+		clearAllClipsHandler: () => void;
 	};
 }
 
@@ -123,6 +128,32 @@ export const uiControlPanelConstructor = (props: UIControlPanelConstructorProps)
 							}}"
 						>
 						</bim-number-input>
+					</bim-panel-section>
+					<bim-panel-section collapsed label="Разрезы">
+						<bim-button
+							label="Горизонтальный (по этажу)"
+							@click="${() => props.callbacks.addHorizontalClipHandler()}"
+						></bim-button>
+						<bim-button
+							label="Вертикальный (ось X)"
+							@click="${() => props.callbacks.addVerticalClipXHandler()}"
+						></bim-button>
+						<bim-button
+							label="Вертикальный (ось Z)"
+							@click="${() => props.callbacks.addVerticalClipZHandler()}"
+						></bim-button>
+						<bim-button
+							label="Разрез по клику (2× в сцене)"
+							@click="${() => props.callbacks.addClipAtCursorHandler()}"
+						></bim-button>
+						<bim-button
+							label="Удалить все разрезы"
+							@click="${() => props.callbacks.clearAllClipsHandler()}"
+						></bim-button>
+						<p style="font-size: 11px; color: #666; margin: 4px 0 0;">
+							Фокус на 3D-сцене: Delete — убрать ближайший разрез. Двойной клик по сцене —
+							разрез в точке.
+						</p>
 					</bim-panel-section>
 					<bim-panel-section collapsed label="Сетка">
 						<bim-checkbox
