@@ -236,3 +236,13 @@ export const RuConstructionTypesSelectValues = [
 	},
 	{ label: 'Дверь', value: ConstructionTypeEnum.Door },
 ];
+
+/** Подпись типа конструкции для таблиц (клиентский и серверный enum). */
+export const getConstructionTypeLabel = (
+	value: string | undefined | null,
+	locale: 'ru' | 'en' = 'ru',
+): string => {
+	if (!value) return '—';
+	const map = locale === 'ru' ? RuConstructionTypesMap : EnConstructionTypesMap;
+	return (map as Record<string, string>)[value] ?? value;
+};

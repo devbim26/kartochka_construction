@@ -116,12 +116,18 @@ const resolveClientConstructionTypeEnum = (
 };
 
 export const convertToClientConstructionsAddData = (data: any): ConstructionsAddData => {
-	const constructionTypeObject = convertToClientConstructionType(data.constructionType!) ?? {
-		constructionTypeEnum: '' as ConstructionTypeEnum,
-	};
+	const constructionTypeBlock =
+		typeof data.constructionType === 'string'
+			? { constructionTypeEnum: data.constructionType, constructions: [] }
+			: data.constructionType;
+
+	const constructionTypeObject = constructionTypeBlock
+		? convertToClientConstructionType(constructionTypeBlock)
+		: { constructionTypeEnum: '' as ConstructionTypeEnum };
+
 	const constructionType =
 		constructionTypeObject.constructionTypeEnum ||
-		resolveClientConstructionTypeEnum(data.constructionType);
+		resolveClientConstructionTypeEnum(constructionTypeBlock);
 
 	return {
 		id: data.id ?? '',
@@ -238,7 +244,16 @@ const FACING_ONE_SIDE_LAYER_ORDER: MaterialTypeEnum[] = [
 	MaterialTypeEnum.Board,
 ];
 
-const mapUserMaterialFromApi = (userMaterial: any) => ({
+export type MappedUserMaterial = {
+	materialId: string;
+	materialName: string;
+	additionalName: string | null;
+	positionId: string;
+	materialType: string;
+	materialTypeValue: Array<{ value: string; materialParameters: string }>;
+};
+
+const mapUserMaterialFromApi = (userMaterial: any): MappedUserMaterial => ({
 	materialId: userMaterial.materialId ?? '',
 	materialName: userMaterial.materialName || '',
 	additionalName: userMaterial.additionalName ?? null,
@@ -247,19 +262,19 @@ const mapUserMaterialFromApi = (userMaterial: any) => ({
 	materialTypeValue:
 		userMaterial.materialTypeValue?.map((mtv: any) => ({
 			value: String(mtv.value ?? ''),
-			materialParameters: String(mtv.materialParametrs ?? ''),
-		})) || [],
+			materialParameters: String(
+				mtv.materialParametrs ?? mtv.materialParameters ?? '',
+			),
+		})) ?? [],
 });
 
 /** Облицовка справа, порядок positionId 0…4 от стены кнаружи. */
-const normalizeFacingOneSideCladding = (
-	materials: ReturnType<typeof mapUserMaterialFromApi>[],
-) =>
+const normalizeFacingOneSideCladding = (materials: MappedUserMaterial[]) =>
 	FACING_ONE_SIDE_LAYER_ORDER.map((materialType, index) => {
 		const row = materials.find((m) => m.materialType === materialType);
 		if (!row) return null;
 		return { ...row, positionId: String(index) };
-	}).filter((row): row is NonNullable<typeof row> => row != null);
+	}).filter((row): row is MappedUserMaterial => row != null);
 
 export const convertToClientConstructionType = (data: any): ConstructionType => {
 	const constructionTypeEnum =
@@ -267,28 +282,31 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 			data.constructionTypeEnum as ServerConstructionTypeEnum,
 		) ?? '';
 
-	let left =
+	const leftRaw =
 		data.constructions?.find((c: any) => c.constructionPosition === 'Left')?.userMaterials ||
 		[];
 
-	let center =
+	const centerRaw =
 		data.constructions?.find((c: any) => c.constructionPosition === 'Center')?.userMaterials ||
 		[];
 
-	let right =
+	const rightRaw =
 		data.constructions?.find((c: any) => c.constructionPosition === 'Right')?.userMaterials ||
 		[];
 
+	let leftConstruction = leftRaw.map(mapUserMaterialFromApi);
+	let rightConstruction = rightRaw.map(mapUserMaterialFromApi);
+
 	if (constructionTypeEnum === ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide) {
-		const claddingSource = left.length ? left : right;
+		const claddingSource = leftRaw.length ? leftRaw : rightRaw;
 		if (claddingSource.length) {
-			right = normalizeFacingOneSideCladding(claddingSource.map(mapUserMaterialFromApi));
-			left = [];
+			rightConstruction = normalizeFacingOneSideCladding(
+				claddingSource.map(mapUserMaterialFromApi),
+			);
+			leftConstruction = [];
 		}
 	}
 
-	const leftConstruction = left.map(mapUserMaterialFromApi);
-	const rightConstruction = right.map(mapUserMaterialFromApi);
 	const normalized = normalizeVerticalCladdingForConstructionType(
 		constructionTypeEnum,
 		leftConstruction,
@@ -298,7 +316,7 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 	return {
 		constructionTypeEnum,
 		leftConstruction: normalized.left,
-		centerConstruction: center.map(mapUserMaterialFromApi),
+		centerConstruction: centerRaw.map(mapUserMaterialFromApi),
 		rightConstruction: normalized.right,
 	};
 };

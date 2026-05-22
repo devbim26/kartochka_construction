@@ -37,7 +37,7 @@ import {
 } from '@features/guidbooks/services';
 import {
 	Guidebooks,
-	RuConstructionTypesMap,
+	getConstructionTypeLabel,
 	RuCountryNamesMap,
 	RuPriorityNamesSelectValues,
 	type ConstructionsAddData,
@@ -62,7 +62,7 @@ import { toast } from 'sonner';
 
 const ConstructionsScreen = () => {
 	const navigate = useAppNavigate();
-	const { t } = useI18n();
+	const { t, locale } = useI18n();
 	const [search] = useSearchParams();
 	const [singleMaterial, setSingleMaterial] = useState<ConstructionsEditData>();
 	const [tableData, setTableData] = useState<ConstructionsAddData[]>([]);
@@ -156,7 +156,10 @@ const ConstructionsScreen = () => {
 				),
 				cell: (info) => (
 					<SimpleTableCell
-						content={RuConstructionTypesMap[info.getValue() as ConstructionTypeEnum]}
+						content={getConstructionTypeLabel(
+							info.getValue() as string,
+							locale === 'en' ? 'en' : 'ru',
+						)}
 					/>
 				),
 			},
