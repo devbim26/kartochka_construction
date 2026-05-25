@@ -1,4 +1,4 @@
-import type { GraphType } from '@api-gen';
+import type { GraphType, IndexType } from '@api-gen';
 import type { NamedDot } from './dot.types';
 
 export type GraphDetailResponse = {
@@ -12,6 +12,8 @@ export interface AdditionalGraphParameters {
 	c?: number;
 	ctr?: number;
 	computingRw?: number;
+	computingLw?: number;
+	laboratoryIndexType?: IndexType;
 	laboratoryIndexValue?: number;
 	laboratoryC?: number;
 	laboratoryCtr?: number;

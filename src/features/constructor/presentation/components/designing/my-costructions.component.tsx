@@ -6,7 +6,12 @@ import {
 	useAppSelector,
 	useI18n,
 } from '@core';
-import type { FloorConstruction, GraphDetailResponse, ReportInfoShort } from '@features';
+import type {
+	AdditionalGraphParameters,
+	FloorConstruction,
+	GraphDetailResponse,
+	ReportInfoShort,
+} from '@features';
 import { ReportCategory, startLoading, stopLoading } from '@features';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
@@ -14,6 +19,7 @@ import {
 	convertToClientFloorConstruction,
 	convertToClientReportInfoShort,
 	convertToClientSingleToFloorConstruction,
+	graphAdditionalValuesConverterToClient,
 	graphDotsConverterToClient,
 } from '@features/constructor/converters';
 import {
@@ -23,6 +29,7 @@ import {
 	getReportConstruction,
 	getReportFloorById,
 	getReportSingleById,
+	graphAdditionalDetail,
 	graphDetail,
 	removeFavoriteConstruction,
 	swapToAlternateFloorConstruction,
@@ -32,6 +39,7 @@ import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { ConstructionsEditData } from '@features/guidbooks/types';
 import { Guidebooks, isFloorConstructionType } from '@features/guidbooks/types';
 import {
+	evaluateGraphRelevance,
 	graphHasComputedData,
 	graphHasImpactComputedData,
 	graphHasImpactLaboratoryData,
@@ -59,14 +67,12 @@ const MyConstructions = () => {
 	const [search] = useSearchParams();
 	const reportId = search.get('reportId');
 	const [graphData, setGraphData] = useState<GraphDetailResponse[] | null>(null);
+	const [graphAdditionalData, setGraphAdditionalData] =
+		useState<AdditionalGraphParameters | null>(null);
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
-	const [compIsRelevant, setCompIsRelevant] = useState<boolean>(false);
-	const [labIsRelevant, setLabIsRelevant] = useState<boolean>(false);
-	const [compImpactRelevant, setCompImpactRelevant] = useState<boolean>(false);
-	const [labImpactRelevant, setLabImpactRelevant] = useState<boolean>(false);
 	const reportFloorInfoId = search.get('reportFloorInfoId');
 
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
@@ -106,6 +112,44 @@ const MyConstructions = () => {
 	const isFloorConstruction = useMemo(
 		() => isFloorConstructionType(constructionHeader?.constructionType),
 		[constructionHeader?.constructionType],
+	);
+
+	const {
+		compIsRelevant,
+		labIsRelevant,
+		compImpactRelevant,
+		labImpactRelevant,
+		displayComputedRw,
+		displayComputedLw,
+		displayLabRw,
+		displayLabLw,
+	} = useMemo(
+		() =>
+			evaluateGraphRelevance({
+				additional: graphAdditionalData,
+				headerRw: constructionHeader?.RCalcs,
+				headerLw: constructionHeader?.estimatedIndexValue,
+				headerLabRw: constructionHeader?.airLaboratory?.labIndexValue,
+				headerLabLw: constructionHeader?.impactLaboratory?.labIndexValue,
+				reqRw: currentConstruction?.reportConstructionHeader?.requirementNoizeIsolationIndex,
+				reqLw: currentConstruction?.reportConstructionHeader?.requirementNoizeImpactIndex,
+				isFloorConstruction,
+				hasComputedDots,
+				hasLaboratoryDots,
+				hasImpactComputedDots,
+				hasImpactLaboratoryDots,
+			}),
+		[
+			graphAdditionalData,
+			constructionHeader,
+			currentConstruction?.reportConstructionHeader?.requirementNoizeIsolationIndex,
+			currentConstruction?.reportConstructionHeader?.requirementNoizeImpactIndex,
+			isFloorConstruction,
+			hasComputedDots,
+			hasLaboratoryDots,
+			hasImpactComputedDots,
+			hasImpactLaboratoryDots,
+		],
 	);
 
 	const visibleFavoriteConstructions = useMemo(
@@ -294,70 +338,37 @@ const MyConstructions = () => {
 	}, [reportType, reportId]);
 
 	useEffect(() => {
-		const header = currentConstruction?.reportConstructionHeader;
-		const reqRw = header?.requirementNoizeIsolationIndex;
-		const reqLwRaw = header?.requirementNoizeImpactIndex;
-		const reqLw =
-			reqLwRaw != null && !Number.isNaN(Number(reqLwRaw))
-				? Number(reqLwRaw)
-				: reqRw != null && !Number.isNaN(Number(reqRw))
-					? Number(reqRw)
-					: null;
-
-		if (!!constructionHeader && reqRw != null && !Number.isNaN(Number(reqRw))) {
-			const rwValue = +(constructionHeader.RCalcs || 0);
-			const labRwValue = +(constructionHeader.airLaboratory?.labIndexValue || 0);
-			const requiredRw = Number(reqRw);
-			setLabIsRelevant(labRwValue >= requiredRw);
-			setCompIsRelevant(rwValue >= requiredRw);
-		}
-
-		if (!!constructionHeader && isFloorConstruction && reqLw != null) {
-			const lwCalcStr = String(constructionHeader.estimatedIndexValue ?? '').trim();
-			const lwLabStr = String(constructionHeader.impactLaboratory?.labIndexValue ?? '').trim();
-			const lwCalc = Number(lwCalcStr.replace(',', '.')) || 0;
-			const lwLab = Number(lwLabStr.replace(',', '.')) || 0;
-			const hasLwCalc =
-				hasImpactComputedDots ||
-				(lwCalcStr !== '' && Number.isFinite(Number(lwCalcStr.replace(',', '.'))));
-			const hasLwLab =
-				hasImpactLaboratoryDots ||
-				(lwLabStr !== '' && Number.isFinite(Number(lwLabStr.replace(',', '.'))));
-			setCompImpactRelevant(hasLwCalc ? lwCalc <= reqLw : false);
-			setLabImpactRelevant(hasLwLab ? lwLab <= reqLw : false);
-		} else {
-			setCompImpactRelevant(false);
-			setLabImpactRelevant(false);
-		}
-	}, [
-		constructionHeader,
-		currentConstruction,
-		isFloorConstruction,
-		hasImpactComputedDots,
-		hasImpactLaboratoryDots,
-	]);
-
-	useEffect(() => {
 		if (!constructionHeaderId) return;
 		setGraphData(null);
+		setGraphAdditionalData(null);
 		dispatch(startLoading());
-		from(graphDetail({ constructionHeaderId }))
+		from(
+			Promise.all([
+				graphDetail({ constructionHeaderId }),
+				graphAdditionalDetail({ constructionHeaderId }),
+			]),
+		)
 			.pipe(
 				catchError((error) => {
 					toast.error(t('errors.graphDataLoad'));
 					dispatch(stopLoading());
-					return [];
+					return of([null, null] as const);
 				}),
 			)
-			.subscribe(({ data }) => {
-				if (!data) {
-					dispatch(stopLoading());
-					return;
+			.subscribe(([gRes, aRes]) => {
+				if (gRes?.data) {
+					setGraphData(gRes.data.map(graphDotsConverterToClient));
+				} else {
+					setGraphData(null);
 				}
-				setGraphData(data.map(graphDotsConverterToClient));
+				if (aRes?.data) {
+					setGraphAdditionalData(graphAdditionalValuesConverterToClient(aRes.data));
+				} else {
+					setGraphAdditionalData(null);
+				}
 				dispatch(stopLoading());
 			});
-	}, [constructionHeaderId]);
+	}, [constructionHeaderId, dispatch, t]);
 
 	const openFavoriteConstruction = (id: string) => {
 		if (!id) return;
@@ -511,7 +522,7 @@ const MyConstructions = () => {
 										</p>
 										<div className="flex w-full items-center gap-1">
 											<p className="font-sans text-[25px] font-semibold leading-4">
-												Rw = {constructionHeader?.RCalcs} dB
+												Rw = {displayComputedRw ?? constructionHeader?.RCalcs} dB
 											</p>
 											<p
 												className={
@@ -538,7 +549,10 @@ const MyConstructions = () => {
 										</p>
 										<div className="flex w-full items-center gap-1">
 											<p className="font-sans text-[25px] font-semibold leading-4">
-												Rw = {constructionHeader?.airLaboratory?.labIndexValue} dB
+												Rw ={' '}
+												{displayLabRw ??
+													constructionHeader?.airLaboratory?.labIndexValue}{' '}
+												dB
 											</p>
 											<p
 												className={
@@ -565,7 +579,10 @@ const MyConstructions = () => {
 										</p>
 										<div className="flex w-full items-center gap-1">
 											<p className="font-sans text-[25px] font-semibold leading-4">
-												Lw = {constructionHeader?.estimatedIndexValue} dB
+												Lw ={' '}
+												{displayComputedLw ??
+													constructionHeader?.estimatedIndexValue}{' '}
+												dB
 											</p>
 											<p
 												className={
@@ -594,7 +611,9 @@ const MyConstructions = () => {
 										</p>
 										<div className="flex w-full items-center gap-1">
 											<p className="font-sans text-[25px] font-semibold leading-4">
-												Lw = {constructionHeader?.impactLaboratory?.labIndexValue}{' '}
+												Lw ={' '}
+												{displayLabLw ??
+													constructionHeader?.impactLaboratory?.labIndexValue}{' '}
 												dB
 											</p>
 											<p
@@ -629,14 +648,8 @@ const MyConstructions = () => {
 								(() => {
 									const h = currentConstruction?.reportConstructionHeader;
 									const lwReq = h?.requirementNoizeImpactIndex;
-									const rwReq = h?.requirementNoizeIsolationIndex;
-									const lim =
-										lwReq != null && !Number.isNaN(Number(lwReq))
-											? Number(lwReq)
-											: rwReq != null && !Number.isNaN(Number(rwReq))
-												? Number(rwReq)
-												: null;
-									if (lim == null || Number.isNaN(lim)) return null;
+									if (lwReq == null || Number.isNaN(Number(lwReq))) return null;
+									const lim = Number(lwReq);
 									return (
 										<p className="font-sans text-[30px] font-semibold leading-4">
 											Lw ⩽ {lim} dB

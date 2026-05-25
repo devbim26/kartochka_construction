@@ -102,8 +102,20 @@ const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 	const gt = s.graphType;
 	if (gt === GraphType.Computed)
 		return { color: '#2563eb', lineTier: 'thick' as LineTier, borderDash: undefined };
+	if (gt === GraphType.ComputedImpact)
+		return {
+			color: '#0f766e',
+			lineTier: 'thick' as LineTier,
+			borderDash: [10, 4] as number[],
+		};
 	if (gt === GraphType.Laboratory)
 		return { color: '#ef4444', lineTier: 'thick' as LineTier, borderDash: undefined };
+	if (gt === GraphType.LaboratoryImpact)
+		return {
+			color: '#c2410c',
+			lineTier: 'thick' as LineTier,
+			borderDash: [10, 4] as number[],
+		};
 	if (gt === GraphType.Atalon)
 		return { color: '#9ca3af', lineTier: 'thin' as LineTier, borderDash: [6, 6] as number[] };
 	if (gt === GraphType.AdditionalDoor)

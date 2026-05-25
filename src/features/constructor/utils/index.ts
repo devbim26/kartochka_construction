@@ -3,6 +3,7 @@ export * from './config';
 export * from './construction-layout.utils';
 export * from './construction-mass.utils';
 export * from './formatMaterial';
+export * from './graph-index.utils';
 export * from './graph-visibility.utils';
 export * from './helpers';
 export * from './hooks';

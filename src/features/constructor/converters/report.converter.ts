@@ -356,6 +356,6 @@ export const convertToClientAlternateConstruction = (
 		maxHeight: data.maxHeight || 0,
 		name: data.name || '',
 		shortName: data.shortName || '',
-		rLab: data.rLab != null && !Number.isNaN(Number(data.rLab)) ? Number(data.rLab) : null,
+		rLab: null,
 	};
 };

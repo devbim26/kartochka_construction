@@ -1,4 +1,4 @@
-import { GraphType } from '@api-gen';
+import { GraphType, IndexType } from '@api-gen';
 import { SimpleTableCell, SimpleTableHeaderCell, useI18n } from '@core';
 import { DesigningRwTable } from '@features';
 import type { AdditionalGraphParameters, GraphDetailResponse } from '@features/constructor/types';
@@ -32,7 +32,7 @@ interface GraphTableProps {
 	noPadding?: boolean;
 }
 
-export const GraphDetailTable = ({ graphData, additional: _additional, noPadding = false }: GraphTableProps) => {
+export const GraphDetailTable = ({ graphData, additional, noPadding = false }: GraphTableProps) => {
 	const { t } = useI18n();
 	const { freqData, extraData, showImpactColumns } = useMemo(() => {
 		const getDotsForSeries = (graphType: GraphType, legacyNameLower: string) =>
@@ -43,17 +43,13 @@ export const GraphDetailTable = ({ graphData, additional: _additional, noPadding
 						(g.name || '').toLowerCase() === legacyNameLower.toLowerCase()),
 			)?.namedDots ?? [];
 
-		const getDotsByLegacyName = (legacyNameLower: string) =>
-			graphData?.find(
-				(g) =>
-					(g.namedDots?.length ?? 0) > 0 &&
-					(g.name || '').toLowerCase() === legacyNameLower.toLowerCase(),
-			)?.namedDots ?? [];
-
 		const computedDots = getDotsForSeries(GraphType.Computed, 'computeddots');
 		const laboratoryDots = getDotsForSeries(GraphType.Laboratory, 'laboratorydots');
-		const impactComputedDots = getDotsByLegacyName('impactcomputeddots');
-		const impactLaboratoryDots = getDotsByLegacyName('impactlaboratorydots');
+		const impactComputedDots = getDotsForSeries(GraphType.ComputedImpact, 'impactcomputeddots');
+		const impactLaboratoryDots = getDotsForSeries(
+			GraphType.LaboratoryImpact,
+			'impactlaboratorydots',
+		);
 
 		const showImpactColumns =
 			graphHasImpactComputedData(graphData) || graphHasImpactLaboratoryData(graphData);
@@ -93,9 +89,35 @@ export const GraphDetailTable = ({ graphData, additional: _additional, noPadding
 		}));
 
 		const extraData: ExtraTableRow[] = [];
+		const fmt = (n: number | undefined) => (n != null && Number.isFinite(n) ? String(n) : '–');
+
+		if (additional?.computingRw != null) {
+			extraData.push({
+				type: 'Rw',
+				rCalc: fmt(additional.computingRw),
+				rLab:
+					additional.laboratoryIndexType === IndexType.Rw
+						? fmt(additional.laboratoryIndexValue)
+						: '–',
+				lwCalc: '–',
+				lwLab: '–',
+			});
+		}
+		if (showImpactColumns && additional?.computingLw != null) {
+			extraData.push({
+				type: 'Lw',
+				rCalc: '–',
+				rLab: '–',
+				lwCalc: fmt(additional.computingLw),
+				lwLab:
+					additional.laboratoryIndexType === IndexType.Lnw
+						? fmt(additional.laboratoryIndexValue)
+						: '–',
+			});
+		}
 
 		return { freqData, extraData, showImpactColumns };
-	}, [graphData]);
+	}, [graphData, additional]);
 
 	const columns = useMemo<ColumnDef<GraphTableRow>[]>(() => {
 		const base: ColumnDef<GraphTableRow>[] = [
@@ -193,8 +215,8 @@ export const GraphDetailTable = ({ graphData, additional: _additional, noPadding
 		];
 	}, [noPadding, showImpactColumns]);
 
-	const extraColumns = useMemo<ColumnDef<ExtraTableRow>[]>(
-		() => [
+	const extraColumns = useMemo<ColumnDef<ExtraTableRow>[]>(() => {
+		const base: ColumnDef<ExtraTableRow>[] = [
 			{
 				accessorKey: 'type',
 				header: () => (
@@ -264,9 +286,60 @@ export const GraphDetailTable = ({ graphData, additional: _additional, noPadding
 					);
 				},
 			},
-		],
-		[noPadding, t],
-	);
+		];
+
+		if (!showImpactColumns) return base;
+
+		return [
+			...base,
+			{
+				accessorKey: 'lwCalc',
+				header: () => (
+					<SimpleTableHeaderCell
+						text="Lw calc, dB"
+						textClassName="w-[88px] border-r text-[18px] border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+				cell: (info) => {
+					const isLw = info.row.original.type === 'Lw';
+					return (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge(
+								'w-[88px] border-r text-[18px] border-[#EDEFF2] text-center',
+								isLw && 'text-blue-600 text-[25px] font-bold',
+							)}
+							noPadding={noPadding}
+						/>
+					);
+				},
+			},
+			{
+				accessorKey: 'lwLab',
+				header: () => (
+					<SimpleTableHeaderCell
+						text="Lw lab, dB"
+						textClassName="w-[88px] border-r text-[18px] border-[#EDEFF2] text-center"
+						noPadding={noPadding}
+					/>
+				),
+				cell: (info) => {
+					const isLw = info.row.original.type === 'Lw';
+					return (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge(
+								'w-[88px] border-r text-[18px] border-[#EDEFF2] text-center',
+								isLw && 'text-blue-600 text-[25px] font-bold',
+							)}
+							noPadding={noPadding}
+						/>
+					);
+				},
+			},
+		];
+	}, [noPadding, showImpactColumns, t]);
 
 	return (
 		<div className="flex gap-4">

@@ -20,8 +20,12 @@ const resolveLegendLabel = (
 	switch (graphType) {
 		case GraphType.Computed:
 			return t('constructor.chart.legendWallR');
+		case GraphType.ComputedImpact:
+			return t('constructor.chart.legendImpactComputed');
 		case GraphType.Laboratory:
 			return t('constructor.chart.legendWallRlab');
+		case GraphType.LaboratoryImpact:
+			return t('constructor.chart.legendImpactLaboratory');
 		case GraphType.AdditionalWindow:
 			return t('constructor.chart.legendWindowsRlab');
 		case GraphType.AdditionalDoor:
@@ -62,7 +66,9 @@ const mapWithLabels = (dots: NamedDot[]) =>
 const legacyNameToGraphType = (name: string | null | undefined): GraphType | undefined => {
 	const n = (name || '').toLowerCase();
 	if (n === 'computeddots') return GraphType.Computed;
+	if (n === 'impactcomputeddots') return GraphType.ComputedImpact;
 	if (n === 'laboratorydots') return GraphType.Laboratory;
+	if (n === 'impactlaboratorydots') return GraphType.LaboratoryImpact;
 	return undefined;
 };
 
@@ -77,8 +83,12 @@ const graphTypeToKind = (gt: GraphType | undefined): GraphSeriesKind => {
 	switch (gt) {
 		case GraphType.Computed:
 			return 'computed_wall';
+		case GraphType.ComputedImpact:
+			return 'computed_impact';
 		case GraphType.Laboratory:
 			return 'laboratory_wall';
+		case GraphType.LaboratoryImpact:
+			return 'laboratory_impact';
 		case GraphType.Atalon:
 			return 'reference';
 		case GraphType.AdditionalDoor:
