@@ -36,6 +36,7 @@ export type GraphSeriesKind =
 	| 'window'
 	| 'door'
 	| 'reference'
+	| 'reference_impact'
 	| 'other';
 
 export type GraphDataPoint = {

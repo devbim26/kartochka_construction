@@ -798,7 +798,7 @@ const DesigningConstructionScreen = () => {
 							{hasComputedDots && (
 								<>
 									<div className="flex flex-col gap-1">
-										<p className="text-[30px] font-extrabold text-black">
+										<p className="text-[23px] font-extrabold text-black">
 											{t('constructor.designing.calcValue')}
 										</p>
 										<p className="font-sans text-[14px]">
@@ -844,8 +844,8 @@ const DesigningConstructionScreen = () => {
 							{isFloorConstruction && hasImpactComputedDots && (
 								<>
 									<div className="flex flex-col gap-1">
-										<p className="text-[30px] font-extrabold text-black">
-											{locale === 'ru' ? 'Расчёт (ударный)' : 'Computed (impact)'}
+										<p className="text-[23px] font-extrabold text-black">
+											{locale === 'ru' ? 'Расчетное значение(ударный)' : 'Computed (impact)'}
 										</p>
 										<p className="font-sans text-[14px]">
 											{currentReportInfo?.calculationDocument?.fullName}

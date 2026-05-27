@@ -639,6 +639,7 @@ export const en = {
 	'constructor.chart.legendImpactComputed': 'Impact sound insulation Lw (computed), dB',
 	'constructor.chart.legendImpactLaboratory': 'Impact sound insulation Lw (laboratory), dB',
 	'constructor.chart.legendReference': 'Reference curve, dB',
+	'constructor.chart.legendReferenceImpact': 'Impact reference curve, dB',
 	'constructor.chart.legendIntermediate': 'Intermediate / additional layer, dB',
 	'constructor.chart.legendSeries': 'Series',
 
@@ -660,7 +661,7 @@ export const en = {
 
 	'constructor.designing.selectType': 'Select type',
 	'constructor.designing.calculate': 'Calculate',
-	'constructor.designing.calcValue': 'Calculated value',
+	'constructor.designing.calcValue': 'Calculated value(air)',
 	'constructor.designing.labValue': 'Laboratory value',
 	'constructor.designing.allowedValue': 'Allowed value',
 	'constructor.designing.generalIssuerEditHint':
@@ -1779,7 +1780,8 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.chart.legendDoorRlab': 'Звукоизоляция двери Rlab, dB',
 	'constructor.chart.legendImpactComputed': 'Звукоизоляция на ударный шум Lw (расчёт), dB',
 	'constructor.chart.legendImpactLaboratory': 'Звукоизоляция на ударный шум Lw (лаборатория), dB',
-	'constructor.chart.legendReference': 'Эталонная кривая, dB',
+	'constructor.chart.legendReference': 'Эталонная кривая(воздушный), dB',
+	'constructor.chart.legendReferenceImpact': 'Эталонная кривая(ударный), dB',
 	'constructor.chart.legendIntermediate': 'Промежуточная / дополнительный слой, dB',
 	'constructor.chart.legendSeries': 'Серия',
 
@@ -1801,7 +1803,7 @@ export const ru: Record<TranslationKey, string> = {
 
 	'constructor.designing.selectType': 'Выберите тип',
 	'constructor.designing.calculate': 'Рассчитать',
-	'constructor.designing.calcValue': 'Расчетное значение',
+	'constructor.designing.calcValue': 'Расчетное значение(воздушный)',
 	'constructor.designing.labValue': 'Лабораторное значение',
 	'constructor.designing.allowedValue': 'Допустимое значение',
 	'constructor.designing.generalIssuerEditHint':

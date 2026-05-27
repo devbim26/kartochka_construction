@@ -31,7 +31,9 @@ const resolveLegendLabel = (
 		case GraphType.AdditionalDoor:
 			return t('constructor.chart.legendDoorRlab');
 		case GraphType.Atalon:
-			return t('constructor.chart.legendReference');
+			return '';
+		case GraphType.ImpactAtalon:
+			return '';
 		case GraphType.Intermediate:
 			return t('constructor.chart.legendIntermediate');
 		default:
@@ -91,12 +93,16 @@ const graphTypeToKind = (gt: GraphType | undefined): GraphSeriesKind => {
 			return 'laboratory_impact';
 		case GraphType.Atalon:
 			return 'reference';
+		case GraphType.ImpactAtalon:
+			return 'reference_impact';
 		case GraphType.AdditionalDoor:
 			return 'door';
 		case GraphType.AdditionalWindow:
 			return 'window';
 		case GraphType.Intermediate:
 			return 'other';
+		case GraphType.ImpactAtalon:
+			return 'reference_impact';
 		default:
 			return 'other';
 	}
@@ -162,13 +168,14 @@ const DesigningGraph = ({
 
 		const drawOrder: Record<GraphSeriesKind, number> = {
 			reference: 0,
-			other: 1,
-			window: 2,
-			door: 3,
-			computed_wall: 4,
-			laboratory_wall: 5,
-			computed_impact: 6,
-			laboratory_impact: 7,
+			reference_impact: 1,
+			other: 2,
+			window: 3,
+			door: 4,
+			computed_wall: 5,
+			laboratory_wall: 6,
+			computed_impact: 7,
+			laboratory_impact: 8,
 		};
 
 		return [...out].sort((a, b) => drawOrder[a.kind] - drawOrder[b.kind]);
