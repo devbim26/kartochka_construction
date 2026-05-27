@@ -633,6 +633,7 @@ export interface GetAlternativeConstructionHeadersQuery {
 	minLabRw?: number | null;
 	/** @format double */
 	maxLabRw?: number | null;
+	constructionTypeEnum?: ConstructionTypeEnum;
 }
 
 export interface GetArticlesWithPaginationParamsQuery {
@@ -815,6 +816,7 @@ export enum GraphType {
 	Laboratory = 'Laboratory',
 	LaboratoryImpact = 'LaboratoryImpact',
 	Atalon = 'Atalon',
+	ImpactAtalon = 'ImpactAtalon',
 	AdditionalDoor = 'AdditionalDoor',
 	AdditionalWindow = 'AdditionalWindow',
 	Intermediate = 'Intermediate',
@@ -1053,6 +1055,8 @@ export interface PaginatedConstructionHeaderDto {
 	issuer?: NamedEntity;
 	issuerLogo?: string | null;
 	shortName?: string | null;
+	/** @format double */
+	labR?: number;
 	/** @format uuid */
 	userId?: string | null;
 }

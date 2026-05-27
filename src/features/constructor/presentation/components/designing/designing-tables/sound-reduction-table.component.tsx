@@ -142,7 +142,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				accessorKey: 'rCalc',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="R calc, dB"
+						text="R, dB"
 						textClassName="w-[80px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
@@ -182,7 +182,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				accessorKey: 'lwCalc',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="Lw calc, dB"
+						text="Lw, dB"
 						textClassName="w-[88px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
@@ -222,7 +222,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				header: () => (
 					<SimpleTableHeaderCell
 						text={t('constructor.table.data')}
-						textClassName="w-[80px] text-[20px] border-r text-[18px] border-[#EDEFF2] text-center"
+						textClassName="w-[80px] text-[20px] border-r text-[16px] border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
@@ -232,7 +232,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						<SimpleTableCell
 							content={info.getValue() as string}
 							contentClassName={twMerge(
-								'w-[80px] border-r border-[#EDEFF2] text-[18px] text-center',
+								'w-[80px] border-r border-[#EDEFF2] text-[16px] text-center',
 								isRw && 'text-blue-600  text-[25px] font-bold',
 							)}
 							noPadding={noPadding}
@@ -244,8 +244,8 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				accessorKey: 'rCalc',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="R calc, dB"
-						textClassName="w-[80px] text-[18px] border-r border-[#EDEFF2] text-center"
+						text="Rw, dB"
+						textClassName="w-[80px] text-[16px] border-r border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
@@ -255,7 +255,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						<SimpleTableCell
 							content={info.getValue() as string}
 							contentClassName={twMerge(
-								'w-[80px] border-r text-[18px] border-[#EDEFF2] text-center',
+								'w-[80px] border-r text-[16px] border-[#EDEFF2] text-center',
 								isRw && 'text-blue-600 text-[25px] font-bold',
 							)}
 							noPadding={noPadding}
@@ -267,8 +267,8 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				accessorKey: 'rLab',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="R lab, dB"
-						textClassName="w-[80px] border-r text-[18px] border-[#EDEFF2] text-center"
+						text="Rw lab, dB"
+						textClassName="w-[80px] border-r text-[16px] border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
@@ -278,7 +278,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						<SimpleTableCell
 							content={info.getValue() as string}
 							contentClassName={twMerge(
-								'w-[80px] border-r text-[18px] border-[#EDEFF2] text-center',
+								'w-[80px] border-r text-[16px] border-[#EDEFF2] text-center',
 								isRw && 'text-blue-600 text-[25px] font-bold',
 							)}
 							noPadding={noPadding}
@@ -296,8 +296,8 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				accessorKey: 'lwCalc',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="Lw calc, dB"
-						textClassName="w-[88px] border-r text-[18px] border-[#EDEFF2] text-center"
+						text="Lnw, dB"
+						textClassName="w-[88px] border-r text-[16px] border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
@@ -307,7 +307,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						<SimpleTableCell
 							content={info.getValue() as string}
 							contentClassName={twMerge(
-								'w-[88px] border-r text-[18px] border-[#EDEFF2] text-center',
+								'w-[88px] border-r text-[16px] border-[#EDEFF2] text-center',
 								isLw && 'text-blue-600 text-[25px] font-bold',
 							)}
 							noPadding={noPadding}
@@ -319,8 +319,8 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				accessorKey: 'lwLab',
 				header: () => (
 					<SimpleTableHeaderCell
-						text="Lw lab, dB"
-						textClassName="w-[88px] border-r text-[18px] border-[#EDEFF2] text-center"
+						text="Lnw lab, dB"
+						textClassName="w-[88px] border-r text-[16px] border-[#EDEFF2] text-center"
 						noPadding={noPadding}
 					/>
 				),
@@ -330,7 +330,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 						<SimpleTableCell
 							content={info.getValue() as string}
 							contentClassName={twMerge(
-								'w-[88px] border-r text-[18px] border-[#EDEFF2] text-center',
+								'w-[88px] border-r text-[16px] border-[#EDEFF2] text-center',
 								isLw && 'text-blue-600 text-[25px] font-bold',
 							)}
 							noPadding={noPadding}
@@ -342,7 +342,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 	}, [noPadding, showImpactColumns, t]);
 
 	return (
-		<div className="flex gap-4">
+		<div className="flex flex-col gap-4">
 			{extraData.length > 0 && (
 				<DesigningRwTable
 					data={extraData}
@@ -350,8 +350,8 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 					classNames={{
 						tableContainerClassName: 'w-max max-w-full',
 						tableClassName: 'w-max border border-[#EDEFF2] border-collapse',
-						headerCellClassName: 'border border-[#EDEFF2]',
-						contentCellClassName: 'border text-[20px] border-[#EDEFF2] font-bold',
+						headerCellClassName: 'border text-[20px] border-[#EDEFF2]',
+						contentCellClassName: 'border border-[#EDEFF2] font-bold',
 					}}
 				/>
 			)}
