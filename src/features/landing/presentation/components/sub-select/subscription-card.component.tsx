@@ -53,14 +53,19 @@ export const SubscriptionCard = ({ subscription, onClick }: Props) => {
 						{t('subscription.reportsCount')}: {subscription.numberOfReports}
 					</span>
 				</div>
-				<div className="flex items-start gap-2">
-					<span className="shrink-0 pt-1">
-						<CheckMarkImage />
-					</span>
-					<span className="text-start font-montserrat text-base font-semibold leading-[145%] sm:text-lg">
-						{t('subscription.aiModeBalance')}: {subscription.budgetForGeneration || 0} BYN
-					</span>
-				</div>
+				{subscription.tariffPlanName ? (
+					<div className="flex items-start gap-2">
+						<span className="shrink-0 pt-1">
+							<CheckMarkImage />
+						</span>
+						<span className="text-start font-montserrat text-base font-semibold leading-[145%] sm:text-lg">
+							{t('subscription.tariffPlan')}: {subscription.tariffPlanName}
+							{subscription.tariffPlanLimit
+								? ` (${t('subscription.tariffLimit')}: ${subscription.tariffPlanLimit})`
+								: ''}
+						</span>
+					</div>
+				) : null}
 			</div>
 		</div>
 	);

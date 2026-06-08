@@ -8,7 +8,9 @@ export const SubscriptionAddAndEditConfig: EntityConfig = {
 		price: '',
 		numberOfReports: '',
 		numberOfDowloadReports: '',
-		budgetForGeneration: '',
+		tariffPlanId: '',
+		tariffPlanName: '',
+		tariffPlanLimit: '',
 		description: '',
 	},
 };

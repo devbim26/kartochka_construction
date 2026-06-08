@@ -439,8 +439,8 @@ export interface CreateSubscriptionCommand {
 	numberOfReports?: number;
 	/** @format int32 */
 	numberOfDowloadReports?: number;
-	/** @format double */
-	budgetForGeneration?: number;
+	/** @format uuid */
+	tariffPlanId?: string | null;
 }
 
 export interface CreateUserMaterialDto {
@@ -510,6 +510,11 @@ export interface DeleteRequirementCommand {
 export interface DeleteSubscriptionCommand {
 	/** @format uuid */
 	id?: string;
+}
+
+export interface DeleteTariffPlanCommand {
+	/** @format uuid */
+	tariffId?: string;
 }
 
 export interface DeleteUserCommand {
@@ -788,6 +793,15 @@ export interface GetSubscriptionsWithPaginationParamsQuery {
 	price?: number | null;
 	/** @format int32 */
 	numberOfReports?: number | null;
+}
+
+export interface GetTariffPlanWithPaginationQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
 }
 
 export interface GetUsersWithPaginationParamsQuery {
@@ -1446,6 +1460,11 @@ export interface RequirementDtoPaginatedList {
 	hasNextPage?: boolean;
 }
 
+export enum ResetInterval {
+	Daily = 'daily',
+	Monthly = 'monthly',
+}
+
 export enum RoleType {
 	Admin = 'Admin',
 	User = 'User',
@@ -1500,8 +1519,7 @@ export interface SubscriptionDto {
 	numberOfReports?: number;
 	/** @format int32 */
 	numberOfDowloadReports?: number;
-	/** @format double */
-	budgetForGeneration?: number;
+	tariffPlan?: TariffPlanDto;
 }
 
 export interface SubscriptionDtoPaginatedList {
@@ -1523,6 +1541,31 @@ export interface SwapConstructionHeaderCommand {
 	reportConstructionId?: string;
 	/** @format uuid */
 	alternativeConstructionHeaderId?: string;
+}
+
+export interface TariffPlanDto {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	resetInterval?: ResetInterval;
+	/** @format double */
+	credits?: number;
+	/** @format double */
+	coefficient?: number;
+}
+
+export interface TariffPlanDtoPaginatedList {
+	items?: TariffPlanDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
 }
 
 export interface ThermalInsulationFloorReportInfoFlagsDto {
@@ -1657,8 +1700,8 @@ export interface UpdateSubscriptionCommand {
 	numberOfReports?: number;
 	/** @format int32 */
 	numberOfDownloadReports?: number;
-	/** @format double */
-	budgetForGeneration?: number;
+	/** @format uuid */
+	tariffPlanId?: string | null;
 }
 
 export interface UserMaterialDto {
@@ -3724,6 +3767,112 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				path: `/api/SvgConstruction/${id}`,
 				method: 'GET',
 				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags TariffPlan
+		 * @name TariffPlanDetail
+		 * @request GET:/api/TariffPlan/{id}
+		 */
+		tariffPlanDetail: (id: string, params: RequestParams = {}) =>
+			this.request<TariffPlanDto, any>({
+				path: `/api/TariffPlan/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags TariffPlan
+		 * @name TariffPlanDelete
+		 * @request DELETE:/api/TariffPlan/{id}
+		 */
+		tariffPlanDelete: (id: string, data: DeleteTariffPlanCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/TariffPlan/${id}`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags TariffPlan
+		 * @name TariffPlanGetPaginatedCreate
+		 * @request POST:/api/TariffPlan/getPaginated
+		 */
+		tariffPlanGetPaginatedCreate: (
+			data: GetTariffPlanWithPaginationQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<TariffPlanDtoPaginatedList, any>({
+				path: `/api/TariffPlan/getPaginated`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags TariffPlan
+		 * @name TariffPlanCreate
+		 * @request POST:/api/TariffPlan
+		 */
+		tariffPlanCreate: (
+			data: {
+				name?: string;
+				resetInterval?: ResetInterval;
+				/** @format double */
+				credits?: number;
+				/** @format double */
+				coefficient?: number;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<TariffPlanDto, any>({
+				path: `/api/TariffPlan`,
+				method: 'POST',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags TariffPlan
+		 * @name TariffPlanUpdate
+		 * @request PUT:/api/TariffPlan
+		 */
+		tariffPlanUpdate: (
+			data: {
+				/** @format uuid */
+				id?: string;
+				name?: string;
+				resetInterval?: ResetInterval;
+				/** @format double */
+				credits?: number;
+				/** @format double */
+				coefficient?: number;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/TariffPlan`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
 				...params,
 			}),
 

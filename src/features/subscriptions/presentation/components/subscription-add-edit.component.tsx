@@ -1,15 +1,49 @@
-import { Input, useI18n } from '@core';
+import { Input, Select, useI18n } from '@core';
+import { getPaginatedTariffPlans } from '@features/guidbooks/services/tariff-plan.services';
 import type { Subscription } from '@features/subscriptions/types';
+import { useEffect, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
 export const SubscriptionAddEdit = () => {
 	const form = useFormContext<Subscription>();
-	const { register, formState } = form;
+	const { register, formState, watch, setValue } = form;
 	const { t } = useI18n();
+	const [tariffOptions, setTariffOptions] = useState<{ value: string; label: string }[]>([]);
+	const tariffPlanId = watch('tariffPlanId');
+
+	useEffect(() => {
+		let cancelled = false;
+		getPaginatedTariffPlans({ pagination: { pageNumber: 1, pageSize: 500 } })
+			.then((response) => {
+				if (cancelled) return;
+				setTariffOptions(
+					(response.data.items ?? [])
+						.filter((item) => item.id)
+						.map((item) => ({
+							value: String(item.id),
+							label: item.name ?? '',
+						})),
+				);
+			})
+			.catch(() => {
+				if (!cancelled) setTariffOptions([]);
+			});
+		return () => {
+			cancelled = true;
+		};
+	}, []);
+
+	const tariffPlanOptions = useMemo(
+		() => [
+			{ value: '', label: t('subscriptions.fields.tariffNone') },
+			...tariffOptions,
+		],
+		[tariffOptions, t],
+	);
 
 	return (
-		<div className="flex w-full items-end gap-6">
+		<div className="flex w-full flex-wrap items-end gap-6">
 			<Input
 				{...register('name')}
 				labelClassName={twMerge(
@@ -64,20 +98,22 @@ export const SubscriptionAddEdit = () => {
 				type="number"
 				placeholder={t('subscriptions.placeholders.count')}
 			/>
-			<Input
-				{...register('budgetForGeneration')}
-				labelClassName={twMerge(
-					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary',
-					formState.errors.budgetForGeneration?.message ? 'text-error' : '',
-				)}
-				label={
-					formState.errors?.budgetForGeneration?.message ||
-					t('subscriptions.fields.aiFunds')
+			<Select
+				options={tariffPlanOptions}
+				value={tariffPlanId ?? ''}
+				onChange={(value) =>
+					setValue('tariffPlanId', value ? String(value) : '', {
+						shouldDirty: true,
+						shouldTouch: true,
+					})
 				}
-				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
-				containerClassName="w-[226px]"
-				type="number"
-				placeholder={t('subscriptions.placeholders.amount')}
+				isSearchable
+				disablePlaceholder
+				label={t('subscriptions.fields.tariffPlan')}
+				placeholder={t('subscriptions.fields.tariffNone')}
+				labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary"
+				buttonClassName="h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+				wrapperClassname="w-[226px] shadow-none ring-input-border-primary"
 			/>
 			<Input
 				{...register('description')}

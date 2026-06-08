@@ -15,4 +15,8 @@ export const GUIDBOOKS_ROUTES = {
 		id: 'issuers-page-id',
 		route: 'issuers',
 	},
+	tariffPlans: {
+		id: 'tariff-plans-page-id',
+		route: 'tariff-plans',
+	},
 };

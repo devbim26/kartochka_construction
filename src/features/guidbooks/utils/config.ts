@@ -11,7 +11,10 @@ import {
 	MaterialsFilterSchema,
 	RequirementsFilterSchema,
 	RequirementsFormSchema,
+	TariffPlanFilterSchema,
+	TariffPlanSchema,
 } from './validation';
+import { RESET_INTERVAL_EMPTY } from '../constants/tariff-plan.constants';
 
 export const MaterialsAddAndEditConfig: EntityConfig = {
 	schema: MaterialsAddAndEditSchema,
@@ -57,6 +60,20 @@ export const IssuersAddAndEditConfig: EntityConfig = {
 export const IssuersFilterConfig: EntityConfig = {
 	schema: IssuersSchema,
 	defaultValues: { name: '', countries: '', webSite: '' },
+};
+
+export const TariffPlanAddAndEditConfig: EntityConfig = {
+	schema: TariffPlanSchema,
+	defaultValues: {
+		name: '',
+		resetInterval: RESET_INTERVAL_EMPTY,
+		credits: '',
+	},
+};
+
+export const TariffPlanFilterConfig: EntityConfig = {
+	schema: TariffPlanFilterSchema,
+	defaultValues: {},
 };
 
 export const RequirementsFilterDataConfig: EntityConfig = {

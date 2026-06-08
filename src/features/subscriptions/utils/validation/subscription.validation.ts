@@ -14,11 +14,9 @@ export const SubscriptionSchema = z.object({
 		.min(1, 'Поле обязательно для заполнения')
 		.refine((value) => Number.isInteger(+value), 'Значение должно быть целым числом')
 		.refine((value) => +value >= 0, 'Значение должно быть больше или равно нулю'),
-	budgetForGeneration: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => !Number.isNaN(+value), 'Значение должно быть числом')
-		.refine((value) => +value >= 0, 'Значение должно быть больше или равно нулю'),
+	tariffPlanId: z.string().optional(),
+	tariffPlanName: z.string().optional(),
+	tariffPlanLimit: z.string().optional(),
 	price: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')

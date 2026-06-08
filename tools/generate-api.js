@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const generateApi = require('swagger-typescript-api').generateApi;
-const apiUrl = 'http://localhost:5000/swagger/v1/swagger.json';
+const apiUrl = 'http://192.168.10.23:5000/swagger/v1/swagger.json';
 const apiFilePath = path.join(__dirname, '../src/api-gen/api.ts');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';

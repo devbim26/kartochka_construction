@@ -118,8 +118,16 @@ export const CurrentSub = ({ className }: Props) => {
 							) : null}
 							<div className="flex flex-col gap-[10px]">
 								<p className="font-sans text-base font-bold leading-6 text-[#111827]">
-									{t('main.currentSub.price')}: {subscription.budgetForGeneration || 0}
+									{t('main.currentSub.price')}: {subscription.price || 0} BYN
 								</p>
+								{subscription.tariffPlanName ? (
+									<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+										{t('subscription.tariffPlan')}: {subscription.tariffPlanName}
+										{subscription.tariffPlanLimit
+											? ` (${t('subscription.tariffLimit')}: ${subscription.tariffPlanLimit})`
+											: ''}
+									</p>
+								) : null}
 								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
 									{t('main.currentSub.remainingReports')}: {userData.data?.reportsNumber ?? 0}
 								</p>

@@ -10,6 +10,15 @@ export const getSubscriptionColumns = (t: any): ColumnDef<Subscription>[] => [
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 	},
 	{
+		id: 'tariffPlanName',
+		accessorKey: 'tariffPlanName',
+		header: () => <SimpleTableHeaderCell text={t('subscriptions.fields.tariffPlan')} />,
+		cell: (info) => {
+			const value = (info.getValue() as string) || '—';
+			return <SimpleTableCell content={value} />;
+		},
+	},
+	{
 		id: 'price',
 		accessorKey: 'price',
 		header: () => <SimpleTableHeaderCell text={t('subscriptions.fields.price')} />,
@@ -25,12 +34,6 @@ export const getSubscriptionColumns = (t: any): ColumnDef<Subscription>[] => [
 		id: 'numberOfDowloadReports',
 		accessorKey: 'numberOfDowloadReports',
 		header: () => <SimpleTableHeaderCell text={t('subscriptions.fields.calculationsCount')} />,
-		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
-	},
-	{
-		id: 'budgetForGeneration',
-		accessorKey: 'budgetForGeneration',
-		header: () => <SimpleTableHeaderCell text={t('subscriptions.fields.aiFunds')} />,
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 	},
 ];

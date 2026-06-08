@@ -4,3 +4,4 @@ export * from './constructions/construction-field-names.constants';
 export * from './material-purpose.constants';
 export * from './guidbook-header.constants';
 export * from './guidbooks-routes.constants';
+export * from './tariff-plan.constants';

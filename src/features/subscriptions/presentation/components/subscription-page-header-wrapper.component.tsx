@@ -20,8 +20,9 @@ interface SubscriptionPageHeaderWrapperProps {
 
 export const SubscriptionPageHeaderWrapper = memoize(
 	({ titles, forms, formElements, onSave }: SubscriptionPageHeaderWrapperProps) => {
+		const { addForm, editForm, filterForm } = forms;
 		const { t } = useI18n();
-		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
+		const [currentForm, setCurrentForm] = useState<UseFormReturn>(filterForm);
 		const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
 		);
@@ -50,42 +51,31 @@ export const SubscriptionPageHeaderWrapper = memoize(
 		}, [search.get('add'), search.get('edit')]);
 
 		useEffect(() => {
-			if (currentHeaderFormType === HeaderFormTypes.add) setCurrentForm(forms.addForm);
-			else if (currentHeaderFormType === HeaderFormTypes.filter)
-				setCurrentForm(forms.filterForm);
-			else if (currentHeaderFormType === HeaderFormTypes.edit) setCurrentForm(forms.editForm);
-			currentForm.reset();
-		}, [currentHeaderFormType]);
+			if (currentHeaderFormType === HeaderFormTypes.add) {
+				setCurrentForm(addForm);
+				addForm.reset();
+				return;
+			}
+			if (currentHeaderFormType === HeaderFormTypes.filter) {
+				setCurrentForm(filterForm);
+				filterForm.reset();
+				return;
+			}
+			if (currentHeaderFormType === HeaderFormTypes.edit) {
+				setCurrentForm(editForm);
+			}
+		}, [currentHeaderFormType, addForm, editForm, filterForm]);
 
 		const submitHandle = useCallback(() => {
 			currentForm.handleSubmit(() => onSave())();
 		}, [currentForm, onSave]);
 
-		const formComponent = useMemo(() => {
-			return (
-				<FormProvider {...currentForm}>
-					{currentHeaderFormType == HeaderFormTypes.filter ? (
-						<formElements.filter
-							control={currentForm.control}
-							setValue={currentForm.setValue}
-							formState={currentForm.formState}
-						/>
-					) : currentHeaderFormType == HeaderFormTypes.edit ? (
-						<formElements.edit
-							control={currentForm.control}
-							setValue={currentForm.setValue}
-							formState={currentForm.formState}
-						/>
-					) : (
-						<formElements.add
-							control={currentForm.control}
-							setValue={currentForm.setValue}
-							formState={currentForm.formState}
-						/>
-					)}
-				</FormProvider>
-			);
-		}, [currentForm, currentHeaderFormType, formElements]);
+		const FormBody =
+			currentHeaderFormType === HeaderFormTypes.filter
+				? formElements.filter
+				: currentHeaderFormType === HeaderFormTypes.edit
+					? formElements.edit
+					: formElements.add;
 
 		const subTitle = useMemo(() => {
 			switch (currentHeaderFormType) {
@@ -121,7 +111,13 @@ export const SubscriptionPageHeaderWrapper = memoize(
 						{subTitle}
 					</p>
 					<div className="flex flex-wrap gap-[16px] border-b border-solid px-[16px] pb-[24px] pt-[16px]">
-						{formComponent}
+						<FormProvider {...currentForm}>
+							<FormBody
+								control={currentForm.control}
+								setValue={currentForm.setValue}
+								formState={currentForm.formState}
+							/>
+						</FormProvider>
 					</div>
 					<div className="flex flex-row justify-end gap-[30px] px-[16px] py-[13px]">
 						{currentHeaderFormType !== HeaderFormTypes.filter && (

@@ -187,6 +187,12 @@ export function getSidebarItemsConfig(): SidebarItemsConfig {
 						labelKey: 'sidebar.manufacturers',
 						permission: UserRoles.Admin,
 					},
+					{
+						id: GUIDBOOKS_ROUTES.tariffPlans.id,
+						path: GUIDBOOKS_ROUTES.tariffPlans.route,
+						labelKey: 'sidebar.tariffPlans',
+						permission: UserRoles.Admin,
+					},
 				],
 			},
 			{
