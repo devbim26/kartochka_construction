@@ -3,6 +3,10 @@ import { Button, convertToPaginatedType, useAppNavigate, useAppSelector, useI18n
 import {
 	convertSubscriptionToClient,
 	getPaginatedSubscriptions,
+	shouldShowSubscriptionCalculations,
+	shouldShowSubscriptionPrice,
+	shouldShowSubscriptionReports,
+	shouldShowSubscriptionTariffPlan,
 	type Subscription,
 } from '@features/subscriptions';
 import { AxiosError } from 'axios';
@@ -117,10 +121,12 @@ export const CurrentSub = ({ className }: Props) => {
 								</p>
 							) : null}
 							<div className="flex flex-col gap-[10px]">
-								<p className="font-sans text-base font-bold leading-6 text-[#111827]">
-									{t('main.currentSub.price')}: {subscription.price || 0} BYN
-								</p>
-								{subscription.tariffPlanName ? (
+								{shouldShowSubscriptionPrice(subscription.price) ? (
+									<p className="font-sans text-base font-bold leading-6 text-[#111827]">
+										{t('main.currentSub.price')}: {subscription.price} BYN
+									</p>
+								) : null}
+								{shouldShowSubscriptionTariffPlan(subscription.tariffPlanName) ? (
 									<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
 										{t('subscription.tariffPlan')}: {subscription.tariffPlanName}
 										{subscription.tariffPlanLimit
@@ -128,13 +134,17 @@ export const CurrentSub = ({ className }: Props) => {
 											: ''}
 									</p>
 								) : null}
-								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
-									{t('main.currentSub.remainingReports')}: {userData.data?.reportsNumber ?? 0}
-								</p>
-								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
-									{t('main.currentSub.remainingDownloads')}:{' '}
-									{userData.data?.dowloadReportsNumber ?? 0}
-								</p>
+								{shouldShowSubscriptionReports(subscription.numberOfReports) ? (
+									<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+										{t('main.currentSub.remainingReports')}: {userData.data?.reportsNumber ?? 0}
+									</p>
+								) : null}
+								{shouldShowSubscriptionCalculations(subscription.numberOfDowloadReports) ? (
+									<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+										{t('main.currentSub.remainingDownloads')}:{' '}
+										{userData.data?.dowloadReportsNumber ?? 0}
+									</p>
+								) : null}
 							</div>
 						</div>
 						<Button

@@ -1,11 +1,32 @@
 import { GraphType } from '@api-gen';
-import { useI18n, type TranslationKey } from '@core';
+import { Switch, useI18n, type TranslationKey } from '@core';
 import type { GraphDetailResponse, NamedDot } from '@features/constructor/types';
-import { useMemo } from 'react';
+import {
+	graphHasAirborneGraphData,
+	graphHasImpactGraphData,
+	type GraphNoiseMode,
+} from '@features/constructor/utils';
+import { useEffect, useMemo, useState } from 'react';
 import DesigningChart, {
 	type DesigningChartSeries,
 	type GraphSeriesKind,
 } from './designing-chart.component';
+
+const isImpactChartSeries = (series: DesigningChartSeries): boolean => {
+	const gt = series.graphType;
+	if (
+		gt === GraphType.ComputedImpact ||
+		gt === GraphType.LaboratoryImpact ||
+		gt === GraphType.ImpactAtalon
+	) {
+		return true;
+	}
+	return (
+		series.kind === 'computed_impact' ||
+		series.kind === 'laboratory_impact' ||
+		series.kind === 'reference_impact'
+	);
+};
 
 const resolveLegendLabel = (
 	rawName: string,
@@ -101,8 +122,6 @@ const graphTypeToKind = (gt: GraphType | undefined): GraphSeriesKind => {
 			return 'window';
 		case GraphType.Intermediate:
 			return 'other';
-		case GraphType.ImpactAtalon:
-			return 'reference_impact';
 		default:
 			return 'other';
 	}
@@ -123,6 +142,12 @@ const classifyExtraSeries = (name: string): GraphSeriesKind => {
 	return 'other';
 };
 
+const filterSeriesByNoiseMode = (
+	series: DesigningChartSeries[],
+	mode: GraphNoiseMode,
+): DesigningChartSeries[] =>
+	series.filter((s) => (mode === 'impact' ? isImpactChartSeries(s) : !isImpactChartSeries(s)));
+
 const DesigningGraph = ({
 	graphData,
 	regulatoryDocName: _regulatoryDocName,
@@ -135,8 +160,21 @@ const DesigningGraph = ({
 	chartSize?: 'default' | 'large';
 }) => {
 	const { t } = useI18n();
+	const hasAirborneData = useMemo(() => graphHasAirborneGraphData(graphData), [graphData]);
+	const hasImpactData = useMemo(() => graphHasImpactGraphData(graphData), [graphData]);
+	const showNoiseModeSwitch = hasAirborneData && hasImpactData;
 
-	const series: DesigningChartSeries[] = useMemo(() => {
+	const [noiseMode, setNoiseMode] = useState<GraphNoiseMode>('airborne');
+
+	useEffect(() => {
+		if (hasAirborneData) {
+			setNoiseMode('airborne');
+		} else if (hasImpactData) {
+			setNoiseMode('impact');
+		}
+	}, [graphData, hasAirborneData, hasImpactData]);
+
+	const allSeries: DesigningChartSeries[] = useMemo(() => {
 		if (!graphData?.length) return [];
 
 		const out: DesigningChartSeries[] = [];
@@ -181,19 +219,37 @@ const DesigningGraph = ({
 		return [...out].sort((a, b) => drawOrder[a.kind] - drawOrder[b.kind]);
 	}, [graphData, t]);
 
-	const yAxisTitle = useMemo(() => {
-		const hasAir = series.some(
-			(s) => s.kind === 'computed_wall' || s.kind === 'laboratory_wall',
-		);
-		const hasImpact = series.some(
-			(s) => s.kind === 'computed_impact' || s.kind === 'laboratory_impact',
-		);
-		if (hasAir && hasImpact) return 'dB';
-		if (hasImpact) return "Lw, dB";
-		return 'Rw, dB';
-	}, [series]);
+	const activeNoiseMode: GraphNoiseMode = showNoiseModeSwitch
+		? noiseMode
+		: hasImpactData && !hasAirborneData
+			? 'impact'
+			: 'airborne';
 
-	return <DesigningChart series={series} chartSize={chartSize} yAxisTitle={yAxisTitle} />;
+	const series = useMemo(
+		() =>
+			showNoiseModeSwitch || (hasImpactData && !hasAirborneData)
+				? filterSeriesByNoiseMode(allSeries, activeNoiseMode)
+				: allSeries,
+		[activeNoiseMode, allSeries, hasAirborneData, hasImpactData, showNoiseModeSwitch],
+	);
+
+	const yAxisTitle = activeNoiseMode === 'impact' ? 'Lw, dB' : 'Rw, dB';
+
+	return (
+		<div className="flex w-full flex-col items-center gap-3">
+			{showNoiseModeSwitch ? (
+				<Switch
+					offText={t('constructor.chart.noiseModeAirborne')}
+					onText={t('constructor.chart.noiseModeImpact')}
+					textClassName="font-sans text-sm font-semibold leading-5"
+					wrapperClassName="h-[30px] w-[min(100%,360px)] self-center p-[3px] bg-primary"
+					isEnabledProp={noiseMode === 'impact'}
+					onChange={(isImpact) => setNoiseMode(isImpact ? 'impact' : 'airborne')}
+				/>
+			) : null}
+			<DesigningChart series={series} chartSize={chartSize} yAxisTitle={yAxisTitle} />
+		</div>
+	);
 };
 
 export default DesigningGraph;

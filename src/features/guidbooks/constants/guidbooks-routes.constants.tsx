@@ -19,4 +19,8 @@ export const GUIDBOOKS_ROUTES = {
 		id: 'tariff-plans-page-id',
 		route: 'tariff-plans',
 	},
+	acousticModels: {
+		id: 'acoustic-models-page-id',
+		route: 'acoustic-models',
+	},
 };

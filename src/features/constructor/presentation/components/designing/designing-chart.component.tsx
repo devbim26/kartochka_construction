@@ -64,6 +64,14 @@ type DesigningChartProps = {
 
 type LineTier = 'thick' | 'medium' | 'thin';
 
+/** Окна, двери и прочие доп. серии — серые линии без пункта в легенде. */
+const GREY_SECONDARY_SERIES_COLOR = '#6b7280';
+
+const isGreySecondarySeries = (kind: GraphSeriesKind) =>
+	kind === 'window' || kind === 'door' || kind === 'other';
+
+const isLegendHiddenKind = (kind: GraphSeriesKind) => isGreySecondarySeries(kind);
+
 const seriesStyleByKind = (kind: GraphSeriesKind) => {
 	switch (kind) {
 		case 'laboratory_wall':
@@ -83,9 +91,12 @@ const seriesStyleByKind = (kind: GraphSeriesKind) => {
 				borderDash: [10, 4] as number[],
 			};
 		case 'window':
-			return { color: '#22c55e', lineTier: 'thin' as const, borderDash: undefined };
 		case 'door':
-			return { color: '#f97316', lineTier: 'thin' as const, borderDash: undefined };
+			return {
+				color: GREY_SECONDARY_SERIES_COLOR,
+				lineTier: 'thin' as const,
+				borderDash: undefined,
+			};
 		case 'reference':
 			return {
 				color: '#9ca3af',
@@ -93,7 +104,11 @@ const seriesStyleByKind = (kind: GraphSeriesKind) => {
 				borderDash: [6, 6] as number[],
 			};
 		default:
-			return { color: '#6b7280', lineTier: 'thin' as const, borderDash: undefined };
+			return {
+				color: GREY_SECONDARY_SERIES_COLOR,
+				lineTier: 'thin' as const,
+				borderDash: undefined,
+			};
 	}
 };
 
@@ -120,11 +135,23 @@ const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 	if (gt === GraphType.Atalon)
 		return { color: '#9ca3af', lineTier: 'thin' as LineTier, borderDash: [6, 6] as number[] };
 	if (gt === GraphType.AdditionalDoor)
-		return { color: '#f97316', lineTier: 'thin' as LineTier, borderDash: undefined };
+		return {
+			color: GREY_SECONDARY_SERIES_COLOR,
+			lineTier: 'thin' as LineTier,
+			borderDash: undefined,
+		};
 	if (gt === GraphType.AdditionalWindow)
-		return { color: '#22c55e', lineTier: 'thin' as LineTier, borderDash: undefined };
+		return {
+			color: GREY_SECONDARY_SERIES_COLOR,
+			lineTier: 'thin' as LineTier,
+			borderDash: undefined,
+		};
 	if (gt === GraphType.Intermediate)
-		return { color: '#a855f7', lineTier: 'medium' as LineTier, borderDash: undefined };
+		return {
+			color: GREY_SECONDARY_SERIES_COLOR,
+			lineTier: 'thin' as LineTier,
+			borderDash: undefined,
+		};
 	return seriesStyleByKind(s.kind);
 };
 
@@ -270,7 +297,7 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 			const { color, lineTier, borderDash: styleDash } = style;
 			const borderWidth =
 				lineTier === 'thick' ? thickWidth : lineTier === 'medium' ? (thickWidth + thinWidth) / 2 : thinWidth;
-			const isGreyOther = s.kind === 'other' && s.graphType !== GraphType.Intermediate;
+			const isGreySecondary = isGreySecondarySeries(s.kind);
 
 			const dataPoints = displayFrequencies.map((frequency) => {
 				const point = s.data.find((p) => p.x === frequency);
@@ -309,25 +336,25 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 					return hasLabel ? '#000000' : color;
 				},
 				pointRadius: (context: any) => {
-					if (context.dataIndex === undefined) return isGreyOther ? 4 : 5;
+					if (context.dataIndex === undefined) return isGreySecondary ? 4 : 5;
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
 					if (value === null || value === undefined) return 0;
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
-					if (isGreyOther) return hasLabel ? 4 : 0;
+					if (isGreySecondary) return hasLabel ? 4 : 0;
 					return hasLabel ? 6 : 3;
 				},
 				pointBorderWidth: (context: any) => {
-					if (context.dataIndex === undefined) return isGreyOther ? 1 : 2;
+					if (context.dataIndex === undefined) return isGreySecondary ? 1 : 2;
 					const value = context.dataset.data[context.dataIndex];
 					const frequency = displayFrequencies[context.dataIndex];
 					if (value === null || value === undefined) return 0;
 					const hasLabel = pointLabels.some(
 						(label) => label.x === frequency && label.y === value,
 					);
-					if (isGreyOther) return hasLabel ? 1.5 : 0;
+					if (isGreySecondary) return hasLabel ? 1.5 : 0;
 					return hasLabel ? 2 : 1;
 				},
 				pointHoverRadius: (context: any) => {
@@ -391,9 +418,10 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 						generateLabels: (chart: Chart<'line'>): LegendItem[] => {
 							return chart.data.datasets
 								.map((dataset, datasetIndex) => {
+									const s = series[datasetIndex];
+									if (s != null && isLegendHiddenKind(s.kind)) return null;
 									const text = String(dataset.label ?? '').trim();
 									if (!text.length) return null;
-									const s = series[datasetIndex];
 									const fill =
 										s != null
 											? seriesColor(s)

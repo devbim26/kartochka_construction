@@ -31,6 +31,13 @@ export interface AccountDto {
 	dowloadReportsNumber?: number;
 }
 
+export interface AcousticModelDto {
+	name?: string | null;
+	/** @format double */
+	coefficient?: number;
+	openRouterModelId?: string | null;
+}
+
 export interface AdditionalConstructionHeaderDto {
 	constructionHeader?: ConstructionHeaderDto;
 	/** @format double */
@@ -354,6 +361,12 @@ export interface CreateFloorReportReceivingCommand {
 	reportInfoId?: string;
 }
 
+export interface CreateOrUpdateAcousticModelsCommand {
+	modelId?: string | null;
+	/** @format double */
+	coefficient?: number;
+}
+
 export interface CreateReportConstructionDto {
 	/** @format uuid */
 	id?: string | null;
@@ -450,6 +463,10 @@ export interface CreateUserMaterialDto {
 	positionId?: number;
 	additionalName?: string | null;
 	materialTypeValue?: MaterialTypeValueDto[] | null;
+}
+
+export interface DeleteAcousticModelsCommand {
+	modelId?: string | null;
 }
 
 export interface DeleteArticleCommand {
@@ -617,6 +634,10 @@ export interface GeneralCharacteristicFlagsDto {
 	takeRoomCharacteristic?: boolean;
 	takeWallMaterialsVolumesCalculation?: boolean;
 	takeFloorMaterialsVolumesCalculation?: boolean;
+}
+
+export interface GetAcousticModelsQuery {
+	name?: string | null;
 }
 
 export interface GetAlternativeConstructionHeadersQuery {
@@ -1702,6 +1723,14 @@ export interface UpdateSubscriptionCommand {
 	numberOfDownloadReports?: number;
 	/** @format uuid */
 	tariffPlanId?: string | null;
+}
+
+export interface UpdateUserSubscriptionByModelMessageComand {
+	/** @format uuid */
+	openRouterWebUiUserId?: string;
+	/** @format double */
+	messageCost?: number;
+	modelId?: string | null;
 }
 
 export interface UserMaterialDto {
@@ -2831,6 +2860,94 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<MaterialTypeDto[], any>({
 				path: `/api/MaterialType`,
 				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags OpenRouterModels
+		 * @name OpenRouterModelsModelsCreate
+		 * @request POST:/api/OpenRouterModels/Models
+		 */
+		openRouterModelsModelsCreate: (data: GetAcousticModelsQuery, params: RequestParams = {}) =>
+			this.request<AcousticModelDto[], any>({
+				path: `/api/OpenRouterModels/Models`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags OpenRouterModels
+		 * @name OpenRouterModelsCreate
+		 * @request POST:/api/OpenRouterModels
+		 */
+		openRouterModelsCreate: (
+			data: CreateOrUpdateAcousticModelsCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<AcousticModelDto, any>({
+				path: `/api/OpenRouterModels`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags OpenRouterModels
+		 * @name OpenRouterModelsDelete
+		 * @request DELETE:/api/OpenRouterModels
+		 */
+		openRouterModelsDelete: (data: DeleteAcousticModelsCommand, params: RequestParams = {}) =>
+			this.request<void, any>({
+				path: `/api/OpenRouterModels`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags OpenRouterModels
+		 * @name OpenRouterModelsIsHaveAccessList
+		 * @request GET:/api/OpenRouterModels/isHaveAccess
+		 */
+		openRouterModelsIsHaveAccessList: (params: RequestParams = {}) =>
+			this.request<SubscriptionDto, any>({
+				path: `/api/OpenRouterModels/isHaveAccess`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags OpenRouterModels
+		 * @name OpenRouterModelsUpdateSubscriptionUpdate
+		 * @request PUT:/api/OpenRouterModels/updateSubscription
+		 */
+		openRouterModelsUpdateSubscriptionUpdate: (
+			data: UpdateUserSubscriptionByModelMessageComand,
+			params: RequestParams = {},
+		) =>
+			this.request<SubscriptionDto, any>({
+				path: `/api/OpenRouterModels/updateSubscription`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
 				format: 'json',
 				...params,
 			}),

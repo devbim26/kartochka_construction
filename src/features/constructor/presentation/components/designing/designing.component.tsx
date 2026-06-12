@@ -36,7 +36,7 @@ import {
 	mapAdditionalOpeningsToUpdateDto,
 } from '@features/constructor/converters';
 import {
-	filterConstructionTypeSelectOptions,
+	filterDesigningConstructionTypeSelectOptions,
 	getLayoutClassFromConstructionHeader,
 	evaluateGraphRelevance,
 	graphHasComputedData,
@@ -152,7 +152,7 @@ const DesigningConstructionScreen = () => {
 	const constructionTypeSelectOptions = useMemo(() => {
 		const all =
 			locale === 'ru' ? RuConstructionTypesSelectValues : EnConstructionTypesSelectValues;
-		return filterConstructionTypeSelectOptions(all, constructionLayoutClass);
+		return filterDesigningConstructionTypeSelectOptions(all, constructionLayoutClass);
 	}, [locale, constructionLayoutClass]);
 
 	const hasComputedDots = useMemo(() => graphHasComputedData(graphData), [graphData]);
@@ -451,6 +451,9 @@ const DesigningConstructionScreen = () => {
 	);
 
 	const updateAdditionalOpenings$ = useCallback(() => {
+		if (isFloorConstruction) {
+			return of(true);
+		}
 		const rcId = reportConstructionIdRef.current;
 		const openings = additionalOpeningsRef.current;
 		if (!rcId || !openings) {
@@ -467,7 +470,7 @@ const DesigningConstructionScreen = () => {
 			catchError(catchRequestError),
 			switchMap((addRes) => of(addRes?.status === 200)),
 		);
-	}, [catchRequestError]);
+	}, [catchRequestError, isFloorConstruction]);
 
 	const refreshReportConstructionData = useCallback(() => {
 		if (reportType === ReportCategory.Single && reportId) {
@@ -761,7 +764,9 @@ const DesigningConstructionScreen = () => {
 						}).component}
 					</SelectableMaterialDesignationProvider>
 				)}
-				{currentConstruction?.reportConstructionHeader?.id ? (
+				{currentConstruction?.reportConstructionHeader?.id &&
+				!isFloorConstruction &&
+				!isConstructionEditLocked ? (
 					<AdditionalOpeningsForm
 						ref={additionalOpeningsRef}
 						key={currentConstruction.reportConstructionHeader.id}
@@ -774,22 +779,26 @@ const DesigningConstructionScreen = () => {
 						}
 					/>
 				) : null}
-				<div className="flex items-center justify-end gap-[10px]">
-					{hasPendingTypeChange && (
-						<Button
-							onClick={handleRestoreInitialConstruction}
-							className="h-[40px] w-fit bg-white px-[16px] font-sans text-sm font-semibold text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
-						>
-							{locale === 'ru' ? 'Вернуть' : 'Restore'}
-						</Button>
-					)}
-					<Button
-						onClick={onEditHandle}
-						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
-					>
-						{t('constructor.designing.calculate')}
-					</Button>
-				</div>
+				{(hasPendingTypeChange || !isConstructionEditLocked) && (
+					<div className="flex items-center justify-end gap-[10px]">
+						{hasPendingTypeChange && (
+							<Button
+								onClick={handleRestoreInitialConstruction}
+								className="h-[40px] w-fit bg-white px-[16px] font-sans text-sm font-semibold text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
+							>
+								{locale === 'ru' ? 'Вернуть' : 'Restore'}
+							</Button>
+						)}
+						{!isConstructionEditLocked && (
+							<Button
+								onClick={onEditHandle}
+								className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
+							>
+								{t('constructor.designing.calculate')}
+							</Button>
+						)}
+					</div>
+				)}
 			</div>
 			<div className="flex w-full flex-col items-stretch gap-6 rounded-[20px] bg-white px-[25px] py-[27px] xl:flex-row xl:items-start">
 				<div className="flex w-full shrink-0 flex-col gap-[10px] px-[24px] py-[10px] xl:max-w-[min(100%,400px)] xl:basis-[400px]">

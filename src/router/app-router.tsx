@@ -16,6 +16,7 @@ import {
 	GuidbooksLauout,
 	IFCModelScreen,
 	IssuersScreen,
+	AcousticModelsScreen,
 	TariffPlansScreen,
 	LandingContent,
 	LandingScreen,
@@ -129,6 +130,10 @@ export const AppRouter = () => {
 					<Route
 						path={GUIDBOOKS_ROUTES.tariffPlans.route}
 						element={<TariffPlansScreen />}
+					/>
+					<Route
+						path={GUIDBOOKS_ROUTES.acousticModels.route}
+						element={<AcousticModelsScreen />}
 					/>
 				</Route>
 

@@ -193,6 +193,12 @@ export function getSidebarItemsConfig(): SidebarItemsConfig {
 						labelKey: 'sidebar.tariffPlans',
 						permission: UserRoles.Admin,
 					},
+					{
+						id: GUIDBOOKS_ROUTES.acousticModels.id,
+						path: GUIDBOOKS_ROUTES.acousticModels.route,
+						labelKey: 'sidebar.acousticModels',
+						permission: UserRoles.Admin,
+					},
 				],
 			},
 			{

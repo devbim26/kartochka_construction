@@ -134,6 +134,13 @@ const supplementalMaterialTypes: MaterialTypeEnum[] = [
 	MaterialTypeEnum.AcousticTreatmentMaterials,
 ];
 
+/** Тяжёлые стены: тяжёлые, плиты, штукатурка (без мембран и акустики в базе). */
+const heavyBaseLayerMaterialTypes: MaterialTypeEnum[] = [
+	MaterialTypeEnum.Heavy,
+	MaterialTypeEnum.Board,
+	MaterialTypeEnum.Plaster,
+];
+
 const buildMaterialTypesSelectValuesMap = (locale: 'ru' | 'en') => ({
 	[MaterialTypesSelectValuesEnum.Base]: materialTypeSelectOptions(
 		[MaterialTypeEnum.Heavy, MaterialTypeEnum.Board, ...supplementalMaterialTypes],
@@ -158,12 +165,13 @@ const buildMaterialTypesSelectValuesMap = (locale: 'ru' | 'en') => ({
 			MaterialTypeEnum.Link,
 			MaterialTypeEnum.Filler,
 			MaterialTypeEnum.Board,
+			MaterialTypeEnum.Plaster,
 			...supplementalMaterialTypes,
 		],
 		locale,
 	),
 	[MaterialTypesSelectValuesEnum.Additional]: materialTypeSelectOptions(
-		[MaterialTypeEnum.Board, ...supplementalMaterialTypes],
+		[MaterialTypeEnum.Board, MaterialTypeEnum.Plaster, ...supplementalMaterialTypes],
 		locale,
 	),
 	[MaterialTypesSelectValuesEnum.FramePartition]: materialTypeSelectOptions(
@@ -193,7 +201,7 @@ const buildMaterialTypesSelectValuesMap = (locale: 'ru' | 'en') => ({
 		locale,
 	),
 	[MaterialTypesSelectValuesEnum.BaseHeavySingleLayer]: materialTypeSelectOptions(
-		[MaterialTypeEnum.Heavy, MaterialTypeEnum.Board, MaterialTypeEnum.Plaster],
+		heavyBaseLayerMaterialTypes,
 		locale,
 	),
 });

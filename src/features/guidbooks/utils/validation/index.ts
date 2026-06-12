@@ -1,3 +1,4 @@
+export * from './acoustic-model.validation';
 export * from './constructions';
 export * from './issuer.validation';
 export * from './materials';

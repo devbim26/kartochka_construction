@@ -43,3 +43,18 @@ export function filterConstructionTypeSelectOptions(
 		return true;
 	});
 }
+
+/** Типы, недоступные для смены в проектировании. */
+const DESIGNING_EXCLUDED_CONSTRUCTION_TYPES: ReadonlySet<ConstructionTypeEnum> = new Set([
+	ConstructionTypeEnum.ZPanel,
+]);
+
+/** Фильтр селекта типа конструкции на экране проектирования. */
+export function filterDesigningConstructionTypeSelectOptions(
+	options: ConstructionTypeSelectOption[],
+	layoutClass: ConstructionClass | null,
+): ConstructionTypeSelectOption[] {
+	return filterConstructionTypeSelectOptions(options, layoutClass).filter(
+		(option) => !DESIGNING_EXCLUDED_CONSTRUCTION_TYPES.has(option.value),
+	);
+}

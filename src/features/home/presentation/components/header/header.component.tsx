@@ -1,5 +1,6 @@
-import { APP_ROUTES, LogoIcon, LogoTextIcon } from '@core';
-import { useState } from 'react';
+import { APP_ROUTES, LogoIcon, LogoTextIcon, selectIsUserLoggedIn, useAppSelector } from '@core';
+import { DESIGNING_ROUTES } from '@features/home/constants';
+import { useCallback, useState } from 'react';
 import { ChevronLandingIcon } from '@core/presentation/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
@@ -12,8 +13,17 @@ export const HomeHeader = () => {
 	const { pathname } = useLocation();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const navigate = useNavigate();
+	const isLoggedIn = useAppSelector(selectIsUserLoggedIn);
 	const designingSidebar = useDesigningSidebar();
 	const isDesigning = pathname.startsWith(APP_ROUTES.designing.route);
+
+	const handleLogoClick = useCallback(() => {
+		if (isLoggedIn) {
+			navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`);
+			return;
+		}
+		navigate(APP_ROUTES.landing.route);
+	}, [isLoggedIn, navigate]);
 
 	const toggleMenu = () => {
 		setIsMenuOpen((prev) => !prev);
@@ -63,7 +73,7 @@ export const HomeHeader = () => {
 					</button>
 
 					<div
-						onClick={() => navigate(APP_ROUTES.landing.route)}
+						onClick={handleLogoClick}
 						className="flex cursor-pointer flex-row items-center gap-[12px]"
 					>
 						<LogoIcon className="xs:size-[30px] md:size-[50px]" />

@@ -36,7 +36,7 @@ export const HeavySingleLayerWallFacingOneSideComponent = ({
 			constructionPosition: 'Center' as const,
 			positions: ['0', '1', '2', '3', '4'],
 			selectable: ['0', '1', '3', '4'],
-			materialType: MaterialTypesSelectValuesEnum.Base,
+			materialType: MaterialTypesSelectValuesEnum.BaseHeavySingleLayer,
 		},
 		{
 			title: '2. Облицовка',

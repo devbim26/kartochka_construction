@@ -3,6 +3,8 @@ import { type EntityConfig } from '@core';
 import { getDesignCalculationConstructionPurpose } from '@core/utils/helpers/design-calculation-mode.helper';
 import { getSessionStorageData } from '@core/utils/helpers/session.helper';
 import {
+	AcousticModelFilterSchema,
+	AcousticModelSchema,
 	ConstructionsAddSchema,
 	ConstructionsEditSchema,
 	ConstructionsFilterSchema,
@@ -74,6 +76,20 @@ export const TariffPlanAddAndEditConfig: EntityConfig = {
 export const TariffPlanFilterConfig: EntityConfig = {
 	schema: TariffPlanFilterSchema,
 	defaultValues: {},
+};
+
+export const AcousticModelAddAndEditConfig: EntityConfig = {
+	schema: AcousticModelSchema,
+	defaultValues: {
+		name: '',
+		openRouterModelId: '',
+		coefficient: '',
+	},
+};
+
+export const AcousticModelFilterConfig: EntityConfig = {
+	schema: AcousticModelFilterSchema,
+	defaultValues: { name: '' },
 };
 
 export const RequirementsFilterDataConfig: EntityConfig = {

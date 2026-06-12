@@ -78,7 +78,9 @@ export const HeavyMultiLayerWallBaseSection = ({
 											fieldIndex={fieldIndex}
 											positionId={Number(positionId)}
 											constructionPosition="Center"
-											materialTypesSelectValues={MaterialTypesSelectValuesEnum.Base}
+											materialTypesSelectValues={
+												MaterialTypesSelectValuesEnum.BaseHeavySingleLayer
+											}
 										/>
 									)}
 
