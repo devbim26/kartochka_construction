@@ -5,6 +5,7 @@ import { ChevronLandingIcon } from '@core/presentation/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useDesigningSidebar } from '../../context/designing-sidebar.context';
+import { CreateNewReportButton } from './create-new-report-button.component';
 import { HeaderNav } from './header-nav.component';
 import { LanguageToggle } from './language-toggle.component';
 import { LogoutHeader } from './logout-header.component';
@@ -87,6 +88,7 @@ export const HomeHeader = () => {
 
 				{pathname.startsWith('/') && (
 					<div className="hidden items-center gap-3 sm:flex">
+						<CreateNewReportButton />
 						<LanguageToggle />
 						<LogoutHeader />
 					</div>
@@ -112,6 +114,7 @@ export const HomeHeader = () => {
 								<LogoTextIcon className="h-[48px] w-[130px]" />
 							</div>
 							<div className="flex items-center gap-2">
+								<CreateNewReportButton />
 								<LanguageToggle />
 								<button
 									onClick={toggleMenu}

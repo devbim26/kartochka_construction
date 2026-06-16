@@ -46,6 +46,7 @@ export const en = {
 	'nav.aboutUs': 'About us',
 	'nav.subscription': 'Plans',
 	'nav.contacts': 'Contacts',
+	'nav.createNewReport': 'Create new report',
 	'nav.designing': 'Home',
 	'lang.switch': 'Switch language',
 	'ai.assistant.title': 'AI mode',
@@ -1254,6 +1255,7 @@ export const ru: Record<TranslationKey, string> = {
 	'nav.aboutUs': 'О нас',
 	'nav.subscription': 'Тарифы',
 	'nav.contacts': 'Контакты',
+	'nav.createNewReport': 'Создать новый отчет',
 	'nav.designing': 'Главная',
 	'lang.switch': 'Сменить язык',
 
