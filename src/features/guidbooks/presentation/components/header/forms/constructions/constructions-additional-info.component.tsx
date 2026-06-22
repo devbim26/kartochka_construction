@@ -1,0 +1,270 @@
+import { Button, FormElementLabel, Input, TextArea, useI18n } from '@core';
+import type { ConstructionsAddData } from '@features/guidbooks/types';
+import type { ChangeEvent } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { twMerge } from 'tailwind-merge';
+import { FormSubTitle } from '../../form-sub-title.component';
+
+const MULTILINE_FIELDS = [
+	{
+		name: 'additionalInfo.suppliers',
+		labelKey: 'guides.constructions.info.suppliers',
+		placeholderKey: 'guides.constructions.info.multilinePlaceholder',
+	},
+	{
+		name: 'additionalInfo.composition',
+		labelKey: 'guides.constructions.info.composition',
+		placeholderKey: 'guides.constructions.info.multilinePlaceholder',
+	},
+	{
+		name: 'additionalInfo.features',
+		labelKey: 'guides.constructions.info.features',
+		placeholderKey: 'guides.constructions.info.multilinePlaceholder',
+	},
+	{
+		name: 'additionalInfo.physicalCharacteristics',
+		labelKey: 'guides.constructions.info.physicalCharacteristics',
+		placeholderKey: 'guides.constructions.info.multilinePlaceholder',
+	},
+	{
+		name: 'additionalInfo.fireSafetyAndMore',
+		labelKey: 'guides.constructions.info.fireSafetyAndMore',
+		placeholderKey: 'guides.constructions.info.multilinePlaceholder',
+	},
+	{
+		name: 'additionalInfo.installation',
+		labelKey: 'guides.constructions.info.installation',
+		placeholderKey: 'guides.constructions.info.multilinePlaceholder',
+	},
+] as const;
+
+const fieldLabelClassName = 'font-sans text-sm font-normal leading-5 tracking-[0.1px]';
+const fieldInputClassName =
+	'py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]';
+const fieldTextAreaClassName =
+	'py-[6px] px-[12px] min-h-[96px] font-sans text-sm font-normal leading-5 tracking-[0.1px]';
+
+const listTextClassName =
+	'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary';
+
+const getFileNameFromUrl = (url: string) => {
+	try {
+		const pathname = new URL(url, window.location.origin).pathname;
+		const name = pathname.split('/').pop();
+		return name ? decodeURIComponent(name) : url;
+	} catch {
+		return url.split('/').pop() || url;
+	}
+};
+
+const SelectedFilesList = ({
+	title,
+	items,
+}: {
+	title: string;
+	items: Array<{ key: string; name: string; href?: string }>;
+}) => {
+	if (!items.length) return null;
+
+	return (
+		<div className="flex flex-col gap-1 text-left">
+			<p className={twMerge(listTextClassName, 'font-semibold text-[#14181F]')}>
+				{title} ({items.length})
+			</p>
+			<ul className="flex flex-col gap-1">
+				{items.map((item) => (
+					<li key={item.key} className={listTextClassName}>
+						{item.href ? (
+							<a
+								className="text-primary underline"
+								href={item.href}
+								target="_blank"
+								rel="noreferrer"
+							>
+								{item.name}
+							</a>
+						) : (
+							<span>{item.name}</span>
+						)}
+					</li>
+				))}
+			</ul>
+		</div>
+	);
+};
+
+export const ConstructionsAdditionalInfo = () => {
+	const { t } = useI18n();
+	const { register, setValue, watch } = useFormContext<ConstructionsAddData>();
+	const fileUrls = watch('additionalInfo.fileUrls') ?? [];
+	const imageUrls = watch('additionalInfo.imageUrls') ?? [];
+	const selectedFiles = (watch('additionalInfo.files') ?? []) as File[];
+	const selectedImages = (watch('additionalInfo.images') ?? []) as File[];
+
+	const selectedImagePreviews = useMemo(
+		() => selectedImages.map((file) => URL.createObjectURL(file)),
+		[selectedImages],
+	);
+
+	useEffect(
+		() => () => {
+			selectedImagePreviews.forEach((url) => URL.revokeObjectURL(url));
+		},
+		[selectedImagePreviews],
+	);
+
+	const existingFileItems = fileUrls.filter(Boolean).map((url, index) => ({
+		key: `existing-file-${url}-${index}`,
+		name: getFileNameFromUrl(url),
+		href: url,
+	}));
+
+	const newFileItems = selectedFiles.map((file, index) => ({
+		key: `new-file-${file.name}-${file.lastModified}-${index}`,
+		name: file.name,
+	}));
+
+	const existingImageItems = imageUrls.filter(Boolean).map((url, index) => ({
+		key: `existing-image-${url}-${index}`,
+		name: getFileNameFromUrl(url),
+		href: url,
+	}));
+
+	const newImageItems = selectedImages.map((file, index) => ({
+		key: `new-image-${file.name}-${file.lastModified}-${index}`,
+		name: file.name,
+	}));
+
+	const handleFilesChange =
+		(field: 'additionalInfo.files' | 'additionalInfo.images') =>
+		(event: ChangeEvent<HTMLInputElement>) => {
+			setValue(field, Array.from(event.target.files ?? []), { shouldDirty: true });
+		};
+
+	return (
+		<div className="flex flex-col gap-[16px]">
+			<div className="flex flex-wrap gap-[16px]">
+				<Input
+					labelClassName={fieldLabelClassName}
+					inputClassName={fieldInputClassName}
+					containerClassName="w-[468px]"
+					label={t('guides.constructions.info.standartName')}
+					placeholder={t('guides.constructions.info.standartNamePlaceholder')}
+					{...register('additionalInfo.standartName')}
+					type="text"
+				/>
+			</div>
+
+			<div className="flex flex-wrap gap-[16px]">
+				{MULTILINE_FIELDS.map((field) => (
+					<TextArea
+						key={field.name}
+						labelClassName={fieldLabelClassName}
+						inputClassName={fieldTextAreaClassName}
+						containerClassName="w-[468px]"
+						label={t(field.labelKey)}
+						placeholder={t(field.placeholderKey)}
+						{...register(field.name)}
+					/>
+				))}
+			</div>
+
+			<FormSubTitle text={t('guides.constructions.info.attachmentsTitle')} />
+			<div className="flex flex-wrap gap-[16px]">
+				<div className="relative flex w-[468px] items-start gap-4">
+					<div className="flex flex-col gap-y-2">
+						<FormElementLabel className={twMerge(fieldLabelClassName, 'text-input-label-primary')}>
+							{t('guides.constructions.info.files')}
+						</FormElementLabel>
+						<div className="flex items-center gap-[8px]">
+							<Button
+								variant="primary"
+								type="button"
+								className="group flex w-fit flex-row items-center gap-[4px] border-2 border-solid border-primary bg-white"
+								onClick={() => document.getElementById('construction-files-upload')?.click()}
+							>
+								<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
+									{t('guides.constructions.info.selectFiles')}
+								</p>
+							</Button>
+							<input
+								id="construction-files-upload"
+								type="file"
+								multiple
+								className="hidden"
+								onChange={handleFilesChange('additionalInfo.files')}
+							/>
+						</div>
+						<SelectedFilesList
+							title={t('guides.constructions.info.currentFiles')}
+							items={existingFileItems}
+						/>
+						<SelectedFilesList
+							title={t('guides.constructions.info.selectedFiles')}
+							items={newFileItems}
+						/>
+					</div>
+				</div>
+
+				<div className="relative flex w-[468px] items-start gap-4">
+					<div className="flex flex-col gap-y-2">
+						<FormElementLabel className={twMerge(fieldLabelClassName, 'text-input-label-primary')}>
+							{t('guides.constructions.info.images')}
+						</FormElementLabel>
+						<div className="flex items-center gap-[8px]">
+							<Button
+								variant="primary"
+								type="button"
+								className="group flex w-fit flex-row items-center gap-[4px] border-2 border-solid border-primary bg-white"
+								onClick={() => document.getElementById('construction-images-upload')?.click()}
+							>
+								<p className="border-primary font-sans text-base font-semibold leading-4 text-primary group-hover:text-white">
+									{t('guides.constructions.info.selectImages')}
+								</p>
+							</Button>
+							<input
+								id="construction-images-upload"
+								type="file"
+								multiple
+								accept="image/*"
+								className="hidden"
+								onChange={handleFilesChange('additionalInfo.images')}
+							/>
+						</div>
+						<SelectedFilesList
+							title={t('guides.constructions.info.currentImages')}
+							items={existingImageItems}
+						/>
+						<SelectedFilesList
+							title={t('guides.constructions.info.selectedImages')}
+							items={newImageItems}
+						/>
+					</div>
+					{(imageUrls.length > 0 || selectedImagePreviews.length > 0) && (
+						<div className="flex flex-wrap gap-2 self-center">
+							{imageUrls.map((url, index) => (
+								<a key={`${url}-${index}`} href={url} target="_blank" rel="noreferrer">
+									<img
+										src={url}
+										alt={`${t('guides.constructions.info.currentImage')} ${index + 1}`}
+										className="size-[60px] rounded-md object-cover"
+									/>
+								</a>
+							))}
+							{selectedImagePreviews.map((previewUrl, index) => (
+								<img
+									key={previewUrl}
+									src={previewUrl}
+									alt={selectedImages[index]?.name ?? ''}
+									title={selectedImages[index]?.name}
+									className="size-[60px] rounded-md object-cover"
+								/>
+							))}
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	);
+};

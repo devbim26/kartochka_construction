@@ -157,7 +157,7 @@ const DesigningGraph = ({
 	graphData: GraphDetailResponse[] | null;
 	regulatoryDocName: string;
 	calculationDocName: string;
-	chartSize?: 'default' | 'large';
+	chartSize?: 'compact' | 'default' | 'large';
 }) => {
 	const { t } = useI18n();
 	const hasAirborneData = useMemo(() => graphHasAirborneGraphData(graphData), [graphData]);

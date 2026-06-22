@@ -1,5 +1,5 @@
-import type { CreateConstructionTypeDto } from '@api-gen';
+import type { ConstructionTypeDto } from '@api-gen';
 
-export const convertToClientConstructionTypeDto = (data: CreateConstructionTypeDto): string => {
+export const convertToClientConstructionTypeDto = (data: ConstructionTypeDto): string => {
 	return data.constructionTypeEnum ? (data.constructionTypeEnum as string) : '';
 };

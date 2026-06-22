@@ -105,6 +105,20 @@ export const ConstructionTypeShema = z.object({
 
 export type ConstructionTypeSchemaType = z.infer<typeof ConstructionTypeShema>;
 
+export const ConstructionAdditionalInfoSchema = z.object({
+	suppliers: z.string().optional(),
+	standartName: z.string().optional(),
+	composition: z.string().optional(),
+	features: z.string().optional(),
+	physicalCharacteristics: z.string().optional(),
+	fireSafetyAndMore: z.string().optional(),
+	installation: z.string().optional(),
+	fileUrls: z.array(z.string()).optional(),
+	imageUrls: z.array(z.string()).optional(),
+	files: z.array(z.any()).optional(),
+	images: z.array(z.any()).optional(),
+});
+
 const constructionsAddShape = z.object({
 	id: z.string().optional(),
 	name: z.string().optional().nullable(),
@@ -132,6 +146,7 @@ const constructionsAddShape = z.object({
 	lnw: z.string().optional(),
 	constructionTypeObject: ConstructionTypeShema,
 	reportInfoId: z.string().optional(),
+	additionalInfo: ConstructionAdditionalInfoSchema.optional(),
 });
 
 const impactLaboratoryRequiredForFloorsRefine = (

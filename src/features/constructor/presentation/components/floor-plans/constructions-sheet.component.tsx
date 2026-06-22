@@ -343,6 +343,7 @@ export const ConstructionSheets = ({
 															info: 'true',
 															reportId: search.get('reportId')!,
 															reportType: search.get('reportType')!,
+															reportConstructionId: info.row.original.id,
 															reportFloorInfoId:
 																info.row.original.reportFloorInfoId!,
 														})
@@ -350,6 +351,7 @@ export const ConstructionSheets = ({
 															info: 'true',
 															reportId: search.get('reportId')!,
 															reportType: search.get('reportType')!,
+															reportConstructionId: info.row.original.id,
 														});
 											}}
 										/>

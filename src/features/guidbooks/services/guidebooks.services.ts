@@ -96,6 +96,10 @@ export const getGuidebooksConstructionTypes = async () => {
 	return await fetchApi.api.constructionConstructionTypesList();
 };
 
+export const getConstructionAdditionalInfo = async (constructionHeaderId: string) => {
+	return await fetchApi.api.constructionAdditionalInfoCreate({ constructionHeaderId });
+};
+
 export const getRegulatoryRequirementDocuments = async () => {
 	return await fetchApi.api.regulatoryRequirementDocumentList();
 };

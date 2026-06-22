@@ -218,6 +218,12 @@ export const getAlternateConstructions = async (data: AlternateConstructionsType
 	);
 };
 
+export const getConstructionAdditionalInfoForReport = async (reportConstructionId: string) => {
+	return await withConstructorLoader(() =>
+		fetchApi.api.constructionAdditionalInfoForReportCreate({ reportConstructionId }),
+	);
+};
+
 export const getFavoriteConstructions = async () => {
 	return await withConstructorLoader(() => fetchApi.api.constructionFavoriteConstructionList());
 };

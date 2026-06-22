@@ -51,7 +51,6 @@ import {
 	AddRoomModal,
 	CreateConstructionModal,
 	EditConstructionModal,
-	GeneralInformationForm,
 	GeneralInformationModal,
 } from '../modals';
 import type { AddRoomFormValues } from '../modals/modal-forms/add-room-form.component';
@@ -1057,10 +1056,9 @@ export const FloorPlans = memoize(() => {
 						onCancel={() => window.history.back()}
 						onClose={() => window.history.back()}
 						className="!max-w-[1200px] !w-[min(96vw,1180px)] md:!w-[1080px]"
+						contentClassName="visible p-4 md:p-6"
 						headerTitle=""
-					>
-						<GeneralInformationForm />
-					</GeneralInformationModal>
+					/>
 					<EditConstructionModal
 						isOpen={!!search.get('edit')}
 						onCancel={() => window.history.back()}

@@ -26,6 +26,7 @@ import {
 	convertToServerConstructionsAddData,
 	convertToServerConstructionsEditData,
 	convertToServerConstructionsFilterData,
+	mergeConstructionAdditionalInfo,
 } from '@features/guidbooks/converters';
 import { prepareConstructionEditDataForPersistence } from '@features/guidbooks/utils';
 import {
@@ -34,6 +35,7 @@ import {
 	getGuidebooksDetail,
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
+	getConstructionAdditionalInfo,
 } from '@features/guidbooks/services';
 import {
 	Guidebooks,
@@ -297,11 +299,19 @@ const ConstructionsScreen = () => {
 	};
 
 	const handleGetOneTableData = (id: string) => {
-		from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
+		from(
+			Promise.all([
+				getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }),
+				getConstructionAdditionalInfo(id),
+			]),
+		)
 			.pipe(
-				switchMap((response: AxiosResponse) => {
+				switchMap(([response, additionalInfoResponse]: AxiosResponse[]) => {
 					const data = prepareConstructionEditDataForPersistence(
-						convertToClientConstructionsEditData(response.data),
+						mergeConstructionAdditionalInfo(
+							convertToClientConstructionsEditData(response.data),
+							additionalInfoResponse.data,
+						),
 					);
 					return from([data]);
 				}),

@@ -4,7 +4,6 @@ import {
 	convertToSelectValues,
 	Input,
 	Select,
-	Switch,
 	useI18n,
 } from '@core';
 import {
@@ -30,10 +29,14 @@ import {
 } from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
 import { FormSubTitle } from '../../form-sub-title.component';
+import { ConstructionsAdditionalInfo } from './constructions-additional-info.component';
 import { ConstructionLaboratoryDataFields } from './constructions-laboratory-data-fields.component';
+import {
+	ConstructionsFormTabs,
+	type ConstructionFormTab,
+} from './constructions-form-tabs.component';
 
 export const ConstructionsAdd = () => {
 	const form = useFormContext<ConstructionsAddData>();
@@ -47,12 +50,18 @@ export const ConstructionsAdd = () => {
 		issuerErrorMessage === 'guides.constructions.zPanelRequiresBrandIssuer'
 			? t('guides.constructions.zPanelRequiresBrandIssuer')
 			: issuerErrorMessage || 'Производитель';
-	const [displayChars, setDisplayChars] = useState(false);
+	const [activeTab, setActiveTab] = useState<ConstructionFormTab>('description');
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionType');
 	const showImpactLaboratory = isFloorConstructionType(currentConstruction);
 	const showZPanelGuidebookHint =
-		!displayChars && isZPanelGuidebookConstructionType(currentConstruction);
+		activeTab === 'description' && isZPanelGuidebookConstructionType(currentConstruction);
+	const hasDescriptionErrors = Object.keys(formState.errors).some((key) =>
+		ConstructionsAddFieldNames.includes(key),
+	);
+	const hasCharacteristicsErrors = Object.keys(formState.errors).some((key) =>
+		ConstructionTypeFieldNames.includes(key),
+	);
 
 	const handleGetIssuerData = useCallback(async () => {
 		try {
@@ -81,24 +90,20 @@ export const ConstructionsAdd = () => {
 	}, []);
 	return (
 		<div className="flex w-full flex-col gap-[16px] px-[25px]">
-			<Switch
-				onText="Характеристики"
-				offText="Описание"
-				textClassName="font-sans text-[17px] font-normal leading-5 tracking-[0.1px]"
-				offIcon={
-					Object.keys(formState.errors).some((key) =>
-						ConstructionsAddFieldNames.includes(key),
-					) && <IoMdWarning />
-				}
-				onIcon={
-					Object.keys(formState.errors).some((key) =>
-						ConstructionTypeFieldNames.includes(key),
-					) && <IoMdWarning />
-				}
-				wrapperClassName="h-[30px] w-[400px] self-center p-[3px] bg-primary"
-				onChange={() => setDisplayChars(!displayChars)}
+			<ConstructionsFormTabs
+				activeTab={activeTab}
+				onChange={setActiveTab}
+				tabs={[
+					{ id: 'description', label: 'Описание', hasError: hasDescriptionErrors },
+					{
+						id: 'characteristics',
+						label: 'Характеристики',
+						hasError: hasCharacteristicsErrors,
+					},
+					{ id: 'info', label: 'Информация' },
+				]}
 			/>
-			{!displayChars ? (
+			{activeTab === 'description' ? (
 				<>
 					<FormSubTitle text="Описание" />
 					<div className="flex flex-wrap gap-[16px]">
@@ -308,7 +313,7 @@ export const ConstructionsAdd = () => {
 						/>
 					) : null}
 				</>
-			) : (
+			) : activeTab === 'characteristics' ? (
 				<>
 					<FormSubTitle text="Тип конструкции" />
 					<Controller
@@ -353,6 +358,11 @@ export const ConstructionsAdd = () => {
 					) : (
 						<></>
 					)}
+				</>
+			) : (
+				<>
+					<FormSubTitle text="Информация" />
+					<ConstructionsAdditionalInfo />
 				</>
 			)}
 		</div>

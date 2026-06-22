@@ -1,11 +1,10 @@
 import {
 	ConstructionPosition,
 	ConstructionPurpose,
+	type ConstructionAdditionalInfoDto,
 	type ConstructionLaboratoryDataDto,
 	type ConstructionTypeEnum as ServerConstructionTypeEnum,
 	type CountryType,
-	type CreateConstructionLaboratoryDataDto,
-	type CreateConstructionTypeDto,
 	type IndexType,
 	type RTotalDto,
 } from '@api-gen';
@@ -57,6 +56,76 @@ const parseFilterNumber = (value: string): number | null => {
 	if (!t) return null;
 	const n = Number(t.replace(',', '.'));
 	return Number.isFinite(n) ? n : null;
+};
+
+const linesToArray = (value?: string | null): string[] =>
+	String(value ?? '')
+		.split('\n')
+		.map((line) => line.trim())
+		.filter(Boolean);
+
+const arrayToLines = (value?: string[] | null): string =>
+	Array.isArray(value) ? value.filter(Boolean).join('\n') : '';
+
+const mapAdditionalInfoFromApi = (data?: ConstructionAdditionalInfoDto | null) => ({
+	suppliers: arrayToLines(data?.suppliers),
+	standartName: data?.standartName ?? '',
+	composition: arrayToLines(data?.composition),
+	features: arrayToLines(data?.features),
+	physicalCharacteristics: arrayToLines(data?.physicalCharacteristics),
+	fireSafetyAndMore: arrayToLines(data?.fireSafetyAndMore),
+	installation: arrayToLines(data?.installation),
+	fileUrls: data?.fileUrls ?? [],
+	imageUrls: data?.imageUrls ?? [],
+	files: [],
+	images: [],
+});
+
+const mapCreateAdditionalInfoToServer = (data: ConstructionsAddData) => {
+	const info = data.additionalInfo;
+	return {
+		'createConstructionAdditionalInformationDto.suppliers': linesToArray(info?.suppliers),
+		'createConstructionAdditionalInformationDto.standartName': info?.standartName || undefined,
+		'createConstructionAdditionalInformationDto.composition': linesToArray(info?.composition),
+		'createConstructionAdditionalInformationDto.features': linesToArray(info?.features),
+		'createConstructionAdditionalInformationDto.physicalCharacteristics': linesToArray(
+			info?.physicalCharacteristics,
+		),
+		'createConstructionAdditionalInformationDto.fireSafetyAndMore': linesToArray(
+			info?.fireSafetyAndMore,
+		),
+		'createConstructionAdditionalInformationDto.installation': linesToArray(info?.installation),
+		'createConstructionAdditionalInformationDto.files': info?.files?.length
+			? info.files
+			: undefined,
+		'createConstructionAdditionalInformationDto.images': info?.images?.length
+			? info.images
+			: undefined,
+	};
+};
+
+const mapUpdateAdditionalInfoToServer = (data: ConstructionsEditData) => {
+	const info = data.additionalInfo;
+	const files = info?.files?.length ? info.files : undefined;
+	const images = info?.images?.length ? info.images : undefined;
+
+	return {
+		'updateConstructionAdditionalInformationDto.suppliers': linesToArray(info?.suppliers),
+		'updateConstructionAdditionalInformationDto.standartName': info?.standartName || undefined,
+		'updateConstructionAdditionalInformationDto.composition': linesToArray(info?.composition),
+		'updateConstructionAdditionalInformationDto.features': linesToArray(info?.features),
+		'updateConstructionAdditionalInformationDto.physicalCharacteristics': linesToArray(
+			info?.physicalCharacteristics,
+		),
+		'updateConstructionAdditionalInformationDto.fireSafetyAndMore': linesToArray(
+			info?.fireSafetyAndMore,
+		),
+		'updateConstructionAdditionalInformationDto.installation': linesToArray(info?.installation),
+		'updateConstructionAdditionalInformationDto.isUpdateFiles': Boolean(files),
+		'updateConstructionAdditionalInformationDto.files': files,
+		'updateConstructionAdditionalInformationDto.isUpdateImages': Boolean(images),
+		'updateConstructionAdditionalInformationDto.images': images,
+	};
 };
 
 /** Параметры пагинации конструкций; расширения сверх OpenAPI передаются как есть. */
@@ -157,6 +226,7 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 		issuerName: data.issuer?.name ?? '',
 		rw: data.rw != null && data.rw !== '' ? String(data.rw) : '',
 		lnw: data.lnw != null && data.lnw !== '' ? String(data.lnw) : '',
+		additionalInfo: mapAdditionalInfoFromApi(data.additionalInfo),
 	};
 };
 
@@ -171,7 +241,7 @@ export const convertToClientConstructionsEditData = (data: any): ConstructionsEd
 
 export const convertToServerConstructionType = (
 	data: ConstructionType,
-): CreateConstructionTypeDto => ({
+): any => ({
 	constructionTypeEnum: convertToServerConstructionTypeEnumData(
 		data.constructionTypeEnum as ConstructionTypeEnum,
 	),
@@ -321,13 +391,21 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 	};
 };
 
-const packLaboratoryCreateDto = (block: ConstructionsAddData['airLaboratory']): CreateConstructionLaboratoryDataDto => ({
+type ConstructionLaboratoryFormData = {
+	rTotal: number[];
+	laboratoryTestSource: string | null;
+	index?: IndexType;
+};
+
+const packLaboratoryCreateDto = (
+	block: ConstructionsAddData['airLaboratory'],
+): ConstructionLaboratoryFormData => ({
 	rTotal: block.labRTotal.split(',').map((split) => +String(split).trim()),
 	laboratoryTestSource: block.laboratoryTestSource || null,
 	index: (block.labIndex as IndexType) || undefined,
 });
 
-export const convertToServerConstructionsAddData = (data: ConstructionsAddData): any => ({
+const convertToServerConstructionsBaseData = (data: ConstructionsAddData): any => ({
 	name: data.name || null,
 	description: data.description || null,
 	priority: convertToServerPriorityData(data.priority as Priority) || null,
@@ -345,10 +423,26 @@ export const convertToServerConstructionsAddData = (data: ConstructionsAddData):
 	constructionType: convertToServerConstructionType(data.constructionTypeObject) || null,
 });
 
+export const convertToServerConstructionsAddData = (data: ConstructionsAddData): any => ({
+	...convertToServerConstructionsBaseData(data),
+	...mapCreateAdditionalInfoToServer(data),
+});
+
 export const convertToServerConstructionsEditData = (data: ConstructionsEditData): any => ({
-	...convertToServerConstructionsAddData(data),
+	...convertToServerConstructionsBaseData(data),
 	id: data.id || null,
 	rw: data.RCalcs || null,
 	reportInfoId: data.reportInfoId || undefined,
 	conputingIndexValue: data.estimatedIndexValue || null,
+	...mapUpdateAdditionalInfoToServer(data),
+});
+
+export const mergeConstructionAdditionalInfo = <
+	T extends ConstructionsAddData | ConstructionsEditData,
+>(
+	data: T,
+	additionalInfo?: ConstructionAdditionalInfoDto | null,
+): T => ({
+	...data,
+	additionalInfo: mapAdditionalInfoFromApi(additionalInfo),
 });

@@ -149,6 +149,49 @@ export enum CategoryClass {
 	C = 'C',
 }
 
+export interface ConstructionAdditionalInfoDto {
+	suppliers?: string[] | null;
+	standartName?: string | null;
+	composition?: string[] | null;
+	features?: string[] | null;
+	physicalCharacteristics?: string[] | null;
+	fireSafetyAndMore?: string[] | null;
+	installation?: string[] | null;
+	fileUrls?: string[] | null;
+	imageUrls?: string[] | null;
+}
+
+export interface ConstructionAdditionalInfoForReportDto {
+	suppliers?: string[] | null;
+	standartName?: string | null;
+	composition?: string[] | null;
+	features?: string[] | null;
+	physicalCharacteristics?: string[] | null;
+	fireSafetyAndMore?: string[] | null;
+	installation?: string[] | null;
+	fileUrls?: string[] | null;
+	imageUrls?: string[] | null;
+	issuerName?: string | null;
+	issuerImage?: string | null;
+	constructionType?: ConstructionTypeEnum;
+	firstRoomName?: string | null;
+	secondRoomName?: string | null;
+	/** @format double */
+	length?: number;
+	/** @format double */
+	width?: number;
+	/** @format double */
+	square?: number;
+	/** @format double */
+	totalThickness?: number;
+	/** @format double */
+	totalMass?: number;
+	isHaveAdditionalConstruction?: boolean;
+	/** @format double */
+	rw?: number;
+	graphImage?: string | null;
+}
+
 export interface ConstructionBase {
 	constructions?: ConstructionTemplate[] | null;
 }
@@ -326,34 +369,6 @@ export interface CreateBillCommand {
 export interface CreateConstructionDto {
 	constructionPosition?: ConstructionPosition;
 	userMaterials?: CreateUserMaterialDto[] | null;
-}
-
-export interface CreateConstructionHeaderCommand {
-	description?: string | null;
-	priority?: Priority;
-	countries?: CountryType[] | null;
-	descriptionSource?: string | null;
-	/** @format uuid */
-	issuerId?: string;
-	propertySource?: string | null;
-	/** @format double */
-	maxHeight?: number;
-	fireResistance?: string | null;
-	airNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
-	impactNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
-	constructionPurpose?: ConstructionPurpose;
-	constructionType?: CreateConstructionTypeDto;
-}
-
-export interface CreateConstructionLaboratoryDataDto {
-	rTotal?: number[] | null;
-	laboratoryTestSource?: string | null;
-	index?: IndexType;
-}
-
-export interface CreateConstructionTypeDto {
-	constructionTypeEnum?: ConstructionTypeEnum;
-	constructions?: CreateConstructionDto[] | null;
 }
 
 export interface CreateFloorReportReceivingCommand {
@@ -687,6 +702,16 @@ export interface GetBillWithPaginationParamsQuery {
 	date?: string | null;
 	clientName?: string | null;
 	billType?: BillTypeEnum;
+}
+
+export interface GetConstructionAdditionalInfoForReportQuery {
+	/** @format uuid */
+	reportConstructionId?: string;
+}
+
+export interface GetConstructionAdditionalInfoQuery {
+	/** @format uuid */
+	constructionHeaderId?: string;
 }
 
 export interface GetConstructionHeaderWithPaginationQuery {
@@ -1625,29 +1650,6 @@ export interface UpdateBillCommand {
 	billType?: BillTypeEnum;
 }
 
-export interface UpdateConstructionHeaderCommand {
-	/** @format uuid */
-	id?: string;
-	name?: string | null;
-	description?: string | null;
-	priority?: Priority;
-	countries?: CountryType[] | null;
-	descriptionSource?: string | null;
-	notation?: string | null;
-	constructionPurpose?: ConstructionPurpose;
-	/** @format uuid */
-	issuerId?: string;
-	propertySource?: string | null;
-	/** @format double */
-	maxHeight?: number;
-	fireResistance?: string | null;
-	airNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
-	impactNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
-	constructionType?: CreateConstructionTypeDto;
-	/** @format uuid */
-	reportInfoId?: string | null;
-}
-
 export interface UpdateReportCommand {
 	/** @format uuid */
 	reportId?: string;
@@ -2380,12 +2382,44 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name ConstructionCreate
 		 * @request POST:/api/Construction
 		 */
-		constructionCreate: (data: CreateConstructionHeaderCommand, params: RequestParams = {}) =>
+		constructionCreate: (
+			data: {
+				description?: string;
+				priority?: Priority;
+				countries?: CountryType[];
+				descriptionSource?: string;
+				/** @format uuid */
+				issuerId?: string;
+				propertySource?: string;
+				/** @format double */
+				maxHeight?: number;
+				fireResistance?: string;
+				'airNoizeLaboratoryData.rTotal'?: number[];
+				'airNoizeLaboratoryData.laboratoryTestSource'?: string;
+				'airNoizeLaboratoryData.index'?: IndexType;
+				'impactNoizeLaboratoryData.rTotal'?: number[];
+				'impactNoizeLaboratoryData.laboratoryTestSource'?: string;
+				'impactNoizeLaboratoryData.index'?: IndexType;
+				constructionPurpose?: ConstructionPurpose;
+				'constructionType.constructionTypeEnum'?: ConstructionTypeEnum;
+				'constructionType.constructions'?: CreateConstructionDto[];
+				'createConstructionAdditionalInformationDto.suppliers'?: string[];
+				'createConstructionAdditionalInformationDto.standartName'?: string;
+				'createConstructionAdditionalInformationDto.composition'?: string[];
+				'createConstructionAdditionalInformationDto.features'?: string[];
+				'createConstructionAdditionalInformationDto.physicalCharacteristics'?: string[];
+				'createConstructionAdditionalInformationDto.fireSafetyAndMore'?: string[];
+				'createConstructionAdditionalInformationDto.installation'?: string[];
+				'createConstructionAdditionalInformationDto.files'?: File[];
+				'createConstructionAdditionalInformationDto.images'?: File[];
+			},
+			params: RequestParams = {},
+		) =>
 			this.request<ConstructionHeaderDto, any>({
 				path: `/api/Construction`,
 				method: 'POST',
 				body: data,
-				type: ContentType.Json,
+				type: ContentType.FormData,
 				format: 'json',
 				...params,
 			}),
@@ -2413,12 +2447,52 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name ConstructionUpdate
 		 * @request PUT:/api/Construction
 		 */
-		constructionUpdate: (data: UpdateConstructionHeaderCommand, params: RequestParams = {}) =>
+		constructionUpdate: (
+			data: {
+				/** @format uuid */
+				id?: string;
+				name?: string;
+				description?: string;
+				priority?: Priority;
+				countries?: CountryType[];
+				descriptionSource?: string;
+				notation?: string;
+				constructionPurpose?: ConstructionPurpose;
+				/** @format uuid */
+				issuerId?: string;
+				propertySource?: string;
+				/** @format double */
+				maxHeight?: number;
+				fireResistance?: string;
+				'airNoizeLaboratoryData.rTotal'?: number[];
+				'airNoizeLaboratoryData.laboratoryTestSource'?: string;
+				'airNoizeLaboratoryData.index'?: IndexType;
+				'impactNoizeLaboratoryData.rTotal'?: number[];
+				'impactNoizeLaboratoryData.laboratoryTestSource'?: string;
+				'impactNoizeLaboratoryData.index'?: IndexType;
+				'constructionType.constructionTypeEnum'?: ConstructionTypeEnum;
+				'constructionType.constructions'?: CreateConstructionDto[];
+				/** @format uuid */
+				reportInfoId?: string;
+				'updateConstructionAdditionalInformationDto.suppliers'?: string[];
+				'updateConstructionAdditionalInformationDto.standartName'?: string;
+				'updateConstructionAdditionalInformationDto.composition'?: string[];
+				'updateConstructionAdditionalInformationDto.features'?: string[];
+				'updateConstructionAdditionalInformationDto.physicalCharacteristics'?: string[];
+				'updateConstructionAdditionalInformationDto.fireSafetyAndMore'?: string[];
+				'updateConstructionAdditionalInformationDto.installation'?: string[];
+				'updateConstructionAdditionalInformationDto.isUpdateFiles'?: boolean;
+				'updateConstructionAdditionalInformationDto.files'?: File[];
+				'updateConstructionAdditionalInformationDto.isUpdateImages'?: boolean;
+				'updateConstructionAdditionalInformationDto.images'?: File[];
+			},
+			params: RequestParams = {},
+		) =>
 			this.request<ConstructionHeaderDto, any>({
 				path: `/api/Construction`,
 				method: 'PUT',
 				body: data,
-				type: ContentType.Json,
+				type: ContentType.FormData,
 				format: 'json',
 				...params,
 			}),
@@ -2491,6 +2565,46 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<PaginatedConstructionHeaderDtoPaginatedList, any>({
 				path: `/api/Construction/favoriteConstruction`,
 				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionAdditionalInfoForReportCreate
+		 * @request POST:/api/Construction/additionalInfoForReport
+		 */
+		constructionAdditionalInfoForReportCreate: (
+			data: GetConstructionAdditionalInfoForReportQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<ConstructionAdditionalInfoForReportDto, any>({
+				path: `/api/Construction/additionalInfoForReport`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionAdditionalInfoCreate
+		 * @request POST:/api/Construction/additionalInfo
+		 */
+		constructionAdditionalInfoCreate: (
+			data: GetConstructionAdditionalInfoQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<ConstructionAdditionalInfoDto, any>({
+				path: `/api/Construction/additionalInfo`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
 				format: 'json',
 				...params,
 			}),

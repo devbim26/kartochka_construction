@@ -4,7 +4,6 @@ import {
 	convertToSelectValues,
 	Input,
 	Select,
-	Switch,
 	useI18n,
 } from '@core';
 import {
@@ -30,10 +29,14 @@ import {
 } from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { IoMdWarning } from 'react-icons/io';
 import { twMerge } from 'tailwind-merge';
 import { FormSubTitle } from '../../form-sub-title.component';
+import { ConstructionsAdditionalInfo } from './constructions-additional-info.component';
 import { ConstructionLaboratoryDataFields } from './constructions-laboratory-data-fields.component';
+import {
+	ConstructionsFormTabs,
+	type ConstructionFormTab,
+} from './constructions-form-tabs.component';
 
 export const ConstructionsEdit = () => {
 	const form = useFormContext<ConstructionsEditData>();
@@ -47,15 +50,21 @@ export const ConstructionsEdit = () => {
 		issuerErrorMessage === 'guides.constructions.zPanelRequiresBrandIssuer'
 			? t('guides.constructions.zPanelRequiresBrandIssuer')
 			: issuerErrorMessage || 'Производитель';
-	const [displayChars, setDisplayChars] = useState(false);
+	const [activeTab, setActiveTab] = useState<ConstructionFormTab>('description');
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionTypeObject.constructionTypeEnum');
 	const constructionTypeField = watch('constructionType');
 	const selectConstructionType = constructionTypeField || currentConstruction || '';
 	const showImpactLaboratory = isFloorConstructionType(selectConstructionType);
 	const showZPanelGuidebookHint =
-		!displayChars &&
+		activeTab === 'description' &&
 		isZPanelGuidebookConstructionType(selectConstructionType);
+	const hasDescriptionErrors = Object.keys(formState.errors).some((key) =>
+		ConstructionsEditFieldNames.includes(key),
+	);
+	const hasCharacteristicsErrors = Object.keys(formState.errors).some((key) =>
+		ConstructionTypeFieldNames.includes(key),
+	);
 
 	useEffect(() => {
 		if (!currentConstruction || currentConstruction === constructionTypeField) return;
@@ -90,25 +99,20 @@ export const ConstructionsEdit = () => {
 
 	return (
 		<div className="flex w-full flex-col gap-[16px] px-[25px]">
-			<Switch
-				onText="Характеристики"
-				offText="Описание"
-				textClassName="font-sans text-[17px] font-normal leading-5 tracking-[0.1px]"
-				offIcon={
-					Object.keys(formState.errors).some((key) =>
-						ConstructionsEditFieldNames.includes(key),
-					) && <IoMdWarning />
-				}
-				onIcon={
-					!Object.keys(formState.errors).some((key) =>
-						ConstructionTypeFieldNames.includes(key),
-					) &&
-					!!Object.keys(formState.errors).length && <IoMdWarning />
-				}
-				wrapperClassName="h-[30px] w-[400px] self-center p-[3px] bg-primary"
-				onChange={() => setDisplayChars(!displayChars)}
+			<ConstructionsFormTabs
+				activeTab={activeTab}
+				onChange={setActiveTab}
+				tabs={[
+					{ id: 'description', label: 'Описание', hasError: hasDescriptionErrors },
+					{
+						id: 'characteristics',
+						label: 'Характеристики',
+						hasError: hasCharacteristicsErrors,
+					},
+					{ id: 'info', label: 'Информация' },
+				]}
 			/>
-			{!displayChars ? (
+			{activeTab === 'description' ? (
 				<>
 					<FormSubTitle text="Описание" />
 					<div className="flex flex-wrap gap-[16px]">
@@ -342,7 +346,7 @@ export const ConstructionsEdit = () => {
 						<ConstructionLaboratoryDataFields namePrefix="impactLaboratory" title="Ударный шум" />
 					) : null}
 				</>
-			) : (
+			) : activeTab === 'characteristics' ? (
 				<>
 					<FormSubTitle text="Тип конструкции" />
 					<Controller
@@ -389,6 +393,11 @@ export const ConstructionsEdit = () => {
 					) : (
 						<></>
 					)}
+				</>
+			) : (
+				<>
+					<FormSubTitle text="Информация" />
+					<ConstructionsAdditionalInfo />
 				</>
 			)}
 		</div>

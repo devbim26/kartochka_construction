@@ -55,11 +55,63 @@ export type DesigningChartSeries = {
 	pointLabels?: Array<{ x: number; y: number; label: string }>;
 };
 
+export type DesigningChartSize = 'compact' | 'default' | 'large';
+
 type DesigningChartProps = {
 	series: DesigningChartSeries[];
-	chartSize?: 'default' | 'large';
+	chartSize?: DesigningChartSize;
 	/** Подпись оси Y (по умолчанию Rw). */
 	yAxisTitle?: string;
+};
+
+const getDesigningChartMetrics = (chartSize: DesigningChartSize) => {
+	const LARGE_SCALE = 0.75;
+
+	if (chartSize === 'large') {
+		return {
+			thickWidth: Math.round(5 * LARGE_SCALE),
+			thinWidth: Math.round(2.5 * LARGE_SCALE * 10) / 10,
+			chartHeight: Math.round(750 * LARGE_SCALE),
+			chartMinWidth: Math.round(1050 * LARGE_SCALE),
+			datalabelSize: 14,
+			legendMaxWidth: 520,
+			legendBox: 16,
+			legendPadding: 14,
+			legendFont: 13,
+			axisTitle: 14,
+			axisTick: 12,
+		};
+	}
+
+	if (chartSize === 'compact') {
+		return {
+			thickWidth: 3,
+			thinWidth: 1.5,
+			chartHeight: 280,
+			chartMinWidth: 420,
+			datalabelSize: 9,
+			legendMaxWidth: 200,
+			legendBox: 10,
+			legendPadding: 8,
+			legendFont: 10,
+			axisTitle: 10,
+			axisTick: 9,
+		};
+	}
+
+	return {
+		thickWidth: 4,
+		thinWidth: 2,
+		chartHeight: 500,
+		chartMinWidth: 700,
+		datalabelSize: 11,
+		legendMaxWidth: 320,
+		legendBox: 14,
+		legendPadding: 12,
+		legendFont: 12,
+		axisTitle: 12,
+		axisTick: 11,
+	};
 };
 
 type LineTier = 'thick' | 'medium' | 'thin';
@@ -158,13 +210,19 @@ const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }: DesigningChartProps) => {
 	const chartRef = useRef<ChartJS<'line'>>(null);
 	const { t } = useI18n();
-
-	// `large` is tuned for Full HD: ~25% smaller footprint than the previous 750×1050 canvas.
-	const LARGE_SCALE = 0.75;
-	const thickWidth = chartSize === 'large' ? Math.round(5 * LARGE_SCALE) : 4;
-	const thinWidth = chartSize === 'large' ? Math.round(2.5 * LARGE_SCALE * 10) / 10 : 2;
-	const chartHeight = chartSize === 'large' ? Math.round(750 * LARGE_SCALE) : 500;
-	const chartMinWidth = chartSize === 'large' ? Math.round(1050 * LARGE_SCALE) : 700;
+	const {
+		thickWidth,
+		thinWidth,
+		chartHeight,
+		chartMinWidth,
+		datalabelSize,
+		legendMaxWidth,
+		legendBox,
+		legendPadding,
+		legendFont,
+		axisTitle,
+		axisTick,
+	} = getDesigningChartMetrics(chartSize);
 
 	/** Пунктирные границы расчётного диапазона (Гц). */
 	const RANGE_MIN_HZ = 100;
@@ -400,7 +458,7 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 					font: {
 						family: 'Source Sans Pro, system-ui, sans-serif',
 						weight: 'bold',
-						size: chartSize === 'large' ? 14 : 11,
+						size: datalabelSize,
 					},
 					color: (context) => {
 						const s = series[context.datasetIndex];
@@ -408,7 +466,7 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 					},
 				},
 				legend: {
-					maxWidth: chartSize === 'large' ? 520 : 320,
+					maxWidth: legendMaxWidth,
 					display: true,
 					position: 'right',
 					align: 'center',
@@ -444,12 +502,12 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 								})
 								.filter((x): x is LegendItem => x !== null);
 						},
-						boxWidth: chartSize === 'large' ? 16 : 14,
-						boxHeight: chartSize === 'large' ? 16 : 14,
-						padding: chartSize === 'large' ? 14 : 12,
+						boxWidth: legendBox,
+						boxHeight: legendBox,
+						padding: legendPadding,
 						font: {
 							family: 'Source Sans Pro, system-ui, sans-serif',
-							size: chartSize === 'large' ? 13 : 12,
+							size: legendFont,
 							weight: 'bold',
 						},
 						usePointStyle: true,
@@ -493,7 +551,7 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 						color: '#14181f',
 						font: {
 							family: 'Source Sans Pro, system-ui, sans-serif',
-							size: chartSize === 'large' ? 14 : 12,
+							size: axisTitle,
 							weight: 'bold',
 						},
 					},
@@ -507,7 +565,7 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 						color: '#14181f',
 						font: {
 							family: 'Source Sans Pro, system-ui, sans-serif',
-							size: chartSize === 'large' ? 12 : 11,
+							size: axisTick,
 						},
 						callback: (_value, index) => {
 							const freq = displayFrequencies[index];
@@ -523,7 +581,7 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 						color: '#14181f',
 						font: {
 							family: 'Source Sans Pro, system-ui, sans-serif',
-							size: chartSize === 'large' ? 14 : 12,
+							size: axisTitle,
 							weight: 'bold',
 						},
 					},
@@ -534,7 +592,7 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 						color: '#14181f',
 						font: {
 							family: 'Source Sans Pro, system-ui, sans-serif',
-							size: chartSize === 'large' ? 12 : 11,
+							size: axisTick,
 						},
 					},
 					grid: {

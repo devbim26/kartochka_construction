@@ -157,6 +157,19 @@ export const ConstructionsAddConfig: EntityConfig = {
 		impactLaboratory: { ...emptyLaboratoryBlockDefaults },
 		rw: '',
 		lnw: '',
+		additionalInfo: {
+			suppliers: '',
+			standartName: '',
+			composition: '',
+			features: '',
+			physicalCharacteristics: '',
+			fireSafetyAndMore: '',
+			installation: '',
+			fileUrls: [],
+			imageUrls: [],
+			files: [],
+			images: [],
+		},
 	},
 };
 
