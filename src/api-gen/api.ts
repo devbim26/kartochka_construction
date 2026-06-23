@@ -91,6 +91,11 @@ export interface ArticleDto {
 	imageUrl?: string | null;
 }
 
+export interface Attachment {
+	name?: string | null;
+	url?: string | null;
+}
+
 export interface BillDto {
 	/** @format uuid */
 	id?: string;
@@ -157,8 +162,8 @@ export interface ConstructionAdditionalInfoDto {
 	physicalCharacteristics?: string[] | null;
 	fireSafetyAndMore?: string[] | null;
 	installation?: string[] | null;
-	fileUrls?: string[] | null;
-	imageUrls?: string[] | null;
+	fileUrls?: Attachment[] | null;
+	imageUrls?: Attachment[] | null;
 }
 
 export interface ConstructionAdditionalInfoForReportDto {
@@ -169,8 +174,8 @@ export interface ConstructionAdditionalInfoForReportDto {
 	physicalCharacteristics?: string[] | null;
 	fireSafetyAndMore?: string[] | null;
 	installation?: string[] | null;
-	fileUrls?: string[] | null;
-	imageUrls?: string[] | null;
+	fileUrls?: Attachment[] | null;
+	imageUrls?: Attachment[] | null;
 	issuerName?: string | null;
 	issuerImage?: string | null;
 	constructionType?: ConstructionTypeEnum;

@@ -16,9 +16,11 @@ type FavoriteConstructionCardProps = {
 	description?: string | null;
 	locale: 'ru' | 'en';
 	isSelected: boolean;
+	isFavorite: boolean;
 	onOpen: (id: string) => void;
 	onRemove: (id: string) => void;
-	onMakeBase: (id: string) => void;
+	onAddToFavorite?: (id: string) => void;
+	onMakeBase?: (id: string) => void;
 };
 
 export const FavoriteConstructionCard = ({
@@ -27,8 +29,10 @@ export const FavoriteConstructionCard = ({
 	description,
 	locale,
 	isSelected,
+	isFavorite,
 	onOpen,
 	onRemove,
+	onAddToFavorite,
 	onMakeBase,
 }: FavoriteConstructionCardProps) => {
 	const [header, setHeader] = useState<ConstructionsEditData | null>(null);
@@ -135,22 +139,33 @@ export const FavoriteConstructionCard = ({
 				>
 					{title || description || name || header?.description || header?.name || id}
 				</button>
-				<div className="flex items-center gap-[6px]">
-					{!isSelected && (
+				<div className="flex flex-wrap items-center justify-end gap-[6px]">
+					{!isSelected && onMakeBase ? (
 						<Button
+							variant="primary"
 							className="h-[28px] px-[8px] text-[11px]"
 							onClick={() => onMakeBase(id)}
 						>
 							{locale === 'ru' ? 'Использовать в отчете' : 'Use in report'}
 						</Button>
-					)}
-					<Button
-						variant="primary"
-						className="h-[28px] px-[8px] text-[11px]"
-						onClick={() => onRemove(id)}
-					>
-						{locale === 'ru' ? 'Удалить из избранного' : 'Remove from favorites'}
-					</Button>
+					) : null}
+					{isSelected && !isFavorite && onAddToFavorite ? (
+						<Button
+							variant="primary"
+							className="h-[28px] px-[8px] text-[11px]"
+							onClick={() => onAddToFavorite(id)}
+						>
+							{locale === 'ru' ? 'В избранное' : 'Favorite'}
+						</Button>
+					) : isFavorite ? (
+						<Button
+							variant="primary"
+							className="h-[28px] px-[8px] text-[11px]"
+							onClick={() => onRemove(id)}
+						>
+							{locale === 'ru' ? 'Удалить из избранного' : 'Remove from favorites'}
+						</Button>
+					) : null}
 				</div>
 			</div>
 			<div className="flex min-h-0 flex-1 gap-[12px]">

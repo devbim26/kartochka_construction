@@ -1,4 +1,13 @@
-import { Button, FormElementLabel, Input, TextArea, useI18n } from '@core';
+import {
+	Button,
+	FormElementLabel,
+	getFileNameFromUrl,
+	Input,
+	TextArea,
+	useI18n,
+	useResolvedFileNames,
+} from '@core';
+import type { FileAttachment } from '@core/utils/helpers/file-display-name.helper';
 import { mapConstructionAdditionalInfoFromApi } from '@features/guidbooks/converters';
 import { getConstructionAdditionalInfo } from '@features/guidbooks/services';
 import type { ConstructionsAddData } from '@features/guidbooks/types';
@@ -51,16 +60,6 @@ const fieldTextAreaClassName =
 const listTextClassName =
 	'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary';
 
-const getFileNameFromUrl = (url: string) => {
-	try {
-		const pathname = new URL(url, window.location.origin).pathname;
-		const name = pathname.split('/').pop();
-		return name ? decodeURIComponent(name) : url;
-	} catch {
-		return url.split('/').pop() || url;
-	}
-};
-
 const SelectedFilesList = ({
 	title,
 	items,
@@ -103,10 +102,35 @@ export const ConstructionsAdditionalInfo = () => {
 	const { register, setValue, watch } = useFormContext<ConstructionsAddData>();
 	const constructionHeaderId = search.get('entityId') ?? watch('id');
 	const isEditMode = search.get('edit') === 'true';
-	const fileUrls = watch('additionalInfo.fileUrls') ?? [];
-	const imageUrls = watch('additionalInfo.imageUrls') ?? [];
+	const fileAttachments = (watch('additionalInfo.fileUrls') ?? []) as FileAttachment[];
+	const imageAttachments = (watch('additionalInfo.imageUrls') ?? []) as FileAttachment[];
 	const selectedFiles = (watch('additionalInfo.files') ?? []) as File[];
 	const selectedImages = (watch('additionalInfo.images') ?? []) as File[];
+	const fileUrlsToResolve = useMemo(
+		() =>
+			fileAttachments
+				.filter((attachment) => attachment.url && !attachment.name?.trim())
+				.map((attachment) => attachment.url as string),
+		[fileAttachments],
+	);
+	const imageUrlsToResolve = useMemo(
+		() =>
+			imageAttachments
+				.filter((attachment) => attachment.url && !attachment.name?.trim())
+				.map((attachment) => attachment.url as string),
+		[imageAttachments],
+	);
+	const resolvedFileNames = useResolvedFileNames(fileUrlsToResolve);
+	const resolvedImageNames = useResolvedFileNames(imageUrlsToResolve);
+
+	const resolveAttachmentName = (
+		attachment: FileAttachment,
+		resolvedNames: Record<string, string>,
+	) => {
+		if (attachment.name?.trim()) return attachment.name.trim();
+		const url = attachment.url ?? '';
+		return resolvedNames[url] ?? getFileNameFromUrl(url);
+	};
 
 	useEffect(() => {
 		if (!isEditMode || !constructionHeaderId) return;
@@ -156,22 +180,26 @@ export const ConstructionsAdditionalInfo = () => {
 		[selectedImagePreviews],
 	);
 
-	const existingFileItems = fileUrls.filter(Boolean).map((url, index) => ({
-		key: `existing-file-${url}-${index}`,
-		name: getFileNameFromUrl(url),
-		href: url,
-	}));
+	const existingFileItems = fileAttachments
+		.filter((attachment) => attachment.url)
+		.map((attachment, index) => ({
+			key: `existing-file-${attachment.url}-${index}`,
+			name: resolveAttachmentName(attachment, resolvedFileNames),
+			href: attachment.url ?? undefined,
+		}));
 
 	const newFileItems = selectedFiles.map((file, index) => ({
 		key: `new-file-${file.name}-${file.lastModified}-${index}`,
 		name: file.name,
 	}));
 
-	const existingImageItems = imageUrls.filter(Boolean).map((url, index) => ({
-		key: `existing-image-${url}-${index}`,
-		name: getFileNameFromUrl(url),
-		href: url,
-	}));
+	const existingImageItems = imageAttachments
+		.filter((attachment) => attachment.url)
+		.map((attachment, index) => ({
+			key: `existing-image-${attachment.url}-${index}`,
+			name: resolveAttachmentName(attachment, resolvedImageNames),
+			href: attachment.url ?? undefined,
+		}));
 
 	const newImageItems = selectedImages.map((file, index) => ({
 		key: `new-image-${file.name}-${file.lastModified}-${index}`,
@@ -283,13 +311,21 @@ export const ConstructionsAdditionalInfo = () => {
 							items={newImageItems}
 						/>
 					</div>
-					{(imageUrls.length > 0 || selectedImagePreviews.length > 0) && (
+					{(imageAttachments.length > 0 || selectedImagePreviews.length > 0) && (
 						<div className="flex flex-wrap gap-2 self-center">
-							{imageUrls.map((url, index) => (
-								<a key={`${url}-${index}`} href={url} target="_blank" rel="noreferrer">
+							{imageAttachments.map((attachment, index) => (
+								<a
+									key={`${attachment.url}-${index}`}
+									href={attachment.url ?? ''}
+									target="_blank"
+									rel="noreferrer"
+								>
 									<img
-										src={url}
-										alt={`${t('guides.constructions.info.currentImage')} ${index + 1}`}
+										src={attachment.url ?? ''}
+										alt={
+											resolveAttachmentName(attachment, resolvedImageNames) ||
+											`${t('guides.constructions.info.currentImage')} ${index + 1}`
+										}
 										className="size-[60px] rounded-md object-cover"
 									/>
 								</a>

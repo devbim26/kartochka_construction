@@ -51,9 +51,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
-import { CurrentConstructionCard } from './current-construction-card.component';
 import DesigningGraph from './designing-graph.component';
 import { DesigningHeader } from './designing-header.component';
+import { CurrentConstructionCard } from './current-construction-card.component';
 import { FavoriteConstructionCard } from './favorite-construction-card.component';
 
 type FavoriteConstruction = {
@@ -152,14 +152,33 @@ const MyConstructions = () => {
 		],
 	);
 
-	const visibleFavoriteConstructions = useMemo(
-		() =>
-			favoriteConstructions.filter(
-				(item) =>
-					!!getFavoriteHeaderId(item) && getFavoriteHeaderId(item) !== currentHeaderId,
-			),
-		[favoriteConstructions, currentHeaderId],
-	);
+	const carouselConstructions = useMemo(() => {
+		const items = favoriteConstructions.filter((item) => !!getFavoriteHeaderId(item));
+		const hasCurrentInList = items.some(
+			(item) => getFavoriteHeaderId(item) === currentHeaderId,
+		);
+
+		if (currentHeaderId && !hasCurrentInList) {
+			return [
+				{
+					id: currentHeaderId,
+					name: constructionHeader?.name ?? null,
+					description: constructionHeader?.description ?? null,
+				},
+				...items,
+			];
+		}
+
+		if (currentHeaderId && hasCurrentInList) {
+			const currentItem = items.find(
+				(item) => getFavoriteHeaderId(item) === currentHeaderId,
+			);
+			const rest = items.filter((item) => getFavoriteHeaderId(item) !== currentHeaderId);
+			return currentItem ? [currentItem, ...rest] : items;
+		}
+
+		return items;
+	}, [favoriteConstructions, currentHeaderId, constructionHeader?.name, constructionHeader?.description]);
 
 	const handleGetCurrentConstructionReportHeader = (id: string) => {
 		dispatch(startLoading());
@@ -469,20 +488,30 @@ const MyConstructions = () => {
 						onToggleFavorite={handleToggleFavorite}
 					/>
 				</div>
-				<div className="min-w-[620px] border-l border-gray-200 pl-[20px]">
+				<div className="min-w-0 flex-1 border-l border-gray-200 pl-[20px]">
 					<p className="mb-[12px] text-[18px] font-semibold">
 						{locale === 'ru' ? 'Избранные конструкции' : 'Favorite constructions'}
 					</p>
-					{visibleFavoriteConstructions.length ? (
-						<Carousel options={{ align: 'start', loop: true, active: true }}>
-							{visibleFavoriteConstructions.map((favorite) => {
+					{carouselConstructions.length ? (
+						<Carousel
+							className="w-full px-8 [&>div:last-child]:mt-3"
+							options={{
+								align: 'start',
+								loop: carouselConstructions.length > 2,
+							}}
+							showArrows={carouselConstructions.length > 2}
+						>
+							{carouselConstructions.map((favorite) => {
 								const favoriteHeaderId = getFavoriteHeaderId(favorite);
 								const selected = favoriteHeaderId === currentHeaderId;
+								const isFavorite = favoriteConstructions.some(
+									(item) => getFavoriteHeaderId(item) === favoriteHeaderId,
+								);
 
 								return (
 									<CarouselSlide
 										key={favoriteHeaderId}
-										className="basis-1/1 px-2"
+										className="min-w-0 flex-[0_0_50%] basis-1/2 px-2"
 									>
 										<FavoriteConstructionCard
 											id={favoriteHeaderId}
@@ -490,9 +519,13 @@ const MyConstructions = () => {
 											description={favorite.description}
 											locale={locale}
 											isSelected={selected}
+											isFavorite={isFavorite}
 											onOpen={openFavoriteConstruction}
 											onRemove={(id) => handleToggleFavorite(id, true)}
-											onMakeBase={handleSwapByAlternative}
+											onAddToFavorite={(id) => handleToggleFavorite(id, false)}
+											onMakeBase={
+												selected ? undefined : handleSwapByAlternative
+											}
 										/>
 									</CarouselSlide>
 								);

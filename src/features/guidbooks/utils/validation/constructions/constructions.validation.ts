@@ -113,8 +113,22 @@ export const ConstructionAdditionalInfoSchema = z.object({
 	physicalCharacteristics: z.string().optional(),
 	fireSafetyAndMore: z.string().optional(),
 	installation: z.string().optional(),
-	fileUrls: z.array(z.string()).optional(),
-	imageUrls: z.array(z.string()).optional(),
+	fileUrls: z
+		.array(
+			z.object({
+				name: z.string().optional().nullable(),
+				url: z.string().optional().nullable(),
+			}),
+		)
+		.optional(),
+	imageUrls: z
+		.array(
+			z.object({
+				name: z.string().optional().nullable(),
+				url: z.string().optional().nullable(),
+			}),
+		)
+		.optional(),
 	files: z.array(z.any()).optional(),
 	images: z.array(z.any()).optional(),
 });

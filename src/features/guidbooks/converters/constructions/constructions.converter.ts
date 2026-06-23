@@ -31,6 +31,7 @@ import {
 	MaterialTypeEnum,
 } from '@features/guidbooks/types';
 import { normalizeVerticalCladdingForConstructionType } from '@features/guidbooks/utils/cladding-layer-normalization.utils';
+import { normalizeAttachments } from '@core/utils/helpers/file-display-name.helper';
 import {
 	convertToClientConstructionTypeEnumData,
 	convertToServerConstructionTypeEnumData,
@@ -67,21 +68,6 @@ const linesToArray = (value?: string | null): string[] =>
 const arrayToLines = (value?: string[] | null): string =>
 	Array.isArray(value) ? value.filter(Boolean).join('\n') : '';
 
-const normalizeUrlList = (value: unknown): string[] => {
-	if (!Array.isArray(value)) return [];
-	return value
-		.map((item) => {
-			if (typeof item === 'string') return item.trim();
-			if (item && typeof item === 'object') {
-				const record = item as Record<string, unknown>;
-				const url = record.url ?? record.fileUrl ?? record.path ?? record.href;
-				return typeof url === 'string' ? url.trim() : '';
-			}
-			return '';
-		})
-		.filter(Boolean);
-};
-
 export const mapConstructionAdditionalInfoFromApi = (
 	data?: ConstructionAdditionalInfoDto | Record<string, unknown> | null,
 ) => {
@@ -99,10 +85,10 @@ export const mapConstructionAdditionalInfoFromApi = (
 			(raw?.fireSafetyAndMore ?? raw?.FireSafetyAndMore) as string[] | null | undefined,
 		),
 		installation: arrayToLines((raw?.installation ?? raw?.Installation) as string[] | null | undefined),
-		fileUrls: normalizeUrlList(
+		fileUrls: normalizeAttachments(
 			raw?.fileUrls ?? raw?.FileUrls ?? raw?.files ?? raw?.Files,
 		),
-		imageUrls: normalizeUrlList(
+		imageUrls: normalizeAttachments(
 			raw?.imageUrls ?? raw?.ImageUrls ?? raw?.images ?? raw?.Images,
 		),
 		files: [],

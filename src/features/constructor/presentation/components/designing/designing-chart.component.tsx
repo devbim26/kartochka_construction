@@ -62,6 +62,7 @@ type DesigningChartProps = {
 	chartSize?: DesigningChartSize;
 	/** Подпись оси Y (по умолчанию Rw). */
 	yAxisTitle?: string;
+	showLegend?: boolean;
 };
 
 const getDesigningChartMetrics = (chartSize: DesigningChartSize) => {
@@ -207,7 +208,12 @@ const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 	return seriesStyleByKind(s.kind);
 };
 
-const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }: DesigningChartProps) => {
+const DesigningChart = ({
+	series,
+	chartSize = 'default',
+	yAxisTitle = 'Rw, dB',
+	showLegend = true,
+}: DesigningChartProps) => {
 	const chartRef = useRef<ChartJS<'line'>>(null);
 	const { t } = useI18n();
 	const {
@@ -467,7 +473,7 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 				},
 				legend: {
 					maxWidth: legendMaxWidth,
-					display: true,
+					display: showLegend,
 					position: 'right',
 					align: 'center',
 					labels: {
@@ -615,7 +621,7 @@ const DesigningChart = ({ series, chartSize = 'default', yAxisTitle = 'Rw, dB' }
 				mode: 'index',
 			},
 		}),
-		[t, displayFrequencies, series, chartSize, minY, maxY, yAxisTitle],
+		[t, displayFrequencies, series, chartSize, minY, maxY, yAxisTitle, showLegend],
 	);
 
 	if (!series.length) {

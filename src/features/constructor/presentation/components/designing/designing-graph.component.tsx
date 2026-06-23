@@ -153,11 +153,13 @@ const DesigningGraph = ({
 	regulatoryDocName: _regulatoryDocName,
 	calculationDocName: _calculationDocName,
 	chartSize = 'default',
+	showLegend = true,
 }: {
 	graphData: GraphDetailResponse[] | null;
 	regulatoryDocName: string;
 	calculationDocName: string;
 	chartSize?: 'compact' | 'default' | 'large';
+	showLegend?: boolean;
 }) => {
 	const { t } = useI18n();
 	const hasAirborneData = useMemo(() => graphHasAirborneGraphData(graphData), [graphData]);
@@ -247,7 +249,12 @@ const DesigningGraph = ({
 					onChange={(isImpact) => setNoiseMode(isImpact ? 'impact' : 'airborne')}
 				/>
 			) : null}
-			<DesigningChart series={series} chartSize={chartSize} yAxisTitle={yAxisTitle} />
+			<DesigningChart
+				series={series}
+				chartSize={chartSize}
+				yAxisTitle={yAxisTitle}
+				showLegend={showLegend}
+			/>
 		</div>
 	);
 };

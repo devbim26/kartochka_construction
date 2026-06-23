@@ -1,6 +1,6 @@
 import type { ConstructionAdditionalInfoForReportDto, GraphParametrsDto } from '@api-gen';
 import { fetchApi } from '@api-gen';
-import { Carousel, CarouselSlide, useI18n } from '@core';
+import { Carousel, CarouselSlide, getAttachmentDisplayName, normalizeAttachments, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { graphDotsConverterToClient } from '@features/constructor/converters';
 import {
@@ -17,7 +17,6 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import DesigningGraph from '../designing/designing-graph.component';
-import { GeneralInformationSoundproofing } from './modal-forms/general-information-tables';
 
 const dash = '—';
 const tableDash = '-';
@@ -181,9 +180,36 @@ export const ConstructionInfoModalContent = () => {
 	);
 	const suppliers = (data?.suppliers ?? []).filter(Boolean).map(parseNameAndUrl);
 	const constructionImages = useMemo(
-		() => (data?.imageUrls ?? []).filter((url): url is string => Boolean(url?.trim())),
+		() => normalizeAttachments(data?.imageUrls),
 		[data?.imageUrls],
 	);
+	const downloadFiles = useMemo(
+		() =>
+			normalizeAttachments(data?.fileUrls).map((attachment, index) => ({
+				url: attachment.url ?? '',
+				name: getAttachmentDisplayName(attachment),
+				key: `${attachment.url ?? 'file'}-${index}`,
+			})),
+		[data?.fileUrls],
+	);
+	const massPerSquareMeter = useMemo(() => {
+		const mass = data?.totalMass;
+		const square = data?.square;
+		if (
+			mass == null ||
+			square == null ||
+			!Number.isFinite(mass) ||
+			!Number.isFinite(square) ||
+			square <= 0
+		) {
+			return null;
+		}
+		return Math.round((mass / square) * 10) / 10;
+	}, [data?.totalMass, data?.square]);
+	const labTestRwValue = useMemo(() => {
+		if (data?.rw == null || !Number.isFinite(data.rw)) return tableDash;
+		return String(Math.round(data.rw));
+	}, [data?.rw]);
 
 	const specSections = [
 		{
@@ -389,18 +415,22 @@ export const ConstructionInfoModalContent = () => {
 						</p>
 						{constructionImages.length > 0 ? (
 							<Carousel
-								className="w-full max-w-[360px] [&>div:last-child]:mt-3"
+								className="w-full max-w-[360px] px-8 [&>div:last-child]:mt-3"
 								options={{ loop: constructionImages.length > 1 }}
+								showArrows={constructionImages.length > 1}
 							>
-								{constructionImages.map((url, index) => (
+								{constructionImages.map((image, index) => (
 									<CarouselSlide
-										key={`${url}-${index}`}
+										key={`${image.url}-${index}`}
 										className="min-w-0 flex-[0_0_100%] px-1"
 									>
 										<div className="flex h-[180px] items-center justify-center rounded bg-[#F5F5F5] p-2">
 											<img
-												src={url}
-												alt={`${t('guides.constructions.info.currentImage')} ${index + 1}`}
+												src={image.url ?? ''}
+												alt={
+													getAttachmentDisplayName(image) ||
+													`${t('guides.constructions.info.currentImage')} ${index + 1}`
+												}
 												className="max-h-full max-w-full object-contain"
 											/>
 										</div>
@@ -454,8 +484,12 @@ export const ConstructionInfoModalContent = () => {
 								value={formatValue(data?.totalThickness, ' мм')}
 							/>
 							<ParamRow
-								label={t('generalInfo.totalMass')}
-								value={formatValue(data?.totalMass, ' кг')}
+								label={t('generalInfo.massPerSquareMeter')}
+								value={
+									massPerSquareMeter != null
+										? `${massPerSquareMeter} кг/м²`
+										: dash
+								}
 							/>
 							<ParamRow
 								label={t('generalInfo.hasAdditionalConstruction')}
@@ -465,21 +499,12 @@ export const ConstructionInfoModalContent = () => {
 					</div>
 
 					<div className="flex flex-col gap-3">
-						{/* <p className="border-b border-[#14181F] pb-2 text-left font-sans text-base font-bold leading-5 text-[#14181F]">
+						<p className="border-b border-[#14181F] pb-2 text-left font-sans text-base font-bold leading-5 text-[#14181F]">
 							{t('soundproofing.title')}
-						</p> */}
-						<GeneralInformationSoundproofing
-							data={[
-								{
-									label: t('soundproofing.labTest'),
-									soundproofing: 'Rw, dB',
-									values:
-										data?.rw != null && Number.isFinite(data.rw)
-											? String(Math.round(data.rw))
-											: tableDash,
-									requirements: tableDash,
-								},
-							]}
+						</p>
+						<ParamRow
+							label={`${t('soundproofing.labTest')} Rw, dB`}
+							value={labTestRwValue}
 						/>
 					</div>
 
@@ -490,6 +515,7 @@ export const ConstructionInfoModalContent = () => {
 								regulatoryDocName=""
 								calculationDocName=""
 								chartSize="compact"
+								showLegend={false}
 							/>
 						</div>
 					) : null}
@@ -498,18 +524,19 @@ export const ConstructionInfoModalContent = () => {
 						<p className="font-sans text-base font-bold leading-5 text-[#14181F]">
 							{t('generalInfo.download')}
 						</p>
-						{data?.fileUrls && data.fileUrls.filter(Boolean).length > 0 ? (
-							<div className="flex flex-wrap justify-center gap-8">
-								{data.fileUrls.filter(Boolean).map((url, index) => (
+						{downloadFiles.length > 0 ? (
+							<div className="flex flex-wrap justify-center gap-6">
+								{downloadFiles.map((file) => (
 									<a
-										key={`${url}-${index}`}
-										href={url}
+										key={file.key}
+										href={file.url}
 										target="_blank"
 										rel="noreferrer"
-										className="flex flex-col items-center gap-1 text-xs text-[#14181F] hover:opacity-80"
-										title={url.split('/').pop() ?? `file-${index + 1}`}
+										className="flex max-w-[120px] flex-col items-center gap-1 text-center text-xs text-[#14181F] hover:opacity-80"
+										title={file.name}
 									>
-										<FileTypeIcon url={url} />
+										<FileTypeIcon url={file.url} />
+										<span className="line-clamp-2 break-all">{file.name}</span>
 									</a>
 								))}
 							</div>
