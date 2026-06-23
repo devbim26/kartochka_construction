@@ -1,8 +1,11 @@
 import { Button, FormElementLabel, Input, TextArea, useI18n } from '@core';
+import { mapConstructionAdditionalInfoFromApi } from '@features/guidbooks/converters';
+import { getConstructionAdditionalInfo } from '@features/guidbooks/services';
 import type { ConstructionsAddData } from '@features/guidbooks/types';
 import type { ChangeEvent } from 'react';
 import { useEffect, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { FormSubTitle } from '../../form-sub-title.component';
 
@@ -96,11 +99,50 @@ const SelectedFilesList = ({
 
 export const ConstructionsAdditionalInfo = () => {
 	const { t } = useI18n();
+	const [search] = useSearchParams();
 	const { register, setValue, watch } = useFormContext<ConstructionsAddData>();
+	const constructionHeaderId = search.get('entityId') ?? watch('id');
+	const isEditMode = search.get('edit') === 'true';
 	const fileUrls = watch('additionalInfo.fileUrls') ?? [];
 	const imageUrls = watch('additionalInfo.imageUrls') ?? [];
 	const selectedFiles = (watch('additionalInfo.files') ?? []) as File[];
 	const selectedImages = (watch('additionalInfo.images') ?? []) as File[];
+
+	useEffect(() => {
+		if (!isEditMode || !constructionHeaderId) return;
+
+		let cancelled = false;
+
+		const loadAdditionalInfo = async () => {
+			try {
+				const response = await getConstructionAdditionalInfo(constructionHeaderId);
+				if (cancelled || response.status !== 200 || !response.data) return;
+
+				const mapped = mapConstructionAdditionalInfoFromApi(response.data);
+				const setField = (name: keyof typeof mapped, value: (typeof mapped)[typeof name]) => {
+					setValue(`additionalInfo.${name}`, value, { shouldDirty: false });
+				};
+
+				setField('suppliers', mapped.suppliers);
+				setField('standartName', mapped.standartName);
+				setField('composition', mapped.composition);
+				setField('features', mapped.features);
+				setField('physicalCharacteristics', mapped.physicalCharacteristics);
+				setField('fireSafetyAndMore', mapped.fireSafetyAndMore);
+				setField('installation', mapped.installation);
+				setField('fileUrls', mapped.fileUrls);
+				setField('imageUrls', mapped.imageUrls);
+			} catch (error) {
+				console.error('Failed to load construction additional info:', error);
+			}
+		};
+
+		loadAdditionalInfo();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [constructionHeaderId, isEditMode, setValue]);
 
 	const selectedImagePreviews = useMemo(
 		() => selectedImages.map((file) => URL.createObjectURL(file)),

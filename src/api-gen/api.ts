@@ -366,9 +366,48 @@ export interface CreateBillCommand {
 	subscriptionId?: string;
 }
 
+export interface CreateConstructionAdditionalInformationDto {
+	suppliers?: string[] | null;
+	standartName?: string | null;
+	composition?: string[] | null;
+	features?: string[] | null;
+	physicalCharacteristics?: string[] | null;
+	fireSafetyAndMore?: string[] | null;
+	installation?: string[] | null;
+}
+
 export interface CreateConstructionDto {
 	constructionPosition?: ConstructionPosition;
 	userMaterials?: CreateUserMaterialDto[] | null;
+}
+
+export interface CreateConstructionHeaderCommand {
+	description?: string | null;
+	priority?: Priority;
+	countries?: CountryType[] | null;
+	descriptionSource?: string | null;
+	/** @format uuid */
+	issuerId?: string;
+	propertySource?: string | null;
+	/** @format double */
+	maxHeight?: number;
+	fireResistance?: string | null;
+	airNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
+	impactNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
+	constructionPurpose?: ConstructionPurpose;
+	constructionType?: CreateConstructionTypeDto;
+	createConstructionAdditionalInformationDto?: CreateConstructionAdditionalInformationDto;
+}
+
+export interface CreateConstructionLaboratoryDataDto {
+	rTotal?: number[] | null;
+	laboratoryTestSource?: string | null;
+	index?: IndexType;
+}
+
+export interface CreateConstructionTypeDto {
+	constructionTypeEnum?: ConstructionTypeEnum;
+	constructions?: CreateConstructionDto[] | null;
 }
 
 export interface CreateFloorReportReceivingCommand {
@@ -1650,6 +1689,40 @@ export interface UpdateBillCommand {
 	billType?: BillTypeEnum;
 }
 
+export interface UpdateConstructionAdditionalInformationDto {
+	suppliers?: string[] | null;
+	standartName?: string | null;
+	composition?: string[] | null;
+	features?: string[] | null;
+	physicalCharacteristics?: string[] | null;
+	fireSafetyAndMore?: string[] | null;
+	installation?: string[] | null;
+}
+
+export interface UpdateConstructionHeaderCommand {
+	/** @format uuid */
+	id?: string;
+	name?: string | null;
+	description?: string | null;
+	priority?: Priority;
+	countries?: CountryType[] | null;
+	descriptionSource?: string | null;
+	notation?: string | null;
+	constructionPurpose?: ConstructionPurpose;
+	/** @format uuid */
+	issuerId?: string;
+	propertySource?: string | null;
+	/** @format double */
+	maxHeight?: number;
+	fireResistance?: string | null;
+	airNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
+	impactNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
+	constructionType?: CreateConstructionTypeDto;
+	/** @format uuid */
+	reportInfoId?: string | null;
+	updateConstructionAdditionalInformationDto?: UpdateConstructionAdditionalInformationDto;
+}
+
 export interface UpdateReportCommand {
 	/** @format uuid */
 	reportId?: string;
@@ -2382,44 +2455,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name ConstructionCreate
 		 * @request POST:/api/Construction
 		 */
-		constructionCreate: (
-			data: {
-				description?: string;
-				priority?: Priority;
-				countries?: CountryType[];
-				descriptionSource?: string;
-				/** @format uuid */
-				issuerId?: string;
-				propertySource?: string;
-				/** @format double */
-				maxHeight?: number;
-				fireResistance?: string;
-				'airNoizeLaboratoryData.rTotal'?: number[];
-				'airNoizeLaboratoryData.laboratoryTestSource'?: string;
-				'airNoizeLaboratoryData.index'?: IndexType;
-				'impactNoizeLaboratoryData.rTotal'?: number[];
-				'impactNoizeLaboratoryData.laboratoryTestSource'?: string;
-				'impactNoizeLaboratoryData.index'?: IndexType;
-				constructionPurpose?: ConstructionPurpose;
-				'constructionType.constructionTypeEnum'?: ConstructionTypeEnum;
-				'constructionType.constructions'?: CreateConstructionDto[];
-				'createConstructionAdditionalInformationDto.suppliers'?: string[];
-				'createConstructionAdditionalInformationDto.standartName'?: string;
-				'createConstructionAdditionalInformationDto.composition'?: string[];
-				'createConstructionAdditionalInformationDto.features'?: string[];
-				'createConstructionAdditionalInformationDto.physicalCharacteristics'?: string[];
-				'createConstructionAdditionalInformationDto.fireSafetyAndMore'?: string[];
-				'createConstructionAdditionalInformationDto.installation'?: string[];
-				'createConstructionAdditionalInformationDto.files'?: File[];
-				'createConstructionAdditionalInformationDto.images'?: File[];
-			},
-			params: RequestParams = {},
-		) =>
+		constructionCreate: (data: CreateConstructionHeaderCommand, params: RequestParams = {}) =>
 			this.request<ConstructionHeaderDto, any>({
 				path: `/api/Construction`,
 				method: 'POST',
 				body: data,
-				type: ContentType.FormData,
+				type: ContentType.Json,
 				format: 'json',
 				...params,
 			}),
@@ -2447,53 +2488,42 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @name ConstructionUpdate
 		 * @request PUT:/api/Construction
 		 */
-		constructionUpdate: (
-			data: {
-				/** @format uuid */
-				id?: string;
-				name?: string;
-				description?: string;
-				priority?: Priority;
-				countries?: CountryType[];
-				descriptionSource?: string;
-				notation?: string;
-				constructionPurpose?: ConstructionPurpose;
-				/** @format uuid */
-				issuerId?: string;
-				propertySource?: string;
-				/** @format double */
-				maxHeight?: number;
-				fireResistance?: string;
-				'airNoizeLaboratoryData.rTotal'?: number[];
-				'airNoizeLaboratoryData.laboratoryTestSource'?: string;
-				'airNoizeLaboratoryData.index'?: IndexType;
-				'impactNoizeLaboratoryData.rTotal'?: number[];
-				'impactNoizeLaboratoryData.laboratoryTestSource'?: string;
-				'impactNoizeLaboratoryData.index'?: IndexType;
-				'constructionType.constructionTypeEnum'?: ConstructionTypeEnum;
-				'constructionType.constructions'?: CreateConstructionDto[];
-				/** @format uuid */
-				reportInfoId?: string;
-				'updateConstructionAdditionalInformationDto.suppliers'?: string[];
-				'updateConstructionAdditionalInformationDto.standartName'?: string;
-				'updateConstructionAdditionalInformationDto.composition'?: string[];
-				'updateConstructionAdditionalInformationDto.features'?: string[];
-				'updateConstructionAdditionalInformationDto.physicalCharacteristics'?: string[];
-				'updateConstructionAdditionalInformationDto.fireSafetyAndMore'?: string[];
-				'updateConstructionAdditionalInformationDto.installation'?: string[];
-				'updateConstructionAdditionalInformationDto.isUpdateFiles'?: boolean;
-				'updateConstructionAdditionalInformationDto.files'?: File[];
-				'updateConstructionAdditionalInformationDto.isUpdateImages'?: boolean;
-				'updateConstructionAdditionalInformationDto.images'?: File[];
-			},
-			params: RequestParams = {},
-		) =>
+		constructionUpdate: (data: UpdateConstructionHeaderCommand, params: RequestParams = {}) =>
 			this.request<ConstructionHeaderDto, any>({
 				path: `/api/Construction`,
 				method: 'PUT',
 				body: data,
-				type: ContentType.FormData,
+				type: ContentType.Json,
 				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionAdditionalInfoFilesUpdate
+		 * @request PUT:/api/Construction/additionalInfoFiles
+		 */
+		constructionAdditionalInfoFilesUpdate: (
+			data: {
+				files?: File[];
+				images?: File[];
+			},
+			query?: {
+				/** @format uuid */
+				constructionHeaderId?: string;
+				isUpdateFiles?: boolean;
+				isUpdateImages?: boolean;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/Construction/additionalInfoFiles`,
+				method: 'PUT',
+				query: query,
+				body: data,
+				type: ContentType.FormData,
 				...params,
 			}),
 

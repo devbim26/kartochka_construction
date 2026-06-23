@@ -67,65 +67,86 @@ const linesToArray = (value?: string | null): string[] =>
 const arrayToLines = (value?: string[] | null): string =>
 	Array.isArray(value) ? value.filter(Boolean).join('\n') : '';
 
-const mapAdditionalInfoFromApi = (data?: ConstructionAdditionalInfoDto | null) => ({
-	suppliers: arrayToLines(data?.suppliers),
-	standartName: data?.standartName ?? '',
-	composition: arrayToLines(data?.composition),
-	features: arrayToLines(data?.features),
-	physicalCharacteristics: arrayToLines(data?.physicalCharacteristics),
-	fireSafetyAndMore: arrayToLines(data?.fireSafetyAndMore),
-	installation: arrayToLines(data?.installation),
-	fileUrls: data?.fileUrls ?? [],
-	imageUrls: data?.imageUrls ?? [],
-	files: [],
-	images: [],
+const normalizeUrlList = (value: unknown): string[] => {
+	if (!Array.isArray(value)) return [];
+	return value
+		.map((item) => {
+			if (typeof item === 'string') return item.trim();
+			if (item && typeof item === 'object') {
+				const record = item as Record<string, unknown>;
+				const url = record.url ?? record.fileUrl ?? record.path ?? record.href;
+				return typeof url === 'string' ? url.trim() : '';
+			}
+			return '';
+		})
+		.filter(Boolean);
+};
+
+export const mapConstructionAdditionalInfoFromApi = (
+	data?: ConstructionAdditionalInfoDto | Record<string, unknown> | null,
+) => {
+	const raw = (data ?? null) as Record<string, unknown> | null;
+
+	return {
+		suppliers: arrayToLines((raw?.suppliers ?? raw?.Suppliers) as string[] | null | undefined),
+		standartName: String(raw?.standartName ?? raw?.StandartName ?? ''),
+		composition: arrayToLines((raw?.composition ?? raw?.Composition) as string[] | null | undefined),
+		features: arrayToLines((raw?.features ?? raw?.Features) as string[] | null | undefined),
+		physicalCharacteristics: arrayToLines(
+			(raw?.physicalCharacteristics ?? raw?.PhysicalCharacteristics) as string[] | null | undefined,
+		),
+		fireSafetyAndMore: arrayToLines(
+			(raw?.fireSafetyAndMore ?? raw?.FireSafetyAndMore) as string[] | null | undefined,
+		),
+		installation: arrayToLines((raw?.installation ?? raw?.Installation) as string[] | null | undefined),
+		fileUrls: normalizeUrlList(
+			raw?.fileUrls ?? raw?.FileUrls ?? raw?.files ?? raw?.Files,
+		),
+		imageUrls: normalizeUrlList(
+			raw?.imageUrls ?? raw?.ImageUrls ?? raw?.images ?? raw?.Images,
+		),
+		files: [],
+		images: [],
+	};
+};
+
+const mapAdditionalInfoFromApi = mapConstructionAdditionalInfoFromApi;
+
+const mapAdditionalInfoTextFieldsToServer = (
+	info: ConstructionsAddData['additionalInfo'],
+) => ({
+	suppliers: linesToArray(info?.suppliers),
+	standartName: info?.standartName || undefined,
+	composition: linesToArray(info?.composition),
+	features: linesToArray(info?.features),
+	physicalCharacteristics: linesToArray(info?.physicalCharacteristics),
+	fireSafetyAndMore: linesToArray(info?.fireSafetyAndMore),
+	installation: linesToArray(info?.installation),
 });
 
 const mapCreateAdditionalInfoToServer = (data: ConstructionsAddData) => {
-	const info = data.additionalInfo;
+	if (!data.additionalInfo) return {};
 	return {
-		'createConstructionAdditionalInformationDto.suppliers': linesToArray(info?.suppliers),
-		'createConstructionAdditionalInformationDto.standartName': info?.standartName || undefined,
-		'createConstructionAdditionalInformationDto.composition': linesToArray(info?.composition),
-		'createConstructionAdditionalInformationDto.features': linesToArray(info?.features),
-		'createConstructionAdditionalInformationDto.physicalCharacteristics': linesToArray(
-			info?.physicalCharacteristics,
+		createConstructionAdditionalInformationDto: mapAdditionalInfoTextFieldsToServer(
+			data.additionalInfo,
 		),
-		'createConstructionAdditionalInformationDto.fireSafetyAndMore': linesToArray(
-			info?.fireSafetyAndMore,
-		),
-		'createConstructionAdditionalInformationDto.installation': linesToArray(info?.installation),
-		'createConstructionAdditionalInformationDto.files': info?.files?.length
-			? info.files
-			: undefined,
-		'createConstructionAdditionalInformationDto.images': info?.images?.length
-			? info.images
-			: undefined,
 	};
 };
 
 const mapUpdateAdditionalInfoToServer = (data: ConstructionsEditData) => {
-	const info = data.additionalInfo;
-	const files = info?.files?.length ? info.files : undefined;
-	const images = info?.images?.length ? info.images : undefined;
-
+	if (!data.additionalInfo) return {};
 	return {
-		'updateConstructionAdditionalInformationDto.suppliers': linesToArray(info?.suppliers),
-		'updateConstructionAdditionalInformationDto.standartName': info?.standartName || undefined,
-		'updateConstructionAdditionalInformationDto.composition': linesToArray(info?.composition),
-		'updateConstructionAdditionalInformationDto.features': linesToArray(info?.features),
-		'updateConstructionAdditionalInformationDto.physicalCharacteristics': linesToArray(
-			info?.physicalCharacteristics,
+		updateConstructionAdditionalInformationDto: mapAdditionalInfoTextFieldsToServer(
+			data.additionalInfo,
 		),
-		'updateConstructionAdditionalInformationDto.fireSafetyAndMore': linesToArray(
-			info?.fireSafetyAndMore,
-		),
-		'updateConstructionAdditionalInformationDto.installation': linesToArray(info?.installation),
-		'updateConstructionAdditionalInformationDto.isUpdateFiles': Boolean(files),
-		'updateConstructionAdditionalInformationDto.files': files,
-		'updateConstructionAdditionalInformationDto.isUpdateImages': Boolean(images),
-		'updateConstructionAdditionalInformationDto.images': images,
 	};
+};
+
+export const getConstructionAdditionalInfoFilesUpload = (data: ConstructionsAddData) => {
+	const info = data.additionalInfo;
+	const files = ((info?.files ?? []) as File[]).filter((file) => file instanceof File);
+	const images = ((info?.images ?? []) as File[]).filter((file) => file instanceof File);
+	return { files, images };
 };
 
 /** Параметры пагинации конструкций; расширения сверх OpenAPI передаются как есть. */
@@ -226,7 +247,7 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 		issuerName: data.issuer?.name ?? '',
 		rw: data.rw != null && data.rw !== '' ? String(data.rw) : '',
 		lnw: data.lnw != null && data.lnw !== '' ? String(data.lnw) : '',
-		additionalInfo: mapAdditionalInfoFromApi(data.additionalInfo),
+		additionalInfo: mapAdditionalInfoFromApi(null),
 	};
 };
 
@@ -442,7 +463,10 @@ export const mergeConstructionAdditionalInfo = <
 >(
 	data: T,
 	additionalInfo?: ConstructionAdditionalInfoDto | null,
-): T => ({
-	...data,
-	additionalInfo: mapAdditionalInfoFromApi(additionalInfo),
-});
+): T => {
+	if (!additionalInfo) return data;
+	return {
+		...data,
+		additionalInfo: mapAdditionalInfoFromApi(additionalInfo),
+	};
+};

@@ -100,6 +100,32 @@ export const getConstructionAdditionalInfo = async (constructionHeaderId: string
 	return await fetchApi.api.constructionAdditionalInfoCreate({ constructionHeaderId });
 };
 
+export const updateConstructionAdditionalInfoFiles = async ({
+	constructionHeaderId,
+	files = [],
+	images = [],
+}: {
+	constructionHeaderId: string;
+	files?: File[];
+	images?: File[];
+}) => {
+	const hasFiles = files.length > 0;
+	const hasImages = images.length > 0;
+	if (!hasFiles && !hasImages) return null;
+
+	return await fetchApi.api.constructionAdditionalInfoFilesUpdate(
+		{
+			files: hasFiles ? files : undefined,
+			images: hasImages ? images : undefined,
+		},
+		{
+			constructionHeaderId,
+			isUpdateFiles: hasFiles,
+			isUpdateImages: hasImages,
+		},
+	);
+};
+
 export const getRegulatoryRequirementDocuments = async () => {
 	return await fetchApi.api.regulatoryRequirementDocumentList();
 };

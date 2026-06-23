@@ -12,7 +12,7 @@ import {
 	type PaginationState,
 } from '@core';
 import { getDesignCalculationConstructionPurpose } from '@core/utils/helpers/design-calculation-mode.helper';
-import { ConstructionPurpose } from '@api-gen';
+import { ConstructionPurpose, type ConstructionAdditionalInfoDto } from '@api-gen';
 import { RuConstructionPurposeLabels } from '@features/guidbooks/constants';
 import {
 	ConstructionsAdd,
@@ -26,6 +26,7 @@ import {
 	convertToServerConstructionsAddData,
 	convertToServerConstructionsEditData,
 	convertToServerConstructionsFilterData,
+	getConstructionAdditionalInfoFilesUpload,
 	mergeConstructionAdditionalInfo,
 } from '@features/guidbooks/converters';
 import { prepareConstructionEditDataForPersistence } from '@features/guidbooks/utils';
@@ -36,6 +37,7 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 	getConstructionAdditionalInfo,
+	updateConstructionAdditionalInfoFiles,
 } from '@features/guidbooks/services';
 import {
 	Guidebooks,
@@ -307,15 +309,26 @@ const ConstructionsScreen = () => {
 		)
 			.pipe(
 				switchMap(([response, additionalInfoResponse]: AxiosResponse[]) => {
+					if (response?.status !== 200) {
+						return from([null]);
+					}
+
+					const additionalInfo =
+						additionalInfoResponse?.status === 200
+							? (additionalInfoResponse.data as ConstructionAdditionalInfoDto)
+							: null;
+
 					const data = prepareConstructionEditDataForPersistence(
 						mergeConstructionAdditionalInfo(
 							convertToClientConstructionsEditData(response.data),
-							additionalInfoResponse.data,
+							additionalInfo,
 						),
 					);
 					return from([data]);
 				}),
-				tap((data) => setSingleMaterial(data)),
+				tap((data) => {
+					if (data) setSingleMaterial(data);
+				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data);
@@ -334,6 +347,31 @@ const ConstructionsScreen = () => {
 			}),
 		)
 			.pipe(
+				switchMap((response) => {
+					if (response?.status !== 200) return from([response]);
+
+					const constructionHeaderId = response.data?.id as string | undefined;
+					const { files, images } = getConstructionAdditionalInfoFilesUpload(data);
+					if (!constructionHeaderId || (!files.length && !images.length)) {
+						return from([response]);
+					}
+
+					return from(
+						updateConstructionAdditionalInfoFiles({
+							constructionHeaderId,
+							files,
+							images,
+						}),
+					).pipe(
+						catchError((error) => {
+							if (error instanceof AxiosError) {
+								toast.error(error.response?.data);
+							}
+							return from([response]);
+						}),
+						switchMap(() => from([response])),
+					);
+				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data);
@@ -368,6 +406,30 @@ const ConstructionsScreen = () => {
 			}),
 		)
 			.pipe(
+				switchMap((response) => {
+					if (response?.status !== 200) return from([response]);
+
+					const { files, images } = getConstructionAdditionalInfoFilesUpload(prepared);
+					if (!prepared.id || (!files.length && !images.length)) {
+						return from([response]);
+					}
+
+					return from(
+						updateConstructionAdditionalInfoFiles({
+							constructionHeaderId: prepared.id,
+							files,
+							images,
+						}),
+					).pipe(
+						catchError((error) => {
+							if (error instanceof AxiosError) {
+								toast.error(error.response?.data);
+							}
+							return from([response]);
+						}),
+						switchMap(() => from([response])),
+					);
+				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data);
