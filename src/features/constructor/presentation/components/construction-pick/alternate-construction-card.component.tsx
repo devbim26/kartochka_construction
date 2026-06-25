@@ -17,6 +17,7 @@ import {
 	getSurfaceMassKgPerM2FromMaterials,
 	getTotalThicknessMmFromMaterials,
 } from '@features/constructor/utils';
+import { buildCatalogHeightPhysicalRow } from '@features/constructor/utils/catalog-physical-rows.utils';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type {
@@ -264,11 +265,7 @@ export const AlternateConstructionCard = ({
 								requirementMin: massMin,
 								requirementMax: massMax,
 							},
-							{
-								physical: 'Высота, м',
-								values: String(constructionHeader?.maxHeight) || '-',
-								requirements: String(constructionHeader?.maxHeight) || '-',
-							},
+							buildCatalogHeightPhysicalRow(constructionHeader?.maxHeight, reportInfo),
 						]}
 					/>
 					<GeneralInformationSoundproofing

@@ -1,3 +1,4 @@
+import { ChevronLandingIcon } from '@core/presentation/icons';
 import type { EmblaOptionsType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { ReactNode } from 'react';
@@ -9,10 +10,14 @@ interface CarouselProps {
 	children: ReactNode;
 	options?: EmblaOptionsType;
 	className?: string;
+	/** Показывать стрелки влево/вправо, когда есть куда листать. По умолчанию — да. */
 	showArrows?: boolean;
 }
 
-export const Carousel = ({ children, options, className, showArrows = false }: CarouselProps) => {
+const ARROW_BUTTON_CLASS =
+	'absolute top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#EDEFF2] bg-white text-[#14181F] shadow-sm transition-colors hover:bg-[#F7F9FC] disabled:cursor-not-allowed disabled:opacity-30';
+
+export const Carousel = ({ children, options, className, showArrows = true }: CarouselProps) => {
 	const [emblaRef, emblaApi] = useEmblaCarousel(options);
 	const [canScrollPrev, setCanScrollPrev] = useState(false);
 	const [canScrollNext, setCanScrollNext] = useState(false);
@@ -38,7 +43,7 @@ export const Carousel = ({ children, options, className, showArrows = false }: C
 	const showNavigation = showArrows && (canScrollPrev || canScrollNext);
 
 	return (
-		<div className={twMerge('relative w-full', className)}>
+		<div className={twMerge('relative w-full', showNavigation && 'px-10', className)}>
 			<div className="overflow-hidden" ref={emblaRef}>
 				<div className="flex items-stretch">{children}</div>
 			</div>
@@ -46,21 +51,21 @@ export const Carousel = ({ children, options, className, showArrows = false }: C
 				<>
 					<button
 						type="button"
-						className="absolute left-0 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-[#EDEFF2] bg-white text-[#14181F] shadow-sm transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
+						className={twMerge(ARROW_BUTTON_CLASS, 'left-0')}
 						onClick={() => emblaApi?.scrollPrev()}
 						disabled={!canScrollPrev}
 						aria-label="Previous slide"
 					>
-						‹
+						<ChevronLandingIcon direction="left" color="#14181F" />
 					</button>
 					<button
 						type="button"
-						className="absolute right-0 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-[#EDEFF2] bg-white text-[#14181F] shadow-sm transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
+						className={twMerge(ARROW_BUTTON_CLASS, 'right-0')}
 						onClick={() => emblaApi?.scrollNext()}
 						disabled={!canScrollNext}
 						aria-label="Next slide"
 					>
-						›
+						<ChevronLandingIcon direction="right" color="#14181F" />
 					</button>
 				</>
 			) : null}

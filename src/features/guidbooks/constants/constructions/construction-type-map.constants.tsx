@@ -22,6 +22,7 @@ import {
 	multiLayerBottomCladdingInitialRows,
 	multiLayerTopCladdingInitialRows,
 } from './multi-layer-vertical-cladding.defaults';
+import { heavyMultiLayerWallCenterCoreRows } from './heavy-multi-layer-wall-center.defaults';
 
 interface ConstructionTypeMapProps {
 	currentConstruction: ConstructionTypeEnum;
@@ -380,53 +381,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.HeavyMultiLayerWall,
 				);
 
-				setValue('constructionTypeObject.centerConstruction', [
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Plaster,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '3',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '4',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '5',
-						materialId: '',
-						materialType: MaterialTypeEnum.Plaster,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
+				setValue('constructionTypeObject.centerConstruction', heavyMultiLayerWallCenterCoreRows());
 
 				setValue('constructionTypeObject.leftConstruction', []);
 				setValue('constructionTypeObject.rightConstruction', []);
@@ -446,44 +401,7 @@ export const ConstructionTypeMap = ({
 					multiLayerTopCladdingInitialRows(),
 				);
 
-				setValue('constructionTypeObject.centerConstruction', [
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '3',
-						materialId: '',
-						materialType: MaterialTypeEnum.Filler,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '4',
-						materialId: '',
-						materialType: MaterialTypeEnum.Link,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.ConnectionNumber, value: '' },
-							{ materialParameters: MaterialParametrs.ConnectionType, value: '' },
-						],
-					},
-					{
-						positionId: '5',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
+				setValue('constructionTypeObject.centerConstruction', heavyMultiLayerWallCenterCoreRows());
 
 				setValue('constructionTypeObject.rightConstruction', []);
 			},
@@ -502,53 +420,7 @@ export const ConstructionTypeMap = ({
 					multiLayerTopCladdingInitialRows(),
 				);
 
-				setValue('constructionTypeObject.centerConstruction', [
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Plaster,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '3',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '4',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '5',
-						materialId: '',
-						materialType: MaterialTypeEnum.Plaster,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
+				setValue('constructionTypeObject.centerConstruction', heavyMultiLayerWallCenterCoreRows());
 
 				setValue(
 					'constructionTypeObject.rightConstruction',
@@ -565,53 +437,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingOneSide,
 				);
 
-				setValue('constructionTypeObject.centerConstruction', [
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Plaster,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '3',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '4',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '5',
-						materialId: '',
-						materialType: MaterialTypeEnum.Plaster,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
+				setValue('constructionTypeObject.centerConstruction', heavyMultiLayerWallCenterCoreRows());
 
 				setValue('constructionTypeObject.leftConstruction', []);
 				setValue('constructionTypeObject.rightConstruction', []);
@@ -626,53 +452,7 @@ export const ConstructionTypeMap = ({
 					ConstructionTypeEnum.HeavyMultiLayerWallSoundproofingBothSide,
 				);
 
-				setValue('constructionTypeObject.centerConstruction', [
-					{
-						positionId: '1',
-						materialId: '',
-						materialType: MaterialTypeEnum.Plaster,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '2',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '3',
-						materialId: '',
-						materialType: MaterialTypeEnum.Board,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '4',
-						materialId: '',
-						materialType: MaterialTypeEnum.Heavy,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-					{
-						positionId: '5',
-						materialId: '',
-						materialType: MaterialTypeEnum.Plaster,
-						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Thickness, value: '' },
-							{ materialParameters: MaterialParametrs.Density, value: '' },
-						],
-					},
-				]);
+				setValue('constructionTypeObject.centerConstruction', heavyMultiLayerWallCenterCoreRows());
 
 				setValue('constructionTypeObject.leftConstruction', []);
 				setValue('constructionTypeObject.rightConstruction', []);

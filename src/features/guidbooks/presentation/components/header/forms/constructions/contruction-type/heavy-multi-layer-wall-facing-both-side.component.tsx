@@ -1,7 +1,9 @@
 import type { ConstructionTypeProps } from '@features/guidbooks/types';
 import { HeavyMultiLayerWallComponent } from './heavy-multi-layer-wall.component';
 
-/** Облицовка сверху и снизу — та же форма, что у многослойной стены с кнопками добавления. */
+/** Многослойная стена + облицовка слева и справа (всегда две стороны). */
 export const HeavyMultiLayerWallFacingBothSideComponent = ({
 	currentForm,
-}: ConstructionTypeProps) => <HeavyMultiLayerWallComponent currentForm={currentForm} />;
+}: ConstructionTypeProps) => (
+	<HeavyMultiLayerWallComponent currentForm={currentForm} alwaysShowCladding />
+);

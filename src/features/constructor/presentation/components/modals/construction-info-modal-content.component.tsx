@@ -415,9 +415,8 @@ export const ConstructionInfoModalContent = () => {
 						</p>
 						{constructionImages.length > 0 ? (
 							<Carousel
-								className="w-full max-w-[360px] px-8 [&>div:last-child]:mt-3"
+								className="w-full max-w-[360px] [&>div:last-child]:mt-3"
 								options={{ loop: constructionImages.length > 1 }}
-								showArrows={constructionImages.length > 1}
 							>
 								{constructionImages.map((image, index) => (
 									<CarouselSlide

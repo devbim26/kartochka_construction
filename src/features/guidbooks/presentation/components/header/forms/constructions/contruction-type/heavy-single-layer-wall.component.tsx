@@ -10,10 +10,18 @@ import type { ConstructionTypeProps, MaterialTypeEnum } from '@features/guidbook
 import { MaterialTypesSelectValuesEnum } from '@features/guidbooks/types';
 
 import { useConstructionMaterials } from '@features/guidbooks/utils';
+import {
+	CENTER_BOTTOM_OUTER_TO_INNER,
+	CENTER_TOP_OUTER_TO_INNER,
+	isOutermostRemovableOptionalLayer,
+} from '@features/guidbooks/utils/optional-layer-stack.utils';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { Fragment } from 'react/jsx-runtime';
 
-export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
+export const HeavySingleLayerWallComponent = ({
+	currentForm,
+	title = '1. Базовая конструкция',
+}: ConstructionTypeProps & { title?: string }) => {
 	const { control, watch } = currentForm;
 
 	const { fields, append, remove } = useConstructionMaterials(control, watch, 'Center');
@@ -32,7 +40,24 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 		/>
 	);
 
-	const renderMaterialBlock = (positionId: string, fieldIndex: number, fieldId: string) => (
+	const hasPosition = (id: string) => fields.some((f: any) => f.positionId === id);
+
+	const getRemovableStack = (positionId: string) => {
+		if (positionId === '0' || positionId === '1') {
+			return CENTER_TOP_OUTER_TO_INNER;
+		}
+		if (positionId === '3' || positionId === '4') {
+			return CENTER_BOTTOM_OUTER_TO_INNER;
+		}
+		return [];
+	};
+
+	const renderMaterialBlock = (positionId: string, fieldIndex: number, fieldId: string) => {
+		const canRemove =
+			positionId !== '2' &&
+			isOutermostRemovableOptionalLayer(positionId, hasPosition, getRemovableStack(positionId));
+
+		return (
 		<div key={fieldId} className="flex w-full items-start justify-between">
 			<div className="flex flex-1 gap-[20px]">
 				{positionId !== '2' && (
@@ -67,16 +92,17 @@ export const HeavySingleLayerWallComponent = ({ currentForm }: ConstructionTypeP
 				)}
 			</div>
 
-			{positionId !== '2' && (
+			{canRemove ? (
 				<DeleteIcon className="shrink-0 self-start" onClick={() => remove(fieldIndex)} />
-			)}
+			) : null}
 		</div>
-	);
+		);
+	};
 
 	const positions = ['0', '1', '2', '3', '4'];
 
 	return (
-		<ConstructionLayer title="1. Базовая конструкция">
+		<ConstructionLayer title={title}>
 			<div className="flex flex-col gap-[24px]">
 				{fields.length === 0 && renderAddButton('0')}
 

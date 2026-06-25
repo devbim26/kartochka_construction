@@ -154,27 +154,36 @@ const DesigningGraph = ({
 	calculationDocName: _calculationDocName,
 	chartSize = 'default',
 	showLegend = true,
+	noiseMode: controlledNoiseMode,
+	onNoiseModeChange,
 }: {
 	graphData: GraphDetailResponse[] | null;
 	regulatoryDocName: string;
 	calculationDocName: string;
 	chartSize?: 'compact' | 'default' | 'large';
 	showLegend?: boolean;
+	noiseMode?: GraphNoiseMode;
+	onNoiseModeChange?: (mode: GraphNoiseMode) => void;
 }) => {
 	const { t } = useI18n();
 	const hasAirborneData = useMemo(() => graphHasAirborneGraphData(graphData), [graphData]);
 	const hasImpactData = useMemo(() => graphHasImpactGraphData(graphData), [graphData]);
 	const showNoiseModeSwitch = hasAirborneData && hasImpactData;
 
-	const [noiseMode, setNoiseMode] = useState<GraphNoiseMode>('airborne');
+	const [internalNoiseMode, setInternalNoiseMode] = useState<GraphNoiseMode>('airborne');
+	const isControlled = controlledNoiseMode !== undefined && onNoiseModeChange !== undefined;
+	const noiseMode = isControlled ? controlledNoiseMode : internalNoiseMode;
+	const setNoiseMode = isControlled ? onNoiseModeChange : setInternalNoiseMode;
 
 	useEffect(() => {
+		if (isControlled) return;
+
 		if (hasAirborneData) {
-			setNoiseMode('airborne');
+			setInternalNoiseMode('airborne');
 		} else if (hasImpactData) {
-			setNoiseMode('impact');
+			setInternalNoiseMode('impact');
 		}
-	}, [graphData, hasAirborneData, hasImpactData]);
+	}, [graphData, hasAirborneData, hasImpactData, isControlled]);
 
 	const allSeries: DesigningChartSeries[] = useMemo(() => {
 		if (!graphData?.length) return [];

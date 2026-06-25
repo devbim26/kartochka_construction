@@ -1041,7 +1041,7 @@ export const ru: Record<TranslationKey, string> = {
 	'generalInfo.area': 'Площадь, м²',
 	'generalInfo.totalThickness': 'Общая толщина, мм',
 	'generalInfo.totalMass': 'Общая масса, кг',
-	'generalInfo.hasAdditionalConstruction': 'Наличие узлов примыкания',
+	'generalInfo.hasAdditionalConstruction': 'Наличие доп. конструкции',
 	'generalInfo.manufacturer': 'Производитель',
 	'generalInfo.parameters': 'Параметры',
 	'generalInfo.download': 'Скачать',

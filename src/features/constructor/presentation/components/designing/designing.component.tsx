@@ -43,6 +43,7 @@ import {
 	graphHasImpactComputedData,
 	graphHasImpactLaboratoryData,
 	graphHasLaboratoryData,
+	useGraphNoiseMode,
 } from '@features/constructor/utils';
 import {
 	getFloorConstructionById,
@@ -168,6 +169,10 @@ const DesigningConstructionScreen = () => {
 		() => graphHasImpactLaboratoryData(graphData),
 		[graphData],
 	);
+
+	const { noiseMode, setNoiseMode, activeNoiseMode } = useGraphNoiseMode(graphData);
+	const showAirborneValues = activeNoiseMode === 'airborne';
+	const showImpactValues = activeNoiseMode === 'impact' && isFloorConstruction;
 
 	const rCalcsDisplay = useWatch({ control: constructionFormControl, name: 'RCalcs' });
 	const labIndexValueDisplay = useWatch({
@@ -804,7 +809,7 @@ const DesigningConstructionScreen = () => {
 				<div className="flex w-full shrink-0 flex-col gap-[10px] px-[24px] py-[10px] xl:max-w-[min(100%,400px)] xl:basis-[400px]">
 					{currentReportInfo ? (
 						<>
-							{hasComputedDots && (
+							{showAirborneValues && hasComputedDots && (
 								<>
 									<div className="flex flex-col gap-1">
 										<p className="text-[23px] font-extrabold text-black">
@@ -827,7 +832,7 @@ const DesigningConstructionScreen = () => {
 									<div></div>
 								</>
 							)}
-							{hasLaboratoryDots && (
+							{showAirborneValues && hasLaboratoryDots && (
 								<>
 									<div className="flex flex-col gap-2">
 										<p className="text-[30px] font-extrabold leading-none text-black">
@@ -850,7 +855,7 @@ const DesigningConstructionScreen = () => {
 									<div></div>
 								</>
 							)}
-							{isFloorConstruction && hasImpactComputedDots && (
+							{showImpactValues && hasImpactComputedDots && (
 								<>
 									<div className="flex flex-col gap-1">
 										<p className="text-[23px] font-extrabold text-black">
@@ -877,7 +882,7 @@ const DesigningConstructionScreen = () => {
 									<div></div>
 								</>
 							)}
-							{isFloorConstruction && hasImpactLaboratoryDots && (
+							{showImpactValues && hasImpactLaboratoryDots && (
 								<>
 									<div className="flex flex-col gap-2">
 										<p className="text-[30px] font-extrabold leading-none text-black">
@@ -912,15 +917,17 @@ const DesigningConstructionScreen = () => {
 							<p className="font-sans text-[14px]">
 								{currentReportInfo?.regulatoryDocument?.fullName}
 							</p>
-							<p className="font-sans text-[30px] font-semibold leading-4">
-								Rw ⩾{' '}
-								{
-									currentConstruction?.reportConstructionHeader
-										.requirementNoizeIsolationIndex
-								}{' '}
-								dB
-							</p>
-							{isFloorConstruction &&
+							{showAirborneValues && (
+								<p className="font-sans text-[30px] font-semibold leading-4">
+									Rw ⩾{' '}
+									{
+										currentConstruction?.reportConstructionHeader
+											.requirementNoizeIsolationIndex
+									}{' '}
+									dB
+								</p>
+							)}
+							{showImpactValues &&
 								(() => {
 									const h = currentConstruction?.reportConstructionHeader;
 									const lwReq = h?.requirementNoizeImpactIndex;
@@ -945,6 +952,8 @@ const DesigningConstructionScreen = () => {
 						regulatoryDocName={constructionHeader?.airLaboratory?.laboratoryTestSource || ''}
 						calculationDocName={currentReportInfo?.calculationDocument?.name || ''}
 						chartSize="large"
+						noiseMode={noiseMode}
+						onNoiseModeChange={setNoiseMode}
 					/>
 				</div>
 				<div className="w-max min-w-0 shrink-0 xl:max-w-[min(100%,520px)]">

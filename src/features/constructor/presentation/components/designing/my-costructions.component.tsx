@@ -44,6 +44,7 @@ import {
 	graphHasImpactComputedData,
 	graphHasImpactLaboratoryData,
 	graphHasLaboratoryData,
+	useGraphNoiseMode,
 } from '@features/constructor/utils';
 
 import { AxiosError } from 'axios';
@@ -113,6 +114,10 @@ const MyConstructions = () => {
 		() => isFloorConstructionType(constructionHeader?.constructionType),
 		[constructionHeader?.constructionType],
 	);
+
+	const { noiseMode, setNoiseMode, activeNoiseMode } = useGraphNoiseMode(graphData);
+	const showAirborneValues = activeNoiseMode === 'airborne';
+	const showImpactValues = activeNoiseMode === 'impact' && isFloorConstruction;
 
 	const {
 		compIsRelevant,
@@ -494,12 +499,11 @@ const MyConstructions = () => {
 					</p>
 					{carouselConstructions.length ? (
 						<Carousel
-							className="w-full px-8 [&>div:last-child]:mt-3"
+							className="w-full [&>div:last-child]:mt-3"
 							options={{
 								align: 'start',
 								loop: carouselConstructions.length > 2,
 							}}
-							showArrows={carouselConstructions.length > 2}
 						>
 							{carouselConstructions.map((favorite) => {
 								const favoriteHeaderId = getFavoriteHeaderId(favorite);
@@ -544,7 +548,7 @@ const MyConstructions = () => {
 				<div className="flex w-full shrink-0 flex-col gap-[10px] px-[24px] py-[10px] xl:max-w-[min(100%,400px)] xl:basis-[400px]">
 					{currentReportInfo ? (
 						<>
-							{hasComputedDots && (
+							{showAirborneValues && hasComputedDots && (
 								<>
 									<div className="flex flex-col gap-1">
 										<p className="text-[30px] font-extrabold text-black">
@@ -571,7 +575,7 @@ const MyConstructions = () => {
 									<div></div>
 								</>
 							)}
-							{hasLaboratoryDots && (
+							{showAirborneValues && hasLaboratoryDots && (
 								<>
 									<div className="flex flex-col gap-2">
 										<p className="text-[30px] font-extrabold leading-none text-black">
@@ -601,7 +605,7 @@ const MyConstructions = () => {
 									<div></div>
 								</>
 							)}
-							{isFloorConstruction && hasImpactComputedDots && (
+							{showImpactValues && hasImpactComputedDots && (
 								<>
 									<div className="flex flex-col gap-1">
 										<p className="text-[30px] font-extrabold text-black">
@@ -631,7 +635,7 @@ const MyConstructions = () => {
 									<div></div>
 								</>
 							)}
-							{isFloorConstruction && hasImpactLaboratoryDots && (
+							{showImpactValues && hasImpactLaboratoryDots && (
 								<>
 									<div className="flex flex-col gap-2">
 										<p className="text-[30px] font-extrabold leading-none text-black">
@@ -669,15 +673,17 @@ const MyConstructions = () => {
 							<p className="font-sans text-[14px]">
 								{currentReportInfo?.regulatoryDocument?.fullName}
 							</p>
-							<p className="font-sans text-[30px] font-semibold leading-4">
-								Rw ⩾{' '}
-								{
-									currentConstruction?.reportConstructionHeader
-										.requirementNoizeIsolationIndex
-								}{' '}
-								dB
-							</p>
-							{isFloorConstruction &&
+							{showAirborneValues && (
+								<p className="font-sans text-[30px] font-semibold leading-4">
+									Rw ⩾{' '}
+									{
+										currentConstruction?.reportConstructionHeader
+											.requirementNoizeIsolationIndex
+									}{' '}
+									dB
+								</p>
+							)}
+							{showImpactValues &&
 								(() => {
 									const h = currentConstruction?.reportConstructionHeader;
 									const lwReq = h?.requirementNoizeImpactIndex;
@@ -702,6 +708,8 @@ const MyConstructions = () => {
 						regulatoryDocName={currentReportInfo?.regulatoryDocument?.name || ''}
 						calculationDocName={currentReportInfo?.calculationDocument?.name || ''}
 						chartSize="large"
+						noiseMode={noiseMode}
+						onNoiseModeChange={setNoiseMode}
 					/>
 				</div>
 			</div>

@@ -1,110 +1,73 @@
-import { DeleteIcon } from '@core';
-import {
-	multiLayerBottomCladdingInitialRows,
-	multiLayerTopCladdingInitialRows,
-} from '@features/guidbooks/constants/constructions/multi-layer-vertical-cladding.defaults';
-import type { ConstructionTypeProps } from '@features/guidbooks/types';
-import { useEffect, useState } from 'react';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
-import { VerticalFacingCladdingSection } from './vertical-facing-cladding-section.component';
-import { HeavyMultiLayerWallBaseSection } from './heavy-multi-layer-wall-base-section.component';
-
-/** Многослойная стена: база по центру; облицовка сверху/снизу, воздушный зазор у базы (сверху последним, снизу первым). */
-export const HeavyMultiLayerWallComponent = ({ currentForm }: ConstructionTypeProps) => {
-	const { watch, setValue } = currentForm;
-	const [hasTopCladding, setHasTopCladding] = useState(false);
-	const [hasBottomCladding, setHasBottomCladding] = useState(false);
-
-	const leftConstruction = watch('constructionTypeObject.leftConstruction');
-	const rightConstruction = watch('constructionTypeObject.rightConstruction');
-
-	useEffect(() => {
-		setHasTopCladding((leftConstruction?.length ?? 0) > 0);
-		setHasBottomCladding((rightConstruction?.length ?? 0) > 0);
-	}, [leftConstruction, rightConstruction]);
-
-	const addTopCladding = () => {
-		setHasTopCladding(true);
-		setValue('constructionTypeObject.leftConstruction', multiLayerTopCladdingInitialRows());
-	};
-
-	const removeTopCladding = () => {
-		setHasTopCladding(false);
-		setValue('constructionTypeObject.leftConstruction', []);
-	};
-
-	const addBottomCladding = () => {
-		setHasBottomCladding(true);
-		setValue('constructionTypeObject.rightConstruction', multiLayerBottomCladdingInitialRows());
-	};
-
-	const removeBottomCladding = () => {
-		setHasBottomCladding(false);
-		setValue('constructionTypeObject.rightConstruction', []);
-	};
-
-	return (
-		<>
-			<div className="mb-4 flex justify-center">
-				{!hasTopCladding ? (
-					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
-						<AiOutlinePlusCircle
-							onClick={addTopCladding}
-							className="size-[40px] self-center text-primary"
-						/>
-						<span className="text-sm text-gray-600">Добавить облицовку сверху</span>
-					</div>
-				) : (
-					<div className="flex w-full items-center justify-center gap-[10px]">
-						<DeleteIcon onClick={removeTopCladding} className="size-[40px] self-center" />
-						<span className="text-sm text-gray-500">Удалить облицовку сверху</span>
-					</div>
-				)}
-			</div>
-
-			{hasTopCladding && (
-				<VerticalFacingCladdingSection
-					currentForm={currentForm}
-					constructionPosition="Left"
-					variant="top"
-					title="1. Облицовка сверху"
-				/>
-			)}
-
-			<HeavyMultiLayerWallBaseSection
-				currentForm={currentForm}
-				title={hasTopCladding ? '2. Базовая конструкция' : '1. Базовая конструкция'}
-			/>
-
-			<div className="mt-4 flex justify-center">
-				{!hasBottomCladding ? (
-					<div className="flex w-full flex-wrap items-center justify-center gap-[12px]">
-						<AiOutlinePlusCircle
-							onClick={addBottomCladding}
-							className="size-[40px] self-center text-primary"
-						/>
-						<span className="text-sm text-gray-600">Добавить облицовку снизу</span>
-					</div>
-				) : (
-					<div className="flex w-full items-center justify-center gap-[10px]">
-						<DeleteIcon onClick={removeBottomCladding} className="size-[40px] self-center" />
-						<span className="text-sm text-gray-500">Удалить облицовку снизу</span>
-					</div>
-				)}
-			</div>
-
-			{hasBottomCladding && (
-				<VerticalFacingCladdingSection
-					currentForm={currentForm}
-					constructionPosition="Right"
-					variant="bottom"
-					title={
-						hasTopCladding
-							? '3. Облицовка снизу'
-							: '2. Облицовка снизу'
-					}
-				/>
-			)}
-		</>
-	);
-};
+import {
+	multiLayerBottomCladdingInitialRows,
+	multiLayerTopCladdingInitialRows,
+} from '@features/guidbooks/constants/constructions/multi-layer-vertical-cladding.defaults';
+import type { ConstructionTypeProps } from '@features/guidbooks/types';
+import { useEffect } from 'react';
+import { VerticalFacingCladdingSection } from './vertical-facing-cladding-section.component';
+import { HeavyMultiLayerWallBaseSection } from './heavy-multi-layer-wall-base-section.component';
+
+type HeavyMultiLayerWallProps = ConstructionTypeProps & {
+	/** Всегда две облицовки (слева и справа), без удаления. */
+	alwaysShowCladding?: boolean;
+};
+
+/** Многослойная стена: база по центру; облицовка — только в вариантах с облицовкой. */
+export const HeavyMultiLayerWallComponent = ({
+	currentForm,
+	alwaysShowCladding = false,
+}: HeavyMultiLayerWallProps) => {
+	const { setValue } = currentForm;
+
+	useEffect(() => {
+		if (!alwaysShowCladding) return;
+
+		const left = currentForm.getValues('constructionTypeObject.leftConstruction');
+		const right = currentForm.getValues('constructionTypeObject.rightConstruction');
+
+		if (!left?.length) {
+			setValue('constructionTypeObject.leftConstruction', multiLayerTopCladdingInitialRows(), {
+				shouldDirty: false,
+			});
+		}
+		if (!right?.length) {
+			setValue('constructionTypeObject.rightConstruction', multiLayerBottomCladdingInitialRows(), {
+				shouldDirty: false,
+			});
+		}
+	}, [alwaysShowCladding, currentForm, setValue]);
+
+	if (!alwaysShowCladding) {
+		return <HeavyMultiLayerWallBaseSection currentForm={currentForm} title="1. Базовая конструкция" />;
+	}
+
+	return (
+		<>
+			<VerticalFacingCladdingSection
+				currentForm={currentForm}
+				constructionPosition="Left"
+				variant="top"
+				title="1. Облицовка слева"
+				enableAdditionalLayers
+			/>
+
+			<div className="mt-4">
+				<HeavyMultiLayerWallBaseSection
+					currentForm={currentForm}
+					title="2. Базовая конструкция"
+				/>
+			</div>
+
+			<div className="mt-4">
+				<VerticalFacingCladdingSection
+					currentForm={currentForm}
+					constructionPosition="Right"
+					variant="bottom"
+					title="3. Облицовка справа"
+					enableAdditionalLayers
+				/>
+			</div>
+		</>
+	);
+};
+

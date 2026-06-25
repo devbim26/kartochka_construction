@@ -16,6 +16,11 @@ import {
 } from '@features/guidbooks/types';
 
 import { useConstructionMaterials } from '@features/guidbooks/utils';
+import {
+	FRAME_PARTITION_BOTTOM_OUTER_TO_INNER,
+	FRAME_PARTITION_TOP_OUTER_TO_INNER,
+	isOutermostRemovableOptionalLayer,
+} from '@features/guidbooks/utils/optional-layer-stack.utils';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { Fragment } from 'react/jsx-runtime';
 
@@ -43,7 +48,28 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 		/>
 	);
 
-	const renderMaterialBlock = (positionId: string, fieldIndex: number, fieldId: string) => (
+	const getRemovableStack = (positionId: string) => {
+		if (positionId === '0' || positionId === '1') {
+			return FRAME_PARTITION_TOP_OUTER_TO_INNER;
+		}
+		if (positionId === '7' || positionId === '8') {
+			return FRAME_PARTITION_BOTTOM_OUTER_TO_INNER;
+		}
+		return [];
+	};
+
+	const renderMaterialBlock = (positionId: string, fieldIndex: number, fieldId: string) => {
+		const hasPosition = (id: string) =>
+			userMaterials.some((f: any) => f.positionId === id);
+		const canRemove =
+			['0', '1', '7', '8'].includes(positionId) &&
+			isOutermostRemovableOptionalLayer(
+				positionId,
+				hasPosition,
+				getRemovableStack(positionId),
+			);
+
+		return (
 		<div key={fieldId} className="flex w-full items-start justify-between">
 			<div className="flex flex-1 gap-[20px]">
 				{['0', '1', '7', '8'].includes(positionId) && (
@@ -102,11 +128,12 @@ export const FramePartitionSingleComponent = ({ currentForm }: ConstructionTypeP
 				)}
 			</div>
 
-			{['0', '1', '7', '8'].includes(positionId) && (
+			{canRemove ? (
 				<DeleteIcon className="shrink-0 self-start" onClick={() => remove(fieldIndex)} />
-			)}
+			) : null}
 		</div>
-	);
+		);
+	};
 
 	const positions = ['0', '1', '2', '3', '4', '6', '7', '8'];
 

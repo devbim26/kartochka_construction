@@ -16,6 +16,15 @@ export type CladdingMaterialRow = {
 	}> | null;
 };
 
+const OPTIONAL_CLADDING_POSITION_IDS = new Set(['5', '6']);
+
+const partitionCladdingLayers = (materials: CladdingMaterialRow[]) => ({
+	core: materials.filter((row) => !OPTIONAL_CLADDING_POSITION_IDS.has(row.positionId)),
+	optional: materials
+		.filter((row) => OPTIONAL_CLADDING_POSITION_IDS.has(row.positionId))
+		.sort((a, b) => Number(a.positionId) - Number(b.positionId)),
+});
+
 const TOP_LAYER_TYPES = [
 	MaterialTypeEnum.Board,
 	MaterialTypeEnum.Filler,
@@ -37,9 +46,12 @@ const VERTICAL_BOTH_SIDE_TYPES = new Set<string>([
 	ConstructionTypeEnum.HeavyMultiLayerWallFacingBothSide,
 ]);
 
-const VERTICAL_TOP_ONE_SIDE_TYPES = new Set<string>([
+const VERTICAL_ONE_SIDE_TYPES = new Set<string>([
 	ConstructionTypeEnum.HeavyMultiLayerWallFacingOneSide,
+	ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide,
 ]);
+
+const VERTICAL_TOP_ONE_SIDE_TYPES = VERTICAL_ONE_SIDE_TYPES;
 
 const defaultsByMaterialType = (rows: ReturnType<typeof multiLayerTopCladdingInitialRows>) =>
 	new Map(rows.map((row) => [row.materialType, row.materialTypeValue]));
@@ -89,36 +101,42 @@ const reorderCladdingByTypes = (
 		})
 		.filter((row): row is CladdingMaterialRow => row != null);
 
-/** Верхняя облицовка (Left): плита → … → воздушный зазор у базы. */
+/** Левая облицовка (Left): плита → … → воздушный зазор у базы. */
 export const normalizeTopCladdingLayers = (
 	materials: CladdingMaterialRow[],
 ): CladdingMaterialRow[] => {
 	if (!materials.length) {
 		return [];
 	}
-	const withValues = materials.map((row) =>
-		ensureMaterialTypeValues(row, topDefaults),
-	);
-	if (!isLegacyTopCladding(withValues)) {
-		return withValues;
-	}
-	return reorderCladdingByTypes(withValues, TOP_LAYER_TYPES, topDefaults);
+	const { core, optional } = partitionCladdingLayers(materials);
+	const withValues = core.map((row) => ensureMaterialTypeValues(row, topDefaults));
+	const normalizedCore = !isLegacyTopCladding(withValues)
+		? withValues
+		: reorderCladdingByTypes(withValues, TOP_LAYER_TYPES, topDefaults);
+
+	return [
+		...normalizedCore,
+		...optional.map((row) => ensureMaterialTypeValues(row, topDefaults)),
+	];
 };
 
-/** Нижняя облицовка (Right): воздушный зазор у базы → … → плита. */
+/** Правая облицовка (Right): воздушный зазор у базы → … → плита. */
 export const normalizeBottomCladdingLayers = (
 	materials: CladdingMaterialRow[],
 ): CladdingMaterialRow[] => {
 	if (!materials.length) {
 		return [];
 	}
-	const withValues = materials.map((row) =>
-		ensureMaterialTypeValues(row, bottomDefaults),
-	);
-	if (!isLegacyBottomCladding(withValues)) {
-		return withValues;
-	}
-	return reorderCladdingByTypes(withValues, BOTTOM_LAYER_TYPES, bottomDefaults);
+	const { core, optional } = partitionCladdingLayers(materials);
+	const withValues = core.map((row) => ensureMaterialTypeValues(row, bottomDefaults));
+	const normalizedCore = !isLegacyBottomCladding(withValues)
+		? withValues
+		: reorderCladdingByTypes(withValues, BOTTOM_LAYER_TYPES, bottomDefaults);
+
+	return [
+		...normalizedCore,
+		...optional.map((row) => ensureMaterialTypeValues(row, bottomDefaults)),
+	];
 };
 
 export const normalizeVerticalCladdingForConstructionType = (
@@ -141,6 +159,13 @@ export const normalizeVerticalCladdingForConstructionType = (
 		return {
 			left: normalizeTopCladdingLayers(left),
 			right,
+		};
+	}
+
+	if (VERTICAL_ONE_SIDE_TYPES.has(constructionTypeEnum) && right.length) {
+		return {
+			left,
+			right: normalizeBottomCladdingLayers(right),
 		};
 	}
 

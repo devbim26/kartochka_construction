@@ -3,6 +3,13 @@ import type { SoundproofingStandarts } from '@features/constructor/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 
+const parseNumber = (value: unknown): number | null => {
+	if (value === null || value === undefined || value === '') return null;
+	const normalized = String(value).replace(',', '.');
+	const num = Number(normalized);
+	return Number.isFinite(num) ? num : null;
+};
+
 type Props = {
 	data: SoundproofingStandarts[];
 	/** When set, the label in the first column is clickable (e.g. open lab-test graph). */
@@ -75,9 +82,16 @@ export const GeneralInformationSoundproofing = ({
 					const requirement = info.getValue() as string;
 					const value = info.row.original.values;
 
-					const isDash = requirement === '-' || value === '-';
-					const roundedRequirement = isDash ? '-' : Math.round(+requirement).toString();
-					const isMatch = !isDash && +requirement >= +value;
+					const valueNum = parseNumber(value);
+					const requirementNum = parseNumber(requirement);
+
+					const isDash =
+						requirement === '-' ||
+						value === '-' ||
+						valueNum === null ||
+						requirementNum === null;
+					const roundedRequirement = isDash ? '-' : Math.round(requirementNum).toString();
+					const isMatch = !isDash && valueNum >= requirementNum;
 
 					return (
 						<SimpleTableCell

@@ -313,14 +313,6 @@ export const convertToServerConstructionType = (
 	],
 });
 
-const FACING_ONE_SIDE_LAYER_ORDER: MaterialTypeEnum[] = [
-	MaterialTypeEnum.AirGap,
-	MaterialTypeEnum.Link,
-	MaterialTypeEnum.Frame,
-	MaterialTypeEnum.Filler,
-	MaterialTypeEnum.Board,
-];
-
 export type MappedUserMaterial = {
 	materialId: string;
 	materialName: string;
@@ -345,14 +337,6 @@ const mapUserMaterialFromApi = (userMaterial: any): MappedUserMaterial => ({
 		})) ?? [],
 });
 
-/** Облицовка справа, порядок positionId 0…4 от стены кнаружи. */
-const normalizeFacingOneSideCladding = (materials: MappedUserMaterial[]) =>
-	FACING_ONE_SIDE_LAYER_ORDER.map((materialType, index) => {
-		const row = materials.find((m) => m.materialType === materialType);
-		if (!row) return null;
-		return { ...row, positionId: String(index) };
-	}).filter((row): row is MappedUserMaterial => row != null);
-
 export const convertToClientConstructionType = (data: any): ConstructionType => {
 	const constructionTypeEnum =
 		convertToClientConstructionTypeEnumData(
@@ -373,16 +357,6 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 
 	let leftConstruction = leftRaw.map(mapUserMaterialFromApi);
 	let rightConstruction = rightRaw.map(mapUserMaterialFromApi);
-
-	if (constructionTypeEnum === ConstructionTypeEnum.HeavySingleLayerWallFacingOneSide) {
-		const claddingSource = leftRaw.length ? leftRaw : rightRaw;
-		if (claddingSource.length) {
-			rightConstruction = normalizeFacingOneSideCladding(
-				claddingSource.map(mapUserMaterialFromApi),
-			);
-			leftConstruction = [];
-		}
-	}
 
 	const normalized = normalizeVerticalCladdingForConstructionType(
 		constructionTypeEnum,
