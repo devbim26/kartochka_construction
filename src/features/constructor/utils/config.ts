@@ -13,7 +13,6 @@ export const AboutBuildingConfig: EntityConfig = {
 		region: Country.Belarus,
 		buildingPurpose: PurposeBuilding.FramePanelBuilding,
 		buildingType: BuildingType.ResidentialBuildings,
-		maxHeight: '27',
 		comfortClass: CategoryClass.B,
 		requirement: '',
 		isFloorPlan: true,

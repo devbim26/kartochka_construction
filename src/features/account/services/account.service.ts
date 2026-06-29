@@ -1,10 +1,12 @@
 import { fetchApi } from '@api-gen';
+import type { AppDispatch } from '@core/store';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import { toast } from 'sonner';
 import { ACCOUNT_FETCH_ROUTES } from '../constants';
 import { convertToClientAccountData, convertToServerAccountData } from '../converters';
 import type { AccountData } from '../types';
+import { hasFilledCompanyRequisites } from '../utils/company-requisites.utils';
 
 export const getCurrentUser = createAsyncThunk(
 	ACCOUNT_FETCH_ROUTES.getCurrent.async_thunk_route,
@@ -27,6 +29,18 @@ export const getCurrentUser = createAsyncThunk(
 		}
 	},
 );
+
+export const ensureCompanyRequisitesFilled = async (dispatch: AppDispatch): Promise<boolean> => {
+	try {
+		const payload = await dispatch(getCurrentUser()).unwrap();
+		if (payload?.status !== 200 || !payload.data) {
+			return false;
+		}
+		return hasFilledCompanyRequisites(payload.data as AccountData);
+	} catch {
+		return false;
+	}
+};
 
 export const updateUser = createAsyncThunk(
 	ACCOUNT_FETCH_ROUTES.update.async_thunk_route,

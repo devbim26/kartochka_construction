@@ -516,32 +516,6 @@ const AboutBuildingScreen = () => {
 							</div>
 						</div>
 
-						{/* Высота */}
-						<Input
-							{...register('maxHeight')}
-							labelClassName={twMerge(
-								'font-sans text-sm font-normal leading-5 text-input-label-primary w-[170px]',
-								formState.errors.maxHeight?.message ? 'text-error' : '',
-							)}
-							wrapperClassName="flex-row items-center gap-[24px]"
-							inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-							error={
-								formState.errors.maxHeight?.message
-									? t(formState.errors.maxHeight.message as any)
-									: undefined
-							}
-							containerClassName="w-[226px]"
-							disabled={!!search.get('edit')}
-							label={
-								formState.errors?.maxHeight?.message
-									? t(formState.errors.maxHeight.message as any)
-									: t('aboutBuilding.maxHeight.label')
-							}
-							type="number"
-							placeholder={t('aboutBuilding.maxHeight.placeholder')}
-							max={3}
-						/>
-
 						{/* Класс комфортности */}
 						<Controller
 							control={control}

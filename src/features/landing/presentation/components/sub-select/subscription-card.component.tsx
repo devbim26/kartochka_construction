@@ -11,9 +11,10 @@ import { CheckMarkImage } from './images';
 type Props = {
 	subscription: Subscription;
 	onClick: (id: string) => void;
+	showActionButton?: boolean;
 };
 
-export const SubscriptionCard = ({ subscription, onClick }: Props) => {
+export const SubscriptionCard = ({ subscription, onClick, showActionButton = true }: Props) => {
 	const { t } = useI18n();
 	const showPrice = shouldShowSubscriptionPrice(subscription.price);
 	const showCalculations = shouldShowSubscriptionCalculations(subscription.numberOfDowloadReports);
@@ -43,11 +44,13 @@ export const SubscriptionCard = ({ subscription, onClick }: Props) => {
 					</p>
 				</div>
 			) : null}
-			<Button onClick={() => onClick(subscription.id!)} className="mb-2 mt-2 h-11 w-full">
-				<p className="font-sans text-sm font-semibold leading-5 text-white sm:text-base">
-					{t('subscription.buyPlan')}
-				</p>
-			</Button>
+			{showActionButton ? (
+				<Button onClick={() => onClick(subscription.id!)} className="mb-2 mt-2 h-11 w-full">
+					<p className="font-sans text-sm font-semibold leading-5 text-white sm:text-base">
+						{t('subscription.buyPlan')}
+					</p>
+				</Button>
+			) : null}
 			{showCalculations || showReports || showTariffPlan ? (
 			<div className="mt-1 flex flex-col gap-2">
 				{showCalculations ? (

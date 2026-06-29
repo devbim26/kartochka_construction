@@ -8,11 +8,6 @@ export const AboutBuildingSchema = z.object({
 	commonDescription: z.string().nullable().optional(),
 	buildingPurpose: z.string().min(1, 'validation.required'),
 	buildingType: z.string().min(1, 'validation.required'),
-	maxHeight: z
-		.string()
-		.min(1, 'validation.required')
-		.refine((value) => Number.isInteger(Number(value)), 'validation.integer')
-		.refine((value) => +value > 0, 'validation.positiveNumber'),
 	comfortClass: z.string().min(1, 'validation.required'),
 	regulatoryDocumentId: z.string().min(1, 'validation.required'),
 	calculationDocumentId: z.string().min(1, 'validation.required'),
@@ -28,11 +23,7 @@ export const ReportInfoShortScheme = z.object({
 	commonDescription: z.string().nullable().optional(),
 	buildingPurpose: z.string().min(1, 'validation.required'),
 	buildingType: z.string().min(1, 'validation.required'),
-	maxHeight: z
-		.string()
-		.min(1, 'validation.required')
-		.refine((value) => Number.isInteger(Number(value)), 'validation.integer')
-		.refine((value) => +value > 0, 'validation.positiveNumber'),
+	maxHeight: z.string().optional(),
 	comfortClass: z.string().min(1, 'validation.required'),
 	calculationRequirement: RequirementsSchema.optional(),
 	regulatoryRequirement: RequirementsSchema.optional(),

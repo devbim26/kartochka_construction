@@ -3,16 +3,25 @@ import {
 	Button,
 	LogoIcon,
 	LogoTextIcon,
+	useAppDispatch,
 	useAppNavigate,
 	useI18n,
 } from '@core';
+import { ensureCompanyRequisitesFilled } from '@features/account/services';
 import { DESIGNING_ROUTES } from '@features/home/constants';
+import { toast } from 'sonner';
 
 export const AiAccessDenied = () => {
 	const navigate = useAppNavigate();
+	const dispatch = useAppDispatch();
 	const { t } = useI18n();
 
-	const handleSubscribe = () => {
+	const handleSubscribe = async () => {
+		const filled = await ensureCompanyRequisitesFilled(dispatch);
+		if (!filled) {
+			toast.error(t('subscription.requisitesRequired'));
+			return;
+		}
 		navigate(`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.main.route}`, {
 			subSelectModal: 'true',
 			changePlanFlow: 'true',

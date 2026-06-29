@@ -124,7 +124,6 @@ export const convertToClientReportInfo = (data: ReportInfoShortDto): AboutBuildi
 		buildingPurpose: data.purposeBuilding as string,
 		buildingType: data.buildingType as BuildingType,
 		comfortClass: data.class as CategoryClass,
-		maxHeight: '1',
 		isFloorPlan: true,
 		isConstruction: false,
 		isBim: false,

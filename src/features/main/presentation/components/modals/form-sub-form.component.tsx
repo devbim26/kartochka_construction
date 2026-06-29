@@ -1,5 +1,6 @@
 import { fetchApi } from '@api-gen';
-import { Button, useAppNavigate, useI18n } from '@core';
+import { Button, useAppDispatch, useAppNavigate, useI18n } from '@core';
+import { ensureCompanyRequisitesFilled } from '@features/account/services';
 import { convertBillToClient, deleteBill, type Bill } from '@features/bills';
 import { LandingSections } from '@features/landing/constants';
 import type { Subscription } from '@features/subscriptions';
@@ -15,6 +16,7 @@ export const FormSubscription = () => {
 	const [currentSub, setCurrentSub] = useState<Subscription>();
 	const [bill, setBill] = useState<Bill>();
 	const navigate = useAppNavigate();
+	const dispatch = useAppDispatch();
 	const { t } = useI18n();
 	const handleSubscribe = (id: string) => {
 		from(fetchApi.api.billCreate({ subscriptionId: id }))
@@ -72,10 +74,19 @@ export const FormSubscription = () => {
 	};
 
 	useEffect(() => {
-		if (search.get('subId')) {
-			handleSubscribe(search.get('subId')!);
-			handleGetOneTableData(search.get('subId')!);
-		}
+		const subId = search.get('subId');
+		if (!subId) return;
+
+		void (async () => {
+			const filled = await ensureCompanyRequisitesFilled(dispatch);
+			if (!filled) {
+				toast.error(t('subscription.requisitesRequired'));
+				navigate('');
+				return;
+			}
+			handleSubscribe(subId);
+			handleGetOneTableData(subId);
+		})();
 	}, [search]);
 	const handleDownloadFile = () => {
 		if (bill) {

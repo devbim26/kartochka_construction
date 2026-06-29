@@ -1,5 +1,6 @@
 import { fetchApi } from '@api-gen';
-import { Button, convertToPaginatedType, useAppNavigate, useAppSelector, useI18n } from '@core';
+import { Button, convertToPaginatedType, useAppDispatch, useAppNavigate, useAppSelector, useI18n } from '@core';
+import { ensureCompanyRequisitesFilled } from '@features/account/services';
 import {
 	convertSubscriptionToClient,
 	getPaginatedSubscriptions,
@@ -33,6 +34,17 @@ export const CurrentSub = ({ className }: Props) => {
 	const userData = useAppSelector((store) => store.userData);
 	const { t } = useI18n();
 	const navigate = useAppNavigate();
+	const dispatch = useAppDispatch();
+
+	const handleChangePlan = async () => {
+		const filled = await ensureCompanyRequisitesFilled(dispatch);
+		if (!filled) {
+			toast.error(t('subscription.requisitesRequired'));
+			return;
+		}
+		navigate('', { subSelectModal: 'true', changePlanFlow: 'true' });
+	};
+
 	const handleGetTableData = () => {
 		from(
 			getPaginatedSubscriptions({
@@ -147,12 +159,7 @@ export const CurrentSub = ({ className }: Props) => {
 								) : null}
 							</div>
 						</div>
-						<Button
-							className="w-min px-[16px]"
-							onClick={() =>
-								navigate('', { subSelectModal: 'true', changePlanFlow: 'true' })
-							}
-						>
+						<Button className="w-min px-[16px]" onClick={handleChangePlan}>
 							<p className="font-sans text-sm font-semibold leading-4">
 								{t('main.currentSub.changePlan')}
 							</p>

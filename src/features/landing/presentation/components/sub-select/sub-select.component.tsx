@@ -24,12 +24,14 @@ interface SubSelectProps {
 	wrapperClassName?: string;
 	subContainerClassName?: string;
 	onSubscribe?: (id: string) => void;
+	showActionButton?: boolean;
 }
 
 export const SubSelect = ({
 	wrapperClassName,
 	subContainerClassName,
 	onSubscribe,
+	showActionButton = true,
 }: SubSelectProps) => {
 	const [isPerMonth, setIsPerMonth] = useState(true);
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
@@ -119,7 +121,11 @@ export const SubSelect = ({
 				>
 					{subscriptions.map((sub) => (
 						<CarouselSlide key={sub.id} className="basis-1/3 px-3">
-							<SubscriptionCard onClick={handleSubscribe} subscription={sub} />
+							<SubscriptionCard
+								onClick={handleSubscribe}
+								subscription={sub}
+								showActionButton={showActionButton}
+							/>
 						</CarouselSlide>
 					))}
 				</Carousel>

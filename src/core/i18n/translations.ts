@@ -212,6 +212,8 @@ export const en = {
 	'errors.subscriptionsLoad': 'Failed to load subscriptions',
 	'subscription.free': 'Free',
 	'subscription.buyPlan': 'Choose plan',
+	'subscription.requisitesRequired':
+		'Fill in your company details in your account (sidebar menu).',
 	'subscription.reportPerMonth.one': 'report per month',
 	'subscription.reportPerMonth.many': 'reports per month',
 	'subscription.calculationsCount': 'Number of calculations, pcs',
@@ -627,7 +629,8 @@ export const en = {
 	'bill.downloadInvoice': 'Download invoice',
 
 	'subscription.checkout.error': 'Failed to checkout plan',
-	'subscription.checkout.success': 'Plan successfully created',
+	'subscription.checkout.success':
+		'Download the invoice and pay. Within 1 day we will receive the payment and activate access for this plan.',
 	'subscription.paymentData': 'Payment details',
 	'subscription.checkout.cancel': 'Cancel checkout',
 
@@ -870,7 +873,7 @@ export const en = {
 	'aboutBuilding.buildingPurpose.placeholder': 'Select purpose',
 	'aboutBuilding.maxHeight.label': 'Maximum allowable building height, m',
 	'aboutBuilding.maxHeight.placeholder': 'Enter height',
-	'aboutBuilding.comfortClass.label': 'Comfort class',
+	'aboutBuilding.comfortClass.label': 'Class of comfort',
 	'aboutBuilding.comfortClass.placeholder': 'Select class',
 	'aboutBuilding.requirements.title': 'Requirements',
 	'aboutBuilding.requirements.calculation': 'Calculation',
@@ -878,8 +881,8 @@ export const en = {
 	'aboutBuilding.requirements.sound.label': 'Sound insulation*',
 	'aboutBuilding.requirements.sound.placeholder': 'Select calculation document',
 	'aboutBuilding.requirements.regulation.placeholder': 'Select regulatory document',
-	'aboutBuilding.constructionInfo.title': 'Input of building construction information',
-	'aboutBuilding.constructionInfo.constructions': 'Constructions',
+	'aboutBuilding.constructionInfo.title': 'Input of building structures information',
+	'aboutBuilding.constructionInfo.constructions': 'Individual structures',
 	'aboutBuilding.constructionInfo.floorPlans': 'Floor plans (pdf)',
 	'aboutBuilding.constructionInfo.bim': 'BIM model (ifc) in development',
 
@@ -1195,7 +1198,7 @@ export const ru: Record<TranslationKey, string> = {
 	'aboutBuilding.buildingPurpose.placeholder': 'Выберите назначение',
 	'aboutBuilding.maxHeight.label': 'Максимально допустимая высота здания, м',
 	'aboutBuilding.maxHeight.placeholder': 'Введите высоту',
-	'aboutBuilding.comfortClass.label': 'Комфортный класс',
+	'aboutBuilding.comfortClass.label': 'Класс комфортности',
 	'aboutBuilding.comfortClass.placeholder': 'Выберите класс',
 	'aboutBuilding.requirements.title': 'Требования',
 	'aboutBuilding.requirements.calculation': 'Расчет',
@@ -1203,8 +1206,8 @@ export const ru: Record<TranslationKey, string> = {
 	'aboutBuilding.requirements.sound.label': 'Звукоизоляция',
 	'aboutBuilding.requirements.sound.placeholder': 'Выберите расчетный документ',
 	'aboutBuilding.requirements.regulation.placeholder': 'Выберите нормативный документ',
-	'aboutBuilding.constructionInfo.title': 'Ввод информации о строительстве',
-	'aboutBuilding.constructionInfo.constructions': 'Конструкции',
+	'aboutBuilding.constructionInfo.title': 'Ввод информации о конструкциях здания',
+	'aboutBuilding.constructionInfo.constructions': 'Отдельные конструкции',
 	'aboutBuilding.constructionInfo.floorPlans': 'Планы этажей (pdf)',
 	'aboutBuilding.constructionInfo.bim': 'BIM модель (ifc) в разработке',
 
@@ -1455,6 +1458,8 @@ export const ru: Record<TranslationKey, string> = {
 	'errors.subscriptionsLoad': 'Ошибка загрузки подписок',
 	'subscription.free': 'Бесплатно',
 	'subscription.buyPlan': 'Оформить тариф',
+	'subscription.requisitesRequired':
+		'Заполните реквизиты компании в личном кабинете (боковое меню)',
 	'subscription.reportPerMonth.one': 'отчет в месяц',
 	'subscription.reportPerMonth.many': 'отчетов в месяц',
 	'subscription.calculationsCount': 'Количество расчетов, шт',
@@ -1871,7 +1876,8 @@ export const ru: Record<TranslationKey, string> = {
 	'bill.downloadInvoice': 'Скачать счет на оплату',
 
 	'subscription.checkout.error': 'Ошибка оформления тарифа',
-	'subscription.checkout.success': 'Тариф успешно оформлен',
+	'subscription.checkout.success':
+		'Скачайте счёт и оплатите. В течение 1 дня мы получим оплату и откроем доступ по этому тарифу.',
 	'subscription.paymentData': 'Данные для платежа',
 	'subscription.checkout.cancel': 'Отменить оформление',
 
