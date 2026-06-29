@@ -11,14 +11,14 @@ import {
 import { Fragment, type ComponentType } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { ThicknessDensityFieldsType } from '../construction-fields-types/thickness-density-fields-type.component';
-import { BoardMaterialType } from '../construction-material-types/board-material-type.component';
+import { FillerMaterialType } from '../construction-material-types/filler-material-type.component';
 import { HeavyMaterialType } from '../construction-material-types/heavy-material-type.component';
 import { SelectableMaterialType } from '../construction-material-types/selectable-material-type.component';
 import { ConstructionLayer } from '../constructions-layer.component';
 
 const centerMaterialComponentsMap: Record<string, ComponentType<any>[]> = {
 	'2': [HeavyMaterialType, ThicknessDensityFieldsType],
-	'3': [BoardMaterialType, ThicknessDensityFieldsType],
+	'3': [FillerMaterialType, ThicknessDensityFieldsType],
 	'4': [HeavyMaterialType, ThicknessDensityFieldsType],
 };
 

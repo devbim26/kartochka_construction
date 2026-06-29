@@ -6,7 +6,7 @@ const thicknessDensity = () => [
 	{ materialParameters: MaterialParametrs.Density, value: '' },
 ];
 
-/** Ядро многослойной стены: тяжёлый — плита — тяжёлый (без штукатурки). */
+/** Ядро многослойной стены: тяжёлый — заполнитель — тяжёлый (без штукатурки). */
 export const heavyMultiLayerWallCenterCoreRows = () => [
 	{
 		positionId: '2',
@@ -17,7 +17,7 @@ export const heavyMultiLayerWallCenterCoreRows = () => [
 	{
 		positionId: '3',
 		materialId: '',
-		materialType: MaterialTypeEnum.Board,
+		materialType: MaterialTypeEnum.Filler,
 		materialTypeValue: thicknessDensity(),
 	},
 	{
