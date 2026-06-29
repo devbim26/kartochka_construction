@@ -1,6 +1,7 @@
 import type { ModalProps } from '@core';
 import { Button, Modal, useI18n } from '@core';
 import type { FloorConstruction } from '@features/constructor/types';
+import { resolveConstructionClass } from '@features/constructor/utils';
 import { type ConstructionsEditData } from '@features/guidbooks/types';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ interface CreateConstructionModalProps extends Omit<ModalProps, 'Footer'> {
 	currentConstructionHeader?: ConstructionsEditData;
 	floorId?: string;
 	reportFloorInfoId?: string;
+	floorConstructionInfoId?: string;
 }
 
 export const EditConstructionModal = ({
@@ -24,6 +26,7 @@ export const EditConstructionModal = ({
 	currentConstructionHeader,
 	floorId,
 	reportFloorInfoId,
+	floorConstructionInfoId,
 	...props
 }: CreateConstructionModalProps) => {
 	const formRef = useRef<CreateConstructionFormHandle>(null);
@@ -41,8 +44,8 @@ export const EditConstructionModal = ({
 	const applyFormReset = () => {
 		if (!currentReportFloorInfo || !currentConstructionHeader) return;
 		formRef.current?.reset({
-			constructionType: currentConstructionHeader.constructionType,
-			id: reportFloorInfoId,
+			constructionType: resolveConstructionClass(currentConstructionHeader.constructionType),
+			id: floorConstructionInfoId ?? currentReportFloorInfo.id,
 			length: String(currentReportFloorInfo.reportConstructionHeader.length),
 			width: String(currentReportFloorInfo.reportConstructionHeader.width),
 			construction: currentReportFloorInfo.reportConstructionHeader.constructionHeaderId,
@@ -65,6 +68,7 @@ export const EditConstructionModal = ({
 		props.isOpen,
 		currentReportFloorInfo,
 		currentConstructionHeader,
+		floorConstructionInfoId,
 		reportFloorInfoId,
 	]);
 
@@ -100,6 +104,7 @@ export const EditConstructionModal = ({
 				ref={formRef}
 				floorId={floorId}
 				reportFloorInfoId={reportFloorInfoId}
+				floorConstructionInfoId={floorConstructionInfoId ?? currentReportFloorInfo?.id}
 				onSuccess={handleSuccess}
 			/>
 		</Modal>

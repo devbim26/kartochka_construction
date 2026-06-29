@@ -6,6 +6,7 @@ import type {
 } from '@api-gen';
 import { fetchApi } from '@api-gen';
 import type { PaginationState } from '@core';
+import { wrapApiQueryBody } from '@core/utils/api-query-body.utils';
 import type { GuideBooksCreateDataTypes, GuidebooksFiltersDataTypes } from '../types';
 import { Guidebooks } from '../types';
 
@@ -65,11 +66,19 @@ export const getGuidebooksPaginated = async ({
 	guidebookType,
 	pagination,
 }: PaginatedProps) => {
-	return await getGuidebooksPaginatedApiMap[guidebookType]({
+	const query = {
 		...data,
 		pageNumber: pagination.pageNumber,
 		pageSize: pagination.pageSize,
-	});
+	};
+
+	if (guidebookType === Guidebooks.CONSTRUCTION) {
+		return await fetchApi.api.constructionGetPaginatedCreate(
+			wrapApiQueryBody(query) as never,
+		);
+	}
+
+	return await getGuidebooksPaginatedApiMap[guidebookType](query);
 };
 
 export const getGuidebooksDetail = async ({ id, guidebookType }: DetailProps) => {

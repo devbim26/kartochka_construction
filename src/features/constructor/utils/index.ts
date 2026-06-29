@@ -1,5 +1,6 @@
 export * from './classes';
 export * from './config';
+export * from './construction-class.utils';
 export * from './construction-layout.utils';
 export * from './construction-mass.utils';
 export * from './formatMaterial';

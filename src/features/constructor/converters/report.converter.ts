@@ -147,12 +147,12 @@ export const convertToClientSingleReportInfoShort = (
 		isConstruction: false,
 		isBim: false,
 		calculationDocument: {
-			id: data.calculationRequirementDocument!.id || '',
-			name: data.calculationRequirementDocument!.shortName! || '',
+			id: data.calculationRequirementDocument?.id || '',
+			name: data.calculationRequirementDocument?.shortName || '',
 		},
 		regulatoryDocument: {
-			id: data.regulatoryRequirementDocument!.id! || '',
-			name: data.regulatoryRequirementDocument!.shortName! || '',
+			id: data.regulatoryRequirementDocument?.id || '',
+			name: data.regulatoryRequirementDocument?.shortName || '',
 		},
 	};
 };
@@ -162,24 +162,24 @@ export const convertToClientReportInfoShort = (data: ReportInfoShortDto): Report
 		commonDescription: data.description,
 		name: data.buildingName || '',
 		calculationDocument: {
-			id: data.calculationRequirementDocument!.id || '',
-			name: data.calculationRequirementDocument!.shortName! || '',
+			id: data.calculationRequirementDocument?.id || '',
+			name: data.calculationRequirementDocument?.shortName || '',
 			fullName: data.calculationRequirementDocument?.fullName || '',
-			country:
-				(convertToClientCountryData(
-					data.calculationRequirementDocument!.country!,
-				) as string) || '',
+			country: data.calculationRequirementDocument?.country
+				? (convertToClientCountryData(data.calculationRequirementDocument.country) as string)
+				: '',
 		},
 		regulatoryDocument: {
 			fullName: data.regulatoryRequirementDocument?.fullName || '',
-			country:
-				(convertToClientCountryData(
-					data.regulatoryRequirementDocument!.country!,
-				) as string) || '',
-			id: data.regulatoryRequirementDocument!.id! || '',
-			name: data.regulatoryRequirementDocument!.shortName! || '',
+			country: data.regulatoryRequirementDocument?.country
+				? (convertToClientCountryData(data.regulatoryRequirementDocument.country) as string)
+				: '',
+			id: data.regulatoryRequirementDocument?.id || '',
+			name: data.regulatoryRequirementDocument?.shortName || '',
 		},
-		region: convertToClientCountryData(data.country!) as string,
+		region: data.country
+			? (convertToClientCountryData(data.country) as string)
+			: Country.Belarus,
 		buildingPurpose: data.purposeBuilding as string,
 		buildingType: data.buildingType as BuildingType,
 		comfortClass: data.class as CategoryClass,

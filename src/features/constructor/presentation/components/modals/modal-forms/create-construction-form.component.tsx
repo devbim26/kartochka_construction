@@ -12,6 +12,7 @@ import {
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import {
+	convertToClientReportInfoShort,
 	convertToClientSingleReportInfoShort,
 	convertToUpdateReportCommand,
 } from '@features/constructor/converters';
@@ -29,7 +30,7 @@ import { ReportCategory } from '@features/constructor/types';
 
 import { formatMaterial } from '@features'; // предполагаемый хелпер
 import type { ReportInfoShort } from '@features/constructor/utils';
-import { CreateConstructionConfig } from '@features/constructor/utils';
+import { CreateConstructionConfig, resolveConstructionClass } from '@features/constructor/utils';
 import {
 	convertToClientConstructionsAddData,
 	convertToClientConstructionsEditData,
@@ -72,6 +73,7 @@ interface CreateConstructionFormProps {
 	page?: number;
 	floorId?: string;
 	reportFloorInfoId?: string;
+	floorConstructionInfoId?: string;
 	floorNumber?: string;
 	constructionTargetTab?: 'walls' | 'floors';
 }
@@ -98,6 +100,7 @@ export const CreateConstructionForm = memoize(
 				page,
 				floorId,
 				reportFloorInfoId,
+				floorConstructionInfoId,
 				floorNumber,
 				constructionTargetTab = 'walls',
 			},
@@ -309,8 +312,16 @@ export const CreateConstructionForm = memoize(
 					)
 					.subscribe((response) => {
 						if (response?.status === 200) {
-							const data = convertToClientSingleReportInfoShort(response.data);
-							if (data) setReportInfoData(data);
+							const isFloorReport = search.get('reportType') == ReportCategory.Floor;
+							const data = isFloorReport
+								? convertToClientReportInfoShort(response.data as never)
+								: convertToClientSingleReportInfoShort(response.data);
+							if (data) {
+								setReportInfoData({
+									...data,
+									reportInfoId: reportId ?? data.reportInfoId ?? '',
+								});
+							}
 						}
 					});
 			};
@@ -320,15 +331,19 @@ export const CreateConstructionForm = memoize(
 			}, [reportId]);
 
 			useEffect(() => {
-				if (!!reportInfoData && constructionType) {
-					from(
-						getConstructionRooms({
-							class: reportInfoData.comfortClass as CategoryClass,
-							regulatoryDocumentId: reportInfoData.regulatoryDocument?.id,
-							buildingType: reportInfoData.buildingType as BuildingType,
-							constructionClass: constructionType as ConstructionClass,
-						}),
-					)
+				if (!reportInfoData?.comfortClass || !reportInfoData.buildingType) return;
+
+				const constructionClass = resolveConstructionClass(constructionType);
+				const regulatoryDocumentId = reportInfoData.regulatoryDocument?.id?.trim();
+
+				from(
+					getConstructionRooms({
+						class: reportInfoData.comfortClass as CategoryClass,
+						buildingType: reportInfoData.buildingType as BuildingType,
+						constructionClass,
+						...(regulatoryDocumentId ? { regulatoryDocumentId } : {}),
+					}),
+				)
 						.pipe(
 							catchError((error) => {
 								if (error instanceof AxiosError) {
@@ -355,10 +370,9 @@ export const CreateConstructionForm = memoize(
 								);
 
 								const variants = convertToSelectValues(uniqueRooms as any) || [];
-								setRoomOptions(variants);
-							}
-						});
-				}
+							setRoomOptions(variants);
+						}
+					});
 			}, [constructionType, reportInfoData]);
 
 			const handleAddConstruction = (data: CreateConstructionData) => {
@@ -376,21 +390,44 @@ export const CreateConstructionForm = memoize(
 					return normalized.length ? normalized : undefined;
 				};
 
-				const resolvedFloorConstructionInfoId = optionalGuid(floorId || layerId);
-				const resolvedReportFloorInfoId = optionalGuid(
+				const resolvedLevelId = optionalGuid(
+					floorId || layerId || search.get('activeLevelId'),
+				);
+				const resolvedFloorConstructionInstanceId = optionalGuid(
+					floorConstructionInfoId ||
+						(isEditFlow ? id || search.get('reportFloorInfoId') : undefined),
+				);
+				const resolvedReportFloorInfoIdForCreate = optionalGuid(
 					reportFloorInfoId ||
 						search.get('reportFloorInfoId') ||
 						search.get('activeLevelId') ||
 						id,
 				);
 				const selectedFloorNumber = floorNumber || search.get('floorNumber') || '1';
-				if (reportType === ReportCategory.Floor && !resolvedFloorConstructionInfoId) {
-					toast.error('Не удалось определить уровень этажа');
-					return;
-				}
-				if (reportType === ReportCategory.Floor && !resolvedReportFloorInfoId) {
-					toast.error('Не удалось определить reportFloorInfoId (id этажа)');
-					return;
+				if (reportType === ReportCategory.Floor) {
+					if (isEditFlow) {
+						if (!resolvedLevelId) {
+							toast.error('Не удалось определить уровень этажа');
+							dispatch(stopLoading());
+							return;
+						}
+						if (!resolvedFloorConstructionInstanceId) {
+							toast.error('Не удалось определить конструкцию на плане');
+							dispatch(stopLoading());
+							return;
+						}
+					} else {
+						if (!resolvedLevelId) {
+							toast.error('Не удалось определить уровень этажа');
+							dispatch(stopLoading());
+							return;
+						}
+						if (!resolvedReportFloorInfoIdForCreate) {
+							toast.error('Не удалось определить reportFloorInfoId (id этажа)');
+							dispatch(stopLoading());
+							return;
+						}
+					}
 				}
 				const request$ =
 					reportType === ReportCategory.Floor
@@ -419,12 +456,16 @@ export const CreateConstructionForm = memoize(
 								return updateReportFloor({
 									data: {
 										...(isEditFlow
-											? { floorConstructionInfoId: resolvedReportFloorInfoId }
+											? {
+													reportFloorInfoId: resolvedLevelId,
+													floorConstructionInfoId:
+														resolvedFloorConstructionInstanceId,
+												}
 											: {
-													reportFloorInfoId: resolvedReportFloorInfoId,
+													reportFloorInfoId: resolvedReportFloorInfoIdForCreate,
 													floorInfoId:
-														resolvedFloorConstructionInfoId ||
-														resolvedReportFloorInfoId,
+														resolvedLevelId ||
+														resolvedReportFloorInfoIdForCreate,
 												}),
 										'floorInfo.coordinates1.x': baseX,
 										'floorInfo.coordinates1.y': baseY,
@@ -488,9 +529,7 @@ export const CreateConstructionForm = memoize(
 						data: {
 							constructionIdToUpdate: construction || undefined,
 							userId: userId || undefined,
-							...(constructionType
-								? { constructionClass: constructionType as ConstructionClass }
-								: {}),
+							constructionClass: resolveConstructionClass(constructionType),
 							...(paginationRw != null ? { rw: paginationRw } : {}),
 							orderByPriority: true,
 						},

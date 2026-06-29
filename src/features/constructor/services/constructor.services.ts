@@ -5,6 +5,7 @@ import type {
 	UpdateReportInfoWithSingleConstructionCommand,
 } from '@api-gen';
 import { fetchApi } from '@api-gen';
+import { stripNullishQueryFields } from '@core/utils/api-query-body.utils';
 import {
 	convertAlternateConstructionsCommand,
 	convertToServerReportFormFlags,
@@ -67,7 +68,9 @@ type GetGraphParams = {
 
 export const getConstructionRooms = async (data: GetPlacementRoomFromRequirementsQuery) => {
 	return await withConstructorLoader(() =>
-		fetchApi.api.placementRoomVariantsRequirementsCreate(data),
+		fetchApi.api.placementRoomVariantsRequirementsCreate(
+			stripNullishQueryFields(data as Record<string, unknown>) as GetPlacementRoomFromRequirementsQuery,
+		),
 	);
 };
 

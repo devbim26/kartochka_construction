@@ -1075,7 +1075,10 @@ export const FloorPlans = memoize(() => {
 						className="!max-w-[1200px] !w-[min(96vw,1180px)] md:!w-[1080px]"
 						currentConstructionHeader={constructionHeaderForEdit}
 						currentReportFloorInfo={currentReportConstruction}
-						reportFloorInfoId={selectedReportFloorInfoId}
+						reportFloorInfoId={selectedLevelReportFloorInfoId}
+						floorConstructionInfoId={
+							reportFloorInfoIdFromQuery || currentReportConstruction?.id
+						}
 						floorId={currentReportFloorId}
 					/>
 					<DeleteModal
