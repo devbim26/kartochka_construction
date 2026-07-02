@@ -1,47 +1,37 @@
 import { convertToPaginatedType } from '@core';
-import { MaterialPurpose } from '@api-gen';
 import {
 	convertToClientMaterialsAddAndEditData,
 	convertToServerMaterialsFilterData,
 } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
-	ConstructionTypeEnum,
 	Guidebooks,
 	type MaterialTypeEnum,
 	type MaterialsAddAndEditData,
 	type MaterialsFilterData,
 } from '@features/guidbooks/types';
+import {
+	filterMaterialsByApplicationPurpose,
+	resolveMaterialPurposeForConstructionType,
+} from '@features/guidbooks/utils/material-purpose.utils';
+import { MaterialApplicationPurposeContext } from '@features/guidbooks/utils/material-application-purpose.context';
 import type { AxiosResponse } from 'axios';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useWatch } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
-
-function materialPurposeForConstructionType(
-	constructionType: string | undefined,
-): MaterialPurpose | undefined {
-	if (!constructionType?.trim()) return undefined;
-	if (
-		constructionType === ConstructionTypeEnum.HomogeneousFloor ||
-		constructionType === ConstructionTypeEnum.ElasticBaseFloor
-	) {
-		return MaterialPurpose.ForFloor;
-	}
-	return MaterialPurpose.ForWall;
-}
 
 function buildFilter(
 	materialTypeEnum: MaterialTypeEnum,
 	constructionType: string | undefined,
 ): MaterialsFilterData {
-	const mp = materialPurposeForConstructionType(constructionType);
+	const materialPurpose = resolveMaterialPurposeForConstructionType(constructionType);
 	return {
 		name: '',
 		density: '',
 		thickness: '',
 		materialType: materialTypeEnum as string,
-		materialPurpose: mp ?? '',
+		materialPurpose: materialPurpose ?? '',
 	};
 }
 
@@ -61,9 +51,13 @@ export function useConstructionMaterialsCatalog(
 		control: currentForm.control,
 		name: 'constructionTypeObject.constructionTypeEnum',
 	});
+	const layoutClassPurpose = useContext(MaterialApplicationPurposeContext);
 	const constructionType =
 		(typeof constructionTypeEnum === 'string' && constructionTypeEnum.trim()) ||
-		constructionTypeRoot;
+		(typeof constructionTypeRoot === 'string' && constructionTypeRoot.trim()) ||
+		undefined;
+	const materialPurpose =
+		resolveMaterialPurposeForConstructionType(constructionType) ?? layoutClassPurpose;
 
 	useEffect(() => {
 		if (!materialTypeEnum) {
@@ -87,7 +81,13 @@ export function useConstructionMaterialsCatalog(
 					);
 					return from([items]);
 				}),
-				tap((items) => setMaterials(items.items || [])),
+				tap((items) => {
+					const filtered = filterMaterialsByApplicationPurpose(
+						items.items || [],
+						materialPurpose,
+					);
+					setMaterials(filtered);
+				}),
 				catchError(() => {
 					setMaterials([]);
 					return from([null]);
@@ -95,7 +95,7 @@ export function useConstructionMaterialsCatalog(
 			)
 			.subscribe();
 		return () => sub.unsubscribe();
-	}, [materialTypeEnum, constructionType]);
+	}, [materialTypeEnum, constructionType, materialPurpose, layoutClassPurpose]);
 
 	return materials;
 }

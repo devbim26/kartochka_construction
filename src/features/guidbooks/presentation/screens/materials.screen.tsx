@@ -267,9 +267,8 @@ const MaterialsScreen = () => {
 		return cols;
 	}, []);
 
-	const [filterName, filterMaterialType, filterDensity, filterThickness] = forms.filterForm.watch(
-		['name', 'materialType', 'thickness', 'density'],
-	);
+	const [filterName, filterMaterialType, filterMaterialPurpose, filterDensity, filterThickness] =
+		forms.filterForm.watch(['name', 'materialType', 'materialPurpose', 'density', 'thickness']);
 
 	const handleGetTableData = (
 		data: MaterialsFilterData,
@@ -420,7 +419,7 @@ const MaterialsScreen = () => {
 
 	useEffect(() => {
 		handleGetTableData(forms.filterForm.getValues() as MaterialsFilterData, paginationState);
-	}, [filterDensity, filterName, filterThickness, filterMaterialType]);
+	}, [filterDensity, filterName, filterThickness, filterMaterialType, filterMaterialPurpose]);
 
 	useEffect(() => {
 		if (singleMaterial) forms.editForm.reset(singleMaterial);

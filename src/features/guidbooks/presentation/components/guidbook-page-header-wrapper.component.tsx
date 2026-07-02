@@ -104,15 +104,27 @@ export const GuidbookPageHeaderWrapper = memoize(
 					: setCurrentHeaderFormType(HeaderFormTypes.filter);
 		}, [search.get('add'), search.get('edit')]);
 
+		const prevHeaderFormTypeRef = useRef<HeaderFormTypes | null>(null);
+
 		useEffect(() => {
+			const prevHeaderFormType = prevHeaderFormTypeRef.current;
+			prevHeaderFormTypeRef.current = currentHeaderFormType;
+
 			if (currentHeaderFormType === HeaderFormTypes.add) {
 				setCurrentForm(forms.addForm);
-				forms.addForm.reset();
+				if (prevHeaderFormType !== HeaderFormTypes.add) {
+					forms.addForm.reset();
+				}
 				return;
 			}
 			if (currentHeaderFormType === HeaderFormTypes.filter) {
 				setCurrentForm(forms.filterForm);
-				forms.filterForm.reset();
+				if (
+					prevHeaderFormType != null &&
+					prevHeaderFormType !== HeaderFormTypes.filter
+				) {
+					forms.filterForm.reset();
+				}
 				return;
 			}
 			if (currentHeaderFormType === HeaderFormTypes.edit) {

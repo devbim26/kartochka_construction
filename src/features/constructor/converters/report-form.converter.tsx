@@ -10,15 +10,10 @@ export const convertToClientReportFormFlags = (
 			namedConstructionFlags: baseFlag?.namedConstructionFlags ?? [],
 		}),
 	);
-	const thermalBaseFlags = (data.thermalInsulationCalculation?.baseReportInfoFlags ?? []).map(
-		(baseFlag) => ({
-			...baseFlag,
-			namedConstructionFlags: baseFlag?.namedConstructionFlags ?? [],
-		}),
-	);
-
 	return {
-		...data,
+		takeTitleList: data.takeTitleList ?? false,
+		takeContent: data.takeContent ?? false,
+		takeIntroduction: data.takeIntroduction ?? false,
 		generalCharacteristics: {
 			takeRoomCharacteristic: data.generalCharacteristics?.takeRoomCharacteristic ?? false,
 			takeWallMaterialsVolumesCalculation:
@@ -32,28 +27,30 @@ export const convertToClientReportFormFlags = (
 					?.takeEnclosingStructuresSoundInsulationCalculation ?? false,
 			baseReportInfoFlags: soundBaseFlags,
 		},
-		thermalInsulationCalculation: {
-			takeDetailedCalculatingMethod:
-				data.thermalInsulationCalculation?.takeDetailedCalculatingMethod ?? false,
-			baseReportInfoFlags: thermalBaseFlags,
-		},
+		takeConclusion: data.takeConclusion ?? false,
+		takeUsedLiteratureList: data.takeUsedLiteratureList ?? false,
+		takeSupplementSoundInsulationProtocolsWithCalculation:
+			data.takeSupplementSoundInsulationProtocolsWithCalculation ?? false,
 	};
 };
 
 export const convertToServerReportFormFlags = (
 	data: FormReportSchemaType,
 ): FinalizeReportInfoCommand => {
+	const { logo: _logo, logoValue: _logoValue, floorDocumentFlags, ...rest } = data;
+
 	return {
-		...data,
+		...rest,
 		reportInfoId: data.reportInfoId,
-		reportNumber: data.code,
-		reportName: data.projectName,
-		customerName: data.customerName,
-		objectDescription: data.objectDescription,
-		creatorFullName: data.creatorFullName,
-		code: data.code,
-		country: data.country,
-		director: data.director,
-		date: data.date,
+		reportNumber: data.code || null,
+		reportName: data.projectName || null,
+		customerName: data.customerName || null,
+		objectDescription: data.objectDescription || null,
+		creatorFullName: data.creatorFullName || null,
+		code: data.code || null,
+		country: data.country || null,
+		director: data.director || null,
+		date: data.date || null,
+		floorDocumentFlags,
 	};
 };

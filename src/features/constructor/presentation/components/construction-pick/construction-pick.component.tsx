@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import { Switch, useAppDispatch, useAppSelector } from '@core';
+import { Switch, convertToServerCountryData, useAppDispatch, useAppSelector } from '@core';
 import {
 	buildRequirementDisplaySnapshot,
 	convertToClientAlternateConstruction,
@@ -19,7 +19,7 @@ import type { ReportInfoShort } from '@features/constructor/utils';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { AlternateConstruction, ConstructionsEditData } from '@features/guidbooks/types';
-import { ConstructionClass, Guidebooks } from '@features/guidbooks/types';
+import { ConstructionClass, Country, Guidebooks } from '@features/guidbooks/types';
 import { AxiosError } from 'axios';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
@@ -239,7 +239,16 @@ const ContructionPick = () => {
 				)
 				.subscribe((response) => {
 					if (response.status === 200) {
-						const items = response.data?.items ?? [];
+						const reportCountry = currentReportInfo?.region
+							? convertToServerCountryData(currentReportInfo.region as Country)
+							: null;
+						const items = (response.data?.items ?? []).filter((item) => {
+							if (!reportCountry) return true;
+							const countries = item.countries ?? [];
+							return (
+								countries.length === 0 || countries.includes(reportCountry as never)
+							);
+						});
 						const alternate = items.map(convertToClientAlternateConstruction);
 						setAlternateConstructions(alternate);
 						setTotalPages(response.data?.totalPages ?? 1);
@@ -248,7 +257,7 @@ const ContructionPick = () => {
 					}
 				});
 		},
-		[pageNumber, replacementConstructionType],
+		[pageNumber, replacementConstructionType, currentReportInfo?.region],
 	);
 
 	useEffect(() => {

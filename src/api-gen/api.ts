@@ -675,7 +675,7 @@ export interface FinalizeReportInfoCommand {
 	country?: string | null;
 	director?: string | null;
 	/** @format date */
-	date?: string;
+	date?: string | null;
 	floorDocumentFlags?: DocumentReportFlagsDto;
 }
 

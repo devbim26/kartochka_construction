@@ -1,3 +1,5 @@
+export * from './material-purpose.utils';
+export * from './material-application-purpose.context';
 export * from './optional-layer-stack.utils';
 export * from './one-side-cladding-position.utils';
 export * from './config';

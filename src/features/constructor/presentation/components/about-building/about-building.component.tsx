@@ -1,8 +1,7 @@
-import type { SelectOption } from '@core';
 import {
 	APP_ROUTES,
 	Button,
-	convertToSelectValues,
+	convertToClientCountryData,
 	FormElementLabel,
 	Input,
 	Select,
@@ -15,9 +14,15 @@ import {
 } from '@core';
 import { getCurrentUser } from '@features/account/services';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
+import type {
+	CalculationRequirementDocumentDto,
+	RegulatoryRequirementDocumentDto,
+} from '@api-gen';
 import {
 	convertToClientReportInfo,
 	convertToCreateReportInfoCommand,
+	convertToRequirementDocumentSelectValues,
+	getCountryLabel,
 } from '@features/constructor/converters';
 import {
 	createReport,
@@ -82,19 +87,17 @@ const AboutBuildingScreen = () => {
 	const navigateReplace = useNavigate();
 
 	const [regulatoryRequirementDocuments, setRegulatoryRequirementDocuments] = useState<
-		SelectOption[]
+		RegulatoryRequirementDocumentDto[]
 	>([]);
 	const [calculationRequirementDocuments, setCalculationRequirementDocuments] = useState<
-		SelectOption[]
+		CalculationRequirementDocumentDto[]
 	>([]);
 
-	// Загрузка документов (без изменений)
 	const handleGetRequirementDocuments = () => {
 		from(getRegulatoryRequirementDocuments())
 			.pipe(
 				map((r: AxiosResponse) => {
-					const variants = convertToSelectValues(r.data) || [];
-					setRegulatoryRequirementDocuments(variants);
+					setRegulatoryRequirementDocuments(r.data ?? []);
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -110,8 +113,7 @@ const AboutBuildingScreen = () => {
 		from(getCalculationRequirementDocuments())
 			.pipe(
 				map((r: AxiosResponse) => {
-					const variants = convertToSelectValues(r.data) || [];
-					setCalculationRequirementDocuments(variants);
+					setCalculationRequirementDocuments(r.data ?? []);
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -124,13 +126,11 @@ const AboutBuildingScreen = () => {
 	};
 
 	const [search] = useSearchParams();
-	const [selectedRegion, selectedType, selectedClass, reportType, isConstruction, name] = watch([
-		'region',
-		'buildingType',
-		'comfortClass',
+	const [reportType, isConstruction, name, selectedRegulatoryDocumentId] = watch([
 		'isFloorPlan',
 		'isConstruction',
 		'name',
+		'regulatoryDocumentId',
 	]);
 
 	const reportId = search.get('reportId');
@@ -328,16 +328,39 @@ const AboutBuildingScreen = () => {
 		}
 	}, [currentLanguage]);
 
-	const regionCountryLabel = useMemo(() => {
-		if (!selectedRegion || selectedRegion === Country.None) return '';
-		const opt = countryOptions.find((o) => o.value === selectedRegion);
-		return opt?.label ?? '';
-	}, [countryOptions, selectedRegion]);
+	const calculationRequirementDocumentOptions = useMemo(
+		() =>
+			convertToRequirementDocumentSelectValues(
+				calculationRequirementDocuments,
+				currentLanguage,
+			),
+		[calculationRequirementDocuments, currentLanguage],
+	);
 
-	const regionHintText = useMemo(() => {
-		if (!regionCountryLabel) return '';
-		return t('aboutBuilding.region.hint').replace('{{country}}', regionCountryLabel);
-	}, [t, regionCountryLabel]);
+	const regulatoryRequirementDocumentOptions = useMemo(
+		() =>
+			convertToRequirementDocumentSelectValues(
+				regulatoryRequirementDocuments,
+				currentLanguage,
+			),
+		[regulatoryRequirementDocuments, currentLanguage],
+	);
+
+	const selectedRegulatoryDocument = useMemo(
+		() =>
+			regulatoryRequirementDocuments.find(
+				(document) => document.id === selectedRegulatoryDocumentId,
+			),
+		[regulatoryRequirementDocuments, selectedRegulatoryDocumentId],
+	);
+
+	const regulatoryDocumentHintText = useMemo(() => {
+		if (!selectedRegulatoryDocument?.country) return '';
+		const countryKey = String(convertToClientCountryData(selectedRegulatoryDocument.country));
+		const countryLabel = getCountryLabel(countryKey, currentLanguage);
+		if (!countryLabel) return '';
+		return t('aboutBuilding.region.hint').replace('{{country}}', countryLabel);
+	}, [currentLanguage, selectedRegulatoryDocument, t]);
 
 	return (
 		<div className="flex flex-col rounded-xl bg-white">
@@ -392,53 +415,41 @@ const AboutBuildingScreen = () => {
 						/>
 
 						{/* Страна */}
-						<div className="flex w-full items-center gap-2">
-							<Controller
-								control={control}
-								name="region"
-								render={({ field }) => (
-									<Select
-										options={countryOptions}
-										disabled={!!search.get('edit')}
-										{...field}
-										value={field.value || ''}
-										onChange={(val) => {
-											field.onChange(val);
-											form.reset({ ...form.getValues() });
-										}}
-										label={
-											formState.errors?.region?.message
-												? t(formState.errors.region.message as any)
-												: t('aboutBuilding.region.label')
-										}
-										error={
-											formState.errors.region?.message
-												? t(formState.errors.region.message as any)
-												: undefined
-										}
-										isSearchable
-										highlightOnlyRussiaBelarus
-										labelClassName={twMerge(
-											'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
-											formState.errors.region?.message ? 'text-error' : '',
-										)}
-										placeholder={t('aboutBuilding.region.placeholder')}
-										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
-									/>
-								)}
-							/>
-							{selectedRegion &&
-								selectedRegion !== Country.None &&
-								regionHintText && (
-									<div className="group relative shrink-0">
-										<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
-										<div className="pointer-events-none absolute left-1/2 top-full z-10 w-[min(320px,calc(100vw-2rem))] max-w-[320px] -translate-x-1/2 translate-y-2 rounded bg-black px-3 py-2 text-left text-sm font-normal leading-snug text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-											{regionHintText}
-										</div>
-									</div>
-								)}
-						</div>
+						<Controller
+							control={control}
+							name="region"
+							render={({ field }) => (
+								<Select
+									options={countryOptions}
+									disabled={!!search.get('edit')}
+									{...field}
+									value={field.value || ''}
+									onChange={(val) => {
+										field.onChange(val);
+										form.reset({ ...form.getValues() });
+									}}
+									label={
+										formState.errors?.region?.message
+											? t(formState.errors.region.message as any)
+											: t('aboutBuilding.region.label')
+									}
+									error={
+										formState.errors.region?.message
+											? t(formState.errors.region.message as any)
+											: undefined
+									}
+									isSearchable
+									highlightOnlyRussiaBelarus
+									labelClassName={twMerge(
+										'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
+										formState.errors.region?.message ? 'text-error' : '',
+									)}
+									placeholder={t('aboutBuilding.region.placeholder')}
+									buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+									wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
+								/>
+							)}
+						/>
 
 						{/* Тип здания и назначение */}
 						<div className="flex items-center gap-x-[50px]">
@@ -574,7 +585,7 @@ const AboutBuildingScreen = () => {
 								render={({ field }) => (
 									<Select
 										{...field}
-										options={calculationRequirementDocuments ?? []}
+										options={calculationRequirementDocumentOptions}
 										value={field.value || ''}
 										label={
 											formState.errors?.calculationDocumentId?.message
@@ -608,32 +619,42 @@ const AboutBuildingScreen = () => {
 									/>
 								)}
 							/>
-							<Controller
-								control={control}
-								name="regulatoryDocumentId"
-								render={({ field }) => (
-									<Select
-										{...field}
-										options={regulatoryRequirementDocuments ?? []}
-										value={field.value || ''}
-										isSearchable
-										disabled={!!search.get('edit')}
-										error={
-											formState.errors.regulatoryDocumentId?.message
-												? t(
-														formState.errors.regulatoryDocumentId
-															.message as any,
-													)
-												: undefined
-										}
-										placeholder={t(
-											'aboutBuilding.requirements.regulation.placeholder',
-										)}
-										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
-									/>
+							<div className="flex items-center gap-2">
+								<Controller
+									control={control}
+									name="regulatoryDocumentId"
+									render={({ field }) => (
+										<Select
+											{...field}
+											options={regulatoryRequirementDocumentOptions}
+											value={field.value || ''}
+											isSearchable
+											disabled={!!search.get('edit')}
+											error={
+												formState.errors.regulatoryDocumentId?.message
+													? t(
+															formState.errors.regulatoryDocumentId
+																.message as any,
+														)
+													: undefined
+											}
+											placeholder={t(
+												'aboutBuilding.requirements.regulation.placeholder',
+											)}
+											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+											wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
+										/>
+									)}
+								/>
+								{regulatoryDocumentHintText && (
+									<div className="group relative shrink-0">
+										<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
+										<div className="pointer-events-none absolute left-1/2 top-full z-10 w-[min(320px,calc(100vw-2rem))] max-w-[320px] -translate-x-1/2 translate-y-2 rounded bg-black px-3 py-2 text-left text-sm font-normal leading-snug text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+											{regulatoryDocumentHintText}
+										</div>
+									</div>
 								)}
-							/>
+							</div>
 						</div>
 
 						<Separator className="h-[2px] w-full bg-primary" />

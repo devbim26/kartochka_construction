@@ -170,11 +170,20 @@ export const CurrentSub = ({ className }: Props) => {
 					</div>
 				</div>
 			) : (
-				<div className="flex flex-row justify-between">
-					<div className="flex flex-col justify-between">
-						{t('main.currentSub.noneActive')}
+				<div className="flex h-full flex-row justify-between gap-[16px]">
+					<div className="flex flex-1 flex-col justify-between">
+						<p className="font-sans text-base leading-6 text-[#374151]">
+							{t('main.currentSub.noneActive')}
+						</p>
+						<Button className="w-min px-[16px]" onClick={handleChangePlan}>
+							<p className="font-sans text-sm font-semibold leading-4">
+								{t('subscription.buyPlan')}
+							</p>
+						</Button>
 					</div>
-					<SubImage />
+					<div className="flex shrink-0 items-start">
+						<SubImage />
+					</div>
 				</div>
 			)}
 		</div>

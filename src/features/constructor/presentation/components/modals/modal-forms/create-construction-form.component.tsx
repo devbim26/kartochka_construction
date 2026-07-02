@@ -1,6 +1,7 @@
 import {
 	convertToPaginatedType,
 	convertToSelectValues,
+	convertToServerCountryData,
 	ImagePreviewModal,
 	Input,
 	Select,
@@ -30,7 +31,11 @@ import { ReportCategory } from '@features/constructor/types';
 
 import { formatMaterial } from '@features'; // предполагаемый хелпер
 import type { ReportInfoShort } from '@features/constructor/utils';
-import { CreateConstructionConfig, resolveConstructionClass } from '@features/constructor/utils';
+import {
+	CreateConstructionConfig,
+	matchesConstructionClassFilter,
+	resolveLayoutClassFromTargetTab,
+} from '@features/constructor/utils';
 import {
 	convertToClientConstructionsAddData,
 	convertToClientConstructionsEditData,
@@ -40,6 +45,7 @@ import { getGuidebooksDetail, getGuidebooksPaginated } from '@features/guidbooks
 import { flattenConstructionMaterialsTopToBottom } from '@features/guidbooks/utils';
 import {
 	ConstructionClass,
+	Country,
 	Guidebooks,
 	type BuildingType,
 	type CategoryClass,
@@ -107,8 +113,12 @@ export const CreateConstructionForm = memoize(
 			ref,
 		) => {
 			const { t, locale } = useI18n();
+			const layoutClass = resolveLayoutClassFromTargetTab(constructionTargetTab);
 			const form = useForm<CreateConstructionData>({
-				defaultValues: CreateConstructionConfig.defaultValues,
+				defaultValues: {
+					...CreateConstructionConfig.defaultValues,
+					constructionType: layoutClass,
+				},
 				resolver: zodResolver(CreateConstructionConfig.schema),
 			});
 			const { register, formState, control, setValue, watch, handleSubmit, getValues } = form;
@@ -274,12 +284,10 @@ export const CreateConstructionForm = memoize(
 			useEffect(() => {
 				setValue(
 					'constructionType',
-					constructionTargetTab === 'floors'
-						? ConstructionClass.Floor
-						: ConstructionClass.Wall,
+					layoutClass,
 					{ shouldValidate: true },
 				);
-			}, [constructionTargetTab, setValue]);
+			}, [layoutClass, setValue]);
 
 			useImperativeHandle(ref, () => ({
 				submit: () => {
@@ -333,14 +341,13 @@ export const CreateConstructionForm = memoize(
 			useEffect(() => {
 				if (!reportInfoData?.comfortClass || !reportInfoData.buildingType) return;
 
-				const constructionClass = resolveConstructionClass(constructionType);
 				const regulatoryDocumentId = reportInfoData.regulatoryDocument?.id?.trim();
 
 				from(
 					getConstructionRooms({
 						class: reportInfoData.comfortClass as CategoryClass,
 						buildingType: reportInfoData.buildingType as BuildingType,
-						constructionClass,
+						constructionClass: layoutClass,
 						...(regulatoryDocumentId ? { regulatoryDocumentId } : {}),
 					}),
 				)
@@ -373,7 +380,7 @@ export const CreateConstructionForm = memoize(
 							setRoomOptions(variants);
 						}
 					});
-			}, [constructionType, reportInfoData]);
+			}, [layoutClass, reportInfoData]);
 
 			const handleAddConstruction = (data: CreateConstructionData) => {
 				if (!reportId) {
@@ -524,13 +531,19 @@ export const CreateConstructionForm = memoize(
 
 			const handleGetConstructionData = () => {
 				dispatch(startLoading());
+				const constructionClass = layoutClass;
+				const reportCountryType = reportInfoData?.region
+					? convertToServerCountryData(reportInfoData.region as Country)
+					: undefined;
+
 				from(
 					getGuidebooksPaginated({
 						data: {
 							constructionIdToUpdate: construction || undefined,
 							userId: userId || undefined,
-							constructionClass: resolveConstructionClass(constructionType),
+							constructionClass,
 							...(paginationRw != null ? { rw: paginationRw } : {}),
+							...(reportCountryType ? { countryType: reportCountryType } : {}),
 							orderByPriority: true,
 						},
 						guidebookType: Guidebooks.CONSTRUCTION,
@@ -539,7 +552,9 @@ export const CreateConstructionForm = memoize(
 				)
 					.pipe(
 						tap((response: AxiosResponse) => {
-							const items = response?.data?.items || [];
+							const items = (response?.data?.items || []).filter((item: any) =>
+								matchesConstructionClassFilter(item?.constructionType, constructionClass),
+							);
 							const grouped: Map<
 								string,
 								{
@@ -752,7 +767,7 @@ export const CreateConstructionForm = memoize(
 
 			useEffect(() => {
 				handleGetConstructionData();
-			}, [userId, constructionType, paginationRw, construction]);
+			}, [userId, layoutClass, paginationRw, construction, reportInfoData?.region]);
 
 			return (
 				<div className="relative flex w-full flex-col border-b">

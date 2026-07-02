@@ -27,9 +27,11 @@ import {
 	isFloorConstructionType,
 	isZPanelGuidebookConstructionType,
 } from '@features/guidbooks/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
+import { MaterialApplicationPurposeProvider } from '@features/guidbooks/utils';
+import { ConstructionClass } from '@features/guidbooks/types';
 import { FormSubTitle } from '../../form-sub-title.component';
 import { ConstructionsAdditionalInfo } from './constructions-additional-info.component';
 import { ConstructionLaboratoryDataFields } from './constructions-laboratory-data-fields.component';
@@ -54,6 +56,11 @@ export const ConstructionsAdd = () => {
 	const [issuers, setIssuers] = useState<Issuer[]>([]);
 	const currentConstruction = watch('constructionType');
 	const showImpactLaboratory = isFloorConstructionType(currentConstruction);
+	const materialLayoutClass = useMemo(() => {
+		if (isFloorConstructionType(currentConstruction)) return ConstructionClass.Floor;
+		if (currentConstruction) return ConstructionClass.Wall;
+		return undefined;
+	}, [currentConstruction]);
 	const showZPanelGuidebookHint =
 		activeTab === 'description' && isZPanelGuidebookConstructionType(currentConstruction);
 	const hasDescriptionErrors = Object.keys(formState.errors).some((key) =>
@@ -351,10 +358,12 @@ export const ConstructionsAdd = () => {
 						</p>
 					)}
 					{currentConstruction ? (
-						ConstructionTypeMap({
-							currentConstruction: currentConstruction as ConstructionTypeEnum,
-							currentForm: form,
-						}).component
+						<MaterialApplicationPurposeProvider layoutClass={materialLayoutClass}>
+							{ConstructionTypeMap({
+								currentConstruction: currentConstruction as ConstructionTypeEnum,
+								currentForm: form,
+							}).component}
+						</MaterialApplicationPurposeProvider>
 					) : (
 						<></>
 					)}

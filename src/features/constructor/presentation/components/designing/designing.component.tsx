@@ -63,6 +63,7 @@ import { getGuidebooksDetail, getGuidebooksEdit } from '@features/guidbooks/serv
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
 import {
 	flattenConstructionMaterialsTopToBottom,
+	MaterialApplicationPurposeProvider,
 	prepareConstructionEditDataForPersistence,
 } from '@features/guidbooks/utils';
 import {
@@ -760,14 +761,16 @@ const DesigningConstructionScreen = () => {
 					</p>
 				)}
 				{constructionType && !isConstructionEditLocked && (
-					<SelectableMaterialDesignationProvider
-						value={{ showMaterialDesignationInput: true }}
-					>
-						{ConstructionTypeMap({
-							currentConstruction: constructionType,
-							currentForm: form,
-						}).component}
-					</SelectableMaterialDesignationProvider>
+					<MaterialApplicationPurposeProvider layoutClass={constructionLayoutClass}>
+						<SelectableMaterialDesignationProvider
+							value={{ showMaterialDesignationInput: true }}
+						>
+							{ConstructionTypeMap({
+								currentConstruction: constructionType,
+								currentForm: form,
+							}).component}
+						</SelectableMaterialDesignationProvider>
+					</MaterialApplicationPurposeProvider>
 				)}
 				{currentConstruction?.reportConstructionHeader?.id &&
 				!isFloorConstruction &&

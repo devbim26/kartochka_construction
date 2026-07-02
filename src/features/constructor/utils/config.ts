@@ -88,14 +88,9 @@ export const FormReportConfig: EntityConfig = {
 				takeEnclosingStructuresSoundInsulationCalculation: false,
 				baseReportInfoFlags: [],
 			},
-			thermalInsulationCalculation: {
-				takeDetailedCalculatingMethod: false,
-				baseReportInfoFlags: [],
-			},
 			takeConclusion: false,
 			takeUsedLiteratureList: false,
 			takeSupplementSoundInsulationProtocolsWithCalculation: false,
-			takeSupplementThermalInsulationProtocolsWithCalculation: false,
 		},
 	},
 };

@@ -13,13 +13,14 @@ import { useConstructionMaterials } from '@features/guidbooks/utils';
 import { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
 
+/** Сверху вниз в форме: плиты (1) → заполнитель (2) → стяжка/стена (3). */
 const ELASTIC_FLOOR_POSITIONS = ['1', '2', '3'] as const;
 
 const elasticFloorDefaultRows = () => [
 	{
 		positionId: '1',
 		materialId: '',
-		materialType: MaterialTypeEnum.Heavy,
+		materialType: MaterialTypeEnum.Board,
 		materialTypeValue: [
 			{ materialParameters: MaterialParametrs.Thickness, value: '' },
 			{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -37,13 +38,51 @@ const elasticFloorDefaultRows = () => [
 	{
 		positionId: '3',
 		materialId: '',
-		materialType: MaterialTypeEnum.Board,
+		materialType: MaterialTypeEnum.Heavy,
 		materialTypeValue: [
 			{ materialParameters: MaterialParametrs.Thickness, value: '' },
 			{ materialParameters: MaterialParametrs.Density, value: '' },
 		],
 	},
 ];
+
+const migrateLegacyElasticFloorRows = (byPos: Map<string, any>) => {
+	const row0 = byPos.get('0');
+	const row1 = byPos.get('1');
+	const row2 = byPos.get('2');
+	const row3 = byPos.get('3');
+
+	if (
+		row0 &&
+		row1 &&
+		row2 &&
+		String(row0?.materialType) === MaterialTypeEnum.Board &&
+		String(row1?.materialType) === MaterialTypeEnum.Filler &&
+		String(row2?.materialType) === MaterialTypeEnum.Heavy
+	) {
+		return [
+			{ ...row0, positionId: '1', materialType: MaterialTypeEnum.Board },
+			{ ...row1, positionId: '2', materialType: MaterialTypeEnum.Filler },
+			{ ...row2, positionId: '3', materialType: MaterialTypeEnum.Heavy },
+		];
+	}
+
+	if (!row1 || !row2 || !row3) return null;
+
+	if (
+		String(row1?.materialType) === MaterialTypeEnum.Heavy &&
+		String(row2?.materialType) === MaterialTypeEnum.Filler &&
+		String(row3?.materialType) === MaterialTypeEnum.Board
+	) {
+		return [
+			{ ...row3, positionId: '1', materialType: MaterialTypeEnum.Board },
+			{ ...row2, positionId: '2', materialType: MaterialTypeEnum.Filler },
+			{ ...row1, positionId: '3', materialType: MaterialTypeEnum.Heavy },
+		];
+	}
+
+	return null;
+};
 
 export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps) => {
 	const { control, watch } = currentForm;
@@ -68,10 +107,16 @@ export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps
 		const row2 = byPos.get('2');
 		const row3 = byPos.get('3');
 		const typeOk =
-			String(row1?.materialType) === MaterialTypeEnum.Heavy &&
+			String(row1?.materialType) === MaterialTypeEnum.Board &&
 			String(row2?.materialType) === MaterialTypeEnum.Filler &&
-			String(row3?.materialType) === MaterialTypeEnum.Board;
+			String(row3?.materialType) === MaterialTypeEnum.Heavy;
 		if (list.length >= 3 && typeOk) return;
+
+		const migratedLegacyRows = migrateLegacyElasticFloorRows(byPos);
+		if (migratedLegacyRows) {
+			replace(migratedLegacyRows as any);
+			return;
+		}
 
 		replace(elasticFloorDefaultRows() as any);
 	}, [enumValue, centerConstruction, replace]);
@@ -81,7 +126,7 @@ export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps
 			<div className="flex flex-1 gap-[20px]">
 				{positionId === '1' ? (
 					<>
-						<HeavyMaterialType
+						<BoardMaterialType
 							fieldIndex={fieldIndex}
 							constructionPosition="Center"
 							currentForm={currentForm}
@@ -107,7 +152,7 @@ export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps
 					</>
 				) : (
 					<>
-						<BoardMaterialType
+						<HeavyMaterialType
 							fieldIndex={fieldIndex}
 							constructionPosition="Center"
 							currentForm={currentForm}

@@ -7,8 +7,6 @@ export const DocumentFlags = () => {
 	const { setValue, control, watch, getValues } = useFormContext<FormReportSchemaType>();
 	const [showGeneralInfo, setShowGeneralInfo] = useState(true);
 	const [showSoundInfo, setShowSoundInfo] = useState(true);
-
-	const [showThermalInfo, setShowThermalInfo] = useState(true);
 	const { t } = useI18n();
 
 	const generalCharacteristics = watch('floorDocumentFlags.generalCharacteristics');
@@ -20,10 +18,6 @@ export const DocumentFlags = () => {
 	const soundBaseReportInfoFlags = useWatch({
 		control,
 		name: 'floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags',
-	});
-	const thermalBaseReportInfoFlags = useWatch({
-		control,
-		name: 'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags',
 	});
 	const isSoundEnabled =
 		!!watch(
@@ -39,16 +33,6 @@ export const DocumentFlags = () => {
 						!!namedFlag?.takeLaboratoryDataAnalisys,
 				),
 		);
-	const isThermalEnabled =
-		!!watch('floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod') ||
-		(thermalBaseReportInfoFlags ?? []).some(
-			(baseFlag) =>
-				!!baseFlag?.takeFloor ||
-				(baseFlag?.namedConstructionFlags ?? []).some(
-					(namedFlag) => !!namedFlag?.takeConstruction,
-				),
-		);
-
 	const toggleSoundSection = (isEnabled: boolean) => {
 		setValue(
 			'floorDocumentFlags.soundInsulationCalculation.takeEnclosingStructuresSoundInsulationCalculation',
@@ -76,31 +60,6 @@ export const DocumentFlags = () => {
 				);
 				setValue(
 					`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${namedIndex}.takeLaboratoryDataAnalisys` as const,
-					isEnabled,
-				);
-			});
-		});
-	};
-
-	const toggleThermalSection = (isEnabled: boolean) => {
-		setValue(
-			'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod',
-			isEnabled,
-		);
-		const baseFlags = getValues(
-			'floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags',
-		);
-		(baseFlags ?? []).forEach((_, baseIndex) => {
-			setValue(
-				`floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags.${baseIndex}.takeFloor` as const,
-				isEnabled,
-			);
-			const namedFlags = getValues(
-				`floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags` as const,
-			);
-			(namedFlags ?? []).forEach((__, namedIndex) => {
-				setValue(
-					`floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${namedIndex}.takeConstruction` as const,
 					isEnabled,
 				);
 			});
@@ -371,100 +330,6 @@ export const DocumentFlags = () => {
 				</>
 			)}
 			<div className="flex w-full items-center justify-start gap-[10px]">
-				<FormElementLabel className="w-[400px] text-[#383838]">
-					{t('constructor.reportForm.docs.thermal.section')}
-				</FormElementLabel>
-				<Switch
-					isEnabledProp={isThermalEnabled}
-					onChange={toggleThermalSection}
-				/>
-				<Chevron
-					color="#383838"
-					className="pl-[50px]"
-					direction={showThermalInfo ? 'down' : 'up'}
-					onClick={() => setShowThermalInfo(!showThermalInfo)}
-				/>
-			</div>
-			{showThermalInfo && (
-				<>
-					<div className="flex w-full flex-col gap-[20px] pl-[50px] font-semibold text-input-label-primary">
-						<div className="flex w-full items-center justify-start gap-[10px]">
-							<FormElementLabel className="w-[350px]">
-								{t('constructor.reportForm.docs.thermal.detailMethod')}
-							</FormElementLabel>
-							<Controller
-								control={control}
-								name="floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod"
-								render={({ field }) => (
-									<Switch
-										isEnabledProp={watch(
-											'floorDocumentFlags.thermalInsulationCalculation.takeDetailedCalculatingMethod',
-										)}
-										onChange={(isEnabled) => {
-											field.onChange(isEnabled);
-										}}
-									/>
-								)}
-							/>
-						</div>
-					</div>
-					<div className="flex w-full flex-col gap-[20px] pl-[100px] font-semibold text-input-label-primary">
-						{thermalBaseReportInfoFlags?.map((baseFlag, baseIndex) => {
-							return (
-								<div
-									key={baseFlag.floorNumber}
-									className="flex flex-col gap-[20px]"
-								>
-									<div className="flex w-full items-center justify-start gap-[10px]">
-										<FormElementLabel className="w-[350px]">
-											{`3.1.${baseIndex + 1} ${t('constructor.reportForm.docs.thermal.constructionsAt')} ${baseFlag.floorNumber}.000`}
-										</FormElementLabel>
-										<Controller
-											control={control}
-											name={`floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags.${baseIndex}.takeFloor` as const}
-											render={({ field }) => (
-												<Switch
-													isEnabledProp={!!field.value}
-													onChange={(isEnabled) => {
-														field.onChange(isEnabled);
-													}}
-												/>
-											)}
-										/>
-									</div>
-									{baseFlag.namedConstructionFlags?.map((namedConst, index) => {
-										return (
-											<div
-												key={namedConst.reportConstructionId}
-												className="flex flex-col gap-[20px]"
-											>
-												<div className="flex w-full items-center justify-start gap-[10px]">
-													<FormElementLabel className="w-[350px]">
-														{`3.1.${baseIndex + 1}.${index + 1} ${t('constructor.reportForm.docs.thermal.construction')} ${namedConst.constructionName}`}
-													</FormElementLabel>
-													<Controller
-														control={control}
-														name={`floorDocumentFlags.thermalInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${index}.takeConstruction` as const}
-														render={({ field }) => (
-															<Switch
-																isEnabledProp={!!field.value}
-																onChange={(isEnabled) => {
-																	field.onChange(isEnabled);
-																}}
-															/>
-														)}
-													/>
-												</div>
-											</div>
-										);
-									})}
-								</div>
-							);
-						})}
-					</div>
-				</>
-			)}
-			<div className="flex w-full items-center justify-start gap-[10px]">
 				<FormElementLabel className="w-[120px] text-[#383838]">
 					{t('constructor.reportForm.docs.conclusion')}
 				</FormElementLabel>
@@ -505,23 +370,6 @@ export const DocumentFlags = () => {
 				<Controller
 					control={control}
 					name="floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation"
-					render={({ field }) => (
-						<Switch
-							isEnabledProp={!!field.value}
-							onChange={(isEnabled) => {
-								field.onChange(isEnabled);
-							}}
-						/>
-					)}
-				/>
-			</div>
-			<div className="flex w-full items-center justify-start gap-[10px]">
-				<FormElementLabel className="w-[410px] text-[#383838]">
-					{t('constructor.reportForm.docs.appendix2')}
-				</FormElementLabel>
-				<Controller
-					control={control}
-					name="floorDocumentFlags.takeSupplementThermalInsulationProtocolsWithCalculation"
 					render={({ field }) => (
 						<Switch
 							isEnabledProp={!!field.value}

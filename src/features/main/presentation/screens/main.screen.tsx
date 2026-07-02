@@ -59,11 +59,6 @@ const MainScreen = () => {
 				<CurrentSub className="flex-1" />
 			</div>
 			<ReportScreen />
-			<SubSelect
-				wrapperClassName="w-full p-0"
-				subContainerClassName="bg-white"
-				onSubscribe={handleSubscribe}
-			/>
 			<Modal
 				isOpen={wantsSubSelectModal && isAllowed === true}
 				onClose={() => navigate('')}

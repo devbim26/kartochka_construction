@@ -15,7 +15,9 @@ import {
 } from '@features/guidbooks/constants';
 import { convertToClientIssuerData } from '@features/guidbooks/converters';
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
+import { MaterialApplicationPurposeProvider } from '@features/guidbooks/utils';
 import {
+	ConstructionClass,
 	EnConstructionTypesSelectValues,
 	Guidebooks,
 	RuConstructionTypesSelectValues,
@@ -27,7 +29,7 @@ import {
 	isFloorConstructionType,
 	isZPanelGuidebookConstructionType,
 } from '@features/guidbooks/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 import { FormSubTitle } from '../../form-sub-title.component';
@@ -56,6 +58,11 @@ export const ConstructionsEdit = () => {
 	const constructionTypeField = watch('constructionType');
 	const selectConstructionType = constructionTypeField || currentConstruction || '';
 	const showImpactLaboratory = isFloorConstructionType(selectConstructionType);
+	const materialLayoutClass = useMemo(() => {
+		if (isFloorConstructionType(selectConstructionType)) return ConstructionClass.Floor;
+		if (selectConstructionType) return ConstructionClass.Wall;
+		return undefined;
+	}, [selectConstructionType]);
 	const showZPanelGuidebookHint =
 		activeTab === 'description' &&
 		isZPanelGuidebookConstructionType(selectConstructionType);
@@ -386,10 +393,12 @@ export const ConstructionsEdit = () => {
 						</p>
 					)}
 					{currentConstruction ? (
-						ConstructionTypeMap({
-							currentConstruction: currentConstruction as ConstructionTypeEnum,
-							currentForm: form,
-						}).component
+						<MaterialApplicationPurposeProvider layoutClass={materialLayoutClass}>
+							{ConstructionTypeMap({
+								currentConstruction: currentConstruction as ConstructionTypeEnum,
+								currentForm: form,
+							}).component}
+						</MaterialApplicationPurposeProvider>
 					) : (
 						<></>
 					)}
