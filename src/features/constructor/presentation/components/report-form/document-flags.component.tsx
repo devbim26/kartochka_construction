@@ -27,10 +27,7 @@ export const DocumentFlags = () => {
 			(baseFlag) =>
 				!!baseFlag?.takeFloor ||
 				(baseFlag?.namedConstructionFlags ?? []).some(
-					(namedFlag) =>
-						!!namedFlag?.takeConstruction ||
-						!!namedFlag?.takeSoundInsulationCalculation ||
-						!!namedFlag?.takeLaboratoryDataAnalisys,
+					(namedFlag) => !!namedFlag?.takeConstruction,
 				),
 		);
 	const toggleSoundSection = (isEnabled: boolean) => {
@@ -52,14 +49,6 @@ export const DocumentFlags = () => {
 			(namedFlags ?? []).forEach((__, namedIndex) => {
 				setValue(
 					`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${namedIndex}.takeConstruction` as const,
-					isEnabled,
-				);
-				setValue(
-					`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${namedIndex}.takeSoundInsulationCalculation` as const,
-					isEnabled,
-				);
-				setValue(
-					`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${namedIndex}.takeLaboratoryDataAnalisys` as const,
 					isEnabled,
 				);
 			});
@@ -276,40 +265,6 @@ export const DocumentFlags = () => {
 													<Controller
 														control={control}
 														name={`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${index}.takeConstruction` as const}
-														render={({ field }) => (
-															<Switch
-																isEnabledProp={!!field.value}
-																onChange={(isEnabled) => {
-																	field.onChange(isEnabled);
-																}}
-															/>
-														)}
-													/>
-												</div>
-												<div className="flex w-full items-center justify-start gap-[10px] pl-[80px]">
-													<FormElementLabel className="w-[350px]">
-														{`2.1.${baseIndex + 1}.${index + 1}.1 ${t('constructor.reportForm.docs.sound.calcItem')}`}
-													</FormElementLabel>
-													<Controller
-														control={control}
-														name={`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${index}.takeSoundInsulationCalculation` as const}
-														render={({ field }) => (
-															<Switch
-																isEnabledProp={!!field.value}
-																onChange={(isEnabled) => {
-																	field.onChange(isEnabled);
-																}}
-															/>
-														)}
-													/>
-												</div>
-												<div className="flex w-full items-center justify-start gap-[10px] pl-[80px]">
-													<FormElementLabel className="w-[350px]">
-														{`2.1.${baseIndex + 1}.${index + 1}.2 ${t('constructor.reportForm.docs.sound.labAnalysis')}`}
-													</FormElementLabel>
-													<Controller
-														control={control}
-														name={`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${index}.takeLaboratoryDataAnalisys` as const}
 														render={({ field }) => (
 															<Switch
 																isEnabledProp={!!field.value}

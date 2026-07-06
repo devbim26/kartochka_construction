@@ -4,8 +4,6 @@ export const NamedConstructionFlags = z.object({
 	reportConstructionId: z.string().optional(),
 	constructionName: z.string().optional().nullable(),
 	takeConstruction: z.boolean().optional(),
-	takeSoundInsulationCalculation: z.boolean().optional(),
-	takeLaboratoryDataAnalisys: z.boolean().optional(),
 });
 
 export const BaseReportInfoFlags = z.object({

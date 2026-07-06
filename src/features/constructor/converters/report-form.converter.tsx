@@ -6,8 +6,13 @@ export const convertToClientReportFormFlags = (
 ): FloorDocumentsFlagsSchemaType => {
 	const soundBaseFlags = (data.soundInsulationCalculation?.baseReportInfoFlags ?? []).map(
 		(baseFlag) => ({
-			...baseFlag,
-			namedConstructionFlags: baseFlag?.namedConstructionFlags ?? [],
+			floorNumber: baseFlag?.floorNumber ?? null,
+			takeFloor: baseFlag?.takeFloor ?? false,
+			namedConstructionFlags: (baseFlag?.namedConstructionFlags ?? []).map((namedFlag) => ({
+				reportConstructionId: namedFlag?.reportConstructionId,
+				constructionName: namedFlag?.constructionName ?? null,
+				takeConstruction: namedFlag?.takeConstruction ?? false,
+			})),
 		}),
 	);
 	return {
@@ -38,6 +43,17 @@ export const convertToServerReportFormFlags = (
 	data: FormReportSchemaType,
 ): FinalizeReportInfoCommand => {
 	const { logo: _logo, logoValue: _logoValue, floorDocumentFlags, ...rest } = data;
+	const soundBaseFlags = (
+		floorDocumentFlags.soundInsulationCalculation?.baseReportInfoFlags ?? []
+	).map((baseFlag) => ({
+		floorNumber: baseFlag.floorNumber ?? null,
+		takeFloor: baseFlag.takeFloor ?? false,
+		namedConstructionFlags: (baseFlag.namedConstructionFlags ?? []).map((namedFlag) => ({
+			reportConstructionId: namedFlag.reportConstructionId,
+			constructionName: namedFlag.constructionName ?? null,
+			takeConstruction: namedFlag.takeConstruction ?? false,
+		})),
+	}));
 
 	return {
 		...rest,
@@ -51,6 +67,12 @@ export const convertToServerReportFormFlags = (
 		country: data.country || null,
 		director: data.director || null,
 		date: data.date || null,
-		floorDocumentFlags,
+		floorDocumentFlags: {
+			...floorDocumentFlags,
+			soundInsulationCalculation: {
+				...floorDocumentFlags.soundInsulationCalculation,
+				baseReportInfoFlags: soundBaseFlags,
+			},
+		},
 	};
 };

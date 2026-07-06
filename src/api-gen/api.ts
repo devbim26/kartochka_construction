@@ -1594,8 +1594,6 @@ export interface SoundInsulationNamedConstructionFlagsDto {
 	reportConstructionId?: string;
 	constructionName?: string | null;
 	takeConstruction?: boolean;
-	takeSoundInsulationCalculation?: boolean;
-	takeLaboratoryDataAnalisys?: boolean;
 }
 
 export interface SubscriptionDto {
