@@ -164,7 +164,7 @@ export const ConstructionTypeMap = ({
 					{
 						positionId: '1',
 						materialId: '',
-						materialType: MaterialTypeEnum.Board,
+						materialType: MaterialTypeEnum.Heavy,
 						materialTypeValue: [
 							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.Density, value: '' },

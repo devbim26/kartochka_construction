@@ -20,8 +20,10 @@ export const FillerMaterialType = memoize(
 		constructionPosition,
 		fieldIndex,
 		currentForm,
+		label = 'Заполнитель',
 	}: Omit<ConstructionMaterialTypesProps, 'constructionIndex'> & {
 		constructionPosition: 'Left' | 'Center' | 'Right';
+		label?: string;
 	}) => {
 		const { showMaterialDesignationInput } = useSelectableMaterialDesignation();
 		const { formState, control, setValue, register } = currentForm;
@@ -57,7 +59,7 @@ export const FillerMaterialType = memoize(
 							label={
 								(formState.errors as any)?.constructionTypeObject?.[
 									positionMap[constructionPosition]
-								]?.[fieldIndex]?.materialId?.message || 'Заполнитель'
+								]?.[fieldIndex]?.materialId?.message || label
 							}
 							placeholder="Выберите материал"
 							isSearchable

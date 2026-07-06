@@ -964,6 +964,7 @@ const DesigningConstructionScreen = () => {
 						graphData={graphData}
 						additional={graphAdditionalData || undefined}
 						noPadding={true}
+						noiseMode={activeNoiseMode}
 					/>
 				</div>
 			</div>

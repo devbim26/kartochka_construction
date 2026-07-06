@@ -116,8 +116,10 @@ export enum MaterialTypesSelectValuesEnum {
 	AirGapFiller = 'AirGapFiller',
 	Glass = 'Glass',
 	MultiGlass = 'MultiGlass',
-	/** Пол на эластичном основании: только тяжёлые, наполнительные и плиты. */
+	/** Пол с упругим основанием: стяжка, упругий слой, тяжёлая плита. */
 	ElasticBaseFloor = 'ElasticBaseFloor',
+	/** Однослойные перекрытия: доп. слои сверху — плиты или стяжка. */
+	HomogeneousFloorOptional = 'HomogeneousFloorOptional',
 	/** Стекло или плитные слои для двери (над/под базовыми плитами). */
 	DoorOptionalLayers = 'DoorOptionalLayers',
 	/** Тяжелая однослойная стена: тяжёлые, плиты, штукатурка (без мембран и акустики). */
@@ -193,9 +195,13 @@ const buildMaterialTypesSelectValuesMap = (locale: 'ru' | 'en') => ({
 		locale,
 	),
 	[MaterialTypesSelectValuesEnum.ElasticBaseFloor]: materialTypeSelectOptions(
-		[MaterialTypeEnum.Heavy, MaterialTypeEnum.Filler, MaterialTypeEnum.Board],
+		[MaterialTypeEnum.Heavy, MaterialTypeEnum.Filler],
 		locale,
 	),
+	[MaterialTypesSelectValuesEnum.HomogeneousFloorOptional]: [
+		materialTypeSelectOption(MaterialTypeEnum.Board, locale),
+		{ label: locale === 'en' ? 'Screed' : 'Стяжка', value: MaterialTypeEnum.Heavy },
+	],
 	[MaterialTypesSelectValuesEnum.DoorOptionalLayers]: materialTypeSelectOptions(
 		[MaterialTypeEnum.Glazing, MaterialTypeEnum.Heavy, MaterialTypeEnum.Board],
 		locale,

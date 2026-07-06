@@ -44,3 +44,17 @@ export const convertToRequirementDocumentSelectValues = (
 		})
 		.filter((option) => option.value);
 };
+
+export const resolveRequirementDocumentIdByCountry = (
+	documents: RequirementDocumentDto[] | undefined,
+	country: string | undefined | null,
+): string => {
+	if (!country?.trim() || !documents?.length) return '';
+
+	const match = documents.find((doc) => {
+		if (!doc.country) return false;
+		return String(convertToClientCountryData(doc.country)) === country;
+	});
+
+	return match?.id ?? '';
+};

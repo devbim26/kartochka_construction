@@ -100,8 +100,8 @@ export const RuConstructionTypesMap = {
 	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
 	OneGlassFrame: 'Многослойное стекло',
 	DoubleGlazedFrame: 'Стеклопакет',
-	HomogeneousFloor: 'Однородный пол',
-	ElasticBaseFloor: 'Пол с эластичным основанием',
+	HomogeneousFloor: 'Однослойные перекрытия',
+	ElasticBaseFloor: 'Пол с упругим основанием',
 	Door: 'Дверь',
 };
 
@@ -126,7 +126,7 @@ export const EnConstructionTypesMap = {
 	HeavySingleWallFacing: 'Heavy single-layer wall + facing',
 	OneGlassFrame: 'Multi-layer glass',
 	DoubleGlazedFrame: 'Double-glazed window',
-	HomogeneousFloor: 'Homogeneous floor',
+	HomogeneousFloor: 'Single-layer floors',
 	ElasticBaseFloor: 'Floor with elastic base',
 	Door: 'Door',
 };
@@ -227,7 +227,7 @@ export const RuConstructionTypesSelectValues = [
 		value: ConstructionTypeEnum.DoubleGlazedFrame,
 	},
 	{
-		label: 'Однородный пол',
+		label: RuConstructionTypesMap.HomogeneousFloor,
 		value: ConstructionTypeEnum.HomogeneousFloor,
 	},
 	{

@@ -23,6 +23,7 @@ import {
 	convertToCreateReportInfoCommand,
 	convertToRequirementDocumentSelectValues,
 	getCountryLabel,
+	resolveRequirementDocumentIdByCountry,
 } from '@features/constructor/converters';
 import {
 	createReport,
@@ -59,7 +60,7 @@ import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { BsQuestionSquareFill } from 'react-icons/bs';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -126,12 +127,49 @@ const AboutBuildingScreen = () => {
 	};
 
 	const [search] = useSearchParams();
-	const [reportType, isConstruction, name, selectedRegulatoryDocumentId] = watch([
+	const [reportType, isConstruction, name, selectedRegulatoryDocumentId, region] = watch([
 		'isFloorPlan',
 		'isConstruction',
 		'name',
 		'regulatoryDocumentId',
+		'region',
 	]);
+
+	const isEditMode = !!search.get('edit');
+
+	const applyDocumentsForRegion = useCallback(
+		(targetRegion: string | undefined) => {
+			if (isEditMode || !targetRegion) return;
+
+			const calculationId = resolveRequirementDocumentIdByCountry(
+				calculationRequirementDocuments,
+				targetRegion,
+			);
+			const regulatoryId = resolveRequirementDocumentIdByCountry(
+				regulatoryRequirementDocuments,
+				targetRegion,
+			);
+
+			setValue('calculationDocumentId', calculationId, {
+				shouldDirty: true,
+				shouldValidate: true,
+			});
+			setValue('regulatoryDocumentId', regulatoryId, {
+				shouldDirty: true,
+				shouldValidate: true,
+			});
+		},
+		[
+			calculationRequirementDocuments,
+			isEditMode,
+			regulatoryRequirementDocuments,
+			setValue,
+		],
+	);
+
+	useEffect(() => {
+		applyDocumentsForRegion(region);
+	}, [applyDocumentsForRegion, region]);
 
 	const reportId = search.get('reportId');
 
@@ -426,7 +464,6 @@ const AboutBuildingScreen = () => {
 									value={field.value || ''}
 									onChange={(val) => {
 										field.onChange(val);
-										form.reset({ ...form.getValues() });
 									}}
 									label={
 										formState.errors?.region?.message

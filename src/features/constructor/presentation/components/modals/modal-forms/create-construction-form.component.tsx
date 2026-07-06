@@ -179,13 +179,15 @@ export const CreateConstructionForm = memoize(
 			}, [firstPlacementRoom, secondPlacementRoom, roomRequirementsMap]);
 
 			const rwDisplayText = useMemo(() => {
-				if (paginationRw == null) return 'Rw -\u00A0—';
-				const formatted = new Intl.NumberFormat('ru-RU', {
+				if (paginationRw == null) {
+					return locale === 'en' ? 'Rw —, dB' : 'Rw —, дБ';
+				}
+				const formatted = new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'ru-RU', {
 					maximumFractionDigits: 4,
 					minimumFractionDigits: 0,
 				}).format(paginationRw);
-				return `\u00A0${formatted}, Rw`;
-			}, [paginationRw]);
+				return locale === 'en' ? `Rw ${formatted}, dB` : `Rw ${formatted}, дБ`;
+			}, [paginationRw, locale]);
 
 			const [roomOptions, setRoomOptions] = useState<Array<{ label: string; value: string }>>(
 				[],
@@ -869,7 +871,7 @@ export const CreateConstructionForm = memoize(
 									{firstPlacementRoom && secondPlacementRoom ? (
 										<div className="ml-[10px] flex shrink-0 flex-nowrap items-center gap-x-1.5 font-sans text-sm leading-5 text-black">
 											<span className="shrink-0 font-semibold text-black">
-												{t('guides.requirements.pageTitle') + ': '}
+												{t('createConstruction.requirement.label')}:{' '}
 											</span>
 											<span className="shrink-0 font-semibold text-black">
 												{rwDisplayText}

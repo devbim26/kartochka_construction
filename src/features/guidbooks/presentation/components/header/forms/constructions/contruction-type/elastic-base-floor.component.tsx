@@ -1,6 +1,5 @@
 import { MaterialParametrs } from '@api-gen';
 import {
-	BoardMaterialType,
 	ConstructionLayer,
 	FillerMaterialType,
 	HeavyMaterialType,
@@ -13,14 +12,18 @@ import { useConstructionMaterials } from '@features/guidbooks/utils';
 import { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
 
-/** Сверху вниз в форме: плиты (1) → заполнитель (2) → стяжка/стена (3). */
+const FLOOR_HEAVY_SLAB_LABEL = 'Тяжелая однослойная плита';
+const FLOOR_SCREED_LABEL = 'Стяжка';
+const FLOOR_ELASTIC_LAYER_LABEL = 'Упругий слой';
+
+/** Сверху вниз в форме: стяжка (1) → упругий слой (2) → тяжелая плита (3). */
 const ELASTIC_FLOOR_POSITIONS = ['1', '2', '3'] as const;
 
 const elasticFloorDefaultRows = () => [
 	{
 		positionId: '1',
 		materialId: '',
-		materialType: MaterialTypeEnum.Board,
+		materialType: MaterialTypeEnum.Heavy,
 		materialTypeValue: [
 			{ materialParameters: MaterialParametrs.Thickness, value: '' },
 			{ materialParameters: MaterialParametrs.Density, value: '' },
@@ -46,6 +49,12 @@ const elasticFloorDefaultRows = () => [
 	},
 ];
 
+const normalizeElasticFloorRow = (row: any, positionId: string, materialType: MaterialTypeEnum) => ({
+	...row,
+	positionId,
+	materialType,
+});
+
 const migrateLegacyElasticFloorRows = (byPos: Map<string, any>) => {
 	const row0 = byPos.get('0');
 	const row1 = byPos.get('1');
@@ -61,23 +70,35 @@ const migrateLegacyElasticFloorRows = (byPos: Map<string, any>) => {
 		String(row2?.materialType) === MaterialTypeEnum.Heavy
 	) {
 		return [
-			{ ...row0, positionId: '1', materialType: MaterialTypeEnum.Board },
-			{ ...row1, positionId: '2', materialType: MaterialTypeEnum.Filler },
-			{ ...row2, positionId: '3', materialType: MaterialTypeEnum.Heavy },
+			normalizeElasticFloorRow(row0, '1', MaterialTypeEnum.Heavy),
+			normalizeElasticFloorRow(row1, '2', MaterialTypeEnum.Filler),
+			normalizeElasticFloorRow(row2, '3', MaterialTypeEnum.Heavy),
 		];
 	}
 
 	if (!row1 || !row2 || !row3) return null;
 
+	const topType = String(row1?.materialType);
+	const middleType = String(row2?.materialType);
+	const bottomType = String(row3?.materialType);
+
+	if (topType === MaterialTypeEnum.Board && middleType === MaterialTypeEnum.Filler) {
+		return [
+			normalizeElasticFloorRow(row1, '1', MaterialTypeEnum.Heavy),
+			normalizeElasticFloorRow(row2, '2', MaterialTypeEnum.Filler),
+			normalizeElasticFloorRow(row3, '3', MaterialTypeEnum.Heavy),
+		];
+	}
+
 	if (
-		String(row1?.materialType) === MaterialTypeEnum.Heavy &&
-		String(row2?.materialType) === MaterialTypeEnum.Filler &&
-		String(row3?.materialType) === MaterialTypeEnum.Board
+		topType === MaterialTypeEnum.Heavy &&
+		middleType === MaterialTypeEnum.Filler &&
+		bottomType === MaterialTypeEnum.Board
 	) {
 		return [
-			{ ...row3, positionId: '1', materialType: MaterialTypeEnum.Board },
-			{ ...row2, positionId: '2', materialType: MaterialTypeEnum.Filler },
-			{ ...row1, positionId: '3', materialType: MaterialTypeEnum.Heavy },
+			normalizeElasticFloorRow(row3, '1', MaterialTypeEnum.Heavy),
+			normalizeElasticFloorRow(row2, '2', MaterialTypeEnum.Filler),
+			normalizeElasticFloorRow(row1, '3', MaterialTypeEnum.Heavy),
 		];
 	}
 
@@ -107,7 +128,7 @@ export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps
 		const row2 = byPos.get('2');
 		const row3 = byPos.get('3');
 		const typeOk =
-			String(row1?.materialType) === MaterialTypeEnum.Board &&
+			String(row1?.materialType) === MaterialTypeEnum.Heavy &&
 			String(row2?.materialType) === MaterialTypeEnum.Filler &&
 			String(row3?.materialType) === MaterialTypeEnum.Heavy;
 		if (list.length >= 3 && typeOk) return;
@@ -126,7 +147,8 @@ export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps
 			<div className="flex flex-1 gap-[20px]">
 				{positionId === '1' ? (
 					<>
-						<BoardMaterialType
+						<HeavyMaterialType
+							label={FLOOR_SCREED_LABEL}
 							fieldIndex={fieldIndex}
 							constructionPosition="Center"
 							currentForm={currentForm}
@@ -140,6 +162,7 @@ export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps
 				) : positionId === '2' ? (
 					<>
 						<FillerMaterialType
+							label={FLOOR_ELASTIC_LAYER_LABEL}
 							fieldIndex={fieldIndex}
 							constructionPosition="Center"
 							currentForm={currentForm}
@@ -153,6 +176,7 @@ export const ElasticBaseFloorComponent = ({ currentForm }: ConstructionTypeProps
 				) : (
 					<>
 						<HeavyMaterialType
+							label={FLOOR_HEAVY_SLAB_LABEL}
 							fieldIndex={fieldIndex}
 							constructionPosition="Center"
 							currentForm={currentForm}

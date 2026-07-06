@@ -5,6 +5,7 @@ import type { AdditionalGraphParameters, GraphDetailResponse } from '@features/c
 import {
 	graphHasImpactComputedData,
 	graphHasImpactLaboratoryData,
+	type GraphNoiseMode,
 } from '@features/constructor/utils';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
@@ -30,11 +31,18 @@ interface GraphTableProps {
 	graphData: GraphDetailResponse[] | null;
 	additional?: AdditionalGraphParameters;
 	noPadding?: boolean;
+	/** Для перекрытий: одна таблица — воздушный или ударный шум. */
+	noiseMode?: GraphNoiseMode;
 }
 
-export const GraphDetailTable = ({ graphData, additional, noPadding = false }: GraphTableProps) => {
+export const GraphDetailTable = ({
+	graphData,
+	additional,
+	noPadding = false,
+	noiseMode = 'airborne',
+}: GraphTableProps) => {
 	const { t } = useI18n();
-	const { freqData, extraData, showImpactColumns } = useMemo(() => {
+	const { freqData, extraData, showImpactOnly } = useMemo(() => {
 		const getDotsForSeries = (graphType: GraphType, legacyNameLower: string) =>
 			graphData?.find(
 				(g) =>
@@ -53,6 +61,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 
 		const showImpactColumns =
 			graphHasImpactComputedData(graphData) || graphHasImpactLaboratoryData(graphData);
+		const showImpactOnly = showImpactColumns && noiseMode === 'impact';
 
 		const toMap = (dots: typeof computedDots) => {
 			const m = new Map<number, string>();
@@ -71,12 +80,16 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 
 		const allFreqs = Array.from(
 			new Set(
-				[
-					...Array.from(computedMap.keys()),
-					...Array.from(laboratoryMap.keys()),
-					...Array.from(impactComputedMap.keys()),
-					...Array.from(impactLaboratoryMap.keys()),
-				].filter((f) => Number.isFinite(f)),
+				(showImpactOnly
+					? [
+							...Array.from(impactComputedMap.keys()),
+							...Array.from(impactLaboratoryMap.keys()),
+						]
+					: [
+							...Array.from(computedMap.keys()),
+							...Array.from(laboratoryMap.keys()),
+						]
+				).filter((f) => Number.isFinite(f)),
 			),
 		).sort((a, b) => a - b);
 
@@ -91,7 +104,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 		const extraData: ExtraTableRow[] = [];
 		const fmt = (n: number | undefined) => (n != null && Number.isFinite(n) ? String(n) : '–');
 
-		if (additional?.computingRw != null) {
+		if (!showImpactOnly && additional?.computingRw != null) {
 			extraData.push({
 				type: 'Rw',
 				rCalc: fmt(additional.computingRw),
@@ -103,7 +116,7 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				lwLab: '–',
 			});
 		}
-		if (showImpactColumns && additional?.computingLw != null) {
+		if (showImpactOnly && additional?.computingLw != null) {
 			extraData.push({
 				type: 'Lw',
 				rCalc: '–',
@@ -116,24 +129,85 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 			});
 		}
 
-		return { freqData, extraData, showImpactColumns };
-	}, [graphData, additional]);
+		return { freqData, extraData, showImpactOnly };
+	}, [graphData, additional, noiseMode]);
+
+	const headerTextClass = 'text-[16px] border-r border-[#EDEFF2] text-center';
+	const valueCellTextClass = 'text-[18px] font-bold border-r border-[#EDEFF2] text-center';
+	const summaryValueCellClass =
+		'border-r border-[#EDEFF2] text-[18px] font-bold text-center text-blue-600';
 
 	const columns = useMemo<ColumnDef<GraphTableRow>[]>(() => {
+		if (showImpactOnly) {
+			return [
+				{
+					accessorKey: 'frequency',
+					header: () => (
+						<SimpleTableHeaderCell
+							text="Freq, Hz"
+							textClassName={twMerge('w-[80px]', headerTextClass)}
+							noPadding={noPadding}
+						/>
+					),
+					cell: (info) => (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge('w-[80px]', valueCellTextClass)}
+							noPadding={noPadding}
+						/>
+					),
+				},
+				{
+					accessorKey: 'lwCalc',
+					header: () => (
+						<SimpleTableHeaderCell
+							text="Lw, dB"
+							textClassName={twMerge('w-[88px]', headerTextClass)}
+							noPadding={noPadding}
+						/>
+					),
+					cell: (info) => (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge('w-[88px]', valueCellTextClass)}
+							noPadding={noPadding}
+						/>
+					),
+				},
+				{
+					accessorKey: 'lwLab',
+					header: () => (
+						<SimpleTableHeaderCell
+							text="Lw lab, dB"
+							textClassName={twMerge('w-[88px]', headerTextClass)}
+							noPadding={noPadding}
+						/>
+					),
+					cell: (info) => (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge('w-[88px]', valueCellTextClass)}
+							noPadding={noPadding}
+						/>
+					),
+				},
+			];
+		}
+
 		const base: ColumnDef<GraphTableRow>[] = [
 			{
 				accessorKey: 'frequency',
 				header: () => (
 					<SimpleTableHeaderCell
 						text="Freq, Hz"
-						textClassName="w-[60px] border-r border-[#EDEFF2] text-center"
+						textClassName={twMerge('w-[80px]', headerTextClass)}
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[60px] border-r border-[#EDEFF2] text-center"
+						contentClassName={twMerge('w-[80px]', valueCellTextClass)}
 						noPadding={noPadding}
 					/>
 				),
@@ -143,14 +217,14 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				header: () => (
 					<SimpleTableHeaderCell
 						text="R, dB"
-						textClassName="w-[80px] border-r border-[#EDEFF2] text-center"
+						textClassName={twMerge('w-[80px]', headerTextClass)}
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[80px] border-r border-[#EDEFF2] text-center"
+						contentClassName={twMerge('w-[80px]', valueCellTextClass)}
 						noPadding={noPadding}
 					/>
 				),
@@ -160,186 +234,136 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				header: () => (
 					<SimpleTableHeaderCell
 						text="R lab, dB"
-						textClassName="w-[80px] border-r border-[#EDEFF2] text-center"
+						textClassName={twMerge('w-[80px]', headerTextClass)}
 						noPadding={noPadding}
 					/>
 				),
 				cell: (info) => (
 					<SimpleTableCell
 						content={info.getValue() as string}
-						contentClassName="w-[80px] border-r border-[#EDEFF2] text-center"
+						contentClassName={twMerge('w-[80px]', valueCellTextClass)}
 						noPadding={noPadding}
 					/>
 				),
 			},
 		];
 
-		if (!showImpactColumns) return base;
-
-		return [
-			...base,
-			{
-				accessorKey: 'lwCalc',
-				header: () => (
-					<SimpleTableHeaderCell
-						text="Lw, dB"
-						textClassName="w-[88px] border-r border-[#EDEFF2] text-center"
-						noPadding={noPadding}
-					/>
-				),
-				cell: (info) => (
-					<SimpleTableCell
-						content={info.getValue() as string}
-						contentClassName="w-[88px] border-r border-[#EDEFF2] text-center"
-						noPadding={noPadding}
-					/>
-				),
-			},
-			{
-				accessorKey: 'lwLab',
-				header: () => (
-					<SimpleTableHeaderCell
-						text="Lw lab, dB"
-						textClassName="w-[88px] border-r border-[#EDEFF2] text-center"
-						noPadding={noPadding}
-					/>
-				),
-				cell: (info) => (
-					<SimpleTableCell
-						content={info.getValue() as string}
-						contentClassName="w-[88px] border-r border-[#EDEFF2] text-center"
-						noPadding={noPadding}
-					/>
-				),
-			},
-		];
-	}, [noPadding, showImpactColumns]);
+		return base;
+	}, [noPadding, showImpactOnly]);
 
 	const extraColumns = useMemo<ColumnDef<ExtraTableRow>[]>(() => {
+		if (showImpactOnly) {
+			return [
+				{
+					accessorKey: 'type',
+					header: () => (
+						<SimpleTableHeaderCell
+							text={t('constructor.table.data')}
+							textClassName={twMerge('w-[80px]', headerTextClass)}
+							noPadding={noPadding}
+						/>
+					),
+					cell: (info) => (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge('w-[80px]', summaryValueCellClass)}
+							noPadding={noPadding}
+						/>
+					),
+				},
+				{
+					accessorKey: 'lwCalc',
+					header: () => (
+						<SimpleTableHeaderCell
+							text="Lnw, dB"
+							textClassName={twMerge('w-[88px]', headerTextClass)}
+							noPadding={noPadding}
+						/>
+					),
+					cell: (info) => (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge('w-[88px]', summaryValueCellClass)}
+							noPadding={noPadding}
+						/>
+					),
+				},
+				{
+					accessorKey: 'lwLab',
+					header: () => (
+						<SimpleTableHeaderCell
+							text="Lnw lab, dB"
+							textClassName={twMerge('w-[88px]', headerTextClass)}
+							noPadding={noPadding}
+						/>
+					),
+					cell: (info) => (
+						<SimpleTableCell
+							content={info.getValue() as string}
+							contentClassName={twMerge('w-[88px]', summaryValueCellClass)}
+							noPadding={noPadding}
+						/>
+					),
+				},
+			];
+		}
+
 		const base: ColumnDef<ExtraTableRow>[] = [
 			{
 				accessorKey: 'type',
 				header: () => (
 					<SimpleTableHeaderCell
 						text={t('constructor.table.data')}
-						textClassName="w-[80px] text-[20px] border-r text-[16px] border-[#EDEFF2] text-center"
+						textClassName={twMerge('w-[80px]', headerTextClass)}
 						noPadding={noPadding}
 					/>
 				),
-				cell: (info) => {
-					const isRw = info.row.original.type === 'Rw';
-					return (
-						<SimpleTableCell
-							content={info.getValue() as string}
-							contentClassName={twMerge(
-								'w-[80px] border-r border-[#EDEFF2] text-[16px] text-center',
-								isRw && 'text-blue-600  text-[25px] font-bold',
-							)}
-							noPadding={noPadding}
-						/>
-					);
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName={twMerge('w-[80px]', summaryValueCellClass)}
+						noPadding={noPadding}
+					/>
+				),
 			},
 			{
 				accessorKey: 'rCalc',
 				header: () => (
 					<SimpleTableHeaderCell
 						text="Rw, dB"
-						textClassName="w-[80px] text-[16px] border-r border-[#EDEFF2] text-center"
+						textClassName={twMerge('w-[80px]', headerTextClass)}
 						noPadding={noPadding}
 					/>
 				),
-				cell: (info) => {
-					const isRw = info.row.original.type === 'Rw';
-					return (
-						<SimpleTableCell
-							content={info.getValue() as string}
-							contentClassName={twMerge(
-								'w-[80px] border-r text-[16px] border-[#EDEFF2] text-center',
-								isRw && 'text-blue-600 text-[25px] font-bold',
-							)}
-							noPadding={noPadding}
-						/>
-					);
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName={twMerge('w-[80px]', summaryValueCellClass)}
+						noPadding={noPadding}
+					/>
+				),
 			},
 			{
 				accessorKey: 'rLab',
 				header: () => (
 					<SimpleTableHeaderCell
 						text="Rw lab, dB"
-						textClassName="w-[80px] border-r text-[16px] border-[#EDEFF2] text-center"
+						textClassName={twMerge('w-[80px]', headerTextClass)}
 						noPadding={noPadding}
 					/>
 				),
-				cell: (info) => {
-					const isRw = info.row.original.type === 'Rw';
-					return (
-						<SimpleTableCell
-							content={info.getValue() as string}
-							contentClassName={twMerge(
-								'w-[80px] border-r text-[16px] border-[#EDEFF2] text-center',
-								isRw && 'text-blue-600 text-[25px] font-bold',
-							)}
-							noPadding={noPadding}
-						/>
-					);
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={info.getValue() as string}
+						contentClassName={twMerge('w-[80px]', summaryValueCellClass)}
+						noPadding={noPadding}
+					/>
+				),
 			},
 		];
 
-		if (!showImpactColumns) return base;
-
-		return [
-			...base,
-			{
-				accessorKey: 'lwCalc',
-				header: () => (
-					<SimpleTableHeaderCell
-						text="Lnw, dB"
-						textClassName="w-[88px] border-r text-[16px] border-[#EDEFF2] text-center"
-						noPadding={noPadding}
-					/>
-				),
-				cell: (info) => {
-					const isLw = info.row.original.type === 'Lw';
-					return (
-						<SimpleTableCell
-							content={info.getValue() as string}
-							contentClassName={twMerge(
-								'w-[88px] border-r text-[16px] border-[#EDEFF2] text-center',
-								isLw && 'text-blue-600 text-[25px] font-bold',
-							)}
-							noPadding={noPadding}
-						/>
-					);
-				},
-			},
-			{
-				accessorKey: 'lwLab',
-				header: () => (
-					<SimpleTableHeaderCell
-						text="Lnw lab, dB"
-						textClassName="w-[88px] border-r text-[16px] border-[#EDEFF2] text-center"
-						noPadding={noPadding}
-					/>
-				),
-				cell: (info) => {
-					const isLw = info.row.original.type === 'Lw';
-					return (
-						<SimpleTableCell
-							content={info.getValue() as string}
-							contentClassName={twMerge(
-								'w-[88px] border-r text-[16px] border-[#EDEFF2] text-center',
-								isLw && 'text-blue-600 text-[25px] font-bold',
-							)}
-							noPadding={noPadding}
-						/>
-					);
-				},
-			},
-		];
-	}, [noPadding, showImpactColumns, t]);
+		return base;
+	}, [noPadding, showImpactOnly, t]);
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -350,8 +374,8 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 					classNames={{
 						tableContainerClassName: 'w-max max-w-full',
 						tableClassName: 'w-max border border-[#EDEFF2] border-collapse',
-						headerCellClassName: 'border text-[20px] border-[#EDEFF2]',
-						contentCellClassName: 'border border-[#EDEFF2] font-bold',
+						headerCellClassName: 'border text-[16px] border-[#EDEFF2]',
+						contentCellClassName: 'border border-[#EDEFF2] text-[18px] font-bold',
 					}}
 				/>
 			)}
@@ -361,8 +385,8 @@ export const GraphDetailTable = ({ graphData, additional, noPadding = false }: G
 				classNames={{
 					tableContainerClassName: 'w-max max-w-full',
 					tableClassName: 'w-max border border-[#EDEFF2] border-collapse',
-					headerCellClassName: 'border border-[#EDEFF2]',
-					contentCellClassName: 'border border-[#EDEFF2]',
+					headerCellClassName: 'border text-[16px] border-[#EDEFF2]',
+					contentCellClassName: 'border border-[#EDEFF2] text-[18px] font-bold',
 				}}
 			/>
 		</div>

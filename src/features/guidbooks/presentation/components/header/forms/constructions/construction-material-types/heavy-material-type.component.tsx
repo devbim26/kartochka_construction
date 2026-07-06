@@ -20,8 +20,10 @@ export const HeavyMaterialType = memoize(
 		constructionPosition,
 		fieldIndex,
 		currentForm,
+		label = 'Тяжелая однослойная стена',
 	}: Omit<ConstructionMaterialTypesProps, 'constructionIndex'> & {
 		constructionPosition: 'Left' | 'Center' | 'Right';
+		label?: string;
 	}) => {
 		const { showMaterialDesignationInput } = useSelectableMaterialDesignation();
 		const { formState, control, setValue, register } = currentForm;
@@ -57,7 +59,7 @@ export const HeavyMaterialType = memoize(
 							label={
 								(formState.errors as any)?.constructionTypeObject?.[
 									positionMap[constructionPosition]
-								]?.[fieldIndex]?.materialId?.message || 'Тяжелая однослойная стена'
+								]?.[fieldIndex]?.materialId?.message || label
 							}
 							placeholder="Выберите материал"
 							isSearchable

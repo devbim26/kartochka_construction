@@ -8,6 +8,7 @@ import {
 import { graphAdditionalDetail, graphDetail } from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
 import type { AdditionalGraphParameters, GraphDetailResponse } from '@features/constructor/types';
+import { useGraphNoiseMode } from '@features/constructor/utils';
 import { catchError, finalize, from, of } from 'rxjs';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
@@ -34,6 +35,7 @@ export const CatalogLabTestGraphModal = ({
 	const [graphData, setGraphData] = useState<GraphDetailResponse[] | null>(null);
 	const [graphAdditionalData, setGraphAdditionalData] =
 		useState<AdditionalGraphParameters | null>(null);
+	const { noiseMode, setNoiseMode, activeNoiseMode } = useGraphNoiseMode(graphData);
 
 	useEffect(() => {
 		if (!isOpen || !constructionHeaderId) {
@@ -104,6 +106,8 @@ export const CatalogLabTestGraphModal = ({
 							regulatoryDocName={regulatoryDocName}
 							calculationDocName={calculationDocName}
 							chartSize="large"
+							noiseMode={noiseMode}
+							onNoiseModeChange={setNoiseMode}
 						/>
 					</div>
 					<div className="w-max min-w-0 shrink-0 lg:max-w-[min(100%,520px)]">
@@ -111,6 +115,7 @@ export const CatalogLabTestGraphModal = ({
 							graphData={graphData}
 							additional={graphAdditionalData || undefined}
 							noPadding
+							noiseMode={activeNoiseMode}
 						/>
 					</div>
 				</div>
