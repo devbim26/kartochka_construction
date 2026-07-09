@@ -40,11 +40,13 @@ import { ArticlePage } from '@features/news/presentation/components/article-page
 import NewsScreen from '@features/news/presentation/screens/news.screen';
 import { ActiveReportsScreen, ReportScreen } from '@features/reports';
 import SubscriptionScreen from '@features/subscriptions/presentation/screens/subscription.screen';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { RouteErrorFallback } from '@features/not-found';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 
 export const AppRouter = () => {
 	return (
 		<Routes>
+			<Route element={<Outlet />} errorElement={<RouteErrorFallback />}>
 			<Route path="/" element={<Navigate to={APP_ROUTES.landing.route} replace />} />
 			<Route path="/main" element={<Navigate to={APP_ROUTES.landing.route} replace />} />
 			<Route path={APP_ROUTES.landing.route} element={<LandingScreen />}>
@@ -146,6 +148,7 @@ export const AppRouter = () => {
 				</Route>
 			</Route>
 			<Route path="*" element={<NotFoundScreen />} />
+			</Route>
 		</Routes>
 	);
 };

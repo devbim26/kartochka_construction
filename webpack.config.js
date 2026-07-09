@@ -111,6 +111,10 @@ module.exports = {
 		historyApiFallback: true,
 		client: {
 			logging: 'error', //info
+			overlay: {
+				errors: false,
+				warnings: false,
+			},
 		},
 		devMiddleware: {
 			stats: 'minimal',

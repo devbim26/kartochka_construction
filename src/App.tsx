@@ -1,6 +1,6 @@
 import faviconUrl from '@assets/favicon.svg';
 import { I18nProvider, store, useI18n } from '@core';
-import { RootErrorBoundary } from '@features/not-found';
+import { FatalErrorGate, RootErrorBoundaryWithReset } from '@features/not-found';
 import { AppRouter } from '@router';
 import { Helmet } from 'react-helmet';
 import { Provider } from 'react-redux';
@@ -21,16 +21,18 @@ const AppShell = () => {
 					<link rel="alternate icon" href={faviconUrl} type="image/svg+xml" />
 					<link rel="apple-touch-icon" href={faviconUrl} />
 				</Helmet>
-				<RootErrorBoundary>
-					<AppRouter />
-				</RootErrorBoundary>
-				<Toaster
-					richColors
-					closeButton
-					toastOptions={{
-						duration: 5000,
-					}}
-				/>
+				<RootErrorBoundaryWithReset>
+					<FatalErrorGate>
+						<AppRouter />
+					</FatalErrorGate>
+					<Toaster
+						richColors
+						closeButton
+						toastOptions={{
+							duration: 5000,
+						}}
+					/>
+				</RootErrorBoundaryWithReset>
 			</Provider>
 		</BrowserRouter>
 	);

@@ -3,6 +3,7 @@ import {
 	DeleteIcon,
 	DeleteModal,
 	EditIcon,
+	getAxiosErrorMessage,
 	paginationStateDefault,
 	ShortenedTextCell,
 	SimpleTable,
@@ -40,6 +41,8 @@ import {
 import {
 	MaterialsAddAndEditConfig,
 	MaterialsFilterConfig,
+	resolveExportDownloadAction,
+	triggerExportDownload,
 	useHeaderForm,
 } from '@features/guidbooks/utils';
 
@@ -397,23 +400,25 @@ const MaterialsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || t('guides.export.error'));
+						void getAxiosErrorMessage(error, t('guides.export.error')).then((message) => {
+							toast.error(message);
+						});
 					}
 					return from([null]);
 				}),
 			)
 			.subscribe((response) => {
 				if (!response?.data) return;
-				const fileBlob = response.data as Blob;
-				const url = window.URL.createObjectURL(fileBlob);
-				const link = document.createElement('a');
-				link.href = url;
-				link.download = 'materials-export.xlsx';
-				document.body.appendChild(link);
-				link.click();
-				document.body.removeChild(link);
-				window.URL.revokeObjectURL(url);
-				toast.success(t('guides.export.success'));
+				void resolveExportDownloadAction(response, 'materials-export.xlsx').then(
+					(action) => {
+						if (!action) {
+							toast.error(t('guides.export.error'));
+							return;
+						}
+						triggerExportDownload(action);
+						toast.success(t('guides.export.success'));
+					},
+				);
 			});
 	};
 

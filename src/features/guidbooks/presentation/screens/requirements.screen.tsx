@@ -4,6 +4,7 @@ import {
 	convertToPaginatedType,
 	DeleteIcon,
 	DeleteModal,
+	getAxiosErrorMessage,
 	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
@@ -264,7 +265,9 @@ const RequirementsScreen = () => {
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || t('guides.export.error'));
+						void getAxiosErrorMessage(error, t('guides.export.error')).then((message) => {
+							toast.error(message);
+						});
 					}
 					return from([null]);
 				}),
