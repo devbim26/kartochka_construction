@@ -54,7 +54,7 @@ import {
 	RequirementsFilterDataConfig,
 	RequirementsFormDataConfig,
 	resolveExportDownloadAction,
-	triggerExportDownload,
+	triggerDownloadAction,
 	useHeaderForm,
 } from '../../utils';
 import {
@@ -75,6 +75,7 @@ const RequirementsScreen = () => {
 		id: '',
 		name: '',
 	});
+	const [isExporting, setIsExporting] = useState(false);
 
 	const form = useHeaderForm<FormRequirement | RequirementFilter>(
 		{
@@ -256,35 +257,35 @@ const RequirementsScreen = () => {
 			});
 	};
 
-	const handleExportTableData = () => {
-		from(
-			exportRequirements(
+	const handleExportTableData = async () => {
+		setIsExporting(true);
+		try {
+			const response = await exportRequirements(
 				convertToServerFilterRequirementData(form.filterForm.getValues() as RequirementFilter),
-			),
-		)
-			.pipe(
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						void getAxiosErrorMessage(error, t('guides.export.error')).then((message) => {
-							toast.error(message);
-						});
-					}
-					return from([null]);
-				}),
-			)
-			.subscribe((response) => {
-				if (!response?.data) return;
-				void resolveExportDownloadAction(response, 'requirements-export.xlsx').then(
-					(action) => {
-						if (!action) {
-							toast.error(t('guides.export.error'));
-							return;
-						}
-						triggerExportDownload(action);
-						toast.success(t('guides.export.success'));
-					},
-				);
-			});
+			);
+			if (response.status !== 200) {
+				toast.error(t('guides.export.error'));
+				return;
+			}
+
+			const action = await resolveExportDownloadAction(
+				response as AxiosResponse<unknown>,
+				'requirements-export.xlsx',
+			);
+			if (!action) {
+				toast.error(t('guides.export.error'));
+				return;
+			}
+			await triggerDownloadAction(action);
+			toast.success(t('guides.export.success'));
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				const message = await getAxiosErrorMessage(error, t('guides.export.error'));
+				toast.error(message);
+			}
+		} finally {
+			setIsExporting(false);
+		}
 	};
 
 	const onSaveHandle = useCallback(() => {
@@ -430,6 +431,7 @@ const RequirementsScreen = () => {
 			<GuidbookPageHeaderWrapper
 				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
 				onExport={handleExportTableData}
+				isExporting={isExporting}
 				titles={{
 					pageTitleKey: 'guides.requirements.pageTitle',
 					editTitleKey: 'guides.requirements.editTitle',

@@ -154,14 +154,7 @@ export const getSecondRoomVariant = async (data: GetPlacementRoomVariantByAllPar
 };
 
 export const importMaterials = async (data: { formFile: File }) => {
-	const formData = new FormData();
-	formData.append('formFile', data.formFile);
-	return await fetchApi.request({
-		path: `/api/Material/import`,
-		method: 'POST',
-		body: formData,
-		type: 1 as any,
-	});
+	return await fetchApi.api.materialImportCreate({ formFile: data.formFile });
 };
 
 export const importRequirements = async (data: { formFile: File }) => {

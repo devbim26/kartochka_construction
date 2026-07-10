@@ -42,7 +42,7 @@ import {
 	MaterialsAddAndEditConfig,
 	MaterialsFilterConfig,
 	resolveExportDownloadAction,
-	triggerExportDownload,
+	triggerDownloadAction,
 	useHeaderForm,
 } from '@features/guidbooks/utils';
 
@@ -66,6 +66,7 @@ const MaterialsScreen = () => {
 		id: '',
 		name: '',
 	});
+	const [isExporting, setIsExporting] = useState(false);
 
 	const forms = useHeaderForm(
 		{
@@ -395,31 +396,35 @@ const MaterialsScreen = () => {
 			});
 	};
 
-	const handleExportTableData = () => {
-		from(exportMaterials(convertToServerMaterialsFilterData(forms.filterForm.getValues())))
-			.pipe(
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						void getAxiosErrorMessage(error, t('guides.export.error')).then((message) => {
-							toast.error(message);
-						});
-					}
-					return from([null]);
-				}),
-			)
-			.subscribe((response) => {
-				if (!response?.data) return;
-				void resolveExportDownloadAction(response, 'materials-export.xlsx').then(
-					(action) => {
-						if (!action) {
-							toast.error(t('guides.export.error'));
-							return;
-						}
-						triggerExportDownload(action);
-						toast.success(t('guides.export.success'));
-					},
-				);
-			});
+	const handleExportTableData = async () => {
+		setIsExporting(true);
+		try {
+			const response = await exportMaterials(
+				convertToServerMaterialsFilterData(forms.filterForm.getValues()),
+			);
+			if (response.status !== 200) {
+				toast.error(t('guides.export.error'));
+				return;
+			}
+
+			const action = await resolveExportDownloadAction(
+				response as AxiosResponse<unknown>,
+				'materials-export.xlsx',
+			);
+			if (!action) {
+				toast.error(t('guides.export.error'));
+				return;
+			}
+			await triggerDownloadAction(action);
+			toast.success(t('guides.export.success'));
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				const message = await getAxiosErrorMessage(error, t('guides.export.error'));
+				toast.error(message);
+			}
+		} finally {
+			setIsExporting(false);
+		}
 	};
 
 	useEffect(() => {
@@ -449,6 +454,7 @@ const MaterialsScreen = () => {
 			<GuidbookPageHeaderWrapper
 				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
 				onExport={handleExportTableData}
+				isExporting={isExporting}
 				titles={{
 					pageTitleKey: 'guides.materials.pageTitle',
 					editTitleKey: 'guides.materials.editTitle',

@@ -22,10 +22,9 @@ function getHeader(
 /** Имя файла из Content-Disposition (как при «Сохранить по ссылке»). */
 export function getFilenameFromExportHeaders(
 	headers: RawAxiosResponseHeaders | AxiosResponseHeaders,
-	fallback: string,
-): string {
+): string | null {
 	const cd = getHeader(headers, 'content-disposition');
-	if (!cd) return fallback;
+	if (!cd) return null;
 
 	const utf8Star = /filename\*=(?:UTF-8''|utf-8'')([^;\r\n]+)/i.exec(cd);
 	if (utf8Star?.[1]) {
@@ -42,25 +41,40 @@ export function getFilenameFromExportHeaders(
 	const unquoted = /filename=([^;\r\n]+)/i.exec(cd);
 	if (unquoted?.[1]) return unquoted[1].trim().replace(/^"|"$/g, '');
 
-	return fallback;
+	return null;
 }
 
-export function normalizeExportFilename(filename: string, fallback: string): string {
-	const trimmed = filename.trim();
-	if (!trimmed) return fallback;
+export function extractFilenameFromUrl(url: string): string | null {
+	try {
+		const segment = new URL(url).pathname.split('/').pop();
+		if (!segment) return null;
+		const decoded = decodeURIComponent(segment).trim();
+		return decoded || null;
+	} catch {
+		return null;
+	}
+}
 
-	if (/^https?:\/\//i.test(trimmed)) {
-		try {
-			const segment = new URL(trimmed).pathname.split('/').pop() || '';
-			if (segment) return decodeURIComponent(segment);
-		} catch {
-			/* ignore */
+/** Имя с сервера как есть; fallback — только если подходящего имени нет. */
+export function resolveDownloadFilename(
+	candidates: Array<string | null | undefined>,
+	fallback: string,
+): string {
+	for (const candidate of candidates) {
+		if (!candidate?.trim()) continue;
+
+		const trimmed = candidate.trim();
+		if (/^https?:\/\//i.test(trimmed)) {
+			const fromUrl = extractFilenameFromUrl(trimmed);
+			if (fromUrl) return fromUrl;
+			continue;
 		}
+
+		const baseName = (trimmed.split(/[/\\]/).pop() || trimmed).trim();
+		if (baseName) return baseName;
 	}
 
-	const baseName = trimmed.split(/[/\\]/).pop() || trimmed;
-	if (/\.(xlsx|xls|csv)$/i.test(baseName)) return baseName;
-	return baseName.includes('.') ? baseName : `${baseName}.xlsx`;
+	return fallback;
 }
 
 function extractFileUrlFromJson(payload: unknown): string | null {
@@ -134,10 +148,7 @@ export async function resolveExportDownloadAction(
 	fallbackFilename: string,
 ): Promise<ExportDownloadAction | null> {
 	const headers = response.headers;
-	const filename = normalizeExportFilename(
-		getFilenameFromExportHeaders(headers, fallbackFilename),
-		fallbackFilename,
-	);
+	const headerFilename = getFilenameFromExportHeaders(headers);
 	const contentType = getHeader(headers, 'content-type')?.toLowerCase() ?? '';
 	const data = response.data;
 
@@ -145,14 +156,28 @@ export async function resolveExportDownloadAction(
 
 	if (typeof data === 'object' && !(data instanceof Blob) && !(data instanceof ArrayBuffer)) {
 		const fileUrl = extractFileUrlFromJson(data);
-		if (fileUrl) return { type: 'url', url: fileUrl, filename };
+		if (fileUrl) {
+			return {
+				type: 'url',
+				url: fileUrl,
+				filename: resolveDownloadFilename([headerFilename, fileUrl], fallbackFilename),
+			};
+		}
 	}
+
+	const filename = resolveDownloadFilename([headerFilename], fallbackFilename);
 
 	if (data instanceof ArrayBuffer) {
 		if (contentType.includes('json')) {
 			try {
 				const fileUrl = extractFileUrlFromJson(JSON.parse(new TextDecoder().decode(data)));
-				if (fileUrl) return { type: 'url', url: fileUrl, filename };
+				if (fileUrl) {
+					return {
+						type: 'url',
+						url: fileUrl,
+						filename: resolveDownloadFilename([headerFilename, fileUrl], fallbackFilename),
+					};
+				}
 			} catch {
 				/* ignore */
 			}
@@ -172,12 +197,24 @@ export async function resolveExportDownloadAction(
 
 	if (contentType.includes('json') || blob.type.includes('json')) {
 		const fileUrl = extractFileUrlFromJson(await readBlobAsJson(blob));
-		if (fileUrl) return { type: 'url', url: fileUrl, filename };
+		if (fileUrl) {
+			return {
+				type: 'url',
+				url: fileUrl,
+				filename: resolveDownloadFilename([headerFilename, fileUrl], fallbackFilename),
+			};
+		}
 	}
 
 	if (!(await isZipArchiveBlob(blob))) {
 		const fileUrl = extractFileUrlFromJson(await readBlobAsJson(blob));
-		if (fileUrl) return { type: 'url', url: fileUrl, filename };
+		if (fileUrl) {
+			return {
+				type: 'url',
+				url: fileUrl,
+				filename: resolveDownloadFilename([headerFilename, fileUrl], fallbackFilename),
+			};
+		}
 		return null;
 	}
 

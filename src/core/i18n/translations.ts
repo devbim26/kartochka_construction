@@ -327,6 +327,7 @@ export const en = {
 	'common.apply': 'Apply',
 	'common.add': 'Add',
 	'common.import': 'Import',
+	'common.export': 'Export',
 	'common.clear': 'Clear',
 	'common.saveChanges': 'Save changes',
 
@@ -486,6 +487,11 @@ export const en = {
 	'guides.acousticModels.columns.coefficient': 'Coefficient',
 
 	'guides.import.success': 'Import completed successfully',
+	'guides.import.summary':
+		'Imported: {success} of {total}. Errors: {failed}. Check the error report.',
+	'guides.import.noReport': 'Import finished but the report file could not be downloaded',
+	'guides.import.inProgress': 'Importing…',
+	'guides.export.inProgress': 'Exporting…',
 	'guides.export.success': 'Export completed successfully',
 	'guides.export.error': 'Export failed',
 
@@ -1578,6 +1584,7 @@ export const ru: Record<TranslationKey, string> = {
 	'common.apply': 'Применить',
 	'common.add': 'Добавить',
 	'common.import': 'Импорт',
+	'common.export': 'Экспорт',
 	'common.clear': 'Очистить',
 	'common.saveChanges': 'Сохранить изменения',
 
@@ -1737,6 +1744,11 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.acousticModels.columns.coefficient': 'Коэффициент',
 
 	'guides.import.success': 'Импорт успешно выполнен',
+	'guides.import.summary':
+		'Импортировано: {success} из {total}. Ошибок: {failed}. Проверьте отчёт с ошибками.',
+	'guides.import.noReport': 'Импорт завершён, но файл отчёта не удалось скачать',
+	'guides.import.inProgress': 'Импорт…',
+	'guides.export.inProgress': 'Экспорт…',
 	'guides.export.success': 'Экспорт выполнен',
 	'guides.export.error': 'Ошибка экспорта',
 

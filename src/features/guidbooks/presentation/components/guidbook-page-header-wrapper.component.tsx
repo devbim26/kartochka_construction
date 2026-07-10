@@ -1,5 +1,5 @@
 import type { TranslationKey } from '@core';
-import { Button, CleanUpIcon, useAppNavigate, useI18n } from '@core';
+import { Button, CleanUpIcon, getAxiosErrorMessage, useAppNavigate, useI18n } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { GUIDBOOKS_ROUTES, guidbookHeaderTitlesMap } from '@features/guidbooks/constants';
 import { importMaterials, importRequirements } from '@features/guidbooks/services';
@@ -8,18 +8,24 @@ import {
 	type HeaderFormElements,
 	type HeaderFormTitles,
 } from '@features/guidbooks/types';
+import {
+	formatImportResultToast,
+	parseImportResultFromResponse,
+	resolveImportDownloadAction,
+	triggerDownloadAction,
+} from '@features/guidbooks/utils';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { PiExportBold } from 'react-icons/pi';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { catchError, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
 
 interface GuidbookPageHeaderWrapperProps {
 	titles: HeaderFormTitles;
 	onSave: () => void;
-	onExport?: () => void;
+	onExport?: () => void | Promise<void>;
+	isExporting?: boolean;
 	forms: {
 		filterForm: UseFormReturn<any, any, any>;
 		addForm: UseFormReturn<any, any, any>;
@@ -29,11 +35,12 @@ interface GuidbookPageHeaderWrapperProps {
 }
 
 export const GuidbookPageHeaderWrapper = memoize(
-	({ titles, forms, formElements, onSave, onExport }: GuidbookPageHeaderWrapperProps) => {
+	({ titles, forms, formElements, onSave, onExport, isExporting = false }: GuidbookPageHeaderWrapperProps) => {
 		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
 		const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
 		);
+		const [isImporting, setIsImporting] = useState(false);
 		const fileInputRef = useRef<HTMLInputElement>(null);
 		const { pathname } = useLocation();
 		const { t } = useI18n();
@@ -64,7 +71,9 @@ export const GuidbookPageHeaderWrapper = memoize(
 			setCurrentHeaderFormType(HeaderFormTypes.add);
 		}, []);
 
-		const onImportHandle = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const isTransferInProgress = isImporting || isExporting;
+
+		const onImportHandle = async (event: React.ChangeEvent<HTMLInputElement>) => {
 			const file = event.target.files?.[0];
 			event.target.value = '';
 
@@ -74,26 +83,57 @@ export const GuidbookPageHeaderWrapper = memoize(
 			}
 
 			const isRequirements = pathname.includes(`/${GUIDBOOKS_ROUTES.requirements.route}`);
-			const importRequest = isRequirements
-				? importRequirements({ formFile: file })
-				: importMaterials({ formFile: file });
+			const fallbackFilename = isRequirements
+				? 'requirements-import-result.xlsx'
+				: 'materials-import-result.xlsx';
 
-			from(importRequest)
-				.pipe(
-					tap((response) => {
-						if (response.status === 200) {
-							toast.success(t('guides.import.success'));
-						} else {
-							toast.error(t('errors.import'));
-						}
-					}),
-					catchError((error) => {
-						console.error(error);
-						toast.error(t('errors.fileUpload'));
-						return of(null);
-					}),
-				)
-				.subscribe(() => navigate(''));
+			setIsImporting(true);
+			try {
+				const response = isRequirements
+					? await importRequirements({ formFile: file })
+					: await importMaterials({ formFile: file });
+
+				if (response.status !== 200) {
+					toast.error(t('errors.import'));
+					return;
+				}
+
+				const result = await parseImportResultFromResponse(response);
+				if (!result) {
+					toast.error(t('guides.import.noReport'));
+					return;
+				}
+
+				const toastInfo = formatImportResultToast(result, {
+					success: t('guides.import.success'),
+					summary: t('guides.import.summary'),
+				});
+				if (toastInfo.variant === 'warning') {
+					toast.warning(toastInfo.message);
+				} else {
+					toast.success(toastInfo.message);
+				}
+
+				const action = resolveImportDownloadAction(result, fallbackFilename);
+				if (action) {
+					await triggerDownloadAction(action);
+				} else if ((result.failedCount ?? 0) > 0) {
+					toast.error(t('guides.import.noReport'));
+				}
+
+				navigate('');
+			} catch (error) {
+				console.error(error);
+				const message = await getAxiosErrorMessage(error, t('errors.fileUpload'));
+				toast.error(message);
+			} finally {
+				setIsImporting(false);
+			}
+		};
+
+		const onExportHandle = async () => {
+			if (!onExport || isTransferInProgress) return;
+			await onExport();
 		};
 
 		useEffect(() => {
@@ -175,14 +215,21 @@ export const GuidbookPageHeaderWrapper = memoize(
 									<Button
 										className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
 										onClick={handleImportClick}
+										disabled={isTransferInProgress}
 									>
-										<PiExportBold
-											fill="white"
-											width={'16px'}
-											height={'16px'}
-										/>
+										{isImporting ? (
+											<span className="inline-block size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+										) : (
+											<PiExportBold
+												fill="white"
+												width={'16px'}
+												height={'16px'}
+											/>
+										)}
 										<p className="font-sans text-sm font-semibold leading-[18px]">
-											{t('common.import')}
+											{isImporting
+												? t('guides.import.inProgress')
+												: t('common.import')}
 										</p>
 									</Button>
 									<input
@@ -191,6 +238,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 										accept=".txt,.xlsx,.xls,.csv"
 										onChange={onImportHandle}
 										className="hidden"
+										disabled={isTransferInProgress}
 									/>
 								</>
 							)}
@@ -199,11 +247,18 @@ export const GuidbookPageHeaderWrapper = memoize(
 							{currentHeaderFormType === HeaderFormTypes.filter && onExport && (
 								<Button
 									className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"
-									onClick={onExport}
+									onClick={onExportHandle}
+									disabled={isTransferInProgress}
 								>
-									<PiExportBold fill="white" width={'16px'} height={'16px'} />
+									{isExporting ? (
+										<span className="inline-block size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+									) : (
+										<PiExportBold fill="white" width={'16px'} height={'16px'} />
+									)}
 									<p className="font-sans text-sm font-semibold leading-[18px]">
-										Экспорт
+										{isExporting
+											? t('guides.export.inProgress')
+											: t('common.export')}
 									</p>
 								</Button>
 							)}
