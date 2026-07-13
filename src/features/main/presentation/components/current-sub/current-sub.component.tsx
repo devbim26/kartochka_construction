@@ -1,13 +1,13 @@
 import { fetchApi } from '@api-gen';
 import { Button, convertToPaginatedType, useAppDispatch, useAppNavigate, useAppSelector, useI18n } from '@core';
-import { ensureCompanyRequisitesFilled } from '@features/account/services';
+import { getCurrentUser, ensureCompanyRequisitesFilled } from '@features/account/services';
 import {
 	convertSubscriptionToClient,
 	getPaginatedSubscriptions,
-	shouldShowSubscriptionCalculations,
+	resolveActiveSubscription,
 	shouldShowSubscriptionPrice,
-	shouldShowSubscriptionReports,
 	shouldShowSubscriptionTariffPlan,
+	type ActiveSubscriptionPayload,
 	type Subscription,
 } from '@features/subscriptions';
 import { AxiosError } from 'axios';
@@ -17,11 +17,6 @@ import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 import { SubImage } from './images';
-
-type ActiveSubscriptionResponse = {
-	subscriptionId?: string;
-	userSubscriptionId?: string;
-};
 
 type Props = {
 	className?: string;
@@ -81,20 +76,25 @@ export const CurrentSub = ({ className }: Props) => {
 	const handleGetCurrentSubscription = () => {
 		from(fetchApi.api.userActiveUserSubscriptionList())
 			.pipe(
+				switchMap((response) => {
+					if (response?.status !== 200 || !response.data) {
+						return from([undefined]);
+					}
+					return from(
+						resolveActiveSubscription(
+							response.data as ActiveSubscriptionPayload,
+							subscriptions,
+						),
+					);
+				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
 					}
-					return from([null]);
+					return from([undefined]);
 				}),
 			)
-			.subscribe((response) => {
-				if (response?.status === 200 && response.data) {
-					const activeData = response.data as ActiveSubscriptionResponse;
-					const activeSubscriptionId =
-						activeData.subscriptionId || activeData.userSubscriptionId || '';
-					const activeSub = subscriptions.find((sub) => sub.id === activeSubscriptionId);
-					setSubscription(activeSub);
-				}
+			.subscribe((activeSub) => {
+				setSubscription(activeSub);
 			});
 	};
 
@@ -103,8 +103,9 @@ export const CurrentSub = ({ className }: Props) => {
 	}, [subscriptions, search.get('changePlanFlow')]);
 
 	useLayoutEffect(() => {
+		dispatch(getCurrentUser());
 		handleGetTableData();
-	}, []);
+	}, [dispatch]);
 
 	return (
 		<div
@@ -146,17 +147,13 @@ export const CurrentSub = ({ className }: Props) => {
 											: ''}
 									</p>
 								) : null}
-								{shouldShowSubscriptionReports(subscription.numberOfReports) ? (
-									<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
-										{t('main.currentSub.remainingReports')}: {userData.data?.reportsNumber ?? 0}
-									</p>
-								) : null}
-								{shouldShowSubscriptionCalculations(subscription.numberOfDowloadReports) ? (
-									<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
-										{t('main.currentSub.remainingDownloads')}:{' '}
-										{userData.data?.dowloadReportsNumber ?? 0}
-									</p>
-								) : null}
+								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+									{t('main.currentSub.remainingReports')}: {userData.data?.reportsNumber ?? 0}
+								</p>
+								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+									{t('main.currentSub.remainingDownloads')}:{' '}
+									{userData.data?.dowloadReportsNumber ?? 0}
+								</p>
 							</div>
 						</div>
 						<Button className="w-min px-[16px]" onClick={handleChangePlan}>
