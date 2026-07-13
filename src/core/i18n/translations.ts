@@ -50,6 +50,8 @@ export const en = {
 	'nav.designing': 'Home',
 	'lang.switch': 'Switch language',
 	'ai.assistant.title': 'AI mode',
+	'ai.assistant.firstLoginHint':
+		'Your AI mode password is sent to your email. The password cannot be changed.',
 	'ai.accessDenied.title': 'Subscription required',
 	'ai.accessDenied.subtitle': 'Subscribe to access AI mode and its features.',
 	'ai.accessDenied.subscribe': 'Subscribe',
@@ -1303,6 +1305,8 @@ export const ru: Record<TranslationKey, string> = {
 	'lang.switch': 'Сменить язык',
 
 	'ai.assistant.title': 'AI mode',
+	'ai.assistant.firstLoginHint':
+		'Пароль для AI mode отправляется на вашу почту. Изменить пароль нельзя.',
 	'ai.accessDenied.title': 'Требуется подписка',
 	'ai.accessDenied.subtitle': 'Оформите подписку, чтобы получить доступ к AI-режиму.',
 	'ai.accessDenied.subscribe': 'Оформить подписку',
