@@ -11,10 +11,12 @@ export const convertToServerAccountData = (data: AccountData) => {
 		bankAddress: data.bankAddress!,
 		companyAddress: data.companyAddress!,
 		companyDescription: data.compannyInfo!,
-		additionalPhoneNumbers: data.phoneNumbers.map((ph) => ({
-			number: ph.number.replaceAll(' ', ''),
-			id: ph.id,
-		})),
+		additionalPhoneNumbers: data.phoneNumbers
+			.filter((ph) => ph.number.trim().length > 0)
+			.map((ph) => ({
+				number: ph.number.replaceAll(' ', ''),
+				id: ph.id,
+			})),
 		formFile: data.formFile || null,
 	};
 };
@@ -30,10 +32,12 @@ export const convertToServerAccountUpdateData = (data: AccountData) => {
 		bankAddress: data.bankAddress!,
 		companyAddress: data.companyAddress!,
 		companyDescription: data.compannyInfo!,
-		additionalPhoneNumbers: data.phoneNumbers.map((ph) => ({
-			number: ph.number.replaceAll(' ', ''),
-			id: ph.id,
-		})),
+		additionalPhoneNumbers: data.phoneNumbers
+			.filter((ph) => ph.number.trim().length > 0)
+			.map((ph) => ({
+				number: ph.number.replaceAll(' ', ''),
+				id: ph.id,
+			})),
 		userId: data.id,
 		formFile: data.formFile || null,
 		roleId: data.roleId,

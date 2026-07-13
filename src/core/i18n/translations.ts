@@ -85,8 +85,7 @@ export const en = {
 	'auth.registration.skip': 'Skip',
 	'auth.registration.skipTooltip':
 		'Register with email and phone only. Company details below are optional and can be completed later in your account.',
-	'auth.registration.fullFormError':
-		'Please fill in all required company fields and upload a logo.',
+	'auth.registration.fullFormError': 'Please fill in all required company fields.',
 
 	'meta.title':
 		'AI for design | Sound insulation, compliance checking, visualization — Belarus and Russia',
@@ -1339,8 +1338,7 @@ export const ru: Record<TranslationKey, string> = {
 	'auth.registration.skip': 'Пропустить',
 	'auth.registration.skipTooltip':
 		'Можно зарегистрироваться только по email и телефону. Данные компании ниже необязательны — их можно заполнить позже в личном кабинете.',
-	'auth.registration.fullFormError':
-		'Заполните все обязательные поля компании и загрузите логотип.',
+	'auth.registration.fullFormError': 'Заполните все обязательные поля компании.',
 
 	'meta.title':
 		'AI для проектирования | Звукоизоляция, нормоконтроль, визуализация — Беларусь и Россия',

@@ -1,21 +1,38 @@
 import { z } from 'zod';
+import { isValidCompanyPhone, isValidPaymentAccount } from '../company-requisites.utils';
 
-const AccountDataSchema = z.object({
+const accountPhoneRowSchema = z.object({
+	id: z.string(),
+	number: z.string(),
+});
+
+const refineAccountAdditionalPhones = (
+	data: { phoneNumbers: { number: string }[] },
+	ctx: z.RefinementCtx,
+) => {
+	data.phoneNumbers.forEach((p, index) => {
+		const trimmed = p.number.trim();
+		if (trimmed.length === 0) return;
+		if (trimmed.includes('_')) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: 'Неверный формат номера телефона',
+				path: ['phoneNumbers', index, 'number'],
+			});
+		}
+	});
+};
+
+const AccountDataSchema = z
+	.object({
 	id: z.string().optional(),
 	email: z.string().email('Некорректный e-mail').optional(),
 	mainPhoneNumber: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => !value.includes('_'), 'Неверный формат номера телефона'),
-	phoneNumbers: z.array(
-		z.object({
-			number: z
-				.string()
-				.min(1, 'Поле обязательно для заполнения')
-				.refine((value) => !value.includes('_'), 'Неверный формат номера телефона'),
-			id: z.string(),
-		}),
-	),
+		.refine((value) => !value.includes('_'), 'Неверный формат номера телефона')
+		.refine(isValidCompanyPhone, 'Неверный формат номера телефона'),
+	phoneNumbers: z.array(accountPhoneRowSchema),
 	companyName: z.string().min(1, 'Поле обязательно для заполнения'),
 	directorFullName: z.string().min(1, 'Поле обязательно для заполнения'),
 	companyAddress: z.string().min(1, 'Поле обязательно для заполнения'),
@@ -29,7 +46,7 @@ const AccountDataSchema = z.object({
 	paymentAccount: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
-		.min(28, 'Расчетный счет должен содержать 28 символов'),
+		.refine(isValidPaymentAccount, 'Неверный формат расчетного счета'),
 	bankIdNumber: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')
@@ -38,8 +55,9 @@ const AccountDataSchema = z.object({
 	compannyInfo: z.string().min(1, 'Поле обязательно для заполнения'),
 	companyLogo: z.string().optional(),
 	roleId: z.string().min(1, 'Поле обязательно для заполнения'),
-	formFile: z.any().refine((file) => file instanceof File && file.size > 0, 'Логотип не выбран'),
-});
+	formFile: z.any().optional(),
+})
+	.superRefine(refineAccountAdditionalPhones);
 
 type AccountDataSchemaType = z.infer<typeof AccountDataSchema>;
 

@@ -16,7 +16,9 @@ export const isValidBik = (value?: string | null) => /^\d{8}$/.test(value?.trim(
 
 export const isValidPaymentAccount = (value?: string | null) => {
 	const normalized = (value ?? '').replace(/\s/g, '').toUpperCase();
-	return /^BY\d{26}$/.test(normalized);
+	if (!normalized) return false;
+	if (/^BY\d{26}$/.test(normalized)) return true;
+	return /^\d{20,28}$/.test(normalized);
 };
 
 export const isValidCompanyPhone = (value?: string | null): boolean => {
@@ -24,13 +26,10 @@ export const isValidCompanyPhone = (value?: string | null): boolean => {
 	if (!isMeaningfulRequisiteText(trimmed)) return false;
 
 	const digits = (trimmed ?? '').replace(/\D/g, '');
-	if (digits.length < 9) return false;
-	if (/(\d)\1{5,}/.test(digits)) return false;
-
-	return true;
+	return digits.length >= 9;
 };
 
-/** Реквизиты компании для оформления подписки (личный кабинет). */
+/** Реквизиты компании для оформления подписки — только заполненность, без проверки формата. */
 export const hasFilledCompanyRequisites = (data?: AccountData | null): boolean => {
 	if (!data) return false;
 
@@ -40,9 +39,9 @@ export const hasFilledCompanyRequisites = (data?: AccountData | null): boolean =
 		isMeaningfulRequisiteText(data.companyAddress) &&
 		isMeaningfulRequisiteText(data.bankAddress) &&
 		isMeaningfulRequisiteText(data.compannyInfo) &&
-		isValidUnp(data.payersRegistrationNumber) &&
-		isValidBik(data.bankIdNumber) &&
-		isValidPaymentAccount(data.paymentAccount) &&
-		isValidCompanyPhone(data.mainPhoneNumber)
+		isMeaningfulRequisiteText(data.payersRegistrationNumber) &&
+		isMeaningfulRequisiteText(data.bankIdNumber) &&
+		isMeaningfulRequisiteText(data.paymentAccount) &&
+		isMeaningfulRequisiteText(data.mainPhoneNumber)
 	);
 };

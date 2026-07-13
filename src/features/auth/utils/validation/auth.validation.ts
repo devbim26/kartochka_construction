@@ -72,7 +72,7 @@ const RegistrationFormDataSchema = registrationFormDataObjectSchema.superRefine(
 	refineRegistrationAdditionalPhones,
 );
 
-/** Полная регистрация: все поля компании и логотип обязательны. */
+/** Полная регистрация: обязательны реквизиты компании; логотип и доп. телефоны — нет. */
 const RegistrationFormFullSchema = registrationFormDataObjectSchema
 	.merge(
 		z.object({
@@ -84,9 +84,6 @@ const RegistrationFormFullSchema = registrationFormDataObjectSchema
 			bankIdNumber: z.string().min(1, 'Поле обязательно для заполнения'),
 			bankAddress: z.string().min(1, 'Поле обязательно для заполнения'),
 			compannyInfo: z.string().min(1, 'Поле обязательно для заполнения'),
-			formFile: z
-				.any()
-				.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),
 		}),
 	)
 	.superRefine(refineRegistrationAdditionalPhones);

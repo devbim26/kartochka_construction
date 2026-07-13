@@ -217,6 +217,7 @@ export const Select = memoize(
 								isCurrent && 'font-bold',
 								highlightOnlyRussiaBelarus && !isHighlighted && 'text-gray-400',
 							)}
+							title={props.data.label}
 						>
 							{props.data.label}
 						</p>

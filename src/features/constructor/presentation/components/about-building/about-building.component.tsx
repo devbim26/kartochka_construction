@@ -48,13 +48,12 @@ import {
 import {
 	BuildingType,
 	CategoryClass,
-	Country,
 	EnBuildingTypeSelectValues,
 	EnCategoryClassSelectValues,
-	EnCountryNamesSelectValues,
+	EnConstructorCountrySelectValues,
 	RuBuildingTypeSelectValues,
 	RuCategoryClassSelectValues,
-	RuCountryNamesSelectValues,
+	RuConstructorCountrySelectValues,
 } from '@features/guidbooks/types';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -73,6 +72,9 @@ const formatEnumValue = (value: string): string => {
 	// Пример: "ResidentialBuildings" -> "Residential Buildings"
 	return value.replace(/([A-Z])/g, ' $1').trim();
 };
+
+const REQUIREMENT_DOCUMENT_SELECT_CLASS =
+	'w-[480px] max-w-full h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]';
 
 const AboutBuildingScreen = () => {
 	const { t, locale } = useI18n();
@@ -323,14 +325,9 @@ const AboutBuildingScreen = () => {
 	};
 
 	const countryOptions = useMemo(() => {
-		if (currentLanguage === 'ru') {
-			return RuCountryNamesSelectValues;
-		} else {
-			return (
-				EnCountryNamesSelectValues ||
-				Object.values(Country).map((value) => ({ label: formatEnumValue(value), value }))
-			);
-		}
+		return currentLanguage === 'ru'
+			? RuConstructorCountrySelectValues
+			: EnConstructorCountrySelectValues;
 	}, [currentLanguage]);
 
 	const buildingTypeOptions = useMemo(() => {
@@ -476,7 +473,6 @@ const AboutBuildingScreen = () => {
 											: undefined
 									}
 									isSearchable
-									highlightOnlyRussiaBelarus
 									labelClassName={twMerge(
 										'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
 										formState.errors.region?.message ? 'text-error' : '',
@@ -605,17 +601,17 @@ const AboutBuildingScreen = () => {
 								{t('aboutBuilding.requirements.title')}
 							</FormElementLabel>
 							<div className="flex w-full items-center gap-[12px]">
-								<FormElementLabel className="w-[226px] text-center font-sans text-lg font-semibold leading-4 text-input-label-primary">
+								<FormElementLabel className="w-[480px] max-w-full text-center font-sans text-lg font-semibold leading-4 text-input-label-primary">
 									{t('aboutBuilding.requirements.calculation')}
 								</FormElementLabel>
-								<FormElementLabel className="w-[226px] text-center font-sans text-lg font-semibold leading-4 text-input-label-primary">
+								<FormElementLabel className="w-[480px] max-w-full text-center font-sans text-lg font-semibold leading-4 text-input-label-primary">
 									{t('aboutBuilding.requirements.regulation')}
 								</FormElementLabel>
 							</div>
 						</div>
 
 						{/* Документы требований */}
-						<div className="flex gap-[12px]">
+						<div className="flex flex-wrap items-start gap-[12px]">
 							<Controller
 								control={control}
 								name="calculationDocumentId"
@@ -651,7 +647,8 @@ const AboutBuildingScreen = () => {
 										placeholder={t(
 											'aboutBuilding.requirements.sound.placeholder',
 										)}
-										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+										buttonClassName={REQUIREMENT_DOCUMENT_SELECT_CLASS}
+										optionsClassName="!w-[480px] max-w-[calc(100vw-2rem)]"
 										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 									/>
 								)}
@@ -678,7 +675,8 @@ const AboutBuildingScreen = () => {
 											placeholder={t(
 												'aboutBuilding.requirements.regulation.placeholder',
 											)}
-											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+											buttonClassName={REQUIREMENT_DOCUMENT_SELECT_CLASS}
+											optionsClassName="!w-[480px] max-w-[calc(100vw-2rem)]"
 											wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 										/>
 									)}

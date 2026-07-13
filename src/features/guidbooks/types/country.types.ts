@@ -227,3 +227,13 @@ export const EnCountryNamesSelectValues = [
 	{ label: 'Switzerland', value: Country.Switzerland },
 	{ label: 'Ukraine', value: Country.Ukrain },
 ];
+
+const constructorCountryValues = [Country.Belarus, Country.Russia];
+
+export const RuConstructorCountrySelectValues = RuCountryNamesSelectValues.filter((option) =>
+	constructorCountryValues.includes(option.value),
+);
+
+export const EnConstructorCountrySelectValues = EnCountryNamesSelectValues.filter((option) =>
+	constructorCountryValues.includes(option.value),
+);
