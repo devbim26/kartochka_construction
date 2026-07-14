@@ -29,6 +29,8 @@ export interface AccountDto {
 	reportsNumber?: number;
 	/** @format int32 */
 	dowloadReportsNumber?: number;
+	/** @format double */
+	budgetRemaining?: number;
 }
 
 export interface AcousticModelDto {
@@ -137,6 +139,8 @@ export enum BuildingType {
 	Hospital = 'Hospital',
 	EducationalInstitutions = 'EducationalInstitutions',
 	PreschoolEducationalInstitutions = 'PreschoolEducationalInstitutions',
+	ResearchAndPublicBuildings = 'ResearchAndPublicBuildings',
+	BowlingAlleys = 'BowlingAlleys',
 }
 
 export interface CalculationRequirementDocumentDto {
@@ -2057,8 +2061,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				companyAddress?: string;
 				companyDescription?: string;
 				additionalPhoneNumbers?: AdditionalPhoneNumber[];
-				/** @format uuid */
-				roleId?: string;
 				/** @format binary */
 				formFile?: File;
 			},
@@ -4227,8 +4229,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				companyAddress?: string;
 				companyDescription?: string;
 				additionalPhoneNumbers?: AdditionalPhoneNumber[];
-				/** @format uuid */
-				roleId?: string;
 				/** @format binary */
 				formFile?: File;
 			},

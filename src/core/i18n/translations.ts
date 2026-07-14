@@ -541,9 +541,12 @@ export const en = {
 	'main.news.imageAltFallback': 'News image',
 
 	'main.currentSub.title': 'Service plan',
-	'main.currentSub.remainingDownloads': 'downloads left',
-	'main.currentSub.remainingReports': 'reports left',
-	'main.currentSub.price': 'AI mode funds, BYN',
+	'main.currentSub.remainingDownloads': 'Number of reports',
+	'main.currentSub.remainingReports': 'Number of calculations',
+	'main.currentSub.price': 'AI mode balance',
+	'main.currentSub.credits.one': 'credit',
+	'main.currentSub.credits.few': 'credits',
+	'main.currentSub.credits.many': 'credits',
 	'main.currentSub.changePlan': 'Change plan',
 	'main.currentSub.noneActive': 'No active plan',
 
@@ -1798,9 +1801,12 @@ export const ru: Record<TranslationKey, string> = {
 	'main.news.imageAltFallback': 'Изображение новости',
 
 	'main.currentSub.title': 'Тариф услуг',
-	'main.currentSub.remainingDownloads': 'осталось скачиваний',
-	'main.currentSub.remainingReports': 'осталось отчетов',
-	'main.currentSub.price': 'Остаток средств AI mode, BYN',
+	'main.currentSub.remainingDownloads': 'Количество отчетов',
+	'main.currentSub.remainingReports': 'Количество расчетов',
+	'main.currentSub.price': 'Остаток средств AI mode',
+	'main.currentSub.credits.one': 'кредит',
+	'main.currentSub.credits.few': 'кредита',
+	'main.currentSub.credits.many': 'кредитов',
 	'main.currentSub.changePlan': 'Изменить тариф',
 	'main.currentSub.noneActive': 'Нет активного тарифа',
 

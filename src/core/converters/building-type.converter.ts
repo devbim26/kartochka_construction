@@ -10,6 +10,9 @@ export const buildingTypeMap = createDataRecordConverter({
 	[ClientBuildingType.EducationalInstitutions]: ServerBuildingType.EducationalInstitutions,
 	[ClientBuildingType.PreschoolEducationalInstitutions]:
 		ServerBuildingType.PreschoolEducationalInstitutions,
+	[ClientBuildingType.ResearchAndPublicBuildings]:
+		ServerBuildingType.ResearchAndPublicBuildings,
+	[ClientBuildingType.BowlingAlleys]: ServerBuildingType.BowlingAlleys,
 });
 
 export const convertToServerBuildingTypeData = (type: ClientBuildingType): ServerBuildingType => {

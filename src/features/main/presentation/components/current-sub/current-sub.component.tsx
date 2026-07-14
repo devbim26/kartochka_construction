@@ -1,5 +1,13 @@
 import { fetchApi } from '@api-gen';
-import { Button, convertToPaginatedType, useAppDispatch, useAppNavigate, useAppSelector, useI18n } from '@core';
+import {
+	Button,
+	convertToPaginatedType,
+	getPluralForm,
+	useAppDispatch,
+	useAppNavigate,
+	useAppSelector,
+	useI18n,
+} from '@core';
 import { getCurrentUser, ensureCompanyRequisitesFilled } from '@features/account/services';
 import {
 	convertSubscriptionToClient,
@@ -27,7 +35,7 @@ export const CurrentSub = ({ className }: Props) => {
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
 	const [search] = useSearchParams();
 	const userData = useAppSelector((store) => store.userData);
-	const { t } = useI18n();
+	const { t, locale } = useI18n();
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
 
@@ -136,7 +144,13 @@ export const CurrentSub = ({ className }: Props) => {
 							<div className="flex flex-col gap-[10px]">
 								{shouldShowSubscriptionPrice(subscription.price) ? (
 									<p className="font-sans text-base font-bold leading-6 text-[#111827]">
-										{t('main.currentSub.price')}: {subscription.price} BYN
+										{t('main.currentSub.price')}: {subscription.price}{' '}
+										{t(
+											`main.currentSub.credits.${getPluralForm(
+												Number(subscription.price) || 0,
+												locale,
+											)}`,
+										)}
 									</p>
 								) : null}
 								{shouldShowSubscriptionTariffPlan(subscription.tariffPlanName) ? (
@@ -148,11 +162,12 @@ export const CurrentSub = ({ className }: Props) => {
 									</p>
 								) : null}
 								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
-									{t('main.currentSub.remainingReports')}: {userData.data?.reportsNumber ?? 0}
+									{t('main.currentSub.remainingReports')}:{' '}
+									{userData.data?.dowloadReportsNumber ?? 0}
 								</p>
 								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
 									{t('main.currentSub.remainingDownloads')}:{' '}
-									{userData.data?.dowloadReportsNumber ?? 0}
+									{userData.data?.reportsNumber ?? 0}
 								</p>
 							</div>
 						</div>
