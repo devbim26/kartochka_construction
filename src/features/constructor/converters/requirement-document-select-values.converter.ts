@@ -30,7 +30,7 @@ export const convertToRequirementDocumentSelectValues = (
 
 	return data
 		.map((doc) => {
-			const title = (doc.shortName ?? doc.fullName ?? '').trim();
+			const title = (doc.fullName ?? doc.shortName ?? '').trim();
 			const countryKey = doc.country
 				? String(convertToClientCountryData(doc.country))
 				: '';

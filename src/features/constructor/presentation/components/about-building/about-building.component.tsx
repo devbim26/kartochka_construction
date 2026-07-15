@@ -1,3 +1,4 @@
+import type { CalculationRequirementDocumentDto, RegulatoryRequirementDocumentDto } from '@api-gen';
 import {
 	APP_ROUTES,
 	Button,
@@ -14,10 +15,6 @@ import {
 } from '@core';
 import { getCurrentUser } from '@features/account/services';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
-import type {
-	CalculationRequirementDocumentDto,
-	RegulatoryRequirementDocumentDto,
-} from '@api-gen';
 import {
 	convertToClientReportInfo,
 	convertToCreateReportInfoCommand,
@@ -161,12 +158,7 @@ const AboutBuildingScreen = () => {
 				shouldValidate: true,
 			});
 		},
-		[
-			calculationRequirementDocuments,
-			isEditMode,
-			regulatoryRequirementDocuments,
-			setValue,
-		],
+		[calculationRequirementDocuments, isEditMode, regulatoryRequirementDocuments, setValue],
 	);
 
 	useEffect(() => {
