@@ -1,8 +1,16 @@
 import {
+	AcousticDesignLogo,
 	APP_ROUTES,
+	ArchDesignLogo,
 	Carousel,
 	CarouselSlide,
+	ExpertiseDocumentsLogo,
+	ExpertiseGeneralLogo,
+	ExpertiseNormsLogo,
+	ExpertiseSubjectLogo,
 	MainSliderLogo,
+	SoundInsulationLogo,
+	TermoInsulationLogo,
 	useAppNavigate,
 	useI18n,
 } from '@core';
@@ -10,7 +18,7 @@ import { setDesignCalculationModeFromFeatureId } from '@core/utils/helpers/desig
 import { getOpenWebUiModelFromFeatureId } from '@core/utils/helpers/open-webui-model.helper';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { DESIGNING_ROUTES } from '@features/home/constants';
-import { Fragment, useCallback, type ReactNode } from 'react';
+import { Fragment, useCallback, type ComponentType, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface FeatureCard {
@@ -24,6 +32,17 @@ interface FeatureCard {
 	active?: boolean;
 	onClick?: () => void;
 }
+
+const featureLogos: Record<string, ComponentType<{ className?: string }>> = {
+	'sound-isolation': SoundInsulationLogo,
+	'room-acoustics': AcousticDesignLogo,
+	'heat-isolation': TermoInsulationLogo,
+	'arch-design': ArchDesignLogo,
+	'expertise-general': ExpertiseGeneralLogo,
+	'expertise-subject': ExpertiseSubjectLogo,
+	'expertise-documents': ExpertiseDocumentsLogo,
+	'expertise-norms': ExpertiseNormsLogo,
+};
 
 const featureAccentColors: Record<string, string> = {
 	'sound-isolation': '#B1C9E3',
@@ -55,6 +74,8 @@ function MainSliderFeatureCard({
 	feature: FeatureCard;
 	footer: ReactNode;
 }) {
+	const Logo = featureLogos[feature.id] ?? MainSliderLogo;
+
 	return (
 		<div className={twMerge(MAIN_SLIDER_CARD, !feature.active && 'bg-gray-text/30')}>
 			<div className="flex min-h-0 flex-1 flex-col">
@@ -71,7 +92,7 @@ function MainSliderFeatureCard({
 
 				<div className="flex min-h-0 flex-1 items-stretch gap-2.5">
 					<div className="shrink-0 self-start">
-						<MainSliderLogo className="size-14" />
+						<Logo className="size-14" />
 					</div>
 					<div className={MAIN_SLIDER_TEXT}>
 						{feature.description}
