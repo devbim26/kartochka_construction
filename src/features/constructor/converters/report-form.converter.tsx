@@ -19,13 +19,6 @@ export const convertToClientReportFormFlags = (
 		takeTitleList: data.takeTitleList ?? false,
 		takeContent: data.takeContent ?? false,
 		takeIntroduction: data.takeIntroduction ?? false,
-		generalCharacteristics: {
-			takeRoomCharacteristic: data.generalCharacteristics?.takeRoomCharacteristic ?? false,
-			takeWallMaterialsVolumesCalculation:
-				data.generalCharacteristics?.takeWallMaterialsVolumesCalculation ?? false,
-			takeFloorMaterialsVolumesCalculation:
-				data.generalCharacteristics?.takeFloorMaterialsVolumesCalculation ?? false,
-		},
 		soundInsulationCalculation: {
 			takeEnclosingStructuresSoundInsulationCalculation:
 				data.soundInsulationCalculation
@@ -36,6 +29,8 @@ export const convertToClientReportFormFlags = (
 		takeUsedLiteratureList: data.takeUsedLiteratureList ?? false,
 		takeSupplementSoundInsulationProtocolsWithCalculation:
 			data.takeSupplementSoundInsulationProtocolsWithCalculation ?? false,
+		takeSupplementSoundInsulationAlternativeProtocols:
+			data.takeSupplementSoundInsulationAlternativeProtocols ?? false,
 	};
 };
 

@@ -12,12 +12,6 @@ export const BaseReportInfoFlags = z.object({
 	takeFloor: z.boolean().optional(),
 });
 
-export const GeneralCharacteristics = z.object({
-	takeRoomCharacteristic: z.boolean().optional(),
-	takeWallMaterialsVolumesCalculation: z.boolean().optional(),
-	takeFloorMaterialsVolumesCalculation: z.boolean().optional(),
-});
-
 export const SoundInsulationCalculation = z.object({
 	takeEnclosingStructuresSoundInsulationCalculation: z.boolean().optional(),
 	baseReportInfoFlags: z.array(BaseReportInfoFlags).optional().nullable(),
@@ -27,11 +21,11 @@ export const FloorDocumentsFlags = z.object({
 	takeTitleList: z.boolean().optional(),
 	takeContent: z.boolean().optional(),
 	takeIntroduction: z.boolean().optional(),
-	generalCharacteristics: GeneralCharacteristics.optional(),
 	soundInsulationCalculation: SoundInsulationCalculation.optional(),
 	takeConclusion: z.boolean().optional(),
 	takeUsedLiteratureList: z.boolean().optional(),
 	takeSupplementSoundInsulationProtocolsWithCalculation: z.boolean().optional(),
+	takeSupplementSoundInsulationAlternativeProtocols: z.boolean().optional(),
 });
 
 const optionalTextField = z.string().optional().or(z.literal(''));

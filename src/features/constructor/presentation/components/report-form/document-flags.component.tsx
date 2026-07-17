@@ -5,15 +5,8 @@ import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
 export const DocumentFlags = () => {
 	const { setValue, control, watch, getValues } = useFormContext<FormReportSchemaType>();
-	const [showGeneralInfo, setShowGeneralInfo] = useState(true);
 	const [showSoundInfo, setShowSoundInfo] = useState(true);
 	const { t } = useI18n();
-
-	const generalCharacteristics = watch('floorDocumentFlags.generalCharacteristics');
-	const isGeneralEnabled =
-		generalCharacteristics?.takeFloorMaterialsVolumesCalculation ||
-		generalCharacteristics?.takeRoomCharacteristic ||
-		generalCharacteristics?.takeWallMaterialsVolumesCalculation;
 
 	const soundBaseReportInfoFlags = useWatch({
 		control,
@@ -108,88 +101,6 @@ export const DocumentFlags = () => {
 					)}
 				/>
 			</div>
-			<div className="flex w-full items-center justify-start gap-[10px]">
-				<FormElementLabel className="w-[200px] text-[#383838]">
-					{t('constructor.reportForm.docs.general.section')}
-				</FormElementLabel>
-				<Switch
-					isEnabledProp={!!isGeneralEnabled}
-					onChange={(isEnabled) => {
-						setValue('floorDocumentFlags.generalCharacteristics', {
-							takeFloorMaterialsVolumesCalculation: isEnabled,
-							takeRoomCharacteristic: isEnabled,
-							takeWallMaterialsVolumesCalculation: isEnabled,
-						});
-					}}
-				/>
-				<Chevron
-					color="#383838"
-					className="pl-[50px]"
-					direction={showGeneralInfo ? 'down' : 'up'}
-					onClick={() => setShowGeneralInfo(!showGeneralInfo)}
-				/>
-			</div>
-			{showGeneralInfo && (
-				<div className="flex w-full flex-col gap-[20px] pl-[50px] font-semibold text-input-label-primary">
-					<div className="flex w-full items-center justify-start gap-[10px]">
-						<FormElementLabel className="w-[350px]">
-							{t('constructor.reportForm.docs.general.room')}
-						</FormElementLabel>
-						<Controller
-							control={control}
-							name="floorDocumentFlags.generalCharacteristics.takeRoomCharacteristic"
-							render={({ field }) => (
-								<Switch
-									isEnabledProp={watch(
-										'floorDocumentFlags.generalCharacteristics.takeRoomCharacteristic',
-									)}
-									onChange={(isEnabled) => {
-										field.onChange(isEnabled);
-									}}
-								/>
-							)}
-						/>
-					</div>
-					<div className="flex w-full items-center justify-start gap-[10px]">
-						<FormElementLabel className="w-[350px]">
-							{t('constructor.reportForm.docs.general.wallVolumes')}
-						</FormElementLabel>
-						<Controller
-							control={control}
-							name="floorDocumentFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation"
-							render={({ field }) => (
-								<Switch
-									isEnabledProp={watch(
-										'floorDocumentFlags.generalCharacteristics.takeWallMaterialsVolumesCalculation',
-									)}
-									onChange={(isEnabled) => {
-										field.onChange(isEnabled);
-									}}
-								/>
-							)}
-						/>
-					</div>
-					<div className="flex w-full items-center justify-start gap-[10px]">
-						<FormElementLabel className="w-[350px]">
-							{t('constructor.reportForm.docs.general.floorVolumes')}
-						</FormElementLabel>
-						<Controller
-							control={control}
-							name="floorDocumentFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation"
-							render={({ field }) => (
-								<Switch
-									isEnabledProp={watch(
-										'floorDocumentFlags.generalCharacteristics.takeFloorMaterialsVolumesCalculation',
-									)}
-									onChange={(isEnabled) => {
-										field.onChange(isEnabled);
-									}}
-								/>
-							)}
-						/>
-					</div>
-				</div>
-			)}
 			<div className="flex w-full items-center justify-start gap-[10px]">
 				<FormElementLabel className="w-[400px] text-[#383838]">
 					{t('constructor.reportForm.docs.sound.section')}
@@ -325,6 +236,23 @@ export const DocumentFlags = () => {
 				<Controller
 					control={control}
 					name="floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation"
+					render={({ field }) => (
+						<Switch
+							isEnabledProp={!!field.value}
+							onChange={(isEnabled) => {
+								field.onChange(isEnabled);
+							}}
+						/>
+					)}
+				/>
+			</div>
+			<div className="flex w-full items-center justify-start gap-[10px]">
+				<FormElementLabel className="w-[410px] text-[#383838]">
+					{t('constructor.reportForm.docs.appendix2')}
+				</FormElementLabel>
+				<Controller
+					control={control}
+					name="floorDocumentFlags.takeSupplementSoundInsulationAlternativeProtocols"
 					render={({ field }) => (
 						<Switch
 							isEnabledProp={!!field.value}

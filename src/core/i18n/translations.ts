@@ -700,7 +700,7 @@ export const en = {
 	'constructor.reportForm.docs.appendix1':
 		'APPENDIX 1. Sound insulation. Protocols with calculation',
 	'constructor.reportForm.docs.appendix2':
-		'APPENDIX 2. Thermal insulation. Protocols with calculation',
+		'APPENDIX 2. Alternative constructions',
 
 	'constructor.header.title': 'Constructor',
 	'constructor.header.aboutBuilding': 'About building',
@@ -1955,7 +1955,7 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.reportForm.docs.conclusion': 'Выводы',
 	'constructor.reportForm.docs.literature': 'Список используемой литературы',
 	'constructor.reportForm.docs.appendix1': 'ПРИЛОЖЕНИЕ 1. Звукоизоляция. Протоколы с расчетом',
-	'constructor.reportForm.docs.appendix2': 'ПРИЛОЖЕНИЕ 2. Теплоизоляция. Протоколы с расчетом',
+	'constructor.reportForm.docs.appendix2': 'ПРИЛОЖЕНИЕ 2. Альтернативные конструкции',
 
 	'constructor.header.title': 'Конструктор',
 	'constructor.header.aboutBuilding': 'О здании',

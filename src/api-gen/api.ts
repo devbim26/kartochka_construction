@@ -606,13 +606,13 @@ export interface DocumentReportFlagsDto {
 	takeTitleList?: boolean;
 	takeContent?: boolean;
 	takeIntroduction?: boolean;
-	generalCharacteristics?: GeneralCharacteristicFlagsDto;
 	soundInsulationCalculation?: EnclosingStructuresSoundInsulationCalculationFlagsDto;
 	thermalInsulationCalculation?: EnclosingStructuresThermalInsulationCalculationFlagsDto;
 	takeConclusion?: boolean;
 	takeUsedLiteratureList?: boolean;
 	takeSupplementSoundInsulationProtocolsWithCalculation?: boolean;
 	takeSupplementThermalInsulationProtocolsWithCalculation?: boolean;
+	takeSupplementSoundInsulationAlternativeProtocols?: boolean;
 }
 
 export interface Dot {
@@ -691,12 +691,6 @@ export interface FirstRequirementPlacementRoomDto {
 export interface FloorConstructionInfoIdDto {
 	/** @format uuid */
 	id?: string;
-}
-
-export interface GeneralCharacteristicFlagsDto {
-	takeRoomCharacteristic?: boolean;
-	takeWallMaterialsVolumesCalculation?: boolean;
-	takeFloorMaterialsVolumesCalculation?: boolean;
 }
 
 export interface GetAcousticModelsQuery {

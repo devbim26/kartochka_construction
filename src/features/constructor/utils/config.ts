@@ -79,11 +79,6 @@ export const FormReportConfig: EntityConfig = {
 			takeTitleList: false,
 			takeContent: false,
 			takeIntroduction: false,
-			generalCharacteristics: {
-				takeRoomCharacteristic: false,
-				takeWallMaterialsVolumesCalculation: false,
-				takeFloorMaterialsVolumesCalculation: false,
-			},
 			soundInsulationCalculation: {
 				takeEnclosingStructuresSoundInsulationCalculation: false,
 				baseReportInfoFlags: [],
@@ -91,6 +86,7 @@ export const FormReportConfig: EntityConfig = {
 			takeConclusion: false,
 			takeUsedLiteratureList: false,
 			takeSupplementSoundInsulationProtocolsWithCalculation: false,
+			takeSupplementSoundInsulationAlternativeProtocols: false,
 		},
 	},
 };
