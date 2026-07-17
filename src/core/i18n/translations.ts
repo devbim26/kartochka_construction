@@ -682,9 +682,9 @@ export const en = {
 	'constructor.reportForm.docs.general.wallVolumes': '1.2 Wall materials volume calculation',
 	'constructor.reportForm.docs.general.floorVolumes': '1.3 Slab materials volume calculation',
 	'constructor.reportForm.docs.sound.section':
-		'2. Sound insulation calculation of enclosing structures',
+		'1. Sound insulation calculation of enclosing structures',
 	'constructor.reportForm.docs.sound.calc':
-		'2.1 Sound insulation calculation of enclosing structures',
+		'1.1 Sound insulation calculation of enclosing structures',
 	'constructor.reportForm.docs.sound.constructionsAt': 'Constructions at elevation',
 	'constructor.reportForm.docs.sound.construction': 'Construction',
 	'constructor.reportForm.docs.sound.calcItem': 'Sound insulation calculation',
@@ -1940,8 +1940,8 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.reportForm.docs.general.room': '1.1 Характеристика помещений',
 	'constructor.reportForm.docs.general.wallVolumes': '1.2 Расчет объемов материалов стен',
 	'constructor.reportForm.docs.general.floorVolumes': '1.3 Расчет объемов материалов перекрытий',
-	'constructor.reportForm.docs.sound.section': '2. Расчет звукоизоляции ограждающих конструкций',
-	'constructor.reportForm.docs.sound.calc': '2.1 Расчет звукоизоляции ограждающих конструкций',
+	'constructor.reportForm.docs.sound.section': '1. Расчет звукоизоляции ограждающих конструкций',
+	'constructor.reportForm.docs.sound.calc': '1.1 Расчет звукоизоляции ограждающих конструкций',
 	'constructor.reportForm.docs.sound.constructionsAt': 'Конструкции на отметке',
 	'constructor.reportForm.docs.sound.construction': 'Конструкция',
 	'constructor.reportForm.docs.sound.calcItem': 'Расчет звукоизоляции',

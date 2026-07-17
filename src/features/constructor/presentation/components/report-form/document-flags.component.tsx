@@ -147,7 +147,7 @@ export const DocumentFlags = () => {
 										className="flex w-full items-center justify-start gap-[10px]"
 									>
 										<FormElementLabel className="w-[350px]">
-											{`2.1.${baseIndex + 1} ${t('constructor.reportForm.docs.sound.constructionsAt')} ${baseFlag.floorNumber}.000`}
+											{`1.1.${baseIndex + 1} ${t('constructor.reportForm.docs.sound.constructionsAt')} ${baseFlag.floorNumber}.000`}
 										</FormElementLabel>
 										<Controller
 											control={control}
@@ -171,7 +171,7 @@ export const DocumentFlags = () => {
 													className="flex w-full items-center justify-start gap-[10px]"
 												>
 													<FormElementLabel className="w-[350px]">
-														{`2.1.${baseIndex + 1}.${index + 1} ${t('constructor.reportForm.docs.sound.construction')} ${namedConst.constructionName}`}
+														{`1.1.${baseIndex + 1}.${index + 1} ${t('constructor.reportForm.docs.sound.construction')} ${namedConst.constructionName}`}
 													</FormElementLabel>
 													<Controller
 														control={control}
