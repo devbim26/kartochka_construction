@@ -124,7 +124,9 @@ export const FormSubscription = () => {
 						</div>
 						<Button
 							onClick={() => {
-								handleDeleteTableData(bill!.id);
+								if (bill?.id) {
+									handleDeleteTableData(bill.id);
+								}
 								navigate('', { sectionId: LandingSections.subscription.id });
 							}}
 							className="mb-4 h-10 w-fit"
@@ -152,7 +154,9 @@ export const FormSubscription = () => {
 						</div>
 						<Button
 							onClick={() => {
-								handleDeleteTableData(bill!.id);
+								if (bill?.id) {
+									handleDeleteTableData(bill.id);
+								}
 								navigate('');
 							}}
 							className="mb-4 h-10 w-fit"

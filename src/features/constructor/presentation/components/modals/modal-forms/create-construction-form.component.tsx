@@ -643,7 +643,7 @@ export const CreateConstructionForm = memoize(
 					convertToSelectValues(
 						constructionData.map((c) => ({
 							...c,
-							name: `${c.description}(${c.name})`,
+							name: c.description || c.name,
 						})),
 					)?.sort((a, b) => {
 						const aIsFavorite = favoriteConstructionIds.has(String(a.value));
@@ -655,7 +655,7 @@ export const CreateConstructionForm = memoize(
 				if (construction && !valueSet.has(String(construction))) {
 					const labelFromDetail =
 						constructionDetail?.id === construction
-							? `${constructionDetail.description}(${constructionDetail.name})`
+							? constructionDetail.description || constructionDetail.name
 							: null;
 					const fallbackLabel = name?.trim() ? String(name) : String(construction);
 					return [
@@ -828,7 +828,7 @@ export const CreateConstructionForm = memoize(
 									</label>
 								</div>
 								<div className="flex min-w-0 flex-1 flex-nowrap items-center">
-									<div className="flex shrink-0 gap-x-[12px]">
+									<div className="flex min-w-0 flex-1 gap-x-[12px]">
 										<Controller
 											control={control}
 											name="firstPlacementRoom"
@@ -840,8 +840,8 @@ export const CreateConstructionForm = memoize(
 													placeholder={t(
 														'createConstruction.firstRoom.placeholder',
 													)}
-													buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-													wrapperClassname="shadow-none ring-input-border-primary"
+													buttonClassName="w-full min-w-0 h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+													wrapperClassname="shadow-none ring-input-border-primary min-w-0 flex-1"
 													onChange={(value) => {
 														field.onChange(value);
 														setValue('secondPlacementRoom', '');
@@ -861,8 +861,8 @@ export const CreateConstructionForm = memoize(
 													placeholder={t(
 														'createConstruction.secondRoom.placeholder',
 													)}
-													buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-													wrapperClassname="shadow-none ring-input-border-primary"
+													buttonClassName="w-full min-w-0 h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+													wrapperClassname="shadow-none ring-input-border-primary min-w-0 flex-1"
 													isDisabled={!firstPlacementRoom}
 												/>
 											)}
@@ -909,7 +909,7 @@ export const CreateConstructionForm = memoize(
 												: undefined
 										}
 										labelClassName={twMerge(
-											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px] text-left',
+											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px] shrink-0 text-left',
 											formState.errors.construction?.message
 												? 'text-error'
 												: '',
@@ -917,8 +917,8 @@ export const CreateConstructionForm = memoize(
 										placeholder={t(
 											'createConstruction.construction.placeholder',
 										)}
-										buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-										wrapperClassname="shadow-none ring-input-border-primary flex-row gap-[20px]"
+										buttonClassName="w-full min-w-0 h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+										wrapperClassname="shadow-none ring-input-border-primary flex-row gap-[20px] w-full min-w-0 flex-1"
 									/>
 								)}
 							/>
