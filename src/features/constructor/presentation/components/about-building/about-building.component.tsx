@@ -1,4 +1,5 @@
 import type { CalculationRequirementDocumentDto, RegulatoryRequirementDocumentDto } from '@api-gen';
+import { ReportInfoStatus } from '@api-gen';
 import {
 	APP_ROUTES,
 	Button,
@@ -94,6 +95,7 @@ const AboutBuildingScreen = () => {
 	const [regulatoryRequirementDocuments, setRegulatoryRequirementDocuments] = useState<
 		RegulatoryRequirementDocumentDto[]
 	>([]);
+	const [reportInfoStatus, setReportInfoStatus] = useState<ReportInfoStatus | undefined>();
 	const [calculationRequirementDocuments, setCalculationRequirementDocuments] = useState<
 		CalculationRequirementDocumentDto[]
 	>([]);
@@ -140,6 +142,15 @@ const AboutBuildingScreen = () => {
 	]);
 
 	const isEditMode = !!search.get('edit');
+
+	const getReportsListRoute = useCallback(() => {
+		const status =
+			reportInfoStatus ?? (search.get('reportStatus') as ReportInfoStatus | null);
+
+		return status === ReportInfoStatus.Completed
+			? DESIGNING_ROUTES.reports.route
+			: DESIGNING_ROUTES.activeReports.route;
+	}, [reportInfoStatus, search]);
 
 	const applyDocumentsForRegion = useCallback(
 		(targetRegion: string | undefined) => {
@@ -212,6 +223,7 @@ const AboutBuildingScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					toast.success(t('aboutBuilding.report.fetchSuccess'));
+					setReportInfoStatus(response.data.status);
 					const data = convertToClientReportInfo(response.data);
 					if (data)
 						form.reset({
@@ -282,7 +294,6 @@ const AboutBuildingScreen = () => {
 				commonDescription: data.commonDescription || '',
 				name: data.name || '',
 				buildingType: data.buildingType,
-				buildingPurpose: data.buildingPurpose,
 				comfortClass: data.comfortClass,
 			}),
 		)
@@ -314,9 +325,7 @@ const AboutBuildingScreen = () => {
 						return;
 					}
 
-					navigate(
-						`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.reports.route}`,
-					);
+					navigate(`${APP_ROUTES.designing.route}/${getReportsListRoute()}`);
 				}
 			});
 	};

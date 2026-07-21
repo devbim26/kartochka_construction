@@ -1471,6 +1471,7 @@ export interface ReportInfoSingleConstructionDto {
 	id?: string;
 	singleConstructionInfos?: SingleConstructionInfoDto[] | null;
 	buildingName?: string | null;
+	description?: string | null;
 	calculationRequirementDocument?: CalculationRequirementDocumentDto;
 	regulatoryRequirementDocument?: RegulatoryRequirementDocumentDto;
 	category?: ReportCategory;
@@ -1754,6 +1755,8 @@ export interface UpdateReportInfoBaseFieldsCommand {
 	reportInfoId?: string;
 	buildingName?: string | null;
 	description?: string | null;
+	buildingType?: BuildingType;
+	class?: CategoryClass;
 }
 
 export interface UpdateReportInfoWithSingleConstructionCommand {

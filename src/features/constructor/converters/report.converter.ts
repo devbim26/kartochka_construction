@@ -7,13 +7,13 @@ import type {
 	NewFloorIfoDto,
 	NewReportConstructionFloorInfoDto,
 	PaginatedConstructionHeaderDto,
+	ReportInfoFloorConstructionDto,
 	ReportInfoShortDto,
 	ReportInfoSingleConstructionDto,
 	SingleConstructionInfoDto,
 	UpdateAdditionalConstructionHeaderDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
-import { convertToServerPurposeBuildingData } from '@core';
 import { convertToClientCountryData } from '@core';
 import { convertToClientConstructionTypeEnumData } from '@features/guidbooks/converters';
 import type {
@@ -34,10 +34,43 @@ import type {
 	ReportInfoUpdate,
 	SingleConstruction,
 } from '../types';
-import { PurposeBuilding, ReportCategory } from '../types';
+import { ReportCategory } from '../types';
 import type { ReportInfoShort } from '../utils';
 
 const SNAPSHOT_STANDART_DATE = '2000-01-01';
+
+type ReportInfoWithDocuments = {
+	buildingName?: string | null;
+	description?: string | null;
+	buildingType?: BuildingType;
+	class?: CategoryClass;
+	calculationRequirementDocument?: ReportInfoShortDto['calculationRequirementDocument'];
+	regulatoryRequirementDocument?: ReportInfoShortDto['regulatoryRequirementDocument'];
+};
+
+const mapReportDocumentsToAboutBuilding = (data: ReportInfoWithDocuments) => ({
+	calculationDocumentId: data.calculationRequirementDocument?.id || '',
+	regulatoryDocumentId: data.regulatoryRequirementDocument?.id || '',
+});
+
+const mapReportDocumentsToReportInfoShort = (data: ReportInfoWithDocuments) => ({
+	calculationDocument: {
+		id: data.calculationRequirementDocument?.id || '',
+		name: data.calculationRequirementDocument?.shortName || '',
+		fullName: data.calculationRequirementDocument?.fullName || '',
+		country: data.calculationRequirementDocument?.country
+			? (convertToClientCountryData(data.calculationRequirementDocument.country) as string)
+			: '',
+	},
+	regulatoryDocument: {
+		id: data.regulatoryRequirementDocument?.id || '',
+		name: data.regulatoryRequirementDocument?.shortName || '',
+		fullName: data.regulatoryRequirementDocument?.fullName || '',
+		country: data.regulatoryRequirementDocument?.country
+			? (convertToClientCountryData(data.regulatoryRequirementDocument.country) as string)
+			: '',
+	},
+});
 
 export type ReportConstructionSoundIndices = {
 	firstPlacemetnRoom: { name?: string | null };
@@ -116,15 +149,24 @@ export const convertToCreateReportInfoCommand = (
 	};
 };
 
-export const convertToClientReportInfo = (data: ReportInfoShortDto): AboutBuildingData => {
+export const convertToClientReportInfo = (
+	data:
+		| ReportInfoShortDto
+		| ReportInfoFloorConstructionDto
+		| ReportInfoSingleConstructionDto,
+): AboutBuildingData => {
+	const purposeBuilding =
+		'purposeBuilding' in data && data.purposeBuilding ? data.purposeBuilding : undefined;
+	const country = 'country' in data && data.country ? data.country : undefined;
+
 	return {
-		...data,
-		commonDescription: data.description,
+		commonDescription: data.description ?? '',
 		name: data.buildingName || '',
-		calculationDocumentId: data.calculationRequirementDocument?.id || '',
-		regulatoryDocumentId: data.regulatoryRequirementDocument?.id || '',
-		region: convertToClientCountryData(data.country!) as string,
-		buildingPurpose: data.purposeBuilding as string,
+		...mapReportDocumentsToAboutBuilding(data),
+		region: country
+			? (convertToClientCountryData(country) as string)
+			: Country.Belarus,
+		buildingPurpose: purposeBuilding ?? '',
 		buildingType: data.buildingType as BuildingType,
 		comfortClass: data.class as CategoryClass,
 		isFloorPlan: true,
@@ -138,57 +180,45 @@ export const convertToClientSingleReportInfoShort = (
 ): ReportInfoShort => {
 	return {
 		reportInfoId: data.id,
-		commonDescription: '',
+		commonDescription: data.description ?? '',
 		name: data.buildingName || '',
 		region: Country.Belarus,
-		buildingPurpose: data.purposeBuilding as string,
+		buildingPurpose: data.purposeBuilding ?? '',
 		buildingType: data.buildingType as BuildingType,
 		comfortClass: data.class as CategoryClass,
 		maxHeight: '0',
 		isFloorPlan: true,
 		isConstruction: false,
 		isBim: false,
-		calculationDocument: {
-			id: data.calculationRequirementDocument?.id || '',
-			name: data.calculationRequirementDocument?.shortName || '',
-		},
-		regulatoryDocument: {
-			id: data.regulatoryRequirementDocument?.id || '',
-			name: data.regulatoryRequirementDocument?.shortName || '',
-		},
+		...mapReportDocumentsToReportInfoShort(data),
 	};
 };
 
-export const convertToClientReportInfoShort = (data: ReportInfoShortDto): ReportInfoShort => {
+export const convertToClientReportInfoShort = (
+	data:
+		| ReportInfoShortDto
+		| ReportInfoFloorConstructionDto
+		| ReportInfoSingleConstructionDto,
+): ReportInfoShort => {
+	const purposeBuilding =
+		'purposeBuilding' in data && data.purposeBuilding ? data.purposeBuilding : undefined;
+	const country = 'country' in data && data.country ? data.country : undefined;
+
 	return {
-		commonDescription: data.description,
+		reportInfoId: 'id' in data ? data.id : undefined,
+		commonDescription: data.description ?? '',
 		name: data.buildingName || '',
-		calculationDocument: {
-			id: data.calculationRequirementDocument?.id || '',
-			name: data.calculationRequirementDocument?.shortName || '',
-			fullName: data.calculationRequirementDocument?.fullName || '',
-			country: data.calculationRequirementDocument?.country
-				? (convertToClientCountryData(data.calculationRequirementDocument.country) as string)
-				: '',
-		},
-		regulatoryDocument: {
-			fullName: data.regulatoryRequirementDocument?.fullName || '',
-			country: data.regulatoryRequirementDocument?.country
-				? (convertToClientCountryData(data.regulatoryRequirementDocument.country) as string)
-				: '',
-			id: data.regulatoryRequirementDocument?.id || '',
-			name: data.regulatoryRequirementDocument?.shortName || '',
-		},
-		region: data.country
-			? (convertToClientCountryData(data.country) as string)
+		region: country
+			? (convertToClientCountryData(country) as string)
 			: Country.Belarus,
-		buildingPurpose: data.purposeBuilding as string,
+		buildingPurpose: purposeBuilding ?? '',
 		buildingType: data.buildingType as BuildingType,
 		comfortClass: data.class as CategoryClass,
 		maxHeight: '0',
 		isFloorPlan: true,
 		isConstruction: false,
 		isBim: false,
+		...mapReportDocumentsToReportInfoShort(data),
 	};
 };
 
@@ -200,11 +230,8 @@ export const convertToUpdateReportInfoCommand = (
 		description: data.commonDescription || '',
 		buildingName: data.name || '',
 		buildingType: data.buildingType as ApiBuildingType,
-		purposeBuilding: data.buildingPurpose
-			? convertToServerPurposeBuildingData(data.buildingPurpose as PurposeBuilding)
-			: undefined,
 		class: data.comfortClass as ApiCategoryClass,
-	} as UpdateReportInfoBaseFieldsCommand;
+	};
 };
 
 export const convertToClientFloorInfo = (data: NewFloorIfoDto): FloorFromReport => {

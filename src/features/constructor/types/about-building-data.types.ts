@@ -7,7 +7,6 @@ type ReportInfoUpdate = {
 	name?: string;
 	commonDescription?: string;
 	buildingType?: string;
-	buildingPurpose?: string;
 	comfortClass?: string;
 };
 

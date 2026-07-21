@@ -1,5 +1,5 @@
 import type { ReportInfoShortDto, ReportInfoShortDtoPaginatedList } from '@api-gen';
-import { ReportCategory as ApiReportCategory } from '@api-gen';
+import { ReportCategory as ApiReportCategory, ReportInfoStatus } from '@api-gen';
 import type { PaginationState } from '@core';
 import {
 	APP_ROUTES,
@@ -110,6 +110,7 @@ export const ActiveReportInfosPanel = () => {
 			{
 				reportId: id,
 				reportType,
+				reportStatus: ReportInfoStatus.InProgress,
 				edit: 'true',
 			},
 		);

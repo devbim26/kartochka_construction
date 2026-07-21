@@ -1,3 +1,4 @@
+import { ReportInfoStatus } from '@api-gen';
 import type { PaginationState } from '@core';
 import {
 	APP_ROUTES,
@@ -193,6 +194,7 @@ export const ReportScreen = () => {
 						{
 							reportId: editingReport.reportInfoId,
 							reportType: editingReport.reportCategory,
+							reportStatus: ReportInfoStatus.Completed,
 							edit: 'true',
 						},
 					);
