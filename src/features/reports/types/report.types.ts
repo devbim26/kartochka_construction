@@ -4,6 +4,7 @@ import type { ReportStatus } from './report-status.types';
 
 export type Report = {
 	id: string;
+	reportInfoId: string;
 	name: string;
 	client: string;
 	lastUpdated: string;

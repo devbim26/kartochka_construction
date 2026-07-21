@@ -13,7 +13,6 @@ import {
 	useAppNavigate,
 	useI18n,
 } from '@core';
-import { getCurrentUser } from '@features/account/services';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import {
 	convertToClientReportInfo,
@@ -27,8 +26,6 @@ import {
 	createReport,
 	getReportFloorById,
 	getReportSingleById,
-	reportReceiveFloor,
-	reportReceiveSingle,
 	updateReport,
 } from '@features/constructor/services';
 import { constructorSlice } from '@features/constructor/store';
@@ -184,14 +181,14 @@ const AboutBuildingScreen = () => {
 		}
 	}, [search, reportId, navigateReplace, t]);
 
-	const handleSubmit = () => {
-		form.handleSubmit(onSubmit)();
+	const handleSubmit = (navigateTo?: 'reports' | 'floorPlans') => {
+		form.handleSubmit((data) => onSubmit(data, navigateTo))();
 	};
 
-	const onSubmit = (data: AboutBuildingData) => {
+	const onSubmit = (data: AboutBuildingData, navigateTo?: 'reports' | 'floorPlans') => {
 		const payload = { ...data, isBim: false };
-		if (!!search.get('edit')) {
-			handleUpdateReport(payload);
+		if (isEditMode) {
+			handleUpdateReport(payload, navigateTo ?? 'reports');
 		} else {
 			dispatch(constructorSlice.actions.setAboutBuilding(payload));
 			handleCreateReport(payload);
@@ -275,7 +272,10 @@ const AboutBuildingScreen = () => {
 			});
 	};
 
-	const handleUpdateReport = (data: AboutBuildingData) => {
+	const handleUpdateReport = (
+		data: AboutBuildingData,
+		navigateTo: 'reports' | 'floorPlans',
+	) => {
 		from(
 			updateReport({
 				reportInfoId: data.reportInfoId,
@@ -297,32 +297,26 @@ const AboutBuildingScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					toast.success(t('aboutBuilding.report.updateSuccess'));
-					if (response.status === 200)
-						from(
-							search.get('reportType') == ReportCategory.Floor
-								? reportReceiveFloor(reportId!)
-								: reportReceiveSingle(reportId!),
-						)
-							.pipe(
-								catchError(() => {
-									return [null];
-								}),
-							)
-							.subscribe((response) => {
-								if (response?.status === 200) {
-									const link = document.createElement('a');
-									link.href = response.data!;
-									document.body.appendChild(link);
-									link.click();
-									document.body.removeChild(link);
-									dispatch(getCurrentUser());
-								}
-								navigate(
-									APP_ROUTES.designing.route +
-										'/' +
-										DESIGNING_ROUTES.reports.route,
-								);
-							});
+
+					if (navigateTo === 'floorPlans') {
+						const resolvedReportId = data.reportInfoId || reportId!;
+						const resolvedReportType =
+							(search.get('reportType') as ReportCategory) ||
+							(data.isConstruction ? ReportCategory.Single : ReportCategory.Floor);
+
+						sessionStorage.setItem('reportId', resolvedReportId);
+						sessionStorage.setItem('reportType', resolvedReportType);
+
+						navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
+							reportId: resolvedReportId,
+							reportType: resolvedReportType,
+						});
+						return;
+					}
+
+					navigate(
+						`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.reports.route}`,
+					);
 				}
 			});
 	};
@@ -784,15 +778,29 @@ const AboutBuildingScreen = () => {
 							/>
 						</div> */}
 
-						{/* Кнопка */}
-						<div className="flex justify-end px-[16px] py-[13px]">
+						{/* Кнопки */}
+						<div className="flex justify-end gap-[12px] px-[16px] py-[13px]">
+							{isEditMode && (
+								<Button
+									type="button"
+									variant="secondary"
+									onClick={() => handleSubmit('reports')}
+									className="h-[40px] w-fit px-[16px]"
+								>
+									<p className="font-sans text-sm font-semibold leading-4">
+										{t('common.save')}
+									</p>
+								</Button>
+							)}
 							<Button
 								type="submit"
-								onClick={handleSubmit}
+								onClick={() =>
+									handleSubmit(isEditMode ? 'floorPlans' : undefined)
+								}
 								className="h-[40px] w-fit px-[16px]"
 							>
 								<p className="font-sans text-sm font-semibold leading-4">
-									{!!search.get('edit') ? t('common.save') : t('common.continue')}
+									{t('common.continue')}
 								</p>
 							</Button>
 						</div>

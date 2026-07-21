@@ -6,6 +6,7 @@ import { convertToClientReportStatus } from './report-status.converter';
 export const reportToClientConverter = (data: ReportDto): Report => {
 	return {
 		id: data.id || '',
+		reportInfoId: data.reportInfoId || '',
 		name: data.name || '',
 		client: data.client || '',
 		lastUpdated: data.lastUpdated || '',

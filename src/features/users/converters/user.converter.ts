@@ -8,6 +8,7 @@ export const convertToServerUserFilterData = (
 ): GetUsersWithPaginationParamsQuery => ({
 	directorFullName: data.directorFullName || undefined,
 	companyName: data.companyName || undefined,
+	mail: data.email || undefined,
 	pageNumber: pagination.pageNumber,
 	pageSize: pagination.pageSize,
 });

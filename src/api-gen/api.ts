@@ -904,6 +904,7 @@ export interface GetUsersWithPaginationParamsQuery {
 	roleName?: string | null;
 	directorFullName?: string | null;
 	companyName?: string | null;
+	mail?: string | null;
 }
 
 export interface GraphParametrsDto {
@@ -1236,6 +1237,7 @@ export interface PaginatedMaterialDtoPaginatedList {
 export interface PaginatedUserDto {
 	/** @format uuid */
 	id?: string;
+	email?: string | null;
 	phoneNumber?: string | null;
 	companyName?: string | null;
 	bankIdNumber?: string | null;

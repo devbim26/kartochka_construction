@@ -54,7 +54,11 @@ export const UserScreen = () => {
 		},
 	);
 
-	const [phoneNumber, companyName] = form.filterForm.watch(['mainPhoneNumber', 'companyName']);
+	const [companyName, email, directorFullName] = form.filterForm.watch([
+		'companyName',
+		'email',
+		'directorFullName',
+	]);
 
 	useEffect(() => {
 		if (search.get('edit') && search.get('entityId')) {
@@ -64,7 +68,7 @@ export const UserScreen = () => {
 
 	useEffect(() => {
 		handleGetTableData(form.filterForm.getValues(), paginationState);
-	}, [phoneNumber, companyName]);
+	}, [companyName, email, directorFullName]);
 
 	const handleGetTableData = (
 		data: Partial<AccountData>,

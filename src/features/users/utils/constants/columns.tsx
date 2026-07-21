@@ -35,6 +35,11 @@ export const getUserColumns = (t: any): ColumnDef<AccountData>[] => [
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
 	},
 	{
+		accessorKey: 'email',
+		header: () => <SimpleTableHeaderCell text={t('account.form.email.label')} />,
+		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,
+	},
+	{
 		accessorKey: 'directorFullName',
 		header: () => <SimpleTableHeaderCell text={t('account.form.directorFullName.label')} />,
 		cell: (info) => <SimpleTableCell content={info.getValue() as string} />,

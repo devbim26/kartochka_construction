@@ -123,6 +123,8 @@ export const ReportScreen = () => {
 		handleGetTableData(getValues(), paginationState);
 	}, [client, name, userId]);
 
+	const editingReport = tableData.find((report) => report.id === search.get('id'));
+
 	return (
 		<div className="flex w-full flex-col gap-[40px]">
 			<FormProvider {...form}>
@@ -176,16 +178,25 @@ export const ReportScreen = () => {
 				}}
 			/>
 			<ReportListActionModal
-				onConfirm={() =>
+				onConfirm={() => {
+					if (!editingReport?.reportInfoId) {
+						toast.error('Не удалось открыть отчет для редактирования');
+						return;
+					}
+
 					navigate(
 						APP_ROUTES.designing.route +
 							'/' +
 							DESIGNING_ROUTES.constructor.route +
 							'/' +
 							CONSTRUCTOR_ROUTES.aboutBuilding.route,
-						{ reportId: search.get('id')!, edit: 'true' },
-					)
-				}
+						{
+							reportId: editingReport.reportInfoId,
+							reportType: editingReport.reportCategory,
+							edit: 'true',
+						},
+					);
+				}}
 				confirmTitle="Редактировать"
 				headerTitle="Редактировать отчет?"
 				onClose={() => navigate('')}
