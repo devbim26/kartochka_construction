@@ -1,5 +1,7 @@
 import type {
 	AdditionalConstructionHeaderDto,
+	BuildingType as ApiBuildingType,
+	CategoryClass as ApiCategoryClass,
 	CountryType,
 	CreateReportInfoCommand,
 	NewFloorIfoDto,
@@ -11,6 +13,7 @@ import type {
 	UpdateAdditionalConstructionHeaderDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
+import { convertToServerPurposeBuildingData } from '@core';
 import { convertToClientCountryData } from '@core';
 import { convertToClientConstructionTypeEnumData } from '@features/guidbooks/converters';
 import type {
@@ -31,7 +34,7 @@ import type {
 	ReportInfoUpdate,
 	SingleConstruction,
 } from '../types';
-import { ReportCategory } from '../types';
+import { PurposeBuilding, ReportCategory } from '../types';
 import type { ReportInfoShort } from '../utils';
 
 const SNAPSHOT_STANDART_DATE = '2000-01-01';
@@ -196,7 +199,12 @@ export const convertToUpdateReportInfoCommand = (
 		reportInfoId: data.reportInfoId,
 		description: data.commonDescription || '',
 		buildingName: data.name || '',
-	};
+		buildingType: data.buildingType as ApiBuildingType,
+		purposeBuilding: data.buildingPurpose
+			? convertToServerPurposeBuildingData(data.buildingPurpose as PurposeBuilding)
+			: undefined,
+		class: data.comfortClass as ApiCategoryClass,
+	} as UpdateReportInfoBaseFieldsCommand;
 };
 
 export const convertToClientFloorInfo = (data: NewFloorIfoDto): FloorFromReport => {

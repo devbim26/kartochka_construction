@@ -7,12 +7,18 @@ import { convertToClientCountryData } from '@core';
 import {
 	Country,
 	EnCountryNamesSelectValues,
+	country2code,
 	country2title,
 } from '@features/guidbooks/types';
 
 type RequirementDocumentDto =
 	| RegulatoryRequirementDocumentDto
 	| CalculationRequirementDocumentDto;
+
+export const getCountryCode = (country: string | undefined): string => {
+	if (!country || country === Country.None) return '';
+	return country2code[country as Country] ?? country;
+};
 
 export const getCountryLabel = (country: string | undefined, locale: 'ru' | 'en'): string => {
 	if (!country || country === Country.None) return '';

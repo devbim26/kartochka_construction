@@ -19,6 +19,7 @@ import {
 	convertToClientReportInfo,
 	convertToCreateReportInfoCommand,
 	convertToRequirementDocumentSelectValues,
+	getCountryCode,
 	getCountryLabel,
 	resolveRequirementDocumentIdByCountry,
 } from '@features/constructor/converters';
@@ -72,6 +73,13 @@ const formatEnumValue = (value: string): string => {
 
 const REQUIREMENT_DOCUMENT_SELECT_CLASS =
 	'w-[480px] max-w-full h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]';
+
+const REQUIREMENT_COUNTRY_SELECT_CLASS =
+	'w-[120px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]';
+
+const REQUIREMENT_COUNTRY_COLUMN_CLASS = 'w-[120px] shrink-0';
+
+const REQUIREMENT_REGULATION_COLUMN_CLASS = 'w-[504px] max-w-full shrink-0';
 
 const AboutBuildingScreen = () => {
 	const { t, locale } = useI18n();
@@ -273,6 +281,9 @@ const AboutBuildingScreen = () => {
 				reportInfoId: data.reportInfoId,
 				commonDescription: data.commonDescription || '',
 				name: data.name || '',
+				buildingType: data.buildingType,
+				buildingPurpose: data.buildingPurpose,
+				comfortClass: data.comfortClass,
 			}),
 		)
 			.pipe(
@@ -317,9 +328,15 @@ const AboutBuildingScreen = () => {
 	};
 
 	const countryOptions = useMemo(() => {
-		return currentLanguage === 'ru'
-			? RuConstructorCountrySelectValues
-			: EnConstructorCountrySelectValues;
+		const base =
+			currentLanguage === 'ru'
+				? RuConstructorCountrySelectValues
+				: EnConstructorCountrySelectValues;
+
+		return base.map((option) => ({
+			...option,
+			label: getCountryCode(option.value as string) || option.label,
+		}));
 	}, [currentLanguage]);
 
 	const buildingTypeOptions = useMemo(() => {
@@ -441,41 +458,6 @@ const AboutBuildingScreen = () => {
 							placeholder={t('aboutBuilding.commonDescription.placeholder')}
 						/>
 
-						{/* Страна */}
-						<Controller
-							control={control}
-							name="region"
-							render={({ field }) => (
-								<Select
-									options={countryOptions}
-									disabled={!!search.get('edit')}
-									{...field}
-									value={field.value || ''}
-									onChange={(val) => {
-										field.onChange(val);
-									}}
-									label={
-										formState.errors?.region?.message
-											? t(formState.errors.region.message as any)
-											: t('aboutBuilding.region.label')
-									}
-									error={
-										formState.errors.region?.message
-											? t(formState.errors.region.message as any)
-											: undefined
-									}
-									isSearchable
-									labelClassName={twMerge(
-										'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]',
-										formState.errors.region?.message ? 'text-error' : '',
-									)}
-									placeholder={t('aboutBuilding.region.placeholder')}
-									buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-									wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
-								/>
-							)}
-						/>
-
 						{/* Тип здания и назначение */}
 						<div className="flex items-center gap-x-[50px]">
 							<div className="w-[145px]">
@@ -513,7 +495,6 @@ const AboutBuildingScreen = () => {
 													: undefined
 											}
 											value={field.value || ''}
-											disabled={!!search.get('edit')}
 											placeholder={t(
 												'aboutBuilding.buildingType.placeholder',
 											)}
@@ -539,7 +520,6 @@ const AboutBuildingScreen = () => {
 													: undefined
 											}
 											value={field.value || ''}
-											disabled={!!search.get('edit')}
 											placeholder={t(
 												'aboutBuilding.buildingPurpose.placeholder',
 											)}
@@ -570,7 +550,6 @@ const AboutBuildingScreen = () => {
 											: t('aboutBuilding.comfortClass.label')
 									}
 									isSearchable
-									disabled={!!search.get('edit')}
 									error={
 										formState.errors.comfortClass?.message
 											? t(formState.errors.comfortClass.message as any)
@@ -592,95 +571,141 @@ const AboutBuildingScreen = () => {
 							<FormElementLabel className="w-[145px] font-sans text-lg font-semibold leading-4 text-primary">
 								{t('aboutBuilding.requirements.title')}
 							</FormElementLabel>
-							<div className="flex w-full items-center gap-[12px]">
-								<FormElementLabel className="w-[480px] max-w-full text-center font-sans text-lg font-semibold leading-4 text-input-label-primary">
+							<div className="flex items-center gap-[12px]">
+								<FormElementLabel
+									className={twMerge(
+										REQUIREMENT_COUNTRY_COLUMN_CLASS,
+										'text-center font-sans text-lg font-semibold leading-4 text-input-label-primary',
+										formState.errors.region?.message ? 'text-error' : '',
+									)}
+								>
+									{formState.errors?.region?.message
+										? t(formState.errors.region.message as any)
+										: t('aboutBuilding.requirements.country')}
+								</FormElementLabel>
+								<FormElementLabel className="w-[480px] max-w-full shrink-0 text-center font-sans text-lg font-semibold leading-4 text-input-label-primary">
 									{t('aboutBuilding.requirements.calculation')}
 								</FormElementLabel>
-								<FormElementLabel className="w-[480px] max-w-full text-center font-sans text-lg font-semibold leading-4 text-input-label-primary">
+								<FormElementLabel
+									className={twMerge(
+										REQUIREMENT_REGULATION_COLUMN_CLASS,
+										'text-center font-sans text-lg font-semibold leading-4 text-input-label-primary',
+									)}
+								>
 									{t('aboutBuilding.requirements.regulation')}
 								</FormElementLabel>
 							</div>
 						</div>
 
 						{/* Документы требований */}
-						<div className="flex flex-wrap items-start gap-[12px]">
-							<Controller
-								control={control}
-								name="calculationDocumentId"
-								render={({ field }) => (
-									<Select
-										{...field}
-										options={calculationRequirementDocumentOptions}
-										value={field.value || ''}
-										label={
-											formState.errors?.calculationDocumentId?.message
-												? t(
-														formState.errors.calculationDocumentId
-															.message as any,
-													)
-												: t('aboutBuilding.requirements.sound.label')
-										}
-										isSearchable
-										disabled={!!search.get('edit')}
-										error={
-											formState.errors.calculationDocumentId?.message
-												? t(
-														formState.errors.calculationDocumentId
-															.message as any,
-													)
-												: undefined
-										}
-										labelClassName={twMerge(
-											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px]',
-											formState.errors.calculationDocumentId?.message
-												? 'text-error'
-												: '',
-										)}
-										placeholder={t(
-											'aboutBuilding.requirements.sound.placeholder',
-										)}
-										buttonClassName={REQUIREMENT_DOCUMENT_SELECT_CLASS}
-										optionsClassName="!w-[480px] max-w-[calc(100vw-2rem)]"
-										wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
-									/>
+						<div className="flex w-full items-start gap-[50px]">
+							<label
+								className={twMerge(
+									'w-[145px] shrink-0 font-sans text-sm font-normal leading-5 text-input-label-primary',
+									formState.errors.calculationDocumentId?.message
+										? 'text-error'
+										: '',
 								)}
-							/>
-							<div className="flex items-center gap-2">
+							>
+								{formState.errors?.calculationDocumentId?.message
+									? t(formState.errors.calculationDocumentId.message as any)
+									: t('aboutBuilding.requirements.sound.label')}
+							</label>
+							<div className="flex items-start gap-[12px]">
 								<Controller
 									control={control}
-									name="regulatoryDocumentId"
+									name="region"
+									render={({ field }) => (
+										<Select
+											options={countryOptions}
+											disabled={!!search.get('edit')}
+											{...field}
+											value={field.value || ''}
+											onChange={(val) => {
+												field.onChange(val);
+											}}
+											error={
+												formState.errors.region?.message
+													? t(formState.errors.region.message as any)
+													: undefined
+											}
+											isSearchable
+											placeholder={t('aboutBuilding.region.placeholder')}
+											buttonClassName={REQUIREMENT_COUNTRY_SELECT_CLASS}
+											optionsClassName="!w-[120px]"
+											wrapperClassname="shadow-none ring-input-border-primary"
+										/>
+									)}
+								/>
+								<Controller
+									control={control}
+									name="calculationDocumentId"
 									render={({ field }) => (
 										<Select
 											{...field}
-											options={regulatoryRequirementDocumentOptions}
+											options={calculationRequirementDocumentOptions}
 											value={field.value || ''}
 											isSearchable
 											disabled={!!search.get('edit')}
 											error={
-												formState.errors.regulatoryDocumentId?.message
+												formState.errors.calculationDocumentId?.message
 													? t(
-															formState.errors.regulatoryDocumentId
+															formState.errors.calculationDocumentId
 																.message as any,
 														)
 													: undefined
 											}
 											placeholder={t(
-												'aboutBuilding.requirements.regulation.placeholder',
+												'aboutBuilding.requirements.sound.placeholder',
 											)}
 											buttonClassName={REQUIREMENT_DOCUMENT_SELECT_CLASS}
 											optionsClassName="!w-[480px] max-w-[calc(100vw-2rem)]"
-											wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
+											wrapperClassname="shadow-none ring-input-border-primary"
 										/>
 									)}
 								/>
-								{regulatoryDocumentHintText && (
-									<div className="group relative shrink-0">
-										<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
-										<div className="pointer-events-none absolute left-1/2 top-full z-10 w-[min(320px,calc(100vw-2rem))] max-w-[320px] -translate-x-1/2 translate-y-2 rounded bg-black px-3 py-2 text-left text-sm font-normal leading-snug text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-											{regulatoryDocumentHintText}
+								<div
+									className={twMerge(
+										REQUIREMENT_REGULATION_COLUMN_CLASS,
+										'flex items-center gap-2',
+									)}
+								>
+									<Controller
+										control={control}
+										name="regulatoryDocumentId"
+										render={({ field }) => (
+											<Select
+												{...field}
+												options={regulatoryRequirementDocumentOptions}
+												value={field.value || ''}
+												isSearchable
+												disabled={!!search.get('edit')}
+												error={
+													formState.errors.regulatoryDocumentId?.message
+														? t(
+																formState.errors.regulatoryDocumentId
+																	.message as any,
+															)
+														: undefined
+												}
+												placeholder={t(
+													'aboutBuilding.requirements.regulation.placeholder',
+												)}
+												buttonClassName={REQUIREMENT_DOCUMENT_SELECT_CLASS}
+												optionsClassName="!w-[480px] max-w-[calc(100vw-2rem)]"
+												wrapperClassname="shadow-none ring-input-border-primary"
+											/>
+										)}
+									/>
+									{regulatoryDocumentHintText && (
+										<div className="group relative shrink-0">
+											<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
+											<div className="pointer-events-none absolute left-1/2 top-full z-10 w-[min(320px,calc(100vw-2rem))] max-w-[320px] -translate-x-1/2 translate-y-2 rounded bg-black px-3 py-2 text-left text-sm font-normal leading-snug text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+												{regulatoryDocumentHintText}
+											</div>
 										</div>
-									</div>
-								)}
+									)}
+								</div>
 							</div>
 						</div>
 
