@@ -8,5 +8,6 @@ export * from './glass-material-type.component';
 export * from './heavy-material-type.component';
 export * from './link-material-type.component';
 export * from './plaster-material-type.component';
+export * from './screed-material-type.component';
 export * from './selectable-material-type.component';
 export * from './z-panel-material-type.component';

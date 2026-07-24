@@ -39,6 +39,7 @@ const AccountDataSchema = z
 	role: z.object({ id: z.string(), name: z.string() }).optional(),
 	reportsNumber: z.number().optional(),
 	dowloadReportsNumber: z.number().optional(),
+	budgetRemaining: z.number().optional(),
 	payersRegistrationNumber: z
 		.string()
 		.min(1, 'Поле обязательно для заполнения')

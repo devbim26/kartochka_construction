@@ -1,5 +1,4 @@
 import type { PaginationState } from '@core/types';
-import { memoize } from '@core/utils/hoc/memo.utils';
 import { useCallback, useEffect, useState } from 'react';
 import { Select, type SelectOption } from '../select';
 import { PaginationButton } from './pagination-button.component';
@@ -16,7 +15,7 @@ interface PaginationProps {
 	state: PaginationState;
 }
 
-export const Pagination = memoize(({ onPageChange, state, onPageSizeChange }: PaginationProps) => {
+export const Pagination = ({ onPageChange, state, onPageSizeChange }: PaginationProps) => {
 	const [viewedPages, setViewedPages] = useState<{ id: string; page: number }[]>([]);
 
 	useEffect(() => {
@@ -31,11 +30,11 @@ export const Pagination = memoize(({ onPageChange, state, onPageSizeChange }: Pa
 
 	const prevPage = useCallback(() => {
 		onPageChange(state.pageNumber - 1);
-	}, [state.pageNumber]);
+	}, [onPageChange, state.pageNumber]);
 
 	const nextPage = useCallback(() => {
 		onPageChange(state.pageNumber + 1);
-	}, [state.pageNumber]);
+	}, [onPageChange, state.pageNumber]);
 
 	return (
 		<div className="flex flex-row items-center justify-end gap-[24px] pr-[39px]">
@@ -73,4 +72,4 @@ export const Pagination = memoize(({ onPageChange, state, onPageSizeChange }: Pa
 			</div>
 		</div>
 	);
-}, 'Pagination');
+};

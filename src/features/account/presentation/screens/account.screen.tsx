@@ -46,7 +46,7 @@ const AccountScreen = () => {
 		<div className="flex w-full flex-col gap-[30px] pb-[29px]">
 			<AccountHeader />
 			<AccountForm />
-			<CurrentSub className="max-w-screen-xs" />
+			<CurrentSub className="w-full" />
 			<Modal
 				isOpen={wantsSubSelectModal && isAllowed === true}
 				onClose={() => navigate('')}

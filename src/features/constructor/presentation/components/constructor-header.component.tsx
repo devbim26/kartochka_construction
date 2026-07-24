@@ -66,22 +66,6 @@ export const ConstructorHeader = () => {
 					className={twMerge(
 						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
 						(isActive(CONSTRUCTOR_ROUTES.aboutBuilding.route) ||
-							isActive(CONSTRUCTOR_ROUTES.floorPlans.route)) &&
-							'hidden',
-
-						isActive(CONSTRUCTOR_ROUTES.designing.route) ||
-							isActive(CONSTRUCTOR_ROUTES.myConstructions.route)
-							? ''
-							: 'hidden bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
-					)}
-					disabled
-				>
-					{t('constructor.header.designing')}
-				</Button>
-				<Button
-					className={twMerge(
-						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
-						(isActive(CONSTRUCTOR_ROUTES.aboutBuilding.route) ||
 							isActive(CONSTRUCTOR_ROUTES.floorPlans.route) ||
 							isActive(CONSTRUCTOR_ROUTES.constructionSelect.route)) &&
 							'hidden',

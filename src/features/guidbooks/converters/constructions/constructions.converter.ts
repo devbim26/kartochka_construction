@@ -233,6 +233,8 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 		issuerName: data.issuer?.name ?? '',
 		rw: data.rw != null && data.rw !== '' ? String(data.rw) : '',
 		lnw: data.lnw != null && data.lnw !== '' ? String(data.lnw) : '',
+		isViewForDefaultUser: Boolean(data.isViewForDefaultUser),
+		isView: data.isView !== undefined ? Boolean(data.isView) : undefined,
 		additionalInfo: mapAdditionalInfoFromApi(null),
 	};
 };
@@ -402,6 +404,7 @@ const convertToServerConstructionsBaseData = (data: ConstructionsAddData): any =
 		: undefined,
 	constructionPurpose: (data.constructionPurpose as ConstructionPurpose) || undefined,
 	constructionType: convertToServerConstructionType(data.constructionTypeObject) || null,
+	isViewForDefaultUser: Boolean(data.isViewForDefaultUser),
 });
 
 export const convertToServerConstructionsAddData = (data: ConstructionsAddData): any => ({

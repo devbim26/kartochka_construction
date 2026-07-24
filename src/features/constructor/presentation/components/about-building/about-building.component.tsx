@@ -294,6 +294,7 @@ const AboutBuildingScreen = () => {
 				commonDescription: data.commonDescription || '',
 				name: data.name || '',
 				buildingType: data.buildingType,
+				buildingPurpose: data.buildingPurpose,
 				comfortClass: data.comfortClass,
 			}),
 		)

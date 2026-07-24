@@ -1,6 +1,8 @@
 import { fetchApi } from '@api-gen';
 import {
 	Button,
+	Carousel,
+	CarouselSlide,
 	convertToPaginatedType,
 	getPluralForm,
 	useAppDispatch,
@@ -8,14 +10,14 @@ import {
 	useAppSelector,
 	useI18n,
 } from '@core';
-import { getCurrentUser, ensureCompanyRequisitesFilled } from '@features/account/services';
+import { ensureCompanyRequisitesFilled, getCurrentUser } from '@features/account/services';
 import {
 	convertSubscriptionToClient,
 	getPaginatedSubscriptions,
-	resolveActiveSubscription,
-	shouldShowSubscriptionPrice,
-	shouldShowSubscriptionTariffPlan,
-	type ActiveSubscriptionPayload,
+	resolveActiveSubscriptions,
+	shouldShowSubscriptionCalculations,
+	shouldShowSubscriptionCredits,
+	shouldShowSubscriptionReports,
 	type Subscription,
 } from '@features/subscriptions';
 import { AxiosError } from 'axios';
@@ -31,13 +33,18 @@ type Props = {
 };
 
 export const CurrentSub = ({ className }: Props) => {
-	const [subscription, setSubscription] = useState<Subscription>();
+	const [activeSubscriptions, setActiveSubscriptions] = useState<Subscription[]>([]);
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
 	const [search] = useSearchParams();
 	const userData = useAppSelector((store) => store.userData);
 	const { t, locale } = useI18n();
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
+
+	const remainingCredits = userData.data?.budgetRemaining ?? 0;
+	const remainingCalculations = userData.data?.dowloadReportsNumber ?? 0;
+	const remainingReports = userData.data?.reportsNumber ?? 0;
+	const hasManyCards = activeSubscriptions.length > 1;
 
 	const handleChangePlan = async () => {
 		const filled = await ensureCompanyRequisitesFilled(dispatch);
@@ -81,33 +88,26 @@ export const CurrentSub = ({ className }: Props) => {
 			.subscribe();
 	};
 
-	const handleGetCurrentSubscription = () => {
+	const handleGetCurrentSubscriptions = () => {
 		from(fetchApi.api.userActiveUserSubscriptionList())
 			.pipe(
 				switchMap((response) => {
 					if (response?.status !== 200 || !response.data) {
-						return from([undefined]);
+						return from([[] as Subscription[]]);
 					}
 					return from(
-						resolveActiveSubscription(
-							response.data as ActiveSubscriptionPayload,
-							subscriptions,
-						),
+						resolveActiveSubscriptions(response.data as unknown, subscriptions),
 					);
 				}),
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-					}
-					return from([undefined]);
-				}),
+				catchError(() => from([[] as Subscription[]])),
 			)
-			.subscribe((activeSub) => {
-				setSubscription(activeSub);
+			.subscribe((activeSubs) => {
+				setActiveSubscriptions(activeSubs);
 			});
 	};
 
 	useEffect(() => {
-		handleGetCurrentSubscription();
+		handleGetCurrentSubscriptions();
 	}, [subscriptions, search.get('changePlanFlow')]);
 
 	useLayoutEffect(() => {
@@ -115,75 +115,97 @@ export const CurrentSub = ({ className }: Props) => {
 		handleGetTableData();
 	}, [dispatch]);
 
+	const creditsLabel = (value: number) =>
+		t(`main.currentSub.credits.${getPluralForm(value, locale)}`);
+
+	const renderSubscriptionCard = (subscription: Subscription) => (
+		<div className="flex min-h-[320px] w-full flex-row justify-between gap-[16px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]">
+			<div className="flex min-w-0 flex-1 flex-col justify-between gap-[16px]">
+				<div className="flex flex-col gap-[18px]">
+					<p className="font-sans text-2xl font-bold leading-7 text-primary">
+						{subscription.name}
+					</p>
+					{subscription.description ? (
+						<p className="font-sans text-base italic leading-6 text-[#374151]">
+							{subscription.description}
+						</p>
+					) : null}
+					<div className="flex flex-col gap-[10px]">
+						{shouldShowSubscriptionCalculations(subscription.numberOfDowloadReports) ? (
+							<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+								{t('subscription.calculationsCount')}:{' '}
+								{subscription.numberOfDowloadReports}
+							</p>
+						) : null}
+						{shouldShowSubscriptionReports(subscription.numberOfReports) ? (
+							<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+								{t('subscription.reportsCount')}: {subscription.numberOfReports}
+							</p>
+						) : null}
+						{shouldShowSubscriptionCredits(subscription.tariffPlanLimit) ? (
+							<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+								{t('subscription.creditsCount')}: {subscription.tariffPlanLimit}
+							</p>
+						) : null}
+					</div>
+				</div>
+				<Button className="w-min px-[16px]" onClick={handleChangePlan}>
+					<p className="font-sans text-sm font-semibold leading-4">
+						{t('main.currentSub.changePlan')}
+					</p>
+				</Button>
+			</div>
+			<div className="flex shrink-0 items-start">
+				<SubImage />
+			</div>
+		</div>
+	);
+
 	return (
-		<div
-			className={twMerge(
-				'flex min-h-[320px] w-full flex-col gap-[20px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]',
-				className,
-			)}
-		>
-			<div className="flex flex-row items-center justify-between">
+		<div className={twMerge('flex w-full flex-col gap-[20px]', className)}>
+			<div className="flex flex-col gap-[8px]">
 				<p className="font-sans text-2xl font-semibold leading-4">
 					{t('main.currentSub.title')}
 				</p>
+				<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+					{t('main.currentSub.remainingCredits')}: {remainingCredits}{' '}
+					{creditsLabel(Number(remainingCredits) || 0)}
+				</p>
+				<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+					{t('main.currentSub.remainingReports')}: {remainingCalculations}
+				</p>
+				<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
+					{t('main.currentSub.remainingDownloads')}: {remainingReports}
+				</p>
 			</div>
-			{subscription ? (
-				<div className="flex h-full flex-row justify-between gap-[16px]">
-					<div className="flex flex-1 flex-col justify-between">
-						<div className="flex flex-col gap-[18px]">
-							<div className="flex flex-row">
-								<p className="font-sans text-2xl font-bold leading-7 text-primary">
-									{subscription.name}
-								</p>
-							</div>
-							{subscription.description ? (
-								<p className="font-sans text-base italic leading-6 text-[#374151]">
-									{subscription.description}
-								</p>
-							) : null}
-							<div className="flex flex-col gap-[10px]">
-								{shouldShowSubscriptionPrice(subscription.price) ? (
-									<p className="font-sans text-base font-bold leading-6 text-[#111827]">
-										{t('main.currentSub.price')}: {subscription.price}{' '}
-										{t(
-											`main.currentSub.credits.${getPluralForm(
-												Number(subscription.price) || 0,
-												locale,
-											)}`,
-										)}
-									</p>
-								) : null}
-								{shouldShowSubscriptionTariffPlan(subscription.tariffPlanName) ? (
-									<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
-										{t('subscription.tariffPlan')}: {subscription.tariffPlanName}
-										{subscription.tariffPlanLimit
-											? ` (${t('subscription.tariffLimit')}: ${subscription.tariffPlanLimit})`
-											: ''}
-									</p>
-								) : null}
-								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
-									{t('main.currentSub.remainingReports')}:{' '}
-									{userData.data?.dowloadReportsNumber ?? 0}
-								</p>
-								<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
-									{t('main.currentSub.remainingDownloads')}:{' '}
-									{userData.data?.reportsNumber ?? 0}
-								</p>
-							</div>
-						</div>
-						<Button className="w-min px-[16px]" onClick={handleChangePlan}>
-							<p className="font-sans text-sm font-semibold leading-4">
-								{t('main.currentSub.changePlan')}
-							</p>
-						</Button>
-					</div>
-					<div className="flex shrink-0 items-start">
-						<SubImage />
-					</div>
-				</div>
+
+			{activeSubscriptions.length > 0 ? (
+				<Carousel
+					options={{
+						align: 'start',
+						loop: false,
+						containScroll: 'trimSnaps',
+					}}
+					slidesClassName="items-start"
+					showPagination={false}
+				>
+					{activeSubscriptions.map((subscription) => (
+						<CarouselSlide
+							key={subscription.id}
+							className={twMerge(
+								'w-auto self-start',
+								hasManyCards
+									? 'basis-full pr-3 md:basis-1/2'
+									: 'basis-full',
+							)}
+						>
+							{renderSubscriptionCard(subscription)}
+						</CarouselSlide>
+					))}
+				</Carousel>
 			) : (
-				<div className="flex h-full flex-row justify-between gap-[16px]">
-					<div className="flex flex-1 flex-col justify-between">
+				<div className="flex min-h-[320px] w-full flex-row justify-between gap-[16px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]">
+					<div className="flex flex-1 flex-col justify-between gap-[16px]">
 						<p className="font-sans text-base leading-6 text-[#374151]">
 							{t('main.currentSub.noneActive')}
 						</p>

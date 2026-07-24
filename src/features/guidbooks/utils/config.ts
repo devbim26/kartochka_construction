@@ -157,6 +157,7 @@ export const ConstructionsAddConfig: EntityConfig = {
 		impactLaboratory: { ...emptyLaboratoryBlockDefaults },
 		rw: '',
 		lnw: '',
+		isViewForDefaultUser: false,
 		additionalInfo: {
 			suppliers: '',
 			standartName: '',

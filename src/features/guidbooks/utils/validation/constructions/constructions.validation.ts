@@ -158,6 +158,10 @@ const constructionsAddShape = z.object({
 	/** Поля списка (фильтр / таблица), при создании не отправляются на сервер */
 	rw: z.string().optional(),
 	lnw: z.string().optional(),
+	/** Доступна ли конструкция бесплатному (default) пользователю — настройка в справочнике */
+	isViewForDefaultUser: z.boolean().optional(),
+	/** Доступна ли конструкция текущему пользователю в пагинированном списке (модалка) */
+	isView: z.boolean().optional(),
 	constructionTypeObject: ConstructionTypeShema,
 	reportInfoId: z.string().optional(),
 	additionalInfo: ConstructionAdditionalInfoSchema.optional(),

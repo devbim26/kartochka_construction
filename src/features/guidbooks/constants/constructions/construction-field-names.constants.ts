@@ -6,6 +6,7 @@ export const ConstructionsAddFieldNames = [
 	'country',
 	'constructionPurpose',
 	'issuer',
+	'isViewForDefaultUser',
 	'maxHeight',
 	'fireResistance',
 	'propertySource',

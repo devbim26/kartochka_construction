@@ -30,6 +30,7 @@ export enum MaterialTypeEnum {
 	Board = 'Board',
 	ZPanel = 'ZPanel',
 	GapDistance = 'GapDistance',
+	Screed = 'Screed',
 }
 
 export enum RuMaterialTypeEnum {
@@ -50,6 +51,7 @@ export enum RuMaterialTypeEnum {
 	Filler = 'Наполнительные',
 	Heavy = 'Тяжелые',
 	Board = 'Плиты',
+	Screed = 'Стяжка',
 }
 
 /** Подписи типов материалов в селектах (enum не меняем). */
@@ -64,6 +66,7 @@ export const MaterialTypeSelectLabelsRu: Partial<Record<MaterialTypeEnum, string
 	[MaterialTypeEnum.Membrane]: 'Мембраны',
 	[MaterialTypeEnum.AcousticTreatmentMaterials]: 'Акустические материалы',
 	[MaterialTypeEnum.Plaster]: 'Штукатурка',
+	[MaterialTypeEnum.Screed]: 'Стяжка',
 };
 
 export const MaterialTypeSelectLabelsEn: Partial<Record<MaterialTypeEnum, string>> = {
@@ -77,6 +80,7 @@ export const MaterialTypeSelectLabelsEn: Partial<Record<MaterialTypeEnum, string
 	[MaterialTypeEnum.Membrane]: 'Membrane',
 	[MaterialTypeEnum.AcousticTreatmentMaterials]: 'Acoustic treatment materials',
 	[MaterialTypeEnum.Plaster]: 'Plaster',
+	[MaterialTypeEnum.Screed]: 'Screed',
 };
 
 /** Не показывать в селектах выбора типа материала. */
@@ -195,13 +199,13 @@ const buildMaterialTypesSelectValuesMap = (locale: 'ru' | 'en') => ({
 		locale,
 	),
 	[MaterialTypesSelectValuesEnum.ElasticBaseFloor]: materialTypeSelectOptions(
-		[MaterialTypeEnum.Heavy, MaterialTypeEnum.Filler],
+		[MaterialTypeEnum.Screed, MaterialTypeEnum.Filler, MaterialTypeEnum.Heavy],
 		locale,
 	),
-	[MaterialTypesSelectValuesEnum.HomogeneousFloorOptional]: [
-		materialTypeSelectOption(MaterialTypeEnum.Board, locale),
-		{ label: locale === 'en' ? 'Screed' : 'Стяжка', value: MaterialTypeEnum.Heavy },
-	],
+	[MaterialTypesSelectValuesEnum.HomogeneousFloorOptional]: materialTypeSelectOptions(
+		[MaterialTypeEnum.Board, MaterialTypeEnum.Screed],
+		locale,
+	),
 	[MaterialTypesSelectValuesEnum.DoorOptionalLayers]: materialTypeSelectOptions(
 		[MaterialTypeEnum.Glazing, MaterialTypeEnum.Heavy, MaterialTypeEnum.Board],
 		locale,
@@ -227,6 +231,7 @@ const allSelectableMaterialTypes: MaterialTypeEnum[] = [
 	MaterialTypeEnum.Heavy,
 	MaterialTypeEnum.Board,
 	MaterialTypeEnum.Plaster,
+	MaterialTypeEnum.Screed,
 ];
 
 export const RuMaterialTypesSelectValues = materialTypeSelectOptions(

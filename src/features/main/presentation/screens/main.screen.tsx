@@ -56,7 +56,7 @@ const MainScreen = () => {
 			<MainHeader />
 			<div className="flex w-full flex-row items-stretch gap-[20px]">
 				<News />
-				<CurrentSub className="flex-1" />
+				<CurrentSub className="min-w-0 flex-1" />
 			</div>
 			<ReportScreen />
 			<Modal

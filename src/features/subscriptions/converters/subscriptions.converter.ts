@@ -1,5 +1,4 @@
 import type { GetSubscriptionsWithPaginationParamsQuery, SubscriptionDto } from '@api-gen';
-import { formatTariffPlanLimit } from '@features/guidbooks/utils';
 import type { Subscription, SubscriptionFilters } from '../types';
 
 export const convertSubscriptionToClient = (data: SubscriptionDto): Subscription => {
@@ -13,7 +12,7 @@ export const convertSubscriptionToClient = (data: SubscriptionDto): Subscription
 		name: data.name || '',
 		tariffPlanId: plan?.id ?? '',
 		tariffPlanName: plan?.name ?? '',
-		tariffPlanLimit: plan ? formatTariffPlanLimit(plan.credits) : '',
+		tariffPlanLimit: plan?.credits != null ? String(plan.credits) : '',
 	};
 };
 

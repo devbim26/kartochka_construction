@@ -228,6 +228,7 @@ export interface ConstructionHeaderDto {
 	issuerId?: string;
 	issuer?: Issuer;
 	constructionPurpose?: ConstructionPurpose;
+	isViewForDefaultUser?: boolean;
 	/** @format double */
 	maxHeight?: number;
 	propertySource?: string | null;
@@ -401,6 +402,7 @@ export interface CreateConstructionHeaderCommand {
 	/** @format double */
 	maxHeight?: number;
 	fireResistance?: string | null;
+	isViewForDefaultUser?: boolean;
 	airNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
 	impactNoizeLaboratoryData?: CreateConstructionLaboratoryDataDto;
 	constructionPurpose?: ConstructionPurpose;
@@ -1160,6 +1162,7 @@ export interface PaginatedConstructionHeaderDto {
 	shortName?: string | null;
 	/** @format double */
 	labR?: number;
+	isView?: boolean;
 	/** @format uuid */
 	userId?: string | null;
 }
@@ -1432,6 +1435,7 @@ export interface ReportInfoFloorConstructionDto {
 	reportDocumentInfo?: ReportDocumentInfoDto;
 	country?: CountryType;
 	status?: ReportInfoStatus;
+	purposeBuilding?: PurposeBuilding;
 	description?: string | null;
 	floorDocumentUrl?: string | null;
 }
@@ -1478,8 +1482,8 @@ export interface ReportInfoSingleConstructionDto {
 	reportDocumentInfo?: ReportDocumentInfoDto;
 	status?: ReportInfoStatus;
 	buildingType?: BuildingType;
-	class?: CategoryClass;
 	purposeBuilding?: PurposeBuilding;
+	class?: CategoryClass;
 }
 
 export enum ReportInfoStatus {
@@ -1713,6 +1717,7 @@ export interface UpdateConstructionHeaderCommand {
 	descriptionSource?: string | null;
 	notation?: string | null;
 	constructionPurpose?: ConstructionPurpose;
+	isViewForDefaultUser?: boolean;
 	/** @format uuid */
 	issuerId?: string;
 	propertySource?: string | null;
@@ -1757,6 +1762,7 @@ export interface UpdateReportInfoBaseFieldsCommand {
 	description?: string | null;
 	buildingType?: BuildingType;
 	class?: CategoryClass;
+	purposeBuilding?: PurposeBuilding;
 }
 
 export interface UpdateReportInfoWithSingleConstructionCommand {

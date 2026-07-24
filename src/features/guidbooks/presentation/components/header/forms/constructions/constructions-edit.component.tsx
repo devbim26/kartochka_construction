@@ -4,6 +4,7 @@ import {
 	convertToSelectValues,
 	Input,
 	Select,
+	Switch,
 	useI18n,
 } from '@core';
 import {
@@ -269,6 +270,21 @@ export const ConstructionsEdit = () => {
 								/>
 							)}
 						/>
+						<div className="flex w-[226px] flex-col gap-2">
+							<p className="font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary">
+								Доступно бесплатному пользователю
+							</p>
+							<Controller
+								name="isViewForDefaultUser"
+								control={control}
+								render={({ field }) => (
+									<Switch
+										isEnabledProp={!!field.value}
+										onChange={field.onChange}
+									/>
+								)}
+							/>
+						</div>
 					</div>
 					<FormSubTitle text="Характеристики" />
 					<div className="flex flex-wrap gap-[16px]">
@@ -347,10 +363,13 @@ export const ConstructionsEdit = () => {
 					<FormSubTitle text="Лабораторные данные" />
 					<ConstructionLaboratoryDataFields
 						namePrefix="airLaboratory"
-						title={showImpactLaboratory ? 'Воздушный шум' : undefined}
+						title={showImpactLaboratory ? 'Воздушный шум (лаб.)' : undefined}
 					/>
 					{showImpactLaboratory ? (
-						<ConstructionLaboratoryDataFields namePrefix="impactLaboratory" title="Ударный шум" />
+						<ConstructionLaboratoryDataFields
+							namePrefix="impactLaboratory"
+							title="Ударный шум (лаб.)"
+						/>
 					) : null}
 				</>
 			) : activeTab === 'characteristics' ? (

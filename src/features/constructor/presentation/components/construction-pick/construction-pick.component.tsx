@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import { Switch, convertToServerCountryData, useAppDispatch, useAppSelector } from '@core';
+import {
+	Switch,
+	convertToServerCountryData,
+	useAppDispatch,
+	useAppNavigate,
+	useAppSelector,
+} from '@core';
 import {
 	buildRequirementDisplaySnapshot,
 	convertToClientAlternateConstruction,
@@ -34,6 +40,7 @@ import { ConstructionFilters } from './construction-filters.component';
 
 const ContructionPick = () => {
 	const [search] = useSearchParams();
+	const navigate = useAppNavigate();
 	const reportId = search.get('reportId');
 	const [showAlternate, setShowAlternate] = useState(true);
 	const [pageNumber, setPageNumber] = useState(1);
@@ -193,25 +200,39 @@ const ContructionPick = () => {
 			handleGetCurrentReportFloorInfo(reportId);
 		else if (reportType === ReportCategory.Single && reportId)
 			handleGetCurrentReportShortSingleInfo(reportId);
-	}, [reportType, reportId]);
+	}, [reportType, reportId, constructionHeaderId]);
 
 	useEffect(() => {
-		if (!constructionHeaderId || svgUrl) return;
+		if (!constructionHeaderId) {
+			setSvgUrl(null);
+			return;
+		}
+
+		let cancelled = false;
+		setSvgUrl(null);
+
 		from(svgConstructionDetail(constructionHeaderId))
 			.pipe(
-				catchError((error) => {
-					toast.error('Не удалось получить картинку');
+				catchError(() => {
+					if (!cancelled) {
+						toast.error('Не удалось получить картинку');
+					}
 					return [];
 				}),
 			)
 			.subscribe((response) => {
+				if (cancelled) return;
 				if (response.status === 200 && typeof response.data === 'string') {
 					setSvgUrl(response.data);
 				} else {
 					toast.error('Неверный формат');
 				}
 			});
-	}, [constructionHeaderId, svgUrl]);
+
+		return () => {
+			cancelled = true;
+		};
+	}, [constructionHeaderId]);
 
 	const replacementConstructionType =
 		constructionHeader?.constructionTypeObject?.constructionTypeEnum ||
@@ -276,24 +297,19 @@ const ContructionPick = () => {
 
 	const handleSwapSuccess = useCallback(
 		(newConstructionHeaderId: string) => {
-			setConstructionHeader(null);
-			setSvgUrl(null);
-			handleGetConstructionByHeaderId(newConstructionHeaderId);
-
-			from(svgConstructionDetail(newConstructionHeaderId))
-				.pipe(catchError(() => []))
-				.subscribe((response) => {
-					if (response.status === 200 && typeof response.data === 'string') {
-						setSvgUrl(response.data);
-					}
-				});
+			const params: Record<string, string> = {};
+			search.forEach((value, key) => {
+				params[key] = value;
+			});
+			params.constructionHeaderId = newConstructionHeaderId;
+			navigate('', params);
 
 			if (showAlternate) {
 				setPageNumber(1);
 				handleAlternateConstructions(form.getValues(), 1);
 			}
 		},
-		[showAlternate, form, handleAlternateConstructions],
+		[search, navigate, showAlternate, form, handleAlternateConstructions],
 	);
 
 	return (
@@ -338,6 +354,7 @@ const ContructionPick = () => {
 			<p className="font-sans text-lg font-semibold leading-4">Базовая конструкция</p>
 			{currentReportInfo && constructionHeader && (
 				<ConstructionCard
+					key={constructionHeader.id}
 					construction={constructionHeader}
 					svgUrl={svgUrl}
 					reportInfo={currentReportInfo}

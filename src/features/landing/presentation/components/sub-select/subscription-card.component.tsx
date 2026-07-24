@@ -2,9 +2,9 @@ import { Button, useI18n } from '@core';
 import type { Subscription } from '@features/subscriptions';
 import {
 	shouldShowSubscriptionCalculations,
+	shouldShowSubscriptionCredits,
 	shouldShowSubscriptionPrice,
 	shouldShowSubscriptionReports,
-	shouldShowSubscriptionTariffPlan,
 } from '@features/subscriptions';
 import { CheckMarkImage } from './images';
 
@@ -19,7 +19,7 @@ export const SubscriptionCard = ({ subscription, onClick, showActionButton = tru
 	const showPrice = shouldShowSubscriptionPrice(subscription.price);
 	const showCalculations = shouldShowSubscriptionCalculations(subscription.numberOfDowloadReports);
 	const showReports = shouldShowSubscriptionReports(subscription.numberOfReports);
-	const showTariffPlan = shouldShowSubscriptionTariffPlan(subscription.tariffPlanName);
+	const showCredits = shouldShowSubscriptionCredits(subscription.tariffPlanLimit);
 
 	return (
 		<div
@@ -51,42 +51,40 @@ export const SubscriptionCard = ({ subscription, onClick, showActionButton = tru
 					</p>
 				</Button>
 			) : null}
-			{showCalculations || showReports || showTariffPlan ? (
-			<div className="mt-1 flex flex-col gap-2">
-				{showCalculations ? (
-					<div className="flex items-start gap-2">
-						<span className="shrink-0 pt-1">
-							<CheckMarkImage />
-						</span>
-						<span className="text-start font-montserrat text-base font-semibold leading-[145%] sm:text-lg">
-							{t('subscription.calculationsCount')}: {subscription.numberOfDowloadReports}
-						</span>
-					</div>
-				) : null}
-				{showReports ? (
-					<div className="flex items-start gap-2">
-						<span className="shrink-0 pt-1">
-							<CheckMarkImage />
-						</span>
-						<span className="text-start font-montserrat text-base font-semibold leading-[145%] sm:text-lg">
-							{t('subscription.reportsCount')}: {subscription.numberOfReports}
-						</span>
-					</div>
-				) : null}
-				{showTariffPlan ? (
-					<div className="flex items-start gap-2">
-						<span className="shrink-0 pt-1">
-							<CheckMarkImage />
-						</span>
-						<span className="text-start font-montserrat text-base font-semibold leading-[145%] sm:text-lg">
-							{t('subscription.tariffPlan')}: {subscription.tariffPlanName}
-							{subscription.tariffPlanLimit
-								? ` (${t('subscription.tariffLimit')}: ${subscription.tariffPlanLimit})`
-								: ''}
-						</span>
-					</div>
-				) : null}
-			</div>
+			{showCalculations || showReports || showCredits ? (
+				<div className="mt-1 flex flex-col gap-2">
+					{showCalculations ? (
+						<div className="flex items-start gap-2">
+							<span className="shrink-0 pt-1">
+								<CheckMarkImage />
+							</span>
+							<span className="text-start font-montserrat text-base font-semibold leading-[145%] sm:text-lg">
+								{t('subscription.calculationsCount')}:{' '}
+								{subscription.numberOfDowloadReports}
+							</span>
+						</div>
+					) : null}
+					{showReports ? (
+						<div className="flex items-start gap-2">
+							<span className="shrink-0 pt-1">
+								<CheckMarkImage />
+							</span>
+							<span className="text-start font-montserrat text-base font-semibold leading-[145%] sm:text-lg">
+								{t('subscription.reportsCount')}: {subscription.numberOfReports}
+							</span>
+						</div>
+					) : null}
+					{showCredits ? (
+						<div className="flex items-start gap-2">
+							<span className="shrink-0 pt-1">
+								<CheckMarkImage />
+							</span>
+							<span className="text-start font-montserrat text-base font-semibold leading-[145%] sm:text-lg">
+								{t('subscription.creditsCount')}: {subscription.tariffPlanLimit}
+							</span>
+						</div>
+					) : null}
+				</div>
 			) : null}
 		</div>
 	);

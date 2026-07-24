@@ -29,6 +29,13 @@ export const ConstructionFieldsMap = ({
 				currentForm={currentForm}
 			/>
 		),
+		[MaterialTypeEnum.Screed]: (
+			<ThicknessDensityFieldsType
+				fieldIndex={fieldIndex}
+				constructionPosition={constructionPosition}
+				currentForm={currentForm}
+			/>
+		),
 		[MaterialTypeEnum.AirGap]: (
 			<ThicknessDensityFieldsType
 				fieldIndex={fieldIndex}
@@ -115,6 +122,16 @@ export const ConstructionFieldsMap = ({
 
 export const MaterialTypeValuesMap = {
 	[MaterialTypeEnum.Heavy]: [
+		{
+			materialParameters: MaterialParametrs.Thickness,
+			value: '',
+		},
+		{
+			materialParameters: MaterialParametrs.Density,
+			value: '',
+		},
+	],
+	[MaterialTypeEnum.Screed]: [
 		{
 			materialParameters: MaterialParametrs.Thickness,
 			value: '',

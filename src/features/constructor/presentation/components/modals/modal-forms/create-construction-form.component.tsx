@@ -639,17 +639,38 @@ export const CreateConstructionForm = memoize(
 			};
 
 			const constructionSelectOptions: SelectOption[] = useMemo(() => {
+				const withFavoriteIcon = (option: SelectOption): SelectOption => ({
+					...option,
+					icon: favoriteConstructionIds.has(String(option.value)) ? (
+						<span className="text-[14px] leading-none text-green-600">★</span>
+					) : undefined,
+				});
+
+				const isOptionUnavailable = (id: string | number | boolean) => {
+					const item = constructionData.find((c) => String(c.id) === String(id));
+					return item?.isView === false;
+				};
+
 				const base =
 					convertToSelectValues(
 						constructionData.map((c) => ({
 							...c,
 							name: c.description || c.name,
 						})),
-					)?.sort((a, b) => {
-						const aIsFavorite = favoriteConstructionIds.has(String(a.value));
-						const bIsFavorite = favoriteConstructionIds.has(String(b.value));
-						return Number(bIsFavorite) - Number(aIsFavorite);
-					}) ?? [];
+					)
+						?.map((option) => ({
+							...option,
+							isDisabled: isOptionUnavailable(option.value),
+						}))
+						?.sort((a, b) => {
+							const aIsFavorite = favoriteConstructionIds.has(String(a.value));
+							const bIsFavorite = favoriteConstructionIds.has(String(b.value));
+							if (aIsFavorite !== bIsFavorite) {
+								return Number(bIsFavorite) - Number(aIsFavorite);
+							}
+							// Доступные выше недоступных
+							return Number(a.isDisabled) - Number(b.isDisabled);
+						}) ?? [];
 
 				const valueSet = new Set(base.map((o) => String(o.value)));
 				if (construction && !valueSet.has(String(construction))) {
@@ -662,22 +683,13 @@ export const CreateConstructionForm = memoize(
 						{
 							value: construction,
 							label: labelFromDetail ?? fallbackLabel,
+							isDisabled: false,
 						},
 						...base,
-					].map((option) => ({
-						...option,
-						icon: favoriteConstructionIds.has(String(option.value)) ? (
-							<span className="text-[14px] leading-none text-green-600">★</span>
-						) : undefined,
-					}));
+					].map(withFavoriteIcon);
 				}
 
-				return base.map((option) => ({
-					...option,
-					icon: favoriteConstructionIds.has(String(option.value)) ? (
-						<span className="text-[14px] leading-none text-green-600">★</span>
-					) : undefined,
-				}));
+				return base.map(withFavoriteIcon);
 			}, [constructionData, construction, constructionDetail, favoriteConstructionIds, name]);
 
 			// Получение детальной информации о выбранной конструкции

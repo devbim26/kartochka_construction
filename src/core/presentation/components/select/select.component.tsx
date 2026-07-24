@@ -23,6 +23,8 @@ export interface SelectOption {
 	value: string | number | boolean;
 	icon?: JSX.Element;
 	toolTip?: string;
+	/** Пункт виден, но выбрать нельзя (например конструкция недоступна бесплатному пользователю). */
+	isDisabled?: boolean;
 }
 
 export type SelectRef = SelectInstance<SelectOption, boolean, GroupBase<SelectOption>>;
@@ -186,8 +188,11 @@ export const Select = memoize(
 					},
 					option: (state) => {
 						return twMerge(
-							'py-2 pl-3 pr-9 hover:cursor-pointer hover:bg-primary hover:text-white flex w-full items-center truncate',
-							state.isDisabled && 'disabled:text-gray',
+							'flex w-full items-center truncate py-2 pl-3 pr-9',
+							state.isDisabled
+								? 'cursor-not-allowed bg-gray-50 text-gray-400'
+								: 'hover:cursor-pointer hover:bg-primary hover:text-white',
+							!state.isDisabled && state.isSelected && 'bg-primary text-white',
 							optionsClassName,
 						);
 					},
@@ -201,11 +206,13 @@ export const Select = memoize(
 				const currentValue = props.getValue()?.[0];
 				const isCurrent = currentValue?.value === props.data?.value;
 				const isHighlighted = ['Беларусь', 'Россия', 'Нет'].includes(props.data.label);
+				const isUnavailable = !!props.data.isDisabled || !!props.isDisabled;
 				return (
 					<div
 						className={twMerge(
 							props.getClassNames('option', props),
-							isCurrent && 'bg-primary text-white',
+							!isUnavailable && isCurrent && 'bg-primary text-white',
+							isUnavailable && 'bg-gray-50 text-gray-400',
 						)}
 						{...props.innerProps}
 					>
@@ -214,7 +221,8 @@ export const Select = memoize(
 						<p
 							className={twMerge(
 								'ml-3 truncate',
-								isCurrent && 'font-bold',
+								!isUnavailable && isCurrent && 'font-bold',
+								isUnavailable && 'text-gray-400',
 								highlightOnlyRussiaBelarus && !isHighlighted && 'text-gray-400',
 							)}
 							title={props.data.label}
@@ -318,6 +326,7 @@ export const Select = memoize(
 						options={_options}
 						onChange={_onChange}
 						isSearchable={isSearchable}
+						isOptionDisabled={(option) => !!option.isDisabled}
 						classNames={classNames}
 						styles={styles}
 						isDisabled={props.disabled}

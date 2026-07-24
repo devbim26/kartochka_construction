@@ -17,6 +17,7 @@ export const materialTypeMap = createDataRecordConverter({
 	[ClientMaterialType.ZPanel]: ServerMaterialType.ZPanel,
 	[ClientMaterialType.GapDistance]: ServerMaterialType.GapDistance,
 	[ClientMaterialType.Plaster]: ServerMaterialType.Plaster,
+	[ClientMaterialType.Screed]: ServerMaterialType.Screed,
 });
 
 export const convertToServerMaterialTypeData = (type: ClientMaterialType): ServerMaterialType => {

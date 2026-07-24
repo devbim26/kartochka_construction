@@ -16,3 +16,6 @@ export const shouldShowSubscriptionReports = (numberOfReports?: string | number 
 
 export const shouldShowSubscriptionTariffPlan = (tariffPlanName?: string | null) =>
 	Boolean(tariffPlanName?.trim());
+
+export const shouldShowSubscriptionCredits = (credits?: string | number | null) =>
+	toPositiveNumber(credits) != null;

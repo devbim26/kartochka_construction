@@ -14,7 +14,7 @@ import type {
 	UpdateAdditionalConstructionHeaderDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
-import { convertToClientCountryData } from '@core';
+import { convertToClientCountryData, convertToServerPurposeBuildingData } from '@core';
 import { convertToClientConstructionTypeEnumData } from '@features/guidbooks/converters';
 import type {
 	AlternateConstruction,
@@ -34,7 +34,7 @@ import type {
 	ReportInfoUpdate,
 	SingleConstruction,
 } from '../types';
-import { ReportCategory } from '../types';
+import { PurposeBuilding, ReportCategory } from '../types';
 import type { ReportInfoShort } from '../utils';
 
 const SNAPSHOT_STANDART_DATE = '2000-01-01';
@@ -231,6 +231,9 @@ export const convertToUpdateReportInfoCommand = (
 		buildingName: data.name || '',
 		buildingType: data.buildingType as ApiBuildingType,
 		class: data.comfortClass as ApiCategoryClass,
+		purposeBuilding: data.buildingPurpose
+			? convertToServerPurposeBuildingData(data.buildingPurpose as PurposeBuilding)
+			: undefined,
 	};
 };
 

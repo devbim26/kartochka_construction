@@ -10,14 +10,25 @@ interface CarouselProps {
 	children: ReactNode;
 	options?: EmblaOptionsType;
 	className?: string;
+	/** Классы для трека слайдов (flex-контейнер). По умолчанию — items-stretch. */
+	slidesClassName?: string;
 	/** Показывать стрелки влево/вправо, когда есть куда листать. По умолчанию — да. */
 	showArrows?: boolean;
+	/** Показывать точки пагинации. По умолчанию — да. */
+	showPagination?: boolean;
 }
 
 const ARROW_BUTTON_CLASS =
 	'absolute top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#EDEFF2] bg-white text-[#14181F] shadow-sm transition-colors hover:bg-[#F7F9FC] disabled:cursor-not-allowed disabled:opacity-30';
 
-export const Carousel = ({ children, options, className, showArrows = true }: CarouselProps) => {
+export const Carousel = ({
+	children,
+	options,
+	className,
+	slidesClassName,
+	showArrows = true,
+	showPagination = true,
+}: CarouselProps) => {
 	const [emblaRef, emblaApi] = useEmblaCarousel(options);
 	const [canScrollPrev, setCanScrollPrev] = useState(false);
 	const [canScrollNext, setCanScrollNext] = useState(false);
@@ -45,7 +56,7 @@ export const Carousel = ({ children, options, className, showArrows = true }: Ca
 	return (
 		<div className={twMerge('relative w-full', showNavigation && 'px-10', className)}>
 			<div className="overflow-hidden" ref={emblaRef}>
-				<div className="flex items-stretch">{children}</div>
+				<div className={twMerge('flex items-stretch', slidesClassName)}>{children}</div>
 			</div>
 			{showNavigation ? (
 				<>
@@ -69,7 +80,7 @@ export const Carousel = ({ children, options, className, showArrows = true }: Ca
 					</button>
 				</>
 			) : null}
-			<CarouselPagination emblaApi={emblaApi} />
+			{showPagination ? <CarouselPagination emblaApi={emblaApi} /> : null}
 		</div>
 	);
 };
