@@ -139,6 +139,7 @@ const RequirementsScreen = () => {
 				switchMap((response: AxiosResponse) => {
 					const res = convertToPaginatedType(convertToClientRequirementTableData)(
 						response.data,
+						pagination,
 					);
 					return from([res]);
 				}),
@@ -450,6 +451,7 @@ const RequirementsScreen = () => {
 				columns={columns}
 				paginationState={paginationState}
 				onChangePaginationState={(newState) => {
+					setPaginationState((prev) => ({ ...prev, ...newState }));
 					handleGetTableData(form.filterForm.getValues() as RequirementFilter, newState);
 				}}
 			/>

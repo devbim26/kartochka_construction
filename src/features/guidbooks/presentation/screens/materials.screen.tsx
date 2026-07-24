@@ -289,6 +289,7 @@ const MaterialsScreen = () => {
 				switchMap((response: AxiosResponse) => {
 					const res = convertToPaginatedType(convertToClientMaterialsAddAndEditData)(
 						response.data,
+						pagination,
 					);
 					return from([res]);
 				}),
@@ -473,6 +474,7 @@ const MaterialsScreen = () => {
 				columns={columns}
 				paginationState={paginationState}
 				onChangePaginationState={(newState) => {
+					setPaginationState((prev) => ({ ...prev, ...newState }));
 					handleGetTableData(
 						forms.filterForm.getValues() as MaterialsFilterData,
 						newState,

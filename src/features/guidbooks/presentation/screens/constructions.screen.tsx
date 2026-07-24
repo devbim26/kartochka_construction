@@ -76,6 +76,9 @@ const ConstructionsScreen = () => {
 		id: '',
 		name: '',
 	});
+	const fetchGenerationRef = useRef(0);
+	const pageSizeRef = useRef(paginationState.pageSize);
+	pageSizeRef.current = paginationState.pageSize;
 
 	const forms = useHeaderForm(
 		{
@@ -254,9 +257,14 @@ const ConstructionsScreen = () => {
 	]);
 
 	useEffect(() => {
+		const pagination = {
+			pageNumber: 1,
+			pageSize: pageSizeRef.current || 10,
+		};
+		setPaginationState((prev) => ({ ...prev, ...pagination }));
 		handleGetTableData(
 			forms.filterForm.getValues() as ConstructionsFilterData,
-			paginationState,
+			pagination,
 		);
 	}, [
 		filterName,
@@ -272,6 +280,7 @@ const ConstructionsScreen = () => {
 		data: ConstructionsFilterData,
 		pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>,
 	) => {
+		const fetchId = ++fetchGenerationRef.current;
 		from(
 			getGuidebooksPaginated({
 				data: convertToServerConstructionsFilterData(data),
@@ -283,16 +292,22 @@ const ConstructionsScreen = () => {
 				switchMap((response: AxiosResponse) => {
 					const res = convertToPaginatedType(convertToClientConstructionsAddData)(
 						response.data,
+						pagination,
 					);
 					return from([res]);
 				}),
 				tap((res) => {
+					if (fetchId !== fetchGenerationRef.current) return;
 					setTableData(res.items);
 					setPaginationState(res.pagination);
 				}),
 				catchError((error) => {
+					if (fetchId !== fetchGenerationRef.current) return from([null]);
+					console.error(error);
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data);
+					} else {
+						toast.error('Не удалось загрузить конструкции');
 					}
 					return from([null]);
 				}),
@@ -509,6 +524,7 @@ const ConstructionsScreen = () => {
 				columns={columns}
 				paginationState={paginationState}
 				onChangePaginationState={(newState) => {
+					setPaginationState((prev) => ({ ...prev, ...newState }));
 					handleGetTableData(
 						forms.filterForm.getValues() as ConstructionsFilterData,
 						newState,

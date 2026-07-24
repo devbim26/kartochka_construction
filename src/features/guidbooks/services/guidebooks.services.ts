@@ -66,17 +66,23 @@ export const getGuidebooksPaginated = async ({
 	guidebookType,
 	pagination,
 }: PaginatedProps) => {
+	const pageNumber = Number(pagination.pageNumber) || 1;
+	const pageSize = Number(pagination.pageSize) || 10;
+
 	const query = {
 		...data,
-		pageNumber: pagination.pageNumber,
-		pageSize: pagination.pageSize,
+		pageNumber,
+		pageSize,
 	};
 
-	// Конструкции: плоское тело как в OpenAPI; null/'' в enum-полях бэк не принимает.
+	// Конструкции: плоское тело (без `{ query: ... }`), null/'' в enum-полях бэк не принимает.
 	if (guidebookType === Guidebooks.CONSTRUCTION) {
-		return await fetchApi.api.constructionGetPaginatedCreate(
-			stripNullishQueryFields(query as Record<string, unknown>) as never,
-		);
+		const stripped = stripNullishQueryFields(query as Record<string, unknown>);
+		return await fetchApi.api.constructionGetPaginatedCreate({
+			...stripped,
+			pageNumber,
+			pageSize,
+		} as never);
 	}
 
 	return await getGuidebooksPaginatedApiMap[guidebookType](query);

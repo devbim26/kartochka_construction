@@ -77,15 +77,18 @@ export const UserScreen = () => {
 		from(getPaginatedUsers(convertToServerUserFilterData(data, pagination)))
 			.pipe(
 				switchMap((response) => {
-					const res = convertToPaginatedType(convertToClientAccountData)({
-						items: response.data.items ?? [],
-						pageNumber: response.data.pageNumber ?? 1,
-						totalPages: response.data.totalPages ?? 0,
-						totalCount: response.data.totalCount ?? 0,
-						pageSize: response.data.pageSize ?? 10,
-						hasPreviousPage: false,
-						hasNextPage: false,
-					});
+					const res = convertToPaginatedType(convertToClientAccountData)(
+						{
+							items: response.data.items ?? [],
+							pageNumber: response.data.pageNumber ?? 1,
+							totalPages: response.data.totalPages ?? 0,
+							totalCount: response.data.totalCount ?? 0,
+							pageSize: response.data.pageSize ?? 10,
+							hasPreviousPage: false,
+							hasNextPage: false,
+						},
+						pagination,
+					);
 					return from([res]);
 				}),
 				tap((res) => {
@@ -259,6 +262,7 @@ export const UserScreen = () => {
 				]}
 				paginationState={paginationState}
 				onChangePaginationState={(newState) => {
+					setPaginationState((prev) => ({ ...prev, ...newState }));
 					handleGetTableData(form.filterForm.getValues(), newState);
 				}}
 			/>

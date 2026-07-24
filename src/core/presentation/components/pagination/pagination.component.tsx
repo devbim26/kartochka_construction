@@ -4,8 +4,9 @@ import { Select, type SelectOption } from '../select';
 import { PaginationButton } from './pagination-button.component';
 
 export const pageSizeSelectOptions: SelectOption[] = [
+	{ label: '5 строк', value: 5 },
 	{ label: '10 строк', value: 10 },
-	{ label: '25 строк', value: 25 },
+	{ label: '20 строк', value: 20 },
 	{ label: '50 строк', value: 50 },
 ];
 
@@ -39,9 +40,15 @@ export const Pagination = ({ onPageChange, state, onPageSizeChange }: Pagination
 	return (
 		<div className="flex flex-row items-center justify-end gap-[24px] pr-[39px]">
 			<Select
-				value={state.pageSize}
+				value={Number(state.pageSize) || 10}
 				options={pageSizeSelectOptions}
-				onChange={(value) => value && onPageSizeChange(Number(value))}
+				disableDefaultValue
+				wrapperClassname="w-[130px] shrink-0"
+				buttonClassName="w-[130px]"
+				onChange={(value) => {
+					if (value === '' || value == null) return;
+					onPageSizeChange(Number(value));
+				}}
 			/>
 			<div className="text-[14px] leading-[20px] tracking-[0.1px]">
 				{viewedPages.length &&

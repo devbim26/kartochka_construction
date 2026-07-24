@@ -104,7 +104,10 @@ const IssuersScreen = () => {
 		)
 			.pipe(
 				switchMap((response: AxiosResponse) => {
-					const res = convertToPaginatedType(convertToClientIssuerData)(response.data);
+					const res = convertToPaginatedType(convertToClientIssuerData)(
+						response.data,
+						pagination,
+					);
 					return from([res]);
 				}),
 				tap((res) => {
@@ -330,6 +333,7 @@ const IssuersScreen = () => {
 				columns={columns}
 				paginationState={paginationState}
 				onChangePaginationState={(newState) => {
+					setPaginationState((prev) => ({ ...prev, ...newState }));
 					handleGetTableData(form.filterForm.getValues(), newState);
 				}}
 			/>

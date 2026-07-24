@@ -75,16 +75,19 @@ const TariffPlansScreen = () => {
 		from(getPaginatedTariffPlans({ pagination }))
 			.pipe(
 				switchMap((response) => {
-					const res = convertToPaginatedType(convertTariffPlanToClient)({
-						...response.data,
-						items: response.data.items ?? [],
-						pageNumber: response.data.pageNumber ?? 1,
-						totalPages: response.data.totalPages ?? 0,
-						totalCount: response.data.totalCount ?? 0,
-						pageSize: response.data.pageSize ?? 10,
-						hasPreviousPage: response.data.hasPreviousPage ?? false,
-						hasNextPage: response.data.hasNextPage ?? false,
-					});
+					const res = convertToPaginatedType(convertTariffPlanToClient)(
+						{
+							...response.data,
+							items: response.data.items ?? [],
+							pageNumber: response.data.pageNumber ?? 1,
+							totalPages: response.data.totalPages ?? 0,
+							totalCount: response.data.totalCount ?? 0,
+							pageSize: response.data.pageSize ?? 10,
+							hasPreviousPage: response.data.hasPreviousPage ?? false,
+							hasNextPage: response.data.hasNextPage ?? false,
+						},
+						pagination,
+					);
 					return from([res]);
 				}),
 				tap((res) => {
@@ -275,6 +278,7 @@ const TariffPlansScreen = () => {
 				columns={columns}
 				paginationState={paginationState}
 				onChangePaginationState={(newState) => {
+					setPaginationState((prev) => ({ ...prev, ...newState }));
 					handleGetTableData(newState);
 				}}
 			/>

@@ -19,6 +19,7 @@ import {
 } from '@features/constructor/converters';
 import {
 	getConstructionRooms,
+	getFavoriteConstructions,
 	getReportFloorById,
 	getReportSingleById,
 	svgConstructionDetail,
@@ -539,21 +540,30 @@ export const CreateConstructionForm = memoize(
 					: undefined;
 
 				from(
-					getGuidebooksPaginated({
-						data: {
-							constructionIdToUpdate: construction || undefined,
-							userId: userId || undefined,
-							constructionClass,
-							...(paginationRw != null ? { rw: paginationRw } : {}),
-							...(reportCountryType ? { countryType: reportCountryType } : {}),
-							orderByPriority: true,
-						},
-						guidebookType: Guidebooks.CONSTRUCTION,
-						pagination: { pageNumber: 1, pageSize: 99999 },
-					}),
+					Promise.all([
+						getGuidebooksPaginated({
+							data: {
+								constructionIdToUpdate: construction || undefined,
+								userId: userId || undefined,
+								constructionClass,
+								...(paginationRw != null ? { rw: paginationRw } : {}),
+								...(reportCountryType ? { countryType: reportCountryType } : {}),
+								orderByPriority: true,
+							},
+							guidebookType: Guidebooks.CONSTRUCTION,
+							pagination: { pageNumber: 1, pageSize: 99999 },
+						}),
+						getFavoriteConstructions(),
+					]),
 				)
 					.pipe(
-						tap((response: AxiosResponse) => {
+						tap(([response, favoritesResponse]: [AxiosResponse, AxiosResponse]) => {
+							const favoriteKeys = new Set<string>();
+							for (const fav of favoritesResponse?.data?.items || []) {
+								if (fav?.id) favoriteKeys.add(String(fav.id));
+								if (fav?.constructionId) favoriteKeys.add(String(fav.constructionId));
+							}
+
 							const items = (response?.data?.items || []).filter((item: any) =>
 								matchesConstructionClassFilter(item?.constructionType, constructionClass),
 							);
@@ -561,7 +571,6 @@ export const CreateConstructionForm = memoize(
 								string,
 								{
 									displayItem: any;
-									hasFavorite: boolean;
 								}
 							> = items.reduce(
 								(
@@ -569,7 +578,6 @@ export const CreateConstructionForm = memoize(
 										string,
 										{
 											displayItem: any;
-											hasFavorite: boolean;
 										}
 									>,
 									item: any,
@@ -581,17 +589,15 @@ export const CreateConstructionForm = memoize(
 									if (!existing) {
 										acc.set(uniqueKey, {
 											displayItem: item,
-											hasFavorite: !!item?.userId,
 										});
 										return acc;
 									}
 
-									// For UI text/value prefer base/common record (without userId).
+									// Для UI предпочитаем общую запись (без userId).
 									if (existing.displayItem?.userId && !item?.userId) {
 										existing.displayItem = item;
 									}
 
-									existing.hasFavorite = existing.hasFavorite || !!item?.userId;
 									acc.set(uniqueKey, existing);
 									return acc;
 								},
@@ -599,29 +605,30 @@ export const CreateConstructionForm = memoize(
 									string,
 									{
 										displayItem: any;
-										hasFavorite: boolean;
 									}
 								>(),
 							);
 
 							const groupedValues = Array.from(grouped.values()) as Array<{
 								displayItem: any;
-								hasFavorite: boolean;
 							}>;
 
 							const normalizedItems = groupedValues.map((group) => group.displayItem);
 
-							const favoriteIds = new Set<string>(
-								groupedValues
-									.filter((group) => group.hasFavorite)
-									.map((group) => group.displayItem?.id)
-									.filter(Boolean),
-							);
+							const favoriteIds = new Set<string>();
+							for (const item of normalizedItems) {
+								const keys = [item?.id, item?.constructionId]
+									.filter(Boolean)
+									.map(String);
+								if (keys.some((key) => favoriteKeys.has(key)) && item?.id) {
+									favoriteIds.add(String(item.id));
+								}
+							}
 							setFavoriteConstructionIds(favoriteIds);
 
 							response.data.items = normalizedItems;
 						}),
-						switchMap((response: AxiosResponse) => {
+						switchMap(([response]: [AxiosResponse, AxiosResponse]) => {
 							const resData = convertToPaginatedType(
 								convertToClientConstructionsAddData,
 							)(response.data);

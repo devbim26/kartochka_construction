@@ -211,10 +211,12 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 		description: data.description ?? '',
 		priority:
 			data.priority != null && data.priority !== ''
-				? (convertToClientPriorityData(data.priority) as string)
+				? ((convertToClientPriorityData(data.priority) as string) ?? '')
 				: '',
 		descriptionSource: data.descriptionSource ?? '',
-		country: (convertToClientCountryData(data.countries!) as string[]) ?? [],
+		country: Array.isArray(data.countries)
+			? (convertToClientCountryData(data.countries) as string[])
+			: [],
 		maxHeight: String(data.maxHeight) ?? '',
 		fireResistance: String(data.fireResistance) ?? '',
 		propertySource: data.propertySource ?? '',

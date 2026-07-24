@@ -146,10 +146,14 @@ export const Select = memoize(
 			const currentOption = useMemo(() => {
 				if (multiple) {
 					return _options.filter((o) =>
-						(value as SelectOption['value'][])?.some((v) => v === o.value),
+						(value as SelectOption['value'][])?.some(
+							(v) => v === o.value || String(v) === String(o.value),
+						),
 					);
 				}
-				return _options.find((o) => o.value === value);
+				return _options.find(
+					(o) => o.value === value || String(o.value) === String(value),
+				);
 			}, [value, _options, multiple, disablePlaceholder]);
 
 			const classNames = useMemo((): ClassNamesConfig<SelectOption> => {
@@ -163,11 +167,14 @@ export const Select = memoize(
 							error ? 'ring-inset ring-error focus:ring-error' : '',
 						);
 					},
-					singleValue: (state) => {
-						return twMerge('flex flex-nowrap bg-red-300');
+					singleValue: () => {
+						return twMerge('flex max-w-full flex-nowrap truncate');
 					},
 					control: () => {
-						return twMerge('w-full rounded-md py-1.5 px-3', buttonClassName);
+						return twMerge(
+							'relative w-full rounded-md py-1.5 px-3',
+							buttonClassName,
+						);
 					},
 					indicatorSeparator: () => {
 						return twMerge('hidden');
@@ -235,9 +242,9 @@ export const Select = memoize(
 
 			const SingleValue = memoize((props) => {
 				return (
-					<div className="absolute" {...props.innerProps}>
+					<div className="flex max-w-full items-center truncate" {...props.innerProps}>
 						{headerImage}
-						<div className={twMerge('flex items-center gap-3')}>
+						<div className={twMerge('flex min-w-0 items-center gap-3')}>
 							{props.data.icon}
 							<p
 								className={twMerge(
