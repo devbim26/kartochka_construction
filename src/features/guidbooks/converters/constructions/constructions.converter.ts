@@ -137,7 +137,8 @@ export const getConstructionAdditionalInfoFilesUpload = (data: ConstructionsAddD
 
 /** Параметры пагинации конструкций; расширения сверх OpenAPI передаются как есть. */
 export const convertToServerConstructionsFilterData = (data: ConstructionsFilterData): any => ({
-	name: data.name || null,
+	// В таблице «Название» = description, поэтому фильтр name уходит в description.
+	description: data.name || null,
 	shortName: data.constructionType || null,
 	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
 	...(data.priority
