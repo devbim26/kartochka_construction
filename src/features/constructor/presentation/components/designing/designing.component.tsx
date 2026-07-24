@@ -7,6 +7,7 @@ import {
 	useI18n,
 } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
+import { MdCheckCircle, MdWarning } from 'react-icons/md';
 import type {
 	AdditionalGraphParameters,
 	DesigningData,
@@ -236,6 +237,31 @@ const DesigningConstructionScreen = () => {
 			hasImpactLaboratoryDots,
 		],
 	);
+
+	const reqRw =
+		currentConstruction?.reportConstructionHeader?.requirementNoizeIsolationIndex;
+	const reqLw = currentConstruction?.reportConstructionHeader?.requirementNoizeImpactIndex;
+	const hasReqRw = reqRw != null && !Number.isNaN(Number(reqRw));
+	const hasReqLw = reqLw != null && !Number.isNaN(Number(reqLw));
+	const showMismatchWarning =
+		(showAirborneValues &&
+			hasReqRw &&
+			((hasComputedDots && displayComputedRw != null && !compIsRelevant) ||
+				(hasLaboratoryDots && displayLabRw != null && !labIsRelevant))) ||
+		(showImpactValues &&
+			hasReqLw &&
+			((hasImpactComputedDots && displayComputedLw != null && !compImpactRelevant) ||
+				(hasImpactLaboratoryDots && displayLabLw != null && !labImpactRelevant)));
+	const hasEvaluatedValues =
+		(showAirborneValues &&
+			hasReqRw &&
+			((hasComputedDots && displayComputedRw != null) ||
+				(hasLaboratoryDots && displayLabRw != null))) ||
+		(showImpactValues &&
+			hasReqLw &&
+			((hasImpactComputedDots && displayComputedLw != null) ||
+				(hasImpactLaboratoryDots && displayLabLw != null)));
+	const showMatchSuccess = hasEvaluatedValues && !showMismatchWarning;
 
 	const handleGetCurrentReportFloorInfo = (id: string) => {
 		dispatch(startLoading());
@@ -690,7 +716,11 @@ const DesigningConstructionScreen = () => {
 					<Loader />
 				</div>
 			)}
-			<DesigningHeader />
+			<DesigningHeader
+				complianceStatus={
+					showMismatchWarning ? 'mismatch' : showMatchSuccess ? 'match' : null
+				}
+			/>
 			<div className="flex h-fit w-full flex-row gap-[72px] rounded-[20px] bg-white px-[44px] py-[34px]">
 				{svgUrl ? (
 					<button
@@ -821,16 +851,9 @@ const DesigningConstructionScreen = () => {
 										<p className="font-sans text-[14px]">
 											{currentReportInfo?.calculationDocument?.fullName}
 										</p>
-										<div className="flex w-full items-center gap-1">
-											<p className="font-sans text-[25px] font-semibold leading-4">
-												{`Rw = ${displayComputedRw ?? rCalcsDisplay ?? constructionHeader?.RCalcs ?? ''} dB`}
-											</p>
-											<p className={compIsRelevant ? 'text-green-600' : 'text-error'}>
-												{compIsRelevant
-													? t('constructor.relevant.yes')
-													: t('constructor.relevant.no')}
-											</p>
-										</div>
+										<p className="font-sans text-[25px] font-semibold leading-4">
+											{`Rw = ${displayComputedRw ?? rCalcsDisplay ?? constructionHeader?.RCalcs ?? ''} dB`}
+										</p>
 									</div>
 									<div></div>
 								</>
@@ -844,16 +867,9 @@ const DesigningConstructionScreen = () => {
 										<p className="font-sans text-[14px]">
 											{currentReportInfo?.calculationDocument?.fullName}
 										</p>
-										<div className="flex w-full items-center gap-1">
-											<p className="font-sans text-[25px] font-semibold leading-4">
-												{`Rw = ${displayLabRw ?? labIndexValueDisplay ?? constructionHeader?.airLaboratory?.labIndexValue ?? ''} dB`}
-											</p>
-											<p className={labIsRelevant ? 'text-green-600' : 'text-error'}>
-												{labIsRelevant
-													? t('constructor.relevant.yes')
-													: t('constructor.relevant.no')}
-											</p>
-										</div>
+										<p className="font-sans text-[25px] font-semibold leading-4">
+											{`Rw = ${displayLabRw ?? labIndexValueDisplay ?? constructionHeader?.airLaboratory?.labIndexValue ?? ''} dB`}
+										</p>
 									</div>
 									<div></div>
 								</>
@@ -867,20 +883,9 @@ const DesigningConstructionScreen = () => {
 										<p className="font-sans text-[14px]">
 											{currentReportInfo?.calculationDocument?.fullName}
 										</p>
-										<div className="flex w-full items-center gap-1">
-											<p className="font-sans text-[25px] font-semibold leading-4">
-												{`Lw = ${displayComputedLw ?? estimatedLwDisplay ?? constructionHeader?.estimatedIndexValue ?? ''} dB`}
-											</p>
-											<p
-												className={
-													compImpactRelevant ? 'text-green-600' : 'text-error'
-												}
-											>
-												{compImpactRelevant
-													? t('constructor.relevant.yes')
-													: t('constructor.relevant.no')}
-											</p>
-										</div>
+										<p className="font-sans text-[25px] font-semibold leading-4">
+											{`Lw = ${displayComputedLw ?? estimatedLwDisplay ?? constructionHeader?.estimatedIndexValue ?? ''} dB`}
+										</p>
 									</div>
 									<div></div>
 								</>
@@ -896,20 +901,9 @@ const DesigningConstructionScreen = () => {
 										<p className="font-sans text-[14px]">
 											{currentReportInfo?.calculationDocument?.fullName}
 										</p>
-										<div className="flex w-full items-center gap-1">
-											<p className="font-sans text-[25px] font-semibold leading-4">
-												{`Lw = ${displayLabLw ?? impactLabIndexValueDisplay ?? constructionHeader?.impactLaboratory?.labIndexValue ?? ''} dB`}
-											</p>
-											<p
-												className={
-													labImpactRelevant ? 'text-green-600' : 'text-error'
-												}
-											>
-												{labImpactRelevant
-													? t('constructor.relevant.yes')
-													: t('constructor.relevant.no')}
-											</p>
-										</div>
+										<p className="font-sans text-[25px] font-semibold leading-4">
+											{`Lw = ${displayLabLw ?? impactLabIndexValueDisplay ?? constructionHeader?.impactLaboratory?.labIndexValue ?? ''} dB`}
+										</p>
 									</div>
 									<div></div>
 								</>
@@ -942,6 +936,22 @@ const DesigningConstructionScreen = () => {
 										</p>
 									);
 								})()}
+							{showMismatchWarning && (
+								<div className="mt-4 flex flex-col items-center gap-2 text-center">
+									<MdWarning className="text-[28px] text-orange-500" aria-hidden />
+									<p className="max-w-[240px] font-sans text-[14px] leading-snug text-orange-500">
+										{t('constructor.relevant.mismatchWarning')}
+									</p>
+								</div>
+							)}
+							{showMatchSuccess && (
+								<div className="mt-4 flex flex-col items-center gap-2 text-center">
+									<MdCheckCircle className="text-[28px] text-green-600" aria-hidden />
+									<p className="max-w-[240px] font-sans text-[14px] leading-snug text-green-600">
+										{t('constructor.relevant.matchSuccess')}
+									</p>
+								</div>
+							)}
 						</>
 					) : (
 						<div className="flex size-full items-center justify-center">

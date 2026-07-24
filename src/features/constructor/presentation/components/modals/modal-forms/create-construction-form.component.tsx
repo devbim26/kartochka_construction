@@ -60,7 +60,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { BsQuestionSquareFill } from 'react-icons/bs';
+import { BsExclamationSquareFill } from 'react-icons/bs';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -138,6 +138,7 @@ export const CreateConstructionForm = memoize(
 			const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 
 			const [roomRequirementsMap, setRoomRequirementsMap] = useState<RoomRequirementMap>({});
+			const [isRequirementNoteOpen, setIsRequirementNoteOpen] = useState(false);
 			const [secondRoomOptions, setSecondRoomOptions] = useState<
 				Array<{ label: string; value: string }>
 			>([]);
@@ -179,6 +180,10 @@ export const CreateConstructionForm = memoize(
 				return (match?.annotation ?? '').trim();
 			}, [firstPlacementRoom, secondPlacementRoom, roomRequirementsMap]);
 
+			useEffect(() => {
+				setIsRequirementNoteOpen(false);
+			}, [firstPlacementRoom, secondPlacementRoom, selectedRequirementAnnotation]);
+
 			const rwDisplayText = useMemo(() => {
 				if (paginationRw == null) {
 					return locale === 'en' ? 'Rw —, dB' : 'Rw —, дБ';
@@ -212,12 +217,14 @@ export const CreateConstructionForm = memoize(
 					const firstRoomId = item.firstPlacementRoom.id;
 
 					item.secondRequirementRooms.forEach(
-						(requirement: SecondRequirementPlacementRoomDto) => {
+						(requirement: SecondRequirementPlacementRoomDto & {
+							notice?: string | null;
+						}) => {
 							const secondRoomId = requirement.secondPlacementRoom?.id;
 							const secondRoomName = requirement.secondPlacementRoom?.name;
 							const requirementId = requirement.requirementId;
 							const rw = requirement.rw as number | null | undefined;
-							const annotation = requirement.annotation;
+							const annotation = requirement.annotation ?? requirement.notice;
 
 							if (!secondRoomId || !secondRoomName || !requirementId) return;
 
@@ -897,8 +904,27 @@ export const CreateConstructionForm = memoize(
 											</span>
 											{selectedRequirementAnnotation ? (
 												<div className="group relative shrink-0">
-													<BsQuestionSquareFill className="size-[20px] cursor-pointer text-primary" />
-													<div className="pointer-events-none absolute right-0 top-full z-20 mt-2 w-[min(280px,calc(100vw-48px))] rounded bg-black px-3 py-2 text-left text-sm text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+													<button
+														type="button"
+														aria-label={
+															locale === 'ru'
+																? 'Примечание к требованию'
+																: 'Requirement note'
+														}
+														aria-expanded={isRequirementNoteOpen}
+														onClick={() =>
+															setIsRequirementNoteOpen((open) => !open)
+														}
+														className="flex size-[20px] items-center justify-center text-primary"
+													>
+														<BsExclamationSquareFill className="size-[20px]" />
+													</button>
+													<div
+														className={twMerge(
+															'pointer-events-none absolute right-0 top-full z-20 mt-2 w-[min(280px,calc(100vw-48px))] rounded bg-black px-3 py-2 text-left text-sm text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100',
+															isRequirementNoteOpen && 'opacity-100',
+														)}
+													>
 														{selectedRequirementAnnotation}
 													</div>
 												</div>

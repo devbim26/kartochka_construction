@@ -3,7 +3,7 @@ import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useLayoutEffect } from 'react';
 import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
-import { ConstructorHeader } from '../components';
+import { ConstructionComplianceProvider, ConstructorHeader } from '../components';
 
 export const ConstructorLayout = () => {
 	const [search] = useSearchParams();
@@ -28,11 +28,13 @@ export const ConstructorLayout = () => {
 	}, [search, navigate]);
 
 	return (
-		<div className="flex min-h-0 w-full flex-1 flex-col gap-[30px] pb-[29px]">
-			<ConstructorHeader />
-			<div className="flex min-h-0 min-w-0 flex-1 flex-col">
-				<Outlet />
+		<ConstructionComplianceProvider>
+			<div className="flex min-h-0 w-full flex-1 flex-col gap-[30px] pb-[29px]">
+				<ConstructorHeader />
+				<div className="flex min-h-0 min-w-0 flex-1 flex-col">
+					<Outlet />
+				</div>
 			</div>
-		</div>
+		</ConstructionComplianceProvider>
 	);
 };

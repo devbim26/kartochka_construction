@@ -6,8 +6,16 @@ import {
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+import {
+	ConstructionComplianceBanner,
+	type ConstructionComplianceStatus,
+} from '../construction-compliance-banner.component';
 
-export const DesigningHeader = () => {
+type Props = {
+	complianceStatus?: ConstructionComplianceStatus;
+};
+
+export const DesigningHeader = ({ complianceStatus = null }: Props) => {
 	const navigate = useAppNavigate();
 	const location = useLocation();
 	const [search] = useSearchParams();
@@ -31,47 +39,50 @@ export const DesigningHeader = () => {
 			<p className="font-sans text-lg font-semibold leading-6">
 				{t('constructor.designingHeader.title')}
 			</p>
-			<div className="flex flex-row gap-[20px]">
-				<Button
-					className={twMerge(
-						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
-						isActive(CONSTRUCTOR_ROUTES.designing.route)
-							? ''
-							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
-					)}
-					onClick={() =>
-						navigate(
-							APP_ROUTES.designing.route +
-								'/' +
-								DESIGNING_ROUTES.constructor.route +
-								'/' +
-								CONSTRUCTOR_ROUTES.designing.route,
-							designingNavParams(),
-						)
-					}
-				>
-					{t('constructor.designingHeader.editConstruction')}
-				</Button>
-				<Button
-					className={twMerge(
-						'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
-						isActive(CONSTRUCTOR_ROUTES.myConstructions.route)
-							? ''
-							: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
-					)}
-					onClick={() =>
-						navigate(
-							APP_ROUTES.designing.route +
-								'/' +
-								DESIGNING_ROUTES.constructor.route +
-								'/' +
-								CONSTRUCTOR_ROUTES.myConstructions.route,
-							designingNavParams(),
-						)
-					}
-				>
-					{t('constructor.designingHeader.myConstructions')}
-				</Button>
+			<div className="flex flex-row items-center justify-between gap-[20px]">
+				<div className="flex flex-row gap-[20px]">
+					<Button
+						className={twMerge(
+							'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
+							isActive(CONSTRUCTOR_ROUTES.designing.route)
+								? ''
+								: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
+						)}
+						onClick={() =>
+							navigate(
+								APP_ROUTES.designing.route +
+									'/' +
+									DESIGNING_ROUTES.constructor.route +
+									'/' +
+									CONSTRUCTOR_ROUTES.designing.route,
+								designingNavParams(),
+							)
+						}
+					>
+						{t('constructor.designingHeader.editConstruction')}
+					</Button>
+					<Button
+						className={twMerge(
+							'h-[30px] px-[16px] font-sans text-sm font-semibold shadow-none',
+							isActive(CONSTRUCTOR_ROUTES.myConstructions.route)
+								? ''
+								: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
+						)}
+						onClick={() =>
+							navigate(
+								APP_ROUTES.designing.route +
+									'/' +
+									DESIGNING_ROUTES.constructor.route +
+									'/' +
+									CONSTRUCTOR_ROUTES.myConstructions.route,
+								designingNavParams(),
+							)
+						}
+					>
+						{t('constructor.designingHeader.myConstructions')}
+					</Button>
+				</div>
+				<ConstructionComplianceBanner status={complianceStatus} />
 			</div>
 		</div>
 	);

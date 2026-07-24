@@ -750,6 +750,10 @@ export const en = {
 
 	'constructor.relevant.yes': 'Meets requirements',
 	'constructor.relevant.no': 'Does not meet requirements',
+	'constructor.relevant.mismatchWarning':
+		'Construction does not meet sound insulation requirements',
+	'constructor.relevant.matchSuccess':
+		'Construction meets sound insulation requirements',
 	'constructor.catalog.labTestGraphTitle': 'Sound insulation (lab test)',
 	'constructor.myConstructions.construction1': 'Construction 1',
 	'constructor.myConstructions.imagePreview': 'Image preview',
@@ -2011,6 +2015,10 @@ export const ru: Record<TranslationKey, string> = {
 
 	'constructor.relevant.yes': 'Соответствует',
 	'constructor.relevant.no': 'Не соответствует',
+	'constructor.relevant.mismatchWarning':
+		'Конструкция не соответствует требованиям звукоизоляции',
+	'constructor.relevant.matchSuccess':
+		'Конструкция соответствует требованиям звукоизоляции',
 	'constructor.catalog.labTestGraphTitle': 'Звукоизоляция (лабораторный тест)',
 	'constructor.myConstructions.construction1': 'Конструкция 1',
 	'constructor.myConstructions.imagePreview': 'Превью изображения',

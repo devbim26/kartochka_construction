@@ -29,11 +29,13 @@ import { ConstructionClass, Country, Guidebooks } from '@features/guidbooks/type
 import { AxiosError } from 'axios';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
+import { getAirborneComplianceStatus } from '../construction-compliance-banner.component';
+import { useConstructionCompliance } from '../construction-compliance.context';
 import { AlternateConstructionList } from './alternate-constructions-list.component';
 import { ConstructionCard } from './construction-card.component';
 import { ConstructionFilters } from './construction-filters.component';
@@ -61,6 +63,23 @@ const ContructionPick = () => {
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
+	const { setStatus: setComplianceStatus } = useConstructionCompliance();
+
+	const complianceStatus = useMemo(() => {
+		const requirement =
+			currentReportInfo?.regulatoryRequirement?.noizeIsolationIndex ??
+			currentReportInfo?.calculationRequirement?.noizeIsolationIndex;
+		const value =
+			constructionHeader?.RCalcs ??
+			constructionHeader?.airLaboratory?.labIndexValue ??
+			null;
+		return getAirborneComplianceStatus(value, requirement);
+	}, [currentReportInfo, constructionHeader]);
+
+	useEffect(() => {
+		setComplianceStatus(complianceStatus);
+		return () => setComplianceStatus(null);
+	}, [complianceStatus, setComplianceStatus]);
 
 	const handleGetCurrentReportShortSingleInfo = (id: string) => {
 		dispatch(startLoading());
