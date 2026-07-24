@@ -1,8 +1,10 @@
-import { MaterialParametrs } from '@api-gen';
 import { convertToSelectValues, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { MaterialTypeValuesMap } from '@features/guidbooks/constants';
-import { useConstructionMaterialsCatalog } from '@features/guidbooks/utils';
+import {
+	applySelectedMaterialThicknessDensity,
+	useConstructionMaterialsCatalog,
+} from '@features/guidbooks/utils';
 import {
 	DESIGNING_EXCLUDED_MATERIAL_TYPES,
 	EnMaterialTypesSelectValuesMap,
@@ -151,24 +153,15 @@ export const SelectableMaterialType = memoize(
 								if (showMaterialDesignationInput) {
 									setValue(`${basePath}.additionalName`, '');
 								}
-								if (
-									materialTypeValue?.[0].materialParameters ===
-										MaterialParametrs.Thickness &&
-									materialTypeValue?.[1].materialParameters ===
-										MaterialParametrs.Density
-								) {
-									const selectedMaterial = materials?.find(
-										(m) => m.id === selectedOption,
-									);
-									setValue<any>(
-										`${basePath}.materialTypeValue.0.value`,
-										selectedMaterial?.thickness,
-									);
-									setValue<any>(
-										`${basePath}.materialTypeValue.1.value`,
-										selectedMaterial?.density,
-									);
-								}
+								const selectedMaterial = materials?.find(
+									(m) => m.id === selectedOption,
+								);
+								applySelectedMaterialThicknessDensity(
+									setValue,
+									basePath,
+									materialTypeValue,
+									selectedMaterial,
+								);
 							}}
 							isSearchable
 						/>

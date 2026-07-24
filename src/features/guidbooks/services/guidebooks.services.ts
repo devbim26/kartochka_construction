@@ -6,7 +6,7 @@ import type {
 } from '@api-gen';
 import { fetchApi } from '@api-gen';
 import type { PaginationState } from '@core';
-import { wrapApiQueryBody } from '@core/utils/api-query-body.utils';
+import { stripNullishQueryFields } from '@core/utils/api-query-body.utils';
 import type { GuideBooksCreateDataTypes, GuidebooksFiltersDataTypes } from '../types';
 import { Guidebooks } from '../types';
 
@@ -72,9 +72,10 @@ export const getGuidebooksPaginated = async ({
 		pageSize: pagination.pageSize,
 	};
 
+	// Конструкции: плоское тело как в OpenAPI; null/'' в enum-полях бэк не принимает.
 	if (guidebookType === Guidebooks.CONSTRUCTION) {
 		return await fetchApi.api.constructionGetPaginatedCreate(
-			wrapApiQueryBody(query) as never,
+			stripNullishQueryFields(query as Record<string, unknown>) as never,
 		);
 	}
 

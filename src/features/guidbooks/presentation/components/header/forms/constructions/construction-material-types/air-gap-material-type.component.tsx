@@ -1,6 +1,9 @@
 import { convertToSelectValues, Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { useConstructionMaterialsCatalog } from '@features/guidbooks/utils';
+import {
+	applySelectedMaterialThicknessDensity,
+	useConstructionMaterialsCatalog,
+} from '@features/guidbooks/utils';
 import {
 	MaterialTypeEnum,
 	type ConstructionMaterialTypesProps,
@@ -24,7 +27,7 @@ export const AirGapMaterialType = memoize(
 		constructionPosition: 'Left' | 'Center' | 'Right';
 	}) => {
 		const { showMaterialDesignationInput } = useSelectableMaterialDesignation();
-		const { formState, control, setValue, register } = currentForm;
+		const { formState, control, setValue, getValues, register } = currentForm;
 		const materials = useConstructionMaterialsCatalog(MaterialTypeEnum.AirGap, currentForm);
 
 		const basePath = `constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}`;
@@ -69,13 +72,11 @@ export const AirGapMaterialType = memoize(
 								const selectedMaterial = materials?.find(
 									(m) => m.id === selectedOption,
 								);
-								setValue<any>(
-									`${basePath}.materialTypeValue.0.value`,
-									selectedMaterial?.thickness,
-								);
-								setValue<any>(
-									`${basePath}.materialTypeValue.1.value`,
-									selectedMaterial?.density,
+								applySelectedMaterialThicknessDensity(
+									setValue,
+									basePath,
+									getValues(`${basePath}.materialTypeValue`),
+									selectedMaterial,
 								);
 							}}
 						/>
