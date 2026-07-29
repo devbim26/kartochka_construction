@@ -1,4 +1,4 @@
-import { Button, ImagePreviewModal } from '@core';
+import { Button, ImagePreviewModal, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { formatMaterial } from '@features';
 import {
@@ -6,13 +6,18 @@ import {
 	convertToClientIssuerData,
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import type { ConstructionsEditData, Issuer, UserMaterials } from '@features/guidbooks/types';
+import type {
+	ConstructionsEditData,
+	Issuer,
+	UserMaterials,
+} from '@features/guidbooks/types';
 import { flattenConstructionMaterialsTopToBottom } from '@features/guidbooks/utils';
 import { Guidebooks } from '@features/guidbooks/types';
 
 import type { IssuerDto } from '@api-gen';
 import { svgConstructionDetail } from '@features/constructor/services';
 import { useEffect, useMemo, useState } from 'react';
+import { ConstructionDetailsModal } from '../modals';
 
 type CurrentConstructionCardProps = {
 	constructionHeaderId: string;
@@ -35,6 +40,8 @@ export const CurrentConstructionCard = ({
 	const [isLoading, setIsLoading] = useState(false);
 	const [isImageLoading, setIsImageLoading] = useState(false);
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+	const { t } = useI18n();
 
 	useEffect(() => {
 		let isCancelled = false;
@@ -217,11 +224,36 @@ export const CurrentConstructionCard = ({
 					)}
 				</div>
 			</div>
-			<div className="text-[12px] text-input-label-primary">
-				{issuer?.name}
-				{issuer?.webSite ? `: ${issuer.webSite}` : ''}
+			<div className="flex items-center justify-between gap-[8px] text-[12px] text-input-label-primary">
+				<span>
+					{issuer?.name}
+					{issuer?.webSite ? `: ${issuer.webSite}` : ''}
+				</span>
+				{constructionHeaderId ? (
+					<button
+						type="button"
+						onClick={() => setIsDetailsOpen(true)}
+						className="shrink-0 font-sans text-sm font-semibold text-primary hover:opacity-80"
+					>
+						{t('createConstruction.details.more')}
+					</button>
+				) : null}
 			</div>
 		</div>
+		<ConstructionDetailsModal
+			isOpen={isDetailsOpen}
+			onClose={() => setIsDetailsOpen(false)}
+			constructionHeaderId={constructionHeaderId}
+			overrides={{
+				constructionType: header?.constructionType,
+				issuerName: issuer?.name || header?.issuerName,
+				issuerImage: issuer?.logoUrl,
+				rw:
+					header?.RCalcs != null && header.RCalcs !== ''
+						? Number(String(header.RCalcs).replace(',', '.'))
+						: null,
+			}}
+		/>
 		</>
 	);
 };

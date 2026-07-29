@@ -1,4 +1,4 @@
-import { Button, ImagePreviewModal } from '@core';
+import { Button, ImagePreviewModal, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { formatMaterial } from '@features';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
@@ -9,6 +9,7 @@ import { Guidebooks } from '@features/guidbooks/types';
 
 import { svgConstructionDetail } from '@features/constructor/services';
 import { useEffect, useMemo, useState } from 'react';
+import { ConstructionDetailsModal } from '../modals';
 
 type FavoriteConstructionCardProps = {
 	id: string;
@@ -41,6 +42,8 @@ export const FavoriteConstructionCard = ({
 	const [isLoading, setIsLoading] = useState(false);
 	const [isImageLoading, setIsImageLoading] = useState(false);
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+	const { t } = useI18n();
 
 	useEffect(() => {
 		let isCancelled = false;
@@ -207,7 +210,29 @@ export const FavoriteConstructionCard = ({
 					)}
 				</div>
 			</div>
+			<div className="flex justify-end">
+				<button
+					type="button"
+					onClick={() => setIsDetailsOpen(true)}
+					className="font-sans text-sm font-semibold text-primary hover:opacity-80"
+				>
+					{t('createConstruction.details.more')}
+				</button>
+			</div>
 		</div>
+		<ConstructionDetailsModal
+			isOpen={isDetailsOpen}
+			onClose={() => setIsDetailsOpen(false)}
+			constructionHeaderId={id}
+			overrides={{
+				constructionType: header?.constructionType,
+				issuerName: header?.issuerName,
+				rw:
+					header?.RCalcs != null && header.RCalcs !== ''
+						? Number(String(header.RCalcs).replace(',', '.'))
+						: null,
+			}}
+		/>
 		</>
 	);
 };

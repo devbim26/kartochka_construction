@@ -1,6 +1,6 @@
 import type { ModalProps } from '@core';
 import { Button, Modal, useI18n } from '@core';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { twJoin, twMerge } from 'tailwind-merge';
 import { CreateConstructionForm, type CreateConstructionFormHandle } from './modal-forms';
@@ -24,15 +24,23 @@ export const CreateConstructionModal = ({
 	floorId,
 	reportFloorInfoId,
 	floorNumber,
+	className,
 	...props
 }: CreateConstructionModalProps) => {
 	const formRef = useRef<CreateConstructionFormHandle>(null);
 	const { t } = useI18n();
+	const [detailsOpen, setDetailsOpen] = useState(false);
 	const modalTabLabelKey = {
 		walls: 'floorPlans.modal.addWall',
 		floors: 'floorPlans.modal.addFloor',
 		rooms: 'floorPlans.modal.addRoom',
 	} as const;
+
+	useEffect(() => {
+		if (!props.isOpen) {
+			setDetailsOpen(false);
+		}
+	}, [props.isOpen]);
 
 	const handleConfirm = () => {
 		formRef.current?.submit();
@@ -63,8 +71,13 @@ export const CreateConstructionModal = ({
 					</Button>
 				</div>
 			)}
-			contentClassName={twJoin('text-center', props.contentClassName ?? '')}
 			{...props}
+			contentClassName={twJoin('text-center', props.contentClassName ?? '')}
+			className={twMerge(
+				className,
+				detailsOpen &&
+					'!max-w-[min(98vw,2000px)] !w-[min(98vw,2000px)] md:!w-[min(98vw,1920px)]',
+			)}
 		>
 			<div className="mb-4 flex flex-row flex-wrap gap-[12px]">
 				{(['walls', 'floors', 'rooms'] as const).map((tab) => {
@@ -99,6 +112,8 @@ export const CreateConstructionModal = ({
 				reportFloorInfoId={reportFloorInfoId}
 				floorNumber={floorNumber}
 				constructionTargetTab={activeTab === 'floors' ? 'floors' : 'walls'}
+				detailsOpen={detailsOpen}
+				onDetailsOpenChange={setDetailsOpen}
 			/>
 		</Modal>
 	);

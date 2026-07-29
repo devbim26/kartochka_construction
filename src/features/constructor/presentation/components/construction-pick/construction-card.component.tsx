@@ -12,6 +12,7 @@ import { RuConstructionTypesMap } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import issuer from '../../../../../assets/issuer.png';
 import {
+	ConstructionDetailsModal,
 	GeneralInformationFireResistance,
 	GeneralInformationPhysical,
 	GeneralInformationSoundproofing,
@@ -50,6 +51,7 @@ export const ConstructionCard = ({
 	const [mass, setMass] = useState<number>(0);
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 	const [isLabGraphOpen, setIsLabGraphOpen] = useState(false);
+	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
 	useEffect(() => {
 		if (!construction) return;
@@ -181,9 +183,35 @@ export const ConstructionCard = ({
 					/>
 					<GeneralInformationThermal />
 					<GeneralInformationFireResistance />
+					{constructionHeaderId ? (
+						<div className="flex justify-end pt-2">
+							<button
+								type="button"
+								onClick={() => setIsDetailsOpen(true)}
+								className="font-sans text-sm font-semibold text-primary hover:opacity-80"
+							>
+								{t('createConstruction.details.more')}
+							</button>
+						</div>
+					) : null}
 				</div>
 			</div>
 		</div>
+		<ConstructionDetailsModal
+			isOpen={isDetailsOpen}
+			onClose={() => setIsDetailsOpen(false)}
+			constructionHeaderId={constructionHeaderId}
+			overrides={{
+				constructionType: construction?.constructionType,
+				issuerName: construction?.issuerName,
+				rw:
+					construction?.RCalcs != null && construction.RCalcs !== ''
+						? Number(String(construction.RCalcs).replace(',', '.'))
+						: null,
+				totalThickness: thickness || null,
+				massPerSquareMeter: Number.isFinite(mass) ? mass : null,
+			}}
+		/>
 		</>
 	);
 };

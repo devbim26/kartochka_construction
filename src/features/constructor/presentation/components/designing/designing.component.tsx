@@ -90,6 +90,7 @@ import {
 import DesigningGraph from './designing-graph.component';
 import { DesigningRoomStubScreen } from './designing-room-stub.component';
 import { SelectableMaterialDesignationProvider } from '@features/guidbooks/presentation/components/header/forms/constructions/construction-material-types/selectable-material-designation.context';
+import { ConstructionDetailsModal } from '../modals';
 
 const isGeneralReferenceIssuer = (issuerName?: string | null) => {
 	const n = (issuerName ?? '').trim().toLowerCase();
@@ -116,6 +117,7 @@ const DesigningConstructionScreen = () => {
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 	const [currentReportInfo, setCurrentReportInfo] = useState<ReportInfoShort>();
 	const [currentConstruction, setCurrentConstruction] = useState<FloorConstruction>();
 	const additionalOpeningsRef = useRef<AdditionalOpeningsFormHandle>(null);
@@ -711,6 +713,19 @@ const DesigningConstructionScreen = () => {
 			{previewSrc && (
 				<ImagePreviewModal src={previewSrc} onClose={() => setPreviewSrc(null)} />
 			)}
+			<ConstructionDetailsModal
+				isOpen={isDetailsOpen}
+				onClose={() => setIsDetailsOpen(false)}
+				constructionHeaderId={constructionHeaderId}
+				overrides={{
+					constructionType: constructionHeader?.constructionType,
+					issuerName: constructionHeader?.issuerName,
+					rw:
+						constructionHeader?.RCalcs != null && constructionHeader.RCalcs !== ''
+							? Number(String(constructionHeader.RCalcs).replace(',', '.'))
+							: null,
+				}}
+			/>
 			{isLoading && (
 				<div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-[10px] bg-white/60">
 					<Loader />
@@ -782,6 +797,17 @@ const DesigningConstructionScreen = () => {
 								</p>
 							))}
 					</div>
+					{constructionHeaderId ? (
+						<div className="flex justify-end">
+							<button
+								type="button"
+								onClick={() => setIsDetailsOpen(true)}
+								className="font-sans text-sm font-semibold text-primary hover:opacity-80"
+							>
+								{t('createConstruction.details.more')}
+							</button>
+						</div>
+					) : null}
 				</div>
 			</div>
 			<div className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]">

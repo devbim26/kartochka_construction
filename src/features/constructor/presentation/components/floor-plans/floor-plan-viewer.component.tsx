@@ -37,6 +37,10 @@ type Props = {
 	// Новые пропсы для управления страницей из родителя
 	currentPage?: number;
 	onPageChange?: (page: number) => void;
+	/** Создаёт уровень на странице при первой конструкции (имя = номер страницы). */
+	ensureLevelForPage?: (
+		page: number,
+	) => Promise<{ layerId: string; floorNumber: string } | null>;
 };
 
 export const FloorPlanViewer = ({
@@ -52,6 +56,7 @@ export const FloorPlanViewer = ({
 	explantationTab = 'walls',
 	currentPage = 1, // значение по умолчанию
 	onPageChange,
+	ensureLevelForPage,
 }: Props) => {
 	const { t, locale } = useI18n();
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -163,7 +168,7 @@ export const FloorPlanViewer = ({
 		);
 	};
 
-	const tryOpenCreateConstruction = (
+	const tryOpenCreateConstruction = async (
 		normalizedX1: number,
 		normalizedY1: number,
 		normalizedX2: number,
@@ -207,6 +212,18 @@ export const FloorPlanViewer = ({
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 
+		let resolvedFloorId = floorId || '';
+		let resolvedFloorNumber = floorNumber || `${currentPage}.000`;
+		if (search.get('reportType') === 'Floor' && ensureLevelForPage) {
+			const ensured = await ensureLevelForPage(currentPage);
+			if (!ensured) {
+				toast.error(t('floorPlans.toast.uploadError'));
+				return;
+			}
+			resolvedFloorId = ensured.layerId;
+			resolvedFloorNumber = ensured.floorNumber;
+		}
+
 		dispatch(constructorSlice.actions.setFile({ image: canvas.toDataURL('image/png') }));
 		navigate('', {
 			...(explantationTab === 'rooms' ? { addRoom: 'true' } : { create: 'true' }),
@@ -218,8 +235,8 @@ export const FloorPlanViewer = ({
 						: 'walls',
 			reportId: search.get('reportId')!.toString(),
 			reportType: search.get('reportType')!.toString(),
-			layerId: floorId || '',
-			floorNumber: floorNumber || '',
+			layerId: resolvedFloorId,
+			floorNumber: resolvedFloorNumber,
 			x: newRect.left.toString(),
 			y: newRect.top.toString(),
 			x2: newRect.right.toString(),
@@ -289,11 +306,6 @@ export const FloorPlanViewer = ({
 
 		if (event.button !== 0) return;
 
-		if (search.get('reportType') === 'Floor' && !floorNumber) {
-			toast.error(t('floorPlanViewer.selectLevelFirst'));
-			return;
-		}
-
 		const p = getCanvasPointClamped(event.clientX, event.clientY);
 		if (!p) return;
 
@@ -320,7 +332,7 @@ export const FloorPlanViewer = ({
 		window.addEventListener('mouseup', onUp);
 	};
 
-	const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+	const handleCanvasRightClick = async (event: React.MouseEvent<HTMLCanvasElement>) => {
 		event.preventDefault();
 
 		if (isMarqueeDraggingRef.current) {
@@ -329,25 +341,30 @@ export const FloorPlanViewer = ({
 			return;
 		}
 
-		if (search.get('reportType') === 'Floor' && !floorNumber) {
-			if (explantationTab === 'rooms') {
-				toast.error(t('floorPlanViewer.selectLevelFirst'));
-			}
-			return;
-		}
-
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 
 		if (explantationTab === 'rooms') {
+			let resolvedFloorId = floorId || '';
+			let resolvedFloorNumber = floorNumber || `${currentPage}.000`;
+			if (search.get('reportType') === 'Floor' && ensureLevelForPage) {
+				const ensured = await ensureLevelForPage(currentPage);
+				if (!ensured) {
+					toast.error(t('floorPlans.toast.uploadError'));
+					return;
+				}
+				resolvedFloorId = ensured.layerId;
+				resolvedFloorNumber = ensured.floorNumber;
+			}
+
 			dispatch(constructorSlice.actions.setFile({ image: canvas.toDataURL('image/png') }));
 			navigate('', {
 				addRoom: 'true',
 				createTypeTab: 'rooms',
 				reportId: search.get('reportId')!.toString(),
 				reportType: search.get('reportType')!.toString(),
-				layerId: floorId || '',
-				floorNumber: floorNumber || '',
+				layerId: resolvedFloorId,
+				floorNumber: resolvedFloorNumber,
 				page: currentPage.toString(),
 			});
 		}

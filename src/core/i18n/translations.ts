@@ -2,6 +2,7 @@ export const en = {
 	// Floor Plans
 	'floorPlans.addLevel': 'Add level',
 	'floorPlans.addLevelTooltip': 'To add a new tab (level), switch the page in the document',
+	'floorPlans.levels': 'Levels',
 	'floorPlans.uploadFloorPlan': 'Upload floor plan',
 	'floorPlans.createConstruction': 'Create construction',
 	'floorPlans.generateReport': 'Generate report',
@@ -1008,6 +1009,8 @@ export const en = {
 	'physical.requirements': 'Requirements',
 	'createConstruction.selectedConstruction': 'Selected Construction',
 	'createConstruction.manufacturer': 'Manufacturer',
+	'createConstruction.details.more': 'More details >>',
+	'createConstruction.details.hide': 'Hide <<',
 
 	// Account Form
 	'account.form.title': 'Company data',
@@ -1072,6 +1075,8 @@ export const ru: Record<TranslationKey, string> = {
 	'generalInfo.massPerSquareMeter': 'Масса, кг/м²',
 	'createConstruction.selectedConstruction': 'Выбранная конструкция',
 	'createConstruction.manufacturer': 'Производитель',
+	'createConstruction.details.more': 'Подробнее >>',
+	'createConstruction.details.hide': 'Скрыть <<',
 
 	// Account Form
 	'account.form.title': 'Данные о компании',
@@ -1164,6 +1169,7 @@ export const ru: Record<TranslationKey, string> = {
 	// Floor Plans
 	'floorPlans.addLevel': 'Добавить уровень',
 	'floorPlans.addLevelTooltip': 'Для добавления новой закладки (уровня) измените страницу',
+	'floorPlans.levels': 'Уровни',
 	'floorPlans.uploadFloorPlan': 'Загрузить план этажа',
 	'floorPlans.createConstruction': 'Создать конструкцию',
 	'floorPlans.generateReport': 'Сформировать отчет',

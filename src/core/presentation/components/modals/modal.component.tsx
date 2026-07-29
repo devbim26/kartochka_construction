@@ -1,6 +1,7 @@
 import type { MotionProps } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { type PropsWithChildren } from 'react';
+import { createPortal } from 'react-dom';
 import { IoCloseOutline } from 'react-icons/io5';
 import { twMerge } from 'tailwind-merge';
 import { Separator } from '../separator';
@@ -26,7 +27,9 @@ export const Modal = ({
 	contentClassName,
 	...props
 }: ModalProps) => {
-	return (
+	if (typeof document === 'undefined') return null;
+
+	return createPortal(
 		<>
 			<AnimatePresence>
 				{isOpen && (
@@ -90,6 +93,7 @@ export const Modal = ({
 					</div>
 				)}
 			</AnimatePresence>
-		</>
+		</>,
+		document.body,
 	);
 };

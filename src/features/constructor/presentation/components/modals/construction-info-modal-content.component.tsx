@@ -8,6 +8,7 @@ import {
 	getFloorConstructionById,
 	getReportSingleById,
 } from '@features/constructor/services';
+import { getConstructionAdditionalInfo } from '@features/guidbooks/services';
 import { ReportCategory, type GraphDetailResponse } from '@features/constructor/types';
 import { graphHasAirborneGraphData, graphHasImpactGraphData } from '@features/constructor/utils';
 import { EnConstructionTypesMap, RuConstructionTypesMap } from '@features/guidbooks/types';
@@ -152,7 +153,45 @@ const YesNoValue = ({ value }: { value?: boolean | null }) => {
 };
 
 /** Контент модалки «i» в ведомости конструкций (поэтажные планы). */
-export const ConstructionInfoModalContent = () => {
+export type ConstructionInfoOverrides = {
+	length?: number | string | null;
+	width?: number | string | null;
+	square?: number | string | null;
+	firstRoomName?: string | null;
+	secondRoomName?: string | null;
+	constructionType?: string | null;
+	issuerName?: string | null;
+	issuerImage?: string | null;
+	rw?: number | null;
+	totalThickness?: number | null;
+	/** Масса на м² — если задана, используется вместо totalMass/square. */
+	massPerSquareMeter?: number | null;
+	isHaveAdditionalConstruction?: boolean | null;
+};
+
+export type ConstructionInfoModalContentProps = {
+	/** Режим каталога: загрузка по id конструкции из справочника (ещё не в отчёте). */
+	constructionHeaderId?: string;
+	hideDownload?: boolean;
+	overrides?: ConstructionInfoOverrides;
+	className?: string;
+	compact?: boolean;
+};
+
+const toOptionalNumber = (value: unknown): number | undefined => {
+	if (value == null || value === '') return undefined;
+	const n = Number(String(value).replace(',', '.'));
+	return Number.isFinite(n) ? n : undefined;
+};
+
+/** Контент модалки «i» в ведомости конструкций (поэтажные планы). */
+export const ConstructionInfoModalContent = ({
+	constructionHeaderId: catalogConstructionHeaderId,
+	hideDownload = false,
+	overrides,
+	className,
+	compact = false,
+}: ConstructionInfoModalContentProps = {}) => {
 	const { t, locale } = useI18n();
 	const [search] = useSearchParams();
 	const [data, setData] = useState<ConstructionAdditionalInfoForReportDto | null>(null);
@@ -162,39 +201,65 @@ export const ConstructionInfoModalContent = () => {
 	const reportFloorInfoId = search.get('reportFloorInfoId');
 	const reportId = search.get('reportId');
 	const reportType = search.get('reportType');
+	const isCatalogMode = Boolean(catalogConstructionHeaderId);
+
+	const displayData = useMemo(() => {
+		if (!data && !overrides) return null;
+		if (!isCatalogMode) return data;
+		return {
+			...(data ?? {}),
+			constructionType: overrides?.constructionType ?? data?.constructionType,
+			issuerName: overrides?.issuerName ?? data?.issuerName ?? null,
+			issuerImage: overrides?.issuerImage ?? data?.issuerImage ?? null,
+			firstRoomName: overrides?.firstRoomName ?? data?.firstRoomName ?? null,
+			secondRoomName: overrides?.secondRoomName ?? data?.secondRoomName ?? null,
+			length: toOptionalNumber(overrides?.length) ?? data?.length,
+			width: toOptionalNumber(overrides?.width) ?? data?.width,
+			square: toOptionalNumber(overrides?.square) ?? data?.square,
+			totalThickness: toOptionalNumber(overrides?.totalThickness) ?? data?.totalThickness,
+			rw: overrides?.rw ?? data?.rw ?? null,
+			isHaveAdditionalConstruction:
+				overrides?.isHaveAdditionalConstruction ??
+				data?.isHaveAdditionalConstruction ??
+				false,
+		} as ConstructionAdditionalInfoForReportDto;
+	}, [data, isCatalogMode, overrides]);
 
 	const constructionTypeMap = locale === 'ru' ? RuConstructionTypesMap : EnConstructionTypesMap;
 
 	const constructionTypeLabel = useMemo(() => {
-		if (!data?.constructionType) return dash;
+		if (!displayData?.constructionType) return dash;
 		return (
-			constructionTypeMap[data.constructionType as keyof typeof constructionTypeMap] ||
-			data.constructionType
+			constructionTypeMap[displayData.constructionType as keyof typeof constructionTypeMap] ||
+			displayData.constructionType
 		);
-	}, [constructionTypeMap, data?.constructionType]);
+	}, [constructionTypeMap, displayData?.constructionType]);
 
-	const showManufacturer = !isGeneralIssuer(data?.issuerName);
+	const showManufacturer = !isGeneralIssuer(displayData?.issuerName);
 	const showGraph = useMemo(
 		() => graphHasAirborneGraphData(graphData) || graphHasImpactGraphData(graphData),
 		[graphData],
 	);
-	const suppliers = (data?.suppliers ?? []).filter(Boolean).map(parseNameAndUrl);
+	const suppliers = (displayData?.suppliers ?? []).filter(Boolean).map(parseNameAndUrl);
 	const constructionImages = useMemo(
-		() => normalizeAttachments(data?.imageUrls),
-		[data?.imageUrls],
+		() => normalizeAttachments(displayData?.imageUrls),
+		[displayData?.imageUrls],
 	);
 	const downloadFiles = useMemo(
 		() =>
-			normalizeAttachments(data?.fileUrls).map((attachment, index) => ({
+			normalizeAttachments(displayData?.fileUrls).map((attachment, index) => ({
 				url: attachment.url ?? '',
 				name: getAttachmentDisplayName(attachment),
 				key: `${attachment.url ?? 'file'}-${index}`,
 			})),
-		[data?.fileUrls],
+		[displayData?.fileUrls],
 	);
 	const massPerSquareMeter = useMemo(() => {
-		const mass = data?.totalMass;
-		const square = data?.square;
+		if (overrides?.massPerSquareMeter != null && Number.isFinite(overrides.massPerSquareMeter)) {
+			return Math.round(overrides.massPerSquareMeter * 10) / 10;
+		}
+		const mass = displayData?.totalMass;
+		const square = displayData?.square;
 		if (
 			mass == null ||
 			square == null ||
@@ -205,36 +270,36 @@ export const ConstructionInfoModalContent = () => {
 			return null;
 		}
 		return Math.round((mass / square) * 10) / 10;
-	}, [data?.totalMass, data?.square]);
+	}, [displayData?.totalMass, displayData?.square, overrides?.massPerSquareMeter]);
 	const labTestRwValue = useMemo(() => {
-		if (data?.rw == null || !Number.isFinite(data.rw)) return tableDash;
-		return String(Math.round(data.rw));
-	}, [data?.rw]);
+		if (displayData?.rw == null || !Number.isFinite(displayData.rw)) return tableDash;
+		return String(Math.round(displayData.rw));
+	}, [displayData?.rw]);
 
 	const specSections = [
 		{
 			label: t('guides.constructions.info.standartName'),
-			items: data?.standartName ? [data.standartName] : [],
+			items: displayData?.standartName ? [displayData.standartName] : [],
 		},
 		{
 			label: t('guides.constructions.info.composition'),
-			items: data?.composition?.filter(Boolean) ?? [],
+			items: displayData?.composition?.filter(Boolean) ?? [],
 		},
 		{
 			label: t('guides.constructions.info.features'),
-			items: data?.features?.filter(Boolean) ?? [],
+			items: displayData?.features?.filter(Boolean) ?? [],
 		},
 		{
 			label: t('guides.constructions.info.physicalCharacteristics'),
-			items: data?.physicalCharacteristics?.filter(Boolean) ?? [],
+			items: displayData?.physicalCharacteristics?.filter(Boolean) ?? [],
 		},
 		{
 			label: t('guides.constructions.info.fireSafetyAndMore'),
-			items: data?.fireSafetyAndMore?.filter(Boolean) ?? [],
+			items: displayData?.fireSafetyAndMore?.filter(Boolean) ?? [],
 		},
 		{
 			label: t('guides.constructions.info.installation'),
-			items: data?.installation?.filter(Boolean) ?? [],
+			items: displayData?.installation?.filter(Boolean) ?? [],
 		},
 	];
 
@@ -297,6 +362,21 @@ export const ConstructionInfoModalContent = () => {
 			setIsLoading(true);
 			setGraphData(null);
 			try {
+				if (isCatalogMode && catalogConstructionHeaderId) {
+					const [infoResponse, graphResponse] = await Promise.all([
+						getConstructionAdditionalInfo(catalogConstructionHeaderId),
+						loadGraphData(catalogConstructionHeaderId),
+					]);
+					if (cancelled) return;
+					setData(
+						infoResponse.status === 200 && infoResponse.data
+							? { ...infoResponse.data }
+							: {},
+					);
+					setGraphData(graphResponse);
+					return;
+				}
+
 				const context = await resolveContext();
 				if (!context?.reportConstructionId) {
 					setData(null);
@@ -336,23 +416,42 @@ export const ConstructionInfoModalContent = () => {
 		return () => {
 			cancelled = true;
 		};
-	}, [reportConstructionId, reportFloorInfoId, reportId, reportType, t]);
+	}, [
+		catalogConstructionHeaderId,
+		isCatalogMode,
+		reportConstructionId,
+		reportFloorInfoId,
+		reportId,
+		reportType,
+		t,
+	]);
 
 	if (isLoading) {
 		return (
-			<div className="flex min-h-[420px] min-w-[720px] items-center justify-center">
+			<div
+				className={twMerge(
+					'flex items-center justify-center',
+					compact ? 'min-h-[320px] min-w-0' : 'min-h-[420px] min-w-[720px]',
+					className,
+				)}
+			>
 				<Loader />
 			</div>
 		);
 	}
 
 	return (
-		<div className="flex w-full flex-col gap-6 px-2 pb-2">
+		<div className={twMerge('flex w-full flex-col gap-6 px-2 pb-2', className)}>
 			<h2 className="text-center font-sans text-[18px] font-semibold leading-6 text-primary">
 				{constructionTypeLabel}
 			</h2>
 
-			<div className="grid min-h-[420px] w-full grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-8">
+			<div
+				className={twMerge(
+					'grid w-full grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-8',
+					compact ? 'min-h-[320px] gap-5' : 'min-h-[420px]',
+				)}
+			>
 				<aside className="flex min-w-0 flex-col gap-5 border-r border-[#EDEFF2] pr-6">
 					{showManufacturer ? (
 						<div className="flex flex-col items-center gap-2 text-center">
@@ -360,12 +459,12 @@ export const ConstructionInfoModalContent = () => {
 								{t('generalInfo.manufacturer')}
 							</p>
 							<p className="font-sans text-sm leading-5 text-[#14181F]">
-								{formatValue(data?.issuerName)}
+								{formatValue(displayData?.issuerName)}
 							</p>
-							{data?.issuerImage ? (
+							{displayData?.issuerImage ? (
 								<img
-									src={data.issuerImage}
-									alt={data.issuerName ?? ''}
+									src={displayData.issuerImage}
+									alt={displayData.issuerName ?? ''}
 									className="max-h-[56px] max-w-[160px] object-contain"
 								/>
 							) : (
@@ -464,23 +563,23 @@ export const ConstructionInfoModalContent = () => {
 							/>
 							<ParamRow
 								label={t('generalInfo.divides')}
-								value={`${formatValue(data?.firstRoomName)} / ${formatValue(data?.secondRoomName)}`}
+								value={`${formatValue(displayData?.firstRoomName)} / ${formatValue(displayData?.secondRoomName)}`}
 							/>
 							<ParamRow
 								label={t('generalInfo.length')}
-								value={formatValue(data?.length, ' м')}
+								value={formatValue(displayData?.length, ' м')}
 							/>
 							<ParamRow
 								label={t('generalInfo.width')}
-								value={formatValue(data?.width, ' м')}
+								value={formatValue(displayData?.width, ' м')}
 							/>
 							<ParamRow
 								label={t('generalInfo.area')}
-								value={formatValue(data?.square, ' м²')}
+								value={formatValue(displayData?.square, ' м²')}
 							/>
 							<ParamRow
 								label={t('generalInfo.totalThickness')}
-								value={formatValue(data?.totalThickness, ' мм')}
+								value={formatValue(displayData?.totalThickness, ' мм')}
 							/>
 							<ParamRow
 								label={t('generalInfo.massPerSquareMeter')}
@@ -492,7 +591,11 @@ export const ConstructionInfoModalContent = () => {
 							/>
 							<ParamRow
 								label={t('generalInfo.hasAdditionalConstruction')}
-								value={<YesNoValue value={data?.isHaveAdditionalConstruction} />}
+								value={
+									<YesNoValue
+										value={displayData?.isHaveAdditionalConstruction}
+									/>
+								}
 							/>
 						</div>
 					</div>
@@ -519,30 +622,32 @@ export const ConstructionInfoModalContent = () => {
 						</div>
 					) : null}
 
-					<div className="flex flex-col items-center gap-4">
-						<p className="font-sans text-base font-bold leading-5 text-[#14181F]">
-							{t('generalInfo.download')}
-						</p>
-						{downloadFiles.length > 0 ? (
-							<div className="flex flex-wrap justify-center gap-6">
-								{downloadFiles.map((file) => (
-									<a
-										key={file.key}
-										href={file.url}
-										target="_blank"
-										rel="noreferrer"
-										className="flex max-w-[120px] flex-col items-center gap-1 text-center text-xs text-[#14181F] hover:opacity-80"
-										title={file.name}
-									>
-										<FileTypeIcon url={file.url} />
-										<span className="line-clamp-2 break-all">{file.name}</span>
-									</a>
-								))}
-							</div>
-						) : (
-							<EmptyPlaceholder className="w-full max-w-[280px]" />
-						)}
-					</div>
+					{!hideDownload ? (
+						<div className="flex flex-col items-center gap-4">
+							<p className="font-sans text-base font-bold leading-5 text-[#14181F]">
+								{t('generalInfo.download')}
+							</p>
+							{downloadFiles.length > 0 ? (
+								<div className="flex flex-wrap justify-center gap-6">
+									{downloadFiles.map((file) => (
+										<a
+											key={file.key}
+											href={file.url}
+											target="_blank"
+											rel="noreferrer"
+											className="flex max-w-[120px] flex-col items-center gap-1 text-center text-xs text-[#14181F] hover:opacity-80"
+											title={file.name}
+										>
+											<FileTypeIcon url={file.url} />
+											<span className="line-clamp-2 break-all">{file.name}</span>
+										</a>
+									))}
+								</div>
+							) : (
+								<EmptyPlaceholder className="w-full max-w-[280px]" />
+							)}
+						</div>
+					) : null}
 				</section>
 			</div>
 		</div>

@@ -30,6 +30,7 @@ import { useEffect, useState } from 'react';
 import { catchError, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
 import {
+	ConstructionDetailsModal,
 	GeneralInformationFireResistance,
 	GeneralInformationPhysical,
 	GeneralInformationSoundproofing,
@@ -76,6 +77,7 @@ export const AlternateConstructionCard = ({
 	const [mass, setMass] = useState<number>(0);
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 	const [isLabGraphOpen, setIsLabGraphOpen] = useState(false);
+	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 	const thicknessMin = toOptionalNumber(appliedRestrictions?.minThickness);
 	const thicknessMax = toOptionalNumber(appliedRestrictions?.maxThickness);
 	const massMin = toOptionalNumber(appliedRestrictions?.minWeight);
@@ -284,8 +286,36 @@ export const AlternateConstructionCard = ({
 					/>
 					<GeneralInformationThermal />
 					<GeneralInformationFireResistance />
+					{constructionHeaderId ? (
+						<div className="flex justify-end pt-2">
+							<button
+								type="button"
+								onClick={() => setIsDetailsOpen(true)}
+								className="font-sans text-sm font-semibold text-primary hover:opacity-80"
+							>
+								{t('createConstruction.details.more')}
+							</button>
+						</div>
+					) : null}
 				</div>
 			</div>
+			<ConstructionDetailsModal
+				isOpen={isDetailsOpen}
+				onClose={() => setIsDetailsOpen(false)}
+				constructionHeaderId={constructionHeaderId}
+				overrides={{
+				constructionType: construction.constructionType,
+				issuerName: constructionHeader?.issuerName,
+					rw:
+						construction.rLab != null
+							? Number(construction.rLab)
+							: constructionHeader?.RCalcs != null && constructionHeader.RCalcs !== ''
+								? Number(String(constructionHeader.RCalcs).replace(',', '.'))
+								: null,
+					totalThickness: thickness || null,
+					massPerSquareMeter: Number.isFinite(mass) ? mass : null,
+				}}
+			/>
 		</>
 	);
 };

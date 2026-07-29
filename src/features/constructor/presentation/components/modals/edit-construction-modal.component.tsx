@@ -3,12 +3,12 @@ import { Button, Modal, useI18n } from '@core';
 import type { FloorConstruction } from '@features/constructor/types';
 import { resolveConstructionClass } from '@features/constructor/utils';
 import { type ConstructionsEditData } from '@features/guidbooks/types';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { twJoin } from 'tailwind-merge';
+import { twJoin, twMerge } from 'tailwind-merge';
 import { CreateConstructionForm, type CreateConstructionFormHandle } from './modal-forms';
 
-interface CreateConstructionModalProps extends Omit<ModalProps, 'Footer'> {
+interface EditConstructionModalProps extends Omit<ModalProps, 'Footer'> {
 	onCancel: () => void;
 	onConfirm: () => void;
 	wrapperClassName?: string;
@@ -27,10 +27,12 @@ export const EditConstructionModal = ({
 	floorId,
 	reportFloorInfoId,
 	floorConstructionInfoId,
+	className,
 	...props
-}: CreateConstructionModalProps) => {
+}: EditConstructionModalProps) => {
 	const formRef = useRef<CreateConstructionFormHandle>(null);
 	const { t } = useI18n();
+	const [detailsOpen, setDetailsOpen] = useState(false);
 
 	const handleConfirm = () => {
 		formRef.current?.submit();
@@ -57,6 +59,12 @@ export const EditConstructionModal = ({
 			area: String(currentReportFloorInfo.reportConstructionHeader.square),
 		});
 	};
+
+	useEffect(() => {
+		if (!props.isOpen) {
+			setDetailsOpen(false);
+		}
+	}, [props.isOpen]);
 
 	useEffect(() => {
 		if (!props.isOpen || !currentReportFloorInfo || !currentConstructionHeader) return;
@@ -92,8 +100,13 @@ export const EditConstructionModal = ({
 					</Button>
 				</div>
 			)}
-			contentClassName={twJoin('text-center', props.contentClassName ?? '')}
 			{...props}
+			contentClassName={twJoin('text-center', props.contentClassName ?? '')}
+			className={twMerge(
+				className,
+				detailsOpen &&
+					'!max-w-[min(98vw,2000px)] !w-[min(98vw,2000px)] md:!w-[min(98vw,1920px)]',
+			)}
 		>
 			<CreateConstructionForm
 				x={currentReportFloorInfo?.coordinates.x}
@@ -106,6 +119,8 @@ export const EditConstructionModal = ({
 				reportFloorInfoId={reportFloorInfoId}
 				floorConstructionInfoId={floorConstructionInfoId ?? currentReportFloorInfo?.id}
 				onSuccess={handleSuccess}
+				detailsOpen={detailsOpen}
+				onDetailsOpenChange={setDetailsOpen}
 			/>
 		</Modal>
 	);

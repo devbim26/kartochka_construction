@@ -34,6 +34,8 @@ import { formatMaterial } from '@features'; // предполагаемый хе
 import type { ReportInfoShort } from '@features/constructor/utils';
 import {
 	CreateConstructionConfig,
+	getSurfaceMassKgPerM2FromMaterials,
+	getTotalThicknessMmFromMaterials,
 	matchesConstructionClassFilter,
 	resolveLayoutClassFromTargetTab,
 } from '@features/constructor/utils';
@@ -58,6 +60,7 @@ import {
 import type { IssuerDto, SecondRequirementPlacementRoomDto } from '@api-gen';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
+import { AnimatePresence, motion } from 'framer-motion';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { BsExclamationSquareFill } from 'react-icons/bs';
@@ -65,6 +68,7 @@ import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
+import { ConstructionInfoModalContent, type ConstructionInfoOverrides } from '../construction-info-modal-content.component';
 
 export interface CreateConstructionFormHandle {
 	submit: () => void;
@@ -83,6 +87,8 @@ interface CreateConstructionFormProps {
 	floorConstructionInfoId?: string;
 	floorNumber?: string;
 	constructionTargetTab?: 'walls' | 'floors';
+	detailsOpen?: boolean;
+	onDetailsOpenChange?: (open: boolean) => void;
 }
 
 interface RoomRequirementMap {
@@ -110,6 +116,8 @@ export const CreateConstructionForm = memoize(
 				floorConstructionInfoId,
 				floorNumber,
 				constructionTargetTab = 'walls',
+				detailsOpen = false,
+				onDetailsOpenChange,
 			},
 			ref,
 		) => {
@@ -797,8 +805,66 @@ export const CreateConstructionForm = memoize(
 				handleGetConstructionData();
 			}, [userId, layoutClass, paginationRw, construction, reportInfoData?.region]);
 
+			useEffect(() => {
+				if (!construction) {
+					onDetailsOpenChange?.(false);
+				}
+			}, [construction, onDetailsOpenChange]);
+
+			const infoOverrides = useMemo(() => {
+				const materials = flattenConstructionMaterialsTopToBottom(
+					constructionDetail?.constructionTypeObject,
+				);
+				const firstRoomName =
+					roomOptions.find((o) => o.value === firstPlacementRoom)?.label ?? null;
+				const secondRoomName =
+					secondRoomOptions.find((o) => o.value === secondPlacementRoom)?.label ?? null;
+				const rwRaw = constructionDetail?.RCalcs;
+				const rwNum =
+					rwRaw == null || rwRaw === ''
+						? null
+						: Number(String(rwRaw).replace(',', '.'));
+
+				return {
+					length,
+					width,
+					square: area,
+					firstRoomName,
+					secondRoomName,
+					constructionType: constructionDetail?.constructionType as
+						| ConstructionInfoOverrides['constructionType']
+						| undefined,
+					issuerName: issuer?.name || constructionDetail?.issuerName || null,
+					issuerImage: issuer?.logoUrl || null,
+					rw: rwNum != null && Number.isFinite(rwNum) ? rwNum : null,
+					totalThickness: materials.length
+						? getTotalThicknessMmFromMaterials(materials)
+						: null,
+					massPerSquareMeter: materials.length
+						? getSurfaceMassKgPerM2FromMaterials(materials)
+						: null,
+					isHaveAdditionalConstruction: false,
+				};
+			}, [
+				constructionDetail,
+				issuer,
+				length,
+				width,
+				area,
+				firstPlacementRoom,
+				secondPlacementRoom,
+				roomOptions,
+				secondRoomOptions,
+			]);
+
 			return (
-				<div className="relative flex w-full flex-col border-b">
+				<div className="relative flex w-full gap-0 border-b">
+					<div
+						className={twMerge(
+							'relative flex min-w-0 flex-1 flex-col overflow-hidden',
+							detailsOpen && 'pr-6',
+						)}
+					>
 					{previewSrc && (
 						<ImagePreviewModal src={previewSrc} onClose={() => setPreviewSrc(null)} />
 					)}
@@ -1140,7 +1206,44 @@ export const CreateConstructionForm = memoize(
 						</div>
 					)}
 
+					{construction ? (
+						<div className="flex shrink-0 justify-end pt-3 pr-1">
+							<button
+								type="button"
+								onClick={() => onDetailsOpenChange?.(!detailsOpen)}
+								className="relative z-10 font-sans text-sm font-semibold text-primary hover:opacity-80"
+							>
+								{detailsOpen
+									? t('createConstruction.details.hide')
+									: t('createConstruction.details.more')}
+							</button>
+						</div>
+					) : null}
+
 					<div className="flex border-b py-[10px]"></div>
+					</div>
+
+					<AnimatePresence initial={false}>
+						{detailsOpen && construction ? (
+							<motion.div
+								key="construction-details-panel"
+								initial={{ width: 0, opacity: 0 }}
+								animate={{ width: 920, opacity: 1 }}
+								exit={{ width: 0, opacity: 0 }}
+								transition={{ duration: 0.25, ease: 'easeInOut' }}
+								className="shrink-0 overflow-hidden border-l border-[#EDEFF2]"
+							>
+								<div className="box-border h-full max-h-[70vh] w-[920px] overflow-y-auto px-5 py-2 text-left">
+									<ConstructionInfoModalContent
+										constructionHeaderId={construction}
+										hideDownload
+										compact
+										overrides={infoOverrides}
+									/>
+								</div>
+							</motion.div>
+						) : null}
+					</AnimatePresence>
 				</div>
 			);
 		},
