@@ -1009,6 +1009,7 @@ export const en = {
 	'physical.requirements': 'Requirements',
 	'createConstruction.selectedConstruction': 'Selected Construction',
 	'createConstruction.manufacturer': 'Manufacturer',
+	'createConstruction.manufacturerFilter.title': 'Manufacturers',
 	'createConstruction.details.more': 'More details >>',
 	'createConstruction.details.hide': 'Hide <<',
 
@@ -1075,6 +1076,7 @@ export const ru: Record<TranslationKey, string> = {
 	'generalInfo.massPerSquareMeter': 'Масса, кг/м²',
 	'createConstruction.selectedConstruction': 'Выбранная конструкция',
 	'createConstruction.manufacturer': 'Производитель',
+	'createConstruction.manufacturerFilter.title': 'Производители',
 	'createConstruction.details.more': 'Подробнее >>',
 	'createConstruction.details.hide': 'Скрыть <<',
 

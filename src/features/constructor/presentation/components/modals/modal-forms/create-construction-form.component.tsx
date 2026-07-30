@@ -1,4 +1,5 @@
 import {
+	Checkbox,
 	convertToPaginatedType,
 	convertToSelectValues,
 	convertToServerCountryData,
@@ -34,6 +35,7 @@ import { formatMaterial } from '@features'; // предполагаемый хе
 import type { ReportInfoShort } from '@features/constructor/utils';
 import {
 	CreateConstructionConfig,
+	filterConstructionTypeSelectOptions,
 	getSurfaceMassKgPerM2FromMaterials,
 	getTotalThicknessMmFromMaterials,
 	matchesConstructionClassFilter,
@@ -43,13 +45,17 @@ import {
 	convertToClientConstructionsAddData,
 	convertToClientConstructionsEditData,
 	convertToClientIssuerData,
+	convertToServerConstructionTypeEnumData,
 } from '@features/guidbooks/converters';
 import { getGuidebooksDetail, getGuidebooksPaginated } from '@features/guidbooks/services';
 import { flattenConstructionMaterialsTopToBottom } from '@features/guidbooks/utils';
 import {
 	ConstructionClass,
+	ConstructionTypeEnum,
 	Country,
+	EnConstructionTypesSelectValues,
 	Guidebooks,
+	RuConstructionTypesSelectValues,
 	type BuildingType,
 	type CategoryClass,
 	type ConstructionsAddData,
@@ -150,6 +156,9 @@ export const CreateConstructionForm = memoize(
 			const [secondRoomOptions, setSecondRoomOptions] = useState<
 				Array<{ label: string; value: string }>
 			>([]);
+			/** Фильтр по типу конструкции (enum), отдельно от form.constructionType = Wall/Floor. */
+			const [typeEnumFilter, setTypeEnumFilter] = useState<string>('');
+			const [filterByManufacturers, setFilterByManufacturers] = useState(false);
 
 			const [
 				length,
@@ -299,6 +308,14 @@ export const CreateConstructionForm = memoize(
 				}
 			}, [secondPlacementRoom, firstPlacementRoom, roomRequirementsMap, setValue]);
 
+			const clearSelectedConstruction = () => {
+				setValue('construction', '');
+				setConstructionDetail(null);
+				setSvgUrl(null);
+				setIssuer(null);
+				onDetailsOpenChange?.(false);
+			};
+
 			useEffect(() => {
 				setValue(
 					'constructionType',
@@ -306,6 +323,21 @@ export const CreateConstructionForm = memoize(
 					{ shouldValidate: true },
 				);
 			}, [layoutClass, setValue]);
+
+			useEffect(() => {
+				setTypeEnumFilter('');
+				setFilterByManufacturers(false);
+				if (!isEditFlow) {
+					clearSelectedConstruction();
+				}
+			}, [layoutClass, isEditFlow, setValue]);
+
+			useEffect(() => {
+				const nextType = constructionDetail?.constructionType;
+				if (nextType) {
+					setTypeEnumFilter(String(nextType));
+				}
+			}, [constructionDetail?.id, constructionDetail?.constructionType]);
 
 			useImperativeHandle(ref, () => ({
 				submit: () => {
@@ -553,6 +585,11 @@ export const CreateConstructionForm = memoize(
 				const reportCountryType = reportInfoData?.region
 					? convertToServerCountryData(reportInfoData.region as Country)
 					: undefined;
+				const serverTypeFilter = typeEnumFilter
+					? convertToServerConstructionTypeEnumData(
+							typeEnumFilter as ConstructionTypeEnum,
+						)
+					: undefined;
 
 				from(
 					Promise.all([
@@ -563,6 +600,8 @@ export const CreateConstructionForm = memoize(
 								constructionClass,
 								...(paginationRw != null ? { rw: paginationRw } : {}),
 								...(reportCountryType ? { countryType: reportCountryType } : {}),
+								...(serverTypeFilter ? { constructionType: serverTypeFilter } : {}),
+								...(filterByManufacturers ? { onlyManufacturers: true } : {}),
 								orderByPriority: true,
 							},
 							guidebookType: Guidebooks.CONSTRUCTION,
@@ -651,6 +690,16 @@ export const CreateConstructionForm = memoize(
 						}),
 						tap((resData) => {
 							setConstructionData(resData.items);
+							const selectedId = getValues('construction');
+							if (
+								!isEditFlow &&
+								selectedId &&
+								!resData.items.some(
+									(item) => String(item.id) === String(selectedId),
+								)
+							) {
+								clearSelectedConstruction();
+							}
 						}),
 						catchError((error) => {
 							console.log('error:', error);
@@ -659,6 +708,14 @@ export const CreateConstructionForm = memoize(
 					)
 					.subscribe(() => dispatch(stopLoading()));
 			};
+
+			const typeSelectOptions: SelectOption[] = useMemo(() => {
+				const all =
+					locale === 'ru'
+						? RuConstructionTypesSelectValues
+						: EnConstructionTypesSelectValues;
+				return filterConstructionTypeSelectOptions(all, layoutClass);
+			}, [locale, layoutClass]);
 
 			const constructionSelectOptions: SelectOption[] = useMemo(() => {
 				const withFavoriteIcon = (option: SelectOption): SelectOption => ({
@@ -673,9 +730,19 @@ export const CreateConstructionForm = memoize(
 					return item?.isView === false;
 				};
 
+				const filteredData = constructionData.filter((item) => {
+					if (
+						typeEnumFilter &&
+						String(item.constructionType) !== String(typeEnumFilter)
+					) {
+						return false;
+					}
+					return true;
+				});
+
 				const base =
 					convertToSelectValues(
-						constructionData.map((c) => ({
+						filteredData.map((c) => ({
 							...c,
 							name: c.description || c.name,
 						})),
@@ -712,7 +779,14 @@ export const CreateConstructionForm = memoize(
 				}
 
 				return base.map(withFavoriteIcon);
-			}, [constructionData, construction, constructionDetail, favoriteConstructionIds, name]);
+			}, [
+				constructionData,
+				construction,
+				constructionDetail,
+				favoriteConstructionIds,
+				name,
+				typeEnumFilter,
+			]);
 
 			// Получение детальной информации о выбранной конструкции
 			const handleGetConstructionDetail = (id: string) => {
@@ -803,7 +877,15 @@ export const CreateConstructionForm = memoize(
 
 			useEffect(() => {
 				handleGetConstructionData();
-			}, [userId, layoutClass, paginationRw, construction, reportInfoData?.region]);
+			}, [
+				userId,
+				layoutClass,
+				paginationRw,
+				construction,
+				reportInfoData?.region,
+				typeEnumFilter,
+				filterByManufacturers,
+			]);
 
 			useEffect(() => {
 				if (!construction) {
@@ -1000,39 +1082,87 @@ export const CreateConstructionForm = memoize(
 								</div>
 							</div>
 							<input type="hidden" {...register('requirementId')} />
-							<Controller
-								control={control}
-								name={'construction'}
-								render={({ field }) => (
-									<Select
-										options={constructionSelectOptions}
-										{...field}
-										value={field.value || ''}
-										label={
-											formState.errors?.construction?.message
-												? t(formState.errors.construction.message as any)
-												: t('createConstruction.construction.label')
-										}
-										isSearchable
-										error={
-											formState.errors.construction?.message
-												? t(formState.errors.construction.message as any)
-												: undefined
-										}
-										labelClassName={twMerge(
-											'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-[145px] shrink-0 text-left',
-											formState.errors.construction?.message
-												? 'text-error'
-												: '',
-										)}
-										placeholder={t(
-											'createConstruction.construction.placeholder',
-										)}
-										buttonClassName="w-full min-w-0 h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
-										wrapperClassname="shadow-none ring-input-border-primary flex-row gap-[20px] w-full min-w-0 flex-1"
-									/>
-								)}
-							/>
+							<div className="flex w-full min-w-0 items-end gap-3">
+								<Select
+									options={typeSelectOptions}
+									value={typeEnumFilter}
+									onChange={(value) => {
+										const nextType = value ? String(value) : '';
+										if (nextType === typeEnumFilter) return;
+										setTypeEnumFilter(nextType);
+										clearSelectedConstruction();
+									}}
+									isSearchable
+									label={t('createConstruction.constructionType.label')}
+									labelClassName="font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-full shrink-0 text-left"
+									placeholder={t(
+										'createConstruction.constructionType.placeholder',
+									)}
+									buttonClassName="w-full min-w-0 h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+									wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] w-full min-w-0 flex-1"
+								/>
+								<Controller
+									control={control}
+									name={'construction'}
+									render={({ field }) => (
+										<Select
+											options={constructionSelectOptions}
+											{...field}
+											value={field.value || ''}
+											onChange={(value) => {
+												field.onChange(value);
+												const selected = constructionData.find(
+													(item) => String(item.id) === String(value),
+												);
+												if (selected?.constructionType) {
+													setTypeEnumFilter(
+														String(selected.constructionType),
+													);
+												}
+											}}
+											label={
+												formState.errors?.construction?.message
+													? t(
+															formState.errors.construction
+																.message as any,
+														)
+													: t('createConstruction.construction.label')
+											}
+											isSearchable
+											error={
+												formState.errors.construction?.message
+													? t(
+															formState.errors.construction
+																.message as any,
+														)
+													: undefined
+											}
+											labelClassName={twMerge(
+												'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary w-full shrink-0 text-left',
+												formState.errors.construction?.message
+													? 'text-error'
+													: '',
+											)}
+											placeholder={t(
+												'createConstruction.construction.placeholder',
+											)}
+											buttonClassName="w-full min-w-0 h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+											wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] w-full min-w-0 flex-[1.35]"
+										/>
+									)}
+								/>
+								<Checkbox
+									label={t('createConstruction.manufacturerFilter.title')}
+									direction="row"
+									checked={filterByManufacturers}
+									onChange={() => {
+										clearSelectedConstruction();
+										setFilterByManufacturers((prev) => !prev);
+									}}
+									wrapperClassName="mb-[2px] shrink-0"
+									labelClassName="whitespace-nowrap text-input-label-primary"
+								/>
+							</div>
 							<Input
 								{...register('width')}
 								labelClassName={twMerge(

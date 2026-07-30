@@ -779,6 +779,8 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	/** @format float */
 	rw?: number | null;
 	orderByPriority?: boolean;
+	/** Только конструкции брендовых производителей (не «Общий»). */
+	onlyManufacturers?: boolean;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
