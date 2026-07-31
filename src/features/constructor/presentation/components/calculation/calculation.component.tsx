@@ -1,7 +1,6 @@
-import type { CalculationRequirementDocumentDto, RegulatoryRequirementDocumentDto } from '@api-gen';
+import type { CalculationRequirementDocumentDto } from '@api-gen';
 import {
 	Button,
-	Checkbox,
 	convertToPaginatedType,
 	convertToSelectValues,
 	Input,
@@ -21,7 +20,6 @@ import {
 } from '@features/constructor/converters';
 import {
 	createSingleReportInfo,
-	getConstructionRooms,
 	getFavoriteConstructions,
 	getReportSingleById,
 	graphAdditionalDetail,
@@ -30,64 +28,68 @@ import {
 	updateReportSingle,
 } from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
-import type { AdditionalGraphParameters, GraphDetailResponse, ReportInfoShort } from '@features';
-import { GraphDetailTable, ReportCategory } from '@features';
+import type {
+	AdditionalGraphParameters,
+	DesigningData,
+	GraphDetailResponse,
+	ReportInfoShort,
+} from '@features';
+import { DesigningConfig, GraphDetailTable, ReportCategory } from '@features';
 import {
 	filterConstructionTypeSelectOptions,
 	formatMaterial,
 	getLayoutClassFromConstructionHeader,
 	useGraphNoiseMode,
 } from '@features/constructor/utils';
+import { ConstructionTypeMap } from '@features/guidbooks/constants';
 import {
 	convertToClientConstructionsAddData,
 	convertToClientConstructionsEditData,
 	convertToServerConstructionTypeEnumData,
+	convertToServerConstructionsEditData,
 } from '@features/guidbooks/converters';
 import {
 	getCalculationRequirementDocuments,
 	getGuidebooksDetail,
+	getGuidebooksEdit,
 	getGuidebooksPaginated,
-	getRegulatoryRequirementDocuments,
 } from '@features/guidbooks/services';
-import { flattenConstructionMaterialsTopToBottom } from '@features/guidbooks/utils';
 import {
-	BuildingType,
-	CategoryClass,
+	flattenConstructionMaterialsTopToBottom,
+	MaterialApplicationPurposeProvider,
+	prepareConstructionEditDataForPersistence,
+} from '@features/guidbooks/utils';
+import { SelectableMaterialDesignationProvider } from '@features/guidbooks/presentation/components/header/forms/constructions/construction-material-types/selectable-material-designation.context';
+import {
 	ConstructionClass,
 	ConstructionTypeEnum,
-	EnBuildingTypeSelectValues,
-	EnCategoryClassSelectValues,
 	EnConstructionTypesSelectValues,
 	Guidebooks,
 	isFloorConstructionType,
-	RuBuildingTypeSelectValues,
-	RuCategoryClassSelectValues,
 	RuConstructionTypesSelectValues,
 	type ConstructionsAddData,
 	type ConstructionsEditData,
 } from '@features/guidbooks/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
+import { twMerge } from 'tailwind-merge';
 import DesigningGraph from '../designing/designing-graph.component';
-import { ConstructionInfoModalContent } from '../modals/construction-info-modal-content.component';
+import { ConstructionDetailsModal } from '../modals';
 
-type RoomRequirementEntry = {
-	secondRoomId: string;
-	secondRoomName: string;
-	requirementId: string;
-	rw: number | null;
-	annotation: string | null;
+const isGeneralReferenceIssuer = (issuerName?: string | null) => {
+	const n = (issuerName ?? '').trim().toLowerCase();
+	if (!n) return true;
+	return n === 'общий' || n === 'general';
 };
 
-type RoomRequirementMap = Record<string, RoomRequirementEntry[]>;
-
 /**
- * Экран «Расчет» (SingleReportInfo): документы + комнаты (для требования) + конструкция,
- * график/таблица как в проектировании. Комнаты на Single API не сохраняются — только для
- * выбора требования по нормативному документу и сравнения с лаб. данными.
+ * Экран «Расчет»: документы + выбор общей конструкции + редактор материалов как в проектировании.
+ * Брендовые конструкции в селекте недоступны.
  */
 export const CalculationScreen = () => {
 	const { t, locale } = useI18n();
@@ -108,7 +110,6 @@ export const CalculationScreen = () => {
 	const [constructionId, setConstructionId] = useState('');
 	const [savedConstructionId, setSavedConstructionId] = useState<string | null>(null);
 	const [typeEnumFilter, setTypeEnumFilter] = useState('');
-	const [filterByManufacturers, setFilterByManufacturers] = useState(false);
 	const [constructionData, setConstructionData] = useState<ConstructionsAddData[]>([]);
 	const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
 	const [detail, setDetail] = useState<ConstructionsEditData | null>(null);
@@ -118,24 +119,22 @@ export const CalculationScreen = () => {
 		useState<AdditionalGraphParameters | null>(null);
 	const [reportInfo, setReportInfo] = useState<ReportInfoShort | null>(null);
 	const [listLoading, setListLoading] = useState(false);
+	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+	const [hasPendingTypeChange, setHasPendingTypeChange] = useState(false);
 	const { noiseMode, setNoiseMode, activeNoiseMode } = useGraphNoiseMode(graphData);
 
 	const [calculationDocuments, setCalculationDocuments] = useState<
 		CalculationRequirementDocumentDto[]
 	>([]);
-	const [regulatoryDocuments, setRegulatoryDocuments] = useState<
-		RegulatoryRequirementDocumentDto[]
-	>([]);
 	const [calculationDocumentId, setCalculationDocumentId] = useState('');
-	const [regulatoryDocumentId, setRegulatoryDocumentId] = useState('');
-	const [buildingType, setBuildingType] = useState('');
-	const [comfortClass, setComfortClass] = useState('');
-	const [firstPlacementRoom, setFirstPlacementRoom] = useState('');
-	const [secondPlacementRoom, setSecondPlacementRoom] = useState('');
-	const [requirementId, setRequirementId] = useState('');
-	const [roomOptions, setRoomOptions] = useState<SelectOption[]>([]);
-	const [roomRequirementsMap, setRoomRequirementsMap] = useState<RoomRequirementMap>({});
 	const creatingReportRef = useRef(false);
+	const attachingRef = useRef(false);
+
+	const form = useForm<DesigningData>({
+		resolver: zodResolver(DesigningConfig.schema),
+		defaultValues: DesigningConfig.defaultValues,
+		mode: 'onSubmit',
+	});
 
 	useEffect(() => {
 		if (reportIdFromSearch && reportIdFromSearch !== reportId) {
@@ -160,172 +159,21 @@ export const CalculationScreen = () => {
 		return null;
 	}, [detail, typeEnumFilter]);
 
-	const buildingTypeOptions: SelectOption[] = useMemo(
-		() => (locale === 'ru' ? RuBuildingTypeSelectValues : EnBuildingTypeSelectValues),
-		[locale],
-	);
+	const constructionType = useMemo(() => {
+		return (form.watch('constructionTypeObject.constructionTypeEnum') ||
+			detail?.constructionTypeObject?.constructionTypeEnum ||
+			detail?.constructionType) as ConstructionTypeEnum | undefined;
+	}, [form, detail]);
 
-	const comfortClassOptions: SelectOption[] = useMemo(() => {
-		if (locale === 'ru') return RuCategoryClassSelectValues;
-		return (
-			EnCategoryClassSelectValues ||
-			Object.values(CategoryClass).map((value) => ({ label: value, value }))
-		);
-	}, [locale]);
+	const isConstructionEditLocked = useMemo(
+		() => !isGeneralReferenceIssuer(detail?.issuerName),
+		[detail?.issuerName],
+	);
 
 	const calculationDocumentOptions = useMemo(
 		() => convertToRequirementDocumentSelectValues(calculationDocuments, locale),
 		[calculationDocuments, locale],
 	);
-
-	const regulatoryDocumentOptions = useMemo(
-		() => convertToRequirementDocumentSelectValues(regulatoryDocuments, locale),
-		[regulatoryDocuments, locale],
-	);
-
-	const secondRoomOptions: SelectOption[] = useMemo(() => {
-		if (!firstPlacementRoom || !roomRequirementsMap[firstPlacementRoom]) return [];
-		return roomRequirementsMap[firstPlacementRoom].map((entry) => ({
-			value: entry.secondRoomId,
-			label: entry.secondRoomName,
-		}));
-	}, [firstPlacementRoom, roomRequirementsMap]);
-
-	const selectedRequirement = useMemo(() => {
-		if (!firstPlacementRoom || !secondPlacementRoom) return null;
-		return (
-			roomRequirementsMap[firstPlacementRoom]?.find(
-				(entry) => entry.secondRoomId === secondPlacementRoom,
-			) ?? null
-		);
-	}, [firstPlacementRoom, secondPlacementRoom, roomRequirementsMap]);
-
-	const requirementRw = selectedRequirement?.rw ?? null;
-
-	useEffect(() => {
-		from(getCalculationRequirementDocuments())
-			.pipe(
-				tap((response) => {
-					if (response?.status === 200 && Array.isArray(response.data)) {
-						setCalculationDocuments(response.data);
-					}
-				}),
-				catchError(() => of(null)),
-			)
-			.subscribe();
-		from(getRegulatoryRequirementDocuments())
-			.pipe(
-				tap((response) => {
-					if (response?.status === 200 && Array.isArray(response.data)) {
-						setRegulatoryDocuments(response.data);
-					}
-				}),
-				catchError(() => of(null)),
-			)
-			.subscribe();
-	}, []);
-
-	useEffect(() => {
-		if (!reportId) return;
-		from(getReportSingleById({ id: reportId }))
-			.pipe(
-				tap((response) => {
-					if (response?.status !== 200) return;
-					const short = convertToClientSingleReportInfoShort(response.data);
-					setReportInfo(short);
-					if (short.calculationDocument?.id) {
-						setCalculationDocumentId(short.calculationDocument.id);
-					}
-					if (short.regulatoryDocument?.id) {
-						setRegulatoryDocumentId(short.regulatoryDocument.id);
-					}
-					const existing = response.data?.singleReportConstruction;
-					if (!existing?.constructionHeaderId) return;
-					setSavedConstructionId(existing.id || null);
-					setConstructionId(existing.constructionHeaderId);
-					setWidth(String(existing.width || 1));
-					setLength(String(existing.length || 1));
-				}),
-				catchError(() => of(null)),
-			)
-			.subscribe();
-	}, [reportId]);
-
-	useEffect(() => {
-		setFirstPlacementRoom('');
-		setSecondPlacementRoom('');
-		setRequirementId('');
-		setRoomOptions([]);
-		setRoomRequirementsMap({});
-
-		if (!regulatoryDocumentId || !buildingType || !comfortClass || !layoutClass) {
-			return;
-		}
-
-		from(
-			getConstructionRooms({
-				class: comfortClass as CategoryClass,
-				buildingType: buildingType as BuildingType,
-				constructionClass: layoutClass,
-				regulatoryDocumentId,
-			}),
-		)
-			.pipe(
-				tap((response) => {
-					if (response?.status !== 200 || !Array.isArray(response.data)) return;
-					const roomsData = response.data as any[];
-					const map: RoomRequirementMap = {};
-					for (const item of roomsData) {
-						const firstRoomId = item.firstPlacementRoom?.id;
-						if (!firstRoomId) continue;
-						for (const requirement of item.secondRequirementRooms || []) {
-							const secondRoomId = requirement.secondPlacementRoom?.id;
-							const secondRoomName = requirement.secondPlacementRoom?.name;
-							const reqId = requirement.requirementId;
-							if (!secondRoomId || !secondRoomName || !reqId) continue;
-							if (!map[firstRoomId]) map[firstRoomId] = [];
-							map[firstRoomId].push({
-								secondRoomId,
-								secondRoomName,
-								requirementId: reqId,
-								rw: requirement.rw ?? null,
-								annotation: requirement.annotation ?? requirement.notice ?? null,
-							});
-						}
-					}
-					setRoomRequirementsMap(map);
-					const uniqueRooms = Array.from(
-						new Map(
-							roomsData
-								.filter((item: any) => item.firstPlacementRoom?.id)
-								.map((item: any) => [
-									item.firstPlacementRoom.id,
-									item.firstPlacementRoom,
-								]),
-						).values(),
-					);
-					setRoomOptions(convertToSelectValues(uniqueRooms as any) || []);
-				}),
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || t('errors.request'));
-					}
-					return of(null);
-				}),
-			)
-			.subscribe();
-	}, [regulatoryDocumentId, buildingType, comfortClass, layoutClass, t]);
-
-	useEffect(() => {
-		if (!firstPlacementRoom || !secondPlacementRoom) {
-			setRequirementId('');
-			return;
-		}
-		const entry = roomRequirementsMap[firstPlacementRoom]?.find(
-			(item) => item.secondRoomId === secondPlacementRoom,
-		);
-		setRequirementId(entry?.requirementId || '');
-	}, [firstPlacementRoom, secondPlacementRoom, roomRequirementsMap]);
 
 	const typeSelectOptions: SelectOption[] = useMemo(() => {
 		const all =
@@ -345,6 +193,7 @@ export const CalculationScreen = () => {
 		});
 
 		const filtered = constructionData.filter((item) => {
+			if (!isGeneralReferenceIssuer(item.issuerName)) return false;
 			if (typeEnumFilter && String(item.constructionType) !== String(typeEnumFilter)) {
 				return false;
 			}
@@ -379,6 +228,42 @@ export const CalculationScreen = () => {
 		[detail],
 	);
 
+	useEffect(() => {
+		from(getCalculationRequirementDocuments())
+			.pipe(
+				tap((response) => {
+					if (response?.status === 200 && Array.isArray(response.data)) {
+						setCalculationDocuments(response.data);
+					}
+				}),
+				catchError(() => of(null)),
+			)
+			.subscribe();
+	}, []);
+
+	useEffect(() => {
+		if (!reportId) return;
+		from(getReportSingleById({ id: reportId }))
+			.pipe(
+				tap((response) => {
+					if (response?.status !== 200) return;
+					const short = convertToClientSingleReportInfoShort(response.data);
+					setReportInfo(short);
+					if (short.calculationDocument?.id) {
+						setCalculationDocumentId(short.calculationDocument.id);
+					}
+					const existing = response.data?.singleReportConstruction;
+					if (!existing?.constructionHeaderId) return;
+					setSavedConstructionId(existing.id || null);
+					setConstructionId(existing.constructionHeaderId);
+					setWidth(String(existing.width || 1));
+					setLength(String(existing.length || 1));
+				}),
+				catchError(() => of(null)),
+			)
+			.subscribe();
+	}, [reportId]);
+
 	const loadCatalog = () => {
 		setListLoading(true);
 		const serverTypeFilter = typeEnumFilter
@@ -390,7 +275,6 @@ export const CalculationScreen = () => {
 				getGuidebooksPaginated({
 					data: {
 						...(serverTypeFilter ? { constructionType: serverTypeFilter } : {}),
-						...(filterByManufacturers ? { onlyManufacturers: true } : {}),
 						orderByPriority: true,
 					},
 					guidebookType: Guidebooks.CONSTRUCTION,
@@ -406,7 +290,9 @@ export const CalculationScreen = () => {
 						if (fav?.id) favoriteKeys.add(String(fav.id));
 						if (fav?.constructionId) favoriteKeys.add(String(fav.constructionId));
 					}
-					const items = response?.data?.items || [];
+					const items = (response?.data?.items || []).filter((item: any) =>
+						isGeneralReferenceIssuer(item?.issuer?.name ?? item?.issuerName),
+					);
 					const ids = new Set<string>();
 					for (const item of items) {
 						const keys = [item?.id, item?.constructionId].filter(Boolean).map(String);
@@ -415,13 +301,18 @@ export const CalculationScreen = () => {
 						}
 					}
 					setFavoriteIds(ids);
+					response.data.items = items;
 				}),
 				switchMap(([response]: [AxiosResponse, AxiosResponse]) =>
 					from([
 						convertToPaginatedType(convertToClientConstructionsAddData)(response.data),
 					]),
 				),
-				tap((res) => setConstructionData(res.items)),
+				tap((res) =>
+					setConstructionData(
+						res.items.filter((item) => isGeneralReferenceIssuer(item.issuerName)),
+					),
+				),
 				catchError((error) => {
 					console.error(error);
 					toast.error(t('errors.request'));
@@ -434,7 +325,85 @@ export const CalculationScreen = () => {
 
 	useEffect(() => {
 		loadCatalog();
-	}, [typeEnumFilter, filterByManufacturers]);
+	}, [typeEnumFilter]);
+
+	const refreshGraphAndSvg = useCallback(
+		(id: string) => {
+			from(svgConstructionDetail(id))
+				.pipe(
+					tap((response) => {
+						if (response.status === 200 && typeof response.data === 'string') {
+							setSvgUrl(response.data);
+						}
+					}),
+					catchError(() => of(null)),
+				)
+				.subscribe();
+
+			from(graphDetail({ constructionHeaderId: id }))
+				.pipe(
+					tap((response) => {
+						if (response?.status === 200 && Array.isArray(response.data)) {
+							setGraphData(response.data.map(graphDotsConverterToClient));
+						}
+					}),
+					catchError(() => {
+						setGraphData(null);
+						return of(null);
+					}),
+				)
+				.subscribe();
+
+			from(graphAdditionalDetail({ constructionHeaderId: id }))
+				.pipe(
+					tap((response) => {
+						if (response?.status === 200 && response.data) {
+							setGraphAdditionalData(
+								graphAdditionalValuesConverterToClient(response.data),
+							);
+						}
+					}),
+					catchError(() => {
+						setGraphAdditionalData(null);
+						return of(null);
+					}),
+				)
+				.subscribe();
+		},
+		[],
+	);
+
+	const loadConstructionDetail = useCallback(
+		(id: string) => {
+			dispatch(startLoading());
+			from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
+				.pipe(
+					tap((response) => {
+						if (response.status !== 200) return;
+						const data = prepareConstructionEditDataForPersistence(
+							convertToClientConstructionsEditData(response.data),
+						);
+						setDetail(data);
+						form.reset(data as DesigningData);
+						setHasPendingTypeChange(false);
+						if (data.constructionType) {
+							setTypeEnumFilter(String(data.constructionType));
+						}
+						if (!name.trim()) {
+							setName(data.description || data.name || '');
+						}
+					}),
+					catchError(() => {
+						toast.error(t('errors.constructionLoad'));
+						return of(null);
+					}),
+					finalize(() => dispatch(stopLoading())),
+				)
+				.subscribe();
+			refreshGraphAndSvg(id);
+		},
+		[dispatch, form, name, refreshGraphAndSvg, t],
+	);
 
 	useEffect(() => {
 		if (!constructionId) {
@@ -442,90 +411,20 @@ export const CalculationScreen = () => {
 			setSvgUrl(null);
 			setGraphData(null);
 			setGraphAdditionalData(null);
+			form.reset(DesigningConfig.defaultValues);
 			return;
 		}
-
-		dispatch(startLoading());
-		from(getGuidebooksDetail({ id: constructionId, guidebookType: Guidebooks.CONSTRUCTION }))
-			.pipe(
-				tap((response) => {
-					if (response.status === 200) {
-						const data = convertToClientConstructionsEditData(response.data);
-						setDetail(data);
-						if (data.constructionType) {
-							setTypeEnumFilter(String(data.constructionType));
-						}
-						if (!name.trim()) {
-							setName(data.description || data.name || '');
-						}
-					}
-				}),
-				catchError(() => {
-					toast.error(t('errors.constructionLoad'));
-					return of(null);
-				}),
-				finalize(() => dispatch(stopLoading())),
-			)
-			.subscribe();
-
-		from(svgConstructionDetail(constructionId))
-			.pipe(
-				tap((response) => {
-					if (response.status === 200 && typeof response.data === 'string') {
-						setSvgUrl(response.data);
-					}
-				}),
-				catchError(() => of(null)),
-			)
-			.subscribe();
-
-		from(graphDetail({ constructionHeaderId: constructionId }))
-			.pipe(
-				tap((response) => {
-					if (response?.status === 200 && Array.isArray(response.data)) {
-						setGraphData(response.data.map(graphDotsConverterToClient));
-					}
-				}),
-				catchError(() => {
-					setGraphData(null);
-					return of(null);
-				}),
-			)
-			.subscribe();
-
-		from(graphAdditionalDetail({ constructionHeaderId: constructionId }))
-			.pipe(
-				tap((response) => {
-					if (response?.status === 200 && response.data) {
-						setGraphAdditionalData(
-							graphAdditionalValuesConverterToClient(response.data),
-						);
-					}
-				}),
-				catchError(() => {
-					setGraphAdditionalData(null);
-					return of(null);
-				}),
-			)
-			.subscribe();
+		loadConstructionDetail(constructionId);
 	}, [constructionId]);
-
-	const clearConstruction = () => {
-		setConstructionId('');
-		setDetail(null);
-		setSvgUrl(null);
-		setGraphData(null);
-		setGraphAdditionalData(null);
-	};
 
 	const ensureSingleReportId = async (): Promise<string | null> => {
 		if (reportId) return reportId;
 		if (creatingReportRef.current) return null;
-		if (!calculationDocumentId || !regulatoryDocumentId) {
+		if (!calculationDocumentId) {
 			toast.error(
 				locale === 'ru'
-					? 'Выберите расчётный и нормативный документы'
-					: 'Select calculation and regulatory documents',
+					? 'Выберите расчётный документ'
+					: 'Select calculation document',
 			);
 			return null;
 		}
@@ -533,7 +432,6 @@ export const CalculationScreen = () => {
 		try {
 			const response = await createSingleReportInfo({
 				calculationDocumentId,
-				regulatoryDocumentId,
 			});
 			const id = response?.data?.id;
 			if (response?.status === 200 && id) {
@@ -560,60 +458,200 @@ export const CalculationScreen = () => {
 		}
 	};
 
-	const handleSave = async () => {
-		if (!constructionId || !name.trim() || !width || !length || !area) {
-			toast.error(t('validation.required'));
+	const attachConstructionToReport = useCallback(
+		async (nextConstructionId: string) => {
+			if (!nextConstructionId || attachingRef.current) return;
+			if (!name.trim() || !width || !length || !area) return;
+			attachingRef.current = true;
+			try {
+				const ensuredId = await ensureSingleReportId();
+				if (!ensuredId) return;
+				const response = await updateReportSingle({
+					data: convertToUpdateSingleReportCommand(ensuredId, {
+						id: savedConstructionId || undefined,
+						name: name.trim() || 'Construction',
+						construction: nextConstructionId,
+						width,
+						length,
+						area,
+						constructionType: '',
+						firstPlacementRoom: '',
+						secondPlacementRoom: '',
+					}),
+				});
+				if (response?.status === 200) {
+					const id = response.data?.singleReportConstruction?.id;
+					if (id) setSavedConstructionId(id);
+					sessionStorage.setItem('reportType', ReportCategory.Single);
+					sessionStorage.setItem('reportId', ensuredId);
+				}
+			} catch (error) {
+				if (error instanceof AxiosError) {
+					toast.error(
+						error.response?.data || t('createConstruction.error.addConstruction'),
+					);
+				}
+			} finally {
+				attachingRef.current = false;
+			}
+		},
+		[
+			area,
+			calculationDocumentId,
+			length,
+			name,
+			reportId,
+			savedConstructionId,
+			t,
+			width,
+		],
+	);
+
+	useEffect(() => {
+		if (!constructionId) return;
+		void attachConstructionToReport(constructionId);
+		// Привязка к Single-отчёту при выборе конструкции (кнопки «Сохранить» нет).
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- только смена конструкции
+	}, [constructionId]);
+
+	const clearConstruction = () => {
+		setConstructionId('');
+		setDetail(null);
+		setSvgUrl(null);
+		setGraphData(null);
+		setGraphAdditionalData(null);
+		setHasPendingTypeChange(false);
+		form.reset(DesigningConfig.defaultValues);
+	};
+
+	const handleConstructionTypeChange = (value: string) => {
+		if (isConstructionEditLocked) return;
+		if (
+			value?.trim() &&
+			layoutClass === ConstructionClass.Wall &&
+			isFloorConstructionType(value)
+		) {
 			return;
 		}
-		if (!firstPlacementRoom || !secondPlacementRoom || !requirementId) {
-			toast.error(
-				locale === 'ru'
-					? 'Выберите помещения, которые разделяет конструкция'
-					: 'Select rooms separated by the construction',
-			);
+		if (
+			value?.trim() &&
+			layoutClass === ConstructionClass.Floor &&
+			!isFloorConstructionType(value)
+		) {
 			return;
 		}
+		if (!value?.trim()) {
+			form.setValue('constructionTypeObject.constructionTypeEnum', '' as ConstructionTypeEnum);
+			setDetail((prev) => {
+				if (!prev) return null;
+				return {
+					...prev,
+					constructionTypeObject: {
+						...prev.constructionTypeObject,
+						constructionTypeEnum: '' as ConstructionTypeEnum,
+						leftConstruction: undefined,
+						centerConstruction: undefined,
+						rightConstruction: undefined,
+					},
+				};
+			});
+			setGraphData(null);
+			setGraphAdditionalData(null);
+			setSvgUrl(null);
+			setHasPendingTypeChange(true);
+			return;
+		}
+
+		const nextType = value as ConstructionTypeEnum;
+		form.setValue('constructionTypeObject.constructionTypeEnum', nextType);
+		ConstructionTypeMap({
+			currentConstruction: nextType,
+			currentForm: form,
+		})?.action();
+
+		setDetail((prev) => {
+			if (!prev) return null;
+			return {
+				...prev,
+				issuer: '',
+				issuerName: '',
+				airLaboratory: {
+					labRTotal: '',
+					labIndex: '',
+					labIndexValue: '',
+					laboratoryC: '',
+					laboratoryCtr: '',
+					laboratoryTestSource: '',
+				},
+				impactLaboratory: {
+					labRTotal: '',
+					labIndex: '',
+					labIndexValue: '',
+					laboratoryC: '',
+					laboratoryCtr: '',
+					laboratoryTestSource: '',
+				},
+				constructionTypeObject: {
+					...prev.constructionTypeObject,
+					constructionTypeEnum: nextType,
+					leftConstruction: undefined,
+					centerConstruction: undefined,
+					rightConstruction: undefined,
+				},
+			};
+		});
+		setTypeEnumFilter(String(nextType));
+		setHasPendingTypeChange(true);
+		setGraphData(null);
+		setGraphAdditionalData(null);
+		setSvgUrl(null);
+	};
+
+	const handleRestoreInitialConstruction = () => {
+		if (!constructionId) return;
+		loadConstructionDetail(constructionId);
+	};
+
+	const onCalculateHandle = () => {
+		if (!constructionId || isConstructionEditLocked) return;
+		const formData = prepareConstructionEditDataForPersistence(
+			form.getValues() as ConstructionsEditData,
+		);
+		form.reset(formData as DesigningData, { keepDefaultValues: false });
+		setDetail((prev) =>
+			prev
+				? {
+						...prev,
+						constructionType: formData.constructionType ?? prev.constructionType,
+						constructionTypeObject: formData.constructionTypeObject,
+					}
+				: prev,
+		);
+		const dataForServer = convertToServerConstructionsEditData({
+			...formData,
+			reportInfoId: reportId || undefined,
+		});
 
 		dispatch(startLoading());
-		const ensuredId = await ensureSingleReportId();
-		if (!ensuredId) {
-			dispatch(stopLoading());
-			return;
-		}
-
 		from(
-			updateReportSingle({
-				data: convertToUpdateSingleReportCommand(ensuredId, {
-					id: savedConstructionId || undefined,
-					name: name.trim(),
-					construction: constructionId,
-					width,
-					length,
-					area,
-					constructionType: '',
-					firstPlacementRoom,
-					secondPlacementRoom,
-					requirementId,
-				}),
+			getGuidebooksEdit({
+				data: dataForServer,
+				guidebookType: Guidebooks.CONSTRUCTION,
 			}),
 		)
 			.pipe(
 				tap((response) => {
-					if (response?.status === 200) {
-						toast.success(t('constructor.calculation.saved'));
-						const id = response.data?.singleReportConstruction?.id;
-						if (id) setSavedConstructionId(id);
-						sessionStorage.setItem('reportType', ReportCategory.Single);
-						sessionStorage.setItem('reportId', ensuredId);
-					}
+					if (response?.status !== 200) return;
+					toast.success(t('success.constructionUpdated'));
+					setHasPendingTypeChange(false);
+					loadConstructionDetail(constructionId);
+					void attachConstructionToReport(constructionId);
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
-						toast.error(
-							error.response?.data || t('createConstruction.error.addConstruction'),
-						);
+						toast.error(error.response?.data || t('errors.request'));
 					} else {
-						toast.error(t('createConstruction.error.unknown'));
+						toast.error(t('errors.request'));
 					}
 					return of(null);
 				}),
@@ -623,7 +661,7 @@ export const CalculationScreen = () => {
 	};
 
 	return (
-		<div className="flex w-full flex-col gap-[24px]">
+		<div className="relative flex w-full flex-col gap-[24px]">
 			<p className="font-sans text-lg font-semibold">{t('constructor.calculation.title')}</p>
 
 			<div className="flex flex-col gap-[16px] rounded-[20px] bg-white px-[24px] py-[20px]">
@@ -638,56 +676,7 @@ export const CalculationScreen = () => {
 						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
 						placeholder={t('aboutBuilding.requirements.calculation')}
 						buttonClassName="w-full min-w-[220px] h-fit text-sm rounded-[8px]"
-						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[220px] flex-1"
-					/>
-					<Select
-						options={regulatoryDocumentOptions}
-						value={regulatoryDocumentId}
-						onChange={(value) => {
-							setRegulatoryDocumentId(value ? String(value) : '');
-							setFirstPlacementRoom('');
-							setSecondPlacementRoom('');
-							setRequirementId('');
-						}}
-						isSearchable
-						disabled={!!reportId && !!reportInfo?.regulatoryDocument?.id}
-						label={t('aboutBuilding.requirements.regulation')}
-						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
-						placeholder={t('aboutBuilding.requirements.regulation')}
-						buttonClassName="w-full min-w-[220px] h-fit text-sm rounded-[8px]"
-						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[220px] flex-1"
-					/>
-					<Select
-						options={buildingTypeOptions}
-						value={buildingType}
-						onChange={(value) => {
-							setBuildingType(value ? String(value) : '');
-							setFirstPlacementRoom('');
-							setSecondPlacementRoom('');
-							setRequirementId('');
-						}}
-						isSearchable
-						label={t('aboutBuilding.buildingType.label')}
-						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
-						placeholder={t('aboutBuilding.buildingType.placeholder')}
-						buttonClassName="w-full min-w-[180px] h-fit text-sm rounded-[8px]"
-						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[180px] flex-1"
-					/>
-					<Select
-						options={comfortClassOptions}
-						value={comfortClass}
-						onChange={(value) => {
-							setComfortClass(value ? String(value) : '');
-							setFirstPlacementRoom('');
-							setSecondPlacementRoom('');
-							setRequirementId('');
-						}}
-						isSearchable
-						label={t('aboutBuilding.comfortClass.label')}
-						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
-						placeholder={t('aboutBuilding.comfortClass.placeholder')}
-						buttonClassName="w-full min-w-[140px] h-fit text-sm rounded-[8px]"
-						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[140px] flex-1"
+						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[220px] flex-1 max-w-[480px]"
 					/>
 				</div>
 
@@ -700,9 +689,6 @@ export const CalculationScreen = () => {
 							if (next === typeEnumFilter) return;
 							setTypeEnumFilter(next);
 							clearConstruction();
-							setFirstPlacementRoom('');
-							setSecondPlacementRoom('');
-							setRequirementId('');
 						}}
 						isSearchable
 						label={t('createConstruction.constructionType.label')}
@@ -729,54 +715,7 @@ export const CalculationScreen = () => {
 						buttonClassName="w-full min-w-[260px] h-fit text-sm rounded-[8px]"
 						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[260px] flex-[1.4]"
 					/>
-					<Checkbox
-						label={t('createConstruction.manufacturerFilter.title')}
-						direction="row"
-						checked={filterByManufacturers}
-						onChange={() => {
-							clearConstruction();
-							setFilterByManufacturers((prev) => !prev);
-						}}
-						wrapperClassName="mb-[2px] shrink-0"
-						labelClassName="whitespace-nowrap text-input-label-primary"
-					/>
 					{listLoading ? <Loader /> : null}
-				</div>
-
-				<div className="flex w-full min-w-0 flex-wrap items-end gap-3">
-					<Select
-						options={roomOptions}
-						value={firstPlacementRoom}
-						onChange={(value) => {
-							setFirstPlacementRoom(value ? String(value) : '');
-							setSecondPlacementRoom('');
-							setRequirementId('');
-						}}
-						isSearchable
-						disabled={!roomOptions.length}
-						label={t('createConstruction.firstRoom.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
-						placeholder={t('createConstruction.firstRoom.placeholder')}
-						buttonClassName="w-full min-w-[200px] h-fit text-sm rounded-[8px]"
-						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[200px] flex-1"
-					/>
-					<Select
-						options={secondRoomOptions}
-						value={secondPlacementRoom}
-						onChange={(value) => setSecondPlacementRoom(value ? String(value) : '')}
-						isSearchable
-						disabled={!firstPlacementRoom || !secondRoomOptions.length}
-						label={t('createConstruction.secondRoom.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
-						placeholder={t('createConstruction.secondRoom.placeholder')}
-						buttonClassName="w-full min-w-[200px] h-fit text-sm rounded-[8px]"
-						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[200px] flex-1"
-					/>
-					{requirementRw != null ? (
-						<p className="mb-[8px] font-sans text-sm font-semibold text-black">
-							{t('createConstruction.requirement.label')}: Rw = {requirementRw} dB
-						</p>
-					) : null}
 				</div>
 
 				<div className="flex flex-wrap gap-3">
@@ -821,16 +760,6 @@ export const CalculationScreen = () => {
 						containerClassName="w-[140px]"
 					/>
 				</div>
-
-				<div className="flex justify-end">
-					<Button
-						className="h-[36px] px-4 font-sans text-sm font-semibold"
-						onClick={() => void handleSave()}
-						disabled={!constructionId}
-					>
-						{t('constructor.calculation.save')}
-					</Button>
-				</div>
 			</div>
 
 			{!constructionId ? (
@@ -851,13 +780,87 @@ export const CalculationScreen = () => {
 								<Loader />
 							</div>
 						)}
-						<div className="flex min-w-0 flex-1 flex-col gap-2">
-							{materials.map((material, i) => (
-								<p key={`calc-layer-${i}`} className="pl-2 text-[18px]">
-									- {formatMaterial(material, locale)}
-								</p>
-							))}
+						<div className="flex min-w-0 flex-1 flex-col gap-[20px]">
+							<Controller
+								name="constructionTypeObject.constructionTypeEnum"
+								control={form.control}
+								render={({ field }) => (
+									<Select
+										{...field}
+										disabled={isConstructionEditLocked}
+										isSearchable
+										value={field.value || ''}
+										onChange={(value) =>
+											handleConstructionTypeChange(value ? String(value) : '')
+										}
+										options={typeSelectOptions}
+										wrapperClassname="w-fit min-w-[320px] ring-input-border-primary"
+										buttonClassName="text-sm rounded-[8px]"
+										placeholder={t('constructor.designing.selectType')}
+									/>
+								)}
+							/>
+							<div className="flex flex-col gap-2">
+								{materials.map((material, i) => (
+									<p key={`calc-layer-${i}`} className="pl-2 text-[18px]">
+										- {formatMaterial(material, locale)}
+									</p>
+								))}
+							</div>
+							<div className="flex justify-end">
+								<button
+									type="button"
+									onClick={() => setIsDetailsOpen(true)}
+									className="font-sans text-sm font-semibold text-primary hover:opacity-80"
+								>
+									{t('createConstruction.details.more')}
+								</button>
+							</div>
 						</div>
+					</div>
+
+					<div className="flex w-full flex-col gap-[35px] rounded-[20px] bg-white px-[25px] py-[27px]">
+						{isConstructionEditLocked ? (
+							<p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 font-sans text-sm text-amber-950">
+								{t('constructor.designing.generalIssuerEditHint')}
+							</p>
+						) : null}
+						{constructionType && !isConstructionEditLocked ? (
+							<MaterialApplicationPurposeProvider layoutClass={layoutClass}>
+								<SelectableMaterialDesignationProvider
+									value={{ showMaterialDesignationInput: true }}
+								>
+									{
+										ConstructionTypeMap({
+											currentConstruction: constructionType,
+											currentForm: form,
+										}).component
+									}
+								</SelectableMaterialDesignationProvider>
+							</MaterialApplicationPurposeProvider>
+						) : null}
+						{(hasPendingTypeChange || !isConstructionEditLocked) && (
+							<div className="flex items-center justify-end gap-[10px]">
+								{hasPendingTypeChange ? (
+									<Button
+										onClick={handleRestoreInitialConstruction}
+										className="h-[40px] w-fit bg-white px-[16px] font-sans text-sm font-semibold text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
+									>
+										{locale === 'ru' ? 'Вернуть' : 'Restore'}
+									</Button>
+								) : null}
+								{!isConstructionEditLocked ? (
+									<Button
+										onClick={onCalculateHandle}
+										className={twMerge(
+											'h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none',
+										)}
+									>
+										{t('constructor.designing.calculate')}
+									</Button>
+								) : null}
+							</div>
+						)}
 					</div>
 
 					{graphData?.length ? (
@@ -866,11 +869,7 @@ export const CalculationScreen = () => {
 								<DesigningGraph
 									graphData={graphData}
 									chartSize="large"
-									regulatoryDocName={
-										reportInfo?.regulatoryDocument?.name ||
-										detail?.airLaboratory?.laboratoryTestSource ||
-										''
-									}
+									regulatoryDocName=""
 									calculationDocName={reportInfo?.calculationDocument?.name || ''}
 									noiseMode={noiseMode}
 									onNoiseModeChange={setNoiseMode}
@@ -886,26 +885,25 @@ export const CalculationScreen = () => {
 							</div>
 						</div>
 					) : null}
-
-					<div className="rounded-[20px] bg-white px-[24px] py-[20px]">
-						<ConstructionInfoModalContent
-							constructionHeaderId={constructionId}
-							hideDownload
-							overrides={{
-								constructionType: detail?.constructionType,
-								issuerName: detail?.issuerName,
-								length,
-								width,
-								square: area,
-								rw:
-									detail?.RCalcs != null && detail.RCalcs !== ''
-										? Number(String(detail.RCalcs).replace(',', '.'))
-										: null,
-							}}
-						/>
-					</div>
 				</>
 			)}
+
+			<ConstructionDetailsModal
+				isOpen={isDetailsOpen}
+				onClose={() => setIsDetailsOpen(false)}
+				constructionHeaderId={constructionId || null}
+				overrides={{
+					constructionType: detail?.constructionType,
+					issuerName: detail?.issuerName,
+					length,
+					width,
+					square: area,
+					rw:
+						detail?.RCalcs != null && detail.RCalcs !== ''
+							? Number(String(detail.RCalcs).replace(',', '.'))
+							: null,
+				}}
+			/>
 		</div>
 	);
 };

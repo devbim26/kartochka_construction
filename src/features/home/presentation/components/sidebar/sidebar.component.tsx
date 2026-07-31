@@ -1,4 +1,5 @@
 import { getSidebarItemsConfig } from '@features/home/constants';
+import type { SidebarConfigChild } from '@features/home/types';
 import { useLocation } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useDesigningSidebar } from '../../context/designing-sidebar.context';
@@ -8,6 +9,54 @@ import { SidebarList } from './sidebar-list.component';
 
 const buildChildPath = (basePath: string, parentPath: string, childPath: string) =>
 	`${basePath}/${parentPath}/${childPath}`;
+
+const renderSidebarChildren = ({
+	children,
+	basePath,
+	parentRoute,
+	pathname,
+	depth,
+}: {
+	children: SidebarConfigChild[];
+	basePath: string;
+	parentRoute: string;
+	pathname: string;
+	depth: number;
+}) =>
+	children.map((child) => {
+		if (child.childrens?.length) {
+			return (
+				<SidebarList
+					{...child}
+					key={child.id}
+					currentPath={pathname}
+					path={`${basePath}/${parentRoute}`}
+					permission={child.permission}
+					depth={depth}
+				>
+					<>
+						{renderSidebarChildren({
+							children: child.childrens,
+							basePath,
+							parentRoute,
+							pathname,
+							depth: depth + 1,
+						})}
+					</>
+				</SidebarList>
+			);
+		}
+
+		return (
+			<SidebarListItem
+				{...child}
+				key={child.id}
+				currentPath={pathname}
+				path={buildChildPath(basePath, parentRoute, child.path)}
+				depth={depth}
+			/>
+		);
+	});
 
 export const Sidebar = () => {
 	const { pathname } = useLocation();
@@ -54,49 +103,12 @@ export const Sidebar = () => {
 								depth={0}
 							>
 								<>
-									{item.childrens.map((children) => {
-										if (children.childrens?.length) {
-											return (
-												<SidebarList
-													{...children}
-													key={children.id}
-													currentPath={pathname}
-													path={`${sidebarItemsConfig.basePath}/${item.params.path}`}
-													permission={children.permission}
-													depth={1}
-												>
-													<>
-														{children.childrens.map((nested) => (
-															<SidebarListItem
-																{...nested}
-																key={nested.id}
-																currentPath={pathname}
-																path={buildChildPath(
-																	sidebarItemsConfig.basePath,
-																	item.params.path,
-																	nested.path,
-																)}
-																depth={2}
-															/>
-														))}
-													</>
-												</SidebarList>
-											);
-										}
-
-										return (
-											<SidebarListItem
-												{...children}
-												key={children.id}
-												currentPath={pathname}
-												path={buildChildPath(
-													sidebarItemsConfig.basePath,
-													item.params.path,
-													children.path,
-												)}
-												depth={1}
-											/>
-										);
+									{renderSidebarChildren({
+										children: item.childrens,
+										basePath: sidebarItemsConfig.basePath,
+										parentRoute: item.params.path,
+										pathname,
+										depth: 1,
 									})}
 								</>
 							</SidebarList>

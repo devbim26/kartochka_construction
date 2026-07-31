@@ -10,7 +10,7 @@ export interface SidebarItemProps {
 	path: string;
 	isMutltiPathItem?: boolean;
 	permission: UserRoles | UserRoles[];
-	/** 1 = ребёнок Конструктора (Проект/Расчет), 2 = вложенные пункты Проекта. */
+	/** 0 = корень, 1 = ребёнок Конструктора (Звукоизоляция), 2 = Проект/Расчет, 3 = пункты Проекта. */
 	depth?: number;
 }
 
@@ -19,8 +19,8 @@ export interface SidebarListProps extends SidebarItemProps {
 }
 
 export type SidebarConfigChild = SidebarItemProps & {
-	/** Вложенная группа (например Проект → О здании / Поэтажные планы). */
-	childrens?: SidebarItemProps[];
+	/** Вложенная группа (Звукоизоляция → Проект/Расчет → О здании / …). */
+	childrens?: SidebarConfigChild[];
 };
 
 export interface SidebarItemsConfig {

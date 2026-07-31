@@ -7,8 +7,9 @@ import { twMerge } from 'tailwind-merge';
 
 const paddingByDepth: Record<number, string> = {
 	0: 'pl-[24px]',
-	1: 'pl-[60px]',
-	2: 'pl-[80px]',
+	1: 'pl-[48px]',
+	2: 'pl-[72px]',
+	3: 'pl-[96px]',
 };
 
 const SidebarListBase = (props: SidebarListProps) => {

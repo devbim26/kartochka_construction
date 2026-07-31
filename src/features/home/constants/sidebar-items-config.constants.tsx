@@ -66,29 +66,49 @@ function getConstructorSidebarChildren() {
 
 	return [
 		{
-			id: 'constructor-project-group-id',
+			id: 'constructor-sound-insulation-group-id',
 			path: hasFloorSession
 				? buildPathWithParams(CONSTRUCTOR_ROUTES.floorPlans.route, {
 						reportId: reportId!,
 						reportType: reportType!,
 					})
-				: buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
-						intent: 'project',
-					}),
-			labelKey: 'sidebar.project' as const,
+				: hasSingleSession
+					? buildPathWithParams(CONSTRUCTOR_ROUTES.calculation.route, {
+							reportId: reportId!,
+							reportType: reportType!,
+						})
+					: buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
+							intent: 'project',
+						}),
+			labelKey: 'sidebar.soundInsulation' as const,
 			permission: [UserRoles.Admin, UserRoles.User],
-			childrens: projectChildren,
-		},
-		{
-			id: CONSTRUCTOR_ROUTES.calculation.id,
-			path: hasSingleSession
-				? buildPathWithParams(CONSTRUCTOR_ROUTES.calculation.route, {
-						reportId: reportId!,
-						reportType: reportType!,
-					})
-				: CONSTRUCTOR_ROUTES.calculation.route,
-			labelKey: 'sidebar.calculation' as const,
-			permission: [UserRoles.Admin, UserRoles.User],
+			childrens: [
+				{
+					id: 'constructor-project-group-id',
+					path: hasFloorSession
+						? buildPathWithParams(CONSTRUCTOR_ROUTES.floorPlans.route, {
+								reportId: reportId!,
+								reportType: reportType!,
+							})
+						: buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
+								intent: 'project',
+							}),
+					labelKey: 'sidebar.project' as const,
+					permission: [UserRoles.Admin, UserRoles.User],
+					childrens: projectChildren,
+				},
+				{
+					id: CONSTRUCTOR_ROUTES.calculation.id,
+					path: hasSingleSession
+						? buildPathWithParams(CONSTRUCTOR_ROUTES.calculation.route, {
+								reportId: reportId!,
+								reportType: reportType!,
+							})
+						: CONSTRUCTOR_ROUTES.calculation.route,
+					labelKey: 'sidebar.calculation' as const,
+					permission: [UserRoles.Admin, UserRoles.User],
+				},
+			],
 		},
 	];
 }

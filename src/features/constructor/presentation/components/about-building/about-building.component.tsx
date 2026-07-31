@@ -603,6 +603,9 @@ const AboutBuildingScreen = () => {
 							)}
 						/>
 
+						{/* Пустая строка между основной формой и требованиями */}
+						<div className="h-[20px] w-full" aria-hidden />
+
 						{/* Требования: заголовки колонок */}
 						<div className="flex w-full items-center gap-[50px]">
 							<FormElementLabel className="w-[145px] font-sans text-lg font-semibold leading-4 text-primary">
