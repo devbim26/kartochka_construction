@@ -23,8 +23,10 @@ export const ConstructorHeader = () => {
 	const hasFloorSession = reportType === ReportCategory.Floor && !!reportId;
 	const hasSingleSession = reportType === ReportCategory.Single && !!reportId;
 	const isCalculationRoute = isActive(CONSTRUCTOR_ROUTES.calculation.route);
-	/** Расчет — только конструкция, без «О здании». */
-	const isCalculationContext = hasSingleSession || isCalculationRoute;
+	const isAboutBuildingRoute = isActive(CONSTRUCTOR_ROUTES.aboutBuilding.route);
+	/** Расчет — только на своём экране; сессия Single не перекрывает «О здании». */
+	const isCalculationContext =
+		isCalculationRoute || (hasSingleSession && !isAboutBuildingRoute);
 	const showAboutBuilding = !isCalculationContext;
 	const showFloorPlans = hasFloorSession && !isCalculationContext;
 	const showCalculation = isCalculationContext;

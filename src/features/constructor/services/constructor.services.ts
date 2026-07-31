@@ -107,7 +107,7 @@ export const createReport = async ({ data }: ReportCreateProps) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoCreate(data));
 };
 
-/** Создание одиночного отчёта (SingleReportInfo) по документам. */
+/** Создание одиночного отчёта (SingleReportInfo) с расчётным документом и конструкцией. */
 export const createSingleReportInfo = async (data: CreateSingleReportInfoProps) => {
 	return await withConstructorLoader(() => fetchApi.api.singleReportInfoCreate(data));
 };

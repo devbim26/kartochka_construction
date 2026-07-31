@@ -13,6 +13,7 @@ import {
 import Loader from '@core/presentation/components/loaders/loader.component';
 import {
 	convertToClientSingleReportInfoShort,
+	convertToCreateSingleReportInfoCommand,
 	convertToRequirementDocumentSelectValues,
 	convertToUpdateSingleReportCommand,
 	graphAdditionalValuesConverterToClient,
@@ -105,8 +106,8 @@ export const CalculationScreen = () => {
 	);
 
 	const [name, setName] = useState('');
-	const [width, setWidth] = useState('1');
-	const [length, setLength] = useState('1');
+	const [width, setWidth] = useState('');
+	const [length, setLength] = useState('');
 	const [constructionId, setConstructionId] = useState('');
 	const [savedConstructionId, setSavedConstructionId] = useState<string | null>(null);
 	const [typeEnumFilter, setTypeEnumFilter] = useState('');
@@ -128,7 +129,8 @@ export const CalculationScreen = () => {
 	>([]);
 	const [calculationDocumentId, setCalculationDocumentId] = useState('');
 	const creatingReportRef = useRef(false);
-	const attachingRef = useRef(false);
+	const syncingRef = useRef(false);
+	const lastSyncedKeyRef = useRef('');
 
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
@@ -148,6 +150,38 @@ export const CalculationScreen = () => {
 		if (!Number.isFinite(w) || !Number.isFinite(l) || w <= 0 || l <= 0) return '';
 		return String(Math.round(w * l));
 	}, [width, length]);
+
+	/** Все поля верхнего блока заполнены — можно создавать/обновлять отчёт. */
+	const isFormComplete = useMemo(() => {
+		const w = Number(width);
+		const l = Number(length);
+		return (
+			!!calculationDocumentId &&
+			!!constructionId &&
+			!!name.trim() &&
+			Number.isFinite(w) &&
+			w > 0 &&
+			Number.isFinite(l) &&
+			l > 0 &&
+			!!area
+		);
+	}, [area, calculationDocumentId, constructionId, length, name, width]);
+
+	const formSyncKey = useMemo(
+		() =>
+			JSON.stringify({
+				calculationDocumentId,
+				constructionId,
+				name: name.trim(),
+				width,
+				length,
+				area,
+			}),
+		[area, calculationDocumentId, constructionId, length, name, width],
+	);
+
+	/** Графики и редактор — только после создания SingleReportInfo. */
+	const canShowWorkspace = !!reportId;
 
 	const layoutClass = useMemo(() => {
 		const fromDetail = getLayoutClassFromConstructionHeader(detail || undefined);
@@ -249,15 +283,18 @@ export const CalculationScreen = () => {
 					if (response?.status !== 200) return;
 					const short = convertToClientSingleReportInfoShort(response.data);
 					setReportInfo(short);
-					if (short.calculationDocument?.id) {
-						setCalculationDocumentId(short.calculationDocument.id);
+					const docId = short.calculationDocument?.id || '';
+					if (docId) {
+						setCalculationDocumentId(docId);
 					}
 					const existing = response.data?.singleReportConstruction;
 					if (!existing?.constructionHeaderId) return;
+					const nextWidth = String(existing.width || '');
+					const nextLength = String(existing.length || '');
 					setSavedConstructionId(existing.id || null);
 					setConstructionId(existing.constructionHeaderId);
-					setWidth(String(existing.width || 1));
-					setLength(String(existing.length || 1));
+					setWidth(nextWidth);
+					setLength(nextLength);
 				}),
 				catchError(() => of(null)),
 			)
@@ -374,7 +411,7 @@ export const CalculationScreen = () => {
 	);
 
 	const loadConstructionDetail = useCallback(
-		(id: string) => {
+		(id: string, withVisuals: boolean) => {
 			dispatch(startLoading());
 			from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
 				.pipe(
@@ -400,7 +437,13 @@ export const CalculationScreen = () => {
 					finalize(() => dispatch(stopLoading())),
 				)
 				.subscribe();
-			refreshGraphAndSvg(id);
+			if (withVisuals) {
+				refreshGraphAndSvg(id);
+			} else {
+				setSvgUrl(null);
+				setGraphData(null);
+				setGraphAdditionalData(null);
+			}
 		},
 		[dispatch, form, name, refreshGraphAndSvg, t],
 	);
@@ -414,105 +457,123 @@ export const CalculationScreen = () => {
 			form.reset(DesigningConfig.defaultValues);
 			return;
 		}
-		loadConstructionDetail(constructionId);
-	}, [constructionId]);
+		loadConstructionDetail(constructionId, canShowWorkspace);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- визуалы включаем после появления reportId
+	}, [constructionId, canShowWorkspace]);
 
-	const ensureSingleReportId = async (): Promise<string | null> => {
-		if (reportId) return reportId;
-		if (creatingReportRef.current) return null;
-		if (!calculationDocumentId) {
+	const syncReportConstruction = useCallback(async () => {
+		if (syncingRef.current || creatingReportRef.current) return false;
+
+		if (!isFormComplete) {
 			toast.error(
 				locale === 'ru'
-					? 'Выберите расчётный документ'
-					: 'Select calculation document',
+					? 'Заполните расчётный документ, конструкцию, название и линейные размеры'
+					: 'Fill in the calculation document, construction, name and dimensions',
 			);
-			return null;
+			return false;
 		}
-		creatingReportRef.current = true;
-		try {
-			const response = await createSingleReportInfo({
-				calculationDocumentId,
-			});
-			const id = response?.data?.id;
-			if (response?.status === 200 && id) {
-				sessionStorage.setItem('reportId', id);
-				sessionStorage.setItem('reportType', ReportCategory.Single);
-				setReportId(id);
-				navigate('', {
-					reportId: id,
-					reportType: ReportCategory.Single,
-				});
-				return id;
-			}
-			toast.error(t('errors.request'));
-			return null;
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				toast.error(error.response?.data || t('errors.request'));
-			} else {
-				toast.error(t('errors.request'));
-			}
-			return null;
-		} finally {
-			creatingReportRef.current = false;
-		}
-	};
 
-	const attachConstructionToReport = useCallback(
-		async (nextConstructionId: string) => {
-			if (!nextConstructionId || attachingRef.current) return;
-			if (!name.trim() || !width || !length || !area) return;
-			attachingRef.current = true;
+		const constructionPayload = {
+			id: savedConstructionId || undefined,
+			name: name.trim(),
+			construction: constructionId,
+			width,
+			length,
+			area,
+			constructionType: '',
+			firstPlacementRoom: '',
+			secondPlacementRoom: '',
+		};
+
+		if (!reportId) {
+			creatingReportRef.current = true;
+			syncingRef.current = true;
 			try {
-				const ensuredId = await ensureSingleReportId();
-				if (!ensuredId) return;
-				const response = await updateReportSingle({
-					data: convertToUpdateSingleReportCommand(ensuredId, {
-						id: savedConstructionId || undefined,
-						name: name.trim() || 'Construction',
-						construction: nextConstructionId,
-						width,
-						length,
-						area,
-						constructionType: '',
-						firstPlacementRoom: '',
-						secondPlacementRoom: '',
+				const response = await createSingleReportInfo(
+					convertToCreateSingleReportInfoCommand({
+						calculationDocumentId,
+						name: name.trim(),
+						constructionHeaderId: constructionId,
+						width: Number(width),
+						length: Number(length),
+						square: Number(area),
 					}),
-				});
-				if (response?.status === 200) {
-					const id = response.data?.singleReportConstruction?.id;
-					if (id) setSavedConstructionId(id);
+				);
+				const id = response?.data?.id;
+				if (response?.status === 200 && id) {
+					const reportConstructionId = response.data?.singleReportConstruction?.id;
+					if (reportConstructionId) setSavedConstructionId(reportConstructionId);
+					sessionStorage.setItem('reportId', id);
 					sessionStorage.setItem('reportType', ReportCategory.Single);
-					sessionStorage.setItem('reportId', ensuredId);
+					lastSyncedKeyRef.current = formSyncKey;
+					setReportId(id);
+					setReportInfo(convertToClientSingleReportInfoShort(response.data));
+					navigate('', {
+						reportId: id,
+						reportType: ReportCategory.Single,
+					});
+					refreshGraphAndSvg(constructionId);
+					return true;
 				}
+				toast.error(t('errors.request'));
+				return false;
 			} catch (error) {
 				if (error instanceof AxiosError) {
-					toast.error(
-						error.response?.data || t('createConstruction.error.addConstruction'),
-					);
+					toast.error(error.response?.data || t('errors.request'));
+				} else {
+					toast.error(t('errors.request'));
 				}
+				return false;
 			} finally {
-				attachingRef.current = false;
+				creatingReportRef.current = false;
+				syncingRef.current = false;
 			}
-		},
-		[
-			area,
-			calculationDocumentId,
-			length,
-			name,
-			reportId,
-			savedConstructionId,
-			t,
-			width,
-		],
-	);
+		}
 
-	useEffect(() => {
-		if (!constructionId) return;
-		void attachConstructionToReport(constructionId);
-		// Привязка к Single-отчёту при выборе конструкции (кнопки «Сохранить» нет).
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- только смена конструкции
-	}, [constructionId]);
+		syncingRef.current = true;
+		try {
+			const response = await updateReportSingle({
+				data: convertToUpdateSingleReportCommand(reportId, constructionPayload),
+			});
+			if (response?.status === 200) {
+				const nextId = response.data?.singleReportConstruction?.id;
+				if (nextId) setSavedConstructionId(nextId);
+				lastSyncedKeyRef.current = formSyncKey;
+				sessionStorage.setItem('reportType', ReportCategory.Single);
+				sessionStorage.setItem('reportId', reportId);
+				refreshGraphAndSvg(constructionId);
+				return true;
+			}
+			toast.error(t('errors.request'));
+			return false;
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				toast.error(error.response?.data || t('createConstruction.error.addConstruction'));
+			}
+			return false;
+		} finally {
+			syncingRef.current = false;
+		}
+	}, [
+		area,
+		calculationDocumentId,
+		constructionId,
+		formSyncKey,
+		isFormComplete,
+		length,
+		locale,
+		name,
+		navigate,
+		refreshGraphAndSvg,
+		reportId,
+		savedConstructionId,
+		t,
+		width,
+	]);
+
+	const handleCalculateClick = () => {
+		void syncReportConstruction();
+	};
 
 	const clearConstruction = () => {
 		setConstructionId('');
@@ -609,7 +670,7 @@ export const CalculationScreen = () => {
 
 	const handleRestoreInitialConstruction = () => {
 		if (!constructionId) return;
-		loadConstructionDetail(constructionId);
+		loadConstructionDetail(constructionId, canShowWorkspace);
 	};
 
 	const onCalculateHandle = () => {
@@ -644,8 +705,7 @@ export const CalculationScreen = () => {
 					if (response?.status !== 200) return;
 					toast.success(t('success.constructionUpdated'));
 					setHasPendingTypeChange(false);
-					loadConstructionDetail(constructionId);
-					void attachConstructionToReport(constructionId);
+					loadConstructionDetail(constructionId, true);
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -760,11 +820,24 @@ export const CalculationScreen = () => {
 						containerClassName="w-[140px]"
 					/>
 				</div>
+
+				<div className="flex justify-end">
+					<Button
+						type="button"
+						onClick={handleCalculateClick}
+						disabled={!isFormComplete}
+						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
+					>
+						{t('constructor.designing.calculate')}
+					</Button>
+				</div>
 			</div>
 
-			{!constructionId ? (
+			{!canShowWorkspace ? (
 				<p className="font-sans text-sm text-input-label-primary">
-					{t('constructor.calculation.selectHint')}
+					{locale === 'ru'
+						? 'Заполните все поля и нажмите «Рассчитать»'
+						: 'Fill in all fields and click Calculate'}
 				</p>
 			) : (
 				<>

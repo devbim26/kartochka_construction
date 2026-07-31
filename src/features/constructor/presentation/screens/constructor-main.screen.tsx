@@ -14,10 +14,16 @@ export const ConstructorLayout = () => {
 		if (search.get('reportId') || search.get('constructionId')) {
 			return;
 		}
-		// Расчет открывается без «О здании» — пускаем на /calculation без редиректа.
-		if (location.pathname.endsWith(`/${CONSTRUCTOR_ROUTES.calculation.route}`)) {
+
+		const path = location.pathname;
+		// Явные экраны без reportId в URL — не перехватываем sessionStorage.
+		if (
+			path.endsWith(`/${CONSTRUCTOR_ROUTES.calculation.route}`) ||
+			path.endsWith(`/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`)
+		) {
 			return;
 		}
+
 		const base = `${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}`;
 		const storedId = sessionStorage.getItem('reportId');
 		const storedType = sessionStorage.getItem('reportType');

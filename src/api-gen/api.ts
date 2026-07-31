@@ -501,8 +501,7 @@ export interface CreateSingleReportConstructionDto {
 export interface CreateSingleReportInfoCommand {
 	/** @format uuid */
 	calculationDocumentId?: string;
-	/** @format uuid */
-	regulatoryDocumentId?: string;
+	reportConstruction?: CreateSingleReportConstructionDto;
 }
 
 export interface CreateSingleReportReceivingCommand {
@@ -1823,6 +1822,16 @@ export interface UpdateUserSubscriptionByModelMessageComand {
 	/** @format double */
 	messageCost?: number;
 	modelId?: string | null;
+	modelName?: string | null;
+	requestText?: string | null;
+	responseText?: string | null;
+	/** @format date-time */
+	requestDate?: string | null;
+	/** @format date-time */
+	responseDate?: string | null;
+	isSuccess?: boolean;
+	errorMessage?: string | null;
+	metadataJson?: string | null;
 }
 
 export interface UserMaterialDto {

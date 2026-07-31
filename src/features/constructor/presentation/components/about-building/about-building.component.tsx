@@ -142,6 +142,16 @@ const AboutBuildingScreen = () => {
 	const intent = search.get('intent');
 	/** Проект = только PDF (Floor). Отдельные конструкции — только через «Расчет». */
 	const isCalculationIntent = intent === 'calculation';
+	const isProjectIntent = intent === 'project' || (!intent && !isEditMode);
+
+	useLayoutEffect(() => {
+		// Новый проект не должен наследовать сессию Расчета (Single).
+		if (!isProjectIntent || isEditMode) return;
+		if (sessionStorage.getItem('reportType') === ReportCategory.Single) {
+			sessionStorage.removeItem('reportId');
+			sessionStorage.removeItem('reportType');
+		}
+	}, [isProjectIntent, isEditMode]);
 
 	useEffect(() => {
 		if (isEditMode) return;
@@ -267,7 +277,6 @@ const AboutBuildingScreen = () => {
 		const create$ = isSingle
 			? createSingleReportInfo({
 					calculationDocumentId: data.calculationDocumentId || undefined,
-					regulatoryDocumentId: data.regulatoryDocumentId || undefined,
 				})
 			: createReport({
 					data: convertToCreateReportInfoCommand({
