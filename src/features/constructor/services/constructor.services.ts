@@ -1,8 +1,9 @@
 import type {
 	CreateReportInfoCommand,
+	CreateSingleReportInfoCommand,
 	GetPlacementRoomFromRequirementsQuery,
 	UpdateReportConstructionByAdditionalConstructionsCommand,
-	UpdateReportInfoWithSingleConstructionCommand,
+	UpdateSingleReportInfoByReportConstructionCommand,
 } from '@api-gen';
 import { fetchApi } from '@api-gen';
 import { stripNullishQueryFields } from '@core/utils/api-query-body.utils';
@@ -18,12 +19,17 @@ import { withConstructorLoader } from '../utils';
 type ReportCreateProps = {
 	data: CreateReportInfoCommand;
 };
+
+type CreateSingleReportInfoProps = CreateSingleReportInfoCommand;
+
 type GetReportByIdParams = {
 	id: string;
 };
+
 type UpdateSingleReportProps = {
-	data: UpdateReportInfoWithSingleConstructionCommand;
+	data: UpdateSingleReportInfoByReportConstructionCommand;
 };
+
 type FloorDocumentUpload = {
 	reportInfoId?: string;
 	data: {
@@ -62,6 +68,7 @@ type UpdateFloorReportProps = {
 		'floorInfo.floorNumber'?: string;
 	};
 };
+
 type GetGraphParams = {
 	constructionHeaderId: string;
 };
@@ -69,31 +76,42 @@ type GetGraphParams = {
 export const getConstructionRooms = async (data: GetPlacementRoomFromRequirementsQuery) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.placementRoomVariantsRequirementsCreate(
-			stripNullishQueryFields(data as Record<string, unknown>) as GetPlacementRoomFromRequirementsQuery,
+			stripNullishQueryFields(
+				data as Record<string, unknown>,
+			) as GetPlacementRoomFromRequirementsQuery,
 		),
 	);
 };
 
+/** Удаляет FloorConstructionInfo (маркер конструкции на плане). */
 export const deleteFloorPlan = async (data: {
 	reportInfoId?: string;
 	floorConstructionInfoToDeleteId?: string;
 }) => {
 	return await withConstructorLoader(() =>
-		fetchApi.api.reportInfoFloorConstructionDelete({
+		fetchApi.api.reportInfoReportFloorInfoDelete({
 			id: data.floorConstructionInfoToDeleteId,
 		}),
 	);
 };
 
+/** Удаляет ReportFloorInfo (этаж/уровень). */
 export const deleteReportFloorInfo = async (reportFloorInfoId?: string) => {
 	return await withConstructorLoader(() =>
-		fetchApi.api.reportInfoFloorConstructionDelete({ id: reportFloorInfoId }),
+		fetchApi.api.reportConstructionFloorConstructionDelete({ id: reportFloorInfoId }),
 	);
 };
 
+/** Создание поэтажного проекта (ReportInfo). */
 export const createReport = async ({ data }: ReportCreateProps) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoCreate(data));
 };
+
+/** Создание одиночного отчёта (SingleReportInfo) по документам. */
+export const createSingleReportInfo = async (data: CreateSingleReportInfoProps) => {
+	return await withConstructorLoader(() => fetchApi.api.singleReportInfoCreate(data));
+};
+
 export const updateReport = async (data: ReportInfoUpdate) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.reportInfoReportInfoBaseInformationUpdate(
@@ -109,10 +127,11 @@ export const getReportInfoIds = async (id: string) => {
 };
 
 export const getReportSingleById = async ({ id }: GetReportByIdParams) => {
-	return await withConstructorLoader(() => fetchApi.api.reportInfoSingleDetail(id));
+	return await withConstructorLoader(() => fetchApi.api.singleReportInfoDetail(id));
 };
+
 export const getReportFloorById = async ({ id }: GetReportByIdParams) => {
-	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorDetail(id));
+	return await withConstructorLoader(() => fetchApi.api.reportInfoDetail(id));
 };
 
 export const getFloorById = async ({ id }: GetReportByIdParams) => {
@@ -141,32 +160,43 @@ export const updateReportFloorInfo = async (data: {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoReportFloorInfoUpdate(data));
 };
 
+/** Конструкция поэтажного отчёта. */
 export const getReportConstruction = async (id: string) => {
-	return await withConstructorLoader(() => fetchApi.api.reportInfoReportConstructionDetail(id));
+	return await withConstructorLoader(() => fetchApi.api.reportConstructionFloorDetail(id));
+};
+
+/** Конструкция одиночного отчёта. */
+export const getSingleReportConstruction = async (id: string) => {
+	return await withConstructorLoader(() => fetchApi.api.reportConstructionSingleDetail(id));
 };
 
 export const updateReportConstructionAdditional = async (
 	data: UpdateReportConstructionByAdditionalConstructionsCommand,
 ) => {
-	return await withConstructorLoader(() =>
-		fetchApi.api.reportInfoReportConstructionUpdate(data),
-	);
+	return await withConstructorLoader(() => fetchApi.api.reportConstructionUpdate(data));
 };
 
 export const updateReportSingle = async ({ data }: UpdateSingleReportProps) => {
-	return await withConstructorLoader(() => fetchApi.api.reportInfoSingleUpdate(data));
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportConstructionSingleConstructionUpdate(data),
+	);
 };
+
 export const updateReportFloor = async ({ data }: UpdateFloorReportProps) => {
-	return await withConstructorLoader(() => fetchApi.api.reportInfoFloorConstructionUpdate(data));
+	return await withConstructorLoader(() =>
+		fetchApi.api.reportConstructionFloorConstructionUpdate(data),
+	);
 };
+
 export const swapToAlternateFloorConstruction = async (data: {
 	reportConstructionId?: string;
 	alternativeConstructionHeaderId?: string;
 }) => {
 	return await withConstructorLoader(() =>
-		fetchApi.api.reportInfoFloorSwapByAlternativeUpdate(data),
+		fetchApi.api.reportConstructionFloorSwapByAlternativeUpdate(data),
 	);
 };
+
 export const uploadDocument = async ({ data, reportInfoId }: FloorDocumentUpload) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.reportInfoDocumentUpdate(data as any, {
@@ -174,25 +204,31 @@ export const uploadDocument = async ({ data, reportInfoId }: FloorDocumentUpload
 		}),
 	);
 };
+
 export const uploadImage = async ({ data }: FloorDocumentImage) => {
 	return await withConstructorLoader(() =>
-		fetchApi.api.reportInfoFloorConstructionImageUpdate(data),
+		fetchApi.api.reportConstructionFloorConstructionImageUpdate(data),
 	);
 };
+
 export const getReportFormInfo = async (id: string) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoReportInfoFlagsDetail(id));
 };
+
 export const graphDetail = async ({ constructionHeaderId }: GetGraphParams) => {
 	return await withConstructorLoader(() => fetchApi.api.graphDetail(constructionHeaderId));
 };
+
 export const graphAdditionalDetail = async ({ constructionHeaderId }: GetGraphParams) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.graphAdditionalGraphParamsDetail(constructionHeaderId),
 	);
 };
+
 export const svgConstructionDetail = async (id: string) => {
 	return await withConstructorLoader(() => fetchApi.api.svgConstructionDetail(id));
 };
+
 export const deleteConstruction = async (id: string) => {
 	const result = await withConstructorLoader(() => fetchApi.api.constructionDelete({ id }));
 	return result;
@@ -200,7 +236,7 @@ export const deleteConstruction = async (id: string) => {
 
 export const deleteReportConstruction = async (id: string) => {
 	return await withConstructorLoader(() =>
-		fetchApi.api.reportInfoReportConstructionDelete({ id }),
+		fetchApi.api.reportConstructionReportConstructionDelete({ id }),
 	);
 };
 
@@ -213,6 +249,7 @@ export const formReport = async (data: FormReportSchemaType) => {
 export const formReportLogo = async (data: { reportInfoId?: string; logo?: File }) => {
 	return await withConstructorLoader(() => fetchApi.api.reportInfoDocumentInfoLogoUpdate(data));
 };
+
 export const getAlternateConstructions = async (data: AlternateConstructionsType) => {
 	return await withConstructorLoader(() =>
 		fetchApi.api.constructionAlternativeConstructionsCreate(

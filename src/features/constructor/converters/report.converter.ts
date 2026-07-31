@@ -7,10 +7,11 @@ import type {
 	NewFloorIfoDto,
 	NewReportConstructionFloorInfoDto,
 	PaginatedConstructionHeaderDto,
-	ReportInfoFloorConstructionDto,
+	ReportConstructionDto,
+	ReportInfoFloorDto,
 	ReportInfoShortDto,
-	ReportInfoSingleConstructionDto,
-	SingleConstructionInfoDto,
+	ReportInfoSingleDto,
+	SingleReportConstructionDto,
 	UpdateAdditionalConstructionHeaderDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
@@ -34,7 +35,7 @@ import type {
 	ReportInfoUpdate,
 	SingleConstruction,
 } from '../types';
-import { PurposeBuilding, ReportCategory } from '../types';
+import { PurposeBuilding } from '../types';
 import type { ReportInfoShort } from '../utils';
 
 const SNAPSHOT_STANDART_DATE = '2000-01-01';
@@ -142,7 +143,6 @@ export const convertToCreateReportInfoCommand = (
 		buildingName: data.name,
 		calculationDocumentId: data.calculationDocumentId ? data.calculationDocumentId : '',
 		regulatoryDocumentId: data.regulatoryDocumentId ? data.regulatoryDocumentId : '',
-		category: data.isFloorPlan ? ReportCategory.Floor : ReportCategory.Single,
 		country: data.region as CountryType,
 		class: data.comfortClass as CategoryClass,
 		buildingType: data.buildingType as BuildingType,
@@ -150,25 +150,24 @@ export const convertToCreateReportInfoCommand = (
 };
 
 export const convertToClientReportInfo = (
-	data:
-		| ReportInfoShortDto
-		| ReportInfoFloorConstructionDto
-		| ReportInfoSingleConstructionDto,
+	data: ReportInfoShortDto | ReportInfoFloorDto | ReportInfoSingleDto,
 ): AboutBuildingData => {
 	const purposeBuilding =
 		'purposeBuilding' in data && data.purposeBuilding ? data.purposeBuilding : undefined;
 	const country = 'country' in data && data.country ? data.country : undefined;
+	const buildingName = 'buildingName' in data ? data.buildingName : undefined;
+	const description = 'description' in data ? data.description : undefined;
+	const buildingType = 'buildingType' in data ? data.buildingType : undefined;
+	const comfortClass = 'class' in data ? data.class : undefined;
 
 	return {
-		commonDescription: data.description ?? '',
-		name: data.buildingName || '',
+		commonDescription: description ?? '',
+		name: buildingName || '',
 		...mapReportDocumentsToAboutBuilding(data),
-		region: country
-			? (convertToClientCountryData(country) as string)
-			: Country.Belarus,
+		region: country ? (convertToClientCountryData(country) as string) : Country.Belarus,
 		buildingPurpose: purposeBuilding ?? '',
-		buildingType: data.buildingType as BuildingType,
-		comfortClass: data.class as CategoryClass,
+		buildingType: buildingType as BuildingType,
+		comfortClass: comfortClass as CategoryClass,
 		isFloorPlan: true,
 		isConstruction: false,
 		isBim: false,
@@ -176,29 +175,26 @@ export const convertToClientReportInfo = (
 };
 
 export const convertToClientSingleReportInfoShort = (
-	data: ReportInfoSingleConstructionDto,
+	data: ReportInfoSingleDto,
 ): ReportInfoShort => {
 	return {
 		reportInfoId: data.id,
-		commonDescription: data.description ?? '',
-		name: data.buildingName || '',
+		commonDescription: '',
+		name: '',
 		region: Country.Belarus,
-		buildingPurpose: data.purposeBuilding ?? '',
-		buildingType: data.buildingType as BuildingType,
-		comfortClass: data.class as CategoryClass,
+		buildingPurpose: '',
+		buildingType: undefined as unknown as BuildingType,
+		comfortClass: undefined as unknown as CategoryClass,
 		maxHeight: '0',
-		isFloorPlan: true,
-		isConstruction: false,
+		isFloorPlan: false,
+		isConstruction: true,
 		isBim: false,
 		...mapReportDocumentsToReportInfoShort(data),
 	};
 };
 
 export const convertToClientReportInfoShort = (
-	data:
-		| ReportInfoShortDto
-		| ReportInfoFloorConstructionDto
-		| ReportInfoSingleConstructionDto,
+	data: ReportInfoShortDto | ReportInfoFloorDto,
 ): ReportInfoShort => {
 	const purposeBuilding =
 		'purposeBuilding' in data && data.purposeBuilding ? data.purposeBuilding : undefined;
@@ -208,9 +204,7 @@ export const convertToClientReportInfoShort = (
 		reportInfoId: 'id' in data ? data.id : undefined,
 		commonDescription: data.description ?? '',
 		name: data.buildingName || '',
-		region: country
-			? (convertToClientCountryData(country) as string)
-			: Country.Belarus,
+		region: country ? (convertToClientCountryData(country) as string) : Country.Belarus,
 		buildingPurpose: purposeBuilding ?? '',
 		buildingType: data.buildingType as BuildingType,
 		comfortClass: data.class as CategoryClass,
@@ -283,9 +277,17 @@ export const convertToClientFloorConstruction = (
 };
 
 export const convertToClientSingleToFloorConstruction = (
-	data: ReportInfoSingleConstructionDto,
+	data: ReportInfoSingleDto | SingleReportConstructionDto | ReportConstructionDto,
 ): FloorConstruction => {
-	const headerFromSingle = data.singleConstructionInfos?.[0]?.reportConstructionHeader;
+	const headerFromSingle: SingleReportConstructionDto | ReportConstructionDto | undefined =
+		'singleReportConstruction' in data
+			? data.singleReportConstruction ?? undefined
+			: data;
+
+	const floorHeader =
+		headerFromSingle && 'firstPlacementRoom' in headerFromSingle
+			? (headerFromSingle as ReportConstructionDto)
+			: null;
 
 	return {
 		id: '',
@@ -298,17 +300,17 @@ export const convertToClientSingleToFloorConstruction = (
 			square: headerFromSingle?.square ?? 0,
 			id: headerFromSingle?.id ?? '',
 			secondPlacementRoom: {
-				id: headerFromSingle?.secondPlacementRoom?.id ?? '',
-				name: headerFromSingle?.secondPlacementRoom?.name ?? '',
+				id: floorHeader?.secondPlacementRoom?.id ?? '',
+				name: floorHeader?.secondPlacementRoom?.name ?? '',
 			},
 			length: headerFromSingle?.length ?? 0,
 			width: headerFromSingle?.width ?? 0,
 			firstPlacemetnRoom: {
-				id: headerFromSingle?.firstPlacementRoom?.id ?? '',
-				name: headerFromSingle?.firstPlacementRoom?.name ?? '',
+				id: floorHeader?.firstPlacementRoom?.id ?? '',
+				name: floorHeader?.firstPlacementRoom?.name ?? '',
 			},
-			requirementNoizeIsolationIndex: headerFromSingle?.requirementNoizeIsolationIndex,
-			requirementNoizeImpactIndex: headerFromSingle?.requirementNoizeImpactIndex,
+			requirementNoizeIsolationIndex: floorHeader?.requirementNoizeIsolationIndex,
+			requirementNoizeImpactIndex: floorHeader?.requirementNoizeImpactIndex,
 			additionalWindows: mapAdditionalOpeningsFromDto(headerFromSingle?.additionalWindows),
 			additionalDoors: mapAdditionalOpeningsFromDto(headerFromSingle?.additionalDoors),
 		},
@@ -316,33 +318,30 @@ export const convertToClientSingleToFloorConstruction = (
 };
 
 export const convertToClientSingleConstruction = (
-	data: SingleConstructionInfoDto,
+	data: SingleReportConstructionDto | ReportConstructionDto,
 ): SingleConstruction => {
+	const floorHeader = 'firstPlacementRoom' in data ? (data as ReportConstructionDto) : null;
+
 	return {
 		documentImageUrl: '',
 		reportConstructionHeader: {
-			constructionHeaderId: data.reportConstructionHeader?.constructionHeaderId || '',
-			square: data.reportConstructionHeader?.square || 0,
-			id: data.reportConstructionHeader?.id || '',
+			constructionHeaderId: data.constructionHeaderId || '',
+			square: data.square || 0,
+			id: data.id || '',
 			secondPlacementRoom: {
-				id: data.reportConstructionHeader?.secondPlacementRoom?.id || '',
-				name: data.reportConstructionHeader?.secondPlacementRoom?.name || '',
+				id: floorHeader?.secondPlacementRoom?.id ?? '',
+				name: floorHeader?.secondPlacementRoom?.name ?? '',
 			},
-			length: data.reportConstructionHeader?.length || 0,
-			width: data.reportConstructionHeader?.width || 0,
+			length: data.length || 0,
+			width: data.width || 0,
 			firstPlacemetnRoom: {
-				id: data.reportConstructionHeader?.firstPlacementRoom?.id || '',
-				name: data.reportConstructionHeader?.firstPlacementRoom?.name || '',
+				id: floorHeader?.firstPlacementRoom?.id ?? '',
+				name: floorHeader?.firstPlacementRoom?.name ?? '',
 			},
-			requirementNoizeIsolationIndex:
-				data.reportConstructionHeader?.requirementNoizeIsolationIndex,
-			requirementNoizeImpactIndex: data.reportConstructionHeader?.requirementNoizeImpactIndex,
-			additionalWindows: mapAdditionalOpeningsFromDto(
-				data.reportConstructionHeader?.additionalWindows,
-			),
-			additionalDoors: mapAdditionalOpeningsFromDto(
-				data.reportConstructionHeader?.additionalDoors,
-			),
+			requirementNoizeIsolationIndex: floorHeader?.requirementNoizeIsolationIndex,
+			requirementNoizeImpactIndex: floorHeader?.requirementNoizeImpactIndex,
+			additionalWindows: mapAdditionalOpeningsFromDto(data.additionalWindows),
+			additionalDoors: mapAdditionalOpeningsFromDto(data.additionalDoors),
 		},
 	};
 };

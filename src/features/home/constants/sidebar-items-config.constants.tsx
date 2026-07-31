@@ -23,38 +23,71 @@ function buildPathWithParams(
 	return `${basePath}?${query}`;
 }
 
-/** Читает sessionStorage при каждом вызове — иначе пункт «Поэтажные планы» не появляется до F5. */
+/** Читает sessionStorage при каждом вызове — иначе пункты не обновляются до F5. */
 function getConstructorSidebarChildren() {
 	const reportId = sessionStorage.getItem('reportId');
 	const reportType = sessionStorage.getItem('reportType');
-	if (reportId && reportType) {
-		return [
-			{
-				id: CONSTRUCTOR_ROUTES.aboutBuilding.id,
-				path: buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
-					reportId,
-					reportType,
-					edit: true,
-				}),
-				labelKey: 'sidebar.aboutBuilding' as const,
-				permission: [UserRoles.Admin, UserRoles.User],
-			},
-			{
-				id: CONSTRUCTOR_ROUTES.floorPlans.id,
-				path: buildPathWithParams(CONSTRUCTOR_ROUTES.floorPlans.route, {
-					reportId,
-					reportType,
-				}),
-				labelKey: 'sidebar.floorPlans' as const,
-				permission: [UserRoles.Admin, UserRoles.User],
-			},
-		];
-	}
-	return [
+	const hasFloorSession = !!reportId && reportType === 'Floor';
+	const hasSingleSession = !!reportId && reportType === 'Single';
+
+	const projectChildren: Array<{
+		id: string;
+		path: string;
+		labelKey: 'sidebar.aboutBuilding' | 'sidebar.floorPlans';
+		permission: UserRoles[];
+	}> = [
 		{
 			id: CONSTRUCTOR_ROUTES.aboutBuilding.id,
-			path: CONSTRUCTOR_ROUTES.aboutBuilding.route,
-			labelKey: 'sidebar.aboutBuilding' as const,
+			path: hasFloorSession
+				? buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
+						reportId: reportId!,
+						reportType: reportType!,
+						edit: true,
+					})
+				: buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
+						intent: 'project',
+					}),
+			labelKey: 'sidebar.aboutBuilding',
+			permission: [UserRoles.Admin, UserRoles.User],
+		},
+	];
+
+	if (hasFloorSession) {
+		projectChildren.push({
+			id: CONSTRUCTOR_ROUTES.floorPlans.id,
+			path: buildPathWithParams(CONSTRUCTOR_ROUTES.floorPlans.route, {
+				reportId: reportId!,
+				reportType: reportType!,
+			}),
+			labelKey: 'sidebar.floorPlans',
+			permission: [UserRoles.Admin, UserRoles.User],
+		});
+	}
+
+	return [
+		{
+			id: 'constructor-project-group-id',
+			path: hasFloorSession
+				? buildPathWithParams(CONSTRUCTOR_ROUTES.floorPlans.route, {
+						reportId: reportId!,
+						reportType: reportType!,
+					})
+				: buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
+						intent: 'project',
+					}),
+			labelKey: 'sidebar.project' as const,
+			permission: [UserRoles.Admin, UserRoles.User],
+			childrens: projectChildren,
+		},
+		{
+			id: CONSTRUCTOR_ROUTES.calculation.id,
+			path: hasSingleSession
+				? buildPathWithParams(CONSTRUCTOR_ROUTES.calculation.route, {
+						reportId: reportId!,
+						reportType: reportType!,
+					})
+				: CONSTRUCTOR_ROUTES.calculation.route,
+			labelKey: 'sidebar.calculation' as const,
 			permission: [UserRoles.Admin, UserRoles.User],
 		},
 	];

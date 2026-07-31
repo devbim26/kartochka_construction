@@ -333,8 +333,10 @@ export const CreateConstructionForm = memoize(
 			}, [layoutClass, isEditFlow, setValue]);
 
 			useEffect(() => {
+				// Подставляем тип только если фильтр ещё пуст (редактирование / первичный load).
+				// Не перезаписываем при выборе — иначе лишний refetch и сброс селекта.
 				const nextType = constructionDetail?.constructionType;
-				if (nextType) {
+				if (nextType && !typeEnumFilter) {
 					setTypeEnumFilter(String(nextType));
 				}
 			}, [constructionDetail?.id, constructionDetail?.constructionType]);
@@ -590,12 +592,15 @@ export const CreateConstructionForm = memoize(
 							typeEnumFilter as ConstructionTypeEnum,
 						)
 					: undefined;
+				const selectedConstructionId = isEditFlow
+					? getValues('construction') || undefined
+					: undefined;
 
 				from(
 					Promise.all([
 						getGuidebooksPaginated({
 							data: {
-								constructionIdToUpdate: construction || undefined,
+								constructionIdToUpdate: selectedConstructionId,
 								userId: userId || undefined,
 								constructionClass,
 								...(paginationRw != null ? { rw: paginationRw } : {}),
@@ -690,16 +695,9 @@ export const CreateConstructionForm = memoize(
 						}),
 						tap((resData) => {
 							setConstructionData(resData.items);
-							const selectedId = getValues('construction');
-							if (
-								!isEditFlow &&
-								selectedId &&
-								!resData.items.some(
-									(item) => String(item.id) === String(selectedId),
-								)
-							) {
-								clearSelectedConstruction();
-							}
+							// Не сбрасываем выбранную конструкцию после refetch:
+							// группировка может подменить id записи, а fallback в options
+							// сохраняет отображение выбранного значения.
 						}),
 						catchError((error) => {
 							console.log('error:', error);
@@ -881,10 +879,10 @@ export const CreateConstructionForm = memoize(
 				userId,
 				layoutClass,
 				paginationRw,
-				construction,
 				reportInfoData?.region,
 				typeEnumFilter,
 				filterByManufacturers,
+				isEditFlow,
 			]);
 
 			useEffect(() => {
@@ -1114,10 +1112,11 @@ export const CreateConstructionForm = memoize(
 												const selected = constructionData.find(
 													(item) => String(item.id) === String(value),
 												);
-												if (selected?.constructionType) {
-													setTypeEnumFilter(
-														String(selected.constructionType),
-													);
+												const nextType = selected?.constructionType
+													? String(selected.constructionType)
+													: '';
+												if (nextType && nextType !== typeEnumFilter) {
+													setTypeEnumFilter(nextType);
 												}
 											}}
 											label={

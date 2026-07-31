@@ -88,6 +88,18 @@ export const FloorPlans = memoize(() => {
 				`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`,
 				{ replace: true },
 			);
+			return;
+		}
+		// Проект = только PDF. Отдельные конструкции живут на экране «Расчет».
+		if (reportType === ReportCategory.Single) {
+			const qs = new URLSearchParams({
+				reportId,
+				reportType,
+			}).toString();
+			navigateReplace(
+				`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}/${CONSTRUCTOR_ROUTES.calculation.route}?${qs}`,
+				{ replace: true },
+			);
 		}
 	}, [reportId, reportType, navigateReplace, t]);
 
@@ -101,6 +113,13 @@ export const FloorPlans = memoize(() => {
 	const isCreatingLevelRef = useRef(false);
 	/** Не удалять пустые уровни, пока открыт flow создания конструкции. */
 	const suppressEmptyLevelCleanupRef = useRef(false);
+	/**
+	 * Уровни, созданные под текущее добавление конструкции.
+	 * Пока конструкция не пришла с сервера — не удаляем и оставляем кнопку видимой.
+	 */
+	const [protectedLevelIds, setProtectedLevelIds] = useState<string[]>([]);
+	const protectedLevelIdsRef = useRef<string[]>([]);
+	protectedLevelIdsRef.current = protectedLevelIds;
 
 	// Состояния для редактирования кода уровня
 	const [editingLevelId, setEditingLevelId] = useState<string | null>(null);
@@ -398,7 +417,33 @@ export const FloorPlans = memoize(() => {
 		});
 	}, [reportType, levels, constructionHeadersById]);
 
-	const handleGetCurrentReportFloorInfos = (id: string) => {
+	const protectLevel = (levelId?: string | null) => {
+		if (!levelId) return;
+		suppressEmptyLevelCleanupRef.current = true;
+		setProtectedLevelIds((prev) => {
+			if (prev.includes(levelId)) return prev;
+			const next = [...prev, levelId];
+			protectedLevelIdsRef.current = next;
+			return next;
+		});
+	};
+
+	const clearLevelProtection = () => {
+		protectedLevelIdsRef.current = [];
+		setProtectedLevelIds([]);
+		suppressEmptyLevelCleanupRef.current = false;
+	};
+
+	const postCreateRefreshAttemptsRef = useRef(0);
+
+	const handleGetCurrentReportFloorInfos = (
+		id: string,
+		options?: { afterCreate?: boolean; isRetry?: boolean },
+	) => {
+		if (options?.afterCreate && !options.isRetry) {
+			postCreateRefreshAttemptsRef.current = 0;
+		}
+
 		dispatch(startLoading());
 		from(getReportFloorById({ id }))
 			.pipe(
@@ -410,16 +455,47 @@ export const FloorPlans = memoize(() => {
 					const nextLevels = mapServerLevels(floorResponse.data);
 					const pendingPage = pendingNewLevelPageRef.current;
 					pendingNewLevelPageRef.current = null;
-					setLevels((prev) =>
-						mergeLevels(
+
+					let shouldRetryAfterCreate = false;
+					let resolvedLevels: Level[] = [];
+					setLevels((prev) => {
+						resolvedLevels = mergeLevels(
 							nextLevels,
 							prev,
 							pendingPage != null
 								? { defaultPageForNewEmptyLevel: pendingPage }
 								: undefined,
-						),
-					);
-					suppressEmptyLevelCleanupRef.current = false;
+						);
+						return resolvedLevels;
+					});
+
+					const prevProtected = protectedLevelIdsRef.current;
+					const nextProtected = prevProtected.filter((protectedId) => {
+						const level = resolvedLevels.find(
+							(item) => item.serverId === protectedId || item.id === protectedId,
+						);
+						return !level || level.constructions.length === 0;
+					});
+					protectedLevelIdsRef.current = nextProtected;
+					setProtectedLevelIds(nextProtected);
+					if (nextProtected.length === 0) {
+						suppressEmptyLevelCleanupRef.current = false;
+					} else if (
+						options?.afterCreate &&
+						postCreateRefreshAttemptsRef.current < 2
+					) {
+						postCreateRefreshAttemptsRef.current += 1;
+						shouldRetryAfterCreate = true;
+					}
+
+					if (shouldRetryAfterCreate) {
+						window.setTimeout(() => {
+							handleGetCurrentReportFloorInfos(id, {
+								afterCreate: true,
+								isRetry: true,
+							});
+						}, 350);
+					}
 				}),
 				switchMap((floorResponse) => {
 					if (floorResponse.status !== 200 || !floorResponse.data) {
@@ -440,7 +516,9 @@ export const FloorPlans = memoize(() => {
 				tap((pdf) => setPdfDoc(pdf)),
 				catchError((error) => {
 					pendingNewLevelPageRef.current = null;
-					suppressEmptyLevelCleanupRef.current = false;
+					if (protectedLevelIdsRef.current.length === 0) {
+						suppressEmptyLevelCleanupRef.current = false;
+					}
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data || t('floorPlans.toast.loadError'));
 					} else {
@@ -554,8 +632,13 @@ export const FloorPlans = memoize(() => {
 		if (suppressEmptyLevelCleanupRef.current || isCreatingLevelRef.current) {
 			return sourceLevels;
 		}
+		const protectedIds = new Set(protectedLevelIdsRef.current);
 		const emptyLevels = sourceLevels.filter(
-			(level) => level.constructions.length === 0 && level.serverId,
+			(level) =>
+				level.constructions.length === 0 &&
+				level.serverId &&
+				!protectedIds.has(level.serverId) &&
+				!protectedIds.has(level.id),
 		);
 		if (!emptyLevels.length || !reportId) return sourceLevels;
 
@@ -580,6 +663,9 @@ export const FloorPlans = memoize(() => {
 		);
 		const defaultCode = `${page}.000`;
 		if (existingOnPage?.serverId) {
+			if (existingOnPage.constructions.length === 0) {
+				protectLevel(existingOnPage.serverId);
+			}
 			return {
 				layerId: existingOnPage.serverId,
 				floorNumber: existingOnPage.code || defaultCode,
@@ -630,6 +716,7 @@ export const FloorPlans = memoize(() => {
 				suppressEmptyLevelCleanupRef.current = false;
 				return null;
 			}
+			protectLevel(created.serverId);
 			setActiveLevelId(created.id);
 			return {
 				layerId: created.serverId,
@@ -740,8 +827,14 @@ export const FloorPlans = memoize(() => {
 			? createTypeTabQuery
 			: 'walls';
 	const visibleLevels = useMemo(
-		() => levels.filter((level) => level.constructions.length > 0),
-		[levels],
+		() =>
+			levels.filter(
+				(level) =>
+					level.constructions.length > 0 ||
+					(!!level.serverId && protectedLevelIds.includes(level.serverId)) ||
+					protectedLevelIds.includes(level.id),
+			),
+		[levels, protectedLevelIds],
 	);
 
 	const handleCreateTypeTabChange = (tab: 'walls' | 'floors' | 'rooms') => {
@@ -787,7 +880,7 @@ export const FloorPlans = memoize(() => {
 	};
 
 	const cancelCreateFlowModal = () => {
-		suppressEmptyLevelCleanupRef.current = false;
+		clearLevelProtection();
 		closeCreateFlowModal();
 		void cleanupEmptyServerLevels();
 	};
@@ -809,12 +902,17 @@ export const FloorPlans = memoize(() => {
 	useEffect(() => {
 		if (suppressEmptyLevelCleanupRef.current || isCreatingLevelRef.current) return;
 		if (search.get('create') || search.get('addRoom')) return;
+		const protectedIds = new Set(protectedLevelIds);
 		const hasEmpty = levels.some(
-			(level) => level.constructions.length === 0 && !!level.serverId,
+			(level) =>
+				level.constructions.length === 0 &&
+				!!level.serverId &&
+				!protectedIds.has(level.serverId) &&
+				!protectedIds.has(level.id),
 		);
 		if (!hasEmpty) return;
 		void cleanupEmptyServerLevels(levels);
-	}, [levels, search]);
+	}, [levels, search, protectedLevelIds]);
 
 	useEffect(() => {
 		if (reportType !== ReportCategory.Floor) {
@@ -1027,45 +1125,21 @@ export const FloorPlans = memoize(() => {
 								/>
 							) : (
 								<div className="flex h-[518px] flex-col items-center justify-center gap-[20px]">
-									{reportType === 'Floor' && (
-										<>
-											<Button
-												className="h-[40px] w-[190px] px-[16px] text-[16px]"
-												onClick={() =>
-													document.getElementById('pdf-upload')?.click()
-												}
-											>
-												{t('floorPlans.uploadFloorPlan')}
-											</Button>
-											<input
-												type="file"
-												id="pdf-upload"
-												accept="application/pdf"
-												onChange={handleUploadPdf}
-												className="hidden"
-											/>
-										</>
-									)}
-
-									{reportType === 'Single' && (
-										<Button
-											onClick={() =>
-												navigate(``, {
-													create: 'true',
-													createTypeTab: 'walls',
-													reportId: reportId!,
-													reportType: search.get('reportType')!,
-												})
-											}
-											disabled={
-												!!currentReportConstruction
-													?.reportConstructionHeader.id
-											}
-											className="h-[40px] w-[190px] bg-white px-[16px] text-[16px] text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
-										>
-											{t('floorPlans.createConstruction')}
-										</Button>
-									)}
+									<Button
+										className="h-[40px] w-[190px] px-[16px] text-[16px]"
+										onClick={() =>
+											document.getElementById('pdf-upload')?.click()
+										}
+									>
+										{t('floorPlans.uploadFloorPlan')}
+									</Button>
+									<input
+										type="file"
+										id="pdf-upload"
+										accept="application/pdf"
+										onChange={handleUploadPdf}
+										className="hidden"
+									/>
 								</div>
 							)}
 						</div>
@@ -1079,9 +1153,10 @@ export const FloorPlans = memoize(() => {
 						onClose={cancelCreateFlowModal}
 						onConfirm={() => {
 							if (reportType === ReportCategory.Floor && reportId) {
-								handleGetCurrentReportFloorInfos(reportId);
+								protectLevel(search.get('layerId'));
+								handleGetCurrentReportFloorInfos(reportId, { afterCreate: true });
 							} else if (reportType === ReportCategory.Single && reportId) {
-								suppressEmptyLevelCleanupRef.current = false;
+								clearLevelProtection();
 								handleGetSingleConstruction(reportId);
 							}
 							closeCreateFlowModal();
@@ -1101,7 +1176,7 @@ export const FloorPlans = memoize(() => {
 						onCancel={cancelCreateFlowModal}
 						onClose={cancelCreateFlowModal}
 						onConfirm={(_data: AddRoomFormValues) => {
-							suppressEmptyLevelCleanupRef.current = false;
+							clearLevelProtection();
 							toast.success(t('floorPlans.toast.roomSavedDemo'));
 							cancelCreateFlowModal();
 						}}

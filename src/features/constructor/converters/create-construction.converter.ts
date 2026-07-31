@@ -1,25 +1,23 @@
 import type {
-	CreateReportConstructionDto,
-	UpdateReportInfoWithSingleConstructionCommand,
+	UpdateSingleReportInfoByReportConstructionCommand,
 } from '@api-gen';
 import type { CreateConstructionData } from '../types';
 
-export const convertToUpdateReportCommand = (
-	reportId: string,
+/** Создание/обновление конструкции одиночного отчёта (без комнат и requirementId). */
+export const convertToUpdateSingleReportCommand = (
+	singleReportInfoId: string,
 	data: CreateConstructionData,
-): UpdateReportInfoWithSingleConstructionCommand => ({
-	reportInfoId: reportId || undefined,
-	requirementId: data.requirementId || undefined,
+): UpdateSingleReportInfoByReportConstructionCommand => ({
+	singleReportInfoId: singleReportInfoId || undefined,
 	reportConstruction: {
-		id: data.id || null,
-		name: data.name || null,
-		constructionHeaderId: data.construction || null,
-		square: Number(data.area) || null,
-		firstPlacementRoomId: data.firstPlacementRoom || null,
-		width: +data.width || null,
-		secondPlacementRoomId: data.secondPlacementRoom || null,
-		length: +data.length || null,
-		constructionName: data.name || null,
-		constructionType: data.constructionType || null,
-	} as CreateReportConstructionDto,
+		id: data.id || undefined,
+		name: data.name || undefined,
+		constructionHeaderId: data.construction || undefined,
+		square: Number(data.area) || undefined,
+		width: +data.width || undefined,
+		length: +data.length || undefined,
+	},
 });
+
+/** @deprecated Используйте convertToUpdateSingleReportCommand */
+export const convertToUpdateReportCommand = convertToUpdateSingleReportCommand;

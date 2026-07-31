@@ -7,8 +7,6 @@ import {
 	FormElementLabel,
 	Input,
 	Select,
-	Separator,
-	Switch,
 	TextArea,
 	useAppDispatch,
 	useAppNavigate,
@@ -25,6 +23,7 @@ import {
 } from '@features/constructor/converters';
 import {
 	createReport,
+	createSingleReportInfo,
 	getReportFloorById,
 	getReportSingleById,
 	updateReport,
@@ -133,15 +132,28 @@ const AboutBuildingScreen = () => {
 	};
 
 	const [search] = useSearchParams();
-	const [reportType, isConstruction, name, selectedRegulatoryDocumentId, region] = watch([
-		'isFloorPlan',
-		'isConstruction',
+	const [name, selectedRegulatoryDocumentId, region] = watch([
 		'name',
 		'regulatoryDocumentId',
 		'region',
 	]);
 
 	const isEditMode = !!search.get('edit');
+	const intent = search.get('intent');
+	/** Проект = только PDF (Floor). Отдельные конструкции — только через «Расчет». */
+	const isCalculationIntent = intent === 'calculation';
+
+	useEffect(() => {
+		if (isEditMode) return;
+		if (isCalculationIntent) {
+			form.setValue('isConstruction', true);
+			form.setValue('isFloorPlan', false);
+		} else {
+			// project / без intent — только планы этажей (pdf)
+			form.setValue('isFloorPlan', true);
+			form.setValue('isConstruction', false);
+		}
+	}, [isCalculationIntent, isEditMode, form]);
 
 	const getReportsListRoute = useCallback(() => {
 		const status =
@@ -223,8 +235,11 @@ const AboutBuildingScreen = () => {
 			.subscribe((response) => {
 				if (response?.status === 200) {
 					toast.success(t('aboutBuilding.report.fetchSuccess'));
-					setReportInfoStatus(response.data.status);
-					const data = convertToClientReportInfo(response.data);
+					const payload = response.data;
+					setReportInfoStatus(
+						payload && 'status' in payload ? payload.status : undefined,
+					);
+					const data = convertToClientReportInfo(payload);
 					if (data)
 						form.reset({
 							...data,
@@ -248,11 +263,21 @@ const AboutBuildingScreen = () => {
 	}, []);
 
 	const handleCreateReport = (data: AboutBuildingData) => {
-		from(
-			createReport({
-				data: convertToCreateReportInfoCommand(data),
-			}),
-		)
+		const isSingle = isCalculationIntent;
+		const create$ = isSingle
+			? createSingleReportInfo({
+					calculationDocumentId: data.calculationDocumentId || undefined,
+					regulatoryDocumentId: data.regulatoryDocumentId || undefined,
+				})
+			: createReport({
+					data: convertToCreateReportInfoCommand({
+						...data,
+						isFloorPlan: true,
+						isConstruction: false,
+					}),
+				});
+
+		from(create$)
 			.pipe(
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -266,19 +291,22 @@ const AboutBuildingScreen = () => {
 					toast.success(t('aboutBuilding.report.createSuccess'));
 					if (response?.data?.id) {
 						const reportId = response.data.id;
+						const resolvedReportType = isSingle
+							? ReportCategory.Single
+							: ReportCategory.Floor;
 						sessionStorage.setItem('reportId', reportId);
-						sessionStorage.setItem(
-							'reportType',
-							reportType ? ReportCategory.Floor : ReportCategory.Single,
+						sessionStorage.setItem('reportType', resolvedReportType);
+						navigate(
+							`/designing/constructor/${
+								isSingle
+									? CONSTRUCTOR_ROUTES.calculation.route
+									: CONSTRUCTOR_ROUTES.floorPlans.route
+							}`,
+							{
+								reportId,
+								reportType: resolvedReportType,
+							},
 						);
-						navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
-							reportId,
-							reportType: isConstruction
-								? ReportCategory.Single
-								: reportType
-									? ReportCategory.Floor
-									: ReportCategory.Floor,
-						});
 					}
 				}
 			});
@@ -319,7 +347,12 @@ const AboutBuildingScreen = () => {
 						sessionStorage.setItem('reportId', resolvedReportId);
 						sessionStorage.setItem('reportType', resolvedReportType);
 
-						navigate(`/designing/constructor/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
+						const nextRoute =
+							resolvedReportType === ReportCategory.Single
+								? CONSTRUCTOR_ROUTES.calculation.route
+								: CONSTRUCTOR_ROUTES.floorPlans.route;
+
+						navigate(`/designing/constructor/${nextRoute}`, {
 							reportId: resolvedReportId,
 							reportType: resolvedReportType,
 						});
@@ -712,81 +745,6 @@ const AboutBuildingScreen = () => {
 								</div>
 							</div>
 						</div>
-
-						<Separator className="h-[2px] w-full bg-primary" />
-
-						{/* Ввод информации о конструкциях */}
-						<FormElementLabel className="font-sans text-lg font-semibold leading-4 text-primary">
-							{t('aboutBuilding.constructionInfo.title')}
-						</FormElementLabel>
-
-						<div className="flex items-center gap-x-[10px]">
-							<label className="w-[250px] font-sans text-sm font-semibold leading-6">
-								{t('aboutBuilding.constructionInfo.constructions')}
-							</label>
-							<Controller
-								control={control}
-								name="isConstruction"
-								render={({ field }) => (
-									<Switch
-										isEnabledProp={field.value}
-										disabled={!!search.get('edit')}
-										onChange={(isEnabled) => {
-											field.onChange(isEnabled);
-											if (isEnabled) {
-												form.setValue('isFloorPlan', false);
-											} else {
-												form.setValue('isFloorPlan', true);
-											}
-										}}
-									/>
-								)}
-							/>
-						</div>
-
-						<div className="flex items-center gap-x-[10px]">
-							<label className="w-[250px] font-sans text-sm font-semibold leading-6">
-								{t('aboutBuilding.constructionInfo.floorPlans')}
-							</label>
-							<Controller
-								control={control}
-								name="isFloorPlan"
-								render={({ field }) => (
-									<Switch
-										isEnabledProp={field.value}
-										disabled={!!search.get('edit')}
-										onChange={(isEnabled) => {
-											field.onChange(isEnabled);
-											if (isEnabled) {
-												form.setValue('isConstruction', false);
-											} else {
-												form.setValue('isConstruction', true);
-											}
-										}}
-									/>
-								)}
-							/>
-						</div>
-
-						{/* <div className="flex items-center gap-x-[10px]">
-							<label className="w-[250px] font-sans text-sm font-semibold leading-6 text-gray-500">
-								{t('aboutBuilding.constructionInfo.bim')}
-							</label>
-							<Controller
-								control={control}
-								name="isBim"
-								render={({ field }) => (
-									<Switch
-										isEnabledProp={false}
-										disabled
-										onChange={(isEnabled) => {
-											field.onChange(isEnabled);
-										}}
-										wrapperClassName="w-[36px] h-[20px]"
-									/>
-								)}
-							/>
-						</div> */}
 
 						{/* Кнопки */}
 						<div className="flex justify-end gap-[12px] px-[16px] py-[13px]">

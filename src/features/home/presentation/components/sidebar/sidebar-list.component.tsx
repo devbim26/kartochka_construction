@@ -5,8 +5,15 @@ import { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { twMerge } from 'tailwind-merge';
 
+const paddingByDepth: Record<number, string> = {
+	0: 'pl-[24px]',
+	1: 'pl-[60px]',
+	2: 'pl-[80px]',
+};
+
 const SidebarListBase = (props: SidebarListProps) => {
 	const { t } = useI18n();
+	const depth = props.depth ?? (props.icon ? 0 : 1);
 	const [showSubItems, setShowSubItems] = useState<boolean>(
 		(props.currentPath || '').includes(props.path),
 	);
@@ -14,10 +21,18 @@ const SidebarListBase = (props: SidebarListProps) => {
 	return (
 		<div className="flex h-fit flex-col">
 			<div
-				className="flex w-full cursor-pointer flex-row items-center justify-between py-[14px] pl-[24px] pr-[13px]"
+				className={twMerge(
+					'flex w-full cursor-pointer flex-row items-center justify-between py-[14px] pr-[13px]',
+					paddingByDepth[depth] ?? paddingByDepth[1],
+				)}
 				onClick={() => setShowSubItems(!showSubItems)}
 			>
-				<div className="flex flex-row items-center gap-[16px] text-sm font-normal leading-5 tracking-tight text-[#383838]">
+				<div
+					className={twMerge(
+						'flex flex-row items-center gap-[16px] text-sm font-normal leading-5 tracking-tight',
+						depth === 0 ? 'text-[#383838]' : 'text-[#6F7276]',
+					)}
+				>
 					{props.icon && <props.icon size={'20px'} />}
 					{t(props.labelKey)}
 				</div>

@@ -3,6 +3,7 @@ import {
 	AboutBuildingSreen,
 	AccountScreen,
 	AuthorizationScreen,
+	CalculationScreen,
 	CodeConfirmPage,
 	CompanyRegistrationPage,
 	ConstructionPickScreen,
@@ -87,6 +88,10 @@ export const AppRouter = () => {
 					<Route
 						path={CONSTRUCTOR_ROUTES.floorPlans.route}
 						element={<FloorPlansScreen />}
+					/>
+					<Route
+						path={CONSTRUCTOR_ROUTES.calculation.route}
+						element={<CalculationScreen />}
 					/>
 					<Route
 						path={CONSTRUCTOR_ROUTES.constructionSelect.route}

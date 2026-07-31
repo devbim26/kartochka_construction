@@ -7,6 +7,11 @@ export const CONSTRUCTOR_ROUTES = {
 		id: 'constructor-floor-plans-page-id',
 		route: 'floor-plans',
 	},
+	/** Одиночный расчёт (SingleReportInfo). */
+	calculation: {
+		id: 'constructor-calculation-page-id',
+		route: 'calculation',
+	},
 	constructionSelect: {
 		id: 'constructor-construction-choice-page-id',
 		route: 'construction-choice',

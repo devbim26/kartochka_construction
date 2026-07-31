@@ -2,15 +2,20 @@ import { APP_ROUTES } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useLayoutEffect } from 'react';
-import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ConstructionComplianceProvider, ConstructorHeader } from '../components';
 
 export const ConstructorLayout = () => {
 	const [search] = useSearchParams();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	useLayoutEffect(() => {
 		if (search.get('reportId') || search.get('constructionId')) {
+			return;
+		}
+		// Расчет открывается без «О здании» — пускаем на /calculation без редиректа.
+		if (location.pathname.endsWith(`/${CONSTRUCTOR_ROUTES.calculation.route}`)) {
 			return;
 		}
 		const base = `${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}`;
@@ -21,11 +26,17 @@ export const ConstructorLayout = () => {
 				reportId: storedId,
 				reportType: storedType,
 			}).toString();
-			navigate(`${base}/${CONSTRUCTOR_ROUTES.floorPlans.route}?${qs}`, { replace: true });
+			const nextRoute =
+				storedType === 'Single'
+					? CONSTRUCTOR_ROUTES.calculation.route
+					: CONSTRUCTOR_ROUTES.floorPlans.route;
+			navigate(`${base}/${nextRoute}?${qs}`, { replace: true });
 			return;
 		}
-		navigate(`${base}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`, { replace: true });
-	}, [search, navigate]);
+		navigate(`${base}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}?intent=project`, {
+			replace: true,
+		});
+	}, [search, navigate, location.pathname]);
 
 	return (
 		<ConstructionComplianceProvider>

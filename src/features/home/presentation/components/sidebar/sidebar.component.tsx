@@ -6,6 +6,9 @@ import { SidebarItem } from './sidebar-item.component';
 import { SidebarListItem } from './sidebar-list-item.component';
 import { SidebarList } from './sidebar-list.component';
 
+const buildChildPath = (basePath: string, parentPath: string, childPath: string) =>
+	`${basePath}/${parentPath}/${childPath}`;
+
 export const Sidebar = () => {
 	const { pathname } = useLocation();
 	const sidebarItemsConfig = getSidebarItemsConfig();
@@ -48,16 +51,53 @@ export const Sidebar = () => {
 								currentPath={pathname}
 								path={`${sidebarItemsConfig.basePath}/${item.params.path}`}
 								permission={item.params.permission}
+								depth={0}
 							>
 								<>
-									{item.childrens.map((children) => (
-										<SidebarListItem
-											{...children}
-											key={children.id}
-											currentPath={pathname}
-											path={`${sidebarItemsConfig.basePath}/${item.params.path}/${children.path}`}
-										/>
-									))}
+									{item.childrens.map((children) => {
+										if (children.childrens?.length) {
+											return (
+												<SidebarList
+													{...children}
+													key={children.id}
+													currentPath={pathname}
+													path={`${sidebarItemsConfig.basePath}/${item.params.path}`}
+													permission={children.permission}
+													depth={1}
+												>
+													<>
+														{children.childrens.map((nested) => (
+															<SidebarListItem
+																{...nested}
+																key={nested.id}
+																currentPath={pathname}
+																path={buildChildPath(
+																	sidebarItemsConfig.basePath,
+																	item.params.path,
+																	nested.path,
+																)}
+																depth={2}
+															/>
+														))}
+													</>
+												</SidebarList>
+											);
+										}
+
+										return (
+											<SidebarListItem
+												{...children}
+												key={children.id}
+												currentPath={pathname}
+												path={buildChildPath(
+													sidebarItemsConfig.basePath,
+													item.params.path,
+													children.path,
+												)}
+												depth={1}
+											/>
+										);
+									})}
 								</>
 							</SidebarList>
 						) : (

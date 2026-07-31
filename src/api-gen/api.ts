@@ -421,33 +421,10 @@ export interface CreateConstructionTypeDto {
 	constructions?: CreateConstructionDto[] | null;
 }
 
-export interface CreateFloorReportReceivingCommand {
-	/** @format uuid */
-	reportInfoId?: string;
-}
-
 export interface CreateOrUpdateAcousticModelsCommand {
 	modelId?: string | null;
 	/** @format double */
 	coefficient?: number;
-}
-
-export interface CreateReportConstructionDto {
-	/** @format uuid */
-	id?: string | null;
-	name?: string | null;
-	/** @format uuid */
-	constructionHeaderId?: string;
-	/** @format double */
-	square?: number;
-	/** @format double */
-	width?: number;
-	/** @format double */
-	length?: number;
-	/** @format uuid */
-	secondPlacementRoomId?: string;
-	/** @format uuid */
-	firstPlacementRoomId?: string;
 }
 
 export interface CreateReportFloorInfoCommand {
@@ -464,7 +441,6 @@ export interface CreateReportInfoCommand {
 	/** @format uuid */
 	regulatoryDocumentId?: string;
 	country?: CountryType;
-	category?: ReportCategory;
 	buildingType?: BuildingType;
 	class?: CategoryClass;
 }
@@ -479,6 +455,11 @@ export interface CreateReportInfoDto {
 	category?: ReportCategory;
 	buildingType?: BuildingType;
 	class?: CategoryClass;
+}
+
+export interface CreateReportInfoReceivingCommand {
+	/** @format uuid */
+	reportInfoId?: string;
 }
 
 export interface CreateRequirementCommand {
@@ -499,6 +480,27 @@ export interface CreateRequirementCommand {
 	noizeImpactIndex?: number | null;
 	notice?: string | null;
 	constructionClass?: ConstructionClass;
+	/** @format uuid */
+	regulatoryDocumentId?: string;
+}
+
+export interface CreateSingleReportConstructionDto {
+	/** @format uuid */
+	id?: string | null;
+	name?: string | null;
+	/** @format uuid */
+	constructionHeaderId?: string;
+	/** @format double */
+	square?: number;
+	/** @format double */
+	width?: number;
+	/** @format double */
+	length?: number;
+}
+
+export interface CreateSingleReportInfoCommand {
+	/** @format uuid */
+	calculationDocumentId?: string;
 	/** @format uuid */
 	regulatoryDocumentId?: string;
 }
@@ -549,7 +551,7 @@ export interface DeleteConstructionHeaderCommand {
 	id?: string;
 }
 
-export interface DeleteFloorConstructionCommand {
+export interface DeleteFloorConstructionInfoCommand {
 	/** @format uuid */
 	id?: string;
 }
@@ -690,11 +692,6 @@ export interface FirstRequirementPlacementRoomDto {
 	secondRequirementRooms?: SecondRequirementPlacementRoomDto[] | null;
 }
 
-export interface FloorConstructionInfoIdDto {
-	/** @format uuid */
-	id?: string;
-}
-
 export interface GetAcousticModelsQuery {
 	name?: string | null;
 }
@@ -779,8 +776,6 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	/** @format float */
 	rw?: number | null;
 	orderByPriority?: boolean;
-	/** Только конструкции брендовых производителей (не «Общий»). */
-	onlyManufacturers?: boolean;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -851,6 +846,7 @@ export interface GetReportWithPaginationQuery {
 	userId?: string | null;
 	name?: string | null;
 	client?: string | null;
+	reportCategory?: ReportCategory;
 }
 
 export interface GetRequirementsWithPaginationParamsQuery {
@@ -1123,6 +1119,12 @@ export interface NewReportConstructionFloorInfoDto {
 	page?: number;
 }
 
+export interface OpenRouterUserKeyResponseDto {
+	userKey?: string | null;
+	/** @format double */
+	credits?: number;
+}
+
 export interface PaginatedArticleDto {
 	/** @format uuid */
 	id?: string;
@@ -1356,14 +1358,14 @@ export interface ReportConstructionDto {
 	width?: number;
 	/** @format double */
 	length?: number;
+	additionalDoors?: AdditionalConstructionHeaderDto[] | null;
+	additionalWindows?: AdditionalConstructionHeaderDto[] | null;
 	secondPlacementRoom?: PlacementRoomDto;
 	firstPlacementRoom?: PlacementRoomDto;
 	/** @format float */
 	requirementNoizeIsolationIndex?: number;
 	/** @format float */
 	requirementNoizeImpactIndex?: number | null;
-	additionalDoors?: AdditionalConstructionHeaderDto[] | null;
-	additionalWindows?: AdditionalConstructionHeaderDto[] | null;
 }
 
 export interface ReportDocumentInfoDto {
@@ -1426,7 +1428,7 @@ export interface ReportFloorInfoDto {
 	floorNumber?: string | null;
 }
 
-export interface ReportInfoFloorConstructionDto {
+export interface ReportInfoFloorDto {
 	floorConstructionInfos?: ReportFloorInfoDto[] | null;
 	buildingName?: string | null;
 	calculationRequirementDocument?: CalculationRequirementDocumentDto;
@@ -1472,20 +1474,12 @@ export interface ReportInfoShortDtoPaginatedList {
 	hasNextPage?: boolean;
 }
 
-export interface ReportInfoSingleConstructionDto {
+export interface ReportInfoSingleDto {
 	/** @format uuid */
 	id?: string;
-	singleConstructionInfos?: SingleConstructionInfoDto[] | null;
-	buildingName?: string | null;
-	description?: string | null;
 	calculationRequirementDocument?: CalculationRequirementDocumentDto;
 	regulatoryRequirementDocument?: RegulatoryRequirementDocumentDto;
-	category?: ReportCategory;
-	reportDocumentInfo?: ReportDocumentInfoDto;
-	status?: ReportInfoStatus;
-	buildingType?: BuildingType;
-	purposeBuilding?: PurposeBuilding;
-	class?: CategoryClass;
+	singleReportConstruction?: SingleReportConstructionDto;
 }
 
 export enum ReportInfoStatus {
@@ -1581,8 +1575,19 @@ export interface SendSmsCommand {
 	phoneNumber: string | null;
 }
 
-export interface SingleConstructionInfoDto {
-	reportConstructionHeader?: ReportConstructionDto;
+export interface SingleReportConstructionDto {
+	/** @format uuid */
+	id?: string;
+	/** @format uuid */
+	constructionHeaderId?: string;
+	/** @format double */
+	square?: number;
+	/** @format double */
+	width?: number;
+	/** @format double */
+	length?: number;
+	additionalDoors?: AdditionalConstructionHeaderDto[] | null;
+	additionalWindows?: AdditionalConstructionHeaderDto[] | null;
 }
 
 export enum SortOrder {
@@ -1767,14 +1772,6 @@ export interface UpdateReportInfoBaseFieldsCommand {
 	purposeBuilding?: PurposeBuilding;
 }
 
-export interface UpdateReportInfoWithSingleConstructionCommand {
-	/** @format uuid */
-	reportInfoId?: string;
-	/** @format uuid */
-	requirementId?: string;
-	reportConstruction?: CreateReportConstructionDto;
-}
-
 export interface UpdateRequirementCommand {
 	/** @format uuid */
 	id?: string;
@@ -1797,6 +1794,12 @@ export interface UpdateRequirementCommand {
 	constructionClass?: ConstructionClass;
 	/** @format uuid */
 	regulatoryDocumentId?: string;
+}
+
+export interface UpdateSingleReportInfoByReportConstructionCommand {
+	/** @format uuid */
+	singleReportInfoId?: string;
+	reportConstruction?: CreateSingleReportConstructionDto;
 }
 
 export interface UpdateSubscriptionCommand {
@@ -3111,6 +3114,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags OpenRouterModels
+		 * @name OpenRouterModelsKeyDetail
+		 * @request GET:/api/OpenRouterModels/{email}/key
+		 */
+		openRouterModelsKeyDetail: (email: string, params: RequestParams = {}) =>
+			this.request<OpenRouterUserKeyResponseDto, any>({
+				path: `/api/OpenRouterModels/${email}/key`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags PlacementRoomVariants
 		 * @name PlacementRoomVariantsCreate
 		 * @request POST:/api/PlacementRoomVariants
@@ -3237,6 +3255,212 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		/**
 		 * No description
 		 *
+		 * @tags ReportConstruction
+		 * @name ReportConstructionSingleDetail
+		 * @request GET:/api/ReportConstruction/single/{id}
+		 */
+		reportConstructionSingleDetail: (id: string, params: RequestParams = {}) =>
+			this.request<SingleReportConstructionDto, any>({
+				path: `/api/ReportConstruction/single/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportConstruction
+		 * @name ReportConstructionFloorDetail
+		 * @request GET:/api/ReportConstruction/floor/{id}
+		 */
+		reportConstructionFloorDetail: (id: string, params: RequestParams = {}) =>
+			this.request<ReportConstructionDto, any>({
+				path: `/api/ReportConstruction/floor/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportConstruction
+		 * @name ReportConstructionUpdate
+		 * @request PUT:/api/ReportConstruction
+		 */
+		reportConstructionUpdate: (
+			data: UpdateReportConstructionByAdditionalConstructionsCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<ReportConstructionDto, any>({
+				path: `/api/ReportConstruction`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportConstruction
+		 * @name ReportConstructionFloorConstructionUpdate
+		 * @request PUT:/api/ReportConstruction/floor/construction
+		 */
+		reportConstructionFloorConstructionUpdate: (
+			data: {
+				/** @format uuid */
+				reportInfoId?: string;
+				/** @format uuid */
+				reportFloorInfoId?: string;
+				/** @format uuid */
+				floorConstructionInfoId?: string;
+				/** @format uuid */
+				requirementId?: string;
+				/** @format uuid */
+				'floorInfo.reportConstructionHeader.secondPlacementRoomId'?: string;
+				/** @format uuid */
+				'floorInfo.reportConstructionHeader.firstPlacementRoomId'?: string;
+				/** @format uuid */
+				'floorInfo.reportConstructionHeader.id'?: string;
+				'floorInfo.reportConstructionHeader.name'?: string;
+				/** @format uuid */
+				'floorInfo.reportConstructionHeader.constructionHeaderId'?: string;
+				/** @format double */
+				'floorInfo.reportConstructionHeader.square'?: number;
+				/** @format double */
+				'floorInfo.reportConstructionHeader.width'?: number;
+				/** @format double */
+				'floorInfo.reportConstructionHeader.length'?: number;
+				/** @format int32 */
+				'floorInfo.coordinates1.x'?: number;
+				/** @format int32 */
+				'floorInfo.coordinates1.y'?: number;
+				/** @format int32 */
+				'floorInfo.coordinates2.x'?: number;
+				/** @format int32 */
+				'floorInfo.coordinates2.y'?: number;
+				/** @format int32 */
+				'floorInfo.page'?: number;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<ReportInfoFloorDto, any>({
+				path: `/api/ReportConstruction/floor/construction`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportConstruction
+		 * @name ReportConstructionSingleConstructionUpdate
+		 * @request PUT:/api/ReportConstruction/single/construction
+		 */
+		reportConstructionSingleConstructionUpdate: (
+			data: UpdateSingleReportInfoByReportConstructionCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<ReportInfoSingleDto, any>({
+				path: `/api/ReportConstruction/single/construction`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportConstruction
+		 * @name ReportConstructionFloorSwapByAlternativeUpdate
+		 * @request PUT:/api/ReportConstruction/floor/swapByAlternative
+		 */
+		reportConstructionFloorSwapByAlternativeUpdate: (
+			data: SwapConstructionHeaderCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportConstruction/floor/swapByAlternative`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportConstruction
+		 * @name ReportConstructionFloorConstructionImageUpdate
+		 * @request PUT:/api/ReportConstruction/floor/construction/image
+		 */
+		reportConstructionFloorConstructionImageUpdate: (
+			data: {
+				/** @format binary */
+				floorDocumentImage?: File;
+				/** @format uuid */
+				reportFloorConstructionInfoId?: string;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<ReportFloorConstructionInfoDto, any>({
+				path: `/api/ReportConstruction/floor/construction/image`,
+				method: 'PUT',
+				body: data,
+				type: ContentType.FormData,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportConstruction
+		 * @name ReportConstructionFloorConstructionDelete
+		 * @request DELETE:/api/ReportConstruction/floorConstruction
+		 */
+		reportConstructionFloorConstructionDelete: (
+			data: DeleteReportFloorInfoCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportConstruction/floorConstruction`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags ReportConstruction
+		 * @name ReportConstructionReportConstructionDelete
+		 * @request DELETE:/api/ReportConstruction/reportConstruction
+		 */
+		reportConstructionReportConstructionDelete: (
+			data: DeleteReportConstructionCommand,
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/ReportConstruction/reportConstruction`,
+				method: 'DELETE',
+				body: data,
+				type: ContentType.Json,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
 		 * @tags ReportInfo
 		 * @name ReportInfoGetReportInfoRenewDetail
 		 * @request GET:/api/ReportInfo/{id}/GetReportInfoRenew
@@ -3319,12 +3543,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: UpdateReportInfoBaseFieldsCommand,
 			params: RequestParams = {},
 		) =>
-			this.request<ReportDto, any>({
+			this.request<void, any>({
 				path: `/api/ReportInfo/reportInfo/baseInformation`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.Json,
-				format: 'json',
 				...params,
 			}),
 
@@ -3372,11 +3595,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: FinalizeReportInfoCommand,
 			params: RequestParams = {},
 		) =>
-			this.request<void, any>({
+			this.request<ReportInfoFloorDto, any>({
 				path: `/api/ReportInfo/documentInfo`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -3411,47 +3635,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * No description
 		 *
 		 * @tags ReportInfo
-		 * @name ReportInfoSingleDetail
-		 * @request GET:/api/ReportInfo/{id}/single
+		 * @name ReportInfoDetail
+		 * @request GET:/api/ReportInfo/{id}
 		 */
-		reportInfoSingleDetail: (id: string, params: RequestParams = {}) =>
-			this.request<ReportInfoSingleConstructionDto, any>({
-				path: `/api/ReportInfo/${id}/single`,
-				method: 'GET',
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportInfoSingleUpdate
-		 * @request PUT:/api/ReportInfo/single
-		 */
-		reportInfoSingleUpdate: (
-			data: UpdateReportInfoWithSingleConstructionCommand,
-			params: RequestParams = {},
-		) =>
-			this.request<ReportInfoSingleConstructionDto, any>({
-				path: `/api/ReportInfo/single`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.Json,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportInfoFloorDetail
-		 * @request GET:/api/ReportInfo/{id}/floor
-		 */
-		reportInfoFloorDetail: (id: string, params: RequestParams = {}) =>
-			this.request<ReportInfoFloorConstructionDto, any>({
-				path: `/api/ReportInfo/${id}/floor`,
+		reportInfoDetail: (id: string, params: RequestParams = {}) =>
+			this.request<ReportInfoFloorDto, any>({
+				path: `/api/ReportInfo/${id}`,
 				method: 'GET',
 				format: 'json',
 				...params,
@@ -3465,7 +3654,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/ReportInfo/{id}/GetReportFloorInfoIdsRenew
 		 */
 		reportInfoGetReportFloorInfoIdsRenewDetail: (id: string, params: RequestParams = {}) =>
-			this.request<FloorConstructionInfoIdDto[], any>({
+			this.request<string[], any>({
 				path: `/api/ReportInfo/${id}/GetReportFloorInfoIdsRenew`,
 				method: 'GET',
 				format: 'json',
@@ -3528,7 +3717,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request DELETE:/api/ReportInfo/reportFloorInfo
 		 */
 		reportInfoReportFloorInfoDelete: (
-			data: DeleteReportFloorInfoCommand,
+			data: DeleteFloorConstructionInfoCommand,
 			params: RequestParams = {},
 		) =>
 			this.request<void, any>({
@@ -3550,11 +3739,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: CreateReportFloorInfoCommand,
 			params: RequestParams = {},
 		) =>
-			this.request<void, any>({
+			this.request<ReportFloorInfoDto, any>({
 				path: `/api/ReportInfo/reportFloorInfo`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
+				format: 'json',
 				...params,
 			}),
 
@@ -3569,182 +3759,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: UpdateReportFloorInfoCommand,
 			params: RequestParams = {},
 		) =>
-			this.request<void, any>({
+			this.request<ReportFloorInfoDto, any>({
 				path: `/api/ReportInfo/reportFloorInfo`,
 				method: 'PUT',
 				body: data,
 				type: ContentType.Json,
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportInfoReportConstructionDetail
-		 * @request GET:/api/ReportInfo/{id}/reportConstruction
-		 */
-		reportInfoReportConstructionDetail: (id: string, params: RequestParams = {}) =>
-			this.request<ReportConstructionDto, any>({
-				path: `/api/ReportInfo/${id}/reportConstruction`,
-				method: 'GET',
 				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportInfoReportConstructionUpdate
-		 * @request PUT:/api/ReportInfo/reportConstruction
-		 */
-		reportInfoReportConstructionUpdate: (
-			data: UpdateReportConstructionByAdditionalConstructionsCommand,
-			params: RequestParams = {},
-		) =>
-			this.request<ReportConstructionDto, any>({
-				path: `/api/ReportInfo/reportConstruction`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.Json,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportInfoReportConstructionDelete
-		 * @request DELETE:/api/ReportInfo/reportConstruction
-		 */
-		reportInfoReportConstructionDelete: (
-			data: DeleteReportConstructionCommand,
-			params: RequestParams = {},
-		) =>
-			this.request<void, any>({
-				path: `/api/ReportInfo/reportConstruction`,
-				method: 'DELETE',
-				body: data,
-				type: ContentType.Json,
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportInfoFloorConstructionUpdate
-		 * @request PUT:/api/ReportInfo/floor/construction
-		 */
-		reportInfoFloorConstructionUpdate: (
-			data: {
-				/** @format uuid */
-				reportInfoId?: string;
-				/** @format uuid */
-				reportFloorInfoId?: string;
-				/** @format uuid */
-				floorConstructionInfoId?: string;
-				/** @format uuid */
-				requirementId?: string;
-				/** @format uuid */
-				'floorInfo.reportConstructionHeader.id'?: string;
-				'floorInfo.reportConstructionHeader.name'?: string;
-				/** @format uuid */
-				'floorInfo.reportConstructionHeader.constructionHeaderId'?: string;
-				/** @format double */
-				'floorInfo.reportConstructionHeader.square'?: number;
-				/** @format double */
-				'floorInfo.reportConstructionHeader.width'?: number;
-				/** @format double */
-				'floorInfo.reportConstructionHeader.length'?: number;
-				/** @format uuid */
-				'floorInfo.reportConstructionHeader.secondPlacementRoomId'?: string;
-				/** @format uuid */
-				'floorInfo.reportConstructionHeader.firstPlacementRoomId'?: string;
-				/** @format int32 */
-				'floorInfo.coordinates1.x'?: number;
-				/** @format int32 */
-				'floorInfo.coordinates1.y'?: number;
-				/** @format int32 */
-				'floorInfo.coordinates2.x'?: number;
-				/** @format int32 */
-				'floorInfo.coordinates2.y'?: number;
-				/** @format int32 */
-				'floorInfo.page'?: number;
-			},
-			params: RequestParams = {},
-		) =>
-			this.request<ReportFloorInfoDto, any>({
-				path: `/api/ReportInfo/floor/construction`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.FormData,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportInfoFloorSwapByAlternativeUpdate
-		 * @request PUT:/api/ReportInfo/floor/swapByAlternative
-		 */
-		reportInfoFloorSwapByAlternativeUpdate: (
-			data: SwapConstructionHeaderCommand,
-			params: RequestParams = {},
-		) =>
-			this.request<void, any>({
-				path: `/api/ReportInfo/floor/swapByAlternative`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.Json,
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportInfoFloorConstructionImageUpdate
-		 * @request PUT:/api/ReportInfo/floor/construction/image
-		 */
-		reportInfoFloorConstructionImageUpdate: (
-			data: {
-				/** @format binary */
-				floorDocumentImage?: File;
-				/** @format uuid */
-				reportFloorConstructionInfoId?: string;
-			},
-			params: RequestParams = {},
-		) =>
-			this.request<ReportFloorInfoDto, any>({
-				path: `/api/ReportInfo/floor/construction/image`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.FormData,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportInfo
-		 * @name ReportInfoFloorConstructionDelete
-		 * @request DELETE:/api/ReportInfo/floorConstruction
-		 */
-		reportInfoFloorConstructionDelete: (
-			data: DeleteFloorConstructionCommand,
-			params: RequestParams = {},
-		) =>
-			this.request<void, any>({
-				path: `/api/ReportInfo/floorConstruction`,
-				method: 'DELETE',
-				body: data,
-				type: ContentType.Json,
 				...params,
 			}),
 
@@ -3775,7 +3795,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request POST:/api/ReportReceiving/floor
 		 */
 		reportReceivingFloorCreate: (
-			data: CreateFloorReportReceivingCommand,
+			data: CreateReportInfoReceivingCommand,
 			params: RequestParams = {},
 		) =>
 			this.request<void, any>({
@@ -3905,6 +3925,38 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<RequirementDto, any>({
 				path: `/api/Requirement`,
 				method: 'PUT',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags SingleReportInfo
+		 * @name SingleReportInfoDetail
+		 * @request GET:/api/SingleReportInfo/{id}
+		 */
+		singleReportInfoDetail: (id: string, params: RequestParams = {}) =>
+			this.request<ReportInfoSingleDto, any>({
+				path: `/api/SingleReportInfo/${id}`,
+				method: 'GET',
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags SingleReportInfo
+		 * @name SingleReportInfoCreate
+		 * @request POST:/api/SingleReportInfo
+		 */
+		singleReportInfoCreate: (data: CreateSingleReportInfoCommand, params: RequestParams = {}) =>
+			this.request<ReportInfoSingleDto, any>({
+				path: `/api/SingleReportInfo`,
+				method: 'POST',
 				body: data,
 				type: ContentType.Json,
 				format: 'json',
@@ -4208,7 +4260,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		 * @request GET:/api/User/active-userSubscription
 		 */
 		userActiveUserSubscriptionList: (params: RequestParams = {}) =>
-			this.request<PaginatedUserDto, any>({
+			this.request<PaginatedUserDto[], any>({
 				path: `/api/User/active-userSubscription`,
 				method: 'GET',
 				format: 'json',
