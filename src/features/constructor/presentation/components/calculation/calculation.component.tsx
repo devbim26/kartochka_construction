@@ -1,4 +1,4 @@
-import type { CalculationRequirementDocumentDto } from '@api-gen';
+import type { CalculationRequirementDocumentDto, ReportInfoSingleDto } from '@api-gen';
 import {
 	Button,
 	convertToPaginatedType,
@@ -25,6 +25,7 @@ import {
 	getReportSingleById,
 	graphAdditionalDetail,
 	graphDetail,
+	reportReceiveSingle,
 	svgConstructionDetail,
 	updateReportSingle,
 } from '@features/constructor/services';
@@ -36,6 +37,7 @@ import type {
 	ReportInfoShort,
 } from '@features';
 import { DesigningConfig, GraphDetailTable, ReportCategory } from '@features';
+import { getCurrentUser } from '@features/account/services';
 import {
 	filterConstructionTypeSelectOptions,
 	formatMaterial,
@@ -88,6 +90,42 @@ const isGeneralReferenceIssuer = (issuerName?: string | null) => {
 	return n === 'общий' || n === 'general';
 };
 
+const isSuccessStatus = (status?: number) =>
+	typeof status === 'number' && status >= 200 && status < 300;
+
+/** Достаём конструкцию отчёта из ответа create/get/update (разные формы поля). */
+const extractSingleReportConstruction = (data?: ReportInfoSingleDto | null) => {
+	if (!data) return null;
+	const raw = data as ReportInfoSingleDto & {
+		reportConstruction?: {
+			id?: string;
+			constructionHeaderId?: string;
+			constructionHeader?: { id?: string };
+			width?: number;
+			length?: number;
+			square?: number;
+		};
+	};
+	const sc = raw.singleReportConstruction ?? raw.reportConstruction ?? null;
+	if (!sc) return null;
+	const constructionHeaderId =
+		sc.constructionHeaderId ||
+		(sc as { constructionHeader?: { id?: string } }).constructionHeader?.id ||
+		'';
+	return {
+		id: sc.id || '',
+		constructionHeaderId,
+		width: sc.width,
+		length: sc.length,
+		square: sc.square,
+	};
+};
+
+const persistSingleReportSession = (id: string) => {
+	sessionStorage.setItem('reportId', id);
+	sessionStorage.setItem('reportType', ReportCategory.Single);
+};
+
 /**
  * Экран «Расчет»: документы + выбор общей конструкции + редактор материалов как в проектировании.
  * Брендовые конструкции в селекте недоступны.
@@ -108,7 +146,10 @@ export const CalculationScreen = () => {
 	const [name, setName] = useState('');
 	const [width, setWidth] = useState('');
 	const [length, setLength] = useState('');
-	const [constructionId, setConstructionId] = useState('');
+	/** Справочная конструкция из селекта (лабораторная, без расчёта). */
+	const [catalogConstructionId, setCatalogConstructionId] = useState('');
+	/** Копия ConstructionHeader из SingleReportInfo — с ней работаем после create/update. */
+	const [workingHeaderId, setWorkingHeaderId] = useState('');
 	const [savedConstructionId, setSavedConstructionId] = useState<string | null>(null);
 	const [typeEnumFilter, setTypeEnumFilter] = useState('');
 	const [constructionData, setConstructionData] = useState<ConstructionsAddData[]>([]);
@@ -131,6 +172,7 @@ export const CalculationScreen = () => {
 	const creatingReportRef = useRef(false);
 	const syncingRef = useRef(false);
 	const lastSyncedKeyRef = useRef('');
+	const workingHeaderIdRef = useRef('');
 
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
@@ -155,9 +197,10 @@ export const CalculationScreen = () => {
 	const isFormComplete = useMemo(() => {
 		const w = Number(width);
 		const l = Number(length);
+		const hasConstruction = !!catalogConstructionId || !!workingHeaderId;
 		return (
 			!!calculationDocumentId &&
-			!!constructionId &&
+			hasConstruction &&
 			!!name.trim() &&
 			Number.isFinite(w) &&
 			w > 0 &&
@@ -165,23 +208,30 @@ export const CalculationScreen = () => {
 			l > 0 &&
 			!!area
 		);
-	}, [area, calculationDocumentId, constructionId, length, name, width]);
+	}, [area, calculationDocumentId, catalogConstructionId, length, name, width, workingHeaderId]);
 
 	const formSyncKey = useMemo(
 		() =>
 			JSON.stringify({
 				calculationDocumentId,
-				constructionId,
+				catalogConstructionId,
+				workingHeaderId,
 				name: name.trim(),
 				width,
 				length,
 				area,
 			}),
-		[area, calculationDocumentId, constructionId, length, name, width],
+		[area, calculationDocumentId, catalogConstructionId, length, name, width, workingHeaderId],
 	);
 
-	/** Графики и редактор — только после создания SingleReportInfo. */
-	const canShowWorkspace = !!reportId;
+	/** Графики и редактор — только после создания SingleReportInfo и появления копии header. */
+	const canShowWorkspace = !!reportId && !!workingHeaderId;
+
+	/**
+	 * Как в поэтажном: до create — id из справочника; после create — id клона
+	 * (тот же, что reportConstructionHeader.constructionHeaderId).
+	 */
+	const activeHeaderId = workingHeaderId || catalogConstructionId;
 
 	const layoutClass = useMemo(() => {
 		const fromDetail = getLayoutClassFromConstructionHeader(detail || undefined);
@@ -199,10 +249,15 @@ export const CalculationScreen = () => {
 			detail?.constructionType) as ConstructionTypeEnum | undefined;
 	}, [form, detail]);
 
-	const isConstructionEditLocked = useMemo(
-		() => !isGeneralReferenceIssuer(detail?.issuerName),
-		[detail?.issuerName],
-	);
+	const isConstructionEditLocked = useMemo(() => {
+		// Склонённая конструкция отчёта всегда редактируема; справочную не трогаем.
+		if (workingHeaderId) return false;
+		return !isGeneralReferenceIssuer(detail?.issuerName);
+	}, [workingHeaderId, detail?.issuerName]);
+
+	useEffect(() => {
+		workingHeaderIdRef.current = workingHeaderId;
+	}, [workingHeaderId]);
 
 	const calculationDocumentOptions = useMemo(
 		() => convertToRequirementDocumentSelectValues(calculationDocuments, locale),
@@ -234,7 +289,7 @@ export const CalculationScreen = () => {
 			return true;
 		});
 
-		return (
+		const base =
 			convertToSelectValues(
 				filtered.map((c) => ({
 					...c,
@@ -253,9 +308,35 @@ export const CalculationScreen = () => {
 					if (aFav !== bFav) return Number(bFav) - Number(aFav);
 					return Number(a.isDisabled) - Number(b.isDisabled);
 				})
-				?.map(withStar) ?? []
-		);
-	}, [constructionData, favoriteIds, typeEnumFilter]);
+				?.map(withStar) ?? [];
+
+		// Как в create-construction-form: клон может отсутствовать в справочнике
+		const selectedId = catalogConstructionId || workingHeaderId;
+		const valueSet = new Set(base.map((o) => String(o.value)));
+		if (selectedId && !valueSet.has(String(selectedId))) {
+			const labelFromDetail =
+				detail?.id === selectedId ? detail.description || detail.name : null;
+			const fallbackLabel = name.trim() || String(selectedId);
+			return [
+				{
+					value: selectedId,
+					label: labelFromDetail || fallbackLabel,
+					isDisabled: false,
+				},
+				...base,
+			];
+		}
+
+		return base;
+	}, [
+		catalogConstructionId,
+		constructionData,
+		detail,
+		favoriteIds,
+		name,
+		typeEnumFilter,
+		workingHeaderId,
+	]);
 
 	const materials = useMemo(
 		() => flattenConstructionMaterialsTopToBottom(detail?.constructionTypeObject),
@@ -280,26 +361,78 @@ export const CalculationScreen = () => {
 		from(getReportSingleById({ id: reportId }))
 			.pipe(
 				tap((response) => {
-					if (response?.status !== 200) return;
+					if (!isSuccessStatus(response?.status) || !response.data) return;
 					const short = convertToClientSingleReportInfoShort(response.data);
 					setReportInfo(short);
 					const docId = short.calculationDocument?.id || '';
 					if (docId) {
 						setCalculationDocumentId(docId);
 					}
-					const existing = response.data?.singleReportConstruction;
+					const existing = extractSingleReportConstruction(response.data);
 					if (!existing?.constructionHeaderId) return;
-					const nextWidth = String(existing.width || '');
-					const nextLength = String(existing.length || '');
 					setSavedConstructionId(existing.id || null);
-					setConstructionId(existing.constructionHeaderId);
-					setWidth(nextWidth);
-					setLength(nextLength);
+					// Как в поэтажном: текущая конструкция отчёта = клон
+					setWorkingHeaderId(existing.constructionHeaderId);
+					workingHeaderIdRef.current = existing.constructionHeaderId;
+					setCatalogConstructionId(existing.constructionHeaderId);
+					if (existing.width != null) setWidth(String(existing.width));
+					if (existing.length != null) setLength(String(existing.length));
+					persistSingleReportSession(reportId);
 				}),
 				catchError(() => of(null)),
 			)
 			.subscribe();
 	}, [reportId]);
+
+	/** После create/update — как floor plans: перечитываем отчёт и фиксируем клон как текущую конструкцию. */
+	const bindClonedConstruction = useCallback(
+		(clonedHeaderId: string, reportConstructionRowId?: string) => {
+			if (reportConstructionRowId) setSavedConstructionId(reportConstructionRowId);
+			setWorkingHeaderId(clonedHeaderId);
+			workingHeaderIdRef.current = clonedHeaderId;
+			// Селект = клон (как form.construction после create в поэтажном)
+			setCatalogConstructionId(clonedHeaderId);
+		},
+		[],
+	);
+
+	const adoptClonedConstructionFromReport = useCallback(
+		async (ensuredReportId: string) => {
+			const detailResponse = await getReportSingleById({ id: ensuredReportId });
+			if (!isSuccessStatus(detailResponse?.status) || !detailResponse.data) {
+				toast.error(t('errors.request'));
+				return null;
+			}
+
+			const cloned = extractSingleReportConstruction(detailResponse.data);
+			if (!cloned?.constructionHeaderId) {
+				toast.error(
+					locale === 'ru'
+						? 'Отчёт создан, но не получена склонированная конструкция'
+						: 'Report created, but cloned construction was not returned',
+				);
+				return null;
+			}
+
+			const clonedHeaderId = cloned.constructionHeaderId;
+
+			persistSingleReportSession(ensuredReportId);
+			setReportId(ensuredReportId);
+			setReportInfo(convertToClientSingleReportInfoShort(detailResponse.data));
+			bindClonedConstruction(clonedHeaderId, cloned.id || undefined);
+			lastSyncedKeyRef.current = formSyncKey;
+
+			if (cloned.width != null && Number(cloned.width) > 0) {
+				setWidth(String(cloned.width));
+			}
+			if (cloned.length != null && Number(cloned.length) > 0) {
+				setLength(String(cloned.length));
+			}
+
+			return clonedHeaderId;
+		},
+		[bindClonedConstruction, formSyncKey, locale, t],
+	);
 
 	const loadCatalog = () => {
 		setListLoading(true);
@@ -449,7 +582,7 @@ export const CalculationScreen = () => {
 	);
 
 	useEffect(() => {
-		if (!constructionId) {
+		if (!activeHeaderId) {
 			setDetail(null);
 			setSvgUrl(null);
 			setGraphData(null);
@@ -457,9 +590,9 @@ export const CalculationScreen = () => {
 			form.reset(DesigningConfig.defaultValues);
 			return;
 		}
-		loadConstructionDetail(constructionId, canShowWorkspace);
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- визуалы включаем после появления reportId
-	}, [constructionId, canShowWorkspace]);
+		loadConstructionDetail(activeHeaderId, canShowWorkspace);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- визуалы включаем после появления workingHeaderId
+	}, [activeHeaderId, canShowWorkspace]);
 
 	const syncReportConstruction = useCallback(async () => {
 		if (syncingRef.current || creatingReportRef.current) return false;
@@ -473,50 +606,84 @@ export const CalculationScreen = () => {
 			return false;
 		}
 
-		const constructionPayload = {
-			id: savedConstructionId || undefined,
-			name: name.trim(),
-			construction: constructionId,
-			width,
-			length,
-			area,
-			constructionType: '',
-			firstPlacementRoom: '',
-			secondPlacementRoom: '',
-		};
+		if (!reportId && !catalogConstructionId) {
+			toast.error(locale === 'ru' ? 'Выберите конструкцию' : 'Select a construction');
+			return false;
+		}
+
+		/**
+		 * Как поэтажный form.construction:
+		 * - до create: справочный id из селекта
+		 * - после create: в селекте лежит клон → шлём клон
+		 * - если пользователь выбрал другую справочную — шлём её, бэк клонирует снова
+		 */
+		const headerIdToSend = !reportId
+			? catalogConstructionId
+			: workingHeaderIdRef.current || workingHeaderId || catalogConstructionId;
+
+		// Если в селекте после create лежит НЕ клон (пользователь выбрал другую справочную) —
+		// это replace: шлём значение селекта один раз, затем снова фиксируем новый клон.
+		const selectIsDifferentFromClone =
+			!!reportId &&
+			!!workingHeaderIdRef.current &&
+			!!catalogConstructionId &&
+			catalogConstructionId !== workingHeaderIdRef.current;
+
+		const constructionHeaderIdForRequest = selectIsDifferentFromClone
+			? catalogConstructionId
+			: headerIdToSend;
+
+		if (!constructionHeaderIdForRequest) {
+			toast.error(locale === 'ru' ? 'Выберите конструкцию' : 'Select a construction');
+			return false;
+		}
 
 		if (!reportId) {
 			creatingReportRef.current = true;
 			syncingRef.current = true;
+			dispatch(startLoading());
 			try {
 				const response = await createSingleReportInfo(
 					convertToCreateSingleReportInfoCommand({
 						calculationDocumentId,
 						name: name.trim(),
-						constructionHeaderId: constructionId,
+						constructionHeaderId: catalogConstructionId,
 						width: Number(width),
 						length: Number(length),
 						square: Number(area),
 					}),
 				);
 				const id = response?.data?.id;
-				if (response?.status === 200 && id) {
-					const reportConstructionId = response.data?.singleReportConstruction?.id;
-					if (reportConstructionId) setSavedConstructionId(reportConstructionId);
-					sessionStorage.setItem('reportId', id);
-					sessionStorage.setItem('reportType', ReportCategory.Single);
-					lastSyncedKeyRef.current = formSyncKey;
-					setReportId(id);
-					setReportInfo(convertToClientSingleReportInfoShort(response.data));
-					navigate('', {
-						reportId: id,
-						reportType: ReportCategory.Single,
-					});
-					refreshGraphAndSvg(constructionId);
-					return true;
+				if (!isSuccessStatus(response?.status) || !id) {
+					toast.error(t('errors.request'));
+					return false;
 				}
-				toast.error(t('errors.request'));
-				return false;
+
+				const cloned = extractSingleReportConstruction(response.data);
+				const clonedHeaderId = cloned?.constructionHeaderId || '';
+				if (!clonedHeaderId) {
+					toast.error(
+						locale === 'ru'
+							? 'В ответе нет constructionHeaderId склонированной конструкции'
+							: 'Response has no cloned constructionHeaderId',
+					);
+					return false;
+				}
+
+				persistSingleReportSession(id);
+				setReportId(id);
+				setReportInfo(convertToClientSingleReportInfoShort(response.data));
+				bindClonedConstruction(clonedHeaderId, cloned?.id || undefined);
+				lastSyncedKeyRef.current = formSyncKey;
+
+				navigate('', {
+					reportId: id,
+					reportType: ReportCategory.Single,
+				});
+
+				loadConstructionDetail(clonedHeaderId, true);
+				await adoptClonedConstructionFromReport(id);
+				return true;
 			} catch (error) {
 				if (error instanceof AxiosError) {
 					toast.error(error.response?.data || t('errors.request'));
@@ -527,25 +694,52 @@ export const CalculationScreen = () => {
 			} finally {
 				creatingReportRef.current = false;
 				syncingRef.current = false;
+				dispatch(stopLoading());
 			}
 		}
 
 		syncingRef.current = true;
+		dispatch(startLoading());
 		try {
 			const response = await updateReportSingle({
-				data: convertToUpdateSingleReportCommand(reportId, constructionPayload),
+				data: convertToUpdateSingleReportCommand(reportId, {
+					id: savedConstructionId || undefined,
+					name: name.trim(),
+					// всегда клон, либо новая справочная при явной смене в селекте (replace)
+					construction: constructionHeaderIdForRequest,
+					width,
+					length,
+					area,
+					constructionType: '',
+					firstPlacementRoom: '',
+					secondPlacementRoom: '',
+				}),
 			});
-			if (response?.status === 200) {
-				const nextId = response.data?.singleReportConstruction?.id;
-				if (nextId) setSavedConstructionId(nextId);
-				lastSyncedKeyRef.current = formSyncKey;
-				sessionStorage.setItem('reportType', ReportCategory.Single);
-				sessionStorage.setItem('reportId', reportId);
-				refreshGraphAndSvg(constructionId);
-				return true;
+			if (!isSuccessStatus(response?.status)) {
+				toast.error(t('errors.request'));
+				return false;
 			}
-			toast.error(t('errors.request'));
-			return false;
+
+			persistSingleReportSession(reportId);
+
+			const cloned = extractSingleReportConstruction(response.data);
+			const clonedHeaderId =
+				cloned?.constructionHeaderId ||
+				(await adoptClonedConstructionFromReport(reportId));
+
+			if (!clonedHeaderId) {
+				toast.error(
+					locale === 'ru'
+						? 'В ответе нет constructionHeaderId склонированной конструкции'
+						: 'Response has no cloned constructionHeaderId',
+				);
+				return false;
+			}
+
+			bindClonedConstruction(clonedHeaderId, cloned?.id || undefined);
+			lastSyncedKeyRef.current = formSyncKey;
+			loadConstructionDetail(clonedHeaderId, true);
+			return true;
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				toast.error(error.response?.data || t('createConstruction.error.addConstruction'));
@@ -553,30 +747,68 @@ export const CalculationScreen = () => {
 			return false;
 		} finally {
 			syncingRef.current = false;
+			dispatch(stopLoading());
 		}
 	}, [
+		adoptClonedConstructionFromReport,
 		area,
+		bindClonedConstruction,
 		calculationDocumentId,
-		constructionId,
+		catalogConstructionId,
+		dispatch,
 		formSyncKey,
 		isFormComplete,
 		length,
+		loadConstructionDetail,
 		locale,
 		name,
 		navigate,
-		refreshGraphAndSvg,
 		reportId,
 		savedConstructionId,
 		t,
 		width,
+		workingHeaderId,
 	]);
 
 	const handleCalculateClick = () => {
 		void syncReportConstruction();
 	};
 
+	const handleDownloadReport = () => {
+		if (!reportId) return;
+		dispatch(startLoading());
+		from(reportReceiveSingle(reportId))
+			.pipe(
+				catchError((error) => {
+					if (error instanceof AxiosError) {
+						toast.error(error.response?.data || t('errors.request'));
+					} else {
+						toast.error(t('errors.request'));
+					}
+					return of(null);
+				}),
+				finalize(() => dispatch(stopLoading())),
+			)
+			.subscribe((response) => {
+				if (response?.status !== 200) return;
+				if (typeof response.data === 'string' && response.data) {
+					const link = document.createElement('a');
+					link.href = response.data;
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
+					dispatch(getCurrentUser());
+				}
+			});
+	};
+
 	const clearConstruction = () => {
-		setConstructionId('');
+		setCatalogConstructionId('');
+		// Не сбрасываем клон отчёта при смене фильтра типа — отчёт уже создан
+		if (!reportId) {
+			setWorkingHeaderId('');
+			workingHeaderIdRef.current = '';
+		}
 		setDetail(null);
 		setSvgUrl(null);
 		setGraphData(null);
@@ -669,20 +901,24 @@ export const CalculationScreen = () => {
 	};
 
 	const handleRestoreInitialConstruction = () => {
-		if (!constructionId) return;
-		loadConstructionDetail(constructionId, canShowWorkspace);
+		if (!activeHeaderId) return;
+		loadConstructionDetail(activeHeaderId, canShowWorkspace);
 	};
 
 	const onCalculateHandle = () => {
-		if (!constructionId || isConstructionEditLocked) return;
+		const cloneId = workingHeaderIdRef.current || workingHeaderId;
+		if (!cloneId || isConstructionEditLocked) return;
 		const formData = prepareConstructionEditDataForPersistence(
 			form.getValues() as ConstructionsEditData,
 		);
+		// Всегда пишем в склонированный header из отчёта, не в справочный из селекта
+		formData.id = cloneId;
 		form.reset(formData as DesigningData, { keepDefaultValues: false });
 		setDetail((prev) =>
 			prev
 				? {
 						...prev,
+						id: cloneId,
 						constructionType: formData.constructionType ?? prev.constructionType,
 						constructionTypeObject: formData.constructionTypeObject,
 					}
@@ -690,6 +926,7 @@ export const CalculationScreen = () => {
 		);
 		const dataForServer = convertToServerConstructionsEditData({
 			...formData,
+			id: cloneId,
 			reportInfoId: reportId || undefined,
 		});
 
@@ -702,10 +939,10 @@ export const CalculationScreen = () => {
 		)
 			.pipe(
 				tap((response) => {
-					if (response?.status !== 200) return;
+					if (!isSuccessStatus(response?.status)) return;
 					toast.success(t('success.constructionUpdated'));
 					setHasPendingTypeChange(false);
-					loadConstructionDetail(constructionId, true);
+					loadConstructionDetail(cloneId, true);
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -759,10 +996,10 @@ export const CalculationScreen = () => {
 					/>
 					<Select
 						options={constructionSelectOptions}
-						value={constructionId}
+						value={catalogConstructionId}
 						onChange={(value) => {
 							const next = value ? String(value) : '';
-							setConstructionId(next);
+							setCatalogConstructionId(next);
 							const selected = constructionData.find((c) => String(c.id) === next);
 							if (selected?.constructionType) {
 								setTypeEnumFilter(String(selected.constructionType));
@@ -961,10 +1198,23 @@ export const CalculationScreen = () => {
 				</>
 			)}
 
+			{canShowWorkspace ? (
+				<div className="flex justify-end">
+					<Button
+						type="button"
+						onClick={handleDownloadReport}
+						variant="primary"
+						className="h-[50px] self-end text-[20px]"
+					>
+						{t('floorPlans.generateReport')}
+					</Button>
+				</div>
+			) : null}
+
 			<ConstructionDetailsModal
 				isOpen={isDetailsOpen}
 				onClose={() => setIsDetailsOpen(false)}
-				constructionHeaderId={constructionId || null}
+				constructionHeaderId={workingHeaderId || activeHeaderId || null}
 				overrides={{
 					constructionType: detail?.constructionType,
 					issuerName: detail?.issuerName,
