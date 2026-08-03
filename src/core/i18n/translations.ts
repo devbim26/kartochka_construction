@@ -595,6 +595,9 @@ export const en = {
 		'Helps produce architectural solution albums for project documentation.',
 	'main.designCards.continueInConstructor': 'Continue in the constructor',
 	'main.designCards.continueInAiMode': 'Continue in AI mode',
+	'main.designCards.sound.choiceModalTitle': 'Design',
+	'main.designCards.sound.choiceCalculation': 'Construction sound insulation calculation',
+	'main.designCards.sound.choiceProject': 'Building sound insulation project',
 	'main.designCards.heat.title': 'Wall thermal insulation calculation',
 	'main.designCards.heat.desc1': 'Calculation according to SP 2.04.01-2020.',
 	'main.designCards.heat.desc2':
@@ -770,7 +773,7 @@ export const en = {
 
 	'constructor.designing.selectType': 'Select type',
 	'constructor.designing.calculate': 'Calculate',
-	'constructor.designing.calcValue': 'Calculated value(air)',
+	'constructor.designing.calcValue': 'Calculated value (airborne noise)',
 	'constructor.designing.labValue': 'Laboratory value',
 	'constructor.designing.allowedValue': 'Allowed value',
 	'constructor.designing.generalIssuerEditHint':
@@ -1882,6 +1885,9 @@ export const ru: Record<TranslationKey, string> = {
 		'Помогает формировать альбомы архитектурных решений для проектной документации',
 	'main.designCards.continueInConstructor': 'Продолжить в конструкторе',
 	'main.designCards.continueInAiMode': 'Продолжить в AI mode',
+	'main.designCards.sound.choiceModalTitle': 'Проектирование',
+	'main.designCards.sound.choiceCalculation': 'Расчет звукоизоляции конструкции',
+	'main.designCards.sound.choiceProject': 'Проект звукоизоляции здания',
 	'main.designCards.heat.title': 'Расчет теплоизоляции стен',
 	'main.designCards.heat.desc1': 'Расчет по СП 2.04.01-2020.',
 	'main.designCards.heat.desc2':
@@ -2022,8 +2028,8 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.chart.legendDoorRlab': 'Звукоизоляция двери Rlab, dB',
 	'constructor.chart.legendImpactComputed': 'Звукоизоляция на ударный шум Lw (расчёт), dB',
 	'constructor.chart.legendImpactLaboratory': 'Звукоизоляция на ударный шум Lw (лаборатория), dB',
-	'constructor.chart.legendReference': 'Эталонная кривая(воздушный), dB',
-	'constructor.chart.legendReferenceImpact': 'Эталонная кривая(ударный), dB',
+	'constructor.chart.legendReference': 'Эталонная кривая (воздушный шум), dB',
+	'constructor.chart.legendReferenceImpact': 'Эталонная кривая (ударный шум), dB',
 	'constructor.chart.legendIntermediate': 'Промежуточная / дополнительный слой, dB',
 	'constructor.chart.legendSeries': 'Серия',
 	'constructor.chart.noiseModeAirborne': 'Воздушный',
@@ -2051,7 +2057,7 @@ export const ru: Record<TranslationKey, string> = {
 
 	'constructor.designing.selectType': 'Выберите тип',
 	'constructor.designing.calculate': 'Рассчитать',
-	'constructor.designing.calcValue': 'Расчетное значение(воздушный)',
+	'constructor.designing.calcValue': 'Расчетное значение (воздушный шум)',
 	'constructor.designing.labValue': 'Лабораторное значение',
 	'constructor.designing.allowedValue': 'Допустимое значение',
 	'constructor.designing.generalIssuerEditHint':

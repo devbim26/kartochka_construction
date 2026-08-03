@@ -7,6 +7,7 @@ import {
 	Select,
 	useAppDispatch,
 	useAppNavigate,
+	useAppSelector,
 	useI18n,
 	type SelectOption,
 } from '@core';
@@ -18,6 +19,8 @@ import {
 	convertToUpdateSingleReportCommand,
 	graphAdditionalValuesConverterToClient,
 	graphDotsConverterToClient,
+	mapAdditionalOpeningsFromDto,
+	mapAdditionalOpeningsToUpdateDto,
 } from '@features/constructor/converters';
 import {
 	createSingleReportInfo,
@@ -27,11 +30,13 @@ import {
 	graphDetail,
 	reportReceiveSingle,
 	svgConstructionDetail,
+	updateReportConstructionAdditional,
 	updateReportSingle,
 } from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
 import type {
 	AdditionalGraphParameters,
+	AdditionalOpeningRow,
 	DesigningData,
 	GraphDetailResponse,
 	ReportInfoShort,
@@ -39,9 +44,13 @@ import type {
 import { DesigningConfig, GraphDetailTable, ReportCategory } from '@features';
 import { getCurrentUser } from '@features/account/services';
 import {
+	clearCalculationSession,
 	filterConstructionTypeSelectOptions,
 	formatMaterial,
 	getLayoutClassFromConstructionHeader,
+	persistCalculationSession,
+	getCalculationReportId,
+	isMissingReportHttpStatus,
 	useGraphNoiseMode,
 } from '@features/constructor/utils';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
@@ -81,6 +90,10 @@ import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
+import {
+	AdditionalOpeningsForm,
+	type AdditionalOpeningsFormHandle,
+} from '../designing/additional-openings-form.component';
 import DesigningGraph from '../designing/designing-graph.component';
 import { ConstructionDetailsModal } from '../modals';
 
@@ -97,14 +110,7 @@ const isSuccessStatus = (status?: number) =>
 const extractSingleReportConstruction = (data?: ReportInfoSingleDto | null) => {
 	if (!data) return null;
 	const raw = data as ReportInfoSingleDto & {
-		reportConstruction?: {
-			id?: string;
-			constructionHeaderId?: string;
-			constructionHeader?: { id?: string };
-			width?: number;
-			length?: number;
-			square?: number;
-		};
+		reportConstruction?: NonNullable<ReportInfoSingleDto['singleReportConstruction']>;
 	};
 	const sc = raw.singleReportConstruction ?? raw.reportConstruction ?? null;
 	if (!sc) return null;
@@ -118,12 +124,13 @@ const extractSingleReportConstruction = (data?: ReportInfoSingleDto | null) => {
 		width: sc.width,
 		length: sc.length,
 		square: sc.square,
+		additionalWindows: mapAdditionalOpeningsFromDto(sc.additionalWindows),
+		additionalDoors: mapAdditionalOpeningsFromDto(sc.additionalDoors),
 	};
 };
 
 const persistSingleReportSession = (id: string) => {
-	sessionStorage.setItem('reportId', id);
-	sessionStorage.setItem('reportType', ReportCategory.Single);
+	persistCalculationSession(id);
 };
 
 /**
@@ -134,13 +141,11 @@ export const CalculationScreen = () => {
 	const { t, locale } = useI18n();
 	const dispatch = useAppDispatch();
 	const navigate = useAppNavigate();
+	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [search] = useSearchParams();
 	const reportIdFromSearch = search.get('reportId') || '';
 	const [reportId, setReportId] = useState(
-		reportIdFromSearch ||
-			(sessionStorage.getItem('reportType') === ReportCategory.Single
-				? sessionStorage.getItem('reportId') || ''
-				: ''),
+		reportIdFromSearch || getCalculationReportId() || '',
 	);
 
 	const [name, setName] = useState('');
@@ -151,6 +156,10 @@ export const CalculationScreen = () => {
 	/** Копия ConstructionHeader из SingleReportInfo — с ней работаем после create/update. */
 	const [workingHeaderId, setWorkingHeaderId] = useState('');
 	const [savedConstructionId, setSavedConstructionId] = useState<string | null>(null);
+	const [additionalWindows, setAdditionalWindows] = useState<AdditionalOpeningRow[]>([]);
+	const [additionalDoors, setAdditionalDoors] = useState<AdditionalOpeningRow[]>([]);
+	const additionalOpeningsRef = useRef<AdditionalOpeningsFormHandle>(null);
+	const savedConstructionIdRef = useRef<string | null>(null);
 	const [typeEnumFilter, setTypeEnumFilter] = useState('');
 	const [constructionData, setConstructionData] = useState<ConstructionsAddData[]>([]);
 	const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
@@ -249,6 +258,8 @@ export const CalculationScreen = () => {
 			detail?.constructionType) as ConstructionTypeEnum | undefined;
 	}, [form, detail]);
 
+	const isFloorConstruction = layoutClass === ConstructionClass.Floor;
+
 	const isConstructionEditLocked = useMemo(() => {
 		// Склонённая конструкция отчёта всегда редактируема; справочную не трогаем.
 		if (workingHeaderId) return false;
@@ -258,6 +269,10 @@ export const CalculationScreen = () => {
 	useEffect(() => {
 		workingHeaderIdRef.current = workingHeaderId;
 	}, [workingHeaderId]);
+
+	useEffect(() => {
+		savedConstructionIdRef.current = savedConstructionId;
+	}, [savedConstructionId]);
 
 	const calculationDocumentOptions = useMemo(
 		() => convertToRequirementDocumentSelectValues(calculationDocuments, locale),
@@ -344,6 +359,7 @@ export const CalculationScreen = () => {
 	);
 
 	useEffect(() => {
+		dispatch(startLoading());
 		from(getCalculationRequirementDocuments())
 			.pipe(
 				tap((response) => {
@@ -352,16 +368,31 @@ export const CalculationScreen = () => {
 					}
 				}),
 				catchError(() => of(null)),
+				finalize(() => dispatch(stopLoading())),
 			)
 			.subscribe();
-	}, []);
+	}, [dispatch]);
+
+	const resetMissingCalculationReport = useCallback(() => {
+		clearCalculationSession();
+		setReportId('');
+		setReportInfo(null);
+		setSavedConstructionId(null);
+		setWorkingHeaderId('');
+		workingHeaderIdRef.current = '';
+		lastSyncedKeyRef.current = '';
+		navigate('');
+	}, [navigate]);
 
 	useEffect(() => {
 		if (!reportId) return;
 		from(getReportSingleById({ id: reportId }))
 			.pipe(
 				tap((response) => {
-					if (!isSuccessStatus(response?.status) || !response.data) return;
+					if (!isSuccessStatus(response?.status) || !response.data) {
+						resetMissingCalculationReport();
+						return;
+					}
 					const short = convertToClientSingleReportInfoShort(response.data);
 					setReportInfo(short);
 					const docId = short.calculationDocument?.id || '';
@@ -375,23 +406,44 @@ export const CalculationScreen = () => {
 					setWorkingHeaderId(existing.constructionHeaderId);
 					workingHeaderIdRef.current = existing.constructionHeaderId;
 					setCatalogConstructionId(existing.constructionHeaderId);
+					setAdditionalWindows(existing.additionalWindows);
+					setAdditionalDoors(existing.additionalDoors);
 					if (existing.width != null) setWidth(String(existing.width));
 					if (existing.length != null) setLength(String(existing.length));
 					persistSingleReportSession(reportId);
 				}),
-				catchError(() => of(null)),
+				catchError((error) => {
+					if (
+						error instanceof AxiosError &&
+						isMissingReportHttpStatus(error.response?.status)
+					) {
+						resetMissingCalculationReport();
+					}
+					return of(null);
+				}),
 			)
 			.subscribe();
-	}, [reportId]);
+	}, [reportId, resetMissingCalculationReport]);
 
 	/** После create/update — как floor plans: перечитываем отчёт и фиксируем клон как текущую конструкцию. */
 	const bindClonedConstruction = useCallback(
-		(clonedHeaderId: string, reportConstructionRowId?: string) => {
+		(
+			clonedHeaderId: string,
+			reportConstructionRowId?: string,
+			openings?: {
+				additionalWindows?: AdditionalOpeningRow[];
+				additionalDoors?: AdditionalOpeningRow[];
+			},
+		) => {
 			if (reportConstructionRowId) setSavedConstructionId(reportConstructionRowId);
 			setWorkingHeaderId(clonedHeaderId);
 			workingHeaderIdRef.current = clonedHeaderId;
 			// Селект = клон (как form.construction после create в поэтажном)
 			setCatalogConstructionId(clonedHeaderId);
+			if (openings) {
+				setAdditionalWindows(openings.additionalWindows ?? []);
+				setAdditionalDoors(openings.additionalDoors ?? []);
+			}
 		},
 		[],
 	);
@@ -419,7 +471,10 @@ export const CalculationScreen = () => {
 			persistSingleReportSession(ensuredReportId);
 			setReportId(ensuredReportId);
 			setReportInfo(convertToClientSingleReportInfoShort(detailResponse.data));
-			bindClonedConstruction(clonedHeaderId, cloned.id || undefined);
+			bindClonedConstruction(clonedHeaderId, cloned.id || undefined, {
+				additionalWindows: cloned.additionalWindows,
+				additionalDoors: cloned.additionalDoors,
+			});
 			lastSyncedKeyRef.current = formSyncKey;
 
 			if (cloned.width != null && Number(cloned.width) > 0) {
@@ -436,6 +491,7 @@ export const CalculationScreen = () => {
 
 	const loadCatalog = () => {
 		setListLoading(true);
+		dispatch(startLoading());
 		const serverTypeFilter = typeEnumFilter
 			? convertToServerConstructionTypeEnumData(typeEnumFilter as ConstructionTypeEnum)
 			: undefined;
@@ -488,7 +544,10 @@ export const CalculationScreen = () => {
 					toast.error(t('errors.request'));
 					return of(null);
 				}),
-				finalize(() => setListLoading(false)),
+				finalize(() => {
+					setListLoading(false);
+					dispatch(stopLoading());
+				}),
 			)
 			.subscribe();
 	};
@@ -497,51 +556,39 @@ export const CalculationScreen = () => {
 		loadCatalog();
 	}, [typeEnumFilter]);
 
-	const refreshGraphAndSvg = useCallback(
-		(id: string) => {
-			from(svgConstructionDetail(id))
-				.pipe(
-					tap((response) => {
-						if (response.status === 200 && typeof response.data === 'string') {
-							setSvgUrl(response.data);
-						}
-					}),
-					catchError(() => of(null)),
-				)
-				.subscribe();
-
-			from(graphDetail({ constructionHeaderId: id }))
-				.pipe(
-					tap((response) => {
-						if (response?.status === 200 && Array.isArray(response.data)) {
-							setGraphData(response.data.map(graphDotsConverterToClient));
-						}
-					}),
-					catchError(() => {
-						setGraphData(null);
-						return of(null);
-					}),
-				)
-				.subscribe();
-
-			from(graphAdditionalDetail({ constructionHeaderId: id }))
-				.pipe(
-					tap((response) => {
-						if (response?.status === 200 && response.data) {
-							setGraphAdditionalData(
-								graphAdditionalValuesConverterToClient(response.data),
-							);
-						}
-					}),
-					catchError(() => {
-						setGraphAdditionalData(null);
-						return of(null);
-					}),
-				)
-				.subscribe();
-		},
-		[],
-	);
+	const refreshGraphAndSvg = useCallback((id: string) => {
+		return from(
+			Promise.all([
+				svgConstructionDetail(id),
+				graphDetail({ constructionHeaderId: id }),
+				graphAdditionalDetail({ constructionHeaderId: id }),
+			]),
+		).pipe(
+			tap(([svgResponse, graphResponse, additionalResponse]) => {
+				if (svgResponse?.status === 200 && typeof svgResponse.data === 'string') {
+					setSvgUrl(svgResponse.data);
+				}
+				if (graphResponse?.status === 200 && Array.isArray(graphResponse.data)) {
+					setGraphData(graphResponse.data.map(graphDotsConverterToClient));
+				} else {
+					setGraphData(null);
+				}
+				if (additionalResponse?.status === 200 && additionalResponse.data) {
+					setGraphAdditionalData(
+						graphAdditionalValuesConverterToClient(additionalResponse.data),
+					);
+				} else {
+					setGraphAdditionalData(null);
+				}
+			}),
+			catchError(() => {
+				setSvgUrl(null);
+				setGraphData(null);
+				setGraphAdditionalData(null);
+				return of(null);
+			}),
+		);
+	}, []);
 
 	const loadConstructionDetail = useCallback(
 		(id: string, withVisuals: boolean) => {
@@ -567,16 +614,18 @@ export const CalculationScreen = () => {
 						toast.error(t('errors.constructionLoad'));
 						return of(null);
 					}),
+					switchMap(() => {
+						if (!withVisuals) {
+							setSvgUrl(null);
+							setGraphData(null);
+							setGraphAdditionalData(null);
+							return of(null);
+						}
+						return refreshGraphAndSvg(id);
+					}),
 					finalize(() => dispatch(stopLoading())),
 				)
 				.subscribe();
-			if (withVisuals) {
-				refreshGraphAndSvg(id);
-			} else {
-				setSvgUrl(null);
-				setGraphData(null);
-				setGraphAdditionalData(null);
-			}
 		},
 		[dispatch, form, name, refreshGraphAndSvg, t],
 	);
@@ -673,7 +722,10 @@ export const CalculationScreen = () => {
 				persistSingleReportSession(id);
 				setReportId(id);
 				setReportInfo(convertToClientSingleReportInfoShort(response.data));
-				bindClonedConstruction(clonedHeaderId, cloned?.id || undefined);
+				bindClonedConstruction(clonedHeaderId, cloned?.id || undefined, {
+					additionalWindows: cloned?.additionalWindows,
+					additionalDoors: cloned?.additionalDoors,
+				});
 				lastSyncedKeyRef.current = formSyncKey;
 
 				navigate('', {
@@ -713,6 +765,7 @@ export const CalculationScreen = () => {
 					constructionType: '',
 					firstPlacementRoom: '',
 					secondPlacementRoom: '',
+					calculationDocumentId,
 				}),
 			});
 			if (!isSuccessStatus(response?.status)) {
@@ -736,11 +789,73 @@ export const CalculationScreen = () => {
 				return false;
 			}
 
-			bindClonedConstruction(clonedHeaderId, cloned?.id || undefined);
+			bindClonedConstruction(clonedHeaderId, cloned?.id || undefined, {
+				additionalWindows: cloned?.additionalWindows,
+				additionalDoors: cloned?.additionalDoors,
+			});
 			lastSyncedKeyRef.current = formSyncKey;
 			loadConstructionDetail(clonedHeaderId, true);
 			return true;
 		} catch (error) {
+			if (
+				error instanceof AxiosError &&
+				isMissingReportHttpStatus(error.response?.status)
+			) {
+				resetMissingCalculationReport();
+				creatingReportRef.current = true;
+				try {
+					const response = await createSingleReportInfo(
+						convertToCreateSingleReportInfoCommand({
+							calculationDocumentId,
+							name: name.trim(),
+							constructionHeaderId:
+								catalogConstructionId || constructionHeaderIdForRequest,
+							width: Number(width),
+							length: Number(length),
+							square: Number(area),
+						}),
+					);
+					const id = response?.data?.id;
+					if (!isSuccessStatus(response?.status) || !id) {
+						toast.error(t('errors.request'));
+						return false;
+					}
+					const cloned = extractSingleReportConstruction(response.data);
+					const clonedHeaderId = cloned?.constructionHeaderId || '';
+					if (!clonedHeaderId) {
+						toast.error(
+							locale === 'ru'
+								? 'В ответе нет constructionHeaderId склонированной конструкции'
+								: 'Response has no cloned constructionHeaderId',
+						);
+						return false;
+					}
+					persistSingleReportSession(id);
+					setReportId(id);
+					setReportInfo(convertToClientSingleReportInfoShort(response.data));
+					bindClonedConstruction(clonedHeaderId, cloned?.id || undefined, {
+						additionalWindows: cloned?.additionalWindows,
+						additionalDoors: cloned?.additionalDoors,
+					});
+					lastSyncedKeyRef.current = formSyncKey;
+					navigate('', {
+						reportId: id,
+						reportType: ReportCategory.Single,
+					});
+					loadConstructionDetail(clonedHeaderId, true);
+					await adoptClonedConstructionFromReport(id);
+					return true;
+				} catch (createError) {
+					if (createError instanceof AxiosError) {
+						toast.error(createError.response?.data || t('errors.request'));
+					} else {
+						toast.error(t('errors.request'));
+					}
+					return false;
+				} finally {
+					creatingReportRef.current = false;
+				}
+			}
 			if (error instanceof AxiosError) {
 				toast.error(error.response?.data || t('createConstruction.error.addConstruction'));
 			}
@@ -764,6 +879,7 @@ export const CalculationScreen = () => {
 		name,
 		navigate,
 		reportId,
+		resetMissingCalculationReport,
 		savedConstructionId,
 		t,
 		width,
@@ -905,6 +1021,41 @@ export const CalculationScreen = () => {
 		loadConstructionDetail(activeHeaderId, canShowWorkspace);
 	};
 
+	const updateAdditionalOpenings$ = useCallback(() => {
+		if (isFloorConstruction) {
+			return of(true);
+		}
+		const rcId = savedConstructionIdRef.current;
+		const openings = additionalOpeningsRef.current;
+		if (!rcId || !openings) {
+			return of(true);
+		}
+		const { windows, doors } = openings.getPayload();
+		return from(
+			updateReportConstructionAdditional({
+				reportConstructionId: rcId,
+				additionalWindows: mapAdditionalOpeningsToUpdateDto(windows),
+				additionalDoors: mapAdditionalOpeningsToUpdateDto(doors),
+			}),
+		).pipe(
+			tap((res) => {
+				if (isSuccessStatus(res?.status)) {
+					setAdditionalWindows(windows);
+					setAdditionalDoors(doors);
+				}
+			}),
+			catchError((error) => {
+				if (error instanceof AxiosError) {
+					toast.error(error.response?.data || t('errors.request'));
+				} else {
+					toast.error(t('errors.request'));
+				}
+				return of(null);
+			}),
+			switchMap((addRes) => of(addRes?.status === 200)),
+		);
+	}, [isFloorConstruction, t]);
+
 	const onCalculateHandle = () => {
 		const cloneId = workingHeaderIdRef.current || workingHeaderId;
 		if (!cloneId || isConstructionEditLocked) return;
@@ -931,15 +1082,21 @@ export const CalculationScreen = () => {
 		});
 
 		dispatch(startLoading());
-		from(
-			getGuidebooksEdit({
-				data: dataForServer,
-				guidebookType: Guidebooks.CONSTRUCTION,
-			}),
-		)
+		updateAdditionalOpenings$()
 			.pipe(
+				switchMap((openingsOk) => {
+					if (!openingsOk) {
+						return of(null);
+					}
+					return from(
+						getGuidebooksEdit({
+							data: dataForServer,
+							guidebookType: Guidebooks.CONSTRUCTION,
+						}),
+					);
+				}),
 				tap((response) => {
-					if (!isSuccessStatus(response?.status)) return;
+					if (!response || !isSuccessStatus(response?.status)) return;
 					toast.success(t('success.constructionUpdated'));
 					setHasPendingTypeChange(false);
 					loadConstructionDetail(cloneId, true);
@@ -959,6 +1116,11 @@ export const CalculationScreen = () => {
 
 	return (
 		<div className="relative flex w-full flex-col gap-[24px]">
+			{isLoading && (
+				<div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-[10px] bg-white/60">
+					<Loader />
+				</div>
+			)}
 			<p className="font-sans text-lg font-semibold">{t('constructor.calculation.title')}</p>
 
 			<div className="flex flex-col gap-[16px] rounded-[20px] bg-white px-[24px] py-[20px]">
@@ -966,9 +1128,27 @@ export const CalculationScreen = () => {
 					<Select
 						options={calculationDocumentOptions}
 						value={calculationDocumentId}
-						onChange={(value) => setCalculationDocumentId(value ? String(value) : '')}
+						onChange={(value) => {
+							const next = value ? String(value) : '';
+							setCalculationDocumentId(next);
+							const selected = calculationDocuments.find((d) => String(d.id) === next);
+							if (selected) {
+								setReportInfo((prev) =>
+									prev
+										? {
+												...prev,
+												calculationDocument: {
+													id: selected.id || '',
+													name: selected.shortName || selected.fullName || '',
+													fullName: selected.fullName || selected.shortName || '',
+													country: prev.calculationDocument?.country || '',
+												},
+											}
+										: prev,
+								);
+							}
+						}}
 						isSearchable
-						disabled={!!reportId && !!reportInfo?.calculationDocument?.id}
 						label={t('aboutBuilding.requirements.calculation')}
 						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
 						placeholder={t('aboutBuilding.requirements.calculation')}
@@ -1148,6 +1328,15 @@ export const CalculationScreen = () => {
 									}
 								</SelectableMaterialDesignationProvider>
 							</MaterialApplicationPurposeProvider>
+						) : null}
+						{savedConstructionId && !isFloorConstruction && !isConstructionEditLocked ? (
+							<AdditionalOpeningsForm
+								ref={additionalOpeningsRef}
+								key={savedConstructionId}
+								reportConstructionId={savedConstructionId}
+								initialWindows={additionalWindows}
+								initialDoors={additionalDoors}
+							/>
 						) : null}
 						{(hasPendingTypeChange || !isConstructionEditLocked) && (
 							<div className="flex items-center justify-end gap-[10px]">

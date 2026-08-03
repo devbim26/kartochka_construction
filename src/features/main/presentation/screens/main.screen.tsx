@@ -52,11 +52,11 @@ const MainScreen = () => {
 	};
 
 	return (
-		<div className="flex w-full flex-col gap-[30px] pb-[29px]">
+		<div className="flex w-full flex-col gap-[16px] pb-[29px]">
 			<MainHeader />
-			<div className="flex w-full flex-row items-stretch gap-[20px]">
-				<News />
-				<CurrentSub className="min-w-0 flex-1" />
+			<div className="grid w-full grid-cols-2 grid-rows-[auto_1fr] gap-x-[20px] gap-y-[12px]">
+				<News splitForGrid />
+				<CurrentSub splitForGrid />
 			</div>
 			<ReportScreen />
 			<Modal

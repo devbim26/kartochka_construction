@@ -18,6 +18,10 @@ import {
 	GeneralInformationSoundproofing,
 	GeneralInformationThermal,
 } from '../modals';
+import {
+	ConstructionComplianceBanner,
+	type ConstructionComplianceStatus,
+} from '../construction-compliance-banner.component';
 import { CatalogLabTestGraphModal } from './catalog-lab-test-graph-modal.component';
 
 type Props = {
@@ -25,6 +29,7 @@ type Props = {
 	svgUrl: string | null;
 	reportInfo?: ReportInfoShort;
 	appliedRestrictions?: ConstructionSelectRestrictions;
+	complianceStatus?: ConstructionComplianceStatus;
 };
 
 const toOptionalNumber = (value: unknown): number | null => {
@@ -45,6 +50,7 @@ export const ConstructionCard = ({
 	svgUrl,
 	reportInfo,
 	appliedRestrictions,
+	complianceStatus = null,
 }: Props) => {
 	const { t } = useI18n();
 	const [thickness, setThickness] = useState<number>(0);
@@ -86,6 +92,12 @@ export const ConstructionCard = ({
 				calculationDocName=""
 			/>
 			<div className="flex flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
+			{complianceStatus ? (
+				<ConstructionComplianceBanner
+					status={complianceStatus}
+					className="max-w-none"
+				/>
+			) : null}
 			<p className="font-sans text-lg font-semibold leading-4">
 				{
 					RuConstructionTypesMap[

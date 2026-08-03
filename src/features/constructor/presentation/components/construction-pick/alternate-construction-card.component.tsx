@@ -190,7 +190,7 @@ export const AlternateConstructionCard = ({
 						className="h-[40px] w-fit self-end bg-white px-[16px] font-sans text-sm font-semibold text-primary shadow-none ring-2 ring-inset ring-primary enabled:hover:bg-primary enabled:hover:text-white"
 						onClick={handleUseInReport}
 					>
-						Использовать в отчете
+						Сделать базовой
 					</Button>
 				</div>
 				<div className="flex w-full min-w-0 flex-row items-start justify-start gap-3 text-left">

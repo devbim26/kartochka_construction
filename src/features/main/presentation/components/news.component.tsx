@@ -7,8 +7,15 @@ import { FaAngleLeft, FaAngleRight } from 'react-icons/fa6';
 import { from } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { toast } from 'sonner';
+import { twMerge } from 'tailwind-merge';
 
-export const News = () => {
+type Props = {
+	/** Для сетки с тарифом: заголовок и белая карточка — отдельные ячейки одной высоты. */
+	splitForGrid?: boolean;
+	className?: string;
+};
+
+export const News = ({ splitForGrid = false, className }: Props) => {
 	const navigate = useAppNavigate();
 	const [articles, setArticles] = useState<ArticleDto[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
@@ -35,7 +42,7 @@ export const News = () => {
 				}),
 			)
 			.subscribe();
-	}, []);
+	}, [t]);
 
 	const handlePrev = useCallback(() => {
 		setCurrentIndex((prev) => (prev - 1 + articles.length) % articles.length);
@@ -47,10 +54,16 @@ export const News = () => {
 
 	const currentArticle = articles[currentIndex];
 
-	return (
-		<div className="flex h-full min-h-[320px] flex-1 flex-col justify-between gap-[15px] rounded-xl border border-gray-border bg-white px-[18px] pb-[15px] pt-[20px]">
-			<p className="font-sans text-2xl font-semibold leading-4">{t('main.news.title')}</p>
+	const title = (
+		<p className="font-sans text-2xl font-semibold leading-7">{t('main.news.title')}</p>
+	);
 
+	const card = (
+		<div
+			className={twMerge(
+				'flex h-full min-h-[320px] flex-col justify-between gap-[15px] rounded-xl border border-gray-border bg-white px-[18px] pb-[15px] pt-[20px]',
+			)}
+		>
 			<div className="flex min-h-0 flex-1 flex-col gap-3">
 				{currentArticle && (
 					<>
@@ -102,6 +115,22 @@ export const News = () => {
 					</p>
 				)}
 			</div>
+		</div>
+	);
+
+	if (splitForGrid) {
+		return (
+			<>
+				<div className="col-start-1 row-start-1 flex items-end">{title}</div>
+				<div className="col-start-1 row-start-2 h-full min-h-[320px]">{card}</div>
+			</>
+		);
+	}
+
+	return (
+		<div className={twMerge('flex flex-1 flex-col gap-[12px]', className)}>
+			{title}
+			{card}
 		</div>
 	);
 };

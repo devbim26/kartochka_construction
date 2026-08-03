@@ -14,12 +14,11 @@ import {
 	useAppNavigate,
 	useI18n,
 } from '@core';
-import { setDesignCalculationModeFromFeatureId } from '@core/utils/helpers/design-calculation-mode.helper';
 import { getOpenWebUiModelFromFeatureId } from '@core/utils/helpers/open-webui-model.helper';
-import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { DESIGNING_ROUTES } from '@features/home/constants';
-import { Fragment, useCallback, type ComponentType, type ReactNode } from 'react';
+import { Fragment, useCallback, useState, type ComponentType, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { SoundInsulationChoiceModal } from './sound-insulation-choice-modal.component';
 
 interface FeatureCard {
 	id: string;
@@ -75,9 +74,29 @@ function MainSliderFeatureCard({
 	footer: ReactNode;
 }) {
 	const Logo = featureLogos[feature.id] ?? MainSliderLogo;
+	const isCardClickable = feature.id === 'sound-isolation' && Boolean(feature.onClick);
 
 	return (
-		<div className={twMerge(MAIN_SLIDER_CARD, !feature.active && 'bg-gray-text/30')}>
+		<div
+			className={twMerge(
+				MAIN_SLIDER_CARD,
+				!feature.active && 'bg-gray-text/30',
+				isCardClickable && 'cursor-pointer',
+			)}
+			onClick={isCardClickable ? feature.onClick : undefined}
+			onKeyDown={
+				isCardClickable
+					? (e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								feature.onClick?.();
+							}
+						}
+					: undefined
+			}
+			role={isCardClickable ? 'button' : undefined}
+			tabIndex={isCardClickable ? 0 : undefined}
+		>
 			<div className="flex min-h-0 flex-1 flex-col">
 				<div className="mb-1.5 flex shrink-0 items-start justify-between">
 					<div
@@ -113,7 +132,13 @@ function MainSliderFeatureCard({
 					</div>
 				</div>
 			</div>
-			<div className="mt-3 flex w-full shrink-0 justify-end">{footer}</div>
+			<div
+				className="mt-3 flex w-full shrink-0 justify-end"
+				onClick={(e) => e.stopPropagation()}
+				onKeyDown={(e) => e.stopPropagation()}
+			>
+				{footer}
+			</div>
 		</div>
 	);
 }
@@ -137,34 +162,7 @@ const renderAsteriskBold = (text: string) => {
 export const MainHeader = () => {
 	const navigate = useAppNavigate();
 	const { t } = useI18n();
-
-	const reportType = sessionStorage.getItem('reportType');
-	const reportId = sessionStorage.getItem('reportId');
-
-	const handleRedirect = useCallback(() => {
-		if (reportId && reportType)
-			navigate(
-				APP_ROUTES.designing.route +
-					'/' +
-					DESIGNING_ROUTES.constructor.route +
-					'/' +
-					CONSTRUCTOR_ROUTES.floorPlans.route,
-				{ reportId: reportId, reportType: reportType },
-			);
-		else
-			navigate(
-				APP_ROUTES.designing.route +
-					'/' +
-					DESIGNING_ROUTES.constructor.route +
-					'/' +
-					CONSTRUCTOR_ROUTES.aboutBuilding.route,
-			);
-	}, [reportId, reportType, navigate]);
-
-	const handleSoundIsolationDesignRedirect = useCallback(() => {
-		setDesignCalculationModeFromFeatureId('sound-isolation');
-		handleRedirect();
-	}, [handleRedirect]);
+	const [isSoundChoiceOpen, setIsSoundChoiceOpen] = useState(false);
 
 	const handleAiVisualizationRedirect = useCallback(
 		(featureId: string) => {
@@ -280,7 +278,7 @@ export const MainHeader = () => {
 			price: 'FREE',
 			buttonText: t('main.designCards.continueInConstructor'),
 			active: true,
-			onClick: handleSoundIsolationDesignRedirect,
+			onClick: () => setIsSoundChoiceOpen(true),
 		},
 		{
 			id: 'room-acoustics',
@@ -357,6 +355,12 @@ export const MainHeader = () => {
 
 	return (
 		<div className="w-full">
+			<SoundInsulationChoiceModal
+				isOpen={isSoundChoiceOpen}
+				onClose={() => setIsSoundChoiceOpen(false)}
+				mode="resume"
+			/>
+
 			<div className="mb-6 flex w-full items-center justify-between">
 				<p className="font-sans text-lg font-semibold leading-6">{t('main.pageTitle')}</p>
 			</div>

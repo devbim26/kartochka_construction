@@ -13,6 +13,8 @@ export interface ModalProps extends PropsWithChildren<MotionProps> {
 	Footer?: () => React.JSX.Element;
 	className?: string;
 	contentClassName?: string;
+	/** Доп. классы для затемнения фона (например backdrop-blur). */
+	backdropClassName?: string;
 	HeaderButton?: React.JSX.Element;
 }
 
@@ -25,6 +27,7 @@ export const Modal = ({
 	children,
 	className,
 	contentClassName,
+	backdropClassName,
 	...props
 }: ModalProps) => {
 	if (typeof document === 'undefined') return null;
@@ -43,7 +46,10 @@ export const Modal = ({
 						}}
 						onMouseDown={(e) => e.nativeEvent.stopImmediatePropagation()}
 						key="modal-root"
-						className="fixed inset-0 z-20 bg-black/40 transition-opacity"
+						className={twMerge(
+							'fixed inset-0 z-20 bg-black/40 transition-opacity',
+							backdropClassName,
+						)}
 						{...props}
 					/>
 				)}

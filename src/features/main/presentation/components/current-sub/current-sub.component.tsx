@@ -30,9 +30,11 @@ import { SubImage } from './images';
 
 type Props = {
 	className?: string;
+	/** Для сетки с новостями: заголовок и белая карточка — отдельные ячейки одной высоты. */
+	splitForGrid?: boolean;
 };
 
-export const CurrentSub = ({ className }: Props) => {
+export const CurrentSub = ({ className, splitForGrid = false }: Props) => {
 	const [activeSubscriptions, setActiveSubscriptions] = useState<Subscription[]>([]);
 	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
 	const [search] = useSearchParams();
@@ -119,7 +121,7 @@ export const CurrentSub = ({ className }: Props) => {
 		t(`main.currentSub.credits.${getPluralForm(value, locale)}`);
 
 	const renderSubscriptionCard = (subscription: Subscription) => (
-		<div className="flex min-h-[320px] w-full flex-row justify-between gap-[16px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]">
+		<div className="flex h-full min-h-[320px] w-full flex-row justify-between gap-[16px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]">
 			<div className="flex min-w-0 flex-1 flex-col justify-between gap-[16px]">
 				<div className="flex flex-col gap-[18px]">
 					<p className="font-sans text-2xl font-bold leading-7 text-primary">
@@ -161,12 +163,12 @@ export const CurrentSub = ({ className }: Props) => {
 		</div>
 	);
 
-	return (
-		<div className={twMerge('flex w-full flex-col gap-[20px]', className)}>
-			<div className="flex flex-col gap-[8px]">
-				<p className="font-sans text-2xl font-semibold leading-4">
-					{t('main.currentSub.title')}
-				</p>
+	const header = (
+		<div className="flex flex-col gap-[8px]">
+			<p className="font-sans text-2xl font-semibold leading-7">
+				{t('main.currentSub.title')}
+			</p>
+			<div className="flex flex-row flex-wrap items-center gap-x-6 gap-y-1">
 				<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
 					{t('main.currentSub.remainingCredits')}: {remainingCredits}{' '}
 					{creditsLabel(Number(remainingCredits) || 0)}
@@ -178,48 +180,64 @@ export const CurrentSub = ({ className }: Props) => {
 					{t('main.currentSub.remainingDownloads')}: {remainingReports}
 				</p>
 			</div>
+		</div>
+	);
 
-			{activeSubscriptions.length > 0 ? (
-				<Carousel
-					options={{
-						align: 'start',
-						loop: false,
-						containScroll: 'trimSnaps',
-					}}
-					slidesClassName="items-start"
-					showPagination={false}
-				>
-					{activeSubscriptions.map((subscription) => (
-						<CarouselSlide
-							key={subscription.id}
-							className={twMerge(
-								'w-auto self-start',
-								hasManyCards
-									? 'basis-full pr-3 md:basis-1/2'
-									: 'basis-full',
-							)}
-						>
-							{renderSubscriptionCard(subscription)}
-						</CarouselSlide>
-					))}
-				</Carousel>
-			) : (
-				<div className="flex min-h-[320px] w-full flex-row justify-between gap-[16px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]">
-					<div className="flex flex-1 flex-col justify-between gap-[16px]">
-						<p className="font-sans text-base leading-6 text-[#374151]">
-							{t('main.currentSub.noneActive')}
+	const body =
+		activeSubscriptions.length > 0 ? (
+			<Carousel
+				options={{
+					align: 'start',
+					loop: false,
+					containScroll: 'trimSnaps',
+				}}
+				className="h-full min-h-[320px]"
+				slidesClassName="h-full items-stretch"
+				showPagination={false}
+			>
+				{activeSubscriptions.map((subscription) => (
+					<CarouselSlide
+						key={subscription.id}
+						className={twMerge(
+							'h-full w-auto',
+							hasManyCards ? 'basis-full pr-3 md:basis-1/2' : 'basis-full',
+						)}
+					>
+						{renderSubscriptionCard(subscription)}
+					</CarouselSlide>
+				))}
+			</Carousel>
+		) : (
+			<div className="flex h-full min-h-[320px] w-full flex-row justify-between gap-[16px] rounded-xl border border-gray-border bg-white px-[18px] py-[15px]">
+				<div className="flex flex-1 flex-col justify-between gap-[16px]">
+					<p className="font-sans text-base leading-6 text-[#374151]">
+						{t('main.currentSub.noneActive')}
+					</p>
+					<Button className="w-min px-[16px]" onClick={handleChangePlan}>
+						<p className="font-sans text-sm font-semibold leading-4">
+							{t('subscription.buyPlan')}
 						</p>
-						<Button className="w-min px-[16px]" onClick={handleChangePlan}>
-							<p className="font-sans text-sm font-semibold leading-4">
-								{t('subscription.buyPlan')}
-							</p>
-						</Button>
-					</div>
-					<div className="flex shrink-0 items-start">
-						<SubImage />
-					</div>
+					</Button>
 				</div>
-			)}
+				<div className="flex shrink-0 items-start">
+					<SubImage />
+				</div>
+			</div>
+		);
+
+	if (splitForGrid) {
+		return (
+			<>
+				<div className="col-start-2 row-start-1">{header}</div>
+				<div className="col-start-2 row-start-2 h-full min-h-[320px]">{body}</div>
+			</>
+		);
+	}
+
+	return (
+		<div className={twMerge('flex w-full flex-col gap-[20px]', className)}>
+			{header}
+			{body}
 		</div>
 	);
 };

@@ -16,6 +16,7 @@ import {
 	createReportFloorInfo,
 	deleteReportConstruction,
 	deleteReportFloorInfo,
+	getFloorConstructionById,
 	getReportFloorById,
 	getReportSingleById,
 	reportReceiveSingle,
@@ -25,6 +26,10 @@ import {
 import { startLoading, stopLoading } from '@features/constructor/store';
 import type { ConstructionSheet, FloorConstruction } from '@features/constructor/types';
 import { ReportCategory } from '@features/constructor/types';
+import {
+	clearProjectSession,
+	isMissingReportHttpStatus,
+} from '@features/constructor/utils';
 import {
 	getLayoutClassFromConstructionHeader,
 	type FloorPlanExplantationTab,
@@ -138,6 +143,7 @@ export const FloorPlans = memoize(() => {
 	>({});
 	const [activeExplantationTab, setActiveExplantationTab] =
 		useState<FloorPlanExplantationTab>('walls');
+	const openingsHydratedIdsRef = useRef<Set<string>>(new Set());
 
 	const handleGetConstructionByHeaderId = (id: string) => {
 		from(getGuidebooksDetail({ id: id, guidebookType: Guidebooks.CONSTRUCTION }))
@@ -229,11 +235,23 @@ export const FloorPlans = memoize(() => {
 			const mergedConstructions = level.constructions.map((construction) => {
 				const prevConstruction = prevConstructionsById.get(construction.id);
 				if (!prevConstruction) return construction;
+				const nextWindows = construction.reportConstructionHeader.additionalWindows;
+				const nextDoors = construction.reportConstructionHeader.additionalDoors;
 				return {
 					...construction,
 					// Backend may temporarily return empty screenshot after level switches.
 					documentImageUrl:
 						construction.documentImageUrl || prevConstruction.documentImageUrl || '',
+					reportConstructionHeader: {
+						...construction.reportConstructionHeader,
+						// Список этажа часто без проёмов — не затираем уже догруженные окна/двери.
+						additionalWindows: nextWindows?.length
+							? nextWindows
+							: prevConstruction.reportConstructionHeader.additionalWindows,
+						additionalDoors: nextDoors?.length
+							? nextDoors
+							: prevConstruction.reportConstructionHeader.additionalDoors,
+					},
 				};
 			});
 
@@ -417,6 +435,92 @@ export const FloorPlans = memoize(() => {
 		});
 	}, [reportType, levels, constructionHeadersById]);
 
+	/** В списке этажа проёмы часто пустые — догружаем из Renew для ведомости (кол-во окон/дверей). */
+	const floorConstructionIdsKey = useMemo(
+		() =>
+			levels
+				.flatMap((level) => level.constructions.map((c) => c.id))
+				.filter(Boolean)
+				.sort()
+				.join(','),
+		[levels],
+	);
+
+	useEffect(() => {
+		openingsHydratedIdsRef.current = new Set();
+	}, [reportId]);
+
+	useEffect(() => {
+		if (reportType !== ReportCategory.Floor || !floorConstructionIdsKey) return;
+
+		const allConstructions = levels.flatMap((level) => level.constructions);
+		const missing = allConstructions.filter(
+			(c) => c.id && !openingsHydratedIdsRef.current.has(c.id),
+		);
+		if (!missing.length) return;
+
+		missing.forEach((c) => openingsHydratedIdsRef.current.add(c.id));
+
+		let cancelled = false;
+		Promise.all(
+			missing.map((construction) =>
+				getFloorConstructionById(construction.id)
+					.then((response) => {
+						if (response?.status !== 200 || !response.data) return null;
+						const converted = convertToClientFloorConstruction(
+							response.data,
+							construction.id,
+						);
+						return {
+							id: construction.id,
+							additionalWindows:
+								converted.reportConstructionHeader.additionalWindows ?? [],
+							additionalDoors:
+								converted.reportConstructionHeader.additionalDoors ?? [],
+						};
+					})
+					.catch(() => null),
+			),
+		).then((items) => {
+			if (cancelled) return;
+			const patches = items.filter(Boolean) as Array<{
+				id: string;
+				additionalWindows: NonNullable<
+					FloorConstruction['reportConstructionHeader']['additionalWindows']
+				>;
+				additionalDoors: NonNullable<
+					FloorConstruction['reportConstructionHeader']['additionalDoors']
+				>;
+			}>;
+			if (!patches.length) return;
+
+			const byId = new Map(patches.map((p) => [p.id, p]));
+			setLevels((prev) =>
+				prev.map((level) => ({
+					...level,
+					constructions: level.constructions.map((construction) => {
+						const patch = byId.get(construction.id);
+						if (!patch) return construction;
+						return {
+							...construction,
+							reportConstructionHeader: {
+								...construction.reportConstructionHeader,
+								additionalWindows: patch.additionalWindows,
+								additionalDoors: patch.additionalDoors,
+							},
+						};
+					}),
+				})),
+			);
+		});
+
+		return () => {
+			cancelled = true;
+		};
+		// levels намеренно не в deps: иначе цикл после setLevels; ids — через floorConstructionIdsKey
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [reportType, floorConstructionIdsKey, reportId]);
+
 	const protectLevel = (levelId?: string | null) => {
 		if (!levelId) return;
 		suppressEmptyLevelCleanupRef.current = true;
@@ -518,6 +622,17 @@ export const FloorPlans = memoize(() => {
 					pendingNewLevelPageRef.current = null;
 					if (protectedLevelIdsRef.current.length === 0) {
 						suppressEmptyLevelCleanupRef.current = false;
+					}
+					if (
+						error instanceof AxiosError &&
+						isMissingReportHttpStatus(error.response?.status)
+					) {
+						clearProjectSession();
+						navigateReplace(
+							`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}?intent=project`,
+							{ replace: true },
+						);
+						return of(null);
 					}
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data || t('floorPlans.toast.loadError'));
@@ -823,9 +938,7 @@ export const FloorPlans = memoize(() => {
 		search.get('reportConstructionId') || search.get('constructionId');
 	const createTypeTabQuery = search.get('createTypeTab');
 	const activeCreateTypeTab: 'walls' | 'floors' | 'rooms' =
-		createTypeTabQuery === 'floors' || createTypeTabQuery === 'rooms'
-			? createTypeTabQuery
-			: 'walls';
+		createTypeTabQuery === 'floors' ? 'floors' : 'walls';
 	const visibleLevels = useMemo(
 		() =>
 			levels.filter(
@@ -838,6 +951,8 @@ export const FloorPlans = memoize(() => {
 	);
 
 	const handleCreateTypeTabChange = (tab: 'walls' | 'floors' | 'rooms') => {
+		if (tab === 'rooms') return;
+
 		const params: Record<string, string> = {
 			createTypeTab: tab,
 			reportId: reportId || '',
@@ -848,11 +963,6 @@ export const FloorPlans = memoize(() => {
 			const value = search.get(key);
 			if (value) params[key] = value;
 		});
-
-		if (tab === 'rooms') {
-			navigate('', { ...params, addRoom: 'true' });
-			return;
-		}
 
 		navigate('', { ...params, create: 'true' });
 	};
@@ -1243,7 +1353,7 @@ export const FloorPlans = memoize(() => {
 
 				<div className="flex flex-col gap-3">
 					<div className="flex flex-row flex-wrap gap-[20px]">
-						{(['walls', 'floors', 'rooms'] as const).map((tab) => (
+						{(['walls', 'floors'] as const).map((tab) => (
 							<Button
 								key={tab}
 								type="button"
@@ -1260,7 +1370,7 @@ export const FloorPlans = memoize(() => {
 						))}
 					</div>
 					<ConstructionSheets
-						tableVariant={activeExplantationTab === 'rooms' ? 'rooms' : 'default'}
+						tableVariant="default"
 						constructionSheets={constructionSheetsForTable}
 					/>
 				</div>

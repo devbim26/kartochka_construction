@@ -501,11 +501,7 @@ const MyConstructions = () => {
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
-			<DesigningHeader
-				complianceStatus={
-					showMismatchWarning ? 'mismatch' : showMatchSuccess ? 'match' : null
-				}
-			/>
+			<DesigningHeader />
 			{isLoading && (
 				<div className="flex w-full items-center justify-center">
 					<Loader />
@@ -617,7 +613,7 @@ const MyConstructions = () => {
 								<>
 									<div className="flex flex-col gap-1">
 										<p className="text-[30px] font-extrabold text-black">
-											{locale === 'ru' ? 'Расчёт (ударный)' : 'Computed (impact)'}
+											{locale === 'ru' ? 'Расчёт (ударный шум)' : 'Computed (impact noise)'}
 										</p>
 										<p className="font-sans text-[14px]">
 											{currentReportInfo?.calculationDocument?.fullName}
@@ -637,8 +633,8 @@ const MyConstructions = () => {
 									<div className="flex flex-col gap-2">
 										<p className="text-[30px] font-extrabold leading-none text-black">
 											{locale === 'ru'
-												? 'Лаборатория (ударный)'
-												: 'Laboratory (impact)'}
+												? 'Лаборатория (ударный шум)'
+												: 'Laboratory (impact noise)'}
 										</p>
 										<p className="font-sans text-[14px]">
 											{currentReportInfo?.calculationDocument?.fullName}
@@ -682,7 +678,7 @@ const MyConstructions = () => {
 									);
 								})()}
 							{showMismatchWarning && (
-								<div className="mt-4 flex flex-col items-center gap-2 text-center">
+								<div className="mt-10 flex flex-col items-center gap-2 text-center">
 									<MdWarning className="text-[28px] text-orange-500" aria-hidden />
 									<p className="max-w-[240px] font-sans text-[14px] leading-snug text-orange-500">
 										{t('constructor.relevant.mismatchWarning')}
@@ -690,7 +686,7 @@ const MyConstructions = () => {
 								</div>
 							)}
 							{showMatchSuccess && (
-								<div className="mt-4 flex flex-col items-center gap-2 text-center">
+								<div className="mt-10 flex flex-col items-center gap-2 text-center">
 									<MdCheckCircle className="text-[28px] text-green-600" aria-hidden />
 									<p className="max-w-[240px] font-sans text-[14px] leading-snug text-green-600">
 										{t('constructor.relevant.matchSuccess')}

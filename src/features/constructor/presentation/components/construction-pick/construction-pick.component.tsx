@@ -35,7 +35,6 @@ import { useSearchParams } from 'react-router-dom';
 import { catchError, from, of, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { getAirborneComplianceStatus } from '../construction-compliance-banner.component';
-import { useConstructionCompliance } from '../construction-compliance.context';
 import { AlternateConstructionList } from './alternate-constructions-list.component';
 import { ConstructionCard } from './construction-card.component';
 import { ConstructionFilters } from './construction-filters.component';
@@ -63,7 +62,6 @@ const ContructionPick = () => {
 	const [constructionHeader, setConstructionHeader] = useState<ConstructionsEditData | null>(
 		null,
 	);
-	const { setStatus: setComplianceStatus } = useConstructionCompliance();
 
 	const complianceStatus = useMemo(() => {
 		const requirement =
@@ -75,11 +73,6 @@ const ContructionPick = () => {
 			null;
 		return getAirborneComplianceStatus(value, requirement);
 	}, [currentReportInfo, constructionHeader]);
-
-	useEffect(() => {
-		setComplianceStatus(complianceStatus);
-		return () => setComplianceStatus(null);
-	}, [complianceStatus, setComplianceStatus]);
 
 	const handleGetCurrentReportShortSingleInfo = (id: string) => {
 		dispatch(startLoading());
@@ -378,6 +371,7 @@ const ContructionPick = () => {
 					svgUrl={svgUrl}
 					reportInfo={currentReportInfo}
 					appliedRestrictions={appliedRestrictions}
+					complianceStatus={complianceStatus}
 				/>
 			)}
 			<div className="flex gap-[30px]">

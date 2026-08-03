@@ -41,6 +41,11 @@ type Props = {
 
 const MM2_PER_M2 = 1_000_000;
 
+const sumAdditionalOpeningsQuantity = (rows?: AdditionalOpeningRow[]): number => {
+	if (!rows?.length) return 0;
+	return rows.reduce((total, row) => total + (Number(row.quantity) || 0), 0);
+};
+
 const sumAdditionalOpeningsAreaM2 = (rows?: AdditionalOpeningRow[]): number => {
 	if (!rows?.length) return 0;
 	return rows.reduce((total, row) => {
@@ -56,6 +61,20 @@ const formatAreaM2Number = (value: number, locale: string): string =>
 		maximumFractionDigits: 2,
 		minimumFractionDigits: 0,
 	});
+
+const formatOpeningsSummary = (
+	rows: AdditionalOpeningRow[] | undefined,
+	locale: string,
+): string => {
+	const qty = sumAdditionalOpeningsQuantity(rows);
+	const areaM2 = sumAdditionalOpeningsAreaM2(rows);
+	const unitPcs = locale === 'ru' ? 'шт' : 'pcs';
+	const unitArea = locale === 'ru' ? 'м²' : 'm²';
+	if (areaM2 > 0) {
+		return `${qty} ${unitPcs} (${formatAreaM2Number(areaM2, locale)} ${unitArea})`;
+	}
+	return `${qty} ${unitPcs}`;
+};
 
 export const ConstructionSheets = ({
 	constructionSheets,
@@ -172,20 +191,17 @@ export const ConstructionSheets = ({
 			),
 			cell: (info) => {
 				const row = info.row.original;
-				const windowsM2 = sumAdditionalOpeningsAreaM2(row.additionalWindows);
-				const doorsM2 = sumAdditionalOpeningsAreaM2(row.additionalDoors);
-				const unit = locale === 'ru' ? 'м²' : 'm²';
 				return (
 					<SimpleTableCell
 						content={
 							<div className="flex min-w-[140px] flex-col gap-1 text-center font-sans text-[16px] leading-snug">
 								<p>
 									{t('constructionSheets.openingsWindows')}:{' '}
-									{formatAreaM2Number(windowsM2, locale)} {unit}
+									{formatOpeningsSummary(row.additionalWindows, locale)}
 								</p>
 								<p>
 									{t('constructionSheets.openingsDoors')}:{' '}
-									{formatAreaM2Number(doorsM2, locale)} {unit}
+									{formatOpeningsSummary(row.additionalDoors, locale)}
 								</p>
 							</div>
 						}

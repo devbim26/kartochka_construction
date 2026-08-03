@@ -115,12 +115,18 @@ export const mapAdditionalOpeningsFromDto = (
 	items?: AdditionalConstructionHeaderDto[] | null,
 ): AdditionalOpeningRow[] => {
 	if (!items?.length) return [];
-	return items.map((item) => ({
-		constructionHeaderId: item.constructionHeader?.id || '',
-		length: item.lenght ?? 0,
-		height: item.height ?? 0,
-		quantity: item.quantity ?? 0,
-	}));
+	return items.map((item) => {
+		const raw = item as AdditionalConstructionHeaderDto & {
+			length?: number;
+			constructionHeaderId?: string;
+		};
+		return {
+			constructionHeaderId: raw.constructionHeader?.id || raw.constructionHeaderId || '',
+			length: raw.lenght ?? raw.length ?? 0,
+			height: raw.height ?? 0,
+			quantity: raw.quantity ?? 0,
+		};
+	});
 };
 
 export const mapAdditionalOpeningsToUpdateDto = (

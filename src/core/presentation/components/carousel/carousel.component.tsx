@@ -55,8 +55,8 @@ export const Carousel = ({
 
 	return (
 		<div className={twMerge('relative w-full', showNavigation && 'px-10', className)}>
-			<div className="overflow-hidden" ref={emblaRef}>
-				<div className={twMerge('flex items-stretch', slidesClassName)}>{children}</div>
+			<div className="h-full overflow-hidden" ref={emblaRef}>
+				<div className={twMerge('flex h-full items-stretch', slidesClassName)}>{children}</div>
 			</div>
 			{showNavigation ? (
 				<>

@@ -25,10 +25,19 @@ function buildPathWithParams(
 
 /** Читает sessionStorage при каждом вызове — иначе пункты не обновляются до F5. */
 function getConstructorSidebarChildren() {
-	const reportId = sessionStorage.getItem('reportId');
-	const reportType = sessionStorage.getItem('reportType');
-	const hasFloorSession = !!reportId && reportType === 'Floor';
-	const hasSingleSession = !!reportId && reportType === 'Single';
+	const projectReportId = sessionStorage.getItem('projectReportId');
+	const calculationReportId = sessionStorage.getItem('calculationReportId');
+	// Миграция со старых ключей
+	const legacyId = sessionStorage.getItem('reportId');
+	const legacyType = sessionStorage.getItem('reportType');
+	const floorId =
+		projectReportId ||
+		(legacyType === 'Floor' ? legacyId : null);
+	const singleId =
+		calculationReportId ||
+		(legacyType === 'Single' ? legacyId : null);
+	const hasFloorSession = !!floorId;
+	const hasSingleSession = !!singleId;
 
 	const projectChildren: Array<{
 		id: string;
@@ -40,8 +49,8 @@ function getConstructorSidebarChildren() {
 			id: CONSTRUCTOR_ROUTES.aboutBuilding.id,
 			path: hasFloorSession
 				? buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
-						reportId: reportId!,
-						reportType: reportType!,
+						reportId: floorId!,
+						reportType: 'Floor',
 						edit: true,
 					})
 				: buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
@@ -56,8 +65,8 @@ function getConstructorSidebarChildren() {
 		projectChildren.push({
 			id: CONSTRUCTOR_ROUTES.floorPlans.id,
 			path: buildPathWithParams(CONSTRUCTOR_ROUTES.floorPlans.route, {
-				reportId: reportId!,
-				reportType: reportType!,
+				reportId: floorId!,
+				reportType: 'Floor',
 			}),
 			labelKey: 'sidebar.floorPlans',
 			permission: [UserRoles.Admin, UserRoles.User],
@@ -69,13 +78,13 @@ function getConstructorSidebarChildren() {
 			id: 'constructor-sound-insulation-group-id',
 			path: hasFloorSession
 				? buildPathWithParams(CONSTRUCTOR_ROUTES.floorPlans.route, {
-						reportId: reportId!,
-						reportType: reportType!,
+						reportId: floorId!,
+						reportType: 'Floor',
 					})
 				: hasSingleSession
 					? buildPathWithParams(CONSTRUCTOR_ROUTES.calculation.route, {
-							reportId: reportId!,
-							reportType: reportType!,
+							reportId: singleId!,
+							reportType: 'Single',
 						})
 					: buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
 							intent: 'project',
@@ -87,8 +96,8 @@ function getConstructorSidebarChildren() {
 					id: 'constructor-project-group-id',
 					path: hasFloorSession
 						? buildPathWithParams(CONSTRUCTOR_ROUTES.floorPlans.route, {
-								reportId: reportId!,
-								reportType: reportType!,
+								reportId: floorId!,
+								reportType: 'Floor',
 							})
 						: buildPathWithParams(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
 								intent: 'project',
@@ -101,8 +110,8 @@ function getConstructorSidebarChildren() {
 					id: CONSTRUCTOR_ROUTES.calculation.id,
 					path: hasSingleSession
 						? buildPathWithParams(CONSTRUCTOR_ROUTES.calculation.route, {
-								reportId: reportId!,
-								reportType: reportType!,
+								reportId: singleId!,
+								reportType: 'Single',
 							})
 						: CONSTRUCTOR_ROUTES.calculation.route,
 					labelKey: 'sidebar.calculation' as const,

@@ -80,30 +80,21 @@ export const CreateConstructionModal = ({
 			)}
 		>
 			<div className="mb-4 flex flex-row flex-wrap gap-[12px]">
-				{(['walls', 'floors', 'rooms'] as const).map((tab) => {
-					const isRoomsTab = tab === 'rooms';
-					return (
-						<Button
-							key={tab}
-							type="button"
-							disabled={isRoomsTab}
-							onClick={() => {
-								if (isRoomsTab) return;
-								onTabChange?.(tab);
-							}}
-							className={twMerge(
-								'flex h-[30px] flex-row items-center px-[16px] font-sans text-sm font-semibold shadow-none',
-								isRoomsTab
-									? 'cursor-not-allowed bg-gray-100 text-gray-400 ring-[2px] ring-inset ring-gray-300 enabled:hover:bg-gray-100'
-									: activeTab === tab
-										? ''
-										: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
-							)}
-						>
-							{t(modalTabLabelKey[tab])}
-						</Button>
-					);
-				})}
+				{(['walls', 'floors'] as const).map((tab) => (
+					<Button
+						key={tab}
+						type="button"
+						onClick={() => onTabChange?.(tab)}
+						className={twMerge(
+							'flex h-[30px] flex-row items-center px-[16px] font-sans text-sm font-semibold shadow-none',
+							activeTab === tab
+								? ''
+								: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
+						)}
+					>
+						{t(modalTabLabelKey[tab])}
+					</Button>
+				))}
 			</div>
 			<CreateConstructionForm
 				ref={formRef}

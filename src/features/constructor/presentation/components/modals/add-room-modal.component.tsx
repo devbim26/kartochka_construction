@@ -48,7 +48,7 @@ export const AddRoomModal = ({
 			{...props}
 		>
 			<div className="mb-4 flex flex-row flex-wrap gap-[12px]">
-				{(['walls', 'floors', 'rooms'] as const).map((tab) => (
+				{(['walls', 'floors'] as const).map((tab) => (
 					<Button
 						key={tab}
 						type="button"

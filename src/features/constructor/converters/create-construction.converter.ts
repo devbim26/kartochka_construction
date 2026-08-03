@@ -23,12 +23,15 @@ export const convertToCreateSingleReportInfoCommand = (data: {
 	},
 });
 
-/** Обновление конструкции одиночного отчёта (название / размеры / constructionHeader). */
+/** Обновление конструкции одиночного отчёта (название / размеры / constructionHeader / документ). */
 export const convertToUpdateSingleReportCommand = (
 	singleReportInfoId: string,
-	data: CreateConstructionData,
-): UpdateSingleReportInfoByReportConstructionCommand => ({
+	data: CreateConstructionData & { calculationDocumentId?: string },
+): UpdateSingleReportInfoByReportConstructionCommand & {
+	calculationDocumentId?: string;
+} => ({
 	singleReportInfoId: singleReportInfoId || undefined,
+	calculationDocumentId: data.calculationDocumentId || undefined,
 	reportConstruction: {
 		id: data.id || undefined,
 		name: data.name || undefined,

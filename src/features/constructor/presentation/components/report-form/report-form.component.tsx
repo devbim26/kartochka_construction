@@ -19,7 +19,13 @@ import {
 import { stopLoading } from '@features/constructor/store';
 import { ReportCategory } from '@features/constructor/types';
 import type { FormReportSchemaType } from '@features/constructor/utils';
-import { FormReportConfig } from '@features/constructor/utils';
+import {
+	clearCalculationSession,
+	clearProjectSession,
+	FormReportConfig,
+	persistCalculationSession,
+	persistProjectSession,
+} from '@features/constructor/utils';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
@@ -111,15 +117,13 @@ const ReportFromComponent = () => {
 								document.body.appendChild(link);
 								link.click();
 								document.body.removeChild(link);
-								sessionStorage.removeItem('reportId');
-								sessionStorage.removeItem('reportType');
+								clearCalculationSession();
 								dispatch(getCurrentUser());
 							} else if (action === 'save') {
 								navigate(
 									APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route,
 								);
-								sessionStorage.setItem('reportId', reportId);
-								sessionStorage.setItem('reportType', reportType as string);
+								persistCalculationSession(reportId);
 							}
 						}
 						dispatch(stopLoading());
@@ -158,15 +162,13 @@ const ReportFromComponent = () => {
 							document.body.appendChild(link);
 							link.click();
 							document.body.removeChild(link);
-							sessionStorage.removeItem('reportId');
-							sessionStorage.removeItem('reportType');
+							clearProjectSession();
 							dispatch(getCurrentUser());
 						} else if (action === 'save') {
 							navigate(
 								APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route,
 							);
-							sessionStorage.setItem('reportId', reportId);
-							sessionStorage.setItem('reportType', reportType as string);
+							persistProjectSession(reportId);
 						}
 					}
 					dispatch(stopLoading());

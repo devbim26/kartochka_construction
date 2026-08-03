@@ -149,7 +149,7 @@ export const FavoriteConstructionCard = ({
 							className="h-[28px] px-[8px] text-[11px]"
 							onClick={() => onMakeBase(id)}
 						>
-							{locale === 'ru' ? 'Использовать в отчете' : 'Use in report'}
+							{locale === 'ru' ? 'Сделать базовой' : 'Make base'}
 						</Button>
 					) : null}
 					{isSelected && !isFavorite && onAddToFavorite ? (

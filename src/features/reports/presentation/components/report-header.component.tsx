@@ -11,12 +11,16 @@ const ReportHeaderComponent = ({ isAdmin }: Props) => {
 	const { register, reset } = useFormContext<ReportFilter>();
 	const navigate = useAppNavigate();
 
+	const isMainPage =
+		window.location.pathname ===
+		APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.main.route;
+
 	return (
 		<div className="flex w-full flex-col gap-[14px]">
+			{isMainPage ? <div className="h-px w-full bg-[#E5E7EB]" /> : null}
 			<div className="flex w-full items-center justify-between">
 				<p className="font-sans text-lg font-semibold leading-6">Отчеты</p>
-				{window.location.pathname ===
-					APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.main.route && (
+				{isMainPage && (
 					<Button
 						variant="primary"
 						onClick={() =>

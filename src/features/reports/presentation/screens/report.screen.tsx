@@ -127,7 +127,7 @@ export const ReportScreen = () => {
 	const editingReport = tableData.find((report) => report.id === search.get('id'));
 
 	return (
-		<div className="flex w-full flex-col gap-[40px]">
+		<div className="flex w-full flex-col gap-[16px]">
 			<FormProvider {...form}>
 				<ReportHeader isAdmin={isAdmin} />
 			</FormProvider>

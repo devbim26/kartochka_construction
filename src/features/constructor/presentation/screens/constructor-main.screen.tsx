@@ -3,7 +3,7 @@ import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { useLayoutEffect } from 'react';
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { ConstructionComplianceProvider, ConstructorHeader } from '../components';
+import { ConstructorHeader } from '../components';
 
 export const ConstructorLayout = () => {
 	const [search] = useSearchParams();
@@ -25,18 +25,27 @@ export const ConstructorLayout = () => {
 		}
 
 		const base = `${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}`;
+		const projectId = sessionStorage.getItem('projectReportId');
+		const calculationId = sessionStorage.getItem('calculationReportId');
 		const storedId = sessionStorage.getItem('reportId');
 		const storedType = sessionStorage.getItem('reportType');
-		if (storedId && storedType) {
+
+		if (projectId || (storedId && storedType === 'Floor')) {
+			const id = projectId || storedId!;
 			const qs = new URLSearchParams({
-				reportId: storedId,
-				reportType: storedType,
+				reportId: id,
+				reportType: 'Floor',
 			}).toString();
-			const nextRoute =
-				storedType === 'Single'
-					? CONSTRUCTOR_ROUTES.calculation.route
-					: CONSTRUCTOR_ROUTES.floorPlans.route;
-			navigate(`${base}/${nextRoute}?${qs}`, { replace: true });
+			navigate(`${base}/${CONSTRUCTOR_ROUTES.floorPlans.route}?${qs}`, { replace: true });
+			return;
+		}
+		if (calculationId || (storedId && storedType === 'Single')) {
+			const id = calculationId || storedId!;
+			const qs = new URLSearchParams({
+				reportId: id,
+				reportType: 'Single',
+			}).toString();
+			navigate(`${base}/${CONSTRUCTOR_ROUTES.calculation.route}?${qs}`, { replace: true });
 			return;
 		}
 		navigate(`${base}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}?intent=project`, {
@@ -45,13 +54,11 @@ export const ConstructorLayout = () => {
 	}, [search, navigate, location.pathname]);
 
 	return (
-		<ConstructionComplianceProvider>
-			<div className="flex min-h-0 w-full flex-1 flex-col gap-[30px] pb-[29px]">
-				<ConstructorHeader />
-				<div className="flex min-h-0 min-w-0 flex-1 flex-col">
-					<Outlet />
-				</div>
+		<div className="flex min-h-0 w-full flex-1 flex-col gap-[30px] pb-[29px]">
+			<ConstructorHeader />
+			<div className="flex min-h-0 min-w-0 flex-1 flex-col">
+				<Outlet />
 			</div>
-		</ConstructionComplianceProvider>
+		</div>
 	);
 };

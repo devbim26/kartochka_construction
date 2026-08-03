@@ -35,7 +35,7 @@ import {
 	RuPurposeBuildingSelectValues,
 	type AboutBuildingData,
 } from '@features/constructor/types';
-import { AboutBuildingConfig } from '@features/constructor/utils';
+import { AboutBuildingConfig, clearCalculationSession, clearProjectSession, persistCalculationSession, persistProjectSession, isMissingReportHttpStatus } from '@features/constructor/utils';
 import {
 	getCalculationRequirementDocuments,
 	getRegulatoryRequirementDocuments,
@@ -145,8 +145,9 @@ const AboutBuildingScreen = () => {
 	const isProjectIntent = intent === 'project' || (!intent && !isEditMode);
 
 	useLayoutEffect(() => {
-		// Новый проект не должен наследовать сессию Расчета (Single).
+		// Новый проект не должен становиться активным расчётом — расчётную сессию не трогаем.
 		if (!isProjectIntent || isEditMode) return;
+		// Активный контекст Single не должен мешать созданию Floor-проекта.
 		if (sessionStorage.getItem('reportType') === ReportCategory.Single) {
 			sessionStorage.removeItem('reportId');
 			sessionStorage.removeItem('reportType');
@@ -229,13 +230,38 @@ const AboutBuildingScreen = () => {
 	};
 
 	const handleGetReport = (id: string) => {
+		const reportType =
+			(search.get('reportType') as ReportCategory | null) || ReportCategory.Floor;
+		const constructorBase = `${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}`;
+
+		const startFreshReport = () => {
+			if (reportType === ReportCategory.Single) {
+				clearCalculationSession();
+				navigateReplace(`${constructorBase}/${CONSTRUCTOR_ROUTES.calculation.route}`, {
+					replace: true,
+				});
+				return;
+			}
+			clearProjectSession();
+			navigateReplace(`${constructorBase}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}?intent=project`, {
+				replace: true,
+			});
+		};
+
 		from(
-			search.get('reportType') == ReportCategory.Floor
+			reportType === ReportCategory.Floor
 				? getReportFloorById({ id: id })
 				: getReportSingleById({ id: id }),
 		)
 			.pipe(
 				catchError((error) => {
+					if (
+						error instanceof AxiosError &&
+						isMissingReportHttpStatus(error.response?.status)
+					) {
+						startFreshReport();
+						return from([null]);
+					}
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data);
 					}
@@ -257,6 +283,10 @@ const AboutBuildingScreen = () => {
 							isFloorPlan: search.get('reportType') === ReportCategory.Floor,
 							isConstruction: search.get('reportType') === ReportCategory.Single,
 						});
+					return;
+				}
+				if (response != null) {
+					startFreshReport();
 				}
 			});
 	};
@@ -303,8 +333,11 @@ const AboutBuildingScreen = () => {
 						const resolvedReportType = isSingle
 							? ReportCategory.Single
 							: ReportCategory.Floor;
-						sessionStorage.setItem('reportId', reportId);
-						sessionStorage.setItem('reportType', resolvedReportType);
+						if (isSingle) {
+							persistCalculationSession(reportId);
+						} else {
+							persistProjectSession(reportId);
+						}
 						navigate(
 							`/designing/constructor/${
 								isSingle
@@ -353,8 +386,11 @@ const AboutBuildingScreen = () => {
 							(search.get('reportType') as ReportCategory) ||
 							(data.isConstruction ? ReportCategory.Single : ReportCategory.Floor);
 
-						sessionStorage.setItem('reportId', resolvedReportId);
-						sessionStorage.setItem('reportType', resolvedReportType);
+						if (resolvedReportType === ReportCategory.Single) {
+							persistCalculationSession(resolvedReportId);
+						} else {
+							persistProjectSession(resolvedReportId);
+						}
 
 						const nextRoute =
 							resolvedReportType === ReportCategory.Single
