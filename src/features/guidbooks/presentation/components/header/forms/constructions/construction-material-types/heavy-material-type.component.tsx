@@ -23,7 +23,7 @@ export const HeavyMaterialType = memoize(
 		constructionPosition,
 		fieldIndex,
 		currentForm,
-		label = 'Тяжелая однослойная стена',
+		label = 'Тяжелая однослойная',
 	}: Omit<ConstructionMaterialTypesProps, 'constructionIndex'> & {
 		constructionPosition: 'Left' | 'Center' | 'Right';
 		label?: string;

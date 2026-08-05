@@ -2,8 +2,8 @@ import type { ModalProps } from '@core';
 import { Button, Modal, useI18n } from '@core';
 import type { FloorConstruction } from '@features/constructor/types';
 import { resolveConstructionClass } from '@features/constructor/utils';
-import { type ConstructionsEditData } from '@features/guidbooks/types';
-import { useEffect, useRef, useState } from 'react';
+import { ConstructionClass, type ConstructionsEditData } from '@features/guidbooks/types';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { twJoin, twMerge } from 'tailwind-merge';
 import { CreateConstructionForm, type CreateConstructionFormHandle } from './modal-forms';
@@ -33,6 +33,12 @@ export const EditConstructionModal = ({
 	const formRef = useRef<CreateConstructionFormHandle>(null);
 	const { t } = useI18n();
 	const [detailsOpen, setDetailsOpen] = useState(false);
+
+	/** Как при создании: полы и стены — разные каталоги, стены не должны попадать в полы. */
+	const constructionTargetTab = useMemo<'walls' | 'floors'>(() => {
+		const layoutClass = resolveConstructionClass(currentConstructionHeader?.constructionType);
+		return layoutClass === ConstructionClass.Floor ? 'floors' : 'walls';
+	}, [currentConstructionHeader?.constructionType]);
 
 	const handleConfirm = () => {
 		formRef.current?.submit();
@@ -78,6 +84,7 @@ export const EditConstructionModal = ({
 		currentConstructionHeader,
 		floorConstructionInfoId,
 		reportFloorInfoId,
+		constructionTargetTab,
 	]);
 
 	return (
@@ -118,6 +125,7 @@ export const EditConstructionModal = ({
 				floorId={floorId}
 				reportFloorInfoId={reportFloorInfoId}
 				floorConstructionInfoId={floorConstructionInfoId ?? currentReportFloorInfo?.id}
+				constructionTargetTab={constructionTargetTab}
 				onSuccess={handleSuccess}
 				detailsOpen={detailsOpen}
 				onDetailsOpenChange={setDetailsOpen}

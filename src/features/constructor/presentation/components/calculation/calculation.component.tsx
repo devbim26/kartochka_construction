@@ -1,6 +1,7 @@
 import type { CalculationRequirementDocumentDto, ReportInfoSingleDto } from '@api-gen';
 import {
 	Button,
+	convertToClientCountryData,
 	convertToPaginatedType,
 	convertToSelectValues,
 	Input,
@@ -15,12 +16,14 @@ import Loader from '@core/presentation/components/loaders/loader.component';
 import {
 	convertToClientSingleReportInfoShort,
 	convertToCreateSingleReportInfoCommand,
-	convertToRequirementDocumentSelectValues,
 	convertToUpdateSingleReportCommand,
+	getCountryCode,
+	getCountryLabel,
 	graphAdditionalValuesConverterToClient,
 	graphDotsConverterToClient,
 	mapAdditionalOpeningsFromDto,
 	mapAdditionalOpeningsToUpdateDto,
+	resolveRequirementDocumentIdByCountry,
 } from '@features/constructor/converters';
 import {
 	createSingleReportInfo,
@@ -76,9 +79,11 @@ import {
 	ConstructionClass,
 	ConstructionTypeEnum,
 	EnConstructionTypesSelectValues,
+	EnConstructorCountrySelectValues,
 	Guidebooks,
 	isFloorConstructionType,
 	RuConstructionTypesSelectValues,
+	RuConstructorCountrySelectValues,
 	type ConstructionsAddData,
 	type ConstructionsEditData,
 } from '@features/guidbooks/types';
@@ -96,6 +101,7 @@ import {
 } from '../designing/additional-openings-form.component';
 import DesigningGraph from '../designing/designing-graph.component';
 import { ConstructionDetailsModal } from '../modals';
+import { FloatingCalculateButton } from '../floating-calculate-button.component';
 
 const isGeneralReferenceIssuer = (issuerName?: string | null) => {
 	const n = (issuerName ?? '').trim().toLowerCase();
@@ -172,22 +178,63 @@ export const CalculationScreen = () => {
 	const [listLoading, setListLoading] = useState(false);
 	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 	const [hasPendingTypeChange, setHasPendingTypeChange] = useState(false);
+	/** Тип сменили и проектируют в расчёте — в селекте отдельный пункт «Кастомная конструкция». */
+	const [isCustomReportConstruction, setIsCustomReportConstruction] = useState(false);
+	/** После кастомной конструкции нужно заново сформировать отчёт. */
+	const [needsReportRegeneration, setNeedsReportRegeneration] = useState(false);
 	const { noiseMode, setNoiseMode, activeNoiseMode } = useGraphNoiseMode(graphData);
 
 	const [calculationDocuments, setCalculationDocuments] = useState<
 		CalculationRequirementDocumentDto[]
 	>([]);
 	const [calculationDocumentId, setCalculationDocumentId] = useState('');
+	const [documentCountryFilter, setDocumentCountryFilter] = useState('');
 	const creatingReportRef = useRef(false);
 	const syncingRef = useRef(false);
 	const lastSyncedKeyRef = useRef('');
 	const workingHeaderIdRef = useRef('');
+	/** Снимок слоёв справочной/последней загруженной конструкции — для детекта кастома. */
+	const referenceLayersSnapshotRef = useRef('');
+	const suppressCustomDetectRef = useRef(false);
 
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
 		defaultValues: DesigningConfig.defaultValues,
 		mode: 'onSubmit',
 	});
+
+	const layersSnapshot = useCallback((layers: unknown) => JSON.stringify(layers ?? null), []);
+
+	const captureReferenceLayers = useCallback(
+		(layers: unknown) => {
+			referenceLayersSnapshotRef.current = layersSnapshot(layers);
+		},
+		[layersSnapshot],
+	);
+
+	const markAsCustomConstruction = useCallback(() => {
+		const cloneId = workingHeaderIdRef.current;
+		if (!reportId || !cloneId) return;
+		setIsCustomReportConstruction(true);
+		setCatalogConstructionId(cloneId);
+		setHasPendingTypeChange(true);
+	}, [reportId]);
+
+	/** Любое изменение слоёв/типа относительно справочной → «Кастомная конструкция». */
+	useEffect(() => {
+		const subscription = form.watch((values, info) => {
+			const changedPath = info.name;
+			if (changedPath && !changedPath.startsWith('constructionTypeObject')) return;
+			if (suppressCustomDetectRef.current) return;
+			if (!reportId || !workingHeaderIdRef.current) return;
+			if (!referenceLayersSnapshotRef.current) return;
+
+			const current = layersSnapshot(values.constructionTypeObject);
+			if (current === referenceLayersSnapshotRef.current) return;
+			markAsCustomConstruction();
+		});
+		return () => subscription.unsubscribe();
+	}, [form, layersSnapshot, markAsCustomConstruction, reportId]);
 
 	useEffect(() => {
 		if (reportIdFromSearch && reportIdFromSearch !== reportId) {
@@ -274,10 +321,44 @@ export const CalculationScreen = () => {
 		savedConstructionIdRef.current = savedConstructionId;
 	}, [savedConstructionId]);
 
-	const calculationDocumentOptions = useMemo(
-		() => convertToRequirementDocumentSelectValues(calculationDocuments, locale),
-		[calculationDocuments, locale],
-	);
+	const documentCountryOptions = useMemo(() => {
+		const base =
+			locale === 'ru' ? RuConstructorCountrySelectValues : EnConstructorCountrySelectValues;
+		return base.map((option) => ({
+			...option,
+			label: getCountryCode(option.value as string) || option.label,
+		}));
+	}, [locale]);
+
+	const calculationDocumentOptions = useMemo(() => {
+		const filtered = documentCountryFilter
+			? calculationDocuments.filter((doc) => {
+					if (!doc.country) return false;
+					return (
+						String(convertToClientCountryData(doc.country)) === documentCountryFilter
+					);
+				})
+			: calculationDocuments;
+
+		return filtered
+			.map((doc) => {
+				const title = (doc.fullName ?? doc.shortName ?? '').trim();
+				return {
+					value: doc.id ?? '',
+					label: title,
+				};
+			})
+			.filter((option) => option.value);
+	}, [calculationDocuments, documentCountryFilter]);
+
+	const selectedDocumentCountryDisplay = useMemo(() => {
+		const selected = calculationDocuments.find(
+			(doc) => String(doc.id) === String(calculationDocumentId),
+		);
+		if (!selected?.country) return '';
+		const countryKey = String(convertToClientCountryData(selected.country));
+		return getCountryCode(countryKey) || getCountryLabel(countryKey, locale);
+	}, [calculationDocumentId, calculationDocuments, locale]);
 
 	const typeSelectOptions: SelectOption[] = useMemo(() => {
 		const all =
@@ -289,12 +370,13 @@ export const CalculationScreen = () => {
 	}, [locale]);
 
 	const constructionSelectOptions: SelectOption[] = useMemo(() => {
-		const withStar = (option: SelectOption): SelectOption => ({
-			...option,
-			icon: favoriteIds.has(String(option.value)) ? (
-				<span className="text-[14px] leading-none text-green-600">★</span>
-			) : undefined,
-		});
+		const favoritePrefix = t('constructor.calculation.favoritePrefix');
+		const withFavoriteLabel = (option: SelectOption): SelectOption => {
+			if (!favoriteIds.has(String(option.value))) return option;
+			const label = String(option.label ?? '');
+			if (label.startsWith(favoritePrefix)) return option;
+			return { ...option, label: `${favoritePrefix}${label}` };
+		};
 
 		const filtered = constructionData.filter((item) => {
 			if (!isGeneralReferenceIssuer(item.issuerName)) return false;
@@ -323,32 +405,69 @@ export const CalculationScreen = () => {
 					if (aFav !== bFav) return Number(bFav) - Number(aFav);
 					return Number(a.isDisabled) - Number(b.isDisabled);
 				})
-				?.map(withStar) ?? [];
+				?.map(withFavoriteLabel) ?? [];
 
-		// Как в create-construction-form: клон может отсутствовать в справочнике
-		const selectedId = catalogConstructionId || workingHeaderId;
+		const cloneId = workingHeaderId;
+		const customType =
+			detail?.constructionType || detail?.constructionTypeObject?.constructionTypeEnum;
+		const customMatchesType =
+			!!cloneId &&
+			!!reportId &&
+			isCustomReportConstruction &&
+			(!typeEnumFilter ||
+				(customType != null && String(customType) === String(typeEnumFilter)));
+
 		const valueSet = new Set(base.map((o) => String(o.value)));
-		if (selectedId && !valueSet.has(String(selectedId))) {
-			const labelFromDetail =
-				detail?.id === selectedId ? detail.description || detail.name : null;
-			const fallbackLabel = name.trim() || String(selectedId);
-			return [
-				{
-					value: selectedId,
-					label: labelFromDetail || fallbackLabel,
-					isDisabled: false,
-				},
-				...base,
-			];
+		const options: SelectOption[] = [...base];
+
+		if (customMatchesType && !valueSet.has(String(cloneId))) {
+			options.unshift({
+				value: cloneId,
+				label: t('constructor.calculation.customConstruction'),
+				isDisabled: false,
+			});
+			valueSet.add(String(cloneId));
 		}
 
-		return base;
+		// Не подмешиваем уже выбранный/клон в список другого типа — путает фильтр.
+		const selectedId = catalogConstructionId;
+		if (!selectedId || valueSet.has(String(selectedId))) return options;
+
+		const selectedMeta = constructionData.find((c) => String(c.id) === String(selectedId));
+		const selectedType =
+			selectedMeta?.constructionType ||
+			(detail?.id === selectedId
+				? detail.constructionType || detail.constructionTypeObject?.constructionTypeEnum
+				: undefined);
+		const matchesTypeFilter =
+			!typeEnumFilter ||
+			(selectedType != null && String(selectedType) === String(typeEnumFilter));
+		if (!matchesTypeFilter) return options;
+
+		const labelFromDetail =
+			detail?.id === selectedId ? detail.description || detail.name : null;
+		const fallbackLabel =
+			selectedId === cloneId && isCustomReportConstruction
+				? t('constructor.calculation.customConstruction')
+				: name.trim() || String(selectedId);
+		const selectedLabel = labelFromDetail || fallbackLabel;
+		return [
+			withFavoriteLabel({
+				value: selectedId,
+				label: selectedLabel,
+				isDisabled: false,
+			}),
+			...options,
+		];
 	}, [
 		catalogConstructionId,
 		constructionData,
 		detail,
 		favoriteIds,
+		isCustomReportConstruction,
 		name,
+		reportId,
+		t,
 		typeEnumFilter,
 		workingHeaderId,
 	]);
@@ -372,6 +491,16 @@ export const CalculationScreen = () => {
 			)
 			.subscribe();
 	}, [dispatch]);
+
+	// Подтянуть страну фильтра, когда список документов пришёл позже выбранного id.
+	useEffect(() => {
+		if (!calculationDocumentId || documentCountryFilter) return;
+		const selected = calculationDocuments.find(
+			(doc) => String(doc.id) === String(calculationDocumentId),
+		);
+		if (!selected?.country) return;
+		setDocumentCountryFilter(String(convertToClientCountryData(selected.country)));
+	}, [calculationDocumentId, calculationDocuments, documentCountryFilter]);
 
 	const resetMissingCalculationReport = useCallback(() => {
 		clearCalculationSession();
@@ -398,6 +527,9 @@ export const CalculationScreen = () => {
 					const docId = short.calculationDocument?.id || '';
 					if (docId) {
 						setCalculationDocumentId(docId);
+					}
+					if (short.calculationDocument?.country) {
+						setDocumentCountryFilter(String(short.calculationDocument.country));
 					}
 					const existing = extractSingleReportConstruction(response.data);
 					if (!existing?.constructionHeaderId) return;
@@ -600,8 +732,10 @@ export const CalculationScreen = () => {
 						const data = prepareConstructionEditDataForPersistence(
 							convertToClientConstructionsEditData(response.data),
 						);
+						suppressCustomDetectRef.current = true;
 						setDetail(data);
 						form.reset(data as DesigningData);
+						captureReferenceLayers(data.constructionTypeObject);
 						setHasPendingTypeChange(false);
 						if (data.constructionType) {
 							setTypeEnumFilter(String(data.constructionType));
@@ -609,6 +743,9 @@ export const CalculationScreen = () => {
 						if (!name.trim()) {
 							setName(data.description || data.name || '');
 						}
+						queueMicrotask(() => {
+							suppressCustomDetectRef.current = false;
+						});
 					}),
 					catchError(() => {
 						toast.error(t('errors.constructionLoad'));
@@ -627,7 +764,7 @@ export const CalculationScreen = () => {
 				)
 				.subscribe();
 		},
-		[dispatch, form, name, refreshGraphAndSvg, t],
+		[captureReferenceLayers, dispatch, form, name, refreshGraphAndSvg, t],
 	);
 
 	useEffect(() => {
@@ -727,6 +864,8 @@ export const CalculationScreen = () => {
 					additionalDoors: cloned?.additionalDoors,
 				});
 				lastSyncedKeyRef.current = formSyncKey;
+				setNeedsReportRegeneration(false);
+				setHasPendingTypeChange(false);
 
 				navigate('', {
 					reportId: id,
@@ -794,6 +933,8 @@ export const CalculationScreen = () => {
 				additionalDoors: cloned?.additionalDoors,
 			});
 			lastSyncedKeyRef.current = formSyncKey;
+			setNeedsReportRegeneration(false);
+			setHasPendingTypeChange(false);
 			loadConstructionDetail(clonedHeaderId, true);
 			return true;
 		} catch (error) {
@@ -838,6 +979,8 @@ export const CalculationScreen = () => {
 						additionalDoors: cloned?.additionalDoors,
 					});
 					lastSyncedKeyRef.current = formSyncKey;
+					setNeedsReportRegeneration(false);
+					setHasPendingTypeChange(false);
 					navigate('', {
 						reportId: id,
 						reportType: ReportCategory.Single,
@@ -886,12 +1029,16 @@ export const CalculationScreen = () => {
 		workingHeaderId,
 	]);
 
-	const handleCalculateClick = () => {
-		void syncReportConstruction();
-	};
-
 	const handleDownloadReport = () => {
 		if (!reportId) return;
+		if (hasPendingTypeChange || needsReportRegeneration) {
+			toast.warning(
+				hasPendingTypeChange
+					? t('constructor.calculation.calculateBeforeReport')
+					: t('constructor.calculation.regenerateReportHint'),
+			);
+			return;
+		}
 		dispatch(startLoading());
 		from(reportReceiveSingle(reportId))
 			.pipe(
@@ -914,23 +1061,115 @@ export const CalculationScreen = () => {
 					link.click();
 					document.body.removeChild(link);
 					dispatch(getCurrentUser());
+					setNeedsReportRegeneration(false);
 				}
 			});
 	};
 
 	const clearConstruction = () => {
 		setCatalogConstructionId('');
-		// Не сбрасываем клон отчёта при смене фильтра типа — отчёт уже создан
-		if (!reportId) {
-			setWorkingHeaderId('');
-			workingHeaderIdRef.current = '';
-		}
-		setDetail(null);
 		setSvgUrl(null);
 		setGraphData(null);
 		setGraphAdditionalData(null);
 		setHasPendingTypeChange(false);
+		setIsCustomReportConstruction(false);
+		setNeedsReportRegeneration(false);
+		referenceLayersSnapshotRef.current = '';
 		form.reset(DesigningConfig.defaultValues);
+		// До create — сбрасываем всё; после create клон оставляем для PUT, UI очищаем.
+		if (!reportId) {
+			setWorkingHeaderId('');
+			workingHeaderIdRef.current = '';
+			setDetail(null);
+		} else {
+			setDetail((prev) =>
+				prev
+					? {
+							...prev,
+							issuer: '',
+							issuerName: '',
+							constructionTypeObject: {
+								...prev.constructionTypeObject,
+								constructionTypeEnum: '' as ConstructionTypeEnum,
+								leftConstruction: undefined,
+								centerConstruction: undefined,
+								rightConstruction: undefined,
+							},
+						}
+					: null,
+			);
+		}
+	};
+
+	const applyTypeFilterChange = (nextType: string) => {
+		setTypeEnumFilter(nextType);
+
+		// Сброс типа при уже существующей конструкции расчёта:
+		// блок проектирования ниже не трогаем, пока не нажмут «Рассчитать» снова.
+		if (!nextType) {
+			if (reportId && (workingHeaderIdRef.current || workingHeaderId)) {
+				setHasPendingTypeChange(true);
+				return;
+			}
+			clearConstruction();
+			return;
+		}
+
+		const typed = nextType as ConstructionTypeEnum;
+		form.setValue('constructionTypeObject.constructionTypeEnum', typed);
+		ConstructionTypeMap({
+			currentConstruction: typed,
+			currentForm: form,
+		})?.action();
+
+		setHasPendingTypeChange(true);
+		const cloneId = workingHeaderIdRef.current || workingHeaderId;
+		if (reportId && cloneId) {
+			// Проектируем в рамках расчёта — селект показывает «Кастомная конструкция».
+			setIsCustomReportConstruction(true);
+			setCatalogConstructionId(cloneId);
+		} else {
+			setIsCustomReportConstruction(false);
+			setCatalogConstructionId('');
+		}
+
+		setSvgUrl(null);
+		setGraphData(null);
+		setGraphAdditionalData(null);
+
+		setDetail((prev) => {
+			const base = prev ?? {
+				id: cloneId || '',
+				name: name.trim(),
+				description: name.trim(),
+				constructionType: typed,
+				constructionTypeObject: form.getValues('constructionTypeObject'),
+			};
+			return {
+				...base,
+				id: cloneId || base.id,
+				issuer: '',
+				issuerName: '',
+				airLaboratory: {
+					labRTotal: '',
+					labIndex: '',
+					labIndexValue: '',
+					laboratoryC: '',
+					laboratoryCtr: '',
+					laboratoryTestSource: '',
+				},
+				impactLaboratory: {
+					labRTotal: '',
+					labIndex: '',
+					labIndexValue: '',
+					laboratoryC: '',
+					laboratoryCtr: '',
+					laboratoryTestSource: '',
+				},
+				constructionType: typed,
+				constructionTypeObject: form.getValues('constructionTypeObject'),
+			} as ConstructionsEditData;
+		});
 	};
 
 	const handleConstructionTypeChange = (value: string) => {
@@ -950,6 +1189,12 @@ export const CalculationScreen = () => {
 			return;
 		}
 		if (!value?.trim()) {
+			// При существующем расчёте не чистим проектирование — только после нового «Рассчитать».
+			if (reportId && (workingHeaderIdRef.current || workingHeaderId)) {
+				setTypeEnumFilter('');
+				setHasPendingTypeChange(true);
+				return;
+			}
 			form.setValue('constructionTypeObject.constructionTypeEnum', '' as ConstructionTypeEnum);
 			setDetail((prev) => {
 				if (!prev) return null;
@@ -1011,6 +1256,10 @@ export const CalculationScreen = () => {
 		});
 		setTypeEnumFilter(String(nextType));
 		setHasPendingTypeChange(true);
+		if (reportId && (workingHeaderIdRef.current || workingHeaderId)) {
+			setIsCustomReportConstruction(true);
+			setCatalogConstructionId(workingHeaderIdRef.current || workingHeaderId);
+		}
 		setGraphData(null);
 		setGraphAdditionalData(null);
 		setSvgUrl(null);
@@ -1018,6 +1267,8 @@ export const CalculationScreen = () => {
 
 	const handleRestoreInitialConstruction = () => {
 		if (!activeHeaderId) return;
+		setHasPendingTypeChange(false);
+		setIsCustomReportConstruction(false);
 		loadConstructionDetail(activeHeaderId, canShowWorkspace);
 	};
 
@@ -1058,12 +1309,13 @@ export const CalculationScreen = () => {
 
 	const onCalculateHandle = () => {
 		const cloneId = workingHeaderIdRef.current || workingHeaderId;
-		if (!cloneId || isConstructionEditLocked) return;
+		if (!cloneId || isConstructionEditLocked || !reportId) return;
 		const formData = prepareConstructionEditDataForPersistence(
 			form.getValues() as ConstructionsEditData,
 		);
 		// Всегда пишем в склонированный header из отчёта, не в справочный из селекта
 		formData.id = cloneId;
+		suppressCustomDetectRef.current = true;
 		form.reset(formData as DesigningData, { keepDefaultValues: false });
 		setDetail((prev) =>
 			prev
@@ -1082,16 +1334,39 @@ export const CalculationScreen = () => {
 		});
 
 		dispatch(startLoading());
-		updateAdditionalOpenings$()
+		// 1) слои в клоне  2) окна/двери  3) single/construction — пересчёт отчёта
+		from(
+			getGuidebooksEdit({
+				data: dataForServer,
+				guidebookType: Guidebooks.CONSTRUCTION,
+			}),
+		)
 			.pipe(
-				switchMap((openingsOk) => {
-					if (!openingsOk) {
+				switchMap((editRes) => {
+					if (!isSuccessStatus(editRes?.status)) {
 						return of(null);
 					}
-					return from(
-						getGuidebooksEdit({
-							data: dataForServer,
-							guidebookType: Guidebooks.CONSTRUCTION,
+					return updateAdditionalOpenings$().pipe(
+						switchMap((openingsOk) => {
+							if (!openingsOk) {
+								return of(null);
+							}
+							return from(
+								updateReportSingle({
+									data: convertToUpdateSingleReportCommand(reportId, {
+										id: savedConstructionId || undefined,
+										name: name.trim(),
+										construction: cloneId,
+										width,
+										length,
+										area,
+										constructionType: '',
+										firstPlacementRoom: '',
+										secondPlacementRoom: '',
+										calculationDocumentId,
+									}),
+								}),
+							);
 						}),
 					);
 				}),
@@ -1099,7 +1374,27 @@ export const CalculationScreen = () => {
 					if (!response || !isSuccessStatus(response?.status)) return;
 					toast.success(t('success.constructionUpdated'));
 					setHasPendingTypeChange(false);
-					loadConstructionDetail(cloneId, true);
+					captureReferenceLayers(formData.constructionTypeObject);
+					if (isCustomReportConstruction) {
+						setNeedsReportRegeneration(true);
+						toast.info(t('constructor.calculation.regenerateReportHint'));
+					}
+					const cloned = extractSingleReportConstruction(response.data);
+					const nextHeaderId = cloned?.constructionHeaderId || cloneId;
+					if (cloned?.id || nextHeaderId) {
+						bindClonedConstruction(
+							nextHeaderId,
+							cloned?.id || savedConstructionId || undefined,
+							{
+								additionalWindows: cloned?.additionalWindows,
+								additionalDoors: cloned?.additionalDoors,
+							},
+						);
+					}
+					if (isCustomReportConstruction) {
+						setCatalogConstructionId(nextHeaderId);
+					}
+					loadConstructionDetail(nextHeaderId, true);
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -1109,9 +1404,16 @@ export const CalculationScreen = () => {
 					}
 					return of(null);
 				}),
-				finalize(() => dispatch(stopLoading())),
+				finalize(() => {
+					suppressCustomDetectRef.current = false;
+					dispatch(stopLoading());
+				}),
 			)
 			.subscribe();
+	};
+
+	const handleCalculateClick = () => {
+		void syncReportConstruction();
 	};
 
 	return (
@@ -1121,10 +1423,48 @@ export const CalculationScreen = () => {
 					<Loader />
 				</div>
 			)}
-			<p className="font-sans text-lg font-semibold">{t('constructor.calculation.title')}</p>
-
 			<div className="flex flex-col gap-[16px] rounded-[20px] bg-white px-[24px] py-[20px]">
 				<div className="flex w-full min-w-0 flex-wrap items-end gap-3">
+					<Select
+						options={documentCountryOptions}
+						value={documentCountryFilter}
+						onChange={(value) => {
+							const next = value ? String(value) : '';
+							setDocumentCountryFilter(next);
+							if (!next) return;
+							const matchedId = resolveRequirementDocumentIdByCountry(
+								calculationDocuments,
+								next,
+							);
+							if (!matchedId) return;
+							setCalculationDocumentId(matchedId);
+							const selected = calculationDocuments.find(
+								(d) => String(d.id) === matchedId,
+							);
+							if (!selected) return;
+							setReportInfo((prev) =>
+								prev
+									? {
+											...prev,
+											calculationDocument: {
+												id: selected.id || '',
+												name: selected.shortName || selected.fullName || '',
+												fullName:
+													selected.fullName || selected.shortName || '',
+												country: next,
+											},
+										}
+									: prev,
+							);
+						}}
+						isSearchable
+						label={t('aboutBuilding.requirements.country')}
+						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
+						placeholder={t('aboutBuilding.region.placeholder')}
+						buttonClassName="w-[120px] h-fit text-sm rounded-[8px]"
+						optionsClassName="!w-[120px]"
+						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] w-[120px] shrink-0"
+					/>
 					<Select
 						options={calculationDocumentOptions}
 						value={calculationDocumentId}
@@ -1132,29 +1472,40 @@ export const CalculationScreen = () => {
 							const next = value ? String(value) : '';
 							setCalculationDocumentId(next);
 							const selected = calculationDocuments.find((d) => String(d.id) === next);
-							if (selected) {
-								setReportInfo((prev) =>
-									prev
-										? {
-												...prev,
-												calculationDocument: {
-													id: selected.id || '',
-													name: selected.shortName || selected.fullName || '',
-													fullName: selected.fullName || selected.shortName || '',
-													country: prev.calculationDocument?.country || '',
-												},
-											}
-										: prev,
-								);
+							if (!selected) return;
+							const countryKey = selected.country
+								? String(convertToClientCountryData(selected.country))
+								: '';
+							if (countryKey) {
+								setDocumentCountryFilter(countryKey);
 							}
+							setReportInfo((prev) =>
+								prev
+									? {
+											...prev,
+											calculationDocument: {
+												id: selected.id || '',
+												name: selected.shortName || selected.fullName || '',
+												fullName:
+													selected.fullName || selected.shortName || '',
+												country: countryKey,
+											},
+										}
+									: prev,
+							);
 						}}
 						isSearchable
 						label={t('aboutBuilding.requirements.calculation')}
 						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
-						placeholder={t('aboutBuilding.requirements.calculation')}
+						placeholder={t('aboutBuilding.requirements.sound.placeholder')}
 						buttonClassName="w-full min-w-[220px] h-fit text-sm rounded-[8px]"
 						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[220px] flex-1 max-w-[480px]"
 					/>
+					{selectedDocumentCountryDisplay ? (
+						<span className="shrink-0 pb-[8px] font-sans text-sm font-semibold text-input-label-primary">
+							{selectedDocumentCountryDisplay}
+						</span>
+					) : null}
 				</div>
 
 				<div className="flex w-full min-w-0 flex-wrap items-end gap-3">
@@ -1164,8 +1515,7 @@ export const CalculationScreen = () => {
 						onChange={(value) => {
 							const next = value ? String(value) : '';
 							if (next === typeEnumFilter) return;
-							setTypeEnumFilter(next);
-							clearConstruction();
+							applyTypeFilterChange(next);
 						}}
 						isSearchable
 						label={t('createConstruction.constructionType.label')}
@@ -1180,10 +1530,22 @@ export const CalculationScreen = () => {
 						onChange={(value) => {
 							const next = value ? String(value) : '';
 							setCatalogConstructionId(next);
+							setHasPendingTypeChange(false);
 							const selected = constructionData.find((c) => String(c.id) === next);
-							if (selected?.constructionType) {
-								setTypeEnumFilter(String(selected.constructionType));
+							if (selected) {
+								// Базовая из справочника
+								setIsCustomReportConstruction(false);
+								setHasPendingTypeChange(false);
+								if (selected.constructionType) {
+									setTypeEnumFilter(String(selected.constructionType));
+								}
+								return;
 							}
+							if (next && next === (workingHeaderIdRef.current || workingHeaderId)) {
+								setIsCustomReportConstruction(true);
+								return;
+							}
+							setIsCustomReportConstruction(false);
 						}}
 						isSearchable
 						label={t('createConstruction.construction.label')}
@@ -1195,46 +1557,46 @@ export const CalculationScreen = () => {
 					{listLoading ? <Loader /> : null}
 				</div>
 
-				<div className="flex flex-wrap gap-3">
+				<div className="mt-2 flex flex-wrap items-center gap-3">
 					<Input
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 						label={t('createConstruction.name.label')}
 						placeholder={t('createConstruction.name.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary w-[145px] text-left"
-						wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[12px]"
-						inputClassName="w-[226px] py-[6px] px-[12px] h-fit text-sm"
-						containerClassName="w-[226px]"
+						labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
+						wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
+						inputClassName="w-[160px] py-[6px] px-[12px] h-fit text-sm"
+						containerClassName="w-[160px]"
 					/>
 					<Input
 						value={width}
 						onChange={(e) => setWidth(e.target.value)}
 						label={t('createConstruction.width.label')}
 						placeholder={t('createConstruction.width.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary w-[145px] text-left"
-						wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[12px]"
-						inputClassName="w-[140px] py-[6px] px-[12px] h-fit text-sm"
-						containerClassName="w-[140px]"
+						labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
+						wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
+						inputClassName="w-[72px] py-[6px] px-[12px] h-fit text-sm"
+						containerClassName="w-[72px]"
 					/>
 					<Input
 						value={length}
 						onChange={(e) => setLength(e.target.value)}
 						label={t('createConstruction.length.label')}
 						placeholder={t('createConstruction.length.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary w-[145px] text-left"
-						wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[12px]"
-						inputClassName="w-[140px] py-[6px] px-[12px] h-fit text-sm"
-						containerClassName="w-[140px]"
+						labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
+						wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
+						inputClassName="w-[72px] py-[6px] px-[12px] h-fit text-sm"
+						containerClassName="w-[72px]"
 					/>
 					<Input
 						value={area}
 						readOnly
 						label={t('createConstruction.area.label')}
 						placeholder={t('createConstruction.area.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary w-[145px] text-left"
-						wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[12px]"
-						inputClassName="w-[140px] py-[6px] px-[12px] h-fit text-sm"
-						containerClassName="w-[140px]"
+						labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
+						wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
+						inputClassName="w-[72px] py-[6px] px-[12px] h-fit text-sm"
+						containerClassName="w-[72px]"
 					/>
 				</div>
 
@@ -1245,16 +1607,16 @@ export const CalculationScreen = () => {
 						disabled={!isFormComplete}
 						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
 					>
-						{t('constructor.designing.calculate')}
+						{reportId
+							? t('constructor.calculation.recreateReport')
+							: t('constructor.calculation.createReport')}
 					</Button>
 				</div>
 			</div>
 
 			{!canShowWorkspace ? (
 				<p className="font-sans text-sm text-input-label-primary">
-					{locale === 'ru'
-						? 'Заполните все поля и нажмите «Рассчитать»'
-						: 'Fill in all fields and click Calculate'}
+					{t('constructor.calculation.fillAndCreate')}
 				</p>
 			) : (
 				<>
@@ -1339,26 +1701,23 @@ export const CalculationScreen = () => {
 							/>
 						) : null}
 						{(hasPendingTypeChange || !isConstructionEditLocked) && (
-							<div className="flex items-center justify-end gap-[10px]">
-								{hasPendingTypeChange ? (
-									<Button
-										onClick={handleRestoreInitialConstruction}
-										className="h-[40px] w-fit bg-white px-[16px] font-sans text-sm font-semibold text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
-									>
-										{locale === 'ru' ? 'Вернуть' : 'Restore'}
-									</Button>
-								) : null}
-								{!isConstructionEditLocked ? (
-									<Button
-										onClick={onCalculateHandle}
-										className={twMerge(
-											'h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none',
-										)}
-									>
-										{t('constructor.designing.calculate')}
-									</Button>
-								) : null}
-							</div>
+							<FloatingCalculateButton
+								onClick={onCalculateHandle}
+								leading={
+									hasPendingTypeChange ? (
+										<Button
+											onClick={handleRestoreInitialConstruction}
+											className="h-[50px] w-fit bg-white px-6 font-sans text-[20px] font-semibold text-primary shadow-lg ring-2 ring-inset ring-primary enabled:hover:bg-white"
+										>
+											{locale === 'ru' ? 'Вернуть' : 'Restore'}
+										</Button>
+									) : undefined
+								}
+							>
+								{!isConstructionEditLocked
+									? t('constructor.calculation.calculateConstruction')
+									: undefined}
+							</FloatingCalculateButton>
 						)}
 					</div>
 
@@ -1388,14 +1747,23 @@ export const CalculationScreen = () => {
 			)}
 
 			{canShowWorkspace ? (
-				<div className="flex justify-end">
+				<div className="flex flex-col items-end gap-2">
+					{(needsReportRegeneration || hasPendingTypeChange) &&
+					isCustomReportConstruction ? (
+						<p className="max-w-[520px] text-right font-sans text-sm text-amber-800">
+							{hasPendingTypeChange
+								? t('constructor.calculation.calculateBeforeReport')
+								: t('constructor.calculation.regenerateReportHint')}
+						</p>
+					) : null}
 					<Button
 						type="button"
 						onClick={handleDownloadReport}
 						variant="primary"
+						disabled={needsReportRegeneration || hasPendingTypeChange}
 						className="h-[50px] self-end text-[20px]"
 					>
-						{t('floorPlans.generateReport')}
+						{t('constructor.calculation.downloadReport')}
 					</Button>
 				</div>
 			) : null}

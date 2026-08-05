@@ -1,4 +1,5 @@
 import { useI18n } from '@core';
+import { DesigningSectionNav } from '@features/home/presentation/components/designing-section-nav.component';
 import { ActiveReportInfosPanel } from '../components';
 
 export const ActiveReportsScreen = () => {
@@ -6,9 +7,7 @@ export const ActiveReportsScreen = () => {
 
 	return (
 		<div className="flex w-full flex-col gap-6">
-			<p className="font-sans text-lg font-semibold leading-6">
-				{t('reports.activeReports.pageTitle')}
-			</p>
+			<DesigningSectionNav title={t('reports.activeReports.pageTitle')} />
 			<ActiveReportInfosPanel />
 		</div>
 	);

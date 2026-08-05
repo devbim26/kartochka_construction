@@ -9,6 +9,7 @@ import {
 } from '@core';
 import { ensureCompanyRequisitesFilled } from '@features/account/services';
 import { DESIGNING_ROUTES } from '@features/home/constants';
+import { DesigningSectionNav } from '@features/home/presentation/components/designing-section-nav.component';
 import { toast } from 'sonner';
 
 export const AiAccessDenied = () => {
@@ -30,7 +31,7 @@ export const AiAccessDenied = () => {
 
 	return (
 		<div className="flex h-full min-h-0 w-full flex-col">
-			<p className="font-sans text-lg font-semibold leading-6">{t('ai.assistant.title')}</p>
+			<DesigningSectionNav title={t('ai.assistant.title')} />
 			<div className="mt-3 flex min-h-0 flex-1 items-center justify-center">
 				<div className="flex w-full max-w-[412px] flex-col items-center gap-[28px] rounded-[16px] border border-[#e5e7eb] bg-white px-[36px] py-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
 					<div className="flex flex-col items-center gap-[14px] pt-[4px]">

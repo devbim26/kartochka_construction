@@ -1,7 +1,7 @@
 import { DeleteIcon } from '@core';
 import {
+	BoardMaterialType,
 	ConstructionLayer,
-	HeavyMaterialType,
 	SelectableMaterialType,
 	ThicknessDensityFieldsType,
 } from '@features';
@@ -20,9 +20,7 @@ import { useWatch } from 'react-hook-form';
 import { Fragment } from 'react/jsx-runtime';
 import { ConstructionTypeEnum } from '@features/guidbooks/types';
 
-const FLOOR_HEAVY_SLAB_LABEL = 'Тяжелая однослойная плита';
-
-/** Однослойные перекрытия: база (плита) + до двух доп. слоёв только сверху. */
+/** Однослойные перекрытия: база — плитные материалы (как дверь) + до двух доп. слоёв сверху. */
 export const HomogeniusFloorComponent = ({ currentForm }: ConstructionTypeProps) => {
 	const { control, watch } = currentForm;
 
@@ -86,8 +84,7 @@ export const HomogeniusFloorComponent = ({ currentForm }: ConstructionTypeProps)
 
 					{positionId === '2' ? (
 						<>
-							<HeavyMaterialType
-								label={FLOOR_HEAVY_SLAB_LABEL}
+							<BoardMaterialType
 								{...{ fieldIndex, constructionPosition: 'Center', currentForm }}
 							/>
 							<ThicknessDensityFieldsType

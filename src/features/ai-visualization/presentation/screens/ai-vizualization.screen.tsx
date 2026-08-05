@@ -1,4 +1,5 @@
 import { buildOpenWebUiChatUrl, PageLoader, useI18n } from '@core';
+import { DesigningSectionNav } from '@features/home/presentation/components/designing-section-nav.component';
 import { useEffect, useMemo, useState } from 'react';
 import { BsQuestionSquareFill } from 'react-icons/bs';
 import { useSearchParams } from 'react-router-dom';
@@ -49,9 +50,7 @@ export const AiVisualizationScreen = () => {
 	return (
 		<div className="flex size-full min-h-0 flex-col">
 			<div className="flex gap-2">
-				<p className="font-sans text-lg font-semibold leading-6">
-					{t('ai.assistant.title')}
-				</p>
+				<DesigningSectionNav title={t('ai.assistant.title')} />
 
 				<div className="group relative flex items-center">
 					<BsQuestionSquareFill className="size-[16px] shrink-0 text-primary" />

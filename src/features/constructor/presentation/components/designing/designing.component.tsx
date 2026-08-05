@@ -83,6 +83,7 @@ import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
+import { FloatingCalculateButton } from '../floating-calculate-button.component';
 import {
 	AdditionalOpeningsForm,
 	type AdditionalOpeningsFormHandle,
@@ -840,24 +841,23 @@ const DesigningConstructionScreen = () => {
 					/>
 				) : null}
 				{(hasPendingTypeChange || !isConstructionEditLocked) && (
-					<div className="flex items-center justify-end gap-[10px]">
-						{hasPendingTypeChange && (
-							<Button
-								onClick={handleRestoreInitialConstruction}
-								className="h-[40px] w-fit bg-white px-[16px] font-sans text-sm font-semibold text-primary ring-2 ring-inset ring-primary enabled:hover:bg-white"
-							>
-								{locale === 'ru' ? 'Вернуть' : 'Restore'}
-							</Button>
-						)}
-						{!isConstructionEditLocked && (
-							<Button
-								onClick={onEditHandle}
-								className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
-							>
-								{t('constructor.designing.calculate')}
-							</Button>
-						)}
-					</div>
+					<FloatingCalculateButton
+						onClick={onEditHandle}
+						leading={
+							hasPendingTypeChange ? (
+								<Button
+									onClick={handleRestoreInitialConstruction}
+									className="h-[50px] w-fit bg-white px-6 font-sans text-[20px] font-semibold text-primary shadow-lg ring-2 ring-inset ring-primary enabled:hover:bg-white"
+								>
+									{locale === 'ru' ? 'Вернуть' : 'Restore'}
+								</Button>
+							) : undefined
+						}
+					>
+						{!isConstructionEditLocked
+							? t('constructor.designing.calculate')
+							: undefined}
+					</FloatingCalculateButton>
 				)}
 			</div>
 			<div className="flex w-full flex-col items-stretch gap-6 rounded-[20px] bg-white px-[25px] py-[27px] xl:flex-row xl:items-start">

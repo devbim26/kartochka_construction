@@ -1,4 +1,5 @@
-import { APP_ROUTES, Button, CleanUpIcon, Input, useAppNavigate } from '@core';
+import { APP_ROUTES, Button, CleanUpIcon, Input, useAppNavigate, useI18n } from '@core';
+import { DesigningSectionNav } from '@features/home/presentation/components/designing-section-nav.component';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import type { ReportFilter } from '@features/reports/types';
 import { useFormContext } from 'react-hook-form';
@@ -10,6 +11,7 @@ type Props = {
 const ReportHeaderComponent = ({ isAdmin }: Props) => {
 	const { register, reset } = useFormContext<ReportFilter>();
 	const navigate = useAppNavigate();
+	const { t } = useI18n();
 
 	const isMainPage =
 		window.location.pathname ===
@@ -19,7 +21,13 @@ const ReportHeaderComponent = ({ isAdmin }: Props) => {
 		<div className="flex w-full flex-col gap-[14px]">
 			{isMainPage ? <div className="h-px w-full bg-[#E5E7EB]" /> : null}
 			<div className="flex w-full items-center justify-between">
-				<p className="font-sans text-lg font-semibold leading-6">Отчеты</p>
+				{isMainPage ? (
+					<p className="font-sans text-lg font-semibold leading-6">
+						{t('constructor.sectionNav.reports')}
+					</p>
+				) : (
+					<DesigningSectionNav title={t('constructor.sectionNav.reports')} />
+				)}
 				{isMainPage && (
 					<Button
 						variant="primary"

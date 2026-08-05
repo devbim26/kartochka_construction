@@ -60,7 +60,7 @@ export const GapDistanceMaterialType = memoize(
 							label={
 								(formState.errors as any)?.constructionTypeObject?.[
 									positionMap[constructionPosition]
-								]?.[fieldIndex]?.materialId?.message || 'Зазор'
+								]?.[fieldIndex]?.materialId?.message || 'Промежуток'
 							}
 							placeholder="Выберите материал"
 							isSearchable

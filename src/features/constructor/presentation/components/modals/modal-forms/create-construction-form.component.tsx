@@ -716,12 +716,13 @@ export const CreateConstructionForm = memoize(
 			}, [locale, layoutClass]);
 
 			const constructionSelectOptions: SelectOption[] = useMemo(() => {
-				const withFavoriteIcon = (option: SelectOption): SelectOption => ({
-					...option,
-					icon: favoriteConstructionIds.has(String(option.value)) ? (
-						<span className="text-[14px] leading-none text-green-600">★</span>
-					) : undefined,
-				});
+				const favoritePrefix = t('constructor.calculation.favoritePrefix');
+				const withFavoriteLabel = (option: SelectOption): SelectOption => {
+					if (!favoriteConstructionIds.has(String(option.value))) return option;
+					const label = String(option.label ?? '');
+					if (label.startsWith(favoritePrefix)) return option;
+					return { ...option, label: `${favoritePrefix}${label}` };
+				};
 
 				const isOptionUnavailable = (id: string | number | boolean) => {
 					const item = constructionData.find((c) => String(c.id) === String(id));
@@ -757,32 +758,46 @@ export const CreateConstructionForm = memoize(
 							}
 							// Доступные выше недоступных
 							return Number(a.isDisabled) - Number(b.isDisabled);
-						}) ?? [];
+						})
+						?.map(withFavoriteLabel) ?? [];
+
+				// Не подмешиваем выбранную конструкцию в список другого типа — путает фильтр.
+				const selectedMeta = construction
+					? constructionData.find((c) => String(c.id) === String(construction))
+					: undefined;
+				const matchesTypeFilter =
+					!!construction &&
+					(!typeEnumFilter ||
+						(selectedMeta != null &&
+							String(selectedMeta.constructionType) === String(typeEnumFilter)) ||
+						(constructionDetail?.id === construction &&
+							String(constructionDetail.constructionType) === String(typeEnumFilter)));
 
 				const valueSet = new Set(base.map((o) => String(o.value)));
-				if (construction && !valueSet.has(String(construction))) {
+				if (matchesTypeFilter && construction && !valueSet.has(String(construction))) {
 					const labelFromDetail =
 						constructionDetail?.id === construction
 							? constructionDetail.description || constructionDetail.name
 							: null;
 					const fallbackLabel = name?.trim() ? String(name) : String(construction);
 					return [
-						{
+						withFavoriteLabel({
 							value: construction,
 							label: labelFromDetail ?? fallbackLabel,
 							isDisabled: false,
-						},
+						}),
 						...base,
-					].map(withFavoriteIcon);
+					];
 				}
 
-				return base.map(withFavoriteIcon);
+				return base;
 			}, [
 				constructionData,
 				construction,
 				constructionDetail,
 				favoriteConstructionIds,
 				name,
+				t,
 				typeEnumFilter,
 			]);
 

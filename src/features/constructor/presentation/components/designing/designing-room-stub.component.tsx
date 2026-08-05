@@ -12,6 +12,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { IoChevronBack, IoChevronForward } from 'react-icons/io5';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
+import { FloatingCalculateButton } from '../floating-calculate-button.component';
 import { DesigningHeader } from './designing-header.component';
 
 type RoomSurfaceTab = 'wallA' | 'wallB' | 'wallC' | 'wallD' | 'ceiling' | 'floor';
@@ -66,9 +67,6 @@ const CONSTRUCTOR_TAB_ACTIVE =
 	'flex h-[30px] flex-row items-center px-[16px] font-sans text-sm font-semibold shadow-none';
 const CONSTRUCTOR_TAB_INACTIVE =
 	'flex h-[30px] flex-row items-center px-[16px] font-sans text-sm font-semibold shadow-none bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white';
-
-const FOOTER_BUTTON =
-	'h-[40px] min-w-[160px] px-[20px] font-sans text-sm font-semibold shadow-none';
 
 const SCHEMA_NAV_BUTTON =
 	'flex size-[28px] shrink-0 items-center justify-center bg-white p-0 shadow-none ring-1 ring-inset ring-input-border-primary text-primary enabled:hover:bg-gray-50';
@@ -361,15 +359,13 @@ export const DesigningRoomStubScreen = () => {
 				</div>
 
 				<div className="flex justify-end pt-[4px]">
-					<Button
-						variant="primary"
-						className={FOOTER_BUTTON}
+					<FloatingCalculateButton
 						onClick={() =>
 							toast.info(t('constructor.designing.room.calculateStubToast'))
 						}
 					>
 						{t('constructor.designing.room.calculate')}
-					</Button>
+					</FloatingCalculateButton>
 				</div>
 			</div>
 		</div>

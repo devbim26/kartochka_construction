@@ -63,7 +63,7 @@ export const AcousticTreatmentMaterialsType = memoize(
 							label={
 								(formState.errors as any)?.constructionTypeObject?.[
 									positionMap[constructionPosition]
-								]?.[fieldIndex]?.materialId?.message || 'Аккустические материалы'
+								]?.[fieldIndex]?.materialId?.message || 'Акустические материалы'
 							}
 							placeholder="Выберите материал"
 							isSearchable

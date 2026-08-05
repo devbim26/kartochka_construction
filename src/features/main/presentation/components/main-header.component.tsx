@@ -16,6 +16,7 @@ import {
 } from '@core';
 import { getOpenWebUiModelFromFeatureId } from '@core/utils/helpers/open-webui-model.helper';
 import { DESIGNING_ROUTES } from '@features/home/constants';
+import { DesigningSectionNav } from '@features/home/presentation/components/designing-section-nav.component';
 import { Fragment, useCallback, useState, type ComponentType, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { SoundInsulationChoiceModal } from './sound-insulation-choice-modal.component';
@@ -362,7 +363,7 @@ export const MainHeader = () => {
 			/>
 
 			<div className="mb-6 flex w-full items-center justify-between">
-				<p className="font-sans text-lg font-semibold leading-6">{t('main.pageTitle')}</p>
+				<DesigningSectionNav title={t('main.pageTitle')} />
 			</div>
 
 			<div className="mb-6 flex w-full items-center gap-[10px]">

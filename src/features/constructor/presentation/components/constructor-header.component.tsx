@@ -7,6 +7,7 @@ import {
 	getCalculationReportId,
 	getProjectReportId,
 } from '@features/constructor/utils';
+import { DesigningSectionNav } from '@features/home/presentation/components/designing-section-nav.component';
 import { FaPlus } from 'react-icons/fa6';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
@@ -39,7 +40,7 @@ export const ConstructorHeader = () => {
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
-			<p className="font-sans text-lg font-semibold leading-6">{t('constructor.header.title')}</p>
+			<DesigningSectionNav title={t('sidebar.constructor')} />
 			<div className="flex flex-row items-center gap-[20px]">
 				{showAboutBuilding ? (
 					<Button

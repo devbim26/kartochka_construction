@@ -1,7 +1,12 @@
+import { useI18n } from '@core';
+import { DesigningSectionNav } from '@features/home/presentation/components/designing-section-nav.component';
+
 export const AccountHeader = () => {
+	const { t } = useI18n();
+
 	return (
 		<div className="flex">
-			<p className="font-sans text-lg font-semibold leading-6">Личный кабинет</p>
+			<DesigningSectionNav title={t('sidebar.account')} />
 		</div>
 	);
 };

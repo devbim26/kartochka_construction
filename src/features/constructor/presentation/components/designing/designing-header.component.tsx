@@ -28,9 +28,6 @@ export const DesigningHeader = () => {
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
-			<p className="font-sans text-lg font-semibold leading-6">
-				{t('constructor.designingHeader.title')}
-			</p>
 			<div className="flex flex-row items-center gap-[20px]">
 				<Button
 					className={twMerge(
