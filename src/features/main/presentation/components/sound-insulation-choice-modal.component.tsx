@@ -1,4 +1,4 @@
-import { APP_ROUTES, Button, Modal, useAppNavigate, useI18n } from '@core';
+import { APP_ROUTES, useAppNavigate, useI18n } from '@core';
 import { setDesignCalculationModeFromFeatureId } from '@core/utils/helpers/design-calculation-mode.helper';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { ReportCategory } from '@features/constructor/types';
@@ -7,11 +7,12 @@ import {
 	activateProjectSession,
 	clearCalculationSession,
 	clearProjectSession,
-	getCalculationReportId,
-	getProjectReportId,
 } from '@features/constructor/utils';
 import { DESIGNING_ROUTES } from '@features/home/constants';
-import { useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { createPortal } from 'react-dom';
+import { IoCloseOutline } from 'react-icons/io5';
+import { SubImage } from './current-sub/images';
 
 type Mode = 'resume' | 'create';
 
@@ -25,6 +26,9 @@ type Props = {
 const constructorBase =
 	APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.constructor.route;
 
+const choiceButtonClass =
+	'w-full rounded-[12px] border-2 border-primary bg-white px-4 py-[14px] text-center font-sans text-[17px] font-semibold leading-snug text-primary transition-colors hover:bg-primary hover:text-white';
+
 export const SoundInsulationChoiceModal = ({
 	isOpen,
 	onClose,
@@ -32,18 +36,6 @@ export const SoundInsulationChoiceModal = ({
 }: Props) => {
 	const { t } = useI18n();
 	const navigate = useAppNavigate();
-
-	const projectId = useMemo(
-		() => (isOpen ? getProjectReportId() : null),
-		[isOpen],
-	);
-	const calculationId = useMemo(
-		() => (isOpen ? getCalculationReportId() : null),
-		[isOpen],
-	);
-
-	const canContinueProject = mode === 'resume' && !!projectId;
-	const canContinueCalculation = mode === 'resume' && !!calculationId;
 
 	const goProject = () => {
 		setDesignCalculationModeFromFeatureId('sound-isolation');
@@ -93,41 +85,79 @@ export const SoundInsulationChoiceModal = ({
 		navigate(constructorBase + '/' + CONSTRUCTOR_ROUTES.calculation.route);
 	};
 
-	return (
-		<Modal
-			isOpen={isOpen}
-			onClose={onClose}
-			headerTitle={t('main.designCards.sound.choiceModalTitle')}
-			className="max-w-xl md:w-[32rem]"
-			contentClassName="gap-4 py-6"
-			backdropClassName="bg-black/30 backdrop-blur-sm"
-		>
-			<div className="flex flex-col gap-4">
-				<div className="flex items-center justify-between gap-4">
-					<p className="font-sans text-base font-medium text-[#1f2937]">
-						{t('main.designCards.sound.choiceCalculation')}
-					</p>
-					<Button
+	if (typeof document === 'undefined') return null;
+
+	return createPortal(
+		<AnimatePresence>
+			{isOpen ? (
+				<>
+					<motion.button
 						type="button"
-						className="h-[36px] shrink-0 px-4 font-sans text-sm font-semibold shadow-none"
-						onClick={goCalculation}
-					>
-						{canContinueCalculation ? t('common.continue') : t('common.start')}
-					</Button>
-				</div>
-				<div className="flex items-center justify-between gap-4">
-					<p className="font-sans text-base font-medium text-[#1f2937]">
-						{t('main.designCards.sound.choiceProject')}
-					</p>
-					<Button
-						type="button"
-						className="h-[36px] shrink-0 px-4 font-sans text-sm font-semibold shadow-none"
-						onClick={goProject}
-					>
-						{canContinueProject ? t('common.continue') : t('common.start')}
-					</Button>
-				</div>
-			</div>
-		</Modal>
+						aria-label={t('common.close')}
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.2 }}
+						className="fixed inset-0 z-20 bg-black/30 backdrop-blur-sm"
+						onClick={onClose}
+					/>
+					<div className="pointer-events-none fixed inset-0 z-30 flex items-center justify-center p-4">
+						<motion.div
+							role="dialog"
+							aria-modal="true"
+							aria-labelledby="sound-insulation-choice-title"
+							initial={{ y: 40, scale: 0.96, opacity: 0 }}
+							animate={{ y: 0, scale: 1, opacity: 1 }}
+							exit={{ y: 40, scale: 0.96, opacity: 0 }}
+							transition={{ duration: 0.2 }}
+							className="pointer-events-auto relative flex w-full max-w-[720px] overflow-hidden rounded-[20px] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
+						>
+							<button
+								type="button"
+								className="absolute right-3 top-3 z-10 flex size-8 items-center justify-center rounded-md text-[#14181F] transition-colors hover:bg-black/5"
+								onClick={onClose}
+								aria-label={t('common.close')}
+							>
+								<IoCloseOutline className="size-6" />
+							</button>
+
+							<div className="hidden w-[42%] shrink-0 items-center justify-center bg-[#F3F6FA] p-6 sm:flex">
+								<SubImage />
+							</div>
+
+							<div className="flex min-w-0 flex-1 flex-col justify-center gap-5 px-6 py-8 sm:px-8 sm:py-10">
+								<div className="flex flex-col gap-3">
+									<h2
+										id="sound-insulation-choice-title"
+										className="font-sans text-[22px] font-semibold leading-tight text-[#14181F]"
+									>
+										{t('main.designCards.sound.choiceModalTitle')}
+									</h2>
+									<div className="h-px w-full bg-primary" />
+								</div>
+
+								<div className="flex flex-col gap-3">
+									<button
+										type="button"
+										className={choiceButtonClass}
+										onClick={goCalculation}
+									>
+										{t('main.designCards.sound.choiceCalculation')}
+									</button>
+									<button
+										type="button"
+										className={choiceButtonClass}
+										onClick={goProject}
+									>
+										{t('main.designCards.sound.choiceProject')}
+									</button>
+								</div>
+							</div>
+						</motion.div>
+					</div>
+				</>
+			) : null}
+		</AnimatePresence>,
+		document.body,
 	);
 };

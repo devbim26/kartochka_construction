@@ -609,13 +609,6 @@ export const CalculationScreen = () => {
 			});
 			lastSyncedKeyRef.current = formSyncKey;
 
-			if (cloned.width != null && Number(cloned.width) > 0) {
-				setWidth(String(cloned.width));
-			}
-			if (cloned.length != null && Number(cloned.length) > 0) {
-				setLength(String(cloned.length));
-			}
-
 			return clonedHeaderId;
 		},
 		[bindClonedConstruction, formSyncKey, locale, t],
@@ -740,9 +733,6 @@ export const CalculationScreen = () => {
 						if (data.constructionType) {
 							setTypeEnumFilter(String(data.constructionType));
 						}
-						if (!name.trim()) {
-							setName(data.description || data.name || '');
-						}
 						queueMicrotask(() => {
 							suppressCustomDetectRef.current = false;
 						});
@@ -764,7 +754,7 @@ export const CalculationScreen = () => {
 				)
 				.subscribe();
 		},
-		[captureReferenceLayers, dispatch, form, name, refreshGraphAndSvg, t],
+		[captureReferenceLayers, dispatch, form, refreshGraphAndSvg, t],
 	);
 
 	useEffect(() => {
@@ -1557,47 +1547,49 @@ export const CalculationScreen = () => {
 					{listLoading ? <Loader /> : null}
 				</div>
 
-				<div className="mt-2 flex flex-wrap items-center gap-3">
+				<div className="mt-2 flex w-full flex-wrap items-end gap-3">
 					<Input
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 						label={t('createConstruction.name.label')}
 						placeholder={t('createConstruction.name.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
-						wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
-						inputClassName="w-[160px] py-[6px] px-[12px] h-fit text-sm"
-						containerClassName="w-[160px]"
+						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
+						wrapperClassName="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[220px] flex-1"
+						inputClassName="w-full min-w-[220px] py-[6px] px-[12px] h-fit text-sm rounded-[8px]"
+						containerClassName="w-full min-w-[220px] flex-1"
 					/>
-					<Input
-						value={width}
-						onChange={(e) => setWidth(e.target.value)}
-						label={t('createConstruction.width.label')}
-						placeholder={t('createConstruction.width.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
-						wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
-						inputClassName="w-[72px] py-[6px] px-[12px] h-fit text-sm"
-						containerClassName="w-[72px]"
-					/>
-					<Input
-						value={length}
-						onChange={(e) => setLength(e.target.value)}
-						label={t('createConstruction.length.label')}
-						placeholder={t('createConstruction.length.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
-						wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
-						inputClassName="w-[72px] py-[6px] px-[12px] h-fit text-sm"
-						containerClassName="w-[72px]"
-					/>
-					<Input
-						value={area}
-						readOnly
-						label={t('createConstruction.area.label')}
-						placeholder={t('createConstruction.area.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
-						wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
-						inputClassName="w-[72px] py-[6px] px-[12px] h-fit text-sm"
-						containerClassName="w-[72px]"
-					/>
+					<div className="ml-auto flex flex-wrap items-center gap-3">
+						<Input
+							value={width}
+							onChange={(e) => setWidth(e.target.value)}
+							label={t('createConstruction.width.label')}
+							placeholder={t('createConstruction.width.placeholder')}
+							labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
+							wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
+							inputClassName="w-[72px] py-[6px] px-[12px] h-fit text-sm"
+							containerClassName="w-[72px]"
+						/>
+						<Input
+							value={length}
+							onChange={(e) => setLength(e.target.value)}
+							label={t('createConstruction.length.label')}
+							placeholder={t('createConstruction.length.placeholder')}
+							labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
+							wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
+							inputClassName="w-[72px] py-[6px] px-[12px] h-fit text-sm"
+							containerClassName="w-[72px]"
+						/>
+						<Input
+							value={area}
+							readOnly
+							label={t('createConstruction.area.label')}
+							placeholder={t('createConstruction.area.placeholder')}
+							labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
+							wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
+							inputClassName="w-[72px] py-[6px] px-[12px] h-fit text-sm"
+							containerClassName="w-[72px]"
+						/>
+					</div>
 				</div>
 
 				<div className="flex justify-end">
