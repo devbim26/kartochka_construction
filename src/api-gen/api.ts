@@ -1658,6 +1658,16 @@ export interface SubscriptionDtoPaginatedList {
 	hasNextPage?: boolean;
 }
 
+export interface SubscriptionUpdateDto {
+	/** @format date-time */
+	dateTime?: string;
+	email?: string | null;
+	/** @format double */
+	charged?: number;
+	/** @format double */
+	balance?: number;
+}
+
 export interface SwapConstructionHeaderCommand {
 	/** @format uuid */
 	reportConstructionId?: string;
@@ -1818,7 +1828,9 @@ export interface UpdateRequirementCommand {
 	regulatoryDocumentId?: string;
 }
 
-export interface UpdateSingleReportInfoByReportConstructionCommand {
+export interface UpdateSingleReportInfoCommand {
+	/** @format uuid */
+	calculationDocumentId?: string;
 	/** @format uuid */
 	singleReportInfoId?: string;
 	reportConstruction?: CreateSingleReportConstructionDto;
@@ -3176,7 +3188,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: UpdateUserSubscriptionByModelMessageComand,
 			params: RequestParams = {},
 		) =>
-			this.request<SubscriptionDto, any>({
+			this.request<SubscriptionUpdateDto, any>({
 				path: `/api/OpenRouterModels/updateSubscription`,
 				method: 'PUT',
 				body: data,
@@ -3426,26 +3438,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 				method: 'PUT',
 				body: data,
 				type: ContentType.FormData,
-				format: 'json',
-				...params,
-			}),
-
-		/**
-		 * No description
-		 *
-		 * @tags ReportConstruction
-		 * @name ReportConstructionSingleConstructionUpdate
-		 * @request PUT:/api/ReportConstruction/single/construction
-		 */
-		reportConstructionSingleConstructionUpdate: (
-			data: UpdateSingleReportInfoByReportConstructionCommand,
-			params: RequestParams = {},
-		) =>
-			this.request<ReportInfoSingleDto, any>({
-				path: `/api/ReportConstruction/single/construction`,
-				method: 'PUT',
-				body: data,
-				type: ContentType.Json,
 				format: 'json',
 				...params,
 			}),
@@ -4031,6 +4023,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			this.request<ReportInfoSingleDto, any>({
 				path: `/api/SingleReportInfo`,
 				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags SingleReportInfo
+		 * @name SingleReportInfoUpdate
+		 * @request PUT:/api/SingleReportInfo
+		 */
+		singleReportInfoUpdate: (data: UpdateSingleReportInfoCommand, params: RequestParams = {}) =>
+			this.request<ReportInfoSingleDto, any>({
+				path: `/api/SingleReportInfo`,
+				method: 'PUT',
 				body: data,
 				type: ContentType.Json,
 				format: 'json',

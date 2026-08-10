@@ -7,6 +7,8 @@ export const ACTIVE_REPORT_TYPE_KEY = 'reportType';
 /** Отдельные сессии: проект (Floor) и расчёт (Single) не затирают друг друга. */
 export const PROJECT_REPORT_ID_KEY = 'projectReportId';
 export const CALCULATION_REPORT_ID_KEY = 'calculationReportId';
+/** Справочная (оригинальная) конструкция расчёта — не путать с клоном в отчёте. */
+export const CALCULATION_CATALOG_CONSTRUCTION_ID_KEY = 'calculationCatalogConstructionId';
 
 const migrateLegacyIntoSplitSessions = () => {
 	if (typeof window === 'undefined') return;
@@ -51,6 +53,21 @@ export const persistCalculationSession = (reportId: string) => {
 	sessionStorage.setItem(ACTIVE_REPORT_TYPE_KEY, ReportCategory.Single);
 };
 
+export const persistCalculationCatalogConstructionId = (constructionHeaderId: string) => {
+	if (typeof window === 'undefined' || !constructionHeaderId) return;
+	sessionStorage.setItem(CALCULATION_CATALOG_CONSTRUCTION_ID_KEY, constructionHeaderId);
+};
+
+export const getCalculationCatalogConstructionId = (): string | null => {
+	if (typeof window === 'undefined') return null;
+	return sessionStorage.getItem(CALCULATION_CATALOG_CONSTRUCTION_ID_KEY);
+};
+
+export const clearCalculationCatalogConstructionId = () => {
+	if (typeof window === 'undefined') return;
+	sessionStorage.removeItem(CALCULATION_CATALOG_CONSTRUCTION_ID_KEY);
+};
+
 /** Синхронизирует активный контекст с сохранённым проектом (для навигации «Продолжить»). */
 export const activateProjectSession = (): string | null => {
 	const id = getProjectReportId();
@@ -80,6 +97,7 @@ export const clearProjectSession = () => {
 export const clearCalculationSession = () => {
 	if (typeof window === 'undefined') return;
 	sessionStorage.removeItem(CALCULATION_REPORT_ID_KEY);
+	sessionStorage.removeItem(CALCULATION_CATALOG_CONSTRUCTION_ID_KEY);
 	if (sessionStorage.getItem(ACTIVE_REPORT_TYPE_KEY) === ReportCategory.Single) {
 		sessionStorage.removeItem(ACTIVE_REPORT_ID_KEY);
 		sessionStorage.removeItem(ACTIVE_REPORT_TYPE_KEY);
@@ -90,6 +108,7 @@ export const clearAllConstructorReportSessions = () => {
 	if (typeof window === 'undefined') return;
 	sessionStorage.removeItem(PROJECT_REPORT_ID_KEY);
 	sessionStorage.removeItem(CALCULATION_REPORT_ID_KEY);
+	sessionStorage.removeItem(CALCULATION_CATALOG_CONSTRUCTION_ID_KEY);
 	sessionStorage.removeItem(ACTIVE_REPORT_ID_KEY);
 	sessionStorage.removeItem(ACTIVE_REPORT_TYPE_KEY);
 };

@@ -13,6 +13,15 @@ import {
 	type SelectOption,
 } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
+import type {
+	AdditionalGraphParameters,
+	AdditionalOpeningRow,
+	DesigningData,
+	GraphDetailResponse,
+	ReportInfoShort,
+} from '@features';
+import { DesigningConfig, GraphDetailTable, ReportCategory } from '@features';
+import { getCurrentUser } from '@features/account/services';
 import {
 	convertToClientSingleReportInfoShort,
 	convertToCreateSingleReportInfoCommand,
@@ -37,22 +46,10 @@ import {
 	updateReportSingle,
 } from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
-import type {
-	AdditionalGraphParameters,
-	AdditionalOpeningRow,
-	DesigningData,
-	GraphDetailResponse,
-	ReportInfoShort,
-} from '@features';
-import { DesigningConfig, GraphDetailTable, ReportCategory } from '@features';
-import { getCurrentUser } from '@features/account/services';
 import {
-	clearCalculationSession,
 	filterConstructionTypeSelectOptions,
 	formatMaterial,
 	getLayoutClassFromConstructionHeader,
-	persistCalculationSession,
-	getCalculationReportId,
 	isMissingReportHttpStatus,
 	useGraphNoiseMode,
 } from '@features/constructor/utils';
@@ -60,33 +57,36 @@ import { ConstructionTypeMap } from '@features/guidbooks/constants';
 import {
 	convertToClientConstructionsAddData,
 	convertToClientConstructionsEditData,
-	convertToServerConstructionTypeEnumData,
 	convertToServerConstructionsEditData,
+	convertToServerConstructionTypeEnumData,
 } from '@features/guidbooks/converters';
+import { SelectableMaterialDesignationProvider } from '@features/guidbooks/presentation/components/header/forms/constructions/construction-material-types/selectable-material-designation.context';
 import {
 	getCalculationRequirementDocuments,
 	getGuidebooksDetail,
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import {
-	flattenConstructionMaterialsTopToBottom,
-	MaterialApplicationPurposeProvider,
-	prepareConstructionEditDataForPersistence,
-} from '@features/guidbooks/utils';
-import { SelectableMaterialDesignationProvider } from '@features/guidbooks/presentation/components/header/forms/constructions/construction-material-types/selectable-material-designation.context';
+import type {
+	ConstructionsAddData,
+	ConstructionsEditData,
+	ConstructionTypeEnum,
+} from '@features/guidbooks/types';
 import {
 	ConstructionClass,
-	ConstructionTypeEnum,
 	EnConstructionTypesSelectValues,
 	EnConstructorCountrySelectValues,
 	Guidebooks,
 	isFloorConstructionType,
 	RuConstructionTypesSelectValues,
 	RuConstructorCountrySelectValues,
-	type ConstructionsAddData,
-	type ConstructionsEditData,
 } from '@features/guidbooks/types';
+
+import {
+	flattenConstructionMaterialsTopToBottom,
+	MaterialApplicationPurposeProvider,
+	prepareConstructionEditDataForPersistence,
+} from '@features/guidbooks/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -94,14 +94,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
-import { twMerge } from 'tailwind-merge';
 import {
 	AdditionalOpeningsForm,
 	type AdditionalOpeningsFormHandle,
 } from '../designing/additional-openings-form.component';
 import DesigningGraph from '../designing/designing-graph.component';
-import { ConstructionDetailsModal } from '../modals';
 import { FloatingCalculateButton } from '../floating-calculate-button.component';
+import { ConstructionDetailsModal } from '../modals';
 
 const isGeneralReferenceIssuer = (issuerName?: string | null) => {
 	const n = (issuerName ?? '').trim().toLowerCase();
@@ -135,10 +134,6 @@ const extractSingleReportConstruction = (data?: ReportInfoSingleDto | null) => {
 	};
 };
 
-const persistSingleReportSession = (id: string) => {
-	persistCalculationSession(id);
-};
-
 /**
  * Экран «Расчет»: документы + выбор общей конструкции + редактор материалов как в проектировании.
  * Брендовые конструкции в селекте недоступны.
@@ -150,9 +145,7 @@ export const CalculationScreen = () => {
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [search] = useSearchParams();
 	const reportIdFromSearch = search.get('reportId') || '';
-	const [reportId, setReportId] = useState(
-		reportIdFromSearch || getCalculationReportId() || '',
-	);
+	const [reportId, setReportId] = useState(reportIdFromSearch || '');
 
 	const [name, setName] = useState('');
 	const [width, setWidth] = useState('');
@@ -178,10 +171,6 @@ export const CalculationScreen = () => {
 	const [listLoading, setListLoading] = useState(false);
 	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 	const [hasPendingTypeChange, setHasPendingTypeChange] = useState(false);
-	/** Тип сменили и проектируют в расчёте — в селекте отдельный пункт «Кастомная конструкция». */
-	const [isCustomReportConstruction, setIsCustomReportConstruction] = useState(false);
-	/** После кастомной конструкции нужно заново сформировать отчёт. */
-	const [needsReportRegeneration, setNeedsReportRegeneration] = useState(false);
 	const { noiseMode, setNoiseMode, activeNoiseMode } = useGraphNoiseMode(graphData);
 
 	const [calculationDocuments, setCalculationDocuments] = useState<
@@ -193,9 +182,15 @@ export const CalculationScreen = () => {
 	const syncingRef = useRef(false);
 	const lastSyncedKeyRef = useRef('');
 	const workingHeaderIdRef = useRef('');
-	/** Снимок слоёв справочной/последней загруженной конструкции — для детекта кастома. */
+	const catalogConstructionIdRef = useRef('');
+	const reportIdRef = useRef(reportId);
+	/** Идёт «Рассчитать» — не даём useEffect перезатереть форму detail-запросом. */
+	const calculatingRef = useRef(false);
+	/** Какой справочный id был применён в последнем create/PUT. */
+	const appliedCatalogConstructionIdRef = useRef('');
+	/** Снимок слоёв для кнопки «Вернуть» после смены типа в редакторе. */
 	const referenceLayersSnapshotRef = useRef('');
-	const suppressCustomDetectRef = useRef(false);
+	const suppressLayerWatchRef = useRef(false);
 
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
@@ -212,35 +207,15 @@ export const CalculationScreen = () => {
 		[layersSnapshot],
 	);
 
-	const markAsCustomConstruction = useCallback(() => {
-		const cloneId = workingHeaderIdRef.current;
-		if (!reportId || !cloneId) return;
-		setIsCustomReportConstruction(true);
-		setCatalogConstructionId(cloneId);
-		setHasPendingTypeChange(true);
-	}, [reportId]);
-
-	/** Любое изменение слоёв/типа относительно справочной → «Кастомная конструкция». */
-	useEffect(() => {
-		const subscription = form.watch((values, info) => {
-			const changedPath = info.name;
-			if (changedPath && !changedPath.startsWith('constructionTypeObject')) return;
-			if (suppressCustomDetectRef.current) return;
-			if (!reportId || !workingHeaderIdRef.current) return;
-			if (!referenceLayersSnapshotRef.current) return;
-
-			const current = layersSnapshot(values.constructionTypeObject);
-			if (current === referenceLayersSnapshotRef.current) return;
-			markAsCustomConstruction();
-		});
-		return () => subscription.unsubscribe();
-	}, [form, layersSnapshot, markAsCustomConstruction, reportId]);
-
 	useEffect(() => {
 		if (reportIdFromSearch && reportIdFromSearch !== reportId) {
 			setReportId(reportIdFromSearch);
 		}
 	}, [reportIdFromSearch, reportId]);
+
+	useEffect(() => {
+		reportIdRef.current = reportId;
+	}, [reportId]);
 
 	const area = useMemo(() => {
 		const w = Number(width);
@@ -316,6 +291,10 @@ export const CalculationScreen = () => {
 	useEffect(() => {
 		workingHeaderIdRef.current = workingHeaderId;
 	}, [workingHeaderId]);
+
+	useEffect(() => {
+		catalogConstructionIdRef.current = catalogConstructionId;
+	}, [catalogConstructionId]);
 
 	useEffect(() => {
 		savedConstructionIdRef.current = savedConstructionId;
@@ -407,54 +386,27 @@ export const CalculationScreen = () => {
 				})
 				?.map(withFavoriteLabel) ?? [];
 
-		const cloneId = workingHeaderId;
-		const customType =
-			detail?.constructionType || detail?.constructionTypeObject?.constructionTypeEnum;
-		const customMatchesType =
-			!!cloneId &&
-			!!reportId &&
-			isCustomReportConstruction &&
-			(!typeEnumFilter ||
-				(customType != null && String(customType) === String(typeEnumFilter)));
-
 		const valueSet = new Set(base.map((o) => String(o.value)));
 		const options: SelectOption[] = [...base];
 
-		if (customMatchesType && !valueSet.has(String(cloneId))) {
-			options.unshift({
-				value: cloneId,
-				label: t('constructor.calculation.customConstruction'),
-				isDisabled: false,
-			});
-			valueSet.add(String(cloneId));
-		}
-
-		// Не подмешиваем уже выбранный/клон в список другого типа — путает фильтр.
+		// В селекте только справочные. Клон (workingHeaderId) сюда не подмешиваем.
 		const selectedId = catalogConstructionId;
 		if (!selectedId || valueSet.has(String(selectedId))) return options;
+		if (workingHeaderId && String(selectedId) === String(workingHeaderId)) return options;
 
 		const selectedMeta = constructionData.find((c) => String(c.id) === String(selectedId));
-		const selectedType =
-			selectedMeta?.constructionType ||
-			(detail?.id === selectedId
-				? detail.constructionType || detail.constructionTypeObject?.constructionTypeEnum
-				: undefined);
+		if (!selectedMeta) return options;
+
+		const selectedType = selectedMeta.constructionType;
 		const matchesTypeFilter =
 			!typeEnumFilter ||
 			(selectedType != null && String(selectedType) === String(typeEnumFilter));
 		if (!matchesTypeFilter) return options;
 
-		const labelFromDetail =
-			detail?.id === selectedId ? detail.description || detail.name : null;
-		const fallbackLabel =
-			selectedId === cloneId && isCustomReportConstruction
-				? t('constructor.calculation.customConstruction')
-				: name.trim() || String(selectedId);
-		const selectedLabel = labelFromDetail || fallbackLabel;
 		return [
 			withFavoriteLabel({
 				value: selectedId,
-				label: selectedLabel,
+				label: selectedMeta.description || selectedMeta.name || String(selectedId),
 				isDisabled: false,
 			}),
 			...options,
@@ -462,11 +414,7 @@ export const CalculationScreen = () => {
 	}, [
 		catalogConstructionId,
 		constructionData,
-		detail,
 		favoriteIds,
-		isCustomReportConstruction,
-		name,
-		reportId,
 		t,
 		typeEnumFilter,
 		workingHeaderId,
@@ -503,7 +451,6 @@ export const CalculationScreen = () => {
 	}, [calculationDocumentId, calculationDocuments, documentCountryFilter]);
 
 	const resetMissingCalculationReport = useCallback(() => {
-		clearCalculationSession();
 		setReportId('');
 		setReportInfo(null);
 		setSavedConstructionId(null);
@@ -515,9 +462,11 @@ export const CalculationScreen = () => {
 
 	useEffect(() => {
 		if (!reportId) return;
+		if (calculatingRef.current) return;
 		from(getReportSingleById({ id: reportId }))
 			.pipe(
 				tap((response) => {
+					if (calculatingRef.current) return;
 					if (!isSuccessStatus(response?.status) || !response.data) {
 						resetMissingCalculationReport();
 						return;
@@ -534,17 +483,21 @@ export const CalculationScreen = () => {
 					const existing = extractSingleReportConstruction(response.data);
 					if (!existing?.constructionHeaderId) return;
 					setSavedConstructionId(existing.id || null);
-					// Как в поэтажном: текущая конструкция отчёта = клон
-					setWorkingHeaderId(existing.constructionHeaderId);
-					workingHeaderIdRef.current = existing.constructionHeaderId;
-					setCatalogConstructionId(existing.constructionHeaderId);
+					savedConstructionIdRef.current = existing.id || null;
+					const catalogId = catalogConstructionIdRef.current;
+					// Клон — только для редактора; если API вернул справочный id — не затираем рабочий клон.
+					const headerId = existing.constructionHeaderId;
+					if (!catalogId || String(headerId) !== String(catalogId)) {
+						setWorkingHeaderId(headerId);
+						workingHeaderIdRef.current = headerId;
+					}
 					setAdditionalWindows(existing.additionalWindows);
 					setAdditionalDoors(existing.additionalDoors);
 					if (existing.width != null) setWidth(String(existing.width));
 					if (existing.length != null) setLength(String(existing.length));
-					persistSingleReportSession(reportId);
 				}),
 				catchError((error) => {
+					if (calculatingRef.current) return of(null);
 					if (
 						error instanceof AxiosError &&
 						isMissingReportHttpStatus(error.response?.status)
@@ -557,7 +510,7 @@ export const CalculationScreen = () => {
 			.subscribe();
 	}, [reportId, resetMissingCalculationReport]);
 
-	/** После create/update — как floor plans: перечитываем отчёт и фиксируем клон как текущую конструкцию. */
+	/** После create/update — фиксируем клон для редактора; селект справочника не трогаем. */
 	const bindClonedConstruction = useCallback(
 		(
 			clonedHeaderId: string,
@@ -567,11 +520,21 @@ export const CalculationScreen = () => {
 				additionalDoors?: AdditionalOpeningRow[];
 			},
 		) => {
-			if (reportConstructionRowId) setSavedConstructionId(reportConstructionRowId);
+			if (reportConstructionRowId) {
+				setSavedConstructionId(reportConstructionRowId);
+				savedConstructionIdRef.current = reportConstructionRowId;
+			}
+			const catalogId = catalogConstructionIdRef.current;
+			// Нельзя ставить в рабочую форму справочный оригинал из селекта.
+			if (catalogId && String(clonedHeaderId) === String(catalogId)) {
+				if (openings) {
+					setAdditionalWindows(openings.additionalWindows ?? []);
+					setAdditionalDoors(openings.additionalDoors ?? []);
+				}
+				return;
+			}
 			setWorkingHeaderId(clonedHeaderId);
 			workingHeaderIdRef.current = clonedHeaderId;
-			// Селект = клон (как form.construction после create в поэтажном)
-			setCatalogConstructionId(clonedHeaderId);
 			if (openings) {
 				setAdditionalWindows(openings.additionalWindows ?? []);
 				setAdditionalDoors(openings.additionalDoors ?? []);
@@ -599,10 +562,25 @@ export const CalculationScreen = () => {
 			}
 
 			const clonedHeaderId = cloned.constructionHeaderId;
+			const catalogId = catalogConstructionIdRef.current;
 
-			persistSingleReportSession(ensuredReportId);
 			setReportId(ensuredReportId);
 			setReportInfo(convertToClientSingleReportInfoShort(detailResponse.data));
+
+			// Если GET вернул справочный id — клон ещё не готов / не пришёл.
+			if (catalogId && String(clonedHeaderId) === String(catalogId)) {
+				if (cloned.id) {
+					setSavedConstructionId(cloned.id);
+					savedConstructionIdRef.current = cloned.id;
+				}
+				if (cloned.additionalWindows || cloned.additionalDoors) {
+					setAdditionalWindows(cloned.additionalWindows);
+					setAdditionalDoors(cloned.additionalDoors);
+				}
+				lastSyncedKeyRef.current = formSyncKey;
+				return null;
+			}
+
 			bindClonedConstruction(clonedHeaderId, cloned.id || undefined, {
 				additionalWindows: cloned.additionalWindows,
 				additionalDoors: cloned.additionalDoors,
@@ -725,7 +703,7 @@ export const CalculationScreen = () => {
 						const data = prepareConstructionEditDataForPersistence(
 							convertToClientConstructionsEditData(response.data),
 						);
-						suppressCustomDetectRef.current = true;
+						suppressLayerWatchRef.current = true;
 						setDetail(data);
 						form.reset(data as DesigningData);
 						captureReferenceLayers(data.constructionTypeObject);
@@ -734,7 +712,7 @@ export const CalculationScreen = () => {
 							setTypeEnumFilter(String(data.constructionType));
 						}
 						queueMicrotask(() => {
-							suppressCustomDetectRef.current = false;
+							suppressLayerWatchRef.current = false;
 						});
 					}),
 					catchError(() => {
@@ -766,12 +744,17 @@ export const CalculationScreen = () => {
 			form.reset(DesigningConfig.defaultValues);
 			return;
 		}
+		if (calculatingRef.current) return;
 		loadConstructionDetail(activeHeaderId, canShowWorkspace);
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- визуалы включаем после появления workingHeaderId
 	}, [activeHeaderId, canShowWorkspace]);
 
 	const syncReportConstruction = useCallback(async () => {
 		if (syncingRef.current || creatingReportRef.current) return false;
+
+		if (reportId) {
+			return false;
+		}
 
 		if (!isFormComplete) {
 			toast.error(
@@ -782,133 +765,33 @@ export const CalculationScreen = () => {
 			return false;
 		}
 
-		if (!reportId && !catalogConstructionId) {
+		if (!catalogConstructionId) {
 			toast.error(locale === 'ru' ? 'Выберите конструкцию' : 'Select a construction');
 			return false;
 		}
 
-		/**
-		 * Как поэтажный form.construction:
-		 * - до create: справочный id из селекта
-		 * - после create: в селекте лежит клон → шлём клон
-		 * - если пользователь выбрал другую справочную — шлём её, бэк клонирует снова
-		 */
-		const headerIdToSend = !reportId
-			? catalogConstructionId
-			: workingHeaderIdRef.current || workingHeaderId || catalogConstructionId;
-
-		// Если в селекте после create лежит НЕ клон (пользователь выбрал другую справочную) —
-		// это replace: шлём значение селекта один раз, затем снова фиксируем новый клон.
-		const selectIsDifferentFromClone =
-			!!reportId &&
-			!!workingHeaderIdRef.current &&
-			!!catalogConstructionId &&
-			catalogConstructionId !== workingHeaderIdRef.current;
-
-		const constructionHeaderIdForRequest = selectIsDifferentFromClone
-			? catalogConstructionId
-			: headerIdToSend;
-
-		if (!constructionHeaderIdForRequest) {
-			toast.error(locale === 'ru' ? 'Выберите конструкцию' : 'Select a construction');
-			return false;
-		}
-
-		if (!reportId) {
-			creatingReportRef.current = true;
-			syncingRef.current = true;
-			dispatch(startLoading());
-			try {
-				const response = await createSingleReportInfo(
-					convertToCreateSingleReportInfoCommand({
-						calculationDocumentId,
-						name: name.trim(),
-						constructionHeaderId: catalogConstructionId,
-						width: Number(width),
-						length: Number(length),
-						square: Number(area),
-					}),
-				);
-				const id = response?.data?.id;
-				if (!isSuccessStatus(response?.status) || !id) {
-					toast.error(t('errors.request'));
-					return false;
-				}
-
-				const cloned = extractSingleReportConstruction(response.data);
-				const clonedHeaderId = cloned?.constructionHeaderId || '';
-				if (!clonedHeaderId) {
-					toast.error(
-						locale === 'ru'
-							? 'В ответе нет constructionHeaderId склонированной конструкции'
-							: 'Response has no cloned constructionHeaderId',
-					);
-					return false;
-				}
-
-				persistSingleReportSession(id);
-				setReportId(id);
-				setReportInfo(convertToClientSingleReportInfoShort(response.data));
-				bindClonedConstruction(clonedHeaderId, cloned?.id || undefined, {
-					additionalWindows: cloned?.additionalWindows,
-					additionalDoors: cloned?.additionalDoors,
-				});
-				lastSyncedKeyRef.current = formSyncKey;
-				setNeedsReportRegeneration(false);
-				setHasPendingTypeChange(false);
-
-				navigate('', {
-					reportId: id,
-					reportType: ReportCategory.Single,
-				});
-
-				loadConstructionDetail(clonedHeaderId, true);
-				await adoptClonedConstructionFromReport(id);
-				return true;
-			} catch (error) {
-				if (error instanceof AxiosError) {
-					toast.error(error.response?.data || t('errors.request'));
-				} else {
-					toast.error(t('errors.request'));
-				}
-				return false;
-			} finally {
-				creatingReportRef.current = false;
-				syncingRef.current = false;
-				dispatch(stopLoading());
-			}
-		}
-
+		creatingReportRef.current = true;
 		syncingRef.current = true;
 		dispatch(startLoading());
 		try {
-			const response = await updateReportSingle({
-				data: convertToUpdateSingleReportCommand(reportId, {
-					id: savedConstructionId || undefined,
-					name: name.trim(),
-					// всегда клон, либо новая справочная при явной смене в селекте (replace)
-					construction: constructionHeaderIdForRequest,
-					width,
-					length,
-					area,
-					constructionType: '',
-					firstPlacementRoom: '',
-					secondPlacementRoom: '',
+			const response = await createSingleReportInfo(
+				convertToCreateSingleReportInfoCommand({
 					calculationDocumentId,
+					name: name.trim(),
+					constructionHeaderId: catalogConstructionId,
+					width: Number(width),
+					length: Number(length),
+					square: Number(area),
 				}),
-			});
-			if (!isSuccessStatus(response?.status)) {
+			);
+			const id = response?.data?.id;
+			if (!isSuccessStatus(response?.status) || !id) {
 				toast.error(t('errors.request'));
 				return false;
 			}
 
-			persistSingleReportSession(reportId);
-
 			const cloned = extractSingleReportConstruction(response.data);
-			const clonedHeaderId =
-				cloned?.constructionHeaderId ||
-				(await adoptClonedConstructionFromReport(reportId));
-
+			const clonedHeaderId = cloned?.constructionHeaderId || '';
 			if (!clonedHeaderId) {
 				toast.error(
 					locale === 'ru'
@@ -918,82 +801,33 @@ export const CalculationScreen = () => {
 				return false;
 			}
 
+			appliedCatalogConstructionIdRef.current = catalogConstructionId;
+			setReportId(id);
+			setReportInfo(convertToClientSingleReportInfoShort(response.data));
 			bindClonedConstruction(clonedHeaderId, cloned?.id || undefined, {
 				additionalWindows: cloned?.additionalWindows,
 				additionalDoors: cloned?.additionalDoors,
 			});
 			lastSyncedKeyRef.current = formSyncKey;
-			setNeedsReportRegeneration(false);
 			setHasPendingTypeChange(false);
+
+			navigate('', {
+				reportId: id,
+				reportType: ReportCategory.Single,
+			});
+
 			loadConstructionDetail(clonedHeaderId, true);
+			await adoptClonedConstructionFromReport(id);
 			return true;
 		} catch (error) {
-			if (
-				error instanceof AxiosError &&
-				isMissingReportHttpStatus(error.response?.status)
-			) {
-				resetMissingCalculationReport();
-				creatingReportRef.current = true;
-				try {
-					const response = await createSingleReportInfo(
-						convertToCreateSingleReportInfoCommand({
-							calculationDocumentId,
-							name: name.trim(),
-							constructionHeaderId:
-								catalogConstructionId || constructionHeaderIdForRequest,
-							width: Number(width),
-							length: Number(length),
-							square: Number(area),
-						}),
-					);
-					const id = response?.data?.id;
-					if (!isSuccessStatus(response?.status) || !id) {
-						toast.error(t('errors.request'));
-						return false;
-					}
-					const cloned = extractSingleReportConstruction(response.data);
-					const clonedHeaderId = cloned?.constructionHeaderId || '';
-					if (!clonedHeaderId) {
-						toast.error(
-							locale === 'ru'
-								? 'В ответе нет constructionHeaderId склонированной конструкции'
-								: 'Response has no cloned constructionHeaderId',
-						);
-						return false;
-					}
-					persistSingleReportSession(id);
-					setReportId(id);
-					setReportInfo(convertToClientSingleReportInfoShort(response.data));
-					bindClonedConstruction(clonedHeaderId, cloned?.id || undefined, {
-						additionalWindows: cloned?.additionalWindows,
-						additionalDoors: cloned?.additionalDoors,
-					});
-					lastSyncedKeyRef.current = formSyncKey;
-					setNeedsReportRegeneration(false);
-					setHasPendingTypeChange(false);
-					navigate('', {
-						reportId: id,
-						reportType: ReportCategory.Single,
-					});
-					loadConstructionDetail(clonedHeaderId, true);
-					await adoptClonedConstructionFromReport(id);
-					return true;
-				} catch (createError) {
-					if (createError instanceof AxiosError) {
-						toast.error(createError.response?.data || t('errors.request'));
-					} else {
-						toast.error(t('errors.request'));
-					}
-					return false;
-				} finally {
-					creatingReportRef.current = false;
-				}
-			}
 			if (error instanceof AxiosError) {
-				toast.error(error.response?.data || t('createConstruction.error.addConstruction'));
+				toast.error(error.response?.data || t('errors.request'));
+			} else {
+				toast.error(t('errors.request'));
 			}
 			return false;
 		} finally {
+			creatingReportRef.current = false;
 			syncingRef.current = false;
 			dispatch(stopLoading());
 		}
@@ -1012,21 +846,14 @@ export const CalculationScreen = () => {
 		name,
 		navigate,
 		reportId,
-		resetMissingCalculationReport,
-		savedConstructionId,
 		t,
 		width,
-		workingHeaderId,
 	]);
 
 	const handleDownloadReport = () => {
 		if (!reportId) return;
-		if (hasPendingTypeChange || needsReportRegeneration) {
-			toast.warning(
-				hasPendingTypeChange
-					? t('constructor.calculation.calculateBeforeReport')
-					: t('constructor.calculation.regenerateReportHint'),
-			);
+		if (hasPendingTypeChange) {
+			toast.warning(t('constructor.calculation.calculateBeforeReport'));
 			return;
 		}
 		dispatch(startLoading());
@@ -1051,7 +878,6 @@ export const CalculationScreen = () => {
 					link.click();
 					document.body.removeChild(link);
 					dispatch(getCurrentUser());
-					setNeedsReportRegeneration(false);
 				}
 			});
 	};
@@ -1062,104 +888,38 @@ export const CalculationScreen = () => {
 		setGraphData(null);
 		setGraphAdditionalData(null);
 		setHasPendingTypeChange(false);
-		setIsCustomReportConstruction(false);
-		setNeedsReportRegeneration(false);
 		referenceLayersSnapshotRef.current = '';
 		form.reset(DesigningConfig.defaultValues);
-		// До create — сбрасываем всё; после create клон оставляем для PUT, UI очищаем.
-		if (!reportId) {
-			setWorkingHeaderId('');
-			workingHeaderIdRef.current = '';
-			setDetail(null);
-		} else {
-			setDetail((prev) =>
-				prev
-					? {
-							...prev,
-							issuer: '',
-							issuerName: '',
-							constructionTypeObject: {
-								...prev.constructionTypeObject,
-								constructionTypeEnum: '' as ConstructionTypeEnum,
-								leftConstruction: undefined,
-								centerConstruction: undefined,
-								rightConstruction: undefined,
-							},
-						}
-					: null,
-			);
-		}
+		setWorkingHeaderId('');
+		workingHeaderIdRef.current = '';
+		setDetail(null);
 	};
 
+	/**
+	 * Фильтр типа только фильтрует список.
+	 * Нельзя менять тип уже выбранной справочной/клон-конструкции через этот селект.
+	 */
 	const applyTypeFilterChange = (nextType: string) => {
 		setTypeEnumFilter(nextType);
 
-		// Сброс типа при уже существующей конструкции расчёта:
-		// блок проектирования ниже не трогаем, пока не нажмут «Рассчитать» снова.
-		if (!nextType) {
-			if (reportId && (workingHeaderIdRef.current || workingHeaderId)) {
-				setHasPendingTypeChange(true);
-				return;
-			}
+		if (!reportId) {
 			clearConstruction();
 			return;
 		}
 
-		const typed = nextType as ConstructionTypeEnum;
-		form.setValue('constructionTypeObject.constructionTypeEnum', typed);
-		ConstructionTypeMap({
-			currentConstruction: typed,
-			currentForm: form,
-		})?.action();
+		// После создания расчёта: сбрасываем только выбор в селекте справочника,
+		// рабочий клон и редактор ниже не трогаем.
+		const selectedMeta = constructionData.find(
+			(c) => String(c.id) === String(catalogConstructionId),
+		);
+		const selectedMatchesFilter =
+			!!catalogConstructionId &&
+			!!selectedMeta &&
+			(!nextType || String(selectedMeta.constructionType) === String(nextType));
 
-		setHasPendingTypeChange(true);
-		const cloneId = workingHeaderIdRef.current || workingHeaderId;
-		if (reportId && cloneId) {
-			// Проектируем в рамках расчёта — селект показывает «Кастомная конструкция».
-			setIsCustomReportConstruction(true);
-			setCatalogConstructionId(cloneId);
-		} else {
-			setIsCustomReportConstruction(false);
+		if (!selectedMatchesFilter) {
 			setCatalogConstructionId('');
 		}
-
-		setSvgUrl(null);
-		setGraphData(null);
-		setGraphAdditionalData(null);
-
-		setDetail((prev) => {
-			const base = prev ?? {
-				id: cloneId || '',
-				name: name.trim(),
-				description: name.trim(),
-				constructionType: typed,
-				constructionTypeObject: form.getValues('constructionTypeObject'),
-			};
-			return {
-				...base,
-				id: cloneId || base.id,
-				issuer: '',
-				issuerName: '',
-				airLaboratory: {
-					labRTotal: '',
-					labIndex: '',
-					labIndexValue: '',
-					laboratoryC: '',
-					laboratoryCtr: '',
-					laboratoryTestSource: '',
-				},
-				impactLaboratory: {
-					labRTotal: '',
-					labIndex: '',
-					labIndexValue: '',
-					laboratoryC: '',
-					laboratoryCtr: '',
-					laboratoryTestSource: '',
-				},
-				constructionType: typed,
-				constructionTypeObject: form.getValues('constructionTypeObject'),
-			} as ConstructionsEditData;
-		});
 	};
 
 	const handleConstructionTypeChange = (value: string) => {
@@ -1179,13 +939,10 @@ export const CalculationScreen = () => {
 			return;
 		}
 		if (!value?.trim()) {
-			// При существующем расчёте не чистим проектирование — только после нового «Рассчитать».
-			if (reportId && (workingHeaderIdRef.current || workingHeaderId)) {
-				setTypeEnumFilter('');
-				setHasPendingTypeChange(true);
-				return;
-			}
-			form.setValue('constructionTypeObject.constructionTypeEnum', '' as ConstructionTypeEnum);
+			form.setValue(
+				'constructionTypeObject.constructionTypeEnum',
+				'' as ConstructionTypeEnum,
+			);
 			setDetail((prev) => {
 				if (!prev) return null;
 				return {
@@ -1244,12 +1001,7 @@ export const CalculationScreen = () => {
 				},
 			};
 		});
-		setTypeEnumFilter(String(nextType));
 		setHasPendingTypeChange(true);
-		if (reportId && (workingHeaderIdRef.current || workingHeaderId)) {
-			setIsCustomReportConstruction(true);
-			setCatalogConstructionId(workingHeaderIdRef.current || workingHeaderId);
-		}
 		setGraphData(null);
 		setGraphAdditionalData(null);
 		setSvgUrl(null);
@@ -1258,7 +1010,6 @@ export const CalculationScreen = () => {
 	const handleRestoreInitialConstruction = () => {
 		if (!activeHeaderId) return;
 		setHasPendingTypeChange(false);
-		setIsCustomReportConstruction(false);
 		loadConstructionDetail(activeHeaderId, canShowWorkspace);
 	};
 
@@ -1297,94 +1048,178 @@ export const CalculationScreen = () => {
 		);
 	}, [isFloorConstruction, t]);
 
-	const onCalculateHandle = () => {
-		const cloneId = workingHeaderIdRef.current || workingHeaderId;
-		if (!cloneId || isConstructionEditLocked || !reportId) return;
+	const onCalculateHandle = async () => {
+		const previousCloneId = workingHeaderIdRef.current || workingHeaderId;
+		const ensuredReportId = reportIdRef.current || reportId;
+		if (!previousCloneId || isConstructionEditLocked || !ensuredReportId) return;
+
+		if (!isFormComplete) {
+			toast.error(
+				locale === 'ru'
+					? 'Заполните расчётный документ, конструкцию, название и линейные размеры'
+					: 'Fill in the calculation document, construction, name and dimensions',
+			);
+			return;
+		}
+
+		if (!catalogConstructionId) {
+			toast.error(locale === 'ru' ? 'Выберите конструкцию' : 'Select a construction');
+			return;
+		}
+
+		const constructionValid = await form.trigger();
+		if (!constructionValid) {
+			toast.error(
+				locale === 'ru'
+					? 'Проверьте заполнение конструкции'
+					: 'Check construction form fields',
+			);
+			return;
+		}
+
 		const formData = prepareConstructionEditDataForPersistence(
 			form.getValues() as ConstructionsEditData,
 		);
-		// Всегда пишем в склонированный header из отчёта, не в справочный из селекта
-		formData.id = cloneId;
-		suppressCustomDetectRef.current = true;
-		form.reset(formData as DesigningData, { keepDefaultValues: false });
-		setDetail((prev) =>
-			prev
-				? {
-						...prev,
-						id: cloneId,
-						constructionType: formData.constructionType ?? prev.constructionType,
-						constructionTypeObject: formData.constructionTypeObject,
-					}
-				: prev,
-		);
-		const dataForServer = convertToServerConstructionsEditData({
-			...formData,
-			id: cloneId,
-			reportInfoId: reportId || undefined,
-		});
+		// TODO(stub): временная заглушка для теста пересчёта — меняем description, чтобы бэк увидел diff.
+		formData.description = `${formData.description ?? ''}${Math.floor(Math.random() * 10)}`;
+
+		const reportConstructionRowId = savedConstructionIdRef.current || undefined;
+		suppressLayerWatchRef.current = true;
+		calculatingRef.current = true;
 
 		dispatch(startLoading());
-		// 1) слои в клоне  2) окна/двери  3) single/construction — пересчёт отчёта
 		from(
-			getGuidebooksEdit({
-				data: dataForServer,
-				guidebookType: Guidebooks.CONSTRUCTION,
+			updateReportSingle({
+				data: convertToUpdateSingleReportCommand(ensuredReportId, {
+					id: reportConstructionRowId,
+					name: name.trim(),
+					// Контракт PUT: всегда справочный оригинал + Id ReportConstruction.
+					construction: catalogConstructionId,
+					width,
+					length,
+					area,
+					constructionType: '',
+					firstPlacementRoom: '',
+					secondPlacementRoom: '',
+					calculationDocumentId,
+				}),
 			}),
 		)
 			.pipe(
-				switchMap((editRes) => {
-					if (!isSuccessStatus(editRes?.status)) {
+				switchMap((response) => {
+					if (!response || !isSuccessStatus(response?.status)) {
 						return of(null);
 					}
-					return updateAdditionalOpenings$().pipe(
-						switchMap((openingsOk) => {
-							if (!openingsOk) {
+
+					const nextReportId = response.data?.id || ensuredReportId;
+					const reportIdChanged =
+						!!nextReportId && String(nextReportId) !== String(ensuredReportId);
+					if (nextReportId) {
+						reportIdRef.current = nextReportId;
+						setReportId(nextReportId);
+						if (reportIdChanged) {
+							navigate('', {
+								reportId: nextReportId,
+								reportType: ReportCategory.Single,
+							});
+						}
+					}
+
+					const cloned = extractSingleReportConstruction(response.data);
+					if (cloned?.id) {
+						setSavedConstructionId(cloned.id);
+						savedConstructionIdRef.current = cloned.id;
+					}
+
+					// После PUT бэк часто отдаёт новый клон — всегда уточняем через GET.
+					return from(adoptClonedConstructionFromReport(nextReportId)).pipe(
+						switchMap((adoptedId) => {
+							const catalogId =
+								catalogConstructionIdRef.current || catalogConstructionId;
+							const returnedHeaderId = cloned?.constructionHeaderId || '';
+							const fromPut =
+								returnedHeaderId &&
+								String(returnedHeaderId) !== String(catalogId)
+									? returnedHeaderId
+									: '';
+							const nextCloneId = adoptedId || fromPut;
+							if (!nextCloneId) {
+								toast.error(
+									locale === 'ru'
+										? 'Не получен клон конструкции после пересчёта отчёта'
+										: 'Cloned construction was not returned after report update',
+								);
 								return of(null);
 							}
+
+							if (String(nextCloneId) !== String(workingHeaderIdRef.current)) {
+								bindClonedConstruction(
+									nextCloneId,
+									cloned?.id ||
+										savedConstructionIdRef.current ||
+										undefined,
+									{
+										additionalWindows: cloned?.additionalWindows,
+										additionalDoors: cloned?.additionalDoors,
+									},
+								);
+							} else {
+								workingHeaderIdRef.current = nextCloneId;
+							}
+
+							appliedCatalogConstructionIdRef.current = catalogConstructionId;
+
+							const dataForServer = convertToServerConstructionsEditData({
+								...formData,
+								id: nextCloneId,
+								reportInfoId: nextReportId || undefined,
+							});
+
 							return from(
-								updateReportSingle({
-									data: convertToUpdateSingleReportCommand(reportId, {
-										id: savedConstructionId || undefined,
-										name: name.trim(),
-										construction: cloneId,
-										width,
-										length,
-										area,
-										constructionType: '',
-										firstPlacementRoom: '',
-										secondPlacementRoom: '',
-										calculationDocumentId,
-									}),
+								getGuidebooksEdit({
+									data: dataForServer,
+									guidebookType: Guidebooks.CONSTRUCTION,
+								}),
+							).pipe(
+								switchMap((editRes) => {
+									if (!isSuccessStatus(editRes?.status)) {
+										return of(null);
+									}
+									return updateAdditionalOpenings$().pipe(
+										switchMap((openingsOk) => {
+											if (!openingsOk) return of(null);
+											return of({ nextCloneId, formData });
+										}),
+									);
 								}),
 							);
 						}),
 					);
 				}),
-				tap((response) => {
-					if (!response || !isSuccessStatus(response?.status)) return;
+				tap((ctx) => {
+					if (!ctx) return;
 					toast.success(t('success.constructionUpdated'));
 					setHasPendingTypeChange(false);
-					captureReferenceLayers(formData.constructionTypeObject);
-					if (isCustomReportConstruction) {
-						setNeedsReportRegeneration(true);
-						toast.info(t('constructor.calculation.regenerateReportHint'));
+					const { nextCloneId, formData: savedForm } = ctx;
+					const nextForm = { ...savedForm, id: nextCloneId };
+					form.reset(nextForm as DesigningData, { keepDefaultValues: false });
+					setDetail((prev) =>
+						prev
+							? {
+									...prev,
+									id: nextCloneId,
+									constructionType:
+										nextForm.constructionType ?? prev.constructionType,
+									constructionTypeObject: nextForm.constructionTypeObject,
+								}
+							: prev,
+					);
+					captureReferenceLayers(nextForm.constructionTypeObject);
+					if (String(nextCloneId) !== String(workingHeaderId)) {
+						setWorkingHeaderId(nextCloneId);
 					}
-					const cloned = extractSingleReportConstruction(response.data);
-					const nextHeaderId = cloned?.constructionHeaderId || cloneId;
-					if (cloned?.id || nextHeaderId) {
-						bindClonedConstruction(
-							nextHeaderId,
-							cloned?.id || savedConstructionId || undefined,
-							{
-								additionalWindows: cloned?.additionalWindows,
-								additionalDoors: cloned?.additionalDoors,
-							},
-						);
-					}
-					if (isCustomReportConstruction) {
-						setCatalogConstructionId(nextHeaderId);
-					}
-					loadConstructionDetail(nextHeaderId, true);
+					// Не loadConstructionDetail — он form.reset'ом с сервера может затереть только что сохранённые слои.
+					refreshGraphAndSvg(nextCloneId).subscribe();
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -1395,14 +1230,18 @@ export const CalculationScreen = () => {
 					return of(null);
 				}),
 				finalize(() => {
-					suppressCustomDetectRef.current = false;
+					// После setWorkingHeaderId даём useEffect увидеть calculatingRef=true и не задвоить load.
+					queueMicrotask(() => {
+						calculatingRef.current = false;
+					});
+					suppressLayerWatchRef.current = false;
 					dispatch(stopLoading());
 				}),
 			)
 			.subscribe();
 	};
 
-	const handleCalculateClick = () => {
+	const handleCreateReportClick = () => {
 		void syncReportConstruction();
 	};
 
@@ -1461,7 +1300,9 @@ export const CalculationScreen = () => {
 						onChange={(value) => {
 							const next = value ? String(value) : '';
 							setCalculationDocumentId(next);
-							const selected = calculationDocuments.find((d) => String(d.id) === next);
+							const selected = calculationDocuments.find(
+								(d) => String(d.id) === next,
+							);
 							if (!selected) return;
 							const countryKey = selected.country
 								? String(convertToClientCountryData(selected.country))
@@ -1522,20 +1363,9 @@ export const CalculationScreen = () => {
 							setCatalogConstructionId(next);
 							setHasPendingTypeChange(false);
 							const selected = constructionData.find((c) => String(c.id) === next);
-							if (selected) {
-								// Базовая из справочника
-								setIsCustomReportConstruction(false);
-								setHasPendingTypeChange(false);
-								if (selected.constructionType) {
-									setTypeEnumFilter(String(selected.constructionType));
-								}
-								return;
+							if (selected?.constructionType) {
+								setTypeEnumFilter(String(selected.constructionType));
 							}
-							if (next && next === (workingHeaderIdRef.current || workingHeaderId)) {
-								setIsCustomReportConstruction(true);
-								return;
-							}
-							setIsCustomReportConstruction(false);
 						}}
 						isSearchable
 						label={t('createConstruction.construction.label')}
@@ -1553,10 +1383,10 @@ export const CalculationScreen = () => {
 						onChange={(e) => setName(e.target.value)}
 						label={t('createConstruction.name.label')}
 						placeholder={t('createConstruction.name.placeholder')}
-						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
-						wrapperClassName="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[220px] flex-1"
-						inputClassName="w-full min-w-[220px] py-[6px] px-[12px] h-fit text-sm rounded-[8px]"
-						containerClassName="w-full min-w-[220px] flex-1"
+						labelClassName="font-sans text-sm text-input-label-primary w-fit shrink-0 text-left"
+						wrapperClassName="shadow-none ring-input-border-primary flex-row items-center gap-[6px]"
+						inputClassName="w-[1200px] py-[6px] px-[12px] h-fit text-sm"
+						containerClassName="w-[1200px]"
 					/>
 					<div className="ml-auto flex flex-wrap items-center gap-3">
 						<Input
@@ -1592,18 +1422,18 @@ export const CalculationScreen = () => {
 					</div>
 				</div>
 
-				<div className="flex justify-end">
-					<Button
-						type="button"
-						onClick={handleCalculateClick}
-						disabled={!isFormComplete}
-						className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
-					>
-						{reportId
-							? t('constructor.calculation.recreateReport')
-							: t('constructor.calculation.createReport')}
-					</Button>
-				</div>
+				{!reportId ? (
+					<div className="flex justify-end">
+						<Button
+							type="button"
+							onClick={handleCreateReportClick}
+							disabled={!isFormComplete}
+							className="h-[40px] w-fit px-[16px] font-sans text-sm font-semibold shadow-none"
+						>
+							{t('constructor.calculation.createReport')}
+						</Button>
+					</div>
+				) : null}
 			</div>
 
 			{!canShowWorkspace ? (
@@ -1683,7 +1513,9 @@ export const CalculationScreen = () => {
 								</SelectableMaterialDesignationProvider>
 							</MaterialApplicationPurposeProvider>
 						) : null}
-						{savedConstructionId && !isFloorConstruction && !isConstructionEditLocked ? (
+						{savedConstructionId &&
+						!isFloorConstruction &&
+						!isConstructionEditLocked ? (
 							<AdditionalOpeningsForm
 								ref={additionalOpeningsRef}
 								key={savedConstructionId}
@@ -1740,19 +1572,16 @@ export const CalculationScreen = () => {
 
 			{canShowWorkspace ? (
 				<div className="flex flex-col items-end gap-2">
-					{(needsReportRegeneration || hasPendingTypeChange) &&
-					isCustomReportConstruction ? (
+					{hasPendingTypeChange ? (
 						<p className="max-w-[520px] text-right font-sans text-sm text-amber-800">
-							{hasPendingTypeChange
-								? t('constructor.calculation.calculateBeforeReport')
-								: t('constructor.calculation.regenerateReportHint')}
+							{t('constructor.calculation.calculateBeforeReport')}
 						</p>
 					) : null}
 					<Button
 						type="button"
 						onClick={handleDownloadReport}
 						variant="primary"
-						disabled={needsReportRegeneration || hasPendingTypeChange}
+						disabled={hasPendingTypeChange}
 						className="h-[50px] self-end text-[20px]"
 					>
 						{t('constructor.calculation.downloadReport')}

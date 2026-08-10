@@ -1,6 +1,6 @@
 import type {
 	CreateSingleReportInfoCommand,
-	UpdateSingleReportInfoByReportConstructionCommand,
+	UpdateSingleReportInfoCommand,
 } from '@api-gen';
 import type { CreateConstructionData } from '../types';
 
@@ -23,13 +23,11 @@ export const convertToCreateSingleReportInfoCommand = (data: {
 	},
 });
 
-/** Обновление конструкции одиночного отчёта (название / размеры / constructionHeader / документ). */
+/** Обновление одиночного отчёта (PUT /api/SingleReportInfo). */
 export const convertToUpdateSingleReportCommand = (
 	singleReportInfoId: string,
 	data: CreateConstructionData & { calculationDocumentId?: string },
-): UpdateSingleReportInfoByReportConstructionCommand & {
-	calculationDocumentId?: string;
-} => ({
+): UpdateSingleReportInfoCommand => ({
 	singleReportInfoId: singleReportInfoId || undefined,
 	calculationDocumentId: data.calculationDocumentId || undefined,
 	reportConstruction: {
