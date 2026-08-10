@@ -117,13 +117,36 @@ const getDesigningChartMetrics = (chartSize: DesigningChartSize) => {
 
 type LineTier = 'thick' | 'medium' | 'thin';
 
-/** Окна, двери и прочие доп. серии — серые линии без пункта в легенде. */
+/**
+ * Серые вторичные серии (промежуточные / база / двери / окна).
+ * Легенда:
+ * - без доп. конструкций: только итоговая (Computed) / лабораторная — Intermediate скрыт;
+ * - с доп. конструкциями: итоговая + базовая (Intermediate) + двери/окна;
+ * эталон всегда без подписи (пустой label).
+ */
 const GREY_SECONDARY_SERIES_COLOR = '#6b7280';
 
 const isGreySecondarySeries = (kind: GraphSeriesKind) =>
 	kind === 'window' || kind === 'door' || kind === 'other';
 
-const isLegendHiddenKind = (kind: GraphSeriesKind) => isGreySecondarySeries(kind);
+const hasAdditionalOpeningSeries = (series: DesigningChartSeries[]) =>
+	series.some(
+		(s) =>
+			s.kind === 'window' ||
+			s.kind === 'door' ||
+			s.graphType === GraphType.AdditionalWindow ||
+			s.graphType === GraphType.AdditionalDoor,
+	);
+
+/** Скрывать Intermediate, пока нет доп. конструкций; двери/окна в легенде всегда. */
+const isLegendHiddenKind = (
+	kind: GraphSeriesKind,
+	withAdditionalOpenings: boolean,
+) => {
+	if (kind === 'window' || kind === 'door') return false;
+	if (kind === 'other') return !withAdditionalOpenings;
+	return false;
+};
 
 const seriesStyleByKind = (kind: GraphSeriesKind) => {
 	switch (kind) {
@@ -186,6 +209,8 @@ const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 			borderDash: [10, 4] as number[],
 		};
 	if (gt === GraphType.Atalon)
+		return { color: '#9ca3af', lineTier: 'thin' as LineTier, borderDash: [6, 6] as number[] };
+	if (gt === GraphType.ImpactAtalon)
 		return { color: '#9ca3af', lineTier: 'thin' as LineTier, borderDash: [6, 6] as number[] };
 	if (gt === GraphType.AdditionalDoor)
 		return {
@@ -480,10 +505,16 @@ const DesigningChart = ({
 						color: '#14181f',
 						/** Явные цвета маркера: иначе при длинных подписях / line chart маркер в легенде не рисуется */
 						generateLabels: (chart: Chart<'line'>): LegendItem[] => {
+							const withAdditionalOpenings = hasAdditionalOpeningSeries(series);
 							return chart.data.datasets
 								.map((dataset, datasetIndex) => {
 									const s = series[datasetIndex];
-									if (s != null && isLegendHiddenKind(s.kind)) return null;
+									if (
+										s != null &&
+										isLegendHiddenKind(s.kind, withAdditionalOpenings)
+									) {
+										return null;
+									}
 									const text = String(dataset.label ?? '').trim();
 									if (!text.length) return null;
 									const fill =

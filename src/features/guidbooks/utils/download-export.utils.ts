@@ -140,8 +140,10 @@ export type ExportDownloadAction =
 	| { type: 'url'; url: string; filename: string };
 
 /**
- * API экспорта может вернуть файл (xlsx) или JSON с fileUrl (MinIO).
- * Во втором случае открываем ссылку напрямую — как для отчётов.
+ * API экспорта может вернуть:
+ * - файл (xlsx / json blob),
+ * - JSON с fileUrl (MinIO) — открываем ссылку,
+ * - JSON-тело без fileUrl (ConstructionHeader) — скачиваем как .json.
  */
 export async function resolveExportDownloadAction(
 	response: AxiosResponse<unknown>,
@@ -151,11 +153,12 @@ export async function resolveExportDownloadAction(
 	const headerFilename = getFilenameFromExportHeaders(headers);
 	const contentType = getHeader(headers, 'content-type')?.toLowerCase() ?? '';
 	const data = response.data;
+	const filename = resolveDownloadFilename([headerFilename], fallbackFilename);
 
 	if (data == null) return null;
 
-	if (typeof data === 'object' && !(data instanceof Blob) && !(data instanceof ArrayBuffer)) {
-		const fileUrl = extractFileUrlFromJson(data);
+	const jsonFileAction = (payload: unknown): ExportDownloadAction | null => {
+		const fileUrl = extractFileUrlFromJson(payload);
 		if (fileUrl) {
 			return {
 				type: 'url',
@@ -163,24 +166,34 @@ export async function resolveExportDownloadAction(
 				filename: resolveDownloadFilename([headerFilename, fileUrl], fallbackFilename),
 			};
 		}
-	}
+		if (payload == null) return null;
+		const text =
+			typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2);
+		return {
+			type: 'blob',
+			blob: new Blob([text], { type: 'application/json' }),
+			filename: filename.endsWith('.json') ? filename : `${filename.replace(/\.\w+$/, '') || 'export'}.json`,
+		};
+	};
 
-	const filename = resolveDownloadFilename([headerFilename], fallbackFilename);
+	if (typeof data === 'object' && !(data instanceof Blob) && !(data instanceof ArrayBuffer)) {
+		return jsonFileAction(data);
+	}
 
 	if (data instanceof ArrayBuffer) {
 		if (contentType.includes('json')) {
 			try {
-				const fileUrl = extractFileUrlFromJson(JSON.parse(new TextDecoder().decode(data)));
-				if (fileUrl) {
-					return {
-						type: 'url',
-						url: fileUrl,
-						filename: resolveDownloadFilename([headerFilename, fileUrl], fallbackFilename),
-					};
-				}
+				const parsed = JSON.parse(new TextDecoder().decode(data)) as unknown;
+				const fromJson = jsonFileAction(parsed);
+				if (fromJson) return fromJson;
 			} catch {
 				/* ignore */
 			}
+			return {
+				type: 'blob',
+				blob: new Blob([data], { type: 'application/json' }),
+				filename: filename.endsWith('.json') ? filename : 'export.json',
+			};
 		}
 		if (isZipArchiveBuffer(data)) {
 			return { type: 'blob', blob: toExcelBlob(data, contentType), filename };
@@ -196,24 +209,27 @@ export async function resolveExportDownloadAction(
 				});
 
 	if (contentType.includes('json') || blob.type.includes('json')) {
-		const fileUrl = extractFileUrlFromJson(await readBlobAsJson(blob));
-		if (fileUrl) {
-			return {
-				type: 'url',
-				url: fileUrl,
-				filename: resolveDownloadFilename([headerFilename, fileUrl], fallbackFilename),
-			};
+		const parsed = await readBlobAsJson(blob);
+		if (parsed != null) {
+			const fromJson = jsonFileAction(parsed);
+			if (fromJson) return fromJson;
 		}
+		const jsonBlob =
+			blob.type.includes('json')
+				? blob
+				: new Blob([await blob.arrayBuffer()], { type: 'application/json' });
+		return {
+			type: 'blob',
+			blob: jsonBlob,
+			filename: filename.endsWith('.json') ? filename : 'export.json',
+		};
 	}
 
 	if (!(await isZipArchiveBlob(blob))) {
-		const fileUrl = extractFileUrlFromJson(await readBlobAsJson(blob));
-		if (fileUrl) {
-			return {
-				type: 'url',
-				url: fileUrl,
-				filename: resolveDownloadFilename([headerFilename, fileUrl], fallbackFilename),
-			};
+		const parsed = await readBlobAsJson(blob);
+		if (parsed != null) {
+			const fromJson = jsonFileAction(parsed);
+			if (fromJson) return fromJson;
 		}
 		return null;
 	}

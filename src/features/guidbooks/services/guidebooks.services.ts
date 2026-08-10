@@ -1,4 +1,5 @@
 import type {
+	ExportConstructionHeaderQuery,
 	ExportMaterialsQuery,
 	ExportRequirementQuery,
 	GetPalacementRoomVariantsWithTypesQuery,
@@ -168,10 +169,18 @@ export const importRequirements = async (data: { formFile: File }) => {
 	return await fetchApi.api.requirementImportCreate({ formFile: data.formFile });
 };
 
+export const importConstructions = async (data: { file: File }) => {
+	return await fetchApi.api.constructionImportCreate({ file: data.file });
+};
+
 export const exportMaterials = async (data: ExportMaterialsQuery) => {
 	return await fetchApi.api.materialExportCreate(data, { format: 'blob' });
 };
 
 export const exportRequirements = async (data: ExportRequirementQuery) => {
 	return await fetchApi.api.requirementExportCreate(data, { format: 'blob' });
+};
+
+export const exportConstructions = async (data: ExportConstructionHeaderQuery) => {
+	return await fetchApi.api.constructionExportCreate(data, { format: 'blob' });
 };

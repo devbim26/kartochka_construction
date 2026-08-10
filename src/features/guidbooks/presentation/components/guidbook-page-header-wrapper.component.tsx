@@ -2,7 +2,7 @@ import type { TranslationKey } from '@core';
 import { Button, CleanUpIcon, getAxiosErrorMessage, useAppNavigate, useI18n } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { GUIDBOOKS_ROUTES, guidbookHeaderTitlesMap } from '@features/guidbooks/constants';
-import { importMaterials, importRequirements } from '@features/guidbooks/services';
+import { importConstructions, importMaterials, importRequirements } from '@features/guidbooks/services';
 import {
 	HeaderFormTypes,
 	type HeaderFormElements,
@@ -26,6 +26,8 @@ interface GuidbookPageHeaderWrapperProps {
 	onSave: () => void;
 	onExport?: () => void | Promise<void>;
 	isExporting?: boolean;
+	/** После успешного импорта (например, обновить таблицу). */
+	onImportSuccess?: () => void;
 	forms: {
 		filterForm: UseFormReturn<any, any, any>;
 		addForm: UseFormReturn<any, any, any>;
@@ -35,7 +37,15 @@ interface GuidbookPageHeaderWrapperProps {
 }
 
 export const GuidbookPageHeaderWrapper = memoize(
-	({ titles, forms, formElements, onSave, onExport, isExporting = false }: GuidbookPageHeaderWrapperProps) => {
+	({
+		titles,
+		forms,
+		formElements,
+		onSave,
+		onExport,
+		isExporting = false,
+		onImportSuccess,
+	}: GuidbookPageHeaderWrapperProps) => {
 		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
 		const [currentHeaderFormType, setCurrentHeaderFormType] = useState<HeaderFormTypes>(
 			HeaderFormTypes.filter,
@@ -45,9 +55,12 @@ export const GuidbookPageHeaderWrapper = memoize(
 		const { pathname } = useLocation();
 		const { t } = useI18n();
 
-		const showImportButton =
-			pathname.includes(`/${GUIDBOOKS_ROUTES.materials.route}`) ||
-			pathname.includes(`/${GUIDBOOKS_ROUTES.requirements.route}`);
+		const isMaterialsPage = pathname.includes(`/${GUIDBOOKS_ROUTES.materials.route}`);
+		const isRequirementsPage = pathname.includes(`/${GUIDBOOKS_ROUTES.requirements.route}`);
+		const isConstructionsPage = pathname.includes(`/${GUIDBOOKS_ROUTES.constructions.route}`);
+
+		const showImportButton = isMaterialsPage || isRequirementsPage || isConstructionsPage;
+		const importAccept = isConstructionsPage ? '.json,application/json' : '.txt,.xlsx,.xls,.csv';
 
 		const handleImportClick = () => {
 			if (fileInputRef.current) {
@@ -82,16 +95,24 @@ export const GuidbookPageHeaderWrapper = memoize(
 				return;
 			}
 
-			const isRequirements = pathname.includes(`/${GUIDBOOKS_ROUTES.requirements.route}`);
-			const fallbackFilename = isRequirements
+			if (isConstructionsPage && !file.name.toLowerCase().endsWith('.json')) {
+				toast.error(t('errors.fileUpload'));
+				return;
+			}
+
+			const fallbackFilename = isRequirementsPage
 				? 'requirements-import-result.xlsx'
-				: 'materials-import-result.xlsx';
+				: isConstructionsPage
+					? 'constructions-import-result.json'
+					: 'materials-import-result.xlsx';
 
 			setIsImporting(true);
 			try {
-				const response = isRequirements
+				const response = isRequirementsPage
 					? await importRequirements({ formFile: file })
-					: await importMaterials({ formFile: file });
+					: isConstructionsPage
+						? await importConstructions({ file })
+						: await importMaterials({ formFile: file });
 
 				if (response.status !== 200) {
 					toast.error(t('errors.import'));
@@ -99,28 +120,28 @@ export const GuidbookPageHeaderWrapper = memoize(
 				}
 
 				const result = await parseImportResultFromResponse(response);
-				if (!result) {
-					toast.error(t('guides.import.noReport'));
-					return;
-				}
+				if (result) {
+					const toastInfo = formatImportResultToast(result, {
+						success: t('guides.import.success'),
+						summary: t('guides.import.summary'),
+					});
+					if (toastInfo.variant === 'warning') {
+						toast.warning(toastInfo.message);
+					} else {
+						toast.success(toastInfo.message);
+					}
 
-				const toastInfo = formatImportResultToast(result, {
-					success: t('guides.import.success'),
-					summary: t('guides.import.summary'),
-				});
-				if (toastInfo.variant === 'warning') {
-					toast.warning(toastInfo.message);
+					const action = resolveImportDownloadAction(result, fallbackFilename);
+					if (action) {
+						await triggerDownloadAction(action);
+					} else if ((result.failedCount ?? 0) > 0) {
+						toast.error(t('guides.import.noReport'));
+					}
 				} else {
-					toast.success(toastInfo.message);
+					toast.success(t('guides.import.success'));
 				}
 
-				const action = resolveImportDownloadAction(result, fallbackFilename);
-				if (action) {
-					await triggerDownloadAction(action);
-				} else if ((result.failedCount ?? 0) > 0) {
-					toast.error(t('guides.import.noReport'));
-				}
-
+				onImportSuccess?.();
 				navigate('');
 			} catch (error) {
 				console.error(error);
@@ -235,7 +256,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 									<input
 										ref={fileInputRef}
 										type="file"
-										accept=".txt,.xlsx,.xls,.csv"
+										accept={importAccept}
 										onChange={onImportHandle}
 										className="hidden"
 										disabled={isTransferInProgress}

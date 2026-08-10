@@ -3,6 +3,7 @@ import {
 	DeleteIcon,
 	DeleteModal,
 	EditIcon,
+	getAxiosErrorMessage,
 	paginationStateDefault,
 	SimpleTable,
 	SimpleTableCell,
@@ -29,8 +30,17 @@ import {
 	getConstructionAdditionalInfoFilesUpload,
 	mergeConstructionAdditionalInfo,
 } from '@features/guidbooks/converters';
-import { prepareConstructionEditDataForPersistence } from '@features/guidbooks/utils';
 import {
+	prepareConstructionEditDataForPersistence,
+	resolveExportDownloadAction,
+	triggerDownloadAction,
+	ConstructionsAddConfig,
+	ConstructionsEditConfig,
+	ConstructionsFilterConfig,
+	useHeaderForm,
+} from '@features/guidbooks/utils';
+import {
+	exportConstructions,
 	getGuidebooksCreate,
 	getGuidebooksDelete,
 	getGuidebooksDetail,
@@ -50,12 +60,6 @@ import {
 	type ConstructionTypeEnum,
 	type Country,
 } from '@features/guidbooks/types';
-import {
-	ConstructionsAddConfig,
-	ConstructionsEditConfig,
-	ConstructionsFilterConfig,
-	useHeaderForm,
-} from '@features/guidbooks/utils';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { AxiosResponse } from 'axios';
 import { AxiosError } from 'axios';
@@ -72,6 +76,7 @@ const ConstructionsScreen = () => {
 	const [tableData, setTableData] = useState<ConstructionsAddData[]>([]);
 	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [isExporting, setIsExporting] = useState(false);
 	const [itemToDelete, setItemToDelete] = useState({
 		id: '',
 		name: '',
@@ -485,6 +490,51 @@ const ConstructionsScreen = () => {
 			});
 	};
 
+	const handleExportTableData = async () => {
+		setIsExporting(true);
+		try {
+			const response = await exportConstructions(
+				convertToServerConstructionsFilterData(
+					forms.filterForm.getValues() as ConstructionsFilterData,
+				),
+			);
+			if (response.status !== 200) {
+				toast.error(t('guides.export.error'));
+				return;
+			}
+
+			const action = await resolveExportDownloadAction(
+				response as AxiosResponse<unknown>,
+				'constructions-export.json',
+			);
+			if (!action) {
+				toast.error(t('guides.export.error'));
+				return;
+			}
+			await triggerDownloadAction(action);
+			toast.success(t('guides.export.success'));
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				const message = await getAxiosErrorMessage(error, t('guides.export.error'));
+				toast.error(message);
+			} else {
+				toast.error(t('guides.export.error'));
+			}
+		} finally {
+			setIsExporting(false);
+		}
+	};
+
+	const handleImportSuccess = useCallback(() => {
+		handleGetTableData(
+			forms.filterForm.getValues() as ConstructionsFilterData,
+			{
+				pageNumber: 1,
+				pageSize: pageSizeRef.current || 10,
+			},
+		);
+	}, [forms.filterForm]);
+
 	useEffect(() => {
 		if (singleMaterial) forms.editForm.reset(singleMaterial);
 	}, [singleMaterial]);
@@ -507,6 +557,9 @@ const ConstructionsScreen = () => {
 		<div className="flex w-full flex-col gap-[40px]">
 			<GuidbookPageHeaderWrapper
 				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
+				onExport={handleExportTableData}
+				isExporting={isExporting}
+				onImportSuccess={handleImportSuccess}
 				titles={{
 					pageTitleKey: 'guides.constructions.pageTitle',
 					editTitleKey: 'guides.constructions.editTitle',

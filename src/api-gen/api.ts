@@ -635,6 +635,29 @@ export interface EnclosingStructuresThermalInsulationCalculationFlagsDto {
 	baseReportInfoFlags?: ThermalInsulationFloorReportInfoFlagsDto[] | null;
 }
 
+export interface ExportConstructionHeaderQuery {
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	pageSize?: number;
+	sortOrder?: SortOrder;
+	ordering?: string | null;
+	name?: string | null;
+	description?: string | null;
+	shortName?: string | null;
+	constructionType?: ConstructionTypeEnum;
+	countryType?: CountryType;
+	isReportConstruction?: boolean;
+	/** @format uuid */
+	constructionIdToUpdate?: string | null;
+	/** @format uuid */
+	userId?: string | null;
+	constructionClass?: ConstructionClass;
+	/** @format float */
+	rw?: number | null;
+	orderByPriority?: boolean;
+}
+
 export interface ExportMaterialsQuery {
 	/** @format int32 */
 	pageNumber?: number;
@@ -2656,6 +2679,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 		) =>
 			this.request<ConstructionAdditionalInfoDto, any>({
 				path: `/api/Construction/additionalInfo`,
+				method: 'POST',
+				body: data,
+				type: ContentType.Json,
+				format: 'json',
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionImportCreate
+		 * @request POST:/api/Construction/import
+		 */
+		constructionImportCreate: (
+			data: {
+				/** @format binary */
+				file?: File;
+			},
+			params: RequestParams = {},
+		) =>
+			this.request<void, any>({
+				path: `/api/Construction/import`,
+				method: 'POST',
+				body: data,
+				type: ContentType.FormData,
+				...params,
+			}),
+
+		/**
+		 * No description
+		 *
+		 * @tags Construction
+		 * @name ConstructionExportCreate
+		 * @request POST:/api/Construction/export
+		 */
+		constructionExportCreate: (
+			data: ExportConstructionHeaderQuery,
+			params: RequestParams = {},
+		) =>
+			this.request<ConstructionAdditionalInfoDto, any>({
+				path: `/api/Construction/export`,
 				method: 'POST',
 				body: data,
 				type: ContentType.Json,
