@@ -209,6 +209,12 @@ export const CalculationScreen = () => {
 	/** Снимок слоёв для кнопки «Вернуть» после смены типа в редакторе. */
 	const referenceLayersSnapshotRef = useRef('');
 	const suppressLayerWatchRef = useRef(false);
+	/** Игнор устаревших ответов detail/graph при быстрой смене конструкции. */
+	const visualsLoadSeqRef = useRef(0);
+	/** Какой header сейчас грузится (чтобы useEffect не стартовал дубль и не сбивал seq). */
+	const inflightDetailIdRef = useRef('');
+	/** Пользователь сбросил фильтр/селект — не автозаполнять форму клоном. */
+	const suppressWorkspaceAutoloadRef = useRef(false);
 
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
@@ -303,12 +309,11 @@ export const CalculationScreen = () => {
 	/** Графики и редактор — только после создания SingleReportInfo и появления копии header. */
 	const canShowWorkspace = !!reportId && !!workingHeaderId;
 
-	/** Пользователь выбрал другую справочную конструкцию — показываем её в редакторе до пересчёта. */
+	/** Пользователь выбрал другую справочную конструкцию — сразу превью form/svg/graph. */
 	const isCatalogReplacePending =
 		!!reportId &&
 		!!catalogConstructionId &&
-		!!appliedCatalogConstructionIdRef.current &&
-		String(catalogConstructionId) !== String(appliedCatalogConstructionIdRef.current);
+		String(catalogConstructionId) !== String(appliedCatalogConstructionIdRef.current || '');
 
 	/**
 	 * До create — id из справочника; после create — id клона.
@@ -320,9 +325,13 @@ export const CalculationScreen = () => {
 			? workingHeaderId
 			: workingHeaderId || catalogConstructionId;
 
-	/** После create graph/svg — только по id клона из URL/state, как designing.constructionHeaderId. */
+	/** Graph/svg key: при смене каталога — id из селекта, иначе клон после отчёта. */
 	const cloneHeaderId = constructionHeaderIdFromSearch || workingHeaderId;
-	const graphHeaderId = reportId ? cloneHeaderId : activeHeaderId;
+	const graphHeaderId = isCatalogReplacePending
+		? catalogConstructionId
+		: reportId
+			? cloneHeaderId
+			: activeHeaderId;
 
 	const layoutClass = useMemo(() => {
 		const fromDetail = getLayoutClassFromConstructionHeader(detail || undefined);
@@ -729,37 +738,52 @@ export const CalculationScreen = () => {
 		loadCatalog();
 	}, [typeEnumFilter]);
 
-	const refreshGraphAndSvg = useCallback((id: string) => {
+	const refreshGraphAndSvg = useCallback((id: string, loadSeq?: number) => {
+		const isCurrent = () => loadSeq == null || loadSeq === visualsLoadSeqRef.current;
+
+		// Как в designing: каждый запрос отдельно — падение additional не должно гасить svg/graph.
 		return from(
-			Promise.all([
+			Promise.allSettled([
 				svgConstructionDetail(id),
 				graphDetail({ constructionHeaderId: id }),
 				graphAdditionalDetail({ constructionHeaderId: id }),
 			]),
 		).pipe(
-			tap(([svgResponse, graphResponse, additionalResponse]) => {
-				if (svgResponse?.status === 200 && typeof svgResponse.data === 'string') {
-					setSvgUrl(svgResponse.data);
+			tap(([svgResult, graphResult, additionalResult]) => {
+				if (!isCurrent()) return;
+
+				if (svgResult.status === 'fulfilled') {
+					const svgResponse = svgResult.value;
+					if (svgResponse?.status === 200 && typeof svgResponse.data === 'string') {
+						setSvgUrl(svgResponse.data);
+					}
 				}
-				if (graphResponse?.status === 200 && Array.isArray(graphResponse.data)) {
-					setGraphData(graphResponse.data.map(graphDotsConverterToClient));
+
+				if (graphResult.status === 'fulfilled') {
+					const graphResponse = graphResult.value;
+					if (graphResponse?.status === 200 && Array.isArray(graphResponse.data)) {
+						setGraphData(graphResponse.data.map(graphDotsConverterToClient));
+					} else {
+						setGraphData(null);
+					}
 				} else {
 					setGraphData(null);
 				}
-				if (additionalResponse?.status === 200 && additionalResponse.data) {
-					setGraphAdditionalData(
-						graphAdditionalValuesConverterToClient(additionalResponse.data),
-					);
+
+				if (additionalResult.status === 'fulfilled') {
+					const additionalResponse = additionalResult.value;
+					if (additionalResponse?.status === 200 && additionalResponse.data) {
+						setGraphAdditionalData(
+							graphAdditionalValuesConverterToClient(additionalResponse.data),
+						);
+					} else {
+						setGraphAdditionalData(null);
+					}
 				} else {
 					setGraphAdditionalData(null);
 				}
 			}),
-			catchError(() => {
-				setSvgUrl(null);
-				setGraphData(null);
-				setGraphAdditionalData(null);
-				return of(null);
-			}),
+			catchError(() => of(null)),
 		);
 	}, []);
 
@@ -775,27 +799,16 @@ export const CalculationScreen = () => {
 		[refreshGraphAndSvg],
 	);
 
-	const refreshSvgOnly = useCallback((id: string) => {
-		return from(svgConstructionDetail(id)).pipe(
-			tap((svgResponse) => {
-				if (svgResponse?.status === 200 && typeof svgResponse.data === 'string') {
-					setSvgUrl(svgResponse.data);
-				}
-			}),
-			catchError(() => {
-				setSvgUrl(null);
-				return of(null);
-			}),
-		);
-	}, []);
-
 	const loadConstructionDetail = useCallback(
 		(id: string, withVisuals = false, loadForm = true) => {
 			if (!id) return;
+			const loadSeq = ++visualsLoadSeqRef.current;
+			inflightDetailIdRef.current = id;
 			dispatch(startLoading());
 			from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
 				.pipe(
 					tap((response) => {
+						if (loadSeq !== visualsLoadSeqRef.current) return;
 						if (!loadForm || response.status !== 200) return;
 						const data = prepareConstructionEditDataForPersistence(
 							convertToClientConstructionsEditData(response.data),
@@ -805,43 +818,38 @@ export const CalculationScreen = () => {
 						form.reset(data as DesigningData);
 						captureReferenceLayers(data.constructionTypeObject);
 						setHasPendingTypeChange(false);
-						if (data.constructionType) {
-							setTypeEnumFilter(String(data.constructionType));
-						}
+						// Тип-фильтр сверху не трогаем — он только для списка, не синхронизируем из detail.
 						formLoadedForHeaderRef.current = id;
 						queueMicrotask(() => {
 							suppressLayerWatchRef.current = false;
 						});
 					}),
 					catchError(() => {
-						if (loadForm) {
+						if (loadForm && loadSeq === visualsLoadSeqRef.current) {
 							toast.error(t('errors.constructionLoad'));
 						}
 						return of(null);
 					}),
 					switchMap(() => {
+						if (loadSeq !== visualsLoadSeqRef.current) {
+							return of(null);
+						}
 						if (!withVisuals) {
-							setGraphData(null);
-							setGraphAdditionalData(null);
+							if (loadForm) {
+								setSvgUrl(null);
+								setGraphData(null);
+								setGraphAdditionalData(null);
+							}
 							return of(null);
 						}
-						// Превью каталога в селекте — svg/graph по выбранному id; иначе после отчёта — клон.
-						const isCatalogPreview =
-							!!catalogConstructionIdRef.current &&
-							String(id) === String(catalogConstructionIdRef.current);
-						const graphId =
-							reportIdRef.current && workingHeaderIdRef.current && !isCatalogPreview
-								? workingHeaderIdRef.current
-								: id;
-						if (!graphId) {
-							setSvgUrl(null);
-							setGraphData(null);
-							setGraphAdditionalData(null);
-							return of(null);
-						}
-						return refreshGraphAndSvg(graphId);
+						return refreshGraphAndSvg(id, loadSeq);
 					}),
-					finalize(() => dispatch(stopLoading())),
+					finalize(() => {
+						if (inflightDetailIdRef.current === id) {
+							inflightDetailIdRef.current = '';
+						}
+						dispatch(stopLoading());
+					}),
 				)
 				.subscribe();
 		},
@@ -861,19 +869,34 @@ export const CalculationScreen = () => {
 		if (calculatingRef.current) return;
 		if (skipDetailLoadRef.current && !isCatalogReplacePending) return;
 
+		// Пользователь очистил фильтр/селект — не подставляем клон сами.
+		if (suppressWorkspaceAutoloadRef.current && !isCatalogReplacePending) {
+			return;
+		}
+
 		if (!reportId) {
-			loadConstructionDetail(activeHeaderId, true, true);
+			if (catalogConstructionId) {
+				if (
+					formLoadedForHeaderRef.current !== catalogConstructionId &&
+					inflightDetailIdRef.current !== catalogConstructionId
+				) {
+					loadConstructionDetail(catalogConstructionId, true, true);
+				}
+			}
 			return;
 		}
 
 		if (isCatalogReplacePending && catalogConstructionId) {
-			loadConstructionDetail(catalogConstructionId, false, true);
-			refreshSvgOnly(catalogConstructionId).subscribe();
-			formLoadedForHeaderRef.current = catalogConstructionId;
+			if (
+				formLoadedForHeaderRef.current !== catalogConstructionId &&
+				inflightDetailIdRef.current !== catalogConstructionId
+			) {
+				loadConstructionDetail(catalogConstructionId, true, true);
+			}
 			return;
 		}
 
-		// Отчёт есть: форму с GET не перезагружаем при sync clone id — только graph/svg отдельно.
+		// Отчёт есть, справочная не менялась: грузим клон только если форма ещё пустая под него.
 		if (workingHeaderId && formLoadedForHeaderRef.current === workingHeaderId) {
 			return;
 		}
@@ -886,7 +909,6 @@ export const CalculationScreen = () => {
 		catalogConstructionId,
 		isCatalogReplacePending,
 		loadConstructionDetail,
-		refreshSvgOnly,
 		reportId,
 		workingHeaderId,
 	]);
@@ -944,6 +966,7 @@ export const CalculationScreen = () => {
 			}
 
 			appliedCatalogConstructionIdRef.current = catalogConstructionId;
+			suppressWorkspaceAutoloadRef.current = false;
 			setReportId(id);
 			setReportInfo(convertToClientSingleReportInfoShort(response.data));
 			bindClonedConstruction(clonedHeaderId, cloned?.id || undefined, {
@@ -990,10 +1013,6 @@ export const CalculationScreen = () => {
 
 	const handleDownloadReport = () => {
 		if (!reportId) return;
-		if (hasPendingTypeChange || isCatalogReplacePending) {
-			toast.warning(t('constructor.calculation.calculateBeforeReport'));
-			return;
-		}
 		dispatch(startLoading());
 		from(reportReceiveSingle(reportId))
 			.pipe(
@@ -1022,6 +1041,7 @@ export const CalculationScreen = () => {
 
 	const clearConstruction = () => {
 		setCatalogConstructionId('');
+		catalogConstructionIdRef.current = '';
 		setSvgUrl(null);
 		setGraphData(null);
 		setGraphAdditionalData(null);
@@ -1031,33 +1051,40 @@ export const CalculationScreen = () => {
 		setWorkingHeaderId('');
 		workingHeaderIdRef.current = '';
 		setDetail(null);
+		formLoadedForHeaderRef.current = '';
+		suppressWorkspaceAutoloadRef.current = true;
 	};
 
+	/** Сброс превью формы/графика без удаления отчёта и клона. */
+	const resetWorkspacePreview = useCallback(() => {
+		visualsLoadSeqRef.current += 1;
+		inflightDetailIdRef.current = '';
+		setDetail(null);
+		form.reset(DesigningConfig.defaultValues);
+		setSvgUrl(null);
+		setGraphData(null);
+		setGraphAdditionalData(null);
+		setHasPendingTypeChange(false);
+		referenceLayersSnapshotRef.current = '';
+		formLoadedForHeaderRef.current = '';
+	}, [form]);
+
 	/**
-	 * Фильтр типа только фильтрует список.
-	 * Нельзя менять тип уже выбранной справочной/клон-конструкции через этот селект.
+	 * Фильтр типа сверху: только фильтрует список.
+	 * При любом изменении — сбрасываем выбранную конструкцию и форму снизу.
 	 */
 	const applyTypeFilterChange = (nextType: string) => {
 		setTypeEnumFilter(nextType);
+		setCatalogConstructionId('');
+		catalogConstructionIdRef.current = '';
+		suppressWorkspaceAutoloadRef.current = true;
 
 		if (!reportId) {
 			clearConstruction();
 			return;
 		}
 
-		// После создания расчёта: сбрасываем только выбор в селекте справочника,
-		// рабочий клон и редактор ниже не трогаем.
-		const selectedMeta = constructionData.find(
-			(c) => String(c.id) === String(catalogConstructionId),
-		);
-		const selectedMatchesFilter =
-			!!catalogConstructionId &&
-			!!selectedMeta &&
-			(!nextType || String(selectedMeta.constructionType) === String(nextType));
-
-		if (!selectedMatchesFilter) {
-			setCatalogConstructionId('');
-		}
+		resetWorkspacePreview();
 	};
 
 	const handleConstructionTypeChange = (value: string) => {
@@ -1289,6 +1316,7 @@ export const CalculationScreen = () => {
 					const nextCloneId = fromPut || previousCloneId;
 
 					appliedCatalogConstructionIdRef.current = catalogIdForPut;
+					suppressWorkspaceAutoloadRef.current = false;
 
 					const persistLayers$ =
 						String(nextCloneId) !== String(previousCloneId)
@@ -1349,6 +1377,7 @@ export const CalculationScreen = () => {
 				}),
 				finalize(() => {
 					calculatingRef.current = false;
+					skipDetailLoadRef.current = false;
 					suppressLayerWatchRef.current = false;
 					dispatch(stopLoading());
 				}),
@@ -1476,33 +1505,24 @@ export const CalculationScreen = () => {
 						onChange={(value) => {
 							const next = value ? String(value) : '';
 							setCatalogConstructionId(next);
+							catalogConstructionIdRef.current = next;
 							setHasPendingTypeChange(false);
-							const selected = constructionData.find((c) => String(c.id) === next);
-							if (selected?.constructionType) {
-								setTypeEnumFilter(String(selected.constructionType));
-							}
 
 							if (next) {
+								// Выбрали конструкцию — грузим форму + svg + graph. Фильтр типа не трогаем.
+								suppressWorkspaceAutoloadRef.current = false;
 								skipDetailLoadRef.current = false;
-								formLoadedForHeaderRef.current = next;
+								setSvgUrl(null);
 								setGraphData(null);
 								setGraphAdditionalData(null);
-								loadConstructionDetail(next, false, true);
-								refreshSvgOnly(next).subscribe();
+								formLoadedForHeaderRef.current = '';
+								loadConstructionDetail(next, true, true);
 								return;
 							}
 
-							// Сброс селекта после отчёта — возвращаем форму текущего клона.
-							if (reportId) {
-								const cloneId =
-									workingHeaderIdRef.current ||
-									constructionHeaderIdFromSearch ||
-									workingHeaderId;
-								if (cloneId) {
-									formLoadedForHeaderRef.current = cloneId;
-									loadConstructionDetail(cloneId, true, true);
-								}
-							}
+							// Очистили селект — сбрасываем форму снизу, клон сами не подставляем.
+							suppressWorkspaceAutoloadRef.current = true;
+							resetWorkspacePreview();
 						}}
 						isSearchable
 						label={t('createConstruction.construction.label')}
@@ -1582,14 +1602,17 @@ export const CalculationScreen = () => {
 					<div className="flex h-fit w-full flex-row flex-wrap gap-[40px] rounded-[20px] bg-white px-[32px] py-[28px]">
 						{svgUrl ? (
 							<img
+								key={graphHeaderId || catalogConstructionId || 'svg'}
 								className="h-auto max-h-[320px] w-fit max-w-[360px] object-contain"
 								src={svgUrl}
 								alt=""
 							/>
-						) : (
+						) : detail || catalogConstructionId ? (
 							<div className="flex size-[240px] items-center justify-center">
 								<Loader />
 							</div>
+						) : (
+							<div className="size-[240px] rounded-lg bg-slate-50" />
 						)}
 						<div className="flex min-w-0 flex-1 flex-col gap-[20px]">
 							<Controller
@@ -1689,7 +1712,7 @@ export const CalculationScreen = () => {
 						)}
 					</div>
 
-					{graphData?.length && !isCatalogReplacePending && !hasPendingTypeChange ? (
+					{graphData?.length ? (
 						<div
 							key={graphHeaderId || workingHeaderId}
 							className="flex w-full flex-col gap-[24px] rounded-[20px] bg-white px-[24px] py-[28px] xl:flex-row xl:items-start"
@@ -1719,16 +1742,10 @@ export const CalculationScreen = () => {
 
 			{canShowWorkspace ? (
 				<div className="flex flex-col items-end gap-2">
-					{hasPendingTypeChange || isCatalogReplacePending ? (
-						<p className="max-w-[520px] text-right font-sans text-sm text-amber-800">
-							{t('constructor.calculation.calculateBeforeReport')}
-						</p>
-					) : null}
 					<Button
 						type="button"
 						onClick={handleDownloadReport}
 						variant="primary"
-						disabled={hasPendingTypeChange || isCatalogReplacePending}
 						className="h-[50px] self-end text-[20px]"
 					>
 						{t('constructor.calculation.downloadReport')}
