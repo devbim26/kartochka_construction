@@ -112,17 +112,30 @@ const isSuccessStatus = (status?: number) =>
 	typeof status === 'number' && status >= 200 && status < 300;
 
 /** Достаём конструкцию отчёта из ответа create/get/update (разные формы поля). */
-const extractSingleReportConstruction = (data?: ReportInfoSingleDto | null) => {
+const extractSingleReportConstruction = (
+	data?: ReportInfoSingleDto | null,
+	catalogHeaderIds: string[] = [],
+) => {
 	if (!data) return null;
 	const raw = data as ReportInfoSingleDto & {
 		reportConstruction?: NonNullable<ReportInfoSingleDto['singleReportConstruction']>;
 	};
 	const sc = raw.singleReportConstruction ?? raw.reportConstruction ?? null;
 	if (!sc) return null;
+	const nestedHeader = sc as {
+		constructionHeader?: { id?: string };
+		constructionHeaderId?: string;
+	};
+	const flatId = nestedHeader.constructionHeaderId || '';
+	const nestedId = nestedHeader.constructionHeader?.id || '';
+	const isCatalogId = (id: string) =>
+		!!id && catalogHeaderIds.some((catalogId) => String(catalogId) === String(id));
+	// Бэк иногда кладёт справочный id в constructionHeaderId, а клон — в constructionHeader.id.
 	const constructionHeaderId =
-		sc.constructionHeaderId ||
-		(sc as { constructionHeader?: { id?: string } }).constructionHeader?.id ||
-		'';
+		(nestedId && !isCatalogId(nestedId) ? nestedId : '') ||
+		(flatId && !isCatalogId(flatId) ? flatId : '') ||
+		nestedId ||
+		flatId;
 	return {
 		id: sc.id || '',
 		constructionHeaderId,
@@ -145,6 +158,7 @@ export const CalculationScreen = () => {
 	const isLoading = useAppSelector((state) => state.constructorLoader.isLoading);
 	const [search] = useSearchParams();
 	const reportIdFromSearch = search.get('reportId') || '';
+	const constructionHeaderIdFromSearch = search.get('constructionHeaderId') || '';
 	const [reportId, setReportId] = useState(reportIdFromSearch || '');
 
 	const [name, setName] = useState('');
@@ -186,6 +200,10 @@ export const CalculationScreen = () => {
 	const reportIdRef = useRef(reportId);
 	/** Идёт «Рассчитать» — не даём useEffect перезатереть форму detail-запросом. */
 	const calculatingRef = useRef(false);
+	/** После save не подтягиваем форму GET-ом (как designing — только graph/svg). */
+	const skipDetailLoadRef = useRef(false);
+	/** Для какого header id форма уже загружена / сохранена локально. */
+	const formLoadedForHeaderRef = useRef('');
 	/** Какой справочный id был применён в последнем create/PUT. */
 	const appliedCatalogConstructionIdRef = useRef('');
 	/** Снимок слоёв для кнопки «Вернуть» после смены типа в редакторе. */
@@ -214,8 +232,35 @@ export const CalculationScreen = () => {
 	}, [reportIdFromSearch, reportId]);
 
 	useEffect(() => {
+		if (constructionHeaderIdFromSearch && constructionHeaderIdFromSearch !== workingHeaderId) {
+			setWorkingHeaderId(constructionHeaderIdFromSearch);
+			workingHeaderIdRef.current = constructionHeaderIdFromSearch;
+		}
+	}, [constructionHeaderIdFromSearch, workingHeaderId]);
+
+	useEffect(() => {
 		reportIdRef.current = reportId;
 	}, [reportId]);
+
+	/** Как на поэтажном: клон в URL — единый id для save и graph. */
+	const syncCloneToUrl = useCallback(
+		(cloneHeaderId: string, nextReportId?: string) => {
+			if (!cloneHeaderId) return;
+			workingHeaderIdRef.current = cloneHeaderId;
+			setWorkingHeaderId(cloneHeaderId);
+			const ensuredReportId = nextReportId || reportIdRef.current || reportId;
+			if (ensuredReportId) {
+				reportIdRef.current = ensuredReportId;
+				setReportId(ensuredReportId);
+			}
+			navigate('', {
+				reportId: ensuredReportId,
+				reportType: ReportCategory.Single,
+				constructionHeaderId: cloneHeaderId,
+			});
+		},
+		[navigate, reportId],
+	);
 
 	const area = useMemo(() => {
 		const w = Number(width);
@@ -258,11 +303,26 @@ export const CalculationScreen = () => {
 	/** Графики и редактор — только после создания SingleReportInfo и появления копии header. */
 	const canShowWorkspace = !!reportId && !!workingHeaderId;
 
+	/** Пользователь выбрал другую справочную конструкцию — показываем её в редакторе до пересчёта. */
+	const isCatalogReplacePending =
+		!!reportId &&
+		!!catalogConstructionId &&
+		!!appliedCatalogConstructionIdRef.current &&
+		String(catalogConstructionId) !== String(appliedCatalogConstructionIdRef.current);
+
 	/**
-	 * Как в поэтажном: до create — id из справочника; после create — id клона
-	 * (тот же, что reportConstructionHeader.constructionHeaderId).
+	 * До create — id из справочника; после create — id клона.
+	 * При смене справочной в селекте — превью новой конструкции из каталога.
 	 */
-	const activeHeaderId = workingHeaderId || catalogConstructionId;
+	const activeHeaderId = isCatalogReplacePending
+		? catalogConstructionId
+		: reportId
+			? workingHeaderId
+			: workingHeaderId || catalogConstructionId;
+
+	/** После create graph/svg — только по id клона из URL/state, как designing.constructionHeaderId. */
+	const cloneHeaderId = constructionHeaderIdFromSearch || workingHeaderId;
+	const graphHeaderId = reportId ? cloneHeaderId : activeHeaderId;
 
 	const layoutClass = useMemo(() => {
 		const fromDetail = getLayoutClassFromConstructionHeader(detail || undefined);
@@ -411,14 +471,7 @@ export const CalculationScreen = () => {
 			}),
 			...options,
 		];
-	}, [
-		catalogConstructionId,
-		constructionData,
-		favoriteIds,
-		t,
-		typeEnumFilter,
-		workingHeaderId,
-	]);
+	}, [catalogConstructionId, constructionData, favoriteIds, t, typeEnumFilter, workingHeaderId]);
 
 	const materials = useMemo(
 		() => flattenConstructionMaterialsTopToBottom(detail?.constructionTypeObject),
@@ -462,11 +515,11 @@ export const CalculationScreen = () => {
 
 	useEffect(() => {
 		if (!reportId) return;
-		if (calculatingRef.current) return;
+		if (calculatingRef.current || skipDetailLoadRef.current) return;
 		from(getReportSingleById({ id: reportId }))
 			.pipe(
 				tap((response) => {
-					if (calculatingRef.current) return;
+					if (calculatingRef.current || skipDetailLoadRef.current) return;
 					if (!isSuccessStatus(response?.status) || !response.data) {
 						resetMissingCalculationReport();
 						return;
@@ -480,16 +533,26 @@ export const CalculationScreen = () => {
 					if (short.calculationDocument?.country) {
 						setDocumentCountryFilter(String(short.calculationDocument.country));
 					}
-					const existing = extractSingleReportConstruction(response.data);
+					const existing = extractSingleReportConstruction(response.data, [
+						catalogConstructionIdRef.current,
+						appliedCatalogConstructionIdRef.current,
+					]);
 					if (!existing?.constructionHeaderId) return;
 					setSavedConstructionId(existing.id || null);
 					savedConstructionIdRef.current = existing.id || null;
 					const catalogId = catalogConstructionIdRef.current;
-					// Клон — только для редактора; если API вернул справочный id — не затираем рабочий клон.
 					const headerId = existing.constructionHeaderId;
+					const loadedClone = formLoadedForHeaderRef.current;
+					// После save не перезаписываем клон из GET — там часто справочный/устаревший id.
+					if (loadedClone && headerId && String(headerId) !== String(loadedClone)) {
+						return;
+					}
 					if (!catalogId || String(headerId) !== String(catalogId)) {
 						setWorkingHeaderId(headerId);
 						workingHeaderIdRef.current = headerId;
+						if (!loadedClone) {
+							formLoadedForHeaderRef.current = headerId;
+						}
 					}
 					setAdditionalWindows(existing.additionalWindows);
 					setAdditionalDoors(existing.additionalDoors);
@@ -497,7 +560,7 @@ export const CalculationScreen = () => {
 					if (existing.length != null) setLength(String(existing.length));
 				}),
 				catchError((error) => {
-					if (calculatingRef.current) return of(null);
+					if (calculatingRef.current || skipDetailLoadRef.current) return of(null);
 					if (
 						error instanceof AxiosError &&
 						isMissingReportHttpStatus(error.response?.status)
@@ -551,7 +614,10 @@ export const CalculationScreen = () => {
 				return null;
 			}
 
-			const cloned = extractSingleReportConstruction(detailResponse.data);
+			const cloned = extractSingleReportConstruction(detailResponse.data, [
+				catalogConstructionIdRef.current,
+				appliedCatalogConstructionIdRef.current,
+			]);
 			if (!cloned?.constructionHeaderId) {
 				toast.error(
 					locale === 'ru'
@@ -563,12 +629,16 @@ export const CalculationScreen = () => {
 
 			const clonedHeaderId = cloned.constructionHeaderId;
 			const catalogId = catalogConstructionIdRef.current;
+			const appliedCatalog = appliedCatalogConstructionIdRef.current;
 
 			setReportId(ensuredReportId);
 			setReportInfo(convertToClientSingleReportInfoShort(detailResponse.data));
 
-			// Если GET вернул справочный id — клон ещё не готов / не пришёл.
+			// GET вернул справочный id: при смене конструкции клон ещё не готов; при пересчёте той же — оставляем клон.
 			if (catalogId && String(clonedHeaderId) === String(catalogId)) {
+				if (appliedCatalog && String(catalogId) !== String(appliedCatalog)) {
+					return null;
+				}
 				if (cloned.id) {
 					setSavedConstructionId(cloned.id);
 					savedConstructionIdRef.current = cloned.id;
@@ -578,7 +648,7 @@ export const CalculationScreen = () => {
 					setAdditionalDoors(cloned.additionalDoors);
 				}
 				lastSyncedKeyRef.current = formSyncKey;
-				return null;
+				return workingHeaderIdRef.current || null;
 			}
 
 			bindClonedConstruction(clonedHeaderId, cloned.id || undefined, {
@@ -693,13 +763,40 @@ export const CalculationScreen = () => {
 		);
 	}, []);
 
+	/** Как onEditHandle в designing — явный refresh graph/svg после save слоёв. */
+	const refreshGraphVisualsAfterSave = useCallback(
+		(cloneId: string) => {
+			if (!cloneId) return;
+			setGraphData(null);
+			setGraphAdditionalData(null);
+			setSvgUrl(null);
+			refreshGraphAndSvg(cloneId).subscribe();
+		},
+		[refreshGraphAndSvg],
+	);
+
+	const refreshSvgOnly = useCallback((id: string) => {
+		return from(svgConstructionDetail(id)).pipe(
+			tap((svgResponse) => {
+				if (svgResponse?.status === 200 && typeof svgResponse.data === 'string') {
+					setSvgUrl(svgResponse.data);
+				}
+			}),
+			catchError(() => {
+				setSvgUrl(null);
+				return of(null);
+			}),
+		);
+	}, []);
+
 	const loadConstructionDetail = useCallback(
-		(id: string, withVisuals: boolean) => {
+		(id: string, withVisuals = false, loadForm = true) => {
+			if (!id) return;
 			dispatch(startLoading());
 			from(getGuidebooksDetail({ id, guidebookType: Guidebooks.CONSTRUCTION }))
 				.pipe(
 					tap((response) => {
-						if (response.status !== 200) return;
+						if (!loadForm || response.status !== 200) return;
 						const data = prepareConstructionEditDataForPersistence(
 							convertToClientConstructionsEditData(response.data),
 						);
@@ -711,22 +808,38 @@ export const CalculationScreen = () => {
 						if (data.constructionType) {
 							setTypeEnumFilter(String(data.constructionType));
 						}
+						formLoadedForHeaderRef.current = id;
 						queueMicrotask(() => {
 							suppressLayerWatchRef.current = false;
 						});
 					}),
 					catchError(() => {
-						toast.error(t('errors.constructionLoad'));
+						if (loadForm) {
+							toast.error(t('errors.constructionLoad'));
+						}
 						return of(null);
 					}),
 					switchMap(() => {
 						if (!withVisuals) {
+							setGraphData(null);
+							setGraphAdditionalData(null);
+							return of(null);
+						}
+						// Превью каталога в селекте — svg/graph по выбранному id; иначе после отчёта — клон.
+						const isCatalogPreview =
+							!!catalogConstructionIdRef.current &&
+							String(id) === String(catalogConstructionIdRef.current);
+						const graphId =
+							reportIdRef.current && workingHeaderIdRef.current && !isCatalogPreview
+								? workingHeaderIdRef.current
+								: id;
+						if (!graphId) {
 							setSvgUrl(null);
 							setGraphData(null);
 							setGraphAdditionalData(null);
 							return of(null);
 						}
-						return refreshGraphAndSvg(id);
+						return refreshGraphAndSvg(graphId);
 					}),
 					finalize(() => dispatch(stopLoading())),
 				)
@@ -742,12 +855,41 @@ export const CalculationScreen = () => {
 			setGraphData(null);
 			setGraphAdditionalData(null);
 			form.reset(DesigningConfig.defaultValues);
+			formLoadedForHeaderRef.current = '';
 			return;
 		}
 		if (calculatingRef.current) return;
-		loadConstructionDetail(activeHeaderId, canShowWorkspace);
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- визуалы включаем после появления workingHeaderId
-	}, [activeHeaderId, canShowWorkspace]);
+		if (skipDetailLoadRef.current && !isCatalogReplacePending) return;
+
+		if (!reportId) {
+			loadConstructionDetail(activeHeaderId, true, true);
+			return;
+		}
+
+		if (isCatalogReplacePending && catalogConstructionId) {
+			loadConstructionDetail(catalogConstructionId, false, true);
+			refreshSvgOnly(catalogConstructionId).subscribe();
+			formLoadedForHeaderRef.current = catalogConstructionId;
+			return;
+		}
+
+		// Отчёт есть: форму с GET не перезагружаем при sync clone id — только graph/svg отдельно.
+		if (workingHeaderId && formLoadedForHeaderRef.current === workingHeaderId) {
+			return;
+		}
+
+		if (workingHeaderId) {
+			loadConstructionDetail(workingHeaderId, true, true);
+		}
+	}, [
+		activeHeaderId,
+		catalogConstructionId,
+		isCatalogReplacePending,
+		loadConstructionDetail,
+		refreshSvgOnly,
+		reportId,
+		workingHeaderId,
+	]);
 
 	const syncReportConstruction = useCallback(async () => {
 		if (syncingRef.current || creatingReportRef.current) return false;
@@ -790,7 +932,7 @@ export const CalculationScreen = () => {
 				return false;
 			}
 
-			const cloned = extractSingleReportConstruction(response.data);
+			const cloned = extractSingleReportConstruction(response.data, [catalogConstructionId]);
 			const clonedHeaderId = cloned?.constructionHeaderId || '';
 			if (!clonedHeaderId) {
 				toast.error(
@@ -811,10 +953,7 @@ export const CalculationScreen = () => {
 			lastSyncedKeyRef.current = formSyncKey;
 			setHasPendingTypeChange(false);
 
-			navigate('', {
-				reportId: id,
-				reportType: ReportCategory.Single,
-			});
+			syncCloneToUrl(clonedHeaderId, id);
 
 			loadConstructionDetail(clonedHeaderId, true);
 			await adoptClonedConstructionFromReport(id);
@@ -844,15 +983,14 @@ export const CalculationScreen = () => {
 		loadConstructionDetail,
 		locale,
 		name,
-		navigate,
-		reportId,
+		syncCloneToUrl,
 		t,
 		width,
 	]);
 
 	const handleDownloadReport = () => {
 		if (!reportId) return;
-		if (hasPendingTypeChange) {
+		if (hasPendingTypeChange || isCatalogReplacePending) {
 			toast.warning(t('constructor.calculation.calculateBeforeReport'));
 			return;
 		}
@@ -1008,9 +1146,11 @@ export const CalculationScreen = () => {
 	};
 
 	const handleRestoreInitialConstruction = () => {
-		if (!activeHeaderId) return;
+		const cloneId = constructionHeaderIdFromSearch || workingHeaderId;
+		if (!cloneId) return;
 		setHasPendingTypeChange(false);
-		loadConstructionDetail(activeHeaderId, canShowWorkspace);
+		formLoadedForHeaderRef.current = '';
+		loadConstructionDetail(cloneId, true, true);
 	};
 
 	const updateAdditionalOpenings$ = useCallback(() => {
@@ -1053,6 +1193,8 @@ export const CalculationScreen = () => {
 		const ensuredReportId = reportIdRef.current || reportId;
 		if (!previousCloneId || isConstructionEditLocked || !ensuredReportId) return;
 
+		const catalogIdForPut = catalogConstructionId || appliedCatalogConstructionIdRef.current;
+
 		if (!isFormComplete) {
 			toast.error(
 				locale === 'ru'
@@ -1062,7 +1204,7 @@ export const CalculationScreen = () => {
 			return;
 		}
 
-		if (!catalogConstructionId) {
+		if (!catalogIdForPut) {
 			toast.error(locale === 'ru' ? 'Выберите конструкцию' : 'Select a construction');
 			return;
 		}
@@ -1080,146 +1222,122 @@ export const CalculationScreen = () => {
 		const formData = prepareConstructionEditDataForPersistence(
 			form.getValues() as ConstructionsEditData,
 		);
-		// TODO(stub): временная заглушка для теста пересчёта — меняем description, чтобы бэк увидел diff.
-		formData.description = `${formData.description ?? ''}${Math.floor(Math.random() * 10)}`;
 
 		const reportConstructionRowId = savedConstructionIdRef.current || undefined;
+		const dataForCurrentClone = convertToServerConstructionsEditData({
+			...formData,
+			id: previousCloneId,
+			reportInfoId: ensuredReportId || undefined,
+		});
 		suppressLayerWatchRef.current = true;
 		calculatingRef.current = true;
+		skipDetailLoadRef.current = true;
 
 		dispatch(startLoading());
+		// Как designing: сначала save слоёв в текущий клон, потом PUT отчёта.
 		from(
-			updateReportSingle({
-				data: convertToUpdateSingleReportCommand(ensuredReportId, {
-					id: reportConstructionRowId,
-					name: name.trim(),
-					// Контракт PUT: всегда справочный оригинал + Id ReportConstruction.
-					construction: catalogConstructionId,
-					width,
-					length,
-					area,
-					constructionType: '',
-					firstPlacementRoom: '',
-					secondPlacementRoom: '',
-					calculationDocumentId,
-				}),
+			getGuidebooksEdit({
+				data: dataForCurrentClone,
+				guidebookType: Guidebooks.CONSTRUCTION,
 			}),
 		)
 			.pipe(
+				switchMap((editRes) => {
+					if (!isSuccessStatus(editRes?.status)) {
+						return of(null);
+					}
+					return from(
+						updateReportSingle({
+							data: convertToUpdateSingleReportCommand(ensuredReportId, {
+								id: reportConstructionRowId,
+								name: name.trim(),
+								construction: catalogIdForPut,
+								width,
+								length,
+								area,
+								constructionType: '',
+								firstPlacementRoom: '',
+								secondPlacementRoom: '',
+								calculationDocumentId,
+							}),
+						}),
+					);
+				}),
 				switchMap((response) => {
 					if (!response || !isSuccessStatus(response?.status)) {
 						return of(null);
 					}
 
 					const nextReportId = response.data?.id || ensuredReportId;
-					const reportIdChanged =
-						!!nextReportId && String(nextReportId) !== String(ensuredReportId);
-					if (nextReportId) {
-						reportIdRef.current = nextReportId;
-						setReportId(nextReportId);
-						if (reportIdChanged) {
-							navigate('', {
-								reportId: nextReportId,
-								reportType: ReportCategory.Single,
-							});
-						}
-					}
+					reportIdRef.current = nextReportId;
 
-					const cloned = extractSingleReportConstruction(response.data);
+					const cloned = extractSingleReportConstruction(response.data, [
+						catalogConstructionIdRef.current,
+						appliedCatalogConstructionIdRef.current,
+						catalogIdForPut,
+					]);
 					if (cloned?.id) {
 						setSavedConstructionId(cloned.id);
 						savedConstructionIdRef.current = cloned.id;
 					}
 
-					// После PUT бэк часто отдаёт новый клон — всегда уточняем через GET.
-					return from(adoptClonedConstructionFromReport(nextReportId)).pipe(
-						switchMap((adoptedId) => {
-							const catalogId =
-								catalogConstructionIdRef.current || catalogConstructionId;
-							const returnedHeaderId = cloned?.constructionHeaderId || '';
-							const fromPut =
-								returnedHeaderId &&
-								String(returnedHeaderId) !== String(catalogId)
-									? returnedHeaderId
-									: '';
-							const nextCloneId = adoptedId || fromPut;
-							if (!nextCloneId) {
-								toast.error(
-									locale === 'ru'
-										? 'Не получен клон конструкции после пересчёта отчёта'
-										: 'Cloned construction was not returned after report update',
-								);
-								return of(null);
-							}
+					const returnedHeaderId = cloned?.constructionHeaderId || '';
+					const fromPut =
+						returnedHeaderId && String(returnedHeaderId) !== String(catalogIdForPut)
+							? returnedHeaderId
+							: '';
+					const nextCloneId = fromPut || previousCloneId;
 
-							if (String(nextCloneId) !== String(workingHeaderIdRef.current)) {
-								bindClonedConstruction(
-									nextCloneId,
-									cloned?.id ||
-										savedConstructionIdRef.current ||
-										undefined,
-									{
-										additionalWindows: cloned?.additionalWindows,
-										additionalDoors: cloned?.additionalDoors,
-									},
-								);
-							} else {
-								workingHeaderIdRef.current = nextCloneId;
-							}
+					appliedCatalogConstructionIdRef.current = catalogIdForPut;
 
-							appliedCatalogConstructionIdRef.current = catalogConstructionId;
-
-							const dataForServer = convertToServerConstructionsEditData({
-								...formData,
-								id: nextCloneId,
-								reportInfoId: nextReportId || undefined,
-							});
-
-							return from(
-								getGuidebooksEdit({
-									data: dataForServer,
-									guidebookType: Guidebooks.CONSTRUCTION,
-								}),
-							).pipe(
-								switchMap((editRes) => {
-									if (!isSuccessStatus(editRes?.status)) {
-										return of(null);
-									}
-									return updateAdditionalOpenings$().pipe(
-										switchMap((openingsOk) => {
-											if (!openingsOk) return of(null);
-											return of({ nextCloneId, formData });
+					const persistLayers$ =
+						String(nextCloneId) !== String(previousCloneId)
+							? from(
+									getGuidebooksEdit({
+										data: convertToServerConstructionsEditData({
+											...formData,
+											id: nextCloneId,
+											reportInfoId: nextReportId || undefined,
 										}),
-									);
+										guidebookType: Guidebooks.CONSTRUCTION,
+									}),
+								).pipe(switchMap((copyRes) => of(isSuccessStatus(copyRes?.status))))
+							: of(true);
+
+					return persistLayers$.pipe(
+						switchMap((layersOk) => {
+							if (!layersOk) return of(null);
+							return updateAdditionalOpenings$().pipe(
+								switchMap((openingsOk) => {
+									if (!openingsOk) return of(null);
+									return of({ nextCloneId, formData, nextReportId, cloned });
 								}),
 							);
 						}),
 					);
 				}),
 				tap((ctx) => {
-					if (!ctx) return;
+					if (!ctx) {
+						skipDetailLoadRef.current = false;
+						return;
+					}
 					toast.success(t('success.constructionUpdated'));
 					setHasPendingTypeChange(false);
-					const { nextCloneId, formData: savedForm } = ctx;
+					const { nextCloneId, formData: savedForm, nextReportId, cloned } = ctx;
 					const nextForm = { ...savedForm, id: nextCloneId };
 					form.reset(nextForm as DesigningData, { keepDefaultValues: false });
-					setDetail((prev) =>
-						prev
-							? {
-									...prev,
-									id: nextCloneId,
-									constructionType:
-										nextForm.constructionType ?? prev.constructionType,
-									constructionTypeObject: nextForm.constructionTypeObject,
-								}
-							: prev,
-					);
+					setDetail(nextForm as ConstructionsEditData);
 					captureReferenceLayers(nextForm.constructionTypeObject);
-					if (String(nextCloneId) !== String(workingHeaderId)) {
-						setWorkingHeaderId(nextCloneId);
+					formLoadedForHeaderRef.current = nextCloneId;
+					workingHeaderIdRef.current = nextCloneId;
+					setWorkingHeaderId(nextCloneId);
+					if (cloned?.id) {
+						setSavedConstructionId(cloned.id);
+						savedConstructionIdRef.current = cloned.id;
 					}
-					// Не loadConstructionDetail — он form.reset'ом с сервера может затереть только что сохранённые слои.
-					refreshGraphAndSvg(nextCloneId).subscribe();
+					setReportId(nextReportId);
+					syncCloneToUrl(nextCloneId, nextReportId);
+					refreshGraphVisualsAfterSave(nextCloneId);
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
@@ -1230,10 +1348,7 @@ export const CalculationScreen = () => {
 					return of(null);
 				}),
 				finalize(() => {
-					// После setWorkingHeaderId даём useEffect увидеть calculatingRef=true и не задвоить load.
-					queueMicrotask(() => {
-						calculatingRef.current = false;
-					});
+					calculatingRef.current = false;
 					suppressLayerWatchRef.current = false;
 					dispatch(stopLoading());
 				}),
@@ -1365,6 +1480,28 @@ export const CalculationScreen = () => {
 							const selected = constructionData.find((c) => String(c.id) === next);
 							if (selected?.constructionType) {
 								setTypeEnumFilter(String(selected.constructionType));
+							}
+
+							if (next) {
+								skipDetailLoadRef.current = false;
+								formLoadedForHeaderRef.current = next;
+								setGraphData(null);
+								setGraphAdditionalData(null);
+								loadConstructionDetail(next, false, true);
+								refreshSvgOnly(next).subscribe();
+								return;
+							}
+
+							// Сброс селекта после отчёта — возвращаем форму текущего клона.
+							if (reportId) {
+								const cloneId =
+									workingHeaderIdRef.current ||
+									constructionHeaderIdFromSearch ||
+									workingHeaderId;
+								if (cloneId) {
+									formLoadedForHeaderRef.current = cloneId;
+									loadConstructionDetail(cloneId, true, true);
+								}
 							}
 						}}
 						isSearchable
@@ -1500,7 +1637,14 @@ export const CalculationScreen = () => {
 							</p>
 						) : null}
 						{constructionType && !isConstructionEditLocked ? (
-							<MaterialApplicationPurposeProvider layoutClass={layoutClass}>
+							<MaterialApplicationPurposeProvider
+								key={
+									isCatalogReplacePending
+										? `catalog-${catalogConstructionId}`
+										: graphHeaderId || workingHeaderId || 'construction-form'
+								}
+								layoutClass={layoutClass}
+							>
 								<SelectableMaterialDesignationProvider
 									value={{ showMaterialDesignationInput: true }}
 								>
@@ -1545,8 +1689,11 @@ export const CalculationScreen = () => {
 						)}
 					</div>
 
-					{graphData?.length ? (
-						<div className="flex w-full flex-col gap-[24px] rounded-[20px] bg-white px-[24px] py-[28px] xl:flex-row xl:items-start">
+					{graphData?.length && !isCatalogReplacePending && !hasPendingTypeChange ? (
+						<div
+							key={graphHeaderId || workingHeaderId}
+							className="flex w-full flex-col gap-[24px] rounded-[20px] bg-white px-[24px] py-[28px] xl:flex-row xl:items-start"
+						>
 							<div className="flex min-h-0 min-w-0 flex-1 justify-center overflow-x-auto px-2">
 								<DesigningGraph
 									graphData={graphData}
@@ -1572,7 +1719,7 @@ export const CalculationScreen = () => {
 
 			{canShowWorkspace ? (
 				<div className="flex flex-col items-end gap-2">
-					{hasPendingTypeChange ? (
+					{hasPendingTypeChange || isCatalogReplacePending ? (
 						<p className="max-w-[520px] text-right font-sans text-sm text-amber-800">
 							{t('constructor.calculation.calculateBeforeReport')}
 						</p>
@@ -1581,7 +1728,7 @@ export const CalculationScreen = () => {
 						type="button"
 						onClick={handleDownloadReport}
 						variant="primary"
-						disabled={hasPendingTypeChange}
+						disabled={hasPendingTypeChange || isCatalogReplacePending}
 						className="h-[50px] self-end text-[20px]"
 					>
 						{t('constructor.calculation.downloadReport')}
@@ -1592,7 +1739,7 @@ export const CalculationScreen = () => {
 			<ConstructionDetailsModal
 				isOpen={isDetailsOpen}
 				onClose={() => setIsDetailsOpen(false)}
-				constructionHeaderId={workingHeaderId || activeHeaderId || null}
+				constructionHeaderId={graphHeaderId || cloneHeaderId || activeHeaderId || null}
 				overrides={{
 					constructionType: detail?.constructionType,
 					issuerName: detail?.issuerName,
