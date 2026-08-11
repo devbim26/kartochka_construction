@@ -297,10 +297,8 @@ export const en = {
 	'constructor.calculation.downloadReport': 'Download report',
 	'constructor.calculation.regenerateReportHint':
 		'After creating a custom construction, click «Recreate report», then download the report.',
-	'constructor.calculation.calculateBeforeReport':
-		'Calculate the construction first, then recreate and download the report.',
-	'constructor.calculation.fillAndCreate':
-		'Fill in all fields and click «Create calculation»',
+	'constructor.calculation.calculateBeforeReport': 'Calculate the construction first.',
+	'constructor.calculation.fillAndCreate': 'Fill in all fields and click «Create calculation»',
 	'sidebar.account': 'Account',
 	'sidebar.subscriptionsConstructor': 'Plans constructor',
 	'sidebar.bills': 'Bills',
@@ -652,7 +650,8 @@ export const en = {
 		'Produces structured responses with page-by-page analysis and references.',
 	'main.expertiseCards.documents.title': 'Document review and analytics',
 	'main.expertiseCards.documents.p1': '*General chat + DeepResearch*',
-	'main.expertiseCards.documents.p2': 'Access to the latest AI models. Deep information search on the web.',
+	'main.expertiseCards.documents.p2':
+		'Access to the latest AI models. Deep information search on the web.',
 	'main.expertiseCards.documents.p3': '*PDF document analytics*',
 	'main.expertiseCards.documents.p4':
 		'AI reviews, summarizes, and structures documents in DOC/Excel — for estimates, ToR, and protocols.',
@@ -726,8 +725,7 @@ export const en = {
 	'constructor.reportForm.docs.literature': 'References',
 	'constructor.reportForm.docs.appendix1':
 		'APPENDIX 1. Sound insulation. Protocols with calculation',
-	'constructor.reportForm.docs.appendix2':
-		'APPENDIX 2. Alternative constructions',
+	'constructor.reportForm.docs.appendix2': 'APPENDIX 2. Alternative constructions',
 
 	'constructor.header.title': 'Constructor',
 	'constructor.header.aboutBuilding': 'About building',
@@ -783,8 +781,7 @@ export const en = {
 	'constructor.relevant.no': 'Does not meet requirements',
 	'constructor.relevant.mismatchWarning':
 		'Construction does not meet sound insulation requirements',
-	'constructor.relevant.matchSuccess':
-		'Construction meets sound insulation requirements',
+	'constructor.relevant.matchSuccess': 'Construction meets sound insulation requirements',
 	'constructor.catalog.labTestGraphTitle': 'Sound insulation (lab test)',
 	'constructor.myConstructions.construction1': 'Construction 1',
 	'constructor.myConstructions.imagePreview': 'Image preview',
@@ -1608,10 +1605,8 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.calculation.downloadReport': 'Скачать отчет',
 	'constructor.calculation.regenerateReportHint':
 		'После создания кастомной конструкции нажмите «Пересоздать отчет», затем скачайте отчёт.',
-	'constructor.calculation.calculateBeforeReport':
-		'Сначала выполните расчёт конструкции, затем пересоздайте и скачайте отчёт.',
-	'constructor.calculation.fillAndCreate':
-		'Заполните все поля и нажмите «Создать расчет»',
+	'constructor.calculation.calculateBeforeReport': 'Сначала выполните расчёт конструкции.',
+	'constructor.calculation.fillAndCreate': 'Заполните все поля и нажмите «Создать расчет»',
 	'sidebar.account': 'Личный кабинет',
 	'sidebar.subscriptionsConstructor': 'Конструктор тарифов',
 	'sidebar.bills': 'Счета',
@@ -2085,8 +2080,7 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.relevant.no': 'Не соответствует',
 	'constructor.relevant.mismatchWarning':
 		'Конструкция не соответствует требованиям звукоизоляции',
-	'constructor.relevant.matchSuccess':
-		'Конструкция соответствует требованиям звукоизоляции',
+	'constructor.relevant.matchSuccess': 'Конструкция соответствует требованиям звукоизоляции',
 	'constructor.catalog.labTestGraphTitle': 'Звукоизоляция (лабораторный тест)',
 	'constructor.myConstructions.construction1': 'Конструкция 1',
 	'constructor.myConstructions.imagePreview': 'Превью изображения',
