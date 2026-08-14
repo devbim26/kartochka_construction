@@ -246,8 +246,10 @@ export const convertToClientConstructionsEditData = (data: any): ConstructionsEd
 	const base = convertToClientConstructionsAddData(data);
 	return {
 		...base,
-		RCalcs: String(data.rw) ?? '',
-		estimatedIndexValue: String(data.computingIndexValue) ?? '',
+		airLaboratory: base.airLaboratory ?? mapLaboratoryBlockFromApi(undefined),
+		impactLaboratory: base.impactLaboratory ?? mapLaboratoryBlockFromApi(undefined),
+		RCalcs: String(data.rw ?? ''),
+		estimatedIndexValue: String(data.computingIndexValue ?? ''),
 	};
 };
 
@@ -386,6 +388,10 @@ type ConstructionLaboratoryFormData = {
 const packLaboratoryCreateDto = (
 	block: ConstructionsAddData['airLaboratory'],
 ): ConstructionLaboratoryFormData | undefined => {
+	if (!block) {
+		return undefined;
+	}
+
 	const labRTotal = block.labRTotal?.trim() ?? '';
 	const labIndex = block.labIndex?.trim() ?? '';
 	const laboratoryTestSource = block.laboratoryTestSource?.trim() ?? '';
@@ -395,7 +401,7 @@ const packLaboratoryCreateDto = (
 	}
 
 	return {
-		rTotal: labRTotal.split(',').map((split) => +String(split).trim()),
+		rTotal: labRTotal.split(',').map((part: string) => +part.trim()),
 		laboratoryTestSource: laboratoryTestSource || null,
 		index: (block.labIndex as IndexType) || undefined,
 	};
