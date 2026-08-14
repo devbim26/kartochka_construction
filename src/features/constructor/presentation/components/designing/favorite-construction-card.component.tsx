@@ -214,7 +214,7 @@ export const FavoriteConstructionCard = ({
 				<button
 					type="button"
 					onClick={() => setIsDetailsOpen(true)}
-					className="font-sans text-sm font-semibold text-primary hover:opacity-80"
+					className="font-sans text-[28px] font-semibold leading-tight text-primary hover:opacity-80"
 				>
 					{t('createConstruction.details.more')}
 				</button>

@@ -133,7 +133,7 @@ export const ConstructionAdditionalInfoSchema = z.object({
 	images: z.array(z.any()).optional(),
 });
 
-const constructionsAddShape = z.object({
+const constructionsBaseShape = z.object({
 	id: z.string().optional(),
 	name: z.string().optional().nullable(),
 	description: z.string().min(1, 'validation.required'),
@@ -153,8 +153,6 @@ const constructionsAddShape = z.object({
 		.min(1, 'validation.required')
 		.refine((value) => +value > 0, 'validation.positiveNumber'),
 	propertySource: z.string().min(1, 'validation.required'),
-	airLaboratory: laboratoryDataBlockSchema,
-	impactLaboratory: laboratoryDataBlockLooseSchema,
 	/** Поля списка (фильтр / таблица), при создании не отправляются на сервер */
 	rw: z.string().optional(),
 	lnw: z.string().optional(),
@@ -167,23 +165,45 @@ const constructionsAddShape = z.object({
 	additionalInfo: ConstructionAdditionalInfoSchema.optional(),
 });
 
-const impactLaboratoryRequiredForFloorsRefine = (
-	data: z.infer<typeof constructionsAddShape>,
+/** При создании лабораторные блоки не валидируются. */
+const constructionsAddShape = constructionsBaseShape.extend({
+	airLaboratory: z.any().optional(),
+	impactLaboratory: z.any().optional(),
+});
+
+const constructionsEditShape = constructionsBaseShape.extend({
+	airLaboratory: laboratoryDataBlockLooseSchema,
+	impactLaboratory: laboratoryDataBlockLooseSchema,
+});
+
+const laboratoryRequiredForBrandIssuerRefine = (
+	data: z.infer<typeof constructionsEditShape>,
 	ctx: z.RefinementCtx,
 ) => {
+	if (isGeneralIssuerName(data.issuerName)) return;
+
+	const airParsed = laboratoryDataBlockSchema.safeParse(data.airLaboratory);
+	if (!airParsed.success) {
+		for (const issue of airParsed.error.issues) {
+			ctx.addIssue({ ...issue, path: ['airLaboratory', ...issue.path] });
+		}
+	}
+
 	if (!isFloorConstructionType(data.constructionType)) return;
-	const parsed = laboratoryDataBlockSchema.safeParse(data.impactLaboratory);
-	if (parsed.success) return;
-	for (const issue of parsed.error.issues) {
-		ctx.addIssue({ ...issue, path: ['impactLaboratory', ...issue.path] });
+
+	const impactParsed = laboratoryDataBlockSchema.safeParse(data.impactLaboratory);
+	if (!impactParsed.success) {
+		for (const issue of impactParsed.error.issues) {
+			ctx.addIssue({ ...issue, path: ['impactLaboratory', ...issue.path] });
+		}
 	}
 };
 
-export const ConstructionsAddSchema = constructionsAddShape
-	.superRefine(zPanelRequiresBrandIssuerRefine)
-	.superRefine(impactLaboratoryRequiredForFloorsRefine);
+export const ConstructionsAddSchema = constructionsAddShape.superRefine(
+	zPanelRequiresBrandIssuerRefine,
+);
 
-export const ConstructionsEditSchema = constructionsAddShape
+export const ConstructionsEditSchema = constructionsEditShape
 	.merge(
 		z.object({
 			RCalcs: z.string().min(1, 'validation.required'),
@@ -191,7 +211,7 @@ export const ConstructionsEditSchema = constructionsAddShape
 		}),
 	)
 	.superRefine(zPanelRequiresBrandIssuerRefine)
-	.superRefine(impactLaboratoryRequiredForFloorsRefine);
+	.superRefine(laboratoryRequiredForBrandIssuerRefine);
 
 export type ConstructionsAddSchemaType = z.infer<typeof ConstructionsAddSchema>;
 export type ConstructionsEditSchemaType = z.infer<typeof ConstructionsEditSchema>;

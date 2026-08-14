@@ -1,12 +1,19 @@
 import { Chevron, FormElementLabel, Switch, useI18n } from '@core';
 import type { FormReportSchemaType } from '@features/constructor/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 
 export const DocumentFlags = () => {
 	const { setValue, control, watch, getValues } = useFormContext<FormReportSchemaType>();
 	const [showSoundInfo, setShowSoundInfo] = useState(true);
 	const { t } = useI18n();
+
+	useEffect(() => {
+		setValue(
+			'floorDocumentFlags.takeSupplementSoundInsulationAlternativeProtocols',
+			false,
+		);
+	}, [setValue]);
 
 	const soundBaseReportInfoFlags = useWatch({
 		control,
@@ -105,10 +112,7 @@ export const DocumentFlags = () => {
 				<FormElementLabel className="w-[400px] text-[#383838]">
 					{t('constructor.reportForm.docs.sound.section')}
 				</FormElementLabel>
-				<Switch
-					isEnabledProp={isSoundEnabled}
-					onChange={toggleSoundSection}
-				/>
+				<Switch isEnabledProp={isSoundEnabled} onChange={toggleSoundSection} />
 				<Chevron
 					color="#383838"
 					className="pl-[50px]"
@@ -143,15 +147,30 @@ export const DocumentFlags = () => {
 						{soundBaseReportInfoFlags?.map((baseFlag, baseIndex) => {
 							return (
 								<div key={baseFlag.floorNumber || `sound-floor-${baseIndex}`}>
-									<div
-										className="flex w-full items-center justify-start gap-[10px]"
-									>
+									<div className="flex w-full items-center justify-start gap-[10px]">
 										<FormElementLabel className="w-[350px]">
-											{`1.1.${baseIndex + 1} ${t('constructor.reportForm.docs.sound.constructionsAt')} ${baseFlag.floorNumber}.000`}
+											<span>
+												{`1.1.${baseIndex + 1} ${t('constructor.reportForm.docs.sound.constructionsAt')} `}
+												<span
+													className="group relative inline-block cursor-help rounded px-1.5 py-0.5 bg-[#FFE566]"
+													title={t(
+														'constructor.reportForm.docs.sound.elevationMarkHint',
+													)}
+												>
+													{baseFlag.floorNumber}
+													<span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 w-max max-w-[280px] -translate-x-1/2 rounded bg-black px-3 py-2 text-left text-sm font-normal leading-snug text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+														{t(
+															'constructor.reportForm.docs.sound.elevationMarkHint',
+														)}
+													</span>
+												</span>
+											</span>
 										</FormElementLabel>
 										<Controller
 											control={control}
-											name={`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.takeFloor` as const}
+											name={
+												`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.takeFloor` as const
+											}
 											render={({ field }) => (
 												<Switch
 													isEnabledProp={!!field.value}
@@ -165,17 +184,20 @@ export const DocumentFlags = () => {
 									{baseFlag.namedConstructionFlags?.map((namedConst, index) => {
 										return (
 											<div
-												key={namedConst.reportConstructionId || `sound-construction-${baseIndex}-${index}`}
+												key={
+													namedConst.reportConstructionId ||
+													`sound-construction-${baseIndex}-${index}`
+												}
 											>
-												<div
-													className="flex w-full items-center justify-start gap-[10px]"
-												>
+												<div className="flex w-full items-center justify-start gap-[10px]">
 													<FormElementLabel className="w-[350px]">
 														{`1.1.${baseIndex + 1}.${index + 1} ${t('constructor.reportForm.docs.sound.construction')} ${namedConst.constructionName}`}
 													</FormElementLabel>
 													<Controller
 														control={control}
-														name={`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${index}.takeConstruction` as const}
+														name={
+															`floorDocumentFlags.soundInsulationCalculation.baseReportInfoFlags.${baseIndex}.namedConstructionFlags.${index}.takeConstruction` as const
+														}
 														render={({ field }) => (
 															<Switch
 																isEnabledProp={!!field.value}
@@ -236,23 +258,6 @@ export const DocumentFlags = () => {
 				<Controller
 					control={control}
 					name="floorDocumentFlags.takeSupplementSoundInsulationProtocolsWithCalculation"
-					render={({ field }) => (
-						<Switch
-							isEnabledProp={!!field.value}
-							onChange={(isEnabled) => {
-								field.onChange(isEnabled);
-							}}
-						/>
-					)}
-				/>
-			</div>
-			<div className="flex w-full items-center justify-start gap-[10px]">
-				<FormElementLabel className="w-[410px] text-[#383838]">
-					{t('constructor.reportForm.docs.appendix2')}
-				</FormElementLabel>
-				<Controller
-					control={control}
-					name="floorDocumentFlags.takeSupplementSoundInsulationAlternativeProtocols"
 					render={({ field }) => (
 						<Switch
 							isEnabledProp={!!field.value}

@@ -4,7 +4,9 @@ import {
 	DeleteModal,
 	EditIcon,
 	getAxiosErrorMessage,
+	getAxiosErrorMessageSync,
 	paginationStateDefault,
+	Select,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
@@ -14,7 +16,7 @@ import {
 } from '@core';
 import { getDesignCalculationConstructionPurpose } from '@core/utils/helpers/design-calculation-mode.helper';
 import { ConstructionPurpose, type ConstructionAdditionalInfoDto } from '@api-gen';
-import { RuConstructionPurposeLabels } from '@features/guidbooks/constants';
+import { getConstructionPurposeLabel } from '@features/guidbooks/constants';
 import {
 	ConstructionsAdd,
 	ConstructionsEdit,
@@ -22,6 +24,7 @@ import {
 	GuidbookPageHeaderWrapper,
 } from '@features';
 import {
+	convertToClientConstructionTypesList,
 	convertToClientConstructionsAddData,
 	convertToClientConstructionsEditData,
 	convertToServerConstructionsAddData,
@@ -41,6 +44,7 @@ import {
 } from '@features/guidbooks/utils';
 import {
 	exportConstructions,
+	getGuidebooksConstructionTypes,
 	getGuidebooksCreate,
 	getGuidebooksDelete,
 	getGuidebooksDetail,
@@ -52,12 +56,13 @@ import {
 import {
 	Guidebooks,
 	getConstructionTypeLabel,
+	getPriorityLabel,
 	RuCountryNamesMap,
-	RuPriorityNamesSelectValues,
 	type ConstructionsAddData,
 	type ConstructionsEditData,
 	type ConstructionsFilterData,
 	type ConstructionTypeEnum,
+	type ConstructionTypeTemplate,
 	type Country,
 } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -71,12 +76,21 @@ import { toast } from 'sonner';
 const ConstructionsScreen = () => {
 	const navigate = useAppNavigate();
 	const { t, locale } = useI18n();
+	const defaultErrorMessage = t('error.somethingWentWrong.title');
+
+	const showRequestError = (error: unknown, fallback = defaultErrorMessage) => {
+		toast.error(getAxiosErrorMessageSync(error, fallback));
+	};
 	const [search] = useSearchParams();
 	const [singleMaterial, setSingleMaterial] = useState<ConstructionsEditData>();
 	const [tableData, setTableData] = useState<ConstructionsAddData[]>([]);
 	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [isExporting, setIsExporting] = useState(false);
+	const [exportConstructionType, setExportConstructionType] = useState('');
+	const [exportConstructionTypes, setExportConstructionTypes] = useState<
+		ConstructionTypeTemplate[]
+	>([]);
 	const [itemToDelete, setItemToDelete] = useState({
 		id: '',
 		name: '',
@@ -129,12 +143,14 @@ const ConstructionsScreen = () => {
 				header: () => (
 					<SimpleTableHeaderCell text={t('guides.constructions.columns.priority')} />
 				),
-				cell: (info) => {
-					const v = info.getValue() as string;
-					const label =
-						RuPriorityNamesSelectValues.find((o) => o.value === v)?.label ?? v;
-					return <SimpleTableCell content={label || '—'} />;
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={getPriorityLabel(
+							info.getValue() as string,
+							locale === 'en' ? 'en' : 'ru',
+						)}
+					/>
+				),
 			},
 			{
 				accessorKey: 'rw',
@@ -182,14 +198,14 @@ const ConstructionsScreen = () => {
 						text={t('guides.constructions.columns.constructionPurpose')}
 					/>
 				),
-				cell: (info) => {
-					const v = info.getValue() as string;
-					const label =
-						v && v in RuConstructionPurposeLabels
-							? RuConstructionPurposeLabels[v as ConstructionPurpose]
-							: '—';
-					return <SimpleTableCell content={label} />;
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={getConstructionPurposeLabel(
+							info.getValue() as string,
+							locale === 'en' ? 'en' : 'ru',
+						)}
+					/>
+				),
 			},
 			{
 				accessorKey: 'country',
@@ -241,7 +257,7 @@ const ConstructionsScreen = () => {
 			},
 		];
 		return cols;
-	}, [t, navigate]);
+	}, [t, locale, navigate]);
 
 	const [
 		filterName,
@@ -309,11 +325,7 @@ const ConstructionsScreen = () => {
 				catchError((error) => {
 					if (fetchId !== fetchGenerationRef.current) return from([null]);
 					console.error(error);
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
-					} else {
-						toast.error('Не удалось загрузить конструкции');
-					}
+					showRequestError(error, 'Не удалось загрузить конструкции');
 					return from([null]);
 				}),
 			)
@@ -350,9 +362,7 @@ const ConstructionsScreen = () => {
 					if (data) setSingleMaterial(data);
 				}),
 				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
-					}
+					showRequestError(error);
 					return from([null]);
 				}),
 			)
@@ -384,18 +394,14 @@ const ConstructionsScreen = () => {
 						}),
 					).pipe(
 						catchError((error) => {
-							if (error instanceof AxiosError) {
-								toast.error(error.response?.data);
-							}
+							showRequestError(error);
 							return from([response]);
 						}),
 						switchMap(() => from([response])),
 					);
 				}),
 				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
-					}
+					showRequestError(error);
 					return from([null]);
 				}),
 			)
@@ -442,18 +448,14 @@ const ConstructionsScreen = () => {
 						}),
 					).pipe(
 						catchError((error) => {
-							if (error instanceof AxiosError) {
-								toast.error(error.response?.data);
-							}
+							showRequestError(error);
 							return from([response]);
 						}),
 						switchMap(() => from([response])),
 					);
 				}),
 				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
-					}
+					showRequestError(error);
 					return from([null]);
 				}),
 			)
@@ -473,9 +475,7 @@ const ConstructionsScreen = () => {
 		from(getGuidebooksDelete({ data: { id }, guidebookType: Guidebooks.CONSTRUCTION }))
 			.pipe(
 				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data);
-					}
+					showRequestError(error);
 					return from([null]);
 				}),
 			)
@@ -493,11 +493,12 @@ const ConstructionsScreen = () => {
 	const handleExportTableData = async () => {
 		setIsExporting(true);
 		try {
-			const response = await exportConstructions(
-				convertToServerConstructionsFilterData(
+			const response = await exportConstructions({
+				...convertToServerConstructionsFilterData(
 					forms.filterForm.getValues() as ConstructionsFilterData,
 				),
-			);
+				shortName: exportConstructionType || null,
+			});
 			if (response.status !== 200) {
 				toast.error(t('guides.export.error'));
 				return;
@@ -524,6 +525,53 @@ const ConstructionsScreen = () => {
 			setIsExporting(false);
 		}
 	};
+
+	useEffect(() => {
+		from(getGuidebooksConstructionTypes())
+			.pipe(
+				catchError(() => from([null])),
+			)
+			.subscribe((response) => {
+				if (response?.status === 200) {
+					setExportConstructionTypes(
+						convertToClientConstructionTypesList(response.data as any),
+					);
+				}
+			});
+	}, []);
+
+	const exportConstructionTypeOptions = useMemo(
+		() => [
+			{ label: t('guides.export.constructionType.all'), value: '' },
+			...exportConstructionTypes
+				.map((item) => ({
+					label: getConstructionTypeLabel(
+						item.shortName ?? item.name,
+						locale === 'en' ? 'en' : 'ru',
+					),
+					value: item.shortName ?? '',
+				}))
+				.filter((item) => item.value && item.label),
+		],
+		[exportConstructionTypes, locale, t],
+	);
+
+	const exportAccessory = useMemo(
+		() => (
+			<Select
+				value={exportConstructionType}
+				onChange={(value) => setExportConstructionType(value ? String(value) : '')}
+				options={exportConstructionTypeOptions}
+				isSearchable
+				disabled={isExporting}
+				placeholder={t('guides.export.constructionType.placeholder')}
+				buttonClassName="h-[32px] min-w-[280px] max-w-[420px] rounded-[8px] font-sans text-sm font-normal"
+				wrapperClassname="shadow-none ring-input-border-primary"
+				optionsClassName="!min-w-[280px] max-w-[480px]"
+			/>
+		),
+		[exportConstructionType, exportConstructionTypeOptions, isExporting, t],
+	);
 
 	const handleImportSuccess = useCallback(() => {
 		handleGetTableData(
@@ -559,6 +607,7 @@ const ConstructionsScreen = () => {
 				onSave={!!search.get('add') ? onSaveHandle : onEditHandle}
 				onExport={handleExportTableData}
 				isExporting={isExporting}
+				exportAccessory={exportAccessory}
 				onImportSuccess={handleImportSuccess}
 				titles={{
 					pageTitleKey: 'guides.constructions.pageTitle',

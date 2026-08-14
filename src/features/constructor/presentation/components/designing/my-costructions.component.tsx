@@ -185,31 +185,17 @@ const MyConstructions = () => {
 
 	const carouselConstructions = useMemo(() => {
 		const items = favoriteConstructions.filter((item) => !!getFavoriteHeaderId(item));
-		const hasCurrentInList = items.some(
+
+		if (!currentHeaderId) return items;
+
+		const currentItem = items.find(
 			(item) => getFavoriteHeaderId(item) === currentHeaderId,
 		);
+		if (!currentItem) return items;
 
-		if (currentHeaderId && !hasCurrentInList) {
-			return [
-				{
-					id: currentHeaderId,
-					name: constructionHeader?.name ?? null,
-					description: constructionHeader?.description ?? null,
-				},
-				...items,
-			];
-		}
-
-		if (currentHeaderId && hasCurrentInList) {
-			const currentItem = items.find(
-				(item) => getFavoriteHeaderId(item) === currentHeaderId,
-			);
-			const rest = items.filter((item) => getFavoriteHeaderId(item) !== currentHeaderId);
-			return currentItem ? [currentItem, ...rest] : items;
-		}
-
-		return items;
-	}, [favoriteConstructions, currentHeaderId, constructionHeader?.name, constructionHeader?.description]);
+		const rest = items.filter((item) => getFavoriteHeaderId(item) !== currentHeaderId);
+		return [currentItem, ...rest];
+	}, [favoriteConstructions, currentHeaderId]);
 
 	const handleGetCurrentConstructionReportHeader = (id: string) => {
 		dispatch(startLoading());

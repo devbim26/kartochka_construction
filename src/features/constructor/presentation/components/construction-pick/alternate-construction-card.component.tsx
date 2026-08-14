@@ -286,18 +286,18 @@ export const AlternateConstructionCard = ({
 					/>
 					<GeneralInformationThermal />
 					<GeneralInformationFireResistance />
-					{constructionHeaderId ? (
-						<div className="flex justify-end pt-2">
-							<button
-								type="button"
-								onClick={() => setIsDetailsOpen(true)}
-								className="font-sans text-sm font-semibold text-primary hover:opacity-80"
-							>
-								{t('createConstruction.details.more')}
-							</button>
-						</div>
-					) : null}
 				</div>
+				{constructionHeaderId ? (
+					<div className="flex justify-center">
+						<button
+							type="button"
+							onClick={() => setIsDetailsOpen(true)}
+							className="font-sans text-[28px] font-semibold leading-tight text-primary hover:opacity-80"
+						>
+							{t('createConstruction.details.more')}
+						</button>
+					</div>
+				) : null}
 			</div>
 			<ConstructionDetailsModal
 				isOpen={isDetailsOpen}

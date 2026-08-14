@@ -752,7 +752,7 @@ const DesigningConstructionScreen = () => {
 						<Loader />
 					</div>
 				)}
-				<div className="flex h-fit flex-col gap-[30px]">
+				<div className="flex min-h-0 flex-1 flex-col gap-[30px] self-stretch">
 					<Controller
 						name="constructionTypeObject.constructionTypeEnum"
 						control={form.control}
@@ -795,11 +795,11 @@ const DesigningConstructionScreen = () => {
 							))}
 					</div>
 					{constructionHeaderId ? (
-						<div className="flex justify-end">
+						<div className="mt-auto flex justify-end pt-6">
 							<button
 								type="button"
 								onClick={() => setIsDetailsOpen(true)}
-								className="font-sans text-sm font-semibold text-primary hover:opacity-80"
+								className="font-sans text-[28px] font-semibold leading-tight text-primary hover:opacity-80"
 							>
 								{t('createConstruction.details.more')}
 							</button>

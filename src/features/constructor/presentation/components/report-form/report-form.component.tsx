@@ -1,6 +1,7 @@
 import {
 	APP_ROUTES,
 	Button,
+	getAxiosErrorMessage,
 	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
@@ -31,10 +32,45 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { catchError, from, switchMap } from 'rxjs';
+import { catchError, from } from 'rxjs';
 import { toast } from 'sonner';
 import { DocumentFlags } from './document-flags.component';
 import { GeneralInfoForm } from './general-info-form.component';
+
+const resolveReportFileUrl = (data: unknown): string | null => {
+	if (typeof data === 'string') {
+		const trimmed = data.trim();
+		if (!trimmed) return null;
+		if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+			try {
+				return resolveReportFileUrl(JSON.parse(trimmed));
+			} catch {
+				return null;
+			}
+		}
+		return trimmed;
+	}
+
+	if (data && typeof data === 'object') {
+		const record = data as Record<string, unknown>;
+		for (const key of ['fileUrl', 'url', 'downloadUrl', 'file', 'link']) {
+			const value = record[key];
+			if (typeof value === 'string' && value.trim()) return value.trim();
+		}
+	}
+
+	return null;
+};
+
+const triggerReportFileDownload = (url: string) => {
+	const link = document.createElement('a');
+	link.href = url;
+	link.target = '_blank';
+	link.rel = 'noopener noreferrer';
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+};
 
 const ReportFromComponent = () => {
 	const [search] = useSearchParams();
@@ -51,6 +87,8 @@ const ReportFromComponent = () => {
 		resolver: zodResolver(FormReportConfig.schema),
 		defaultValues: FormReportConfig.defaultValues,
 	});
+
+	const fallbackError = t('error.somethingWentWrong.title');
 
 	useEffect(() => {
 		if (!reportId) return;
@@ -70,6 +108,11 @@ const ReportFromComponent = () => {
 				dispatch(stopLoading());
 			});
 	}, [reportId]);
+
+	const showRequestError = async (error: unknown) => {
+		const message = await getAxiosErrorMessage(error, fallbackError);
+		toast.error(message || fallbackError);
+	};
 
 	const submitReportWithLogo = async (action: 'download' | 'save') => {
 		const isValid = await form.trigger();
@@ -94,7 +137,6 @@ const ReportFromComponent = () => {
 
 				if (logoResponse.status !== 200) {
 					toast.error(t('constructor.reportForm.logoUploadError'));
-					setIsSubmitting(false);
 					return;
 				}
 			}
@@ -102,34 +144,25 @@ const ReportFromComponent = () => {
 			// Для одиночной конструкции сразу дергаем ReportReceiving/single,
 			// без отдельного заполнения параметров как для поэтажного плана.
 			if (reportType === ReportCategory.Single) {
-				from(reportReceiveSingle(reportId))
-					.pipe(
-						catchError((error) => {
-							console.error('Error submitting single report:', error);
-							return [null];
-						}),
-					)
-					.subscribe((response) => {
-						if (response?.status === 200) {
-							if (action === 'download') {
-								const link = document.createElement('a');
-								link.href = response.data!;
-								document.body.appendChild(link);
-								link.click();
-								document.body.removeChild(link);
-								clearCalculationSession();
-								dispatch(getCurrentUser());
-							} else if (action === 'save') {
-								navigate(
-									APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route,
-								);
-								persistCalculationSession(reportId);
-							}
-						}
-						dispatch(stopLoading());
-						setIsSubmitting(false);
-					});
+				const response = await reportReceiveSingle(reportId);
+				if (response.status !== 200) {
+					toast.error(fallbackError);
+					return;
+				}
 
+				if (action === 'download') {
+					const fileUrl = resolveReportFileUrl(response.data as unknown);
+					if (!fileUrl) {
+						toast.error(fallbackError);
+						return;
+					}
+					triggerReportFileDownload(fileUrl);
+					clearCalculationSession();
+					dispatch(getCurrentUser());
+				} else {
+					navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route);
+					persistCalculationSession(reportId);
+				}
 				return;
 			}
 
@@ -137,46 +170,41 @@ const ReportFromComponent = () => {
 				...formData,
 				reportInfoId: reportId,
 				logo: undefined,
+				floorDocumentFlags: {
+					...formData.floorDocumentFlags,
+					takeSupplementSoundInsulationAlternativeProtocols: false,
+				},
 			};
 
-			from(formReport(reportData))
-				.pipe(
-					catchError((error) => {
-						console.error('Error submitting report:', error);
-						return [];
-					}),
-					switchMap((response) => {
-						if (response.status === 200) {
-							const reportRequest = reportReceiveFloor(reportId);
+			const formResponse = await formReport(reportData);
+			if (formResponse.status !== 200) {
+				toast.error(fallbackError);
+				return;
+			}
 
-							return from(reportRequest).pipe(catchError(() => [null]));
-						}
-						return [null];
-					}),
-				)
-				.subscribe((response) => {
-					if (response?.status === 200) {
-						if (action === 'download') {
-							const link = document.createElement('a');
-							link.href = response.data!;
-							document.body.appendChild(link);
-							link.click();
-							document.body.removeChild(link);
-							clearProjectSession();
-							dispatch(getCurrentUser());
-						} else if (action === 'save') {
-							navigate(
-								APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route,
-							);
-							persistProjectSession(reportId);
-						}
-					}
-					dispatch(stopLoading());
-					setIsSubmitting(false);
-				});
+			const receiveResponse = await reportReceiveFloor(reportId);
+			if (receiveResponse.status !== 200) {
+				toast.error(fallbackError);
+				return;
+			}
+
+			if (action === 'download') {
+				const fileUrl = resolveReportFileUrl(receiveResponse.data as unknown);
+				if (!fileUrl) {
+					toast.error(fallbackError);
+					return;
+				}
+				triggerReportFileDownload(fileUrl);
+				clearProjectSession();
+				dispatch(getCurrentUser());
+			} else {
+				navigate(APP_ROUTES.designing.route + '/' + DESIGNING_ROUTES.reports.route);
+				persistProjectSession(reportId);
+			}
 		} catch (error) {
-			console.error('Error in submission:', error);
-			toast.error(t('constructor.reportForm.submitError'));
+			console.error('Error in report submission:', error);
+			await showRequestError(error);
+		} finally {
 			setIsSubmitting(false);
 			dispatch(stopLoading());
 		}

@@ -385,11 +385,21 @@ type ConstructionLaboratoryFormData = {
 
 const packLaboratoryCreateDto = (
 	block: ConstructionsAddData['airLaboratory'],
-): ConstructionLaboratoryFormData => ({
-	rTotal: block.labRTotal.split(',').map((split) => +String(split).trim()),
-	laboratoryTestSource: block.laboratoryTestSource || null,
-	index: (block.labIndex as IndexType) || undefined,
-});
+): ConstructionLaboratoryFormData | undefined => {
+	const labRTotal = block.labRTotal?.trim() ?? '';
+	const labIndex = block.labIndex?.trim() ?? '';
+	const laboratoryTestSource = block.laboratoryTestSource?.trim() ?? '';
+
+	if (!labRTotal && !labIndex && !laboratoryTestSource) {
+		return undefined;
+	}
+
+	return {
+		rTotal: labRTotal.split(',').map((split) => +String(split).trim()),
+		laboratoryTestSource: laboratoryTestSource || null,
+		index: (block.labIndex as IndexType) || undefined,
+	};
+};
 
 const convertToServerConstructionsBaseData = (data: ConstructionsAddData): any => ({
 	name: data.name || null,

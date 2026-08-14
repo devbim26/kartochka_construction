@@ -10,10 +10,32 @@ export const EnMaterialOriginTypesSelectValues = [
 	{ label: 'UserDefinedProduct', value: MaterialOriginType.UserDefinedProduct },
 ];
 export const RuMaterialOriginTypesSelectValues = [
-	{ label: 'Общий', value: MaterialOriginType.Generic },
+	{ label: 'Общее', value: MaterialOriginType.Generic },
 	{ label: 'Производитель', value: MaterialOriginType.Manufacturer },
-	{ label: 'Пользовательский продукт', value: MaterialOriginType.UserDefinedProduct },
+	{ label: 'Создано пользователем', value: MaterialOriginType.UserDefinedProduct },
 ];
+
+/** Подписи из OpenAPI x-enum-descriptions (RU). */
+export const RuMaterialOriginTypeLabels: Record<MaterialOriginType, string> = {
+	[MaterialOriginType.Generic]: 'Общее',
+	[MaterialOriginType.Manufacturer]: 'Производитель',
+	[MaterialOriginType.UserDefinedProduct]: 'Создано пользователем',
+};
+
+export const EnMaterialOriginTypeLabels: Record<MaterialOriginType, string> = {
+	[MaterialOriginType.Generic]: 'Generic',
+	[MaterialOriginType.Manufacturer]: 'Manufacturer',
+	[MaterialOriginType.UserDefinedProduct]: 'User-defined product',
+};
+
+export const getMaterialOriginTypeLabel = (
+	value: string | undefined | null,
+	locale: 'ru' | 'en' = 'ru',
+): string => {
+	if (!value) return '—';
+	const map = locale === 'ru' ? RuMaterialOriginTypeLabels : EnMaterialOriginTypeLabels;
+	return map[value as MaterialOriginType] ?? value;
+};
 
 export enum MaterialTypeEnum {
 	Plaster = 'Plaster',
@@ -33,6 +55,17 @@ export enum MaterialTypeEnum {
 	Screed = 'Screed',
 }
 
+export const getMaterialTypeLabel = (
+	value: string | undefined | null,
+	locale: 'ru' | 'en' = 'ru',
+): string => {
+	if (!value) return '—';
+	const map =
+		locale === 'ru' ? MaterialTypeSelectLabelsRu : MaterialTypeSelectLabelsEn;
+	return map[value as MaterialTypeEnum] ?? value;
+};
+
+/** @deprecated Используйте MaterialTypeSelectLabelsRu или getMaterialTypeLabel. */
 export enum RuMaterialTypeEnum {
 	Plaster = 'Штукатурка',
 	Frame = 'Каркас',

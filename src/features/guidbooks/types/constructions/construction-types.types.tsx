@@ -94,7 +94,7 @@ export const RuConstructionTypesMap = {
 		'Тяжелая многослойная стена + звукоизоляционная панель с одной стороны',
 	HeavyMultiLayerWallSoundproofingBothSide:
 		'Тяжелая многослойная стена + звукоизоляционная панель с двух сторон',
-	ZPanel: 'ZPanel (тяжелая однослойная стена + звукоизоляционная панель)',
+	ZPanel: 'Бескаркасная облицовка',
 	OneFramePartition: 'Каркасная перегородка (1 каркас)',
 	TwoFramePartition: 'Каркасная перегородка (2 каркаса)',
 	HeavySingleWallFacing: 'Тяжелая обнослойная стена + облицвока',
@@ -120,7 +120,7 @@ export const EnConstructionTypesMap = {
 		'Heavy multi-layer wall + soundproofing panel on one side',
 	HeavyMultiLayerWallSoundproofingBothSide:
 		'Heavy multi-layer wall + soundproofing panel on both sides',
-	ZPanel: 'ZPanel (heavy single-layer wall + sound insulation panel)',
+	ZPanel: 'Frameless cladding',
 	OneFramePartition: 'Frame partition (1 frame)',
 	TwoFramePartition: 'Frame partition (2 frames)',
 	HeavySingleWallFacing: 'Heavy single-layer wall + facing',

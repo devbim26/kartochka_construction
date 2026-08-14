@@ -108,7 +108,7 @@ export const EditConstructionModal = ({
 				</div>
 			)}
 			{...props}
-			contentClassName={twJoin('text-center', props.contentClassName ?? '')}
+			contentClassName={twJoin('text-left', props.contentClassName ?? '')}
 			className={twMerge(
 				className,
 				detailsOpen &&

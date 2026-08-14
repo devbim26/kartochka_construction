@@ -17,6 +17,62 @@ export type ConstructionTypeSelectOption = {
 	value: ConstructionTypeEnum;
 };
 
+/** Контекст селектов типа/конструкции в каталоге. */
+export enum ConstructionCatalogFilterContext {
+	/** Экран «Расчёт»: без ZPanel и дверей; конструкции — только не брендовые. */
+	Calculation = 'calculation',
+	/** Модалка добавления стены: только стены, без ZPanel, дверей и перекрытий. */
+	WallModal = 'wallModal',
+	/** Модалка добавления пола: только перекрытия. */
+	FloorModal = 'floorModal',
+}
+
+const CALCULATION_EXCLUDED_TYPES: ReadonlySet<ConstructionTypeEnum> = new Set([
+	ConstructionTypeEnum.ZPanel,
+	ConstructionTypeEnum.Door,
+]);
+
+const WALL_MODAL_EXCLUDED_TYPES: ReadonlySet<ConstructionTypeEnum> = new Set([
+	ConstructionTypeEnum.ZPanel,
+	ConstructionTypeEnum.Door,
+]);
+
+export const resolveConstructionCatalogFilterContext = (
+	layoutClass: ConstructionClass,
+): ConstructionCatalogFilterContext =>
+	layoutClass === ConstructionClass.Floor
+		? ConstructionCatalogFilterContext.FloorModal
+		: ConstructionCatalogFilterContext.WallModal;
+
+/** Допустим ли тип конструкции в данном контексте (и для фильтра, и для списка без выбранного типа). */
+export const isConstructionTypeAllowedInCatalogContext = (
+	constructionType: string | undefined | null,
+	context: ConstructionCatalogFilterContext,
+): boolean => {
+	if (!constructionType) return false;
+
+	switch (context) {
+		case ConstructionCatalogFilterContext.Calculation:
+			return !CALCULATION_EXCLUDED_TYPES.has(constructionType as ConstructionTypeEnum);
+		case ConstructionCatalogFilterContext.WallModal:
+			if (isFloorConstructionType(constructionType)) return false;
+			return !WALL_MODAL_EXCLUDED_TYPES.has(constructionType as ConstructionTypeEnum);
+		case ConstructionCatalogFilterContext.FloorModal:
+			return isFloorConstructionType(constructionType);
+		default:
+			return true;
+	}
+};
+
+export function filterConstructionTypeSelectOptionsByCatalogContext(
+	options: ConstructionTypeSelectOption[],
+	context: ConstructionCatalogFilterContext,
+): ConstructionTypeSelectOption[] {
+	return options.filter((option) =>
+		isConstructionTypeAllowedInCatalogContext(option.value, context),
+	);
+}
+
 /**
  * Maps catalog construction header to wall vs floor layout (по типу решения в справочнике).
  */

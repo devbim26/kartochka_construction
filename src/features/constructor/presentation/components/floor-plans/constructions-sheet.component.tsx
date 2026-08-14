@@ -108,9 +108,9 @@ export const ConstructionSheets = ({
 							: EnConstructionTypesMap[row.constructionType as ConstructionTypeEnum];
 				return (
 					<SimpleTableCell
-						contentClassName="w-[350px] text-[15px]"
+						contentClassName="w-[480px] text-[15px]"
 						content={
-							<div className="flex flex-col items-center gap-1 text-center font-sans text-[20px]">
+							<div className="flex flex-col items-start gap-1 text-left font-sans text-[20px]">
 								<div>
 									<p className="font-semibold">{t('constructionSheets.title')}</p>
 									<p>{info.getValue() as string}</p>
@@ -158,7 +158,7 @@ export const ConstructionSheets = ({
 									/>
 								</div>
 							) : (
-								<div className="h-[150px] w-[300px] rounded-[8px] border border-primary bg-white" />
+								<div className="h-[120px] w-[200px] rounded-[8px] border border-primary bg-white" />
 							)
 						}
 					/>
@@ -185,7 +185,7 @@ export const ConstructionSheets = ({
 			id: 'constructionContains',
 			header: () => (
 				<SimpleTableHeaderCell
-					textClassName="min-w-[140px] max-w-[200px]"
+					textClassName="min-w-[110px] max-w-[140px]"
 					text={t('constructionSheets.constructionContains')}
 				/>
 			),
@@ -194,7 +194,7 @@ export const ConstructionSheets = ({
 				return (
 					<SimpleTableCell
 						content={
-							<div className="flex min-w-[140px] flex-col gap-1 text-center font-sans text-[16px] leading-snug">
+							<div className="flex min-w-[110px] flex-col gap-1 text-center font-sans text-[14px] leading-snug">
 								<p>
 									{t('constructionSheets.openingsWindows')}:{' '}
 									{formatOpeningsSummary(row.additionalWindows, locale)}
@@ -221,7 +221,7 @@ export const ConstructionSheets = ({
 			cell: (info) => (
 				<SimpleTableCell
 					content={
-						<div className="w-[100px] text-[20px] font-semibold">
+						<div className="w-[72px] text-[20px] font-semibold">
 							{info.getValue() as string}
 						</div>
 					}
@@ -263,7 +263,7 @@ export const ConstructionSheets = ({
 														},
 													)
 												}
-												className="h-[50px] w-[250px] p-[6px] text-[20px]"
+												className="h-[50px] w-[200px] p-[6px] text-[20px]"
 											>
 												{t('constructionSheets.designing')}
 											</Button>{' '}
@@ -313,7 +313,7 @@ export const ConstructionSheets = ({
 													},
 												)
 											}
-											className="h-[50px] w-[250px] p-[6px] text-[20px]"
+											className="h-[50px] w-[200px] p-[6px] text-[20px]"
 										>
 											{t('constructionSheets.designing')}
 										</Button>{' '}
@@ -324,7 +324,7 @@ export const ConstructionSheets = ({
 									<div className="flex w-full items-center gap-[10px]">
 										<Button
 											variant="primary"
-											className="h-[50px] w-[250px] p-[6px] text-[20px]"
+											className="h-[50px] w-[200px] p-[6px] text-[20px]"
 											onClick={() =>
 												navigate(
 													APP_ROUTES.designing.route +
@@ -426,14 +426,7 @@ export const ConstructionSheets = ({
 			<FormElementLabel className="font-[18px] text-primary">
 				{t('constructionSheets.sheetTitle')}
 			</FormElementLabel>
-			<DesigningTable
-				classNames={{
-					headerCellClassName: 'w-[50px]',
-					contentRowClassName: 'max-w-[100px] w-fit',
-				}}
-				data={constructionSheets || []}
-				columns={columns}
-			/>
+			<DesigningTable data={constructionSheets || []} columns={columns} />
 		</div>
 	);
 };

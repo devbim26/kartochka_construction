@@ -72,14 +72,14 @@ export const CreateConstructionModal = ({
 				</div>
 			)}
 			{...props}
-			contentClassName={twJoin('text-center', props.contentClassName ?? '')}
+			contentClassName={twJoin('text-left', props.contentClassName ?? '')}
 			className={twMerge(
 				className,
 				detailsOpen &&
 					'!max-w-[min(98vw,2000px)] !w-[min(98vw,2000px)] md:!w-[min(98vw,1920px)]',
 			)}
 		>
-			<div className="mb-4 flex flex-row flex-wrap gap-[12px]">
+			<div className="mb-8 flex flex-row flex-wrap gap-[12px]">
 				{(['walls', 'floors'] as const).map((tab) => (
 					<Button
 						key={tab}

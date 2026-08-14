@@ -233,7 +233,7 @@ export const CurrentConstructionCard = ({
 					<button
 						type="button"
 						onClick={() => setIsDetailsOpen(true)}
-						className="shrink-0 font-sans text-sm font-semibold text-primary hover:opacity-80"
+						className="shrink-0 font-sans text-[28px] font-semibold leading-tight text-primary hover:opacity-80"
 					>
 						{t('createConstruction.details.more')}
 					</button>

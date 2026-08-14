@@ -4,6 +4,7 @@ import {
 	convertToClientCountryData,
 	convertToPaginatedType,
 	convertToSelectValues,
+	getAxiosErrorMessage,
 	Input,
 	Select,
 	useAppDispatch,
@@ -47,9 +48,11 @@ import {
 } from '@features/constructor/services';
 import { startLoading, stopLoading } from '@features/constructor/store';
 import {
-	filterConstructionTypeSelectOptions,
+	ConstructionCatalogFilterContext,
+	filterConstructionTypeSelectOptionsByCatalogContext,
 	formatMaterial,
 	getLayoutClassFromConstructionHeader,
+	isConstructionTypeAllowedInCatalogContext,
 	isMissingReportHttpStatus,
 	useGraphNoiseMode,
 } from '@features/constructor/utils';
@@ -402,10 +405,10 @@ export const CalculationScreen = () => {
 	const typeSelectOptions: SelectOption[] = useMemo(() => {
 		const all =
 			locale === 'ru' ? RuConstructionTypesSelectValues : EnConstructionTypesSelectValues;
-		return [
-			...filterConstructionTypeSelectOptions(all, ConstructionClass.Wall),
-			...filterConstructionTypeSelectOptions(all, ConstructionClass.Floor),
-		];
+		return filterConstructionTypeSelectOptionsByCatalogContext(
+			all,
+			ConstructionCatalogFilterContext.Calculation,
+		);
 	}, [locale]);
 
 	const constructionSelectOptions: SelectOption[] = useMemo(() => {
@@ -419,6 +422,14 @@ export const CalculationScreen = () => {
 
 		const filtered = constructionData.filter((item) => {
 			if (!isGeneralReferenceIssuer(item.issuerName)) return false;
+			if (
+				!isConstructionTypeAllowedInCatalogContext(
+					item.constructionType,
+					ConstructionCatalogFilterContext.Calculation,
+				)
+			) {
+				return false;
+			}
 			if (typeEnumFilter && String(item.constructionType) !== String(typeEnumFilter)) {
 				return false;
 			}
@@ -456,6 +467,16 @@ export const CalculationScreen = () => {
 
 		const selectedMeta = constructionData.find((c) => String(c.id) === String(selectedId));
 		if (!selectedMeta) return options;
+
+		if (!isGeneralReferenceIssuer(selectedMeta.issuerName)) return options;
+		if (
+			!isConstructionTypeAllowedInCatalogContext(
+				selectedMeta.constructionType,
+				ConstructionCatalogFilterContext.Calculation,
+			)
+		) {
+			return options;
+		}
 
 		const selectedType = selectedMeta.constructionType;
 		const matchesTypeFilter =
@@ -693,8 +714,13 @@ export const CalculationScreen = () => {
 						if (fav?.id) favoriteKeys.add(String(fav.id));
 						if (fav?.constructionId) favoriteKeys.add(String(fav.constructionId));
 					}
-					const items = (response?.data?.items || []).filter((item: any) =>
-						isGeneralReferenceIssuer(item?.issuer?.name ?? item?.issuerName),
+					const items = (response?.data?.items || []).filter(
+						(item: { issuer?: { name?: string }; issuerName?: string; constructionType?: string }) =>
+							isGeneralReferenceIssuer(item?.issuer?.name ?? item?.issuerName) &&
+							isConstructionTypeAllowedInCatalogContext(
+								item?.constructionType,
+								ConstructionCatalogFilterContext.Calculation,
+							),
 					);
 					const ids = new Set<string>();
 					for (const item of items) {
@@ -713,7 +739,14 @@ export const CalculationScreen = () => {
 				),
 				tap((res) =>
 					setConstructionData(
-						res.items.filter((item) => isGeneralReferenceIssuer(item.issuerName)),
+						res.items.filter(
+							(item) =>
+								isGeneralReferenceIssuer(item.issuerName) &&
+								isConstructionTypeAllowedInCatalogContext(
+									item.constructionType,
+									ConstructionCatalogFilterContext.Calculation,
+								),
+						),
 					),
 				),
 				catchError((error) => {
@@ -1112,32 +1145,67 @@ export const CalculationScreen = () => {
 		],
 	);
 
-	const handleDownloadReport = () => {
+	const handleDownloadReport = async () => {
 		if (!reportId) return;
 		dispatch(startLoading());
-		from(reportReceiveSingle(reportId))
-			.pipe(
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || t('errors.request'));
-					} else {
-						toast.error(t('errors.request'));
+		const fallbackError = t('error.somethingWentWrong.title');
+		try {
+			const response = await reportReceiveSingle(reportId);
+			if (response?.status !== 200) {
+				toast.error(fallbackError);
+				return;
+			}
+
+			let fileUrl: string | null = null;
+			const data = response.data as unknown;
+			if (typeof data === 'string' && data.trim()) {
+				const trimmed = data.trim();
+				if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+					try {
+						const parsed = JSON.parse(trimmed) as Record<string, unknown>;
+						for (const key of ['fileUrl', 'url', 'downloadUrl', 'file', 'link']) {
+							const value = parsed[key];
+							if (typeof value === 'string' && value.trim()) {
+								fileUrl = value.trim();
+								break;
+							}
+						}
+					} catch {
+						fileUrl = trimmed;
 					}
-					return of(null);
-				}),
-				finalize(() => dispatch(stopLoading())),
-			)
-			.subscribe((response) => {
-				if (response?.status !== 200) return;
-				if (typeof response.data === 'string' && response.data) {
-					const link = document.createElement('a');
-					link.href = response.data;
-					document.body.appendChild(link);
-					link.click();
-					document.body.removeChild(link);
-					dispatch(getCurrentUser());
+				} else {
+					fileUrl = trimmed;
 				}
-			});
+			} else if (data && typeof data === 'object') {
+				const record = data as Record<string, unknown>;
+				for (const key of ['fileUrl', 'url', 'downloadUrl', 'file', 'link']) {
+					const value = record[key];
+					if (typeof value === 'string' && value.trim()) {
+						fileUrl = value.trim();
+						break;
+					}
+				}
+			}
+
+			if (!fileUrl) {
+				toast.error(fallbackError);
+				return;
+			}
+
+			const link = document.createElement('a');
+			link.href = fileUrl;
+			link.target = '_blank';
+			link.rel = 'noopener noreferrer';
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			dispatch(getCurrentUser());
+		} catch (error) {
+			const message = await getAxiosErrorMessage(error, fallbackError);
+			toast.error(message || fallbackError);
+		} finally {
+			dispatch(stopLoading());
+		}
 	};
 
 	const clearConstruction = () => {
@@ -1724,7 +1792,7 @@ export const CalculationScreen = () => {
 								<Loader />
 							</div>
 						)}
-						<div className="flex min-w-0 flex-1 flex-col gap-[20px]">
+						<div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[20px] self-stretch">
 							<Controller
 								name="constructionTypeObject.constructionTypeEnum"
 								control={form.control}
@@ -1751,11 +1819,11 @@ export const CalculationScreen = () => {
 									</p>
 								))}
 							</div>
-							<div className="flex justify-end">
+							<div className="mt-auto flex justify-end pt-6">
 								<button
 									type="button"
 									onClick={() => setIsDetailsOpen(true)}
-									className="font-sans text-sm font-semibold text-primary hover:opacity-80"
+									className="font-sans text-[28px] font-semibold leading-tight text-primary hover:opacity-80"
 								>
 									{t('createConstruction.details.more')}
 								</button>

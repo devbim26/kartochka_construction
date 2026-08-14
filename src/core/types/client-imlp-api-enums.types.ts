@@ -51,7 +51,7 @@ export enum PriorityEnum {
 }
 
 export enum MaterialOriginTypeEnum {
-	Generic = 'Общий',
+	Generic = 'Общее',
 	Manufacturer = 'Производитель',
-	UserDefinedProduct = 'Пользовательский продукт',
+	UserDefinedProduct = 'Создано пользователем',
 }

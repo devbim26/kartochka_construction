@@ -14,7 +14,7 @@ import {
 	resolveImportDownloadAction,
 	triggerDownloadAction,
 } from '@features/guidbooks/utils';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { FormProvider, type UseFormReturn } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa6';
 import { PiExportBold } from 'react-icons/pi';
@@ -26,6 +26,8 @@ interface GuidbookPageHeaderWrapperProps {
 	onSave: () => void;
 	onExport?: () => void | Promise<void>;
 	isExporting?: boolean;
+	/** Элемент справа от кнопки экспорта (например, фильтр типа для экспорта конструкций). */
+	exportAccessory?: ReactNode;
 	/** После успешного импорта (например, обновить таблицу). */
 	onImportSuccess?: () => void;
 	forms: {
@@ -44,6 +46,7 @@ export const GuidbookPageHeaderWrapper = memoize(
 		onSave,
 		onExport,
 		isExporting = false,
+		exportAccessory,
 		onImportSuccess,
 	}: GuidbookPageHeaderWrapperProps) => {
 		const [currentForm, setCurrentForm] = useState<UseFormReturn>(forms.filterForm);
@@ -264,7 +267,10 @@ export const GuidbookPageHeaderWrapper = memoize(
 								</>
 							)}
 						</div>
-						<div className="flex items-center justify-between">
+						<div className="flex items-center gap-2">
+							{currentHeaderFormType === HeaderFormTypes.filter &&
+								onExport &&
+								exportAccessory}
 							{currentHeaderFormType === HeaderFormTypes.filter && onExport && (
 								<Button
 									className="flex w-fit flex-row items-center gap-[4px] px-[16px] py-[6px]"

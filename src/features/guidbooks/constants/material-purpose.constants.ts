@@ -12,8 +12,24 @@ export const EnMaterialPurposeSelectValues = [
 	{ label: 'For floors', value: MaterialPurpose.ForFloor },
 ];
 
+/** Подписи из OpenAPI x-enum-descriptions (RU). */
 export const RuMaterialPurposeLabels: Record<MaterialPurpose, string> = {
-	[MaterialPurpose.Any]: 'Любое',
-	[MaterialPurpose.ForWall]: 'Стены',
-	[MaterialPurpose.ForFloor]: 'Перекрытия',
+	[MaterialPurpose.Any]: 'Любое применение',
+	[MaterialPurpose.ForWall]: 'Для стен и перегородок',
+	[MaterialPurpose.ForFloor]: 'Для перекрытий',
+};
+
+export const EnMaterialPurposeLabels: Record<MaterialPurpose, string> = {
+	[MaterialPurpose.Any]: 'Any',
+	[MaterialPurpose.ForWall]: 'For walls / partitions',
+	[MaterialPurpose.ForFloor]: 'For floors',
+};
+
+export const getMaterialPurposeLabel = (
+	value: string | undefined | null,
+	locale: 'ru' | 'en' = 'ru',
+): string => {
+	if (!value) return '—';
+	const map = locale === 'ru' ? RuMaterialPurposeLabels : EnMaterialPurposeLabels;
+	return map[value as MaterialPurpose] ?? value;
 };

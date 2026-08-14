@@ -78,6 +78,14 @@ const REQUIREMENT_COUNTRY_COLUMN_CLASS = 'w-[120px] shrink-0';
 
 const REQUIREMENT_REGULATION_COLUMN_CLASS = 'w-[504px] max-w-full shrink-0';
 
+const FORM_FIELDS_BLOCK_CLASS = 'w-[1128px] max-w-full shrink-0';
+
+const BUILDING_TYPE_SELECT_CLASS =
+	'w-[558px] max-w-full h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]';
+
+const COMFORT_CLASS_SELECT_CLASS =
+	'w-[110px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]';
+
 const AboutBuildingScreen = () => {
 	const { t, locale } = useI18n();
 	const currentLanguage = locale; // 'ru' или 'en'
@@ -507,13 +515,13 @@ const AboutBuildingScreen = () => {
 									formState.errors.name?.message ? 'text-error' : '',
 								)}
 								wrapperClassName="flex-row items-center gap-[50px]"
-								inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
+								inputClassName="w-full py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
 								error={
 									formState.errors.name?.message
 										? t(formState.errors.name.message as any)
 										: undefined
 								}
-								containerClassName="w-[226px]"
+								containerClassName={FORM_FIELDS_BLOCK_CLASS}
 								label={
 									formState.errors?.name?.message
 										? t(formState.errors.name.message as any)
@@ -535,7 +543,7 @@ const AboutBuildingScreen = () => {
 							labelClassName="font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px]"
 							wrapperClassName="flex-row items-center gap-[50px]"
 							inputClassName="w-full py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-							containerClassName="w-[700px]"
+							containerClassName={FORM_FIELDS_BLOCK_CLASS}
 							label={t('aboutBuilding.commonDescription.label')}
 							placeholder={t('aboutBuilding.commonDescription.placeholder')}
 						/>
@@ -557,7 +565,7 @@ const AboutBuildingScreen = () => {
 										: t('aboutBuilding.buildingType.label')}
 								</label>
 							</div>
-							<div className="flex gap-x-[12px]">
+							<div className={twMerge(FORM_FIELDS_BLOCK_CLASS, 'flex gap-x-[12px]')}>
 								<Controller
 									control={control}
 									name="buildingType"
@@ -581,7 +589,7 @@ const AboutBuildingScreen = () => {
 												'aboutBuilding.buildingType.placeholder',
 											)}
 											isSearchable
-											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+											buttonClassName={BUILDING_TYPE_SELECT_CLASS}
 											wrapperClassname="shadow-none ring-input-border-primary"
 										/>
 									)}
@@ -606,7 +614,7 @@ const AboutBuildingScreen = () => {
 												'aboutBuilding.buildingPurpose.placeholder',
 											)}
 											isSearchable
-											buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+											buttonClassName={BUILDING_TYPE_SELECT_CLASS}
 											wrapperClassname="shadow-none ring-input-border-primary"
 										/>
 									)}
@@ -642,7 +650,8 @@ const AboutBuildingScreen = () => {
 										formState.errors.comfortClass?.message ? 'text-error' : '',
 									)}
 									placeholder={t('aboutBuilding.comfortClass.placeholder')}
-									buttonClassName="w-[226px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px] rounded-[8px]"
+									buttonClassName={COMFORT_CLASS_SELECT_CLASS}
+									optionsClassName="!w-[110px]"
 									wrapperClassname="shadow-none ring-input-border-primary flex-row items-center gap-[50px]"
 								/>
 							)}
@@ -656,7 +665,7 @@ const AboutBuildingScreen = () => {
 							<FormElementLabel className="w-[145px] font-sans text-lg font-semibold leading-4 text-primary">
 								{t('aboutBuilding.requirements.title')}
 							</FormElementLabel>
-							<div className="flex items-center gap-[12px]">
+							<div className={twMerge(FORM_FIELDS_BLOCK_CLASS, 'flex items-center gap-[12px]')}>
 								<FormElementLabel
 									className={twMerge(
 										REQUIREMENT_COUNTRY_COLUMN_CLASS,
@@ -696,7 +705,7 @@ const AboutBuildingScreen = () => {
 									? t(formState.errors.calculationDocumentId.message as any)
 									: t('aboutBuilding.requirements.sound.label')}
 							</label>
-							<div className="flex items-start gap-[12px]">
+							<div className={twMerge(FORM_FIELDS_BLOCK_CLASS, 'flex items-start gap-[12px]')}>
 								<Controller
 									control={control}
 									name="region"

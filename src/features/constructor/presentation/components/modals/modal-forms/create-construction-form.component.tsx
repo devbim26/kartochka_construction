@@ -35,10 +35,12 @@ import { formatMaterial } from '@features'; // предполагаемый хе
 import type { ReportInfoShort } from '@features/constructor/utils';
 import {
 	CreateConstructionConfig,
-	filterConstructionTypeSelectOptions,
+	filterConstructionTypeSelectOptionsByCatalogContext,
 	getSurfaceMassKgPerM2FromMaterials,
 	getTotalThicknessMmFromMaterials,
+	isConstructionTypeAllowedInCatalogContext,
 	matchesConstructionClassFilter,
+	resolveConstructionCatalogFilterContext,
 	resolveLayoutClassFromTargetTab,
 } from '@features/constructor/utils';
 import {
@@ -107,6 +109,17 @@ interface RoomRequirementMap {
 	}>;
 }
 
+/** Компактные мерные поля в одну линию, как в расчёте. */
+const DIMENSION_LABEL_CLASS =
+	'font-sans text-sm font-normal leading-5 text-input-label-primary w-fit shrink-0 text-left whitespace-nowrap';
+
+const DIMENSION_INPUT_WRAPPER =
+	'shadow-none ring-input-border-primary flex-row items-center justify-start gap-[6px] text-left';
+
+const DIMENSION_INPUT_CLASS = 'w-[72px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5';
+
+const DIMENSION_CONTAINER_CLASS = 'w-[72px]';
+
 export const CreateConstructionForm = memoize(
 	forwardRef<CreateConstructionFormHandle, CreateConstructionFormProps>(
 		(
@@ -129,6 +142,7 @@ export const CreateConstructionForm = memoize(
 		) => {
 			const { t, locale } = useI18n();
 			const layoutClass = resolveLayoutClassFromTargetTab(constructionTargetTab);
+			const catalogFilterContext = resolveConstructionCatalogFilterContext(layoutClass);
 			const form = useForm<CreateConstructionData>({
 				defaultValues: {
 					...CreateConstructionConfig.defaultValues,
@@ -336,10 +350,17 @@ export const CreateConstructionForm = memoize(
 				// Подставляем тип только если фильтр ещё пуст (редактирование / первичный load).
 				// Не перезаписываем при выборе — иначе лишний refetch и сброс селекта.
 				const nextType = constructionDetail?.constructionType;
-				if (nextType && !typeEnumFilter) {
+				if (
+					nextType &&
+					!typeEnumFilter &&
+					isConstructionTypeAllowedInCatalogContext(
+						String(nextType),
+						catalogFilterContext,
+					)
+				) {
 					setTypeEnumFilter(String(nextType));
 				}
-			}, [constructionDetail?.id, constructionDetail?.constructionType]);
+			}, [constructionDetail?.id, constructionDetail?.constructionType, catalogFilterContext]);
 
 			useImperativeHandle(ref, () => ({
 				submit: () => {
@@ -624,7 +645,11 @@ export const CreateConstructionForm = memoize(
 							}
 
 							const items = (response?.data?.items || []).filter((item: any) =>
-								matchesConstructionClassFilter(item?.constructionType, constructionClass),
+								matchesConstructionClassFilter(item?.constructionType, constructionClass) &&
+								isConstructionTypeAllowedInCatalogContext(
+									item?.constructionType,
+									catalogFilterContext,
+								),
 							);
 							const grouped: Map<
 								string,
@@ -712,8 +737,8 @@ export const CreateConstructionForm = memoize(
 					locale === 'ru'
 						? RuConstructionTypesSelectValues
 						: EnConstructionTypesSelectValues;
-				return filterConstructionTypeSelectOptions(all, layoutClass);
-			}, [locale, layoutClass]);
+				return filterConstructionTypeSelectOptionsByCatalogContext(all, catalogFilterContext);
+			}, [locale, catalogFilterContext]);
 
 			const constructionSelectOptions: SelectOption[] = useMemo(() => {
 				const favoritePrefix = t('constructor.calculation.favoritePrefix');
@@ -730,6 +755,14 @@ export const CreateConstructionForm = memoize(
 				};
 
 				const filteredData = constructionData.filter((item) => {
+					if (
+						!isConstructionTypeAllowedInCatalogContext(
+							item.constructionType,
+							catalogFilterContext,
+						)
+					) {
+						return false;
+					}
 					if (
 						typeEnumFilter &&
 						String(item.constructionType) !== String(typeEnumFilter)
@@ -767,6 +800,10 @@ export const CreateConstructionForm = memoize(
 					: undefined;
 				const matchesTypeFilter =
 					!!construction &&
+					isConstructionTypeAllowedInCatalogContext(
+						selectedMeta?.constructionType ?? constructionDetail?.constructionType,
+						catalogFilterContext,
+					) &&
 					(!typeEnumFilter ||
 						(selectedMeta != null &&
 							String(selectedMeta.constructionType) === String(typeEnumFilter)) ||
@@ -799,6 +836,7 @@ export const CreateConstructionForm = memoize(
 				name,
 				t,
 				typeEnumFilter,
+				catalogFilterContext,
 			]);
 
 			// Получение детальной информации о выбранной конструкции
@@ -1095,6 +1133,78 @@ export const CreateConstructionForm = memoize(
 								</div>
 							</div>
 							<input type="hidden" {...register('requirementId')} />
+							<div className="flex min-w-0 flex-nowrap items-center gap-x-[20px]">
+								<label
+									className={twMerge(
+										'w-[145px] shrink-0 text-left font-sans text-sm font-normal leading-5 text-input-label-primary',
+										formState.errors.width?.message ? 'text-error' : '',
+									)}
+								>
+									{formState.errors?.width?.message
+										? t(formState.errors.width.message as any)
+										: t('createConstruction.width.label')}
+								</label>
+								<div className="flex min-w-0 flex-nowrap items-center gap-3">
+									<Input
+										{...register('width')}
+										wrapperClassName={DIMENSION_INPUT_WRAPPER}
+										inputClassName={DIMENSION_INPUT_CLASS}
+										error={
+											formState.errors.width?.message
+												? t(formState.errors.width.message as any)
+												: undefined
+										}
+										containerClassName={DIMENSION_CONTAINER_CLASS}
+										placeholder={t('createConstruction.width.placeholder')}
+										maxLength={50}
+									/>
+									<Input
+										{...register('length')}
+										labelClassName={twMerge(
+											DIMENSION_LABEL_CLASS,
+											formState.errors.length?.message ? 'text-error' : '',
+										)}
+										wrapperClassName={DIMENSION_INPUT_WRAPPER}
+										inputClassName={DIMENSION_INPUT_CLASS}
+										error={
+											formState.errors.length?.message
+												? t(formState.errors.length.message as any)
+												: undefined
+										}
+										containerClassName={DIMENSION_CONTAINER_CLASS}
+										label={
+											formState.errors?.length?.message
+												? t(formState.errors.length.message as any)
+												: t('createConstruction.length.label')
+										}
+										placeholder={t('createConstruction.length.placeholder')}
+										maxLength={50}
+									/>
+									<Input
+										{...register('area')}
+										labelClassName={twMerge(
+											DIMENSION_LABEL_CLASS,
+											formState.errors.area?.message ? 'text-error' : '',
+										)}
+										wrapperClassName={DIMENSION_INPUT_WRAPPER}
+										inputClassName={DIMENSION_INPUT_CLASS}
+										error={
+											formState.errors.area?.message
+												? t(formState.errors.area.message as any)
+												: undefined
+										}
+										containerClassName={DIMENSION_CONTAINER_CLASS}
+										label={
+											formState.errors?.area?.message
+												? t(formState.errors.area.message as any)
+												: t('createConstruction.area.label')
+										}
+										placeholder={t('createConstruction.area.placeholder')}
+										maxLength={50}
+										readOnly
+									/>
+								</div>
+							</div>
 							<div className="flex w-full min-w-0 items-end gap-3">
 								<Select
 									options={typeSelectOptions}
@@ -1177,73 +1287,6 @@ export const CreateConstructionForm = memoize(
 									labelClassName="whitespace-nowrap text-input-label-primary"
 								/>
 							</div>
-							<Input
-								{...register('width')}
-								labelClassName={twMerge(
-									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px] text-left',
-									formState.errors.width?.message ? 'text-error' : '',
-								)}
-								wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
-								inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-								error={
-									formState.errors.width?.message
-										? t(formState.errors.width.message as any)
-										: undefined
-								}
-								containerClassName="w-[226px]"
-								label={
-									formState.errors?.width?.message
-										? t(formState.errors.width.message as any)
-										: t('createConstruction.width.label')
-								}
-								placeholder={t('createConstruction.width.placeholder')}
-								maxLength={50}
-							/>
-							<Input
-								{...register('length')}
-								labelClassName={twMerge(
-									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px] text-left',
-									formState.errors.length?.message ? 'text-error' : '',
-								)}
-								wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
-								inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-								error={
-									formState.errors.length?.message
-										? t(formState.errors.length.message as any)
-										: undefined
-								}
-								containerClassName="w-[226px]"
-								label={
-									formState.errors?.length?.message
-										? t(formState.errors.length.message as any)
-										: t('createConstruction.length.label')
-								}
-								placeholder={t('createConstruction.length.placeholder')}
-								maxLength={50}
-							/>
-							<Input
-								{...register('area')}
-								labelClassName={twMerge(
-									'font-sans text-sm font-normal leading-5 text-input-label-primary w-[145px] text-left',
-									formState.errors.area?.message ? 'text-error' : '',
-								)}
-								wrapperClassName="shadow-none ring-input-border-primary flex-row gap-[20px]"
-								inputClassName="w-[226px] py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5"
-								error={
-									formState.errors.area?.message
-										? t(formState.errors.area.message as any)
-										: undefined
-								}
-								containerClassName="w-[226px]"
-								label={
-									formState.errors?.area?.message
-										? t(formState.errors.area.message as any)
-										: t('createConstruction.area.label')
-								}
-								placeholder={t('createConstruction.area.placeholder')}
-								maxLength={50}
-								readOnly
-							/>
 						</div>
 					</FormProvider>
 
@@ -1355,7 +1398,7 @@ export const CreateConstructionForm = memoize(
 							<button
 								type="button"
 								onClick={() => onDetailsOpenChange?.(!detailsOpen)}
-								className="relative z-10 font-sans text-sm font-semibold text-primary hover:opacity-80"
+								className="relative z-10 font-sans text-[28px] font-semibold leading-tight text-primary hover:opacity-80"
 							>
 								{detailsOpen
 									? t('createConstruction.details.hide')

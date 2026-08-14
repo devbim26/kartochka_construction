@@ -67,7 +67,7 @@ export const ConstructionImage = ({
 	return svgUrl ? (
 		<>
 			<div
-				className="flex h-[150px] w-[300px] cursor-pointer items-center justify-center rounded-[12px] border-2 border-primary bg-white"
+				className="flex h-[120px] w-[200px] cursor-pointer items-center justify-center rounded-[12px] border-2 border-primary bg-white"
 				onClick={() => setIsPreviewOpen(true)}
 			>
 				<img className="size-full object-contain" src={svgUrl} alt="constructionPreview" />
@@ -84,6 +84,6 @@ export const ConstructionImage = ({
 			)}
 		</>
 	) : (
-		<div className="h-[150px] w-[300px] rounded-[12px] border-2 border-primary bg-white" />
+		<div className="h-[120px] w-[200px] rounded-[12px] border-2 border-primary bg-white" />
 	);
 };

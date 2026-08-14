@@ -28,12 +28,11 @@ import {
 	getGuidebooksEdit,
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
-import { MaterialPurpose } from '@api-gen';
-import { RuMaterialPurposeLabels } from '@features/guidbooks/constants';
+import { getMaterialPurposeLabel } from '@features/guidbooks/constants';
 import {
 	Guidebooks,
+	getMaterialTypeLabel,
 	RuCountryNamesMap,
-	RuMaterialTypeEnum,
 	type Country,
 	type MaterialsAddAndEditData,
 	type MaterialsFilterData,
@@ -56,7 +55,7 @@ import { toast } from 'sonner';
 
 const MaterialsScreen = () => {
 	const navigate = useAppNavigate();
-	const { t } = useI18n();
+	const { t, locale } = useI18n();
 	const [search] = useSearchParams();
 	const [singleMaterial, setSingleMaterial] = useState<MaterialsAddAndEditData>();
 	const [tableData, setTableData] = useState<Array<MaterialsAddAndEditData>>([]);
@@ -136,11 +135,10 @@ const MaterialsScreen = () => {
 				header: () => <SimpleTableHeaderCell text={t('guides.materials.columns.type')} />,
 				cell: (info) => (
 					<SimpleTableCell
-						content={
-							RuMaterialTypeEnum[
-								`${info.getValue() as keyof typeof RuMaterialTypeEnum}`
-							]
-						}
+						content={getMaterialTypeLabel(
+							info.getValue() as string,
+							locale === 'en' ? 'en' : 'ru',
+						)}
 					/>
 				),
 			},
@@ -149,14 +147,14 @@ const MaterialsScreen = () => {
 				header: () => (
 					<SimpleTableHeaderCell text={t('guides.materials.columns.materialPurpose')} />
 				),
-				cell: (info) => {
-					const v = info.getValue() as string;
-					const label =
-						v && v in RuMaterialPurposeLabels
-							? RuMaterialPurposeLabels[v as MaterialPurpose]
-							: '—';
-					return <SimpleTableCell content={label} />;
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={getMaterialPurposeLabel(
+							info.getValue() as string,
+							locale === 'en' ? 'en' : 'ru',
+						)}
+					/>
+				),
 			},
 			{
 				accessorKey: 'country',
@@ -269,7 +267,7 @@ const MaterialsScreen = () => {
 			//процентная доля твердой массы
 		];
 		return cols;
-	}, []);
+	}, [t, locale, navigate]);
 
 	const [filterName, filterMaterialType, filterMaterialPurpose, filterDensity, filterThickness] =
 		forms.filterForm.watch(['name', 'materialType', 'materialPurpose', 'density', 'thickness']);

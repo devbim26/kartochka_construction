@@ -89,6 +89,9 @@ export const en = {
 	'auth.registration.skipTooltip':
 		'Register with email and phone only. Company details below are optional and can be completed later in your account.',
 	'auth.registration.fullFormError': 'Please fill in all required company fields.',
+	'auth.registration.optionalSection': 'Additional company details',
+	'auth.registration.backHome': 'Back to home',
+	'auth.registration.selectImage': 'Select image',
 
 	'meta.title':
 		'AI for design | Sound insulation, compliance checking, visualization — Belarus and Russia',
@@ -332,7 +335,7 @@ export const en = {
 	'reports.activeReports.deleteSuccess': 'Report deleted',
 	'reports.activeReports.loadError': 'Failed to load active reports',
 
-	'reports.activeReports.categoryFloor': 'Floor plans',
+	'reports.activeReports.categoryFloor': 'Floor plan',
 	'reports.activeReports.categorySingle': 'Single construction',
 
 	'common.start': 'Start',
@@ -424,7 +427,7 @@ export const en = {
 	'guides.constructions.editSuccess': 'Construction updated successfully',
 	'guides.constructions.deleteSuccess': 'Construction deleted successfully',
 	'guides.constructions.zPanelRequiresBrandIssuer':
-		'ZPanel constructions cannot use the General manufacturer. Select a brand manufacturer.',
+		'Frameless cladding constructions cannot use the General manufacturer. Select a brand manufacturer.',
 	'guides.constructions.zPanelSideLabel': 'Soundproofing panel position',
 	'guides.constructions.zPanelSideLeft': 'Left (cladding)',
 	'guides.constructions.zPanelSideRight': 'Right (cladding)',
@@ -516,6 +519,8 @@ export const en = {
 	'guides.export.inProgress': 'Exporting…',
 	'guides.export.success': 'Export completed successfully',
 	'guides.export.error': 'Export failed',
+	'guides.export.constructionType.placeholder': 'Construction type',
+	'guides.export.constructionType.all': 'All types',
 
 	'guides.deleteModal.title': 'Confirm action',
 	'guides.deleteModal.materialQuestion': 'Are you sure you want to delete material {name}?',
@@ -712,6 +717,8 @@ export const en = {
 	'constructor.reportForm.docs.sound.calc':
 		'1.1 Sound insulation calculation of enclosing structures',
 	'constructor.reportForm.docs.sound.constructionsAt': 'Constructions at elevation',
+	'constructor.reportForm.docs.sound.elevationMarkHint':
+		'Name of the level set in the floor plans',
 	'constructor.reportForm.docs.sound.construction': 'Construction',
 	'constructor.reportForm.docs.sound.calcItem': 'Sound insulation calculation',
 	'constructor.reportForm.docs.sound.labAnalysis': 'Laboratory data analysis',
@@ -983,8 +990,8 @@ export const en = {
 	'createConstruction.requirement.label': 'Requirement',
 	'createConstruction.firstRoom.placeholder': 'Select room',
 	'createConstruction.secondRoom.placeholder': 'Select room',
-	'createConstruction.width.label': 'Width (height), mm',
-	'createConstruction.width.placeholder': 'Enter width',
+	'createConstruction.width.label': 'Height (Width), mm',
+	'createConstruction.width.placeholder': 'Enter height',
 	'createConstruction.length.label': 'Length, mm',
 	'createConstruction.length.placeholder': 'Enter length',
 	'createConstruction.area.label': 'Area, mm²',
@@ -1002,7 +1009,7 @@ export const en = {
 	'generalInfo.constructionType': 'Construction type',
 	'generalInfo.divides': 'Construction divides',
 	'generalInfo.length': 'Length, mm',
-	'generalInfo.width': 'Width (height), mm',
+	'generalInfo.width': 'Height (Width), mm',
 	'generalInfo.area': 'Area, mm²',
 	'generalInfo.totalThickness': 'Total thickness, mm',
 	'generalInfo.totalMass': 'Total mass, kg',
@@ -1091,7 +1098,7 @@ export const ru: Record<TranslationKey, string> = {
 	'generalInfo.constructionType': 'Тип конструкции',
 	'generalInfo.divides': 'Конструкция разделяет',
 	'generalInfo.length': 'Длина, мм',
-	'generalInfo.width': 'Ширина (высота), мм',
+	'generalInfo.width': 'Высота (Ширина), мм',
 	'generalInfo.area': 'Площадь, мм²',
 	'generalInfo.totalThickness': 'Общая толщина, мм',
 	'generalInfo.totalMass': 'Общая масса, кг',
@@ -1155,8 +1162,8 @@ export const ru: Record<TranslationKey, string> = {
 	'createConstruction.requirement.label': 'Требование',
 	'createConstruction.firstRoom.placeholder': 'Выберите помещение',
 	'createConstruction.secondRoom.placeholder': 'Выберите помещение',
-	'createConstruction.width.label': 'Ширина (высота), мм',
-	'createConstruction.width.placeholder': 'Введите ширину',
+	'createConstruction.width.label': 'Высота (Ширина), мм',
+	'createConstruction.width.placeholder': 'Введите высоту',
 	'createConstruction.length.label': 'Длина, мм',
 	'createConstruction.length.placeholder': 'Введите длину',
 	'createConstruction.area.label': 'Площадь, мм²',
@@ -1393,6 +1400,9 @@ export const ru: Record<TranslationKey, string> = {
 	'auth.registration.skipTooltip':
 		'Можно зарегистрироваться только по email и телефону. Данные компании ниже необязательны — их можно заполнить позже в личном кабинете.',
 	'auth.registration.fullFormError': 'Заполните все обязательные поля компании.',
+	'auth.registration.optionalSection': 'Дополнительные данные компании',
+	'auth.registration.backHome': 'На главную',
+	'auth.registration.selectImage': 'Выбрать изображение',
 
 	'meta.title':
 		'AI для проектирования | Звукоизоляция, нормоконтроль, визуализация — Беларусь и Россия',
@@ -1640,7 +1650,7 @@ export const ru: Record<TranslationKey, string> = {
 	'reports.activeReports.deleteSuccess': 'Отчёт удалён',
 	'reports.activeReports.loadError': 'Не удалось загрузить активные отчёты',
 
-	'reports.activeReports.categoryFloor': 'Поэтажные планы',
+	'reports.activeReports.categoryFloor': 'Поэтажный план',
 	'reports.activeReports.categorySingle': 'Одиночная конструкция',
 
 	'common.start': 'Начать',
@@ -1731,7 +1741,7 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.constructions.editSuccess': 'Конструкция успешно отредактирована',
 	'guides.constructions.deleteSuccess': 'Конструкция успешно удалена',
 	'guides.constructions.zPanelRequiresBrandIssuer':
-		'Для конструкций с ZPanel нельзя выбрать производителя «Общий» — укажите брендового производителя.',
+		'Для конструкций типа «Бескаркасная облицовка» нельзя выбрать производителя «Общий» — укажите брендового производителя.',
 	'guides.constructions.zPanelSideLabel': 'Сторона звукоизоляционной панели',
 	'guides.constructions.zPanelSideLeft': 'Слева (облицовка)',
 	'guides.constructions.zPanelSideRight': 'Справа (облицовка)',
@@ -1823,6 +1833,8 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.export.inProgress': 'Экспорт…',
 	'guides.export.success': 'Экспорт выполнен',
 	'guides.export.error': 'Ошибка экспорта',
+	'guides.export.constructionType.placeholder': 'Тип конструкции',
+	'guides.export.constructionType.all': 'Все типы',
 
 	'guides.deleteModal.title': 'Подтвердите действие',
 	'guides.deleteModal.materialQuestion': 'Вы уверены, что хотите удалить материал {name}?',
@@ -2014,6 +2026,8 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.reportForm.docs.sound.section': '1. Расчет звукоизоляции ограждающих конструкций',
 	'constructor.reportForm.docs.sound.calc': '1.1 Расчет звукоизоляции ограждающих конструкций',
 	'constructor.reportForm.docs.sound.constructionsAt': 'Конструкции на отметке',
+	'constructor.reportForm.docs.sound.elevationMarkHint':
+		'Название уровня заданного в поэтажных планах',
 	'constructor.reportForm.docs.sound.construction': 'Конструкция',
 	'constructor.reportForm.docs.sound.calcItem': 'Расчет звукоизоляции',
 	'constructor.reportForm.docs.sound.labAnalysis': 'Анализ лабораторных данных',

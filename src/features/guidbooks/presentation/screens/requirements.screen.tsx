@@ -30,8 +30,6 @@ import {
 	getGuidebooksPaginated,
 } from '@features/guidbooks/services';
 import type {
-	BuildingType,
-	ConstructionClass,
 	Country,
 	FormRequirement,
 	Requirement,
@@ -39,8 +37,8 @@ import type {
 } from '@features/guidbooks/types';
 import {
 	Guidebooks,
-	RuBuildingTypeNamesMap,
-	RuConstructionTypeNamesMap,
+	getBuildingTypeLabel,
+	getConstructionClassLabel,
 	RuCountryNamesMap,
 } from '@features/guidbooks/types';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -65,7 +63,7 @@ import {
 
 const RequirementsScreen = () => {
 	const navigate = useAppNavigate();
-	const { t } = useI18n();
+	const { t, locale } = useI18n();
 	const [search] = useSearchParams();
 	const [singleRequirement, setSingleRequirement] = useState<FormRequirement>();
 	const [tableData, setTableData] = useState<Array<Requirement>>([]);
@@ -315,13 +313,14 @@ const RequirementsScreen = () => {
 				header: () => (
 					<SimpleTableHeaderCell text={t('guides.requirements.columns.buildingType')} />
 				),
-				cell: (info) => {
-					return (
-						<SimpleTableCell
-							content={RuBuildingTypeNamesMap[info.getValue() as BuildingType]}
-						/>
-					);
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={getBuildingTypeLabel(
+							info.getValue() as string,
+							locale === 'en' ? 'en' : 'ru',
+						)}
+					/>
+				),
 			},
 			{
 				accessorKey: 'regularyDocumentName',
@@ -339,15 +338,14 @@ const RequirementsScreen = () => {
 						text={t('guides.requirements.columns.constructionType')}
 					/>
 				),
-				cell: (info) => {
-					return (
-						<SimpleTableCell
-							content={
-								RuConstructionTypeNamesMap[info.getValue() as ConstructionClass]
-							}
-						/>
-					);
-				},
+				cell: (info) => (
+					<SimpleTableCell
+						content={getConstructionClassLabel(
+							info.getValue() as string,
+							locale === 'en' ? 'en' : 'ru',
+						)}
+					/>
+				),
 			},
 			{
 				accessorKey: 'standartFullName',
@@ -425,7 +423,7 @@ const RequirementsScreen = () => {
 			},
 		];
 		return cols;
-	}, []);
+	}, [t, locale, navigate]);
 
 	return (
 		<div className="flex w-full flex-col gap-[40px]">

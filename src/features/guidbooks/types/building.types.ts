@@ -20,6 +20,26 @@ export const RuBuildingTypeNamesMap = {
 	BowlingAlleys: 'Помещения кегельбанов',
 };
 
+export const EnBuildingTypeNamesMap = {
+	ResidentialBuildings: 'Residential buildings',
+	Hotel: 'Hotel',
+	AdministrativeBuildings: 'Administrative buildings',
+	Hospital: 'Hospitals',
+	EducationalInstitutions: 'Educational institutions',
+	PreschoolEducationalInstitutions: 'Preschool educational institutions',
+	ResearchAndPublicBuildings: 'Research and public buildings',
+	BowlingAlleys: 'Bowling alleys',
+};
+
+export const getBuildingTypeLabel = (
+	value: string | undefined | null,
+	locale: 'ru' | 'en' = 'ru',
+): string => {
+	if (!value) return '—';
+	const map = locale === 'ru' ? RuBuildingTypeNamesMap : EnBuildingTypeNamesMap;
+	return map[value as BuildingType] ?? value;
+};
+
 export const RuBuildingTypeSelectValues = [
 	{ label: 'Жилые здания', value: BuildingType.ResidentialBuildings },
 	{ label: 'Отель', value: BuildingType.Hotel },

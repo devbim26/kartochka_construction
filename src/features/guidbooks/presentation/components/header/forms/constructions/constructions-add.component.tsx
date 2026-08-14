@@ -20,6 +20,7 @@ import {
 	EnConstructionTypesSelectValues,
 	Guidebooks,
 	RuConstructionTypesSelectValues,
+	EnPriorityNamesSelectValues,
 	RuCountryNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	type ConstructionsAddData,
@@ -46,6 +47,8 @@ export const ConstructionsAdd = () => {
 	const { t, locale } = useI18n();
 	const constructionTypeOptions =
 		locale === 'en' ? EnConstructionTypesSelectValues : RuConstructionTypesSelectValues;
+	const priorityOptions =
+		locale === 'en' ? EnPriorityNamesSelectValues : RuPriorityNamesSelectValues;
 	const { formState, control, watch, setValue, register } = form;
 
 	const issuerErrorMessage = formState.errors.issuer?.message;
@@ -150,7 +153,7 @@ export const ConstructionsAdd = () => {
 									{...field}
 									isSearchable
 									value={field.value || ''}
-									options={RuPriorityNamesSelectValues}
+									options={priorityOptions}
 									error={formState.errors.priority?.message}
 									labelClassName={twMerge(
 										'text-sm leading-5 tracking-[0.1px]',

@@ -5,16 +5,36 @@ export enum CategoryClass {
 	General = 'General',
 }
 
-export const RuCategoryClassSelectValues = [
-	{ label: 'А', value: CategoryClass.A },
-	{ label: 'Б', value: CategoryClass.B },
-	{ label: 'В', value: CategoryClass.C },
-	{ label: 'General', value: CategoryClass.General },
-];
+/** Подписи из OpenAPI x-enum-descriptions (RU). */
+export const RuCategoryClassNamesMap: Record<CategoryClass, string> = {
+	[CategoryClass.A]: 'А',
+	[CategoryClass.B]: 'Б',
+	[CategoryClass.C]: 'В',
+	[CategoryClass.General]: 'Общее',
+};
 
-export const EnCategoryClassSelectValues = [
-	{ label: 'A', value: CategoryClass.A },
-	{ label: 'B', value: CategoryClass.B },
-	{ label: 'C', value: CategoryClass.C },
-	{ label: 'General', value: CategoryClass.General },
-];
+export const EnCategoryClassNamesMap: Record<CategoryClass, string> = {
+	[CategoryClass.A]: 'A',
+	[CategoryClass.B]: 'B',
+	[CategoryClass.C]: 'C',
+	[CategoryClass.General]: 'General',
+};
+
+export const getCategoryClassLabel = (
+	value: string | undefined | null,
+	locale: 'ru' | 'en' = 'ru',
+): string => {
+	if (!value) return '—';
+	const map = locale === 'ru' ? RuCategoryClassNamesMap : EnCategoryClassNamesMap;
+	return map[value as CategoryClass] ?? value;
+};
+
+export const RuCategoryClassSelectValues = Object.values(CategoryClass).map((value) => ({
+	label: RuCategoryClassNamesMap[value],
+	value,
+}));
+
+export const EnCategoryClassSelectValues = Object.values(CategoryClass).map((value) => ({
+	label: EnCategoryClassNamesMap[value],
+	value,
+}));

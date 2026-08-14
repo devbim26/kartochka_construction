@@ -6,8 +6,10 @@ import {
 import { convertToClientConstructionTypesList } from '@features/guidbooks/converters';
 import { getGuidebooksConstructionTypes } from '@features/guidbooks/services';
 import {
+	EnPriorityNamesSelectValues,
 	RuCountryNamesSelectValues,
 	RuPriorityNamesSelectValues,
+	getConstructionTypeLabel,
 	type ConstructionsFilterData,
 	type ConstructionTypeTemplate,
 } from '@features/guidbooks/types';
@@ -59,7 +61,10 @@ export const ConstructionsFilter = () => {
 						isSearchable
 						value={field.value || ''}
 						options={constructionTypes.map((data) => ({
-							label: data.shortName ?? '',
+							label: getConstructionTypeLabel(
+								data.shortName ?? data.name,
+								locale === 'en' ? 'en' : 'ru',
+							),
 							value: data.shortName ?? '',
 						}))}
 						error={formState.errors.constructionType?.message}
@@ -129,7 +134,11 @@ export const ConstructionsFilter = () => {
 						{...field}
 						isSearchable
 						value={field.value || ''}
-						options={RuPriorityNamesSelectValues}
+						options={
+							locale === 'en'
+								? EnPriorityNamesSelectValues
+								: RuPriorityNamesSelectValues
+						}
 						error={formState.errors.priority?.message}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px]',

@@ -12,16 +12,65 @@ export enum Priority {
 	Ten = 'Ten',
 }
 
-export const RuPriorityNamesSelectValues = [
-	{ label: '0', value: Priority.Zero },
-	{ label: '1', value: Priority.One },
-	{ label: '2', value: Priority.Two },
-	{ label: '3', value: Priority.Three },
-	{ label: '4', value: Priority.Four },
-	{ label: '5', value: Priority.Five },
-	{ label: '6', value: Priority.Six },
-	{ label: '7', value: Priority.Seven },
-	{ label: '8', value: Priority.Eight },
-	{ label: '9', value: Priority.Nine },
-	{ label: '10', value: Priority.Ten },
+const PRIORITY_ORDER: Priority[] = [
+	Priority.Zero,
+	Priority.One,
+	Priority.Two,
+	Priority.Three,
+	Priority.Four,
+	Priority.Five,
+	Priority.Six,
+	Priority.Seven,
+	Priority.Eight,
+	Priority.Nine,
+	Priority.Ten,
 ];
+
+/** Подписи из OpenAPI x-enum-descriptions (RU). */
+export const RuPriorityNamesMap: Record<Priority, string> = {
+	[Priority.Zero]: 'Ноль',
+	[Priority.One]: 'Один',
+	[Priority.Two]: 'Два',
+	[Priority.Three]: 'Три',
+	[Priority.Four]: 'Четыре',
+	[Priority.Five]: 'Пять',
+	[Priority.Six]: 'Шесть',
+	[Priority.Seven]: 'Семь',
+	[Priority.Eight]: 'Восемь',
+	[Priority.Nine]: 'Девять',
+	[Priority.Ten]: 'Десять',
+};
+
+export const EnPriorityNamesMap: Record<Priority, string> = {
+	[Priority.Zero]: 'Zero',
+	[Priority.One]: 'One',
+	[Priority.Two]: 'Two',
+	[Priority.Three]: 'Three',
+	[Priority.Four]: 'Four',
+	[Priority.Five]: 'Five',
+	[Priority.Six]: 'Six',
+	[Priority.Seven]: 'Seven',
+	[Priority.Eight]: 'Eight',
+	[Priority.Nine]: 'Nine',
+	[Priority.Ten]: 'Ten',
+};
+
+/** Подпись приоритета для таблиц и селектов (клиентский и серверный enum). */
+export const getPriorityLabel = (
+	value: string | undefined | null,
+	locale: 'ru' | 'en' = 'ru',
+): string => {
+	if (!value) return '—';
+	const map = locale === 'ru' ? RuPriorityNamesMap : EnPriorityNamesMap;
+	return map[value as Priority] ?? value;
+};
+
+export const RuPriorityNamesSelectValues = PRIORITY_ORDER.map((value) => ({
+	label: RuPriorityNamesMap[value],
+	value,
+}));
+
+export const EnPriorityNamesSelectValues = PRIORITY_ORDER.map((value) => ({
+	label: EnPriorityNamesMap[value],
+	value,
+}));
