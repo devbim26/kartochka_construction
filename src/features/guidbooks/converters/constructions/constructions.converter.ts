@@ -381,7 +381,7 @@ export const convertToClientConstructionType = (data: any): ConstructionType => 
 
 type ConstructionLaboratoryFormData = {
 	rTotal: number[];
-	laboratoryTestSource: string | null;
+	laboratoryTestSource: string;
 	index?: IndexType;
 };
 
@@ -401,8 +401,8 @@ const packLaboratoryCreateDto = (
 	}
 
 	return {
-		rTotal: labRTotal.split(',').map((part: string) => +part.trim()),
-		laboratoryTestSource: laboratoryTestSource || null,
+		rTotal: labRTotal ? labRTotal.split(',').map((part: string) => +part.trim()) : [],
+		laboratoryTestSource,
 		index: (block.labIndex as IndexType) || undefined,
 	};
 };
