@@ -1,3 +1,4 @@
+import { ReportInfoStatus } from '@api-gen';
 import { APP_ROUTES } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { ReportCategory } from '@features/constructor/types';
@@ -29,13 +30,25 @@ export const openReportInConstructorTarget = (
 	}
 
 	persistProjectSession(reportInfoId);
+
+	const isCompletedReport = options?.reportStatus === ReportInfoStatus.Completed;
+	const floorParams = {
+		reportId: reportInfoId,
+		reportType: ReportCategory.Floor,
+		...(options?.edit !== false ? { edit: 'true' } : {}),
+		...(options?.reportStatus ? { reportStatus: options.reportStatus } : {}),
+	};
+
+	// Активный проект — сразу в поэтажные планы; завершённый отчёт — через «О здании».
+	if (!isCompletedReport) {
+		return {
+			path: `${base}/${CONSTRUCTOR_ROUTES.floorPlans.route}`,
+			params: floorParams,
+		};
+	}
+
 	return {
 		path: `${base}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`,
-		params: {
-			reportId: reportInfoId,
-			reportType: ReportCategory.Floor,
-			...(options?.edit !== false ? { edit: 'true' } : {}),
-			...(options?.reportStatus ? { reportStatus: options.reportStatus } : {}),
-		},
+		params: floorParams,
 	};
 };

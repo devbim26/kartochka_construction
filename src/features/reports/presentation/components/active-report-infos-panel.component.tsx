@@ -2,7 +2,6 @@ import type { BaseReportInfoDto, BaseReportInfoDtoPaginatedList } from '@api-gen
 import { ReportCategory as ApiReportCategory } from '@api-gen';
 import type { PaginationState } from '@core';
 import {
-	APP_ROUTES,
 	Button,
 	convertToPaginatedType,
 	DeleteIcon,
@@ -13,21 +12,15 @@ import {
 	useAppNavigate,
 	useI18n,
 } from '@core';
-import { CONSTRUCTOR_ROUTES } from '@features/constructor';
 import { ReportCategory } from '@features/constructor/types';
-import { DESIGNING_ROUTES } from '@features/home/constants';
 import { deleteReportInfoById, getPaginatedReportInfos } from '@features/reports/services';
+import { openReportInConstructorTarget } from '@features/reports/utils';
 import type { ColumnDef } from '@tanstack/react-table';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { catchError, from, map, of } from 'rxjs';
 import { toast } from 'sonner';
 import { ReportListActionModal } from './report-list-action.modal';
-
-const toConstructorReportType = (category?: ApiReportCategory): string => {
-	if (category === ApiReportCategory.Single) return ReportCategory.Single;
-	return ReportCategory.Floor;
-};
 
 const toPaginatedReportInfos = (
 	data: BaseReportInfoDtoPaginatedList,
@@ -38,15 +31,18 @@ const toPaginatedReportInfos = (
 	const totalPages = data.totalPages ?? 0;
 	const hasPreviousPage = data.hasPreviousPage ?? pageNumber > 1;
 	const hasNextPage = data.hasNextPage ?? (totalPages > 0 && pageNumber < totalPages);
-	return convertToPaginatedType((item: BaseReportInfoDto) => item)({
-		items: data.items ?? [],
-		pageNumber,
-		totalPages,
-		totalCount: data.totalCount ?? 0,
-		pageSize,
-		hasPreviousPage,
-		hasNextPage,
-	});
+	return convertToPaginatedType((item: BaseReportInfoDto) => item)(
+		{
+			items: data.items ?? [],
+			pageNumber: data.pageNumber ?? pageNumber,
+			totalPages,
+			totalCount: data.totalCount ?? 0,
+			pageSize: data.pageSize ?? pageSize,
+			hasPreviousPage,
+			hasNextPage,
+		},
+		pagination,
+	);
 };
 
 export const ActiveReportInfosPanel = () => {
@@ -65,54 +61,48 @@ export const ActiveReportInfosPanel = () => {
 		[t],
 	);
 
-	const reportInfosQuery$ = useCallback(
-		(pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>) =>
-			from(getPaginatedReportInfos({ pagination })).pipe(
-				map((response) => toPaginatedReportInfos(response.data, pagination)),
-				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(
-							(typeof error.response?.data === 'string' && error.response.data) ||
-								t('reports.activeReports.loadError'),
-						);
-					} else {
-						toast.error(t('reports.activeReports.loadError'));
-					}
-					return of(null);
-				}),
-			),
+	const loadReportInfos = useCallback(
+		(pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>) => {
+			from(getPaginatedReportInfos({ pagination }))
+				.pipe(
+					map((response) => toPaginatedReportInfos(response.data, pagination)),
+					catchError((error) => {
+						if (error instanceof AxiosError) {
+							toast.error(
+								(typeof error.response?.data === 'string' && error.response.data) ||
+									t('reports.activeReports.loadError'),
+							);
+						} else {
+							toast.error(t('reports.activeReports.loadError'));
+						}
+						return of(null);
+					}),
+				)
+				.subscribe((res) => {
+					if (!res) return;
+					setRows(res.items);
+					setPaginationState(res.pagination);
+				});
+		},
 		[t],
 	);
 
 	useEffect(() => {
-		let cancelled = false;
-		const pagination = {
-			pageNumber: paginationState.pageNumber,
-			pageSize: paginationState.pageSize,
-		};
-		const sub = reportInfosQuery$(pagination).subscribe((res) => {
-			if (cancelled || !res) return;
-			setRows(res.items);
-			setPaginationState(res.pagination);
+		loadReportInfos({
+			pageNumber: paginationStateDefault.pageNumber,
+			pageSize: paginationStateDefault.pageSize,
 		});
-		return () => {
-			cancelled = true;
-			sub.unsubscribe();
-		};
-	}, [reportInfosQuery$, paginationState.pageNumber, paginationState.pageSize]);
+	}, [loadReportInfos]);
 
 	const openConstructor = (row: BaseReportInfoDto) => {
 		const id = row.id;
 		if (!id) return;
-		const reportType = toConstructorReportType(row.reportCategory);
-		navigate(
-			`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`,
-			{
-				reportId: id,
-				reportType,
-				edit: 'true',
-			},
-		);
+		const reportCategory =
+			row.reportCategory === ApiReportCategory.Single
+				? ReportCategory.Single
+				: ReportCategory.Floor;
+		const target = openReportInConstructorTarget(id, reportCategory);
+		navigate(target.path, target.params);
 	};
 
 	const confirmDelete = () => {
@@ -135,13 +125,9 @@ export const ActiveReportInfosPanel = () => {
 				if (response?.status === 200 || response?.status === 204) {
 					toast.success(t('reports.activeReports.deleteSuccess'));
 					setDeleteId(null);
-					reportInfosQuery$({
+					loadReportInfos({
 						pageNumber: paginationState.pageNumber,
 						pageSize: paginationState.pageSize,
-					}).subscribe((res) => {
-						if (!res) return;
-						setRows(res.items);
-						setPaginationState(res.pagination);
 					});
 				}
 			});
@@ -230,7 +216,12 @@ export const ActiveReportInfosPanel = () => {
 				columns={columns}
 				paginationState={paginationState}
 				onChangePaginationState={(next) => {
-					setPaginationState((prev) => ({ ...prev, ...next }));
+					const pagination = {
+						pageNumber: next.pageNumber ?? paginationState.pageNumber,
+						pageSize: next.pageSize ?? paginationState.pageSize,
+					};
+					setPaginationState((prev) => ({ ...prev, ...pagination }));
+					loadReportInfos(pagination);
 				}}
 			/>
 			<ReportListActionModal

@@ -347,7 +347,7 @@ const AboutBuildingScreen = () => {
 							persistProjectSession(reportId);
 						}
 						navigate(
-							`/designing/constructor/${
+							`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}/${
 								isSingle
 									? CONSTRUCTOR_ROUTES.calculation.route
 									: CONSTRUCTOR_ROUTES.floorPlans.route
@@ -400,12 +400,13 @@ const AboutBuildingScreen = () => {
 							persistProjectSession(resolvedReportId);
 						}
 
+						const constructorBase = `${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}`;
 						const nextRoute =
 							resolvedReportType === ReportCategory.Single
 								? CONSTRUCTOR_ROUTES.calculation.route
 								: CONSTRUCTOR_ROUTES.floorPlans.route;
 
-						navigate(`/designing/constructor/${nextRoute}`, {
+						navigate(`${constructorBase}/${nextRoute}`, {
 							reportId: resolvedReportId,
 							reportType: resolvedReportType,
 						});

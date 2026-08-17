@@ -1,4 +1,4 @@
-import { Button, useAppNavigate, useI18n } from '@core';
+import { APP_ROUTES, Button, useAppNavigate, useI18n } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { ReportCategory } from '@features/constructor/types';
 import {
@@ -7,6 +7,7 @@ import {
 	getProjectReportId,
 } from '@features/constructor/utils';
 import { DesigningSectionNav } from '@features/home/presentation/components/designing-section-nav.component';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import { FaPlus } from 'react-icons/fa6';
 import { useLocation } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
@@ -19,6 +20,7 @@ export const ConstructorHeader = () => {
 
 	const projectReportId = getProjectReportId();
 	const hasFloorSession = !!projectReportId;
+	const constructorBase = `${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}`;
 
 	const isCalculationRoute = isActive(CONSTRUCTOR_ROUTES.calculation.route);
 
@@ -41,14 +43,14 @@ export const ConstructorHeader = () => {
 						onClick={() => {
 							if (hasFloorSession) {
 								const id = activateProjectSession()!;
-								navigate(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
+								navigate(`${constructorBase}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`, {
 									reportId: id,
 									reportType: ReportCategory.Floor,
 									edit: 'true',
 								});
 								return;
 							}
-							navigate(CONSTRUCTOR_ROUTES.aboutBuilding.route, {
+							navigate(`${constructorBase}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`, {
 								intent: 'project',
 							});
 						}}
@@ -67,7 +69,7 @@ export const ConstructorHeader = () => {
 						)}
 						onClick={() => {
 							const id = activateProjectSession()!;
-							navigate(CONSTRUCTOR_ROUTES.floorPlans.route, {
+							navigate(`${constructorBase}/${CONSTRUCTOR_ROUTES.floorPlans.route}`, {
 								reportId: id,
 								reportType: ReportCategory.Floor,
 							});
@@ -86,7 +88,7 @@ export const ConstructorHeader = () => {
 						)}
 						onClick={() => {
 							clearCalculationSession();
-							navigate(CONSTRUCTOR_ROUTES.calculation.route);
+							navigate(`${constructorBase}/${CONSTRUCTOR_ROUTES.calculation.route}`);
 						}}
 					>
 						{t('constructor.header.calculation')}

@@ -238,7 +238,9 @@ export const CalculationScreen = () => {
 	);
 
 	useEffect(() => {
+		if (!reportIdFromSearch) return;
 		if (reportIdFromSearch !== reportId) {
+			loadedReportIdRef.current = '';
 			setReportId(reportIdFromSearch);
 		}
 	}, [reportIdFromSearch, reportId]);
@@ -616,8 +618,10 @@ export const CalculationScreen = () => {
 
 	useEffect(() => {
 		if (reportIdFromSearch) return;
+		if (creatingReportRef.current || syncingRef.current) return;
 
 		loadedReportIdRef.current = '';
+		setReportId('');
 		setReportInfo(null);
 		setName('');
 		setWidth('');
@@ -1961,7 +1965,7 @@ export const CalculationScreen = () => {
 				</>
 			)}
 
-			{canShowConstructionWorkspace ? (
+			{reportId ? (
 				<div className="flex flex-col items-end gap-2">
 					<Button
 						type="button"
