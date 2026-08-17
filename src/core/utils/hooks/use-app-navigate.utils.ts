@@ -20,22 +20,26 @@ export const useAppNavigate = () => {
 
 	const appNavigate = useCallback(
 		(path?: string, searchParams?: SearchParams) => {
-			const search = searchParams
-				? new URLSearchParams(searchParams).toString()
+			const fromParams = searchParams
+				? new URLSearchParams(
+						Object.fromEntries(
+							Object.entries(searchParams).filter(
+								([, value]) => value != null && value !== '',
+							),
+						),
+					).toString()
 				: '';
-			const searchWithPrefix = search ? `?${search}` : '';
 
-			// Empty path means "stay on current route, only change query" (React Router 7 no longer
-			// reliably treats a string like "?a=b" as search-only navigation).
-			if (path === undefined || path === '') {
-				navigate({
-					pathname: location.pathname,
-					search: searchWithPrefix,
-				});
-				return;
-			}
+			const [pathnameFromPath, pathQuery] = (path ?? '').split('?');
+			const search = fromParams || pathQuery || '';
+			const searchWithPrefix = search ? (search.startsWith('?') ? search : `?${search}`) : '';
 
-			navigate(`${path}${searchWithPrefix}`);
+			// React Router 7 does not reliably parse "?a=b" from a concatenated string.
+			navigate({
+				pathname:
+					path === undefined || path === '' ? location.pathname : pathnameFromPath,
+				search: searchWithPrefix,
+			});
 		},
 		[navigate, location.pathname],
 	);

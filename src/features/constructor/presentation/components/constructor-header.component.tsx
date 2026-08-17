@@ -2,20 +2,18 @@ import { Button, useAppNavigate, useI18n } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { ReportCategory } from '@features/constructor/types';
 import {
-	activateCalculationSession,
+	clearCalculationSession,
 	activateProjectSession,
-	getCalculationReportId,
 	getProjectReportId,
 } from '@features/constructor/utils';
 import { DesigningSectionNav } from '@features/home/presentation/components/designing-section-nav.component';
 import { FaPlus } from 'react-icons/fa6';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
 export const ConstructorHeader = () => {
 	const navigate = useAppNavigate();
 	const location = useLocation();
-	const [search] = useSearchParams();
 	const isActive = (route: string) => location.pathname.endsWith(route);
 	const { t } = useI18n();
 
@@ -23,20 +21,10 @@ export const ConstructorHeader = () => {
 	const hasFloorSession = !!projectReportId;
 
 	const isCalculationRoute = isActive(CONSTRUCTOR_ROUTES.calculation.route);
-	const isAboutBuildingRoute = isActive(CONSTRUCTOR_ROUTES.aboutBuilding.route);
-	const reportTypeInUrl = search.get('reportType') as ReportCategory | null;
 
-	/** Расчет — на своём экране; Single в URL не перекрывает вкладки проекта на «О здании». */
-	const isCalculationContext =
-		isCalculationRoute ||
-		(!!getCalculationReportId() &&
-			!isAboutBuildingRoute &&
-			!isActive(CONSTRUCTOR_ROUTES.floorPlans.route) &&
-			reportTypeInUrl !== ReportCategory.Floor);
-
-	const showAboutBuilding = !isCalculationContext;
-	const showFloorPlans = hasFloorSession && !isCalculationContext;
-	const showCalculation = isCalculationContext;
+	const showAboutBuilding = !isCalculationRoute;
+	const showFloorPlans = hasFloorSession && !isCalculationRoute;
+	const showCalculation = true;
 
 	return (
 		<div className="flex w-full flex-col gap-[30px]">
@@ -97,16 +85,8 @@ export const ConstructorHeader = () => {
 								: 'bg-white text-primary ring-[2px] ring-inset ring-primary enabled:hover:bg-white',
 						)}
 						onClick={() => {
-							const id = activateCalculationSession();
-							navigate(
-								CONSTRUCTOR_ROUTES.calculation.route,
-								id
-									? {
-											reportId: id,
-											reportType: ReportCategory.Single,
-										}
-									: undefined,
-							);
+							clearCalculationSession();
+							navigate(CONSTRUCTOR_ROUTES.calculation.route);
 						}}
 					>
 						{t('constructor.header.calculation')}

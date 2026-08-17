@@ -317,9 +317,9 @@ export const en = {
 	'sidebar.acousticModels': 'AI models',
 	'sidebar.news': 'News',
 	'sidebar.reports': 'Reports',
-	'sidebar.activeReports': 'Active reports',
+	'sidebar.activeReports': 'Active projects',
 
-	'reports.activeReports.pageTitle': 'Active reports',
+	'reports.activeReports.pageTitle': 'Active projects',
 	'reports.activeReports.hint':
 		'Active reports are listed here. Continue opens About building in the constructor.',
 	'reports.activeReports.buildingName': 'Building / name',
@@ -748,7 +748,7 @@ export const en = {
 	'constructor.sectionNav.soundReport': 'Sound insulation report',
 	'constructor.sectionNav.soundCalculation': 'Sound insulation calculation',
 	'constructor.sectionNav.aiMode': 'AI mode',
-	'constructor.sectionNav.reports': 'Reports',
+	'constructor.sectionNav.reports': 'Active projects',
 
 	'constructor.guard.reportRequiredForAboutBuilding':
 		'Editing «About building» is only available when a report is open. Open a report from the list.',
@@ -1633,9 +1633,9 @@ export const ru: Record<TranslationKey, string> = {
 	'sidebar.acousticModels': 'Модели',
 	'sidebar.news': 'Новости',
 	'sidebar.reports': 'Отчеты',
-	'sidebar.activeReports': 'Активные отчёты',
+	'sidebar.activeReports': 'Активные проекты',
 
-	'reports.activeReports.pageTitle': 'Активные отчёты',
+	'reports.activeReports.pageTitle': 'Активные проекты',
 	'reports.activeReports.hint':
 		'Список активных отчётов. Кнопка «Продолжить» открывает раздел «О здании» в конструкторе.',
 	'reports.activeReports.buildingName': 'Здание / название',
@@ -2055,7 +2055,7 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.sectionNav.soundReport': 'Звукоизоляция отчёт',
 	'constructor.sectionNav.soundCalculation': 'Звукоизоляция расчёт',
 	'constructor.sectionNav.aiMode': 'AI mode',
-	'constructor.sectionNav.reports': 'Отчёты',
+	'constructor.sectionNav.reports': 'Активные проекты',
 
 	'constructor.guard.reportRequiredForAboutBuilding':
 		'Раздел «О здании» в режиме редактирования доступен только при открытом отчёте. Выберите отчёт в списке.',

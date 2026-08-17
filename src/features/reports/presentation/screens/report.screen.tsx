@@ -1,7 +1,6 @@
 import { ReportInfoStatus } from '@api-gen';
 import type { PaginationState } from '@core';
 import {
-	APP_ROUTES,
 	convertToPaginatedType,
 	DeleteIcon,
 	DownloadIcon,
@@ -15,12 +14,10 @@ import {
 	useAccessValidator,
 	UserRoles,
 } from '@core';
-import { CONSTRUCTOR_ROUTES } from '@features/constructor';
-import { DESIGNING_ROUTES } from '@features/home/constants';
 import { reportToClientConverter } from '@features/reports/converters';
 import { deleteReport, getPaginatedReports } from '@features/reports/services';
 import type { Report, ReportFilter } from '@features/reports/types';
-import { getReportColumns } from '@features/reports/utils';
+import { getReportColumns, openReportInConstructorTarget } from '@features/reports/utils';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -185,19 +182,12 @@ export const ReportScreen = () => {
 						return;
 					}
 
-					navigate(
-						APP_ROUTES.designing.route +
-							'/' +
-							DESIGNING_ROUTES.constructor.route +
-							'/' +
-							CONSTRUCTOR_ROUTES.aboutBuilding.route,
-						{
-							reportId: editingReport.reportInfoId,
-							reportType: editingReport.reportCategory,
-							reportStatus: ReportInfoStatus.Completed,
-							edit: 'true',
-						},
+					const target = openReportInConstructorTarget(
+						editingReport.reportInfoId,
+						editingReport.reportCategory,
+						{ reportStatus: ReportInfoStatus.Completed },
 					);
+					navigate(target.path, target.params);
 				}}
 				confirmTitle="Редактировать"
 				headerTitle="Редактировать отчет?"

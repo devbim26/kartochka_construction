@@ -53,7 +53,6 @@ import {
 	formatMaterial,
 	getLayoutClassFromConstructionHeader,
 	isConstructionTypeAllowedInCatalogContext,
-	isMissingReportHttpStatus,
 	useGraphNoiseMode,
 } from '@features/constructor/utils';
 import { ConstructionTypeMap } from '@features/guidbooks/constants';
@@ -221,6 +220,7 @@ export const CalculationScreen = () => {
 	const inflightDetailIdRef = useRef('');
 	/** Пользователь сбросил фильтр/селект — не автозаполнять форму клоном. */
 	const suppressWorkspaceAutoloadRef = useRef(false);
+	const loadedReportIdRef = useRef('');
 
 	const form = useForm<DesigningData>({
 		resolver: zodResolver(DesigningConfig.schema),
@@ -238,7 +238,7 @@ export const CalculationScreen = () => {
 	);
 
 	useEffect(() => {
-		if (reportIdFromSearch && reportIdFromSearch !== reportId) {
+		if (reportIdFromSearch !== reportId) {
 			setReportId(reportIdFromSearch);
 		}
 	}, [reportIdFromSearch, reportId]);
@@ -524,79 +524,125 @@ export const CalculationScreen = () => {
 		setDocumentCountryFilter(String(convertToClientCountryData(selected.country)));
 	}, [calculationDocumentId, calculationDocuments, documentCountryFilter]);
 
-	const resetMissingCalculationReport = useCallback(() => {
-		setReportId('');
-		setReportInfo(null);
-		setSavedConstructionId(null);
-		setWorkingHeaderId('');
-		workingHeaderIdRef.current = '';
-		lastSyncedKeyRef.current = '';
-		navigate('');
-	}, [navigate]);
+	const applySingleReportPayload = useCallback(
+		(data: ReportInfoSingleDto, options?: { syncUrl?: boolean }) => {
+			const short = convertToClientSingleReportInfoShort(data);
+			setReportInfo(short);
+			const docId = short.calculationDocument?.id || '';
+			if (docId) {
+				setCalculationDocumentId(docId);
+			}
+			if (short.calculationDocument?.country) {
+				setDocumentCountryFilter(String(short.calculationDocument.country));
+			}
+
+			const existing = extractSingleReportConstruction(data, [
+				catalogConstructionIdRef.current,
+				appliedCatalogConstructionIdRef.current,
+			]);
+			if (!existing?.constructionHeaderId) return;
+
+			suppressWorkspaceAutoloadRef.current = false;
+			setIsConstructionSelectionCleared(false);
+			setSavedConstructionId(existing.id || null);
+			savedConstructionIdRef.current = existing.id || null;
+
+			const headerId = existing.constructionHeaderId;
+			const loadedClone = formLoadedForHeaderRef.current;
+			if (loadedClone && headerId && String(headerId) !== String(loadedClone)) {
+				return;
+			}
+
+			formLoadedForHeaderRef.current = '';
+			setWorkingHeaderId(headerId);
+			workingHeaderIdRef.current = headerId;
+			setAdditionalWindows(existing.additionalWindows);
+			setAdditionalDoors(existing.additionalDoors);
+			if (existing.name?.trim()) {
+				setName(existing.name.trim());
+			}
+			if (existing.width != null) setWidth(String(existing.width));
+			if (existing.length != null) setLength(String(existing.length));
+
+			if (options?.syncUrl !== false && data.id) {
+				syncCloneToUrl(headerId, data.id);
+			}
+		},
+		[syncCloneToUrl],
+	);
+
+	const handleLoadCalculationReport = useCallback(
+		(id: string) => {
+			if (!id) return;
+			if (calculatingRef.current || skipDetailLoadRef.current) return;
+			if (loadedReportIdRef.current === id) return;
+
+			loadedReportIdRef.current = id;
+			dispatch(startLoading());
+
+			from(getReportSingleById({ id }))
+				.pipe(
+					tap((response) => {
+						if (calculatingRef.current || skipDetailLoadRef.current) return;
+						if (!isSuccessStatus(response?.status) || !response.data) {
+							toast.error(t('errors.request'));
+							return;
+						}
+						applySingleReportPayload(response.data);
+					}),
+					catchError((error) => {
+						if (calculatingRef.current || skipDetailLoadRef.current) return of(null);
+						void getAxiosErrorMessage(error, t('errors.request')).then((message) => {
+							toast.error(message || t('errors.request'));
+						});
+						return of(null);
+					}),
+					finalize(() => dispatch(stopLoading())),
+				)
+				.subscribe();
+		},
+		[applySingleReportPayload, dispatch, t],
+	);
 
 	useEffect(() => {
-		if (!reportId) return;
-		if (calculatingRef.current || skipDetailLoadRef.current) return;
-		from(getReportSingleById({ id: reportId }))
-			.pipe(
-				tap((response) => {
-					if (calculatingRef.current || skipDetailLoadRef.current) return;
-					if (!isSuccessStatus(response?.status) || !response.data) {
-						resetMissingCalculationReport();
-						return;
-					}
-					const short = convertToClientSingleReportInfoShort(response.data);
-					setReportInfo(short);
-					const docId = short.calculationDocument?.id || '';
-					if (docId) {
-						setCalculationDocumentId(docId);
-					}
-					if (short.calculationDocument?.country) {
-						setDocumentCountryFilter(String(short.calculationDocument.country));
-					}
-					const existing = extractSingleReportConstruction(response.data, [
-						catalogConstructionIdRef.current,
-						appliedCatalogConstructionIdRef.current,
-					]);
-					if (!existing?.constructionHeaderId) return;
-					setSavedConstructionId(existing.id || null);
-					savedConstructionIdRef.current = existing.id || null;
-					const catalogId = catalogConstructionIdRef.current;
-					const headerId = existing.constructionHeaderId;
-					const loadedClone = formLoadedForHeaderRef.current;
-					// После save не перезаписываем клон из GET — там часто справочный/устаревший id.
-					if (loadedClone && headerId && String(headerId) !== String(loadedClone)) {
-						return;
-					}
-					if (!catalogId || String(headerId) !== String(catalogId)) {
-						setWorkingHeaderId(headerId);
-						workingHeaderIdRef.current = headerId;
-						if (!loadedClone) {
-							formLoadedForHeaderRef.current = headerId;
-						}
-					}
-					setAdditionalWindows(existing.additionalWindows);
-					setAdditionalDoors(existing.additionalDoors);
-					// Name живёт на копии ConstructionHeader, не отдельным полем отчёта.
-					if (existing.name?.trim()) {
-						setName(existing.name.trim());
-					}
-					if (existing.width != null) setWidth(String(existing.width));
-					if (existing.length != null) setLength(String(existing.length));
-				}),
-				catchError((error) => {
-					if (calculatingRef.current || skipDetailLoadRef.current) return of(null);
-					if (
-						error instanceof AxiosError &&
-						isMissingReportHttpStatus(error.response?.status)
-					) {
-						resetMissingCalculationReport();
-					}
-					return of(null);
-				}),
-			)
-			.subscribe();
-	}, [reportId, resetMissingCalculationReport]);
+		const id = reportIdFromSearch;
+		if (!id) return;
+
+		const reportType = search.get('reportType');
+		if (reportType && reportType !== ReportCategory.Single) return;
+
+		handleLoadCalculationReport(id);
+	}, [handleLoadCalculationReport, reportIdFromSearch, search]);
+
+	useEffect(() => {
+		if (reportIdFromSearch) return;
+
+		loadedReportIdRef.current = '';
+		setReportInfo(null);
+		setName('');
+		setWidth('');
+		setLength('');
+		setCalculationDocumentId('');
+		setDocumentCountryFilter('');
+		setSavedConstructionId(null);
+		savedConstructionIdRef.current = null;
+		setAdditionalWindows([]);
+		setAdditionalDoors([]);
+		setTypeEnumFilter('');
+		setCatalogConstructionId('');
+		catalogConstructionIdRef.current = '';
+		setWorkingHeaderId('');
+		workingHeaderIdRef.current = '';
+		setDetail(null);
+		setSvgUrl(null);
+		setGraphData(null);
+		setGraphAdditionalData(null);
+		form.reset(DesigningConfig.defaultValues);
+		formLoadedForHeaderRef.current = '';
+		suppressWorkspaceAutoloadRef.current = false;
+		setIsConstructionSelectionCleared(false);
+		lastSyncedKeyRef.current = '';
+	}, [form, reportIdFromSearch]);
 
 	/** После create/update — фиксируем клон для редактора; селект справочника не трогаем. */
 	const bindClonedConstruction = useCallback(

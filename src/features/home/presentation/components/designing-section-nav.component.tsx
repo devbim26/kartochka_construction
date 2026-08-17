@@ -2,9 +2,8 @@ import { APP_ROUTES, useAppNavigate, useI18n } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { ReportCategory } from '@features/constructor/types';
 import {
-	activateCalculationSession,
+	clearCalculationSession,
 	activateProjectSession,
-	getCalculationReportId,
 	getProjectReportId,
 } from '@features/constructor/utils';
 import { DESIGNING_ROUTES } from '@features/home/constants';
@@ -73,16 +72,8 @@ export const DesigningSectionNav = ({ title }: Props) => {
 
 	const goSoundCalculation = () => {
 		setOpen(false);
-		const id = activateCalculationSession() || getCalculationReportId();
-		navigate(
-			`${constructorBase}/${CONSTRUCTOR_ROUTES.calculation.route}`,
-			id
-				? {
-						reportId: id,
-						reportType: ReportCategory.Single,
-					}
-				: undefined,
-		);
+		clearCalculationSession();
+		navigate(`${constructorBase}/${CONSTRUCTOR_ROUTES.calculation.route}`);
 	};
 
 	const goAiMode = () => {

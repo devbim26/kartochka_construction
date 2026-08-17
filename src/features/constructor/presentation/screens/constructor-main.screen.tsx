@@ -16,41 +16,42 @@ export const ConstructorLayout = () => {
 		}
 
 		const path = location.pathname;
-		// Явные экраны без reportId в URL — не перехватываем sessionStorage.
-		if (
-			path.endsWith(`/${CONSTRUCTOR_ROUTES.calculation.route}`) ||
-			path.endsWith(`/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`)
-		) {
-			return;
-		}
-
 		const base = `${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}`;
 		const projectId = sessionStorage.getItem('projectReportId');
-		const calculationId = sessionStorage.getItem('calculationReportId');
 		const storedId = sessionStorage.getItem('reportId');
 		const storedType = sessionStorage.getItem('reportType');
 
+		// «Расчёт» без query — чистый лист, сессию не подставляем.
+		if (path.endsWith(`/${CONSTRUCTOR_ROUTES.calculation.route}`)) {
+			return;
+		}
+
+		// Явный экран «О здании» без reportId — новый проект, сессию не трогаем.
+		if (path.endsWith(`/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`)) {
+			return;
+		}
+
 		if (projectId || (storedId && storedType === 'Floor')) {
 			const id = projectId || storedId!;
-			const qs = new URLSearchParams({
-				reportId: id,
-				reportType: 'Floor',
-			}).toString();
-			navigate(`${base}/${CONSTRUCTOR_ROUTES.floorPlans.route}?${qs}`, { replace: true });
+			navigate(
+				{
+					pathname: `${base}/${CONSTRUCTOR_ROUTES.floorPlans.route}`,
+					search: `?${new URLSearchParams({
+						reportId: id,
+						reportType: 'Floor',
+					}).toString()}`,
+				},
+				{ replace: true },
+			);
 			return;
 		}
-		if (calculationId || (storedId && storedType === 'Single')) {
-			const id = calculationId || storedId!;
-			const qs = new URLSearchParams({
-				reportId: id,
-				reportType: 'Single',
-			}).toString();
-			navigate(`${base}/${CONSTRUCTOR_ROUTES.calculation.route}?${qs}`, { replace: true });
-			return;
-		}
-		navigate(`${base}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}?intent=project`, {
-			replace: true,
-		});
+		navigate(
+			{
+				pathname: `${base}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`,
+				search: '?intent=project',
+			},
+			{ replace: true },
+		);
 	}, [search, navigate, location.pathname]);
 
 	return (
