@@ -139,7 +139,7 @@ export const getConstructionAdditionalInfoFilesUpload = (data: ConstructionsAddD
 export const convertToServerConstructionsFilterData = (data: ConstructionsFilterData): any => ({
 	// В таблице «Название» = description, поэтому фильтр name уходит в description.
 	description: data.name || null,
-	shortName: data.constructionType || null,
+	...(data.constructionType ? { constructionType: data.constructionType } : {}),
 	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
 	...(data.priority
 		? { priority: convertToServerPriorityData(data.priority as Priority) }

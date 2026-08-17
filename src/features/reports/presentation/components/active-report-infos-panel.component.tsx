@@ -1,5 +1,5 @@
-import type { ReportInfoShortDto, ReportInfoShortDtoPaginatedList } from '@api-gen';
-import { ReportCategory as ApiReportCategory, ReportInfoStatus } from '@api-gen';
+import type { BaseReportInfoDto, BaseReportInfoDtoPaginatedList } from '@api-gen';
+import { ReportCategory as ApiReportCategory } from '@api-gen';
 import type { PaginationState } from '@core';
 import {
 	APP_ROUTES,
@@ -30,7 +30,7 @@ const toConstructorReportType = (category?: ApiReportCategory): string => {
 };
 
 const toPaginatedReportInfos = (
-	data: ReportInfoShortDtoPaginatedList,
+	data: BaseReportInfoDtoPaginatedList,
 	pagination: Pick<PaginationState, 'pageNumber' | 'pageSize'>,
 ) => {
 	const pageNumber = pagination.pageNumber;
@@ -38,7 +38,7 @@ const toPaginatedReportInfos = (
 	const totalPages = data.totalPages ?? 0;
 	const hasPreviousPage = data.hasPreviousPage ?? pageNumber > 1;
 	const hasNextPage = data.hasNextPage ?? (totalPages > 0 && pageNumber < totalPages);
-	return convertToPaginatedType((item: ReportInfoShortDto) => item)({
+	return convertToPaginatedType((item: BaseReportInfoDto) => item)({
 		items: data.items ?? [],
 		pageNumber,
 		totalPages,
@@ -53,7 +53,7 @@ export const ActiveReportInfosPanel = () => {
 	const { t } = useI18n();
 	const navigate = useAppNavigate();
 	const [paginationState, setPaginationState] = useState<PaginationState>(paginationStateDefault);
-	const [rows, setRows] = useState<ReportInfoShortDto[]>([]);
+	const [rows, setRows] = useState<BaseReportInfoDto[]>([]);
 	const [deleteId, setDeleteId] = useState<string | null>(null);
 
 	const categoryLabel = useCallback(
@@ -101,16 +101,15 @@ export const ActiveReportInfosPanel = () => {
 		};
 	}, [reportInfosQuery$, paginationState.pageNumber, paginationState.pageSize]);
 
-	const openConstructor = (row: ReportInfoShortDto) => {
+	const openConstructor = (row: BaseReportInfoDto) => {
 		const id = row.id;
 		if (!id) return;
-		const reportType = toConstructorReportType(row.category);
+		const reportType = toConstructorReportType(row.reportCategory);
 		navigate(
 			`${APP_ROUTES.designing.route}/${DESIGNING_ROUTES.constructor.route}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`,
 			{
 				reportId: id,
 				reportType,
-				reportStatus: ReportInfoStatus.InProgress,
 				edit: 'true',
 			},
 		);
@@ -148,52 +147,36 @@ export const ActiveReportInfosPanel = () => {
 			});
 	};
 
-	const columns: ColumnDef<ReportInfoShortDto>[] = [
+	const columns: ColumnDef<BaseReportInfoDto>[] = [
 		{
-			id: 'buildingName',
-			accessorKey: 'buildingName',
+			id: 'reportCategory',
+			accessorKey: 'reportCategory',
 			header: () => (
 				<SimpleTableHeaderCell
-					text={t('reports.activeReports.buildingName')}
-					textClassName="min-w-[200px]"
+					text={t('reports.activeReports.category')}
+					textClassName="min-w-[160px]"
+				/>
+			),
+			cell: (info) => (
+				<SimpleTableCell
+					content={categoryLabel(info.row.original.reportCategory)}
+					contentClassName="min-w-[160px]"
+				/>
+			),
+		},
+		{
+			id: 'id',
+			accessorKey: 'id',
+			header: () => (
+				<SimpleTableHeaderCell
+					text={t('reports.activeReports.reportId')}
+					textClassName="min-w-[220px]"
 				/>
 			),
 			cell: (info) => (
 				<SimpleTableCell
 					content={(info.getValue() as string) || '—'}
-					contentClassName="min-w-[200px] max-w-[360px] truncate"
-				/>
-			),
-		},
-		{
-			id: 'category',
-			accessorKey: 'category',
-			header: () => (
-				<SimpleTableHeaderCell
-					text={t('reports.activeReports.category')}
-					textClassName="min-w-[140px]"
-				/>
-			),
-			cell: (info) => (
-				<SimpleTableCell
-					content={categoryLabel(info.row.original.category)}
-					contentClassName="min-w-[140px]"
-				/>
-			),
-		},
-		{
-			id: 'status',
-			accessorKey: 'status',
-			header: () => (
-				<SimpleTableHeaderCell
-					text={t('reports.activeReports.status')}
-					textClassName="min-w-[120px]"
-				/>
-			),
-			cell: () => (
-				<SimpleTableCell
-					content={t('reports.activeReports.statusInProgress')}
-					contentClassName="min-w-[120px]"
+					contentClassName="min-w-[220px] max-w-[360px] truncate font-mono text-xs"
 				/>
 			),
 		},

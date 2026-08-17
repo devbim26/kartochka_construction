@@ -98,6 +98,28 @@ export interface Attachment {
 	url?: string | null;
 }
 
+export interface BaseReportInfoDto {
+	/** @format uuid */
+	id?: string;
+	reportCategory?: ReportCategory;
+	/** @format uuid */
+	userId?: string;
+}
+
+export interface BaseReportInfoDtoPaginatedList {
+	items?: BaseReportInfoDto[] | null;
+	/** @format int32 */
+	pageNumber?: number;
+	/** @format int32 */
+	totalPages?: number;
+	/** @format int32 */
+	totalCount?: number;
+	/** @format int32 */
+	pageSize?: number;
+	hasPreviousPage?: boolean;
+	hasNextPage?: boolean;
+}
+
 export interface BillDto {
 	/** @format uuid */
 	id?: string;
@@ -671,6 +693,7 @@ export interface ExportMaterialsQuery {
 	/** @format float */
 	thickness?: number | null;
 	materialType?: MaterialTypeEnum;
+	materialPurpose?: MaterialPurpose;
 }
 
 export interface ExportRequirementQuery {
@@ -825,6 +848,7 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	/** @format float */
 	thickness?: number | null;
 	materialType?: MaterialTypeEnum;
+	materialPurpose?: MaterialPurpose;
 }
 
 export interface GetPalacementRoomVariantsWithTypesQuery {
@@ -854,7 +878,6 @@ export interface GetReportInfoWithPaginationQuery {
 	pageSize?: number;
 	sortOrder?: SortOrder;
 	ordering?: string | null;
-	status?: ReportInfoStatus;
 }
 
 export interface GetReportWithPaginationQuery {
@@ -865,7 +888,7 @@ export interface GetReportWithPaginationQuery {
 	sortOrder?: SortOrder;
 	ordering?: string | null;
 	/** @format uuid */
-	userId?: string | null;
+	userId?: string;
 	name?: string | null;
 	client?: string | null;
 	reportCategory?: ReportCategory;
@@ -1480,20 +1503,6 @@ export interface ReportInfoShortDto {
 	calculationRequirementDocument?: CalculationRequirementDocumentDto;
 	regulatoryRequirementDocument?: RegulatoryRequirementDocumentDto;
 	floorDocumentUrl?: string | null;
-}
-
-export interface ReportInfoShortDtoPaginatedList {
-	items?: ReportInfoShortDto[] | null;
-	/** @format int32 */
-	pageNumber?: number;
-	/** @format int32 */
-	totalPages?: number;
-	/** @format int32 */
-	totalCount?: number;
-	/** @format int32 */
-	pageSize?: number;
-	hasPreviousPage?: boolean;
-	hasNextPage?: boolean;
 }
 
 export interface ReportInfoSingleDto {
@@ -3550,7 +3559,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
 			data: GetReportInfoWithPaginationQuery,
 			params: RequestParams = {},
 		) =>
-			this.request<ReportInfoShortDtoPaginatedList, any>({
+			this.request<BaseReportInfoDtoPaginatedList, any>({
 				path: `/api/ReportInfo/get-paginated`,
 				method: 'POST',
 				body: data,

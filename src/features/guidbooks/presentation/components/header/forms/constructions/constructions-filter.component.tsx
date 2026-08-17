@@ -10,6 +10,7 @@ import {
 	RuCountryNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	getConstructionTypeLabel,
+	getConstructionTypeTemplateEnum,
 	type ConstructionsFilterData,
 	type ConstructionTypeTemplate,
 } from '@features/guidbooks/types';
@@ -60,13 +61,18 @@ export const ConstructionsFilter = () => {
 						{...field}
 						isSearchable
 						value={field.value || ''}
-						options={constructionTypes.map((data) => ({
-							label: getConstructionTypeLabel(
-								data.shortName ?? data.name,
-								locale === 'en' ? 'en' : 'ru',
-							),
-							value: data.shortName ?? '',
-						}))}
+						options={constructionTypes
+							.map((data) => {
+								const value = getConstructionTypeTemplateEnum(data);
+								return {
+									label: getConstructionTypeLabel(
+										value || data.shortName || data.name,
+										locale === 'en' ? 'en' : 'ru',
+									),
+									value,
+								};
+							})
+							.filter((item) => item.value && item.label)}
 						error={formState.errors.constructionType?.message}
 						labelClassName={twMerge(
 							'text-sm leading-5 tracking-[0.1px]',

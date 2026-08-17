@@ -3,7 +3,9 @@ import type { UseFormReturn } from 'react-hook-form';
 export interface ConstructionTypeTemplate {
 	name?: string | null | undefined;
 	shortName?: string | null | undefined;
+	constructionTypeEnum?: string | null;
 	constructionRoot?: object | undefined;
+	constructionBase?: object | undefined;
 }
 
 export interface ConstructionTypeProps {
@@ -88,8 +90,13 @@ export const RuConstructionTypesMap = {
 	HeavySingleLayerWallSoundproofingBothSide:
 		'Тяжелая однослойная стена + звукоизоляционная панель с двух сторон',
 	HeavyMultiLayerWall: 'Тяжелая многослойная стена',
+	HeavyMultipleLayerWall: 'Тяжелая многослойная стена',
 	HeavyMultiLayerWallFacingOneSide: 'Тяжелая многослойная стена + облицовка с одной стороны',
+	HeavyMultipleLayerWallFacingOneSide:
+		'Тяжелая многослойная стена + облицовка с одной стороны',
 	HeavyMultiLayerWallFacingBothSide: 'Тяжелая многослойная стена + облицовка с двух сторон',
+	HeavyMultipleLayerWallFacingBothSide:
+		'Тяжелая многослойная стена + облицовка с двух сторон',
 	HeavyMultiLayerWallSoundproofingOneSide:
 		'Тяжелая многослойная стена + звукоизоляционная панель с одной стороны',
 	HeavyMultiLayerWallSoundproofingBothSide:
@@ -114,8 +121,11 @@ export const EnConstructionTypesMap = {
 	HeavySingleLayerWallSoundproofingBothSide:
 		'Heavy single-layer wall + soundproofing panel on both sides',
 	HeavyMultiLayerWall: 'Heavy multi-layer wall',
+	HeavyMultipleLayerWall: 'Heavy multi-layer wall',
 	HeavyMultiLayerWallFacingOneSide: 'Heavy multi-layer wall + facing on one side',
+	HeavyMultipleLayerWallFacingOneSide: 'Heavy multi-layer wall + facing on one side',
 	HeavyMultiLayerWallFacingBothSide: 'Heavy multi-layer wall + facing on both sides',
+	HeavyMultipleLayerWallFacingBothSide: 'Heavy multi-layer wall + facing on both sides',
 	HeavyMultiLayerWallSoundproofingOneSide:
 		'Heavy multi-layer wall + soundproofing panel on one side',
 	HeavyMultiLayerWallSoundproofingBothSide:
@@ -246,3 +256,7 @@ export const getConstructionTypeLabel = (
 	const map = locale === 'ru' ? RuConstructionTypesMap : EnConstructionTypesMap;
 	return (map as Record<string, string>)[value] ?? value;
 };
+
+export const getConstructionTypeTemplateEnum = (
+	item: ConstructionTypeTemplate,
+): string => String(item.constructionTypeEnum ?? '');

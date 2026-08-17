@@ -321,8 +321,9 @@ export const en = {
 
 	'reports.activeReports.pageTitle': 'Active reports',
 	'reports.activeReports.hint':
-		'Only reports with status In progress are listed. Continue opens About building in the constructor.',
+		'Active reports are listed here. Continue opens About building in the constructor.',
 	'reports.activeReports.buildingName': 'Building / name',
+	'reports.activeReports.reportId': 'Report ID',
 	'reports.activeReports.category': 'Report type',
 	'reports.activeReports.status': 'Status',
 	'reports.activeReports.statusInProgress': 'In progress',
@@ -1636,8 +1637,9 @@ export const ru: Record<TranslationKey, string> = {
 
 	'reports.activeReports.pageTitle': 'Активные отчёты',
 	'reports.activeReports.hint':
-		'Показаны отчёты со статусом «В работе». Кнопка «Продолжить» открывает раздел «О здании» в конструкторе.',
+		'Список активных отчётов. Кнопка «Продолжить» открывает раздел «О здании» в конструкторе.',
 	'reports.activeReports.buildingName': 'Здание / название',
+	'reports.activeReports.reportId': 'ID отчёта',
 	'reports.activeReports.category': 'Тип отчёта',
 	'reports.activeReports.status': 'Статус',
 	'reports.activeReports.statusInProgress': 'В работе',

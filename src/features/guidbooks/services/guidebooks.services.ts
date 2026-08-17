@@ -182,5 +182,8 @@ export const exportRequirements = async (data: ExportRequirementQuery) => {
 };
 
 export const exportConstructions = async (data: ExportConstructionHeaderQuery) => {
-	return await fetchApi.api.constructionExportCreate(data, { format: 'blob' });
+	return await fetchApi.api.constructionExportCreate(
+		stripNullishQueryFields(data as Record<string, unknown>) as ExportConstructionHeaderQuery,
+		{ format: 'blob' },
+	);
 };

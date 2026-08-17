@@ -56,12 +56,12 @@ import {
 import {
 	Guidebooks,
 	getConstructionTypeLabel,
+	getConstructionTypeTemplateEnum,
 	getPriorityLabel,
 	RuCountryNamesMap,
 	type ConstructionsAddData,
 	type ConstructionsEditData,
 	type ConstructionsFilterData,
-	type ConstructionTypeEnum,
 	type ConstructionTypeTemplate,
 	type Country,
 } from '@features/guidbooks/types';
@@ -493,11 +493,13 @@ const ConstructionsScreen = () => {
 	const handleExportTableData = async () => {
 		setIsExporting(true);
 		try {
+			const filterQuery = convertToServerConstructionsFilterData(
+				forms.filterForm.getValues() as ConstructionsFilterData,
+			);
+			const { constructionType: _filterConstructionType, ...restFilter } = filterQuery;
 			const response = await exportConstructions({
-				...convertToServerConstructionsFilterData(
-					forms.filterForm.getValues() as ConstructionsFilterData,
-				),
-				shortName: exportConstructionType || null,
+				...restFilter,
+				...(exportConstructionType ? { constructionType: exportConstructionType } : {}),
 			});
 			if (response.status !== 200) {
 				toast.error(t('guides.export.error'));
@@ -544,13 +546,16 @@ const ConstructionsScreen = () => {
 		() => [
 			{ label: t('guides.export.constructionType.all'), value: '' },
 			...exportConstructionTypes
-				.map((item) => ({
-					label: getConstructionTypeLabel(
-						item.shortName ?? item.name,
-						locale === 'en' ? 'en' : 'ru',
-					),
-					value: item.shortName ?? '',
-				}))
+				.map((item) => {
+					const value = getConstructionTypeTemplateEnum(item);
+					return {
+						label: getConstructionTypeLabel(
+							value || item.shortName || item.name,
+							locale === 'en' ? 'en' : 'ru',
+						),
+						value,
+					};
+				})
 				.filter((item) => item.value && item.label),
 		],
 		[exportConstructionTypes, locale, t],
