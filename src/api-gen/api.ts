@@ -589,7 +589,7 @@ export interface DeleteMaterialCommand {
 
 export interface DeleteReportCommand {
 	/** @format uuid */
-	reportId?: string;
+	id?: string;
 }
 
 export interface DeleteReportConstructionCommand {

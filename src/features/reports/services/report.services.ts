@@ -17,6 +17,6 @@ export const getPaginatedReports = async ({ data, pagination }: PaginatedProps) 
 
 export const deleteReport = async (id: string) => {
 	return await fetchApi.api.reportDelete({
-		reportId: id,
+		id,
 	});
 };

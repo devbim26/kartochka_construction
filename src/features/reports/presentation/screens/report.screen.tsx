@@ -195,7 +195,14 @@ export const ReportScreen = () => {
 				isOpen={!!search.get('id') && !!search.get('edit')}
 			/>
 			<ReportListActionModal
-				onConfirm={() => handleDeleteTableData(search.get('id')!)}
+				onConfirm={() => {
+					const reportId = editingReport?.id || search.get('id');
+					if (!reportId) {
+						toast.error('Не удалось удалить отчет');
+						return;
+					}
+					handleDeleteTableData(reportId);
+				}}
 				confirmTitle="Удалить"
 				headerTitle="Удалить отчет?"
 				onClose={() => navigate('')}
