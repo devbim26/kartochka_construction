@@ -1441,7 +1441,12 @@ export const CalculationScreen = () => {
 		const ensuredReportId = reportIdRef.current || reportId;
 		if (!previousCloneId || isConstructionEditLocked || !ensuredReportId) return;
 
-		const catalogIdForPut = catalogConstructionId || appliedCatalogConstructionIdRef.current;
+		const appliedCatalog = appliedCatalogConstructionIdRef.current;
+		// Смена справочной → оригинал (бэк клонирует). Пересчёт той же → клон, иначе отчёт пропадает.
+		const isCatalogReplace =
+			!!catalogConstructionId &&
+			(!appliedCatalog || String(catalogConstructionId) !== String(appliedCatalog));
+		const headerIdForReport = isCatalogReplace ? catalogConstructionId : previousCloneId;
 
 		if (!isFormComplete) {
 			toast.error(
@@ -1452,7 +1457,7 @@ export const CalculationScreen = () => {
 			return;
 		}
 
-		if (!catalogIdForPut) {
+		if (!headerIdForReport) {
 			toast.error(locale === 'ru' ? 'Выберите конструкцию' : 'Select a construction');
 			return;
 		}
@@ -1501,7 +1506,7 @@ export const CalculationScreen = () => {
 							data: convertToUpdateSingleReportCommand(ensuredReportId, {
 								id: reportConstructionRowId,
 								name: name.trim(),
-								construction: catalogIdForPut,
+								construction: headerIdForReport,
 								width,
 								length,
 								area,
@@ -1524,7 +1529,7 @@ export const CalculationScreen = () => {
 					const cloned = extractSingleReportConstruction(response.data, [
 						catalogConstructionIdRef.current,
 						appliedCatalogConstructionIdRef.current,
-						catalogIdForPut,
+						headerIdForReport,
 					]);
 					if (cloned?.id) {
 						setSavedConstructionId(cloned.id);
@@ -1533,12 +1538,14 @@ export const CalculationScreen = () => {
 
 					const returnedHeaderId = cloned?.constructionHeaderId || '';
 					const fromPut =
-						returnedHeaderId && String(returnedHeaderId) !== String(catalogIdForPut)
+						returnedHeaderId && String(returnedHeaderId) !== String(headerIdForReport)
 							? returnedHeaderId
 							: '';
 					const nextCloneId = fromPut || previousCloneId;
 
-					appliedCatalogConstructionIdRef.current = catalogIdForPut;
+					if (isCatalogReplace && catalogConstructionId) {
+						appliedCatalogConstructionIdRef.current = catalogConstructionId;
+					}
 					suppressWorkspaceAutoloadRef.current = false;
 					setIsConstructionSelectionCleared(false);
 
@@ -1588,6 +1595,7 @@ export const CalculationScreen = () => {
 						savedConstructionIdRef.current = cloned.id;
 					}
 					setReportId(nextReportId);
+					loadedReportIdRef.current = nextReportId;
 					syncCloneToUrl(nextCloneId, nextReportId);
 					refreshGraphVisualsAfterSave(nextCloneId);
 				}),
@@ -1915,8 +1923,8 @@ export const CalculationScreen = () => {
 								initialDoors={additionalDoors}
 							/>
 						) : null}
-						{(!!catalogConstructionId &&
-							(hasPendingTypeChange || !isConstructionEditLocked)) && (
+						{(!!workingHeaderId || !!catalogConstructionId) &&
+						(hasPendingTypeChange || !isConstructionEditLocked) ? (
 							<FloatingCalculateButton
 								onClick={onCalculateHandle}
 								leading={
@@ -1934,7 +1942,7 @@ export const CalculationScreen = () => {
 									? t('constructor.calculation.calculateConstruction')
 									: undefined}
 							</FloatingCalculateButton>
-						)}
+						) : null}
 					</div>
 
 					{graphData?.length ? (
