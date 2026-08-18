@@ -1,4 +1,4 @@
-import { APP_ROUTES } from '@core';
+import { APP_ROUTES, RequireRole, UserRoles } from '@core';
 import {
 	AboutBuildingSreen,
 	AccountScreen,
@@ -112,44 +112,45 @@ export const AppRouter = () => {
 					<Route path={CONSTRUCTOR_ROUTES.ifcModel.route} element={<IFCModelScreen />} />
 				</Route>
 				<Route path={DESIGNING_ROUTES.account.route} element={<AccountScreen />} />
-				<Route path={DESIGNING_ROUTES.accounts.route} element={<BillScreen />} />
-				<Route
-					path={DESIGNING_ROUTES.subscribes_constructor.route}
-					element={<SubscriptionScreen />}
-				/>
-				<Route path={DESIGNING_ROUTES.news.route} element={<NewsScreen />} />
-				<Route path={DESIGNING_ROUTES.reports.route} element={<ReportScreen />} />
 				<Route
 					path={DESIGNING_ROUTES.activeReports.route}
 					element={<ActiveReportsScreen />}
 				/>
-				<Route path={DESIGNING_ROUTES.guidbooks.route} element={<GuidbooksLauout />}>
-					<Route path={GUIDBOOKS_ROUTES.materials.route} element={<MaterialsScreen />} />
+				<Route element={<RequireRole roles={UserRoles.Admin} />}>
+					<Route path={DESIGNING_ROUTES.accounts.route} element={<BillScreen />} />
 					<Route
-						path={GUIDBOOKS_ROUTES.constructions.route}
-						element={<ConstructionsScreen />}
+						path={DESIGNING_ROUTES.subscribes_constructor.route}
+						element={<SubscriptionScreen />}
 					/>
-					<Route
-						path={GUIDBOOKS_ROUTES.requirements.route}
-						element={<RequirementsScreen />}
-					/>
-					<Route path={GUIDBOOKS_ROUTES.issuers.route} element={<IssuersScreen />} />
-					<Route
-						path={GUIDBOOKS_ROUTES.tariffPlans.route}
-						element={<TariffPlansScreen />}
-					/>
-					<Route
-						path={GUIDBOOKS_ROUTES.acousticModels.route}
-						element={<AcousticModelsScreen />}
-					/>
-				</Route>
-
-				<Route path={DESIGNING_ROUTES.users_list.route} element={<UsersLayout />}>
-					<Route path={USERS_LIST_ROUTES.client.route} element={<UserScreen />} />
-					<Route
-						path={USERS_LIST_ROUTES.manager.route}
-						element={<DevScreen titleKey="sidebar.manager" />}
-					/>
+					<Route path={DESIGNING_ROUTES.news.route} element={<NewsScreen />} />
+					<Route path={DESIGNING_ROUTES.reports.route} element={<ReportScreen />} />
+					<Route path={DESIGNING_ROUTES.guidbooks.route} element={<GuidbooksLauout />}>
+						<Route path={GUIDBOOKS_ROUTES.materials.route} element={<MaterialsScreen />} />
+						<Route
+							path={GUIDBOOKS_ROUTES.constructions.route}
+							element={<ConstructionsScreen />}
+						/>
+						<Route
+							path={GUIDBOOKS_ROUTES.requirements.route}
+							element={<RequirementsScreen />}
+						/>
+						<Route path={GUIDBOOKS_ROUTES.issuers.route} element={<IssuersScreen />} />
+						<Route
+							path={GUIDBOOKS_ROUTES.tariffPlans.route}
+							element={<TariffPlansScreen />}
+						/>
+						<Route
+							path={GUIDBOOKS_ROUTES.acousticModels.route}
+							element={<AcousticModelsScreen />}
+						/>
+					</Route>
+					<Route path={DESIGNING_ROUTES.users_list.route} element={<UsersLayout />}>
+						<Route path={USERS_LIST_ROUTES.client.route} element={<UserScreen />} />
+						<Route
+							path={USERS_LIST_ROUTES.manager.route}
+							element={<DevScreen titleKey="sidebar.manager" />}
+						/>
+					</Route>
 				</Route>
 			</Route>
 			<Route path="*" element={<NotFoundScreen />} />
