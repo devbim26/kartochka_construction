@@ -1,6 +1,7 @@
 export * from './about-building';
 export * from './calculation';
 export * from './construction-pick';
+export * from './construction-catalog-select';
 export * from './constructor-header.component';
 export * from './constructor-section-nav.component';
 export * from './construction-compliance-banner.component';

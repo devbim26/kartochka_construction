@@ -78,6 +78,7 @@ import {
 	ConstructionClass,
 	EnConstructionTypesSelectValues,
 	EnConstructorCountrySelectValues,
+	getConstructionTypeLabel,
 	Guidebooks,
 	isFloorConstructionType,
 	RuConstructionTypesSelectValues,
@@ -92,7 +93,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -101,6 +102,7 @@ import {
 	type AdditionalOpeningsFormHandle,
 } from '../designing/additional-openings-form.component';
 import DesigningGraph from '../designing/designing-graph.component';
+import { ConstructionCatalogSelect } from '../construction-catalog-select';
 import { FloatingCalculateButton } from '../floating-calculate-button.component';
 import { ConstructionDetailsModal } from '../modals';
 
@@ -896,6 +898,9 @@ export const CalculationScreen = () => {
 						form.reset(data as DesigningData);
 						captureReferenceLayers(data.constructionTypeObject);
 						setHasPendingTypeChange(false);
+						if (data.constructionType) {
+							setTypeEnumFilter(String(data.constructionType));
+						}
 						// Верхнее «Название» = Name копии ConstructionHeader.
 						if (data.name != null) {
 							setName(String(data.name));
@@ -1308,6 +1313,55 @@ export const CalculationScreen = () => {
 		resetWorkspacePreview();
 	};
 
+	const handleCatalogTypeChange = (nextType: string) => {
+		if (nextType === typeEnumFilter) return;
+
+		const canEditLoadedClone =
+			Boolean(workingHeaderId || constructionHeaderIdFromSearch) &&
+			Boolean(detail) &&
+			!isConstructionEditLocked &&
+			canShowConstructionWorkspace;
+
+		if (canEditLoadedClone) {
+			setTypeEnumFilter(nextType);
+			handleConstructionTypeChange(nextType);
+			return;
+		}
+
+		applyTypeFilterChange(nextType);
+	};
+
+	const handleCatalogConstructionChange = (next: string) => {
+		setCatalogConstructionId(next);
+		catalogConstructionIdRef.current = next;
+		setHasPendingTypeChange(false);
+
+		if (next) {
+			const selected = constructionData.find((c) => String(c.id) === String(next));
+			if (selected?.constructionType) {
+				setTypeEnumFilter(String(selected.constructionType));
+			}
+
+			suppressWorkspaceAutoloadRef.current = false;
+			setIsConstructionSelectionCleared(false);
+			skipDetailLoadRef.current = false;
+			setSvgUrl(null);
+			setGraphData(null);
+			setGraphAdditionalData(null);
+			formLoadedForHeaderRef.current = '';
+
+			if (reportId) {
+				void replaceReportWithCatalogConstruction(next);
+				return;
+			}
+			return;
+		}
+
+		suppressWorkspaceAutoloadRef.current = true;
+		setIsConstructionSelectionCleared(true);
+		resetWorkspacePreview();
+	};
+
 	const handleConstructionTypeChange = (value: string) => {
 		if (isConstructionEditLocked) return;
 		if (
@@ -1711,60 +1765,15 @@ export const CalculationScreen = () => {
 				</div>
 
 				<div className="flex w-full min-w-0 flex-wrap items-end gap-3">
-					<Select
-						options={typeSelectOptions}
-						value={typeEnumFilter}
-						onChange={(value) => {
-							const next = value ? String(value) : '';
-							if (next === typeEnumFilter) return;
-							applyTypeFilterChange(next);
-						}}
-						isSearchable
-						label={t('createConstruction.constructionType.label')}
-						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
-						placeholder={t('createConstruction.constructionType.placeholder')}
-						buttonClassName="w-full min-w-[220px] h-fit text-sm rounded-[8px]"
-						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[220px] flex-1"
+					<ConstructionCatalogSelect
+						typeOptions={typeSelectOptions}
+						typeFilter={typeEnumFilter}
+						onTypeFilterChange={handleCatalogTypeChange}
+						constructionOptions={constructionSelectOptions}
+						constructionValue={catalogConstructionId}
+						onConstructionChange={handleCatalogConstructionChange}
+						loading={listLoading}
 					/>
-					<Select
-						options={constructionSelectOptions}
-						value={catalogConstructionId}
-						onChange={(value) => {
-							const next = value ? String(value) : '';
-							setCatalogConstructionId(next);
-							catalogConstructionIdRef.current = next;
-							setHasPendingTypeChange(false);
-
-							if (next) {
-								suppressWorkspaceAutoloadRef.current = false;
-								setIsConstructionSelectionCleared(false);
-								skipDetailLoadRef.current = false;
-								setSvgUrl(null);
-								setGraphData(null);
-								setGraphAdditionalData(null);
-								formLoadedForHeaderRef.current = '';
-
-								// После create — PUT отчёта и график/форма по новому клону.
-								if (reportId) {
-									void replaceReportWithCatalogConstruction(next);
-									return;
-								}
-								return;
-							}
-
-							// Очистили селект — скрываем редактор и графики.
-							suppressWorkspaceAutoloadRef.current = true;
-							setIsConstructionSelectionCleared(true);
-							resetWorkspacePreview();
-						}}
-						isSearchable
-						label={t('createConstruction.construction.label')}
-						labelClassName="font-sans text-sm text-input-label-primary text-left w-full"
-						placeholder={t('createConstruction.construction.placeholder')}
-						buttonClassName="w-full min-w-[260px] h-fit text-sm rounded-[8px]"
-						wrapperClassname="shadow-none ring-input-border-primary flex-col gap-[6px] min-w-[260px] flex-[1.4]"
-					/>
-					{listLoading ? <Loader /> : null}
 				</div>
 
 				<div className="mt-2 flex w-full flex-wrap items-end gap-3">
@@ -1846,25 +1855,14 @@ export const CalculationScreen = () => {
 							</div>
 						)}
 						<div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[20px] self-stretch">
-							<Controller
-								name="constructionTypeObject.constructionTypeEnum"
-								control={form.control}
-								render={({ field }) => (
-									<Select
-										{...field}
-										disabled={isConstructionEditLocked}
-										isSearchable
-										value={field.value || ''}
-										onChange={(value) =>
-											handleConstructionTypeChange(value ? String(value) : '')
-										}
-										options={typeSelectOptions}
-										wrapperClassname="w-fit min-w-[320px] ring-input-border-primary"
-										buttonClassName="text-sm rounded-[8px]"
-										placeholder={t('constructor.designing.selectType')}
-									/>
-								)}
-							/>
+							{constructionType ? (
+								<p className="font-sans text-sm font-semibold text-input-label-primary">
+									{getConstructionTypeLabel(
+										constructionType,
+										locale === 'en' ? 'en' : 'ru',
+									)}
+								</p>
+							) : null}
 							<div className="flex flex-col gap-2">
 								{materials.map((material, i) => (
 									<p key={`calc-layer-${i}`} className="pl-2 text-[18px]">
