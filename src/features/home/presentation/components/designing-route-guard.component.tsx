@@ -1,4 +1,5 @@
-import { APP_ROUTES, PageLoader, useAccessValidator } from '@core';
+import { APP_ROUTES, useAccessValidator } from '@core';
+import { AUTH_ROUTES } from '@features/auth/constants';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { getRequiredPermissionForPath } from '@features/home/utils/sidebar-route-permission.utils';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
@@ -13,9 +14,10 @@ export const DesigningRouteGuard = () => {
 
 	if (!isAuthorized) {
 		return (
-			<div className="flex h-full w-full items-center justify-center">
-				<PageLoader />
-			</div>
+			<Navigate
+				to={`${APP_ROUTES.auth.route}/${AUTH_ROUTES.login.route}`}
+				replace
+			/>
 		);
 	}
 

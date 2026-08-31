@@ -1464,11 +1464,7 @@ export const CalculationScreen = () => {
 
 		const constructionValid = await form.trigger();
 		if (!constructionValid) {
-			toast.error(
-				locale === 'ru'
-					? 'Проверьте заполнение конструкции'
-					: 'Check construction form fields',
-			);
+			toast.error(t('constructor.calculation.constructionInvalid'));
 			return;
 		}
 
@@ -1600,11 +1596,10 @@ export const CalculationScreen = () => {
 					refreshGraphVisualsAfterSave(nextCloneId);
 				}),
 				catchError((error) => {
-					if (error instanceof AxiosError) {
-						toast.error(error.response?.data || t('errors.request'));
-					} else {
-						toast.error(t('errors.request'));
-					}
+					// 400 и прочие ошибки API: показать сообщение, не сбрасывать форму/расчёт.
+					void getAxiosErrorMessage(error, t('errors.request')).then((message) => {
+						toast.error(message || t('errors.request'));
+					});
 					return of(null);
 				}),
 				finalize(() => {

@@ -7,13 +7,17 @@ import {
 	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
+	useI18n,
 } from '@core';
+import { SESSION_EXPIRED_SEARCH_PARAM } from '@api-gen';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMask } from '@react-input/mask';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { FaGoogle } from 'react-icons/fa6';
+import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { AUTH_FETCH_ROUTES } from '../../../constants';
 import { authLogin } from '../../../services';
 import type { LoginFormData } from '../../../types';
@@ -21,10 +25,24 @@ import { LoginFormDataConfig } from '../../../utils';
 
 const LoginPage = () => {
 	const [showPassword, setShowPassword] = useState(false);
+	const [search, setSearchParams] = useSearchParams();
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
+	const { t } = useI18n();
 	const authData = useAppSelector((store) => store.authData);
 	const isLoggedIn = useAppSelector(selectIsUserLoggedIn);
+
+	useEffect(() => {
+		if (search.get(SESSION_EXPIRED_SEARCH_PARAM) !== '1') {
+			return;
+		}
+
+		toast.error(t('auth.sessionExpired'));
+
+		const nextParams = new URLSearchParams(search);
+		nextParams.delete(SESSION_EXPIRED_SEARCH_PARAM);
+		setSearchParams(nextParams, { replace: true });
+	}, [search, setSearchParams, t]);
 
 	useEffect(() => {
 		if (authData.fetch_data?.fetch_name === AUTH_FETCH_ROUTES.login.fetch_name) {

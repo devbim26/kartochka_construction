@@ -92,7 +92,12 @@ export const en = {
 	'auth.registration.optionalSection': 'Additional company details',
 	'auth.registration.backHome': 'Back to home',
 	'auth.registration.selectImage': 'Select image',
+	'auth.login.pageTitle': 'Login',
+	'auth.codeApprove.pageTitle': 'Code confirmation',
+	'auth.registration.pageTitle': 'Registration',
+	'auth.sessionExpired': 'Session expired',
 
+	'meta.siteName': 'devBIM',
 	'meta.title':
 		'AI for design | Sound insulation, compliance checking, visualization — Belarus and Russia',
 	'meta.description':
@@ -108,14 +113,14 @@ export const en = {
 	'landing.about.platformTitle': 'Calculations and design',
 	'landing.about.platformSubtitle': 'Design and structural calculations',
 	'landing.about.platformDesc':
-		'The system not only performs calculations, but also suggests optimal constructions and saves budget.\nGenerates a PDF report for submission to expert review.\nFor calculations, code based on the regulatory framework is used, without AI models.',
+		'The system not only performs calculations, but also suggests optimal constructions and saves budget.\nGenerates a DOCX report for submission to expert review.\nFor calculations, code based on the regulatory framework is used, without AI models.',
 	'landing.about.aiTitle': 'Expertise and analysis',
 	'landing.about.aiSubtitle': 'Visualization and consulting',
 	'landing.about.aiDesc':
 		'Creates facade and interior images. Analyzes documents, codes and calculations in chat. Checks design decisions for compliance. Deep internet research.',
 	'landing.about.platform.block1.title': 'Structural calculations:',
 	'landing.about.platform.block1.desc':
-		'The system not only performs calculations, but also suggests optimal constructions and saves budget. Generates a PDF report for submission to expert review.',
+		'The system not only performs calculations, but also suggests optimal constructions and saves budget. Generates a DOCX report for submission to expert review.',
 	'landing.about.platform.block1.codeNote':
 		'For calculations, code based on the regulatory framework is used, without AI models.',
 	'landing.about.platform.block2.title': 'Architectural design:',
@@ -139,23 +144,23 @@ export const en = {
 	'landing.how.step.3': 'Project expertise (2 modes)',
 	'landing.how.step.4': 'Regulatory documentation analytics',
 	'landing.how.desc.0':
-		'Sound insulation calculation for walls and slabs.\n\nGenerates a PDF report with formulas ready for expert submission.',
+		'Sound insulation calculation for walls and slabs.\n\nGenerates a DOCX report with formulas ready for expert submission. Calculations follow SP 02.04.03-2023.',
 	'landing.how.desc.1':
 		'General\n\nAccess to the latest AI models.\n\nPDF document analytics\n\nAI checks, summarizes and structures documents. Produces a DOC/Excel report — for estimates, TOR, protocols.\n\nDeepResearch\n\nDeep web search with links to sources.',
 	'landing.how.desc.2':
 		'AI image generation with custom settings. Change materials, furniture, camera position and more in one click.',
 	'landing.how.desc.3':
-		'"General expertise"\n\n- Checks overall project structure;\n- Checks compliance with актуальные codes;\n- Checks against internal requirements\n\n"Sound insulation expertise"\n\nAnalysis of sound insulation solutions in the project.',
+		'"General expertise"\n\n- Checks overall project structure;\n- Checks compliance with current codes;\n- Checks against internal requirements\n\n"Sound insulation expertise"\n\nAnalysis of sound insulation solutions in the project.',
 	'landing.how.desc.4':
 		'Deep analysis of regulatory documents. Ask any questions — the system will prepare a report with direct links to document sections and pages.',
 	'landing.how.detail.0':
-		'Sound insulation calculation for walls and slabs.\n\nGenerates a PDF report with formulas ready for expert submission.',
+		'Sound insulation calculation for walls and slabs.\n\nGenerates a DOCX report with formulas ready for expert submission. Calculations follow SP 02.04.03-2023.',
 	'landing.how.detail.1':
 		'General\n\nAccess to the latest AI models.\n\nPDF document analytics\n\nAI checks, summarizes and structures documents. Produces a DOC/Excel report — for estimates, TOR, protocols.\n\nDeepResearch\n\nDeep web search with links to sources.',
 	'landing.how.detail.2':
 		'AI image generation with custom settings. Change materials, furniture, camera position and more in one click.',
 	'landing.how.detail.3':
-		'"General expertise"\n\n- Checks overall project structure;\n- Checks compliance with актуальные codes;\n- Checks against internal requirements\n\n"Sound insulation expertise"\n\nAnalysis of sound insulation solutions in the project.',
+		'"General expertise"\n\n- Checks overall project structure;\n- Checks compliance with current codes;\n- Checks against internal requirements\n\n"Sound insulation expertise"\n\nAnalysis of sound insulation solutions in the project.',
 	'landing.how.detail.4':
 		'Deep analysis of regulatory documents. Ask any questions — the system will prepare a report with direct links to document sections and pages.',
 
@@ -178,11 +183,12 @@ export const en = {
 
 	'landing.faq.q1': 'Can the results be used for official expert review?',
 	'landing.faq.a1':
-		'Yes. DevBIM reports are generated according to regulatory methods and contain references to standards. The PDF format is suitable for submission to project and state expert review.',
+		'Yes. DevBIM reports are generated according to regulatory methods and contain references to standards. The DOCX format is suitable for submission to project and state expert review.',
 
 	'landing.faq.q2': 'Which standards does the platform support?',
-	'landing.faq.a2':
-		'The system uses current editions of SN 2.04.01-2020 "Noise Protection", SP 2.03.-2025 "Sound Insulation and Sound Absorption of Building Structures" and other documents for Belarus. The regulatory database is regularly updated.',
+	'landing.faq.a2.intro':
+		'The system uses current editions of regulatory documents from the Requirements guidebook, including:',
+	'landing.faq.a2.outro': 'The regulatory database is regularly updated.',
 
 	'landing.faq.q3': 'Can I calculate my own (non-standard) construction?',
 	'landing.faq.a3':
@@ -289,6 +295,9 @@ export const en = {
 	'constructor.header.calculation': 'Calculation',
 	'constructor.header.project': 'Project',
 	'constructor.calculation.title': 'Calculation',
+	'constructor.floorPlans.pageTitle': 'Floor plans',
+	'constructor.constructionSelect.pageTitle': 'Construction choice',
+	'constructor.myConstructions.pageTitle': 'My constructions',
 	'constructor.calculation.save': 'Save construction',
 	'constructor.calculation.saved': 'Construction saved',
 	'constructor.calculation.selectHint': 'Select a construction to see details and the graph',
@@ -320,6 +329,7 @@ export const en = {
 	'sidebar.activeReports': 'Active projects',
 
 	'reports.activeReports.pageTitle': 'Active projects',
+	'reports.pageTitle': 'Reports',
 	'reports.activeReports.hint':
 		'Active reports are listed here. Continue opens About building in the constructor.',
 	'reports.activeReports.buildingName': 'Building / name',
@@ -408,8 +418,8 @@ export const en = {
 	'guides.requirements.columns.buildingType': 'Building type',
 	'guides.requirements.columns.document': 'Document',
 	'guides.requirements.columns.constructionType': 'Construction type',
-	'guides.requirements.columns.standardFull': 'Standard (full)',
-	'guides.requirements.columns.standardShort': 'Standard (short)',
+	'guides.requirements.columns.standardFull': 'Standard (full name)',
+	'guides.requirements.columns.standardShort': 'Standard (short name)',
 	'guides.requirements.columns.validity': 'Standard validity',
 	'guides.requirements.columns.firstRoom': 'First room',
 	'guides.requirements.columns.secondRoom': 'Second room',
@@ -533,6 +543,7 @@ export const en = {
 	'guides.deleteModal.acousticModelQuestion': 'Are you sure you want to delete model',
 
 	'main.pageTitle': 'Home',
+	'account.pageTitle': 'Account',
 	'main.section.design': 'Calculations & design',
 	'main.section.aiAssistant': 'Expert evaluation',
 
@@ -593,7 +604,7 @@ export const en = {
 	'main.designCards.roomAcoustics.title': 'Room acoustics calculations',
 	'main.designCards.roomAcoustics.lead':
 		'*Reverberation time RT60 and speech intelligibility RASTI*',
-	'main.designCards.roomAcoustics.forLabel': 'Per SP 2.04.03-2023 for:',
+	'main.designCards.roomAcoustics.forLabel': 'Per SP 02.04.03-2023 for:',
 	'main.designCards.roomAcoustics.bullets': 'conference halls;||concert halls;||cinemas, etc.',
 	'main.designCards.roomAcoustics.footer':
 		'Generates a PDF report with formulas, ready for submission to expert review.',
@@ -615,7 +626,7 @@ export const en = {
 	'main.designCards.sound.choiceCalculation': 'Construction sound insulation calculation',
 	'main.designCards.sound.choiceProject': 'Building sound insulation project',
 	'main.designCards.heat.title': 'Wall thermal insulation calculation',
-	'main.designCards.heat.desc1': 'Calculation according to SP 2.04.01-2020.',
+	'main.designCards.heat.desc1': 'Calculation according to SP 02.04.01-2020.',
 	'main.designCards.heat.desc2':
 		'Generates a PDF report with formulas, ready for expert submission.',
 	'main.designCards.heat.inDevelopment': 'In development',
@@ -948,6 +959,11 @@ export const en = {
 	'validation.required': 'This field is required',
 	'validation.integer': 'Value must be an integer',
 	'validation.positiveNumber': 'Value must be greater than zero',
+	'validation.number': 'Value must be a number',
+	'validation.thicknessMax': 'Thickness must be at most 1000 mm',
+	'validation.numberMax': 'Value exceeds the allowed maximum',
+	'constructor.calculation.constructionInvalid':
+		'Check construction layers: thickness and density must be greater than zero',
 
 	// FloorPlanViewer
 	'floorPlanViewer.instruction':
@@ -1285,6 +1301,11 @@ export const ru: Record<TranslationKey, string> = {
 	'validation.required': 'Это поле обязательно для заполнения',
 	'validation.integer': 'Значение должно быть целым числом',
 	'validation.positiveNumber': 'Значение должно быть больше нуля',
+	'validation.number': 'Значение должно быть числом',
+	'validation.thicknessMax': 'Толщина не должна превышать 1000 мм',
+	'validation.numberMax': 'Значение превышает допустимый максимум',
+	'constructor.calculation.constructionInvalid':
+		'Проверьте слои конструкции: толщина и плотность должны быть больше нуля',
 
 	'news.pageTitle': 'Новости',
 	'news.editTitle': 'Редактировать новость',
@@ -1404,32 +1425,37 @@ export const ru: Record<TranslationKey, string> = {
 	'auth.registration.optionalSection': 'Дополнительные данные компании',
 	'auth.registration.backHome': 'На главную',
 	'auth.registration.selectImage': 'Выбрать изображение',
+	'auth.login.pageTitle': 'Вход',
+	'auth.codeApprove.pageTitle': 'Подтверждение кода',
+	'auth.registration.pageTitle': 'Регистрация',
+	'auth.sessionExpired': 'Сессия истекла',
 
+	'meta.siteName': 'devBIM',
 	'meta.title':
 		'AI для проектирования | Звукоизоляция, нормоконтроль, визуализация — Беларусь и Россия',
 	'meta.description':
 		'AI-сервис для архитекторов и проектировщиков: расчёт звукоизоляции по СП, проверка на соответствие ТНПА Беларуси и России, генерация фасадов и анализ документов. Отчёты для экспертизы за минуты.',
 	'meta.keywords':
-		'AI проектирование, звукоизоляция СП 02.03.01-2023, нормоконтроль Беларусь, нормоконтроль Россия, ТНПА проверка, визуализация фасадов, AI архитектура, анализ смет, техническое задание AI, строительный AI, отчёт для экспертизы, проектная документация, строительные нормы Беларусии',
+		'AI проектирование, звукоизоляция СП 02.04.03-2023, нормоконтроль Беларусь, нормоконтроль Россия, ТНПА проверка, визуализация фасадов, AI архитектура, анализ смет, техническое задание AI, строительный AI, отчёт для экспертизы, проектная документация, строительные нормы Беларусии',
 
 	'landing.pageTop.gifAlt': 'Анимация на лендинге',
 	'landing.pageTop.title': 'devBIM: инженерная AI-платформа',
 	'landing.pageTop.subtitle': 'Для проектирования и экспертизы\n строительных проектов ',
 	'landing.pageTop.start': 'Начать',
 
-	'landing.about.platformTitle': 'Расчеты и  проектирование ',
-	'landing.about.platformSubtitle': 'Проектирование и расчеты конструкций',
+	'landing.about.platformTitle': 'Расчёты и проектирование',
+	'landing.about.platformSubtitle': 'Проектирование и расчёты конструкций',
 	'landing.about.platformDesc':
-		'Система не только выполняет расчеты, но и предлагает оптимальные конструкции и экономит бюджет.\nФормирует отчёт в PDF для передачи в экспертизу.\nДля расчетов используется код, основанный на нормативной базе, без AI моделей.',
+		'Система не только выполняет расчёты, но и предлагает оптимальные конструкции и экономит бюджет.\nФормирует отчёт в DOCX для передачи в экспертизу.\nДля расчётов используется код, основанный на нормативной базе, без AI моделей.',
 	'landing.about.aiTitle': 'Экспертиза строительных проектов',
 	'landing.about.aiSubtitle': 'Визуализация и консультирование',
 	'landing.about.aiDesc':
-		'Создает изображений фасадов и интерьеров. Анализирует документы, нормы и расчёты в чате. Проверяет соответствие проектных решений требованиям. Глубокий поиск информации в интернете.',
-	'landing.about.platform.block1.title': 'Расчеты строительных конструкций:',
+		'Создаёт изображения фасадов и интерьеров. Анализирует документы, нормы и расчёты в чате. Проверяет соответствие проектных решений требованиям. Глубокий поиск информации в интернете.',
+	'landing.about.platform.block1.title': 'Расчёты строительных конструкций:',
 	'landing.about.platform.block1.desc':
-		'Система не только выполняет расчеты, но и предлагает оптимальные конструкции и экономит бюджет. Формирует отчёт в PDF для передачи в экспертизу.',
+		'Система не только выполняет расчёты, но и предлагает оптимальные конструкции и экономит бюджет. Формирует отчёт в DOCX для передачи в экспертизу.',
 	'landing.about.platform.block1.codeNote':
-		'Для расчетов используется код, основанный на нормативной базе, без AI моделей.',
+		'Для расчётов используется код, основанный на нормативной базе, без AI моделей.',
 	'landing.about.platform.block2.title': 'Архитектурное проектирование:',
 	'landing.about.platform.block2.desc':
 		'Помогает проектировать фасады и интерьеры с AI-визуализацией для альбомов архитектурных решений',
@@ -1452,28 +1478,28 @@ export const ru: Record<TranslationKey, string> = {
 	'landing.how.step.3': 'Экспертиза проекта (2 режима)',
 	'landing.how.step.4': 'Аналитика нормативной документации',
 	'landing.how.desc.0':
-		'Рассчет звукоизоляции стен и перекрытий по СП 02.04.03-2023.\n\nГенерирует PDF-отчет с формулами, готовый к подаче на экспертизу.',
+		'Расчёт звукоизоляции стен и перекрытий по СП 02.04.03-2023.\n\nГенерирует DOCX-отчёт с формулами, готовый к подаче на экспертизу.',
 	'landing.how.desc.1':
-		'Общий\n\nДоступ к новейшим моделям ИИ.\n\nАналитика документов PDF\n\nAI проверяет, суммаризирует и структурирует документы. Выдает готовый отчет в DOC/Excel — для смет, ТЗ, протоколов.\n\nDeepResearch\n\nглубокий поиск информации в интернете со ссылками на первоисточник.',
+		'Общий\n\nДоступ к новейшим моделям ИИ.\n\nАналитика документов PDF\n\nAI проверяет, суммаризирует и структурирует документы. Выдаёт готовый отчёт в DOC/Excel — для смет, ТЗ, протоколов.\n\nDeepResearch\n\nглубокий поиск информации в интернете со ссылками на первоисточник.',
 	'landing.how.desc.2':
 		'AI-генерация изображений с кастомными настройками. Меняйте материалы, мебель, положение камеры и др. в один клик.',
 	'landing.how.desc.3':
 		'"Общая экспертиза"\n\n- Проверяет общую структуру проекта;\n- Проверяет проект на соответствие актуальным ТНПА.\n- Проверка проекта по внутренним требованиям\n\n"Экспертиза звукоизоляции"\n\nАнализ заложенных в проекте решений по звукоизоляции',
 	'landing.how.desc.4':
-		'Выполняет глубокий анализ нормативных документов (СН, СП и др.). Задавайте любые вопросы, система создаст отчет с прямыми ссылками на пункты и страницы документов.',
+		'Выполняет глубокий анализ нормативных документов (СН, СП и др.). Задавайте любые вопросы, система создаст отчёт с прямыми ссылками на пункты и страницы документов.',
 	'landing.how.detail.0':
-		'Рассчет звукоизоляции стен и перекрытий по СП 02.04.03-2023.\n\nГенерирует PDF-отчет с формулами, готовый к подаче на экспертизу.',
+		'Расчёт звукоизоляции стен и перекрытий по СП 02.04.03-2023.\n\nГенерирует DOCX-отчёт с формулами, готовый к подаче на экспертизу.',
 	'landing.how.detail.1':
-		'Общий\n\nДоступ к новейшим моделям ИИ.\n\nАналитика документов PDF\n\nAI проверяет, суммаризирует и структурирует документы. Выдает готовый отчет в DOC/Excel — для смет, ТЗ, протоколов.\n\nDeepResearch\n\nглубокий поиск информации в интернете со ссылками на первоисточник.',
+		'Общий\n\nДоступ к новейшим моделям ИИ.\n\nАналитика документов PDF\n\nAI проверяет, суммаризирует и структурирует документы. Выдаёт готовый отчёт в DOC/Excel — для смет, ТЗ, протоколов.\n\nDeepResearch\n\nглубокий поиск информации в интернете со ссылками на первоисточник.',
 	'landing.how.detail.2':
 		'AI-генерация изображений с кастомными настройками. Меняйте материалы, мебель, положение камеры и др. в один клик.',
 	'landing.how.detail.3':
 		'"Общая экспертиза"\n\n- Проверяет общую структуру проекта;\n- Проверяет проект на соответствие актуальным ТНПА.\n- Проверка проекта по внутренним требованиям\n\n"Экспертиза звукоизоляции"\n\nАнализ заложенных в проекте решений по звукоизоляции',
 	'landing.how.detail.4':
-		'Выполняет глубокий анализ нормативных документов (СН, СП и др.). Задавайте любые вопросы, система создаст отчет с прямыми ссылками на пункты и страницы документов.',
+		'Выполняет глубокий анализ нормативных документов (СН, СП и др.). Задавайте любые вопросы, система создаст отчёт с прямыми ссылками на пункты и страницы документов.',
 
 	'landing.contacts.title': 'Контакты',
-	'landing.contacts.company': 'ООО"Акустиком"',
+	'landing.contacts.company': 'ООО «Акустиком»',
 	'landing.contacts.location': 'Беларусь, Минск',
 	'landing.contacts.address': 'ул. Матусевича 35, офис 36',
 
@@ -1491,11 +1517,12 @@ export const ru: Record<TranslationKey, string> = {
 
 	'landing.faq.q1': 'Можно ли использовать результаты для официальной экспертизы?',
 	'landing.faq.a1':
-		'Да. Отчёты DevBIM формируются по нормативным методикам и содержат ссылки на стандарты. Формат PDF подходит для передачи в проектную и государственную экспертизу.',
+		'Да. Отчёты DevBIM формируются по нормативным методикам и содержат ссылки на стандарты. Формат DOCX подходит для передачи в проектную и государственную экспертизу.',
 
 	'landing.faq.q2': 'Какие нормативы поддерживает платформа?',
-	'landing.faq.a2':
-		'Система использует актуальные редакции СН 2.04.01-2020 "Защита от шума", СП 2.03.-2025 "Звукоизоляция и звукопоглощение конструкций зданий и сооружений" и другие документы для Беларуси. Нормативная база регулярно обновляется.',
+	'landing.faq.a2.intro':
+		'Система использует актуальные редакции нормативных документов из справочника «Требования», в том числе:',
+	'landing.faq.a2.outro': 'Нормативная база регулярно обновляется.',
 
 	'landing.faq.q3': 'Можно ли рассчитать собственную (нестандартную) конструкцию?',
 	'landing.faq.a3':
@@ -1531,10 +1558,10 @@ export const ru: Record<TranslationKey, string> = {
 	'subscription.buyPlan': 'Оформить тариф',
 	'subscription.requisitesRequired':
 		'Заполните реквизиты компании в личном кабинете (боковое меню)',
-	'subscription.reportPerMonth.one': 'отчет в месяц',
-	'subscription.reportPerMonth.many': 'отчетов в месяц',
-	'subscription.calculationsCount': 'Количество расчетов, шт',
-	'subscription.reportsCount': 'Количество отчетов, шт',
+	'subscription.reportPerMonth.one': 'отчёт в месяц',
+	'subscription.reportPerMonth.many': 'отчётов в месяц',
+	'subscription.calculationsCount': 'Количество расчётов, шт',
+	'subscription.reportsCount': 'Количество отчётов, шт',
 	'subscription.creditsCount': 'Количество кредитов',
 	'subscription.aiModeBalance': 'Средства AI mode, BYN',
 	'subscription.tariffPlan': 'Тарифный план',
@@ -1555,44 +1582,44 @@ export const ru: Record<TranslationKey, string> = {
 
 	'common.delete': 'Удалить',
 
-	'landing.subText.point.0.0': '1 отчет в месяц',
-	'landing.subText.point.0.1': '1 конструкция в отчете',
+	'landing.subText.point.0.0': '1 отчёт в месяц',
+	'landing.subText.point.0.1': '1 конструкция в отчёте',
 	'landing.subText.point.0.2': 'Работа с одним этажом',
-	'landing.subText.point.0.3': 'Новости партнеров',
-	'landing.subText.point.0.4': 'Ограниченая база материалов',
-	'landing.subText.point.0.5': 'Ограниченые узлы примыкания',
+	'landing.subText.point.0.3': 'Новости партнёров',
+	'landing.subText.point.0.4': 'Ограниченная база материалов',
+	'landing.subText.point.0.5': 'Ограниченные узлы примыкания',
 
-	'landing.subText.point.1.0': '20 отчетов в месяц',
+	'landing.subText.point.1.0': '20 отчётов в месяц',
 	'landing.subText.point.1.1': 'До 20 конструкций',
 	'landing.subText.point.1.2': 'Работа с 4 этажами',
 	'landing.subText.point.1.3': 'База данных материалов',
 	'landing.subText.point.1.4':
-		'Расчёт: звукоизоляции, теплотехнических, противопожарных характеристика',
+		'Расчёт: звукоизоляции, теплотехнических, противопожарных характеристик',
 	'landing.subText.point.1.5': 'Типовые узлы примыкания',
-	'landing.subText.point.1.6': 'Создание конструкций, выполнение расчетов',
-	'landing.subText.point.1.7': 'Подпись отчета',
-	'landing.subText.point.1.8': 'Проверка отчета',
-	'landing.subText.point.1.9': 'Полный отчет',
+	'landing.subText.point.1.6': 'Создание конструкций, выполнение расчётов',
+	'landing.subText.point.1.7': 'Подпись отчёта',
+	'landing.subText.point.1.8': 'Проверка отчёта',
+	'landing.subText.point.1.9': 'Полный отчёт',
 
-	'landing.subText.point.2.0': 'Подпись отчета',
+	'landing.subText.point.2.0': 'Подпись отчёта',
 	'landing.subText.point.2.1': 'До 50 конструкций',
 	'landing.subText.point.2.2': 'Работа с 10 этажами',
 	'landing.subText.point.2.3': 'База данных материалов',
 	'landing.subText.point.2.4':
-		'Расчёт: звукоизоляции, теплотехнических, противопожарных характеристика',
+		'Расчёт: звукоизоляции, теплотехнических, противопожарных характеристик',
 	'landing.subText.point.2.5': 'Специальные сгенерированные узлы примыкания',
-	'landing.subText.point.2.6': 'Создание конструкций, выполнение расчетов',
+	'landing.subText.point.2.6': 'Создание конструкций, выполнение расчётов',
 	'landing.subText.point.2.7': 'Приоритетная поддержка',
-	'landing.subText.point.2.8': 'Подпись отчета',
-	'landing.subText.point.2.9': 'Проверка отчета',
+	'landing.subText.point.2.8': 'Подпись отчёта',
+	'landing.subText.point.2.9': 'Проверка отчёта',
 	'landing.subText.point.2.10': 'Интеграция AutoCAD, Revit',
 
 	'landing.subText.title.0': 'Trial',
-	'landing.subText.title.1': 'Standart',
+	'landing.subText.title.1': 'Standard',
 	'landing.subText.title.2': 'Pro',
 
-	'landing.subText.crossed.0.0': 'Проверка отчета',
-	'landing.subText.crossed.0.1': 'Подпись отчета',
+	'landing.subText.crossed.0.0': 'Проверка отчёта',
+	'landing.subText.crossed.0.1': 'Подпись отчёта',
 
 	'sidebar.home': 'Главная',
 	'sidebar.aiAssistant': 'AI mode',
@@ -1605,6 +1632,9 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.header.calculation': 'Расчет',
 	'constructor.header.project': 'Проект',
 	'constructor.calculation.title': 'Расчет',
+	'constructor.floorPlans.pageTitle': 'Планы этажей',
+	'constructor.constructionSelect.pageTitle': 'Выбор конструкции',
+	'constructor.myConstructions.pageTitle': 'Мои конструкции',
 	'constructor.calculation.save': 'Сохранить конструкцию',
 	'constructor.calculation.saved': 'Конструкция сохранена',
 	'constructor.calculation.selectHint': 'Выберите конструкцию, чтобы увидеть детали и график',
@@ -1636,6 +1666,7 @@ export const ru: Record<TranslationKey, string> = {
 	'sidebar.activeReports': 'Активные проекты',
 
 	'reports.activeReports.pageTitle': 'Активные проекты',
+	'reports.pageTitle': 'Отчёты',
 	'reports.activeReports.hint':
 		'Список активных отчётов. Кнопка «Продолжить» открывает раздел «О здании» в конструкторе.',
 	'reports.activeReports.buildingName': 'Здание / название',
@@ -1723,9 +1754,9 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.requirements.columns.buildingType': 'Тип здания',
 	'guides.requirements.columns.document': 'Документ',
 	'guides.requirements.columns.constructionType': 'Тип конструкции',
-	'guides.requirements.columns.standardFull': 'Стандарт полное',
-	'guides.requirements.columns.standardShort': 'Стандарт краткое',
-	'guides.requirements.columns.validity': 'Срок дейстия стандарта',
+	'guides.requirements.columns.standardFull': 'Название стандарта полное',
+	'guides.requirements.columns.standardShort': 'Название стандарта краткое',
+	'guides.requirements.columns.validity': 'Срок действия стандарта',
 	'guides.requirements.columns.firstRoom': 'Первое помещение',
 	'guides.requirements.columns.secondRoom': 'Второе помещение',
 	'guides.requirements.columns.actions': 'Действия',
@@ -1847,11 +1878,12 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.deleteModal.acousticModelQuestion': 'Вы уверены, что хотите удалить модель',
 
 	'main.pageTitle': 'Главная',
+	'account.pageTitle': 'Личный кабинет',
 	'main.section.design': 'Расчеты и проектирование',
 	'main.section.aiAssistant': 'Экспертиза строительных проектов',
 
 	'main.cards.sound.title': 'Расчет звукоизоляции',
-	'main.cards.sound.desc': 'стен и перекрытий по СП 02.03.01-2023.',
+	'main.cards.sound.desc': 'стен и перекрытий по СП 02.04.03-2023.',
 	'main.cards.sound.feature0': 'Генератор PDF-отчет с формулами, готовый к подаче на экспертизу.',
 	'main.cards.heat.title': 'Расчет теплоизоляции',
 	'main.cards.heat.desc': 'стен и перекрытий по СП 02.03.01-2023.',
@@ -1900,13 +1932,13 @@ export const ru: Record<TranslationKey, string> = {
 	'main.designCards.sound.bullets': 'стен;||конструкций полов;||окон;||стен с окнами и др.',
 	'main.designCards.sound.footer':
 		'Генерирует PDF-отчет с формулами, готовый к подаче в экспертизу',
-	'main.designCards.sound.desc1': 'Расчет по СП 02.04.03-2023.',
+	'main.designCards.sound.desc1': 'Расчёт по СП 02.04.03-2023.',
 	'main.designCards.sound.desc2':
 		'Генерирует PDF-отчет с формулами, готовый к подаче на экспертизу.',
 	'main.designCards.roomAcoustics.title': 'Расчёты акустики помещений',
 	'main.designCards.roomAcoustics.lead':
 		'*расчет времени реверберации RT60, разборчивости речи RASTI*',
-	'main.designCards.roomAcoustics.forLabel': 'по СП 2.04.03-2023 для:',
+	'main.designCards.roomAcoustics.forLabel': 'по СП 02.04.03-2023 для:',
 	'main.designCards.roomAcoustics.bullets':
 		'конференц-залов;||концертных залов;||кинотеатров и др.',
 	'main.designCards.roomAcoustics.footer':
@@ -1928,7 +1960,7 @@ export const ru: Record<TranslationKey, string> = {
 	'main.designCards.sound.choiceCalculation': 'Расчет звукоизоляции конструкции',
 	'main.designCards.sound.choiceProject': 'Проект звукоизоляции здания',
 	'main.designCards.heat.title': 'Расчет теплоизоляции стен',
-	'main.designCards.heat.desc1': 'Расчет по СП 2.04.01-2020.',
+	'main.designCards.heat.desc1': 'Расчет по СП 02.04.01-2020.',
 	'main.designCards.heat.desc2':
 		'Генерирует PDF-отчет с формулами, готовый к подаче на экспертизу.',
 	'main.designCards.heat.inDevelopment': 'В разработке',

@@ -26,43 +26,63 @@ const PRIORITY_ORDER: Priority[] = [
 	Priority.Ten,
 ];
 
-/** Подписи из OpenAPI x-enum-descriptions (RU). */
+/** Подписи приоритета — числа 0–10 (как в API enum). */
 export const RuPriorityNamesMap: Record<Priority, string> = {
-	[Priority.Zero]: 'Ноль',
-	[Priority.One]: 'Один',
-	[Priority.Two]: 'Два',
-	[Priority.Three]: 'Три',
-	[Priority.Four]: 'Четыре',
-	[Priority.Five]: 'Пять',
-	[Priority.Six]: 'Шесть',
-	[Priority.Seven]: 'Семь',
-	[Priority.Eight]: 'Восемь',
-	[Priority.Nine]: 'Девять',
-	[Priority.Ten]: 'Десять',
+	[Priority.Zero]: '0',
+	[Priority.One]: '1',
+	[Priority.Two]: '2',
+	[Priority.Three]: '3',
+	[Priority.Four]: '4',
+	[Priority.Five]: '5',
+	[Priority.Six]: '6',
+	[Priority.Seven]: '7',
+	[Priority.Eight]: '8',
+	[Priority.Nine]: '9',
+	[Priority.Ten]: '10',
 };
 
 export const EnPriorityNamesMap: Record<Priority, string> = {
-	[Priority.Zero]: 'Zero',
-	[Priority.One]: 'One',
-	[Priority.Two]: 'Two',
-	[Priority.Three]: 'Three',
-	[Priority.Four]: 'Four',
-	[Priority.Five]: 'Five',
-	[Priority.Six]: 'Six',
-	[Priority.Seven]: 'Seven',
-	[Priority.Eight]: 'Eight',
-	[Priority.Nine]: 'Nine',
-	[Priority.Ten]: 'Ten',
+	[Priority.Zero]: '0',
+	[Priority.One]: '1',
+	[Priority.Two]: '2',
+	[Priority.Three]: '3',
+	[Priority.Four]: '4',
+	[Priority.Five]: '5',
+	[Priority.Six]: '6',
+	[Priority.Seven]: '7',
+	[Priority.Eight]: '8',
+	[Priority.Nine]: '9',
+	[Priority.Ten]: '10',
 };
 
-/** Подпись приоритета для таблиц и селектов (клиентский и серверный enum). */
+const priorityIndexFromUnknown = (value: string | number | null | undefined): number | null => {
+	// Нельзя использовать !value — 0 валидный приоритет.
+	if (value == null || value === '') return null;
+
+	if (typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 10) {
+		return value;
+	}
+
+	if (typeof value === 'string') {
+		const trimmed = value.trim();
+		if (/^\d+$/.test(trimmed)) {
+			const n = Number(trimmed);
+			return n >= 0 && n <= 10 ? n : null;
+		}
+		const index = PRIORITY_ORDER.indexOf(trimmed as Priority);
+		return index >= 0 ? index : null;
+	}
+
+	return null;
+};
+
+/** Подпись приоритета для таблиц и селектов: «0»…«10». */
 export const getPriorityLabel = (
-	value: string | undefined | null,
-	locale: 'ru' | 'en' = 'ru',
+	value: string | number | undefined | null,
+	_locale: 'ru' | 'en' = 'ru',
 ): string => {
-	if (!value) return '—';
-	const map = locale === 'ru' ? RuPriorityNamesMap : EnPriorityNamesMap;
-	return map[value as Priority] ?? value;
+	const index = priorityIndexFromUnknown(value);
+	return index == null ? '—' : String(index);
 };
 
 export const RuPriorityNamesSelectValues = PRIORITY_ORDER.map((value) => ({

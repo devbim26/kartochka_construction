@@ -21,7 +21,7 @@ import {
 	type Subscription,
 } from '@features/subscriptions';
 import { AxiosError } from 'axios';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, from, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -34,14 +34,27 @@ type Props = {
 	splitForGrid?: boolean;
 };
 
+const EMPTY_SUBSCRIPTION_FILTERS = {
+	description: '',
+	name: '',
+	numberOfReports: '',
+	price: '',
+} as const;
+
+const SUBSCRIPTION_CATALOG_PAGINATION = {
+	pageNumber: 1,
+	pageSize: 999999,
+} as const;
+
 export const CurrentSub = ({ className, splitForGrid = false }: Props) => {
 	const [activeSubscriptions, setActiveSubscriptions] = useState<Subscription[]>([]);
-	const [subscriptions, setSubscriptions] = useState<Array<Subscription>>([]);
 	const [search] = useSearchParams();
 	const userData = useAppSelector((store) => store.userData);
 	const { t, locale } = useI18n();
 	const navigate = useAppNavigate();
 	const dispatch = useAppDispatch();
+	const catalogRef = useRef<Subscription[]>([]);
+	const changePlanFlow = search.get('changePlanFlow');
 
 	const remainingCredits = userData.data?.budgetRemaining ?? 0;
 	const remainingCalculations = userData.data?.dowloadReportsNumber ?? 0;
@@ -57,16 +70,35 @@ export const CurrentSub = ({ className, splitForGrid = false }: Props) => {
 		navigate('', { subSelectModal: 'true', changePlanFlow: 'true' });
 	};
 
-	const handleGetTableData = () => {
-		from(
+	const loadActiveSubscriptions = useCallback((catalog: Subscription[]) => {
+		from(fetchApi.api.userActiveUserSubscriptionList())
+			.pipe(
+				switchMap((response) => {
+					if (response?.status !== 200 || !response.data) {
+						return from([[] as Subscription[]]);
+					}
+					return from(resolveActiveSubscriptions(response.data as unknown, catalog));
+				}),
+				tap((activeSubs) => {
+					setActiveSubscriptions(activeSubs);
+				}),
+				catchError(() => from([[] as Subscription[]])),
+			)
+			.subscribe();
+	}, []);
+
+	useLayoutEffect(() => {
+		dispatch(getCurrentUser());
+
+		const subscription = from(
 			getPaginatedSubscriptions({
-				data: { description: '', name: '', numberOfReports: '', price: '' },
-				pagination: { pageNumber: 1, pageSize: 999999 },
+				data: EMPTY_SUBSCRIPTION_FILTERS,
+				pagination: SUBSCRIPTION_CATALOG_PAGINATION,
 			}),
 		)
 			.pipe(
 				switchMap((response) => {
-					const res = convertToPaginatedType(convertSubscriptionToClient)({
+					const catalog = convertToPaginatedType(convertSubscriptionToClient)({
 						items: response.data.items ?? [],
 						pageNumber: response.data.pageNumber ?? 1,
 						totalPages: response.data.totalPages ?? 0,
@@ -74,48 +106,40 @@ export const CurrentSub = ({ className, splitForGrid = false }: Props) => {
 						pageSize: response.data.pageSize ?? 10,
 						hasPreviousPage: false,
 						hasNextPage: false,
-					});
-					return from([res]);
+					}).items;
+
+					catalogRef.current = catalog;
+
+					return from(fetchApi.api.userActiveUserSubscriptionList()).pipe(
+						switchMap((activeResponse) => {
+							if (activeResponse?.status !== 200 || !activeResponse.data) {
+								return from([[] as Subscription[]]);
+							}
+							return from(
+								resolveActiveSubscriptions(activeResponse.data as unknown, catalog),
+							);
+						}),
+					);
 				}),
-				tap((res) => {
-					setSubscriptions(res.items);
+				tap((activeSubs) => {
+					setActiveSubscriptions(activeSubs);
 				}),
 				catchError((error) => {
 					if (error instanceof AxiosError) {
 						toast.error(error.response?.data?.message || t('errors.packagesLoad'));
 					}
-					return from([null]);
+					return from([[] as Subscription[]]);
 				}),
 			)
 			.subscribe();
-	};
 
-	const handleGetCurrentSubscriptions = () => {
-		from(fetchApi.api.userActiveUserSubscriptionList())
-			.pipe(
-				switchMap((response) => {
-					if (response?.status !== 200 || !response.data) {
-						return from([[] as Subscription[]]);
-					}
-					return from(
-						resolveActiveSubscriptions(response.data as unknown, subscriptions),
-					);
-				}),
-				catchError(() => from([[] as Subscription[]])),
-			)
-			.subscribe((activeSubs) => {
-				setActiveSubscriptions(activeSubs);
-			});
-	};
+		return () => subscription.unsubscribe();
+	}, [dispatch, t]);
 
 	useEffect(() => {
-		handleGetCurrentSubscriptions();
-	}, [subscriptions, search.get('changePlanFlow')]);
-
-	useLayoutEffect(() => {
-		dispatch(getCurrentUser());
-		handleGetTableData();
-	}, [dispatch]);
+		if (!changePlanFlow || catalogRef.current.length === 0) return;
+		loadActiveSubscriptions(catalogRef.current);
+	}, [changePlanFlow, loadActiveSubscriptions]);
 
 	const creditsLabel = (value: number) =>
 		t(`main.currentSub.credits.${getPluralForm(value, locale)}`);

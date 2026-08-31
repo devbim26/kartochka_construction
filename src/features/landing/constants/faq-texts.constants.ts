@@ -15,7 +15,7 @@ export const questions: readonly TranslationKey[] = [
 export const descriptions: readonly TranslationKey[] = [
 	'landing.faq.a0',
 	'landing.faq.a1',
-	'landing.faq.a2',
+	'landing.faq.a2.intro',
 	'landing.faq.a3',
 	'landing.faq.a4',
 	'landing.faq.a5',

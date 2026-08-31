@@ -1,5 +1,5 @@
 import type { PaginationState } from '@core/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Select, type SelectOption } from '../select';
 import { PaginationButton } from './pagination-button.component';
 
@@ -16,6 +16,18 @@ interface PaginationProps {
 	state: PaginationState;
 }
 
+/** Диапазон строк текущей страницы: A–B из N (pageNumber / pageSize / totalCount). */
+export const getPaginationRowRangeLabel = (
+	state: Pick<PaginationState, 'pageNumber' | 'pageSize' | 'totalCount'>,
+): string => {
+	const pageNumber = Math.max(Number(state.pageNumber) || 1, 1);
+	const pageSize = Math.max(Number(state.pageSize) || 10, 1);
+	const totalCount = Math.max(Number(state.totalCount) || 0, 0);
+	const rangeStart = totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1;
+	const rangeEnd = Math.min(pageNumber * pageSize, totalCount);
+	return `${rangeStart}-${rangeEnd} из ${totalCount}`;
+};
+
 export const Pagination = ({ onPageChange, state, onPageSizeChange }: PaginationProps) => {
 	const [viewedPages, setViewedPages] = useState<{ id: string; page: number }[]>([]);
 
@@ -28,6 +40,8 @@ export const Pagination = ({ onPageChange, state, onPageSizeChange }: Pagination
 			})).filter((o) => o.page <= state.totalPages && o.page >= 1),
 		);
 	}, [state.pageNumber, state.totalPages]);
+
+	const rowRangeLabel = useMemo(() => getPaginationRowRangeLabel(state), [state]);
 
 	const prevPage = useCallback(() => {
 		onPageChange(state.pageNumber - 1);
@@ -50,10 +64,7 @@ export const Pagination = ({ onPageChange, state, onPageSizeChange }: Pagination
 					onPageSizeChange(Number(value));
 				}}
 			/>
-			<div className="text-[14px] leading-[20px] tracking-[0.1px]">
-				{viewedPages.length &&
-					`${viewedPages[0].page}-${viewedPages[viewedPages.length - 1].page} из ${state.totalPages}`}
-			</div>
+			<div className="text-[14px] leading-[20px] tracking-[0.1px]">{rowRangeLabel}</div>
 			<div className="flex flex-row items-center gap-2">
 				<PaginationButton
 					type={'left'}

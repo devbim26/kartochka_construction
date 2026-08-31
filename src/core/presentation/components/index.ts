@@ -10,6 +10,7 @@ export * from './image';
 export * from './inputs';
 export * from './loaders';
 export * from './modals';
+export * from './page-title';
 export * from './pagination';
 export * from './popover';
 export * from './select';

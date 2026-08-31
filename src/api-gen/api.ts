@@ -678,6 +678,8 @@ export interface ExportConstructionHeaderQuery {
 	/** @format float */
 	rw?: number | null;
 	orderByPriority?: boolean;
+	/** @format uuid */
+	issuerId?: string | null;
 }
 
 export interface ExportMaterialsQuery {
@@ -821,6 +823,8 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	/** @format float */
 	rw?: number | null;
 	orderByPriority?: boolean;
+	/** @format uuid */
+	issuerId?: string | null;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {
@@ -1073,10 +1077,6 @@ export enum MaterialParametrs {
 	ConnectionNumber = 'ConnectionNumber',
 	ConnectionType = 'ConnectionType',
 	RackStep = 'RackStep',
-	Width = 'Width',
-	Length = 'Length',
-	Square = 'Square',
-	Filler = 'Filler',
 }
 
 export enum MaterialPurpose {
@@ -1128,7 +1128,7 @@ export interface MaterialTypeValue {
 	id?: string;
 	/** @format double */
 	value?: number;
-	materialParametrs?: MaterialParametrs;
+	materialParametr?: MaterialParametrs;
 }
 
 export interface MaterialTypeValueDto {
@@ -1209,8 +1209,9 @@ export interface PaginatedConstructionHeaderDto {
 	issuer?: NamedEntity;
 	issuerLogo?: string | null;
 	shortName?: string | null;
-	/** @format double */
-	labR?: number;
+	airNoiseLaboratoryData?: ConstructionLaboratoryDataDto;
+	impactNoiseLaboratoryData?: ConstructionLaboratoryDataDto;
+	priority?: Priority;
 	isView?: boolean;
 	/** @format uuid */
 	userId?: string | null;

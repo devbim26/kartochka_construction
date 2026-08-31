@@ -6,7 +6,6 @@ export enum MaterialParametrs {
 	ConnectionNumber = 'ConnectionNumber',
 	ConnectionType = 'ConnectionType',
 	RackStep = 'RackStep',
-	Width = 'Width',
 }
 
 export enum ConnectionType {
@@ -24,8 +23,7 @@ export enum RuMaterialParametrs {
 	Density = 'Плотность, кг/м³',
 	ConnectionNumber = 'Количество соединений, шт.',
 	ConnectionType = 'Тип связи',
-	RackStep = 'Шаг стоек, м',
-	Width = 'Ширина, м',
+	RackStep = 'Шаг стоек, мм',
 }
 
 export const ConnectionTypeSelectValues: SelectOption[] = [

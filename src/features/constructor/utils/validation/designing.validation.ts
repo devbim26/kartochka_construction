@@ -1,39 +1,13 @@
+import { ConstructionTypeShema } from '@features/guidbooks/utils/validation/constructions';
 import { z } from 'zod';
 
+/**
+ * Схема формы проектирования / расчёта.
+ * Должна совпадать с `constructionTypeObject` (left/center/right + materialTypeValue),
+ * иначе `form.trigger()` пропускает отрицательную толщину слоёв.
+ */
 export const DesigningSchema = z.object({
-	constructionTypeObject: z.object({
-		constructionTypeEnum: z.string().min(1, 'Поле обязательно для заполнения'),
-		constructions: z
-			.array(
-				z.object({
-					constructionPosition: z.string().min(1, 'Поле обязательно для заполнения'),
-					userMaterials: z
-						.array(
-							z.object({
-								materialId: z.string().min(1, 'Поле обязательно для заполнения'),
-								positionId: z.string().min(1, 'Поле обязательно для заполнения'),
-								additionalName: z.string().optional().nullable(),
-								materialTypeValue: z
-									.array(
-										z.object({
-											value: z.string().min(1, 'Обязательно'),
-											materialParameters: z
-												.string()
-												.min(1, 'Поле обязательно для заполнения'),
-										}),
-									)
-									.optional()
-									.nullable(),
-								materialType: z.string().min(1, 'Поле обязательно для заполнения'),
-							}),
-						)
-						.optional()
-						.nullable(),
-				}),
-			)
-			.optional()
-			.nullable(),
-	}),
+	constructionTypeObject: ConstructionTypeShema,
 });
 
 export type DesigningSchemaType = z.infer<typeof DesigningSchema>;

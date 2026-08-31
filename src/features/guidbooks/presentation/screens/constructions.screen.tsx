@@ -143,14 +143,10 @@ const ConstructionsScreen = () => {
 				header: () => (
 					<SimpleTableHeaderCell text={t('guides.constructions.columns.priority')} />
 				),
-				cell: (info) => (
-					<SimpleTableCell
-						content={getPriorityLabel(
-							info.getValue() as string,
-							locale === 'en' ? 'en' : 'ru',
-						)}
-					/>
-				),
+				cell: (info) => {
+					const raw = info.getValue() as string | number | null | undefined;
+					return <SimpleTableCell content={getPriorityLabel(raw, locale === 'en' ? 'en' : 'ru')} />;
+				},
 			},
 			{
 				accessorKey: 'rw',

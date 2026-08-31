@@ -159,7 +159,7 @@ export const MaterialTypeValuesMap = {
 	],
 	[MaterialTypeEnum.Frame]: [
 		{
-			materialParameters: MaterialParametrs.Width,
+			materialParameters: MaterialParametrs.Thickness,
 			value: '',
 		},
 		{

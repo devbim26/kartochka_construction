@@ -2,6 +2,7 @@ import type {
 	AdditionalConstructionHeaderDto,
 	BuildingType as ApiBuildingType,
 	CategoryClass as ApiCategoryClass,
+	ConstructionLaboratoryDataDto,
 	CountryType,
 	CreateReportInfoCommand,
 	NewFloorIfoDto,
@@ -378,6 +379,20 @@ export const convertFloorDataToClientConstructionSheet = (
 	};
 };
 
+const resolveLabRwFromPaginatedHeader = (
+	data: PaginatedConstructionHeaderDto,
+): number | null => {
+	const lab = data.airNoiseLaboratoryData as ConstructionLaboratoryDataDto | undefined;
+	if (lab?.indexValue != null && Number.isFinite(Number(lab.indexValue))) {
+		return Number(lab.indexValue);
+	}
+	const legacyLabR = (data as { labR?: number | null }).labR;
+	if (legacyLabR != null && Number.isFinite(Number(legacyLabR))) {
+		return Number(legacyLabR);
+	}
+	return null;
+};
+
 export const convertToClientAlternateConstruction = (
 	data: PaginatedConstructionHeaderDto,
 ): AlternateConstruction => {
@@ -398,6 +413,6 @@ export const convertToClientAlternateConstruction = (
 		maxHeight: data.maxHeight || 0,
 		name: data.name || '',
 		shortName: data.shortName || '',
-		rLab: null,
+		rLab: resolveLabRwFromPaginatedHeader(data),
 	};
 };

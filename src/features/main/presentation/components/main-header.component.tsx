@@ -1,9 +1,13 @@
 import {
-	AcousticDesignLogo,
 	APP_ROUTES,
-	ArchDesignLogo,
 	Carousel,
 	CarouselSlide,
+	useAppNavigate,
+	useI18n,
+} from '@core';
+import {
+	AcousticDesignLogo,
+	ArchDesignLogo,
 	ExpertiseDocumentsLogo,
 	ExpertiseGeneralLogo,
 	ExpertiseNormsLogo,
@@ -11,9 +15,7 @@ import {
 	MainSliderLogo,
 	SoundInsulationLogo,
 	TermoInsulationLogo,
-	useAppNavigate,
-	useI18n,
-} from '@core';
+} from '@core/presentation/logos';
 import { getOpenWebUiModelFromFeatureId } from '@core/utils/helpers/open-webui-model.helper';
 import { DESIGNING_ROUTES } from '@features/home/constants';
 import { DesigningSectionNav } from '@features/home/presentation/components/designing-section-nav.component';

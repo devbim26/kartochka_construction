@@ -1,7 +1,8 @@
-import { Input, Select } from '@core';
+import { Input, Select, useI18n } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { ConnectionTypeSelectValues, MaterialParametrs } from '@features/constructor';
 import type { ConstructionFieldTypesProps } from '@features/guidbooks/types';
+import { resolveFormErrorMessage } from '@features/guidbooks/utils/validation/resolve-form-error-message.utils';
 import { Controller } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 
@@ -19,7 +20,8 @@ export const PointConnectionsFieldsType = memoize(
 	}: Omit<ConstructionFieldTypesProps, 'constructionIndex'> & {
 		constructionPosition: 'Left' | 'Center' | 'Right';
 	}) => {
-		const { formState, register, getValues, watch } = currentForm;
+		const { t } = useI18n();
+		const { formState, register, getValues } = currentForm;
 
 		const basePath = `constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}.materialTypeValue`;
 		const values = getValues(basePath) || [];
@@ -33,9 +35,12 @@ export const PointConnectionsFieldsType = memoize(
 		);
 
 		const getError = (index: number) =>
-			(formState.errors as any)?.constructionTypeObject?.[
-				positionMap[constructionPosition]
-			]?.[fieldIndex]?.materialTypeValue?.[index]?.value?.message;
+			resolveFormErrorMessage(
+				(formState.errors as any)?.constructionTypeObject?.[
+					positionMap[constructionPosition]
+				]?.[fieldIndex]?.materialTypeValue?.[index]?.value?.message,
+				t,
+			);
 
 		return (
 			<div className="flex flex-wrap gap-[16px]">

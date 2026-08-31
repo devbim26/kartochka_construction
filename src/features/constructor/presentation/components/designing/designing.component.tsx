@@ -1,5 +1,6 @@
 import {
 	Button,
+	getAxiosErrorMessage,
 	ImagePreviewModal,
 	Select,
 	useAppDispatch,
@@ -471,15 +472,9 @@ const DesigningConstructionScreen = () => {
 
 	const catchRequestError = useCallback(
 		(error: unknown) => {
-			if (error instanceof AxiosError) {
-				const message =
-					typeof error.response?.data === 'string'
-						? error.response.data
-						: error.response?.data?.title || t('errors.request');
-				toast.error(message);
-			} else {
-				toast.error(t('errors.request'));
-			}
+			void getAxiosErrorMessage(error, t('errors.request')).then((message) => {
+				toast.error(message || t('errors.request'));
+			});
 			return of(null);
 		},
 		[t],
@@ -649,50 +644,58 @@ const DesigningConstructionScreen = () => {
 			saveAdditionalOpeningsOnly();
 			return;
 		}
-		const formData = prepareConstructionEditDataForPersistence(
-			form.getValues() as ConstructionsEditData,
-		);
-		form.reset(formData, { keepDefaultValues: false });
-		setConstructionHeader((prev) =>
-			prev
-				? {
-						...prev,
-						constructionType: formData.constructionType ?? prev.constructionType,
-						constructionTypeObject: formData.constructionTypeObject,
-					}
-				: prev,
-		);
-		const dataForServer = convertToServerConstructionsEditData({
-			...formData,
-			reportInfoId: reportId || undefined,
-		});
-		updateAdditionalOpenings$()
-			.pipe(
-				switchMap((openingsOk) => {
-					if (!openingsOk) {
-						return of(null);
-					}
-					return from(
-						getGuidebooksEdit({
-							data: dataForServer,
-							guidebookType: Guidebooks.CONSTRUCTION,
-						}),
-					).pipe(catchError(catchRequestError));
-				}),
-			)
-			.subscribe((response) => {
-				if (response?.status !== 200) {
-					return;
-				}
-				toast.success(t('success.constructionUpdated'));
+		void (async () => {
+			const constructionValid = await form.trigger();
+			if (!constructionValid) {
+				toast.error(t('constructor.calculation.constructionInvalid'));
+				return;
+			}
 
-				if (!constructionHeaderId) return;
-				handleGetConstructionByHeaderId(constructionHeaderId);
-				handleGetConstructionImage(constructionHeaderId);
-				handleGetGraphDetail(constructionHeaderId);
-				handleGetGraphAdditionalDetail(constructionHeaderId);
-				refreshReportConstructionData();
+			const formData = prepareConstructionEditDataForPersistence(
+				form.getValues() as ConstructionsEditData,
+			);
+			form.reset(formData, { keepDefaultValues: false });
+			setConstructionHeader((prev) =>
+				prev
+					? {
+							...prev,
+							constructionType: formData.constructionType ?? prev.constructionType,
+							constructionTypeObject: formData.constructionTypeObject,
+						}
+					: prev,
+			);
+			const dataForServer = convertToServerConstructionsEditData({
+				...formData,
+				reportInfoId: reportId || undefined,
 			});
+			updateAdditionalOpenings$()
+				.pipe(
+					switchMap((openingsOk) => {
+						if (!openingsOk) {
+							return of(null);
+						}
+						return from(
+							getGuidebooksEdit({
+								data: dataForServer,
+								guidebookType: Guidebooks.CONSTRUCTION,
+							}),
+						).pipe(catchError(catchRequestError));
+					}),
+				)
+				.subscribe((response) => {
+					if (response?.status !== 200) {
+						return;
+					}
+					toast.success(t('success.constructionUpdated'));
+
+					if (!constructionHeaderId) return;
+					handleGetConstructionByHeaderId(constructionHeaderId);
+					handleGetConstructionImage(constructionHeaderId);
+					handleGetGraphDetail(constructionHeaderId);
+					handleGetGraphAdditionalDetail(constructionHeaderId);
+					refreshReportConstructionData();
+				});
+		})();
 	}, [
 		form,
 		constructionHeaderId,

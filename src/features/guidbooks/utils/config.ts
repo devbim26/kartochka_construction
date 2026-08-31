@@ -194,6 +194,7 @@ export const ConstructionsFilterConfig: EntityConfig = {
 		constructionPurpose: '',
 		country: '',
 		priority: '',
+		issuer: '',
 		rw: '',
 		lnw: '',
 	},

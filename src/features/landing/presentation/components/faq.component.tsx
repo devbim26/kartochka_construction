@@ -1,11 +1,13 @@
-import { Chevron, useI18n } from '@core';
+import { Chevron, formatRegulatoryDocumentsList, useI18n } from '@core';
 import { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { descriptions, questions } from '../../constants';
 
+const FAQ_REGULATORY_ANSWER_INDEX = 2;
+
 export const FAQ = () => {
 	const [selectedQuestions, setSelectedQuestions] = useState<number[]>([0]);
-	const { t } = useI18n();
+	const { locale, t } = useI18n();
 
 	const handleQuestionClick = (index: number) => {
 		setSelectedQuestions((prevSelected) =>
@@ -39,9 +41,19 @@ export const FAQ = () => {
 									key={index}
 									className="whitespace-pre-wrap font-montserrat text-[16px] font-normal leading-[22px] sm:text-[20px] sm:leading-[24px]"
 								>
-									<span
-										dangerouslySetInnerHTML={{ __html: t(descriptions[index]) }}
-									/>
+									{index === FAQ_REGULATORY_ANSWER_INDEX ? (
+										<span>
+											{t('landing.faq.a2.intro')}
+											{'\n'}
+											{formatRegulatoryDocumentsList(locale)}
+											{'\n\n'}
+											{t('landing.faq.a2.outro')}
+										</span>
+									) : (
+										<span
+											dangerouslySetInnerHTML={{ __html: t(descriptions[index]) }}
+										/>
+									)}
 								</div>
 							</div>
 							<div className="mt-2 flex sm:mt-0 sm:flex-col sm:justify-start">

@@ -8,30 +8,65 @@ export type ActiveSubscriptionPayload = {
 	userSubscriptionId?: string;
 } & Partial<SubscriptionDto>;
 
-const resolveOneActiveSubscription = async (
+const collectMissingSubscriptionIds = (
+	items: ActiveSubscriptionPayload[],
+	catalog: Subscription[],
+): string[] => {
+	const missingIds = new Set<string>();
+
+	for (const activeData of items) {
+		if (activeData.id && activeData.name) continue;
+
+		for (const id of [activeData.subscriptionId, activeData.userSubscriptionId]) {
+			const normalizedId = id?.trim();
+			if (!normalizedId) continue;
+			if (catalog.some((sub) => sub.id === normalizedId)) continue;
+			missingIds.add(normalizedId);
+		}
+	}
+
+	return Array.from(missingIds);
+};
+
+const prefetchSubscriptionsById = async (
+	ids: string[],
+): Promise<Map<string, Subscription>> => {
+	const fetchedById = new Map<string, Subscription>();
+
+	await Promise.all(
+		ids.map(async (id) => {
+			try {
+				const response = await getSubscriptionById(id);
+				if (response.status === 200 && response.data) {
+					fetchedById.set(id, convertSubscriptionToClient(response.data));
+				}
+			} catch {
+				// пробуем следующий id
+			}
+		}),
+	);
+
+	return fetchedById;
+};
+
+const resolveOneActiveSubscription = (
 	activeData: ActiveSubscriptionPayload,
 	catalog: Subscription[],
-): Promise<Subscription | undefined> => {
+	fetchedById: Map<string, Subscription>,
+): Subscription | undefined => {
 	if (activeData.id && activeData.name) {
 		return convertSubscriptionToClient(activeData as SubscriptionDto);
 	}
 
-	const candidateIds = [activeData.subscriptionId, activeData.userSubscriptionId].filter(
-		(id): id is string => Boolean(id?.trim()),
-	);
+	for (const id of [activeData.subscriptionId, activeData.userSubscriptionId]) {
+		const normalizedId = id?.trim();
+		if (!normalizedId) continue;
 
-	for (const id of candidateIds) {
-		const fromCatalog = catalog.find((sub) => sub.id === id);
+		const fromCatalog = catalog.find((sub) => sub.id === normalizedId);
 		if (fromCatalog) return fromCatalog;
 
-		try {
-			const response = await getSubscriptionById(id);
-			if (response.status === 200 && response.data) {
-				return convertSubscriptionToClient(response.data);
-			}
-		} catch {
-			// пробуем следующий id
-		}
+		const fetched = fetchedById.get(normalizedId);
+		if (fetched) return fetched;
 	}
 
 	return undefined;
@@ -42,7 +77,10 @@ export const resolveActiveSubscription = async (
 	catalog: Subscription[],
 ): Promise<Subscription | undefined> => {
 	if (!activeData) return undefined;
-	return resolveOneActiveSubscription(activeData, catalog);
+
+	const missingIds = collectMissingSubscriptionIds([activeData], catalog);
+	const fetchedById = await prefetchSubscriptionsById(missingIds);
+	return resolveOneActiveSubscription(activeData, catalog, fetchedById);
 };
 
 const normalizeActiveSubscriptionsPayload = (
@@ -62,8 +100,11 @@ export const resolveActiveSubscriptions = async (
 	catalog: Subscription[],
 ): Promise<Subscription[]> => {
 	const items = normalizeActiveSubscriptionsPayload(payload);
-	const resolved = await Promise.all(
-		items.map((item) => resolveOneActiveSubscription(item, catalog)),
+	const missingIds = collectMissingSubscriptionIds(items, catalog);
+	const fetchedById = await prefetchSubscriptionsById(missingIds);
+
+	const resolved = items.map((item) =>
+		resolveOneActiveSubscription(item, catalog, fetchedById),
 	);
 
 	const unique = new Map<string, Subscription>();

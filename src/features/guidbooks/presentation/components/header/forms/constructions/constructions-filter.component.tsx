@@ -1,18 +1,23 @@
-import { Input, Select, useI18n } from '@core';
+import { convertToPaginatedType, convertToSelectValues, Input, Select, useI18n } from '@core';
 import {
 	EnConstructionPurposeSelectValues,
 	RuConstructionPurposeSelectValues,
 } from '@features/guidbooks/constants';
-import { convertToClientConstructionTypesList } from '@features/guidbooks/converters';
-import { getGuidebooksConstructionTypes } from '@features/guidbooks/services';
+import {
+	convertToClientConstructionTypesList,
+	convertToClientIssuerData,
+} from '@features/guidbooks/converters';
+import { getGuidebooksConstructionTypes, getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
 	EnPriorityNamesSelectValues,
+	Guidebooks,
 	RuCountryNamesSelectValues,
 	RuPriorityNamesSelectValues,
 	getConstructionTypeLabel,
 	getConstructionTypeTemplateEnum,
 	type ConstructionsFilterData,
 	type ConstructionTypeTemplate,
+	type Issuer,
 } from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -23,6 +28,7 @@ export const ConstructionsFilter = () => {
 	const { formState, control } = form;
 	const { locale } = useI18n();
 	const [constructionTypes, setConstructionTypes] = useState<ConstructionTypeTemplate[]>([]);
+	const [issuers, setIssuers] = useState<Issuer[]>([]);
 
 	const handleGetConstructionTypesData = useCallback(async () => {
 		try {
@@ -34,8 +40,31 @@ export const ConstructionsFilter = () => {
 		}
 	}, []);
 
+	const handleGetIssuerData = useCallback(async () => {
+		try {
+			const response = await getGuidebooksPaginated({
+				data: {
+					name: null,
+					country: null,
+					logoUrl: null,
+					webSite: null,
+				},
+				pagination: {
+					pageSize: 999999,
+					pageNumber: 1,
+				},
+				guidebookType: Guidebooks.ISSUER,
+			});
+			const items = convertToPaginatedType(convertToClientIssuerData)(response.data as any);
+			setIssuers(items.items);
+		} catch (error) {
+			console.log('Error:', error);
+		}
+	}, []);
+
 	useEffect(() => {
 		handleGetConstructionTypesData();
+		handleGetIssuerData();
 	}, []);
 
 	return (
@@ -154,6 +183,30 @@ export const ConstructionsFilter = () => {
 						buttonClassName="text-sm rounded-[8px]"
 						label={formState.errors.priority?.message || 'Приоритет'}
 						placeholder="Выберите приоритет"
+					/>
+				)}
+			/>
+			<Controller
+				name="issuer"
+				control={control}
+				render={({ field }) => (
+					<Select
+						{...field}
+						isSearchable
+						value={field.value || ''}
+						options={[
+							{ label: locale === 'en' ? 'All' : 'Все', value: '' },
+							...(convertToSelectValues(issuers) ?? []),
+						]}
+						error={formState.errors.issuer?.message}
+						labelClassName={twMerge(
+							'text-sm leading-5 tracking-[0.1px]',
+							formState.errors.issuer?.message ? 'text-error' : '',
+						)}
+						wrapperClassname="w-[226px] ring-input-border-primary"
+						buttonClassName="text-sm rounded-[8px]"
+						label={formState.errors.issuer?.message || 'Производитель'}
+						placeholder="Выберите производителя"
 					/>
 				)}
 			/>

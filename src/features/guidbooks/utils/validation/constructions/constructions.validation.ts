@@ -3,6 +3,7 @@ import {
 	ZPanelConstructionTypeValues,
 } from '@features/guidbooks/types';
 import { z } from 'zod';
+import { getMaterialParameterValueError } from './material-parameter-value.validation';
 
 const Z_PANEL_CONSTRUCTION_TYPES = new Set<string>(ZPanelConstructionTypeValues);
 
@@ -33,14 +34,25 @@ export const ConstructionsFilterSchema = z.object({
 	constructionPurpose: z.string().optional(),
 	country: z.string(),
 	priority: z.string(),
+	issuer: z.string(),
 	rw: z.string(),
 	lnw: z.string(),
 });
 
-export const MaterialTypeValues = z.object({
-	value: z.string().min(1, 'validation.required'),
-	materialParameters: z.string().min(1, 'validation.required'),
-});
+export const MaterialTypeValues = z
+	.object({
+		value: z.string().min(1, 'validation.required'),
+		materialParameters: z.string().min(1, 'validation.required'),
+	})
+	.superRefine((data, ctx) => {
+		const errorKey = getMaterialParameterValueError(data.materialParameters, data.value);
+		if (!errorKey || errorKey === 'validation.required') return;
+		ctx.addIssue({
+			code: z.ZodIssueCode.custom,
+			message: errorKey,
+			path: ['value'],
+		});
+	});
 
 export const UserMaterial = z.object({
 	materialId: z.string().min(1, 'validation.required'),

@@ -1,5 +1,5 @@
 import faviconUrl from '@assets/favicon.svg';
-import { I18nProvider, store, useI18n } from '@core';
+import { I18nProvider, RoutePageTitle, store, useI18n } from '@core';
 import { FatalErrorGate, RootErrorBoundaryWithReset } from '@features/not-found';
 import { AppRouter } from '@router';
 import { Helmet } from 'react-helmet';
@@ -13,8 +13,8 @@ const AppShell = () => {
 	return (
 		<BrowserRouter>
 			<Provider store={store}>
+				<RoutePageTitle />
 				<Helmet>
-					<title>{t('meta.title')}</title>
 					<meta name="description" content={t('meta.description')} />
 					<meta name="keywords" content={t('meta.keywords')} />
 					<link rel="icon" href={faviconUrl} type="image/svg+xml" />

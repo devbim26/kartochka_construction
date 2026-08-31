@@ -1,19 +1,19 @@
 import {
 	ConstructionPosition,
 	ConstructionPurpose,
+	IndexType,
 	type ConstructionAdditionalInfoDto,
 	type ConstructionLaboratoryDataDto,
 	type ConstructionTypeEnum as ServerConstructionTypeEnum,
 	type CountryType,
-	type IndexType,
 	type RTotalDto,
 } from '@api-gen';
 import {
 	convertToClientCountryData,
 	convertToClientIndexTypeData,
-	convertToClientPriorityData,
 	convertToServerCountryData,
 	convertToServerPriorityData,
+	resolveClientPriorityValue,
 } from '@core';
 import type { MaterialParametrs } from '@features/constructor';
 import type {
@@ -44,6 +44,65 @@ const parseMaterialNumericValue = (raw: string | undefined | null): number => {
 	}
 	const n = Number(text);
 	return Number.isFinite(n) ? n : 0;
+};
+
+const mapLaboratoryIndexValueToClient = (
+	lab?: ConstructionLaboratoryDataDto | null,
+	expectedIndex?: IndexType,
+): string => {
+	if (lab?.indexValue == null || !Number.isFinite(Number(lab.indexValue))) {
+		return '';
+	}
+	if (expectedIndex && lab.index && lab.index !== expectedIndex) {
+		return '';
+	}
+	return String(Math.round(Number(lab.indexValue)));
+};
+
+/** Rw из detail (`rw`), списка (`labR`) или `airNoiseLaboratoryData.indexValue`. */
+const mapConstructionRwToClient = (data: {
+	rw?: number | string | null;
+	labR?: number | string | null;
+	airNoiseLaboratoryData?: ConstructionLaboratoryDataDto | null;
+}): string => {
+	if (data.rw != null && data.rw !== '') {
+		const n = Number(data.rw);
+		if (Number.isFinite(n)) return String(Math.round(n));
+	}
+
+	const fromLab = mapLaboratoryIndexValueToClient(data.airNoiseLaboratoryData, IndexType.Rw);
+	if (fromLab) return fromLab;
+
+	const raw = data.labR;
+	if (raw == null || raw === '') return '';
+	const n = Number(raw);
+	if (!Number.isFinite(n)) return '';
+	return String(Math.round(n));
+};
+
+/** Lnw из detail (`lnw`) или `impactNoiseLaboratoryData.indexValue`. */
+const mapConstructionLnwToClient = (data: {
+	lnw?: number | string | null;
+	impactNoiseLaboratoryData?: ConstructionLaboratoryDataDto | null;
+}): string => {
+	if (data.lnw != null && data.lnw !== '') {
+		const n = Number(data.lnw);
+		if (Number.isFinite(n)) return String(Math.round(n));
+	}
+
+	return mapLaboratoryIndexValueToClient(data.impactNoiseLaboratoryData, IndexType.Lnw);
+};
+
+const normalizeMaterialParameterFromApi = (
+	param: string | undefined | null,
+	materialType?: string | null,
+): string => {
+	const value = String(param ?? '').trim();
+	if (!value) return '';
+	if (value === 'Width' && materialType === MaterialTypeEnum.Frame) {
+		return 'Thickness';
+	}
+	return value;
 };
 
 export const convertToClientConstructionTypesList = (data: any): ConstructionTypeTemplate[] => {
@@ -146,6 +205,7 @@ export const convertToServerConstructionsFilterData = (data: ConstructionsFilter
 		: {}),
 	rw: parseFilterNumber(data.rw),
 	lnw: parseFilterNumber(data.lnw),
+	...(data.issuer ? { issuerId: data.issuer } : {}),
 	...(data.constructionPurpose
 		? { constructionPurpose: data.constructionPurpose as ConstructionPurpose }
 		: {}),
@@ -210,10 +270,7 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 		id: data.id ?? '',
 		name: data.name ?? '',
 		description: data.description ?? '',
-		priority:
-			data.priority != null && data.priority !== ''
-				? ((convertToClientPriorityData(data.priority) as string) ?? '')
-				: '',
+		priority: resolveClientPriorityValue(data.priority),
 		descriptionSource: data.descriptionSource ?? '',
 		country: Array.isArray(data.countries)
 			? (convertToClientCountryData(data.countries) as string[])
@@ -232,10 +289,10 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 		constructionPurpose:
 			(data.constructionPurpose as string) || ConstructionPurpose.Soundproofing,
 		constructionTypeObject,
-		issuer: data.issuerId ?? '',
+		issuer: data.issuerId ?? data.issuer?.id ?? '',
 		issuerName: data.issuer?.name ?? '',
-		rw: data.rw != null && data.rw !== '' ? String(data.rw) : '',
-		lnw: data.lnw != null && data.lnw !== '' ? String(data.lnw) : '',
+		rw: mapConstructionRwToClient(data),
+		lnw: mapConstructionLnwToClient(data),
 		isViewForDefaultUser: Boolean(data.isViewForDefaultUser),
 		isView: data.isView !== undefined ? Boolean(data.isView) : undefined,
 		additionalInfo: mapAdditionalInfoFromApi(null),
@@ -248,7 +305,7 @@ export const convertToClientConstructionsEditData = (data: any): ConstructionsEd
 		...base,
 		airLaboratory: base.airLaboratory ?? mapLaboratoryBlockFromApi(undefined),
 		impactLaboratory: base.impactLaboratory ?? mapLaboratoryBlockFromApi(undefined),
-		RCalcs: String(data.rw ?? ''),
+		RCalcs: mapConstructionRwToClient(data),
 		estimatedIndexValue: String(data.computingIndexValue ?? ''),
 	};
 };
@@ -273,7 +330,10 @@ export const convertToServerConstructionType = (
 							materialTypeValue:
 								m.materialTypeValue?.map((mtv) => ({
 									value: parseMaterialNumericValue(mtv.value),
-									materialParametrs: mtv.materialParameters as MaterialParametrs,
+									materialParametr: normalizeMaterialParameterFromApi(
+										mtv.materialParameters,
+										m.materialType,
+									) as MaterialParametrs,
 								})) ?? [],
 						})),
 					},
@@ -292,7 +352,10 @@ export const convertToServerConstructionType = (
 							materialTypeValue:
 								m.materialTypeValue?.map((mtv) => ({
 									value: parseMaterialNumericValue(mtv.value),
-									materialParametrs: mtv.materialParameters as MaterialParametrs,
+									materialParametr: normalizeMaterialParameterFromApi(
+										mtv.materialParameters,
+										m.materialType,
+									) as MaterialParametrs,
 								})) ?? [],
 						})),
 					},
@@ -311,7 +374,10 @@ export const convertToServerConstructionType = (
 							materialTypeValue:
 								m.materialTypeValue?.map((mtv) => ({
 									value: parseMaterialNumericValue(mtv.value),
-									materialParametrs: mtv.materialParameters as MaterialParametrs,
+									materialParametr: normalizeMaterialParameterFromApi(
+										mtv.materialParameters,
+										m.materialType,
+									) as MaterialParametrs,
 								})) ?? [],
 						})),
 					},
@@ -338,8 +404,9 @@ const mapUserMaterialFromApi = (userMaterial: any): MappedUserMaterial => ({
 	materialTypeValue:
 		userMaterial.materialTypeValue?.map((mtv: any) => ({
 			value: String(mtv.value ?? ''),
-			materialParameters: String(
-				mtv.materialParametrs ?? mtv.materialParameters ?? '',
+			materialParameters: normalizeMaterialParameterFromApi(
+				mtv.materialParametr ?? mtv.materialParametrs ?? mtv.materialParameters,
+				userMaterial.materialType,
 			),
 		})) ?? [],
 });

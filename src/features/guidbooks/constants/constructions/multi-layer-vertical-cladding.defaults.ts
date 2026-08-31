@@ -14,7 +14,7 @@ const thicknessDensity = (): VerticalCladdingFormRow['materialTypeValue'] => [
 ];
 
 const frameWidthStep = (): VerticalCladdingFormRow['materialTypeValue'] => [
-	{ materialParameters: MaterialParametrs.Width, value: '' },
+	{ materialParameters: MaterialParametrs.Thickness, value: '' },
 	{ materialParameters: MaterialParametrs.RackStep, value: '' },
 ];
 

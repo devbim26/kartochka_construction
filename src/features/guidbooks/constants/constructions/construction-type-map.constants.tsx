@@ -295,7 +295,7 @@ export const ConstructionTypeMap = ({
 						materialId: '',
 						materialType: MaterialTypeEnum.Frame,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.RackStep, value: '' },
 						],
 					},
@@ -491,7 +491,7 @@ export const ConstructionTypeMap = ({
 						materialId: '',
 						materialType: MaterialTypeEnum.Frame,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.RackStep, value: '' },
 						],
 					},
@@ -542,7 +542,7 @@ export const ConstructionTypeMap = ({
 						materialId: '',
 						materialType: MaterialTypeEnum.Frame,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.RackStep, value: '' },
 						],
 					},
@@ -560,7 +560,7 @@ export const ConstructionTypeMap = ({
 						materialId: '',
 						materialType: MaterialTypeEnum.Frame,
 						materialTypeValue: [
-							{ materialParameters: MaterialParametrs.Width, value: '' },
+							{ materialParameters: MaterialParametrs.Thickness, value: '' },
 							{ materialParameters: MaterialParametrs.RackStep, value: '' },
 						],
 					},
