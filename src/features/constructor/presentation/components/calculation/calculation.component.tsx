@@ -78,7 +78,6 @@ import {
 	ConstructionClass,
 	EnConstructionTypesSelectValues,
 	EnConstructorCountrySelectValues,
-	getConstructionTypeLabel,
 	Guidebooks,
 	isFloorConstructionType,
 	RuConstructionTypesSelectValues,
@@ -93,7 +92,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -1294,41 +1293,10 @@ export const CalculationScreen = () => {
 		formLoadedForHeaderRef.current = '';
 	}, [form]);
 
-	/**
-	 * Фильтр типа сверху: только фильтрует список.
-	 * При любом изменении — сбрасываем выбранную конструкцию и форму снизу.
-	 */
-	const applyTypeFilterChange = (nextType: string) => {
-		setTypeEnumFilter(nextType);
-		setCatalogConstructionId('');
-		catalogConstructionIdRef.current = '';
-		suppressWorkspaceAutoloadRef.current = true;
-		setIsConstructionSelectionCleared(true);
-
-		if (!reportId) {
-			clearConstruction();
-			return;
-		}
-
-		resetWorkspacePreview();
-	};
-
+	/** Фильтр типа в селекте каталога — только сужает список, форму не трогает. */
 	const handleCatalogTypeChange = (nextType: string) => {
 		if (nextType === typeEnumFilter) return;
-
-		const canEditLoadedClone =
-			Boolean(workingHeaderId || constructionHeaderIdFromSearch) &&
-			Boolean(detail) &&
-			!isConstructionEditLocked &&
-			canShowConstructionWorkspace;
-
-		if (canEditLoadedClone) {
-			setTypeEnumFilter(nextType);
-			handleConstructionTypeChange(nextType);
-			return;
-		}
-
-		applyTypeFilterChange(nextType);
+		setTypeEnumFilter(nextType);
 	};
 
 	const handleCatalogConstructionChange = (next: string) => {
@@ -1855,14 +1823,25 @@ export const CalculationScreen = () => {
 							</div>
 						)}
 						<div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[20px] self-stretch">
-							{constructionType ? (
-								<p className="font-sans text-sm font-semibold text-input-label-primary">
-									{getConstructionTypeLabel(
-										constructionType,
-										locale === 'en' ? 'en' : 'ru',
-									)}
-								</p>
-							) : null}
+							<Controller
+								name="constructionTypeObject.constructionTypeEnum"
+								control={form.control}
+								render={({ field }) => (
+									<Select
+										{...field}
+										disabled={isConstructionEditLocked}
+										isSearchable
+										value={field.value || ''}
+										onChange={(value) =>
+											handleConstructionTypeChange(value ? String(value) : '')
+										}
+										options={typeSelectOptions}
+										wrapperClassname="w-fit min-w-[320px] ring-input-border-primary"
+										buttonClassName="text-sm rounded-[8px]"
+										placeholder={t('constructor.designing.selectType')}
+									/>
+								)}
+							/>
 							<div className="flex flex-col gap-2">
 								{materials.map((material, i) => (
 									<p key={`calc-layer-${i}`} className="pl-2 text-[18px]">
