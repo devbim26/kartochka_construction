@@ -330,7 +330,7 @@ export const convertToServerConstructionType = (
 							materialTypeValue:
 								m.materialTypeValue?.map((mtv) => ({
 									value: parseMaterialNumericValue(mtv.value),
-									materialParametr: normalizeMaterialParameterFromApi(
+									materialParametrs: normalizeMaterialParameterFromApi(
 										mtv.materialParameters,
 										m.materialType,
 									) as MaterialParametrs,
@@ -352,7 +352,7 @@ export const convertToServerConstructionType = (
 							materialTypeValue:
 								m.materialTypeValue?.map((mtv) => ({
 									value: parseMaterialNumericValue(mtv.value),
-									materialParametr: normalizeMaterialParameterFromApi(
+									materialParametrs: normalizeMaterialParameterFromApi(
 										mtv.materialParameters,
 										m.materialType,
 									) as MaterialParametrs,
@@ -374,7 +374,7 @@ export const convertToServerConstructionType = (
 							materialTypeValue:
 								m.materialTypeValue?.map((mtv) => ({
 									value: parseMaterialNumericValue(mtv.value),
-									materialParametr: normalizeMaterialParameterFromApi(
+									materialParametrs: normalizeMaterialParameterFromApi(
 										mtv.materialParameters,
 										m.materialType,
 									) as MaterialParametrs,
