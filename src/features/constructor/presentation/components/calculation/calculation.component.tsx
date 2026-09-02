@@ -481,12 +481,7 @@ export const CalculationScreen = () => {
 			return options;
 		}
 
-		const selectedType = selectedMeta.constructionType;
-		const matchesTypeFilter =
-			!typeEnumFilter ||
-			(selectedType != null && String(selectedType) === String(typeEnumFilter));
-		if (!matchesTypeFilter) return options;
-
+		// Справочная в селекте остаётся видимой при смене типа в форме (кастом).
 		return [
 			withFavoriteLabel({
 				value: selectedId,
@@ -897,7 +892,8 @@ export const CalculationScreen = () => {
 						form.reset(data as DesigningData);
 						captureReferenceLayers(data.constructionTypeObject);
 						setHasPendingTypeChange(false);
-						if (data.constructionType) {
+						// Фильтр каталога = тип справочника при выборе; клон в форме его не меняет.
+						if (data.constructionType && !catalogConstructionIdRef.current) {
 							setTypeEnumFilter(String(data.constructionType));
 						}
 						// Верхнее «Название» = Name копии ConstructionHeader.
@@ -1297,6 +1293,18 @@ export const CalculationScreen = () => {
 	const handleCatalogTypeChange = (nextType: string) => {
 		if (nextType === typeEnumFilter) return;
 		setTypeEnumFilter(nextType);
+
+		const selectedId = catalogConstructionIdRef.current;
+		if (!selectedId || !nextType) return;
+
+		const selected = constructionData.find((c) => String(c.id) === String(selectedId));
+		if (
+			selected?.constructionType &&
+			String(selected.constructionType) !== String(nextType)
+		) {
+			setCatalogConstructionId('');
+			catalogConstructionIdRef.current = '';
+		}
 	};
 
 	const handleCatalogConstructionChange = (next: string) => {

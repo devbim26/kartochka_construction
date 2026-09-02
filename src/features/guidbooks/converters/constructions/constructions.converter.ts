@@ -15,7 +15,8 @@ import {
 	convertToServerPriorityData,
 	resolveClientPriorityValue,
 } from '@core';
-import type { MaterialParametrs } from '@features/constructor';
+import { MaterialParametrs } from '@api-gen';
+import { parseMaterialTypeValueForServer } from '@features/constructor/utils/connection-type-value.utils';
 import type {
 	ConstructionsAddData,
 	ConstructionsEditData,
@@ -31,6 +32,7 @@ import {
 	MaterialTypeEnum,
 } from '@features/guidbooks/types';
 import { normalizeVerticalCladdingForConstructionType } from '@features/guidbooks/utils/cladding-layer-normalization.utils';
+import { ensureClientMaterialTypeValues } from '@features/guidbooks/utils/ensure-client-material-type-values.utils';
 import { normalizeAttachments } from '@core/utils/helpers/file-display-name.helper';
 import {
 	convertToClientConstructionTypeEnumData,
@@ -328,13 +330,20 @@ export const convertToServerConstructionType = (
 							positionId: Number(m.positionId),
 							materialType: m.materialType,
 							materialTypeValue:
-								m.materialTypeValue?.map((mtv) => ({
-									value: parseMaterialNumericValue(mtv.value),
-									materialParametrs: normalizeMaterialParameterFromApi(
+								m.materialTypeValue?.map((mtv) => {
+									const materialParameter = normalizeMaterialParameterFromApi(
 										mtv.materialParameters,
 										m.materialType,
-									) as MaterialParametrs,
-								})) ?? [],
+									);
+									return {
+										value: parseMaterialTypeValueForServer(
+											materialParameter,
+											mtv.value,
+											parseMaterialNumericValue,
+										),
+										materialParametrs: materialParameter as MaterialParametrs,
+									};
+								}) ?? [],
 						})),
 					},
 				]
@@ -350,13 +359,20 @@ export const convertToServerConstructionType = (
 							positionId: Number(m.positionId),
 							materialType: m.materialType,
 							materialTypeValue:
-								m.materialTypeValue?.map((mtv) => ({
-									value: parseMaterialNumericValue(mtv.value),
-									materialParametrs: normalizeMaterialParameterFromApi(
+								m.materialTypeValue?.map((mtv) => {
+									const materialParameter = normalizeMaterialParameterFromApi(
 										mtv.materialParameters,
 										m.materialType,
-									) as MaterialParametrs,
-								})) ?? [],
+									);
+									return {
+										value: parseMaterialTypeValueForServer(
+											materialParameter,
+											mtv.value,
+											parseMaterialNumericValue,
+										),
+										materialParametrs: materialParameter as MaterialParametrs,
+									};
+								}) ?? [],
 						})),
 					},
 				]
@@ -372,13 +388,20 @@ export const convertToServerConstructionType = (
 							positionId: Number(m.positionId),
 							materialType: m.materialType,
 							materialTypeValue:
-								m.materialTypeValue?.map((mtv) => ({
-									value: parseMaterialNumericValue(mtv.value),
-									materialParametrs: normalizeMaterialParameterFromApi(
+								m.materialTypeValue?.map((mtv) => {
+									const materialParameter = normalizeMaterialParameterFromApi(
 										mtv.materialParameters,
 										m.materialType,
-									) as MaterialParametrs,
-								})) ?? [],
+									);
+									return {
+										value: parseMaterialTypeValueForServer(
+											materialParameter,
+											mtv.value,
+											parseMaterialNumericValue,
+										),
+										materialParametrs: materialParameter as MaterialParametrs,
+									};
+								}) ?? [],
 						})),
 					},
 				]
@@ -395,21 +418,26 @@ export type MappedUserMaterial = {
 	materialTypeValue: Array<{ value: string; materialParameters: string }>;
 };
 
-const mapUserMaterialFromApi = (userMaterial: any): MappedUserMaterial => ({
-	materialId: userMaterial.materialId ?? '',
-	materialName: userMaterial.materialName || '',
-	additionalName: userMaterial.additionalName ?? null,
-	positionId: String(userMaterial.positionId ?? ''),
-	materialType: userMaterial.materialType ?? '',
-	materialTypeValue:
+const mapUserMaterialFromApi = (userMaterial: any): MappedUserMaterial => {
+	const materialType = userMaterial.materialType ?? '';
+	const mappedValues =
 		userMaterial.materialTypeValue?.map((mtv: any) => ({
 			value: String(mtv.value ?? ''),
 			materialParameters: normalizeMaterialParameterFromApi(
 				mtv.materialParametr ?? mtv.materialParametrs ?? mtv.materialParameters,
-				userMaterial.materialType,
+				materialType,
 			),
-		})) ?? [],
-});
+		})) ?? [];
+
+	return {
+		materialId: userMaterial.materialId ?? '',
+		materialName: userMaterial.materialName || '',
+		additionalName: userMaterial.additionalName ?? null,
+		positionId: String(userMaterial.positionId ?? ''),
+		materialType,
+		materialTypeValue: ensureClientMaterialTypeValues(materialType, mappedValues),
+	};
+};
 
 export const convertToClientConstructionType = (data: any): ConstructionType => {
 	const constructionTypeEnum =

@@ -5,6 +5,7 @@ export * from './optional-layer-stack.utils';
 export * from './one-side-cladding-position.utils';
 export * from './config';
 export * from './cladding-layer-normalization.utils';
+export * from './ensure-client-material-type-values.utils';
 export * from './prepare-construction-edit-data.utils';
 export * from './construction-material-display-order.utils';
 export * from './resolve-facing-construction-type.utils';

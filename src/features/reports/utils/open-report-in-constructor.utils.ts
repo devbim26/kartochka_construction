@@ -35,11 +35,10 @@ export const openReportInConstructorTarget = (
 	const floorParams = {
 		reportId: reportInfoId,
 		reportType: ReportCategory.Floor,
-		...(options?.edit !== false ? { edit: 'true' } : {}),
 		...(options?.reportStatus ? { reportStatus: options.reportStatus } : {}),
 	};
 
-	// Активный проект — сразу в поэтажные планы; завершённый отчёт — через «О здании».
+	// Активный проект — только PDF (без модалки конструкции); завершённый — «О здании».
 	if (!isCompletedReport) {
 		return {
 			path: `${base}/${CONSTRUCTOR_ROUTES.floorPlans.route}`,
@@ -49,6 +48,9 @@ export const openReportInConstructorTarget = (
 
 	return {
 		path: `${base}/${CONSTRUCTOR_ROUTES.aboutBuilding.route}`,
-		params: floorParams,
+		params: {
+			...floorParams,
+			...(options?.edit !== false ? { edit: 'true' } : {}),
+		},
 	};
 };

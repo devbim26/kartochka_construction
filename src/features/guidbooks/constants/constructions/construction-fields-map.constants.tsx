@@ -156,6 +156,10 @@ export const MaterialTypeValuesMap = {
 			materialParameters: MaterialParametrs.ConnectionNumber,
 			value: '',
 		},
+		{
+			materialParameters: MaterialParametrs.ConnectionType,
+			value: '',
+		},
 	],
 	[MaterialTypeEnum.Frame]: [
 		{

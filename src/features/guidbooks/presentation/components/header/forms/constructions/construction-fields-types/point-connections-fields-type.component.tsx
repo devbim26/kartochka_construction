@@ -1,6 +1,7 @@
-import { Input, Select, useI18n } from '@core';
+import { MaterialParametrs } from '@api-gen';
+import { Select, Input, useI18n } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { ConnectionTypeSelectValues, MaterialParametrs } from '@features/constructor';
+import { ConnectionTypeSelectValues } from '@features/constructor/types/material-parametrs.types';
 import type { ConstructionFieldTypesProps } from '@features/guidbooks/types';
 import { resolveFormErrorMessage } from '@features/guidbooks/utils/validation/resolve-form-error-message.utils';
 import { Controller } from 'react-hook-form';
@@ -21,10 +22,10 @@ export const PointConnectionsFieldsType = memoize(
 		constructionPosition: 'Left' | 'Center' | 'Right';
 	}) => {
 		const { t } = useI18n();
-		const { formState, register, getValues } = currentForm;
+		const { formState, register, control, watch } = currentForm;
 
 		const basePath = `constructionTypeObject.${positionMap[constructionPosition]}.${fieldIndex}.materialTypeValue`;
-		const values = getValues(basePath) || [];
+		const values = watch(basePath) || [];
 
 		const pointIndex = values.findIndex(
 			(v: any) => v.materialParameters === MaterialParametrs.ConnectionNumber,
@@ -63,10 +64,13 @@ export const PointConnectionsFieldsType = memoize(
 				{typeIndex !== -1 && (
 					<Controller
 						name={`${basePath}.${typeIndex}.value`}
-						control={currentForm.control}
+						control={control}
 						render={({ field }) => (
 							<Select
-								{...field}
+								value={field.value || ''}
+								onChange={(value) => field.onChange(value ? String(value) : '')}
+								onBlur={field.onBlur}
+								disableDefaultValue
 								labelClassName={twMerge(
 									'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-nowrap',
 									getError(typeIndex) ? 'text-error' : '',
@@ -75,6 +79,7 @@ export const PointConnectionsFieldsType = memoize(
 								label={getError(typeIndex) || 'Тип связи'}
 								error={getError(typeIndex)}
 								options={ConnectionTypeSelectValues}
+								isSearchable
 							/>
 						)}
 					/>

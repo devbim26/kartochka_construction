@@ -2,7 +2,19 @@ import {
 	normalizeVerticalCladdingForConstructionType,
 	type CladdingMaterialRow,
 } from './cladding-layer-normalization.utils';
+import { ensureClientMaterialTypeValues } from './ensure-client-material-type-values.utils';
 import { applyResolvedConstructionTypeToEditData } from './resolve-facing-construction-type.utils';
+
+const ensureLayersMaterialTypeValues = (
+	rows: CladdingMaterialRow[] | null | undefined,
+): CladdingMaterialRow[] =>
+	(rows ?? []).map((row) => ({
+		...row,
+		materialTypeValue: ensureClientMaterialTypeValues(
+			row.materialType,
+			row.materialTypeValue,
+		),
+	}));
 
 /**
  * Перед сохранением / после загрузки: тип по фактическим облицовкам + порядок слоёв + стороны UI.
@@ -37,8 +49,11 @@ export const prepareConstructionEditDataForPersistence = <
 		constructionType: layers.constructionTypeEnum ?? withType.constructionType,
 		constructionTypeObject: {
 			...layers,
-			leftConstruction: left,
-			rightConstruction: right,
+			leftConstruction: ensureLayersMaterialTypeValues(left),
+			centerConstruction: ensureLayersMaterialTypeValues(
+				(layers.centerConstruction ?? []) as CladdingMaterialRow[],
+			),
+			rightConstruction: ensureLayersMaterialTypeValues(right),
 		},
 	} as T;
 };
