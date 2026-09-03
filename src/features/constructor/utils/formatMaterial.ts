@@ -16,12 +16,14 @@ const formatMaterialParameterValue = (
 ): string => {
 	if (materialParameter === MaterialParametrs.ConnectionType) {
 		const connectionTypeLabelsRu: Record<string, string> = {
-			'1': RuConnectionType.Linear,
-			'2': RuConnectionType.Spot,
+			'0': RuConnectionType.Linear,
+			'1': RuConnectionType.Spot,
+			'2': RuConnectionType.Spot, // legacy
 		};
 		const connectionTypeLabelsEn: Record<string, string> = {
-			'1': 'Linear',
-			'2': 'Spot',
+			'0': 'Linear',
+			'1': 'Spot',
+			'2': 'Spot', // legacy
 		};
 		const labels = language === 'ru' ? connectionTypeLabelsRu : connectionTypeLabelsEn;
 		return labels[String(rawValue).trim()] ?? rawValue;

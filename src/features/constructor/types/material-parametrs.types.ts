@@ -27,6 +27,6 @@ export enum RuMaterialParametrs {
 }
 
 export const ConnectionTypeSelectValues: SelectOption[] = [
-	{ label: RuConnectionType.Linear, value: '1' },
-	{ label: RuConnectionType.Spot, value: '2' },
+	{ label: RuConnectionType.Linear, value: '0' },
+	{ label: RuConnectionType.Spot, value: '1' },
 ];

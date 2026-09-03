@@ -16,7 +16,10 @@ import {
 	resolveClientPriorityValue,
 } from '@core';
 import { MaterialParametrs } from '@api-gen';
-import { parseMaterialTypeValueForServer } from '@features/constructor/utils/connection-type-value.utils';
+import {
+	mapConnectionTypeValueFromApi,
+	parseMaterialTypeValueForServer,
+} from '@features/constructor/utils/connection-type-value.utils';
 import type {
 	ConstructionsAddData,
 	ConstructionsEditData,
@@ -421,13 +424,20 @@ export type MappedUserMaterial = {
 const mapUserMaterialFromApi = (userMaterial: any): MappedUserMaterial => {
 	const materialType = userMaterial.materialType ?? '';
 	const mappedValues =
-		userMaterial.materialTypeValue?.map((mtv: any) => ({
-			value: String(mtv.value ?? ''),
-			materialParameters: normalizeMaterialParameterFromApi(
+		userMaterial.materialTypeValue?.map((mtv: any) => {
+			const materialParameters = normalizeMaterialParameterFromApi(
 				mtv.materialParametr ?? mtv.materialParametrs ?? mtv.materialParameters,
 				materialType,
-			),
-		})) ?? [];
+			);
+			const rawValue = String(mtv.value ?? '');
+			return {
+				value:
+					materialParameters === MaterialParametrs.ConnectionType
+						? mapConnectionTypeValueFromApi(rawValue)
+						: rawValue,
+				materialParameters,
+			};
+		}) ?? [];
 
 	return {
 		materialId: userMaterial.materialId ?? '',
