@@ -58,6 +58,13 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	edin: String(data.edin) ?? '',
 });
 
+/** Пустое / нечисловое значение физ. параметра → 0 на сервер. */
+const toPhysicalParam = (value?: string | null): number => {
+	if (value == null || value === '') return 0;
+	const n = Number(value);
+	return Number.isFinite(n) ? n : 0;
+};
+
 export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): any => ({
 	id: data.id || null,
 	name: data.name || null,
@@ -69,20 +76,20 @@ export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): 
 	countryTypes: convertToServerCountryData(data.country as Country[]) || null,
 	issuerId: data.issuer || null,
 	formFile: data.imageFile,
-	materialCoefficient: +data.materialCoefficient || null,
+	materialCoefficient: toPhysicalParam(data.materialCoefficient),
 	materialTypeEnum: data.materialType || null,
 	materialPurpose: (data.materialPurpose as MaterialPurpose) || null,
-	velocity: +data.velocity || null,
-	lossFactor: +data.lossFactor || null,
-	youngModulus: +data.youngModulus || null,
-	damping: +data.damping || null,
-	solid: +data.solid || null,
-	rb: +data.rb || null,
-	rc: +data.rc || null,
-	fc: +data.fc || null,
-	fb: +data.fb || null,
-	relativeCompression: +data.relativeCompression || null,
-	edin: +data.edin || null,
+	velocity: toPhysicalParam(data.velocity),
+	lossFactor: toPhysicalParam(data.lossFactor),
+	youngModulus: toPhysicalParam(data.youngModulus),
+	damping: toPhysicalParam(data.damping),
+	solid: toPhysicalParam(data.solid),
+	rb: toPhysicalParam(data.rb),
+	rc: toPhysicalParam(data.rc),
+	fc: toPhysicalParam(data.fc),
+	fb: toPhysicalParam(data.fb),
+	relativeCompression: toPhysicalParam(data.relativeCompression),
+	edin: toPhysicalParam(data.edin),
 	editFile: data.editFile,
 });
 

@@ -24,58 +24,22 @@ export const MaterialsAddAndEditSchema = z.object({
 	/** Имя производителя из списка (не обязательно в форме создания). */
 	issuerName: z.string().optional(),
 	imageUrl: z.string().min(1, 'Поле обязательно для заполнения'),
-	relativeCompression: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	edin: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	/** Остальные физ. параметры опциональны — при пустом значении на сервер уходит 0. */
+	relativeCompression: z.string().optional(),
+	edin: z.string().optional(),
 	imageFile: z
 		.any()
 		.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),
-	materialCoefficient: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	velocity: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	lossFactor: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	youngModulus: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	damping: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	solid: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля')
-		.refine((value) => +value <= 100, 'Значение должно быть меньше или равно ста'),
-	fb: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	fc: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	rb: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
-	rc: z
-		.string()
-		.min(1, 'Поле обязательно для заполнения')
-		.refine((value) => +value > 0, 'Значение должно быть больше нуля'),
+	materialCoefficient: z.string().optional(),
+	velocity: z.string().optional(),
+	lossFactor: z.string().optional(),
+	youngModulus: z.string().optional(),
+	damping: z.string().optional(),
+	solid: z.string().optional(),
+	fb: z.string().optional(),
+	fc: z.string().optional(),
+	rb: z.string().optional(),
+	rc: z.string().optional(),
 });
 
 export const MaterialsFilterSchema = z.object({
