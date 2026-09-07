@@ -5,6 +5,7 @@ import {
 	convertToServerCountryData,
 	ImagePreviewModal,
 	Input,
+	SafeImage,
 	Select,
 	useAppDispatch,
 	useAppSelector,
@@ -1304,10 +1305,11 @@ export const CreateConstructionForm = memoize(
 											className="cursor-pointer border-0 bg-transparent p-0"
 											onClick={() => setPreviewSrc(svgUrl)}
 										>
-											<img
+											<SafeImage
 												src={svgUrl}
 												alt=""
 												className="block size-auto max-h-[min(68vh,560px)] max-w-full object-contain"
+												fallbackClassName="h-[200px] w-full"
 												decoding="async"
 											/>
 										</button>
@@ -1357,19 +1359,22 @@ export const CreateConstructionForm = memoize(
 										</div>
 									) : (
 										<>
-											{issuer?.logoUrl && (
-												<button
-													type="button"
-													className="cursor-pointer border-0 bg-transparent p-0"
-													onClick={() => setPreviewSrc(issuer.logoUrl!)}
-												>
-													<img
-														src={issuer.logoUrl}
-														alt={issuer.name || ''}
-														className="max-h-[72px] w-auto max-w-[180px] object-contain"
-													/>
-												</button>
-											)}
+											<SafeImage
+												src={issuer?.logoUrl}
+												alt={issuer?.name || ''}
+												className="max-h-[72px] w-auto max-w-[180px] object-contain"
+												fallbackClassName="h-[72px] w-[180px]"
+												onClick={
+													issuer?.logoUrl
+														? () => setPreviewSrc(issuer.logoUrl!)
+														: undefined
+												}
+												style={
+													issuer?.logoUrl
+														? { cursor: 'pointer' }
+														: undefined
+												}
+											/>
 											<p className="max-w-full text-center text-[14px] text-gray-800">
 												{issuer?.name ||
 													constructionDetail?.issuerName ||

@@ -6,6 +6,7 @@ import {
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
 	Guidebooks,
+	MaterialOriginType,
 	type MaterialTypeEnum,
 	type MaterialsAddAndEditData,
 	type MaterialsFilterData,
@@ -35,8 +36,23 @@ function buildFilter(
 	};
 }
 
+const isGeneralIssuerName = (name?: string | null) => {
+	const n = (name ?? '').trim().toLowerCase();
+	return n === 'общий' || n === 'general';
+};
+
+/** В форме конструкции — только материалы производителя «Общий», не брендовые. */
+const isGeneralIssuerMaterial = (item: MaterialsAddAndEditData): boolean => {
+	if (item.issuerName != null && String(item.issuerName).trim()) {
+		return isGeneralIssuerName(item.issuerName);
+	}
+	// Fallback, если имя issuer не пришло в DTO списка.
+	return item.type === MaterialOriginType.Generic;
+};
+
 /**
  * Материалы справочника для слоя конструкции: тип материала + применение (стена/пол) по типу конструкции.
+ * Только производитель «Общий» (не брендовые).
  */
 export function useConstructionMaterialsCatalog(
 	materialTypeEnum: MaterialTypeEnum | '',
@@ -82,11 +98,11 @@ export function useConstructionMaterialsCatalog(
 					return from([items]);
 				}),
 				tap((items) => {
-					const filtered = filterMaterialsByApplicationPurpose(
+					const byPurpose = filterMaterialsByApplicationPurpose(
 						items.items || [],
 						materialPurpose,
 					);
-					setMaterials(filtered);
+					setMaterials(byPurpose.filter(isGeneralIssuerMaterial));
 				}),
 				catchError(() => {
 					setMaterials([]);

@@ -1,4 +1,4 @@
-import { Button, convertToBase64, dateMask, FormElementLabel, Input, useI18n } from '@core';
+import { Button, convertToBase64, dateMask, FormElementLabel, Input, SafeImage, useI18n } from '@core';
 import type { Article } from '@features/news/types';
 import { useMask } from '@react-input/mask';
 import { useFormContext } from 'react-hook-form';
@@ -102,13 +102,18 @@ export const NewsAddEdit = () => {
 							/>
 						</div>
 					</div>
-					{imageUrl && (
+					{imageUrl ? (
 						<div className="flex justify-center self-center">
-							<img
+							<SafeImage
 								src={imageUrl}
 								alt={t('account.form.companyLogo.preview')}
 								className="size-[60px] rounded-md object-cover"
+								fallbackClassName="size-[60px]"
 							/>
+						</div>
+					) : (
+						<div className="flex justify-center self-center">
+							<SafeImage src={null} alt="" fallbackClassName="size-[60px]" />
 						</div>
 					)}
 				</div>

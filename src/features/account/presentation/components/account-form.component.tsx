@@ -5,6 +5,7 @@ import {
 	FormElementLabel,
 	Input,
 	phoneNumberMask,
+	SafeImage,
 	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
@@ -327,15 +328,14 @@ export const AccountForm = () => {
 									t('account.form.companyLogo.label')}
 							</FormElementLabel>
 							<div className="flex flex-col items-center gap-[10px]">
-								{logo && (
-									<div className="flex justify-center self-center">
-										<img
-											src={logo}
-											alt={t('account.form.companyLogo.preview')}
-											className="h-[80px] w-[220px] rounded-md object-cover"
-										/>
-									</div>
-								)}
+								<div className="flex justify-center self-center">
+									<SafeImage
+										src={logo}
+										alt={t('account.form.companyLogo.preview')}
+										className="h-[80px] w-[220px] rounded-md object-cover"
+										fallbackClassName="h-[80px] w-[220px]"
+									/>
+								</div>
 								<Button
 									variant="primary"
 									type="button"

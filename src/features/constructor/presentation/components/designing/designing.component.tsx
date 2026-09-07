@@ -2,6 +2,7 @@ import {
 	Button,
 	getAxiosErrorMessage,
 	ImagePreviewModal,
+	SafeImage,
 	Select,
 	useAppDispatch,
 	useAppSelector,
@@ -743,11 +744,12 @@ const DesigningConstructionScreen = () => {
 						className="h-full w-fit cursor-pointer border-0 bg-transparent p-0 text-left"
 						onClick={() => setPreviewSrc(svgUrl)}
 					>
-						<img
+						<SafeImage
 							className="h-full w-fit"
 							src={svgUrl}
 							alt="SVG Construction"
 							key={constructionHeaderId}
+							fallbackClassName="size-[300px]"
 						/>
 					</button>
 				) : (

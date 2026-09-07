@@ -1,6 +1,13 @@
 import type { ConstructionAdditionalInfoForReportDto, GraphParametrsDto } from '@api-gen';
 import { fetchApi } from '@api-gen';
-import { Carousel, CarouselSlide, getAttachmentDisplayName, normalizeAttachments, useI18n } from '@core';
+import {
+	Carousel,
+	CarouselSlide,
+	getAttachmentDisplayName,
+	normalizeAttachments,
+	SafeImage,
+	useI18n,
+} from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { graphDotsConverterToClient } from '@features/constructor/converters';
 import {
@@ -461,15 +468,12 @@ export const ConstructionInfoModalContent = ({
 							<p className="font-sans text-sm leading-5 text-[#14181F]">
 								{formatValue(displayData?.issuerName)}
 							</p>
-							{displayData?.issuerImage ? (
-								<img
-									src={displayData.issuerImage}
-									alt={displayData.issuerName ?? ''}
-									className="max-h-[56px] max-w-[160px] object-contain"
-								/>
-							) : (
-								<EmptyPlaceholder className="w-full max-w-[160px]" />
-							)}
+							<SafeImage
+								src={displayData?.issuerImage}
+								alt={displayData?.issuerName ?? ''}
+								className="max-h-[56px] max-w-[160px] object-contain"
+								fallbackClassName="h-[56px] w-full max-w-[160px]"
+							/>
 						</div>
 					) : null}
 
@@ -523,13 +527,14 @@ export const ConstructionInfoModalContent = ({
 										className="min-w-0 flex-[0_0_100%] px-1"
 									>
 										<div className="flex h-[180px] items-center justify-center rounded bg-[#F5F5F5] p-2">
-											<img
+											<SafeImage
 												src={image.url ?? ''}
 												alt={
 													getAttachmentDisplayName(image) ||
 													`${t('guides.constructions.info.currentImage')} ${index + 1}`
 												}
 												className="max-h-full max-w-full object-contain"
+												fallbackClassName="h-full w-full"
 											/>
 										</div>
 									</CarouselSlide>

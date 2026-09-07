@@ -1,4 +1,4 @@
-import { useI18n } from '@core';
+import { SafeImage, useI18n } from '@core';
 import type { ArticleDto } from '@api-gen';
 import { convertToClientArticleData } from '@features/news/converters';
 import { getArticleById } from '@features/news/services';
@@ -73,10 +73,11 @@ export const ArticlePage = () => {
 			<p className="mb-4 text-sm uppercase text-gray-500">{t('news.pageTitle')}</p>
 			<h1 className="mb-8 text-4xl font-bold text-gray-900">{article.title}</h1>
 			<div className="mb-8 flex">
-				<img
-					src={article.imageUrl || ''}
+				<SafeImage
+					src={article.imageUrl}
 					alt={article.title || ''}
 					className="max-h-[400px] w-auto max-w-full rounded-lg object-contain"
+					fallbackClassName="h-[200px] w-full max-w-[400px]"
 				/>
 			</div>
 			<div

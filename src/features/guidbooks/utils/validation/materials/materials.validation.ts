@@ -21,6 +21,8 @@ export const MaterialsAddAndEditSchema = z.object({
 		.min(1, 'Поле обязательно для заполнения'),
 	type: z.string().min(1, 'Поле обязательно для заполнения'),
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
+	/** Имя производителя из списка (не обязательно в форме создания). */
+	issuerName: z.string().optional(),
 	imageUrl: z.string().min(1, 'Поле обязательно для заполнения'),
 	relativeCompression: z
 		.string()

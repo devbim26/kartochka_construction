@@ -7,6 +7,7 @@ import {
 	FormElementLabel,
 	ImagePreviewModal,
 	InfoIcon,
+	SafeImage,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
 	useAppNavigate,
@@ -146,20 +147,19 @@ export const ConstructionSheets = ({
 				return (
 					<SimpleTableCell
 						content={
-							src ? (
-								<div
-									className="h-[150px] w-[300px] cursor-pointer"
-									onClick={() => setPreviewSrc(src)}
-								>
-									<img
-										className="size-full rounded-[8px] border border-primary object-cover"
-										src={src}
-										alt="floorPlanPreview"
-									/>
-								</div>
-							) : (
-								<div className="h-[120px] w-[200px] rounded-[8px] border border-primary bg-white" />
-							)
+							<button
+								type="button"
+								className="h-[150px] w-[300px] cursor-pointer border-0 bg-transparent p-0 disabled:cursor-default"
+								disabled={!src}
+								onClick={() => src && setPreviewSrc(src)}
+							>
+								<SafeImage
+									className="size-full rounded-[8px] border border-primary object-cover"
+									src={src}
+									alt="floorPlanPreview"
+									fallbackClassName="h-[120px] w-[200px]"
+								/>
+							</button>
 						}
 					/>
 				);

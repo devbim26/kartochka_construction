@@ -5,6 +5,7 @@ import {
 	DeleteModal,
 	EditIcon,
 	paginationStateDefault,
+	SafeImage,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
@@ -208,15 +209,12 @@ const NewsScreen = () => {
 					<SimpleTableCell
 						contentClassName="flex items-center size-[80px]"
 						content={
-							info.getValue() ? (
-								<img
-									src={info.getValue() as string}
-									className="size-fit rounded-lg object-cover"
-									alt={t('news.columns.image')}
-								/>
-							) : (
-								''
-							)
+							<SafeImage
+								src={info.getValue() as string}
+								className="size-[80px] rounded-lg object-cover"
+								alt={t('news.columns.image')}
+								fallbackClassName="size-[80px]"
+							/>
 						}
 					/>
 				),

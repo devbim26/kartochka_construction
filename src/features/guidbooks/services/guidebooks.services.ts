@@ -70,23 +70,22 @@ export const getGuidebooksPaginated = async ({
 	const pageNumber = Number(pagination.pageNumber) || 1;
 	const pageSize = Number(pagination.pageSize) || 10;
 
-	const query = {
-		...data,
+	const query = stripNullishQueryFields({
+		...(data as Record<string, unknown>),
 		pageNumber,
 		pageSize,
-	};
+	});
 
-	// Конструкции: плоское тело (без `{ query: ... }`), null/'' в enum-полях бэк не принимает.
+	// Конструкции: плоское тело (без `{ query: ... }`).
 	if (guidebookType === Guidebooks.CONSTRUCTION) {
-		const stripped = stripNullishQueryFields(query as Record<string, unknown>);
 		return await fetchApi.api.constructionGetPaginatedCreate({
-			...stripped,
+			...query,
 			pageNumber,
 			pageSize,
 		} as never);
 	}
 
-	return await getGuidebooksPaginatedApiMap[guidebookType](query);
+	return await getGuidebooksPaginatedApiMap[guidebookType](query as never);
 };
 
 export const getGuidebooksDetail = async ({ id, guidebookType }: DetailProps) => {

@@ -1,4 +1,4 @@
-import { Button, CheckboxSelect, convertToBase64, FormElementLabel, Input, Select } from '@core';
+import { Button, CheckboxSelect, convertToBase64, FormElementLabel, Input, SafeImage, Select } from '@core';
 import { RuMaterialPurposeSelectValues } from '@features/guidbooks/constants';
 import { convertToPaginatedType, convertToSelectValues } from '@core/converters';
 import { convertToClientIssuerData } from '@features/guidbooks/converters';
@@ -290,13 +290,18 @@ export const MaterialsAddAndEdit = () => {
 							/>
 						</div>
 					</div>
-					{imageUrl && (
+					{imageUrl ? (
 						<div className="flex justify-center self-center">
-							<img
+							<SafeImage
 								src={imageUrl}
 								alt="Превью изображения"
 								className="size-[60px] rounded-md object-cover"
+								fallbackClassName="size-[60px]"
 							/>
+						</div>
+					) : (
+						<div className="flex justify-center self-center">
+							<SafeImage src={null} alt="" fallbackClassName="size-[60px]" />
 						</div>
 					)}
 				</div>

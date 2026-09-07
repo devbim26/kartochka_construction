@@ -5,6 +5,7 @@ import {
 	EditIcon,
 	getAxiosErrorMessage,
 	paginationStateDefault,
+	SafeImage,
 	ShortenedTextCell,
 	SimpleTable,
 	SimpleTableCell,
@@ -90,14 +91,12 @@ const MaterialsScreen = () => {
 						<SimpleTableCell
 							contentClassName="flex size-[80px] items-center"
 							content={
-								info.row.original.imageUrl ? (
-									<img
-										src={info.row.original.imageUrl}
-										className="size-fit rounded-lg"
-									/>
-								) : (
-									''
-								)
+								<SafeImage
+									src={info.row.original.imageUrl}
+									alt=""
+									className="size-[80px] rounded-lg object-contain"
+									fallbackClassName="size-[80px]"
+								/>
 							}
 						/>
 					);

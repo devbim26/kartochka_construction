@@ -261,6 +261,7 @@ const ConstructionsScreen = () => {
 		filterConstructionPurpose,
 		filterRegion,
 		filterPriority,
+		filterIssuer,
 		filterRw,
 		filterLnw,
 	] = forms.filterForm.watch([
@@ -269,6 +270,7 @@ const ConstructionsScreen = () => {
 		'constructionPurpose',
 		'country',
 		'priority',
+		'issuer',
 		'rw',
 		'lnw',
 	]);
@@ -289,6 +291,7 @@ const ConstructionsScreen = () => {
 		filterConstructionPurpose,
 		filterRegion,
 		filterPriority,
+		filterIssuer,
 		filterRw,
 		filterLnw,
 	]);

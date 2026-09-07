@@ -1,4 +1,5 @@
-import { FormElementLabel, ImagePreviewModal, useI18n } from '@core';
+import { FormElementLabel, ImagePreviewModal, SafeImage, useI18n } from '@core';
+import type { IssuerDto } from '@api-gen';
 import type { ConstructionSelectRestrictions } from '@features/constructor/types';
 import type { ReportInfoShort } from '@features/constructor/utils';
 import {
@@ -7,10 +8,12 @@ import {
 	getTotalThicknessMmFromMaterials,
 } from '@features/constructor/utils';
 import { buildCatalogHeightPhysicalRow } from '@features/constructor/utils/catalog-physical-rows.utils';
+import { convertToClientIssuerData } from '@features/guidbooks/converters';
+import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
-import { RuConstructionTypesMap } from '@features/guidbooks/types';
+import { Guidebooks, RuConstructionTypesMap } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
-import issuer from '../../../../../assets/issuer.png';
+import { catchError, from, of, tap } from 'rxjs';
 import {
 	ConstructionDetailsModal,
 	GeneralInformationFireResistance,
@@ -58,6 +61,7 @@ export const ConstructionCard = ({
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 	const [isLabGraphOpen, setIsLabGraphOpen] = useState(false);
 	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+	const [fetchedIssuerLogo, setFetchedIssuerLogo] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (!construction) return;
@@ -72,12 +76,37 @@ export const ConstructionCard = ({
 		setMass(getSurfaceMassKgPerM2FromMaterials(allMaterials));
 	}, [construction]);
 
+	useEffect(() => {
+		setFetchedIssuerLogo(null);
+		const issuerId = construction?.issuer;
+		const existingLogo = construction?.issuerLogo;
+		if (!issuerId || existingLogo) return;
+
+		const subscription = from(
+			getGuidebooksDetail({ id: issuerId, guidebookType: Guidebooks.ISSUER }),
+		)
+			.pipe(
+				tap((response) => {
+					if (response?.status === 200 && response.data) {
+						const issuer = convertToClientIssuerData(response.data as IssuerDto);
+						setFetchedIssuerLogo(issuer.logoUrl || null);
+					}
+				}),
+				catchError(() => of(null)),
+			)
+			.subscribe();
+
+		return () => subscription.unsubscribe();
+	}, [construction?.issuer, construction?.issuerLogo]);
+
 	const thicknessMin = toOptionalNumber(appliedRestrictions?.minThickness);
 	const thicknessMax = toOptionalNumber(appliedRestrictions?.maxThickness);
 	const massMin = toOptionalNumber(appliedRestrictions?.minWeight);
 	const massMax = toOptionalNumber(appliedRestrictions?.maxWeight);
 
 	const constructionHeaderId = construction?.id ?? null;
+	const issuerLogo = construction?.issuerLogo || fetchedIssuerLogo || null;
+	const issuerLabel = construction?.issuerName || '';
 
 	return (
 		<>
@@ -92,138 +121,148 @@ export const ConstructionCard = ({
 				calculationDocName=""
 			/>
 			<div className="flex flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
-			{complianceStatus ? (
-				<ConstructionComplianceBanner
-					status={complianceStatus}
-					className="max-w-none"
-				/>
-			) : null}
-			<p className="font-sans text-lg font-semibold leading-4">
-				{
-					RuConstructionTypesMap[
-						construction.constructionTypeObject!
-							.constructionTypeEnum as ConstructionTypeEnum
-					]
-				}
-			</p>
-			<div className="flex flex-row justify-between">
-				<div className="flex w-1/2 min-w-0 flex-col gap-[10px]">
-					<div className="flex flex-row items-start justify-start gap-3 text-left">
-						<button
-							type="button"
-							className="shrink-0 cursor-pointer border-0 bg-transparent p-0"
-							onClick={() => setPreviewSrc(issuer)}
-						>
-							<img
-								src={issuer}
-								alt="Превью изображения"
-								className="h-[66px] w-[140px] shrink-0 rounded-md object-cover"
-							/>
-						</button>
-						<p className="text-left text-[14px] leading-snug">www.acoustic.ru</p>
-					</div>
-					<div className="flex min-w-0 flex-row items-start justify-start gap-4 text-left">
-						{svgUrl ? (
+				{complianceStatus ? (
+					<ConstructionComplianceBanner
+						status={complianceStatus}
+						className="max-w-none"
+					/>
+				) : null}
+				<p className="font-sans text-lg font-semibold leading-4">
+					{
+						RuConstructionTypesMap[
+							construction.constructionTypeObject!
+								.constructionTypeEnum as ConstructionTypeEnum
+						]
+					}
+				</p>
+				<div className="flex flex-row justify-between">
+					<div className="flex w-1/2 min-w-0 flex-col gap-[10px]">
+						<div className="flex flex-row items-start justify-start gap-3 text-left">
 							<button
 								type="button"
-								className="flex shrink-0 cursor-pointer items-start justify-start border-0 bg-transparent p-0"
-								onClick={() => setPreviewSrc(svgUrl)}
+								className="shrink-0 cursor-pointer border-0 bg-transparent p-0 disabled:cursor-default"
+								disabled={!issuerLogo}
+								onClick={() => issuerLogo && setPreviewSrc(issuerLogo)}
 							>
-								<img
-									className="block h-auto max-h-[280px] w-auto max-w-[260px] object-contain"
-									src={svgUrl}
-									alt="SVG Construction"
+								<SafeImage
+									src={issuerLogo}
+									alt={issuerLabel || 'Issuer logo'}
+									className="h-[66px] w-[140px] shrink-0 rounded-md object-contain"
+									fallbackClassName="h-[66px] w-[140px]"
 								/>
 							</button>
-						) : null}
-						<div className="min-w-0 flex-1 overflow-x-auto text-left">
-							<div className="flex w-full min-w-0 flex-col items-start gap-1 text-left">
-								{[
-									...(construction?.constructionTypeObject.leftConstruction || []),
-									...(construction?.constructionTypeObject.centerConstruction || []),
-									...(construction?.constructionTypeObject.rightConstruction || []),
-								].map((material: any, index: number) => (
-									<p
-										key={index}
-										className="whitespace-nowrap text-left text-[16px] leading-snug text-gray-800"
-									>
-										- {formatMaterial(material)}
-									</p>
-								))}
+							<p className="text-left text-[14px] leading-snug">{issuerLabel || '—'}</p>
+						</div>
+						<div className="flex min-w-0 flex-row items-start justify-start gap-4 text-left">
+							<button
+								type="button"
+								className="flex shrink-0 cursor-pointer items-start justify-start border-0 bg-transparent p-0 disabled:cursor-default"
+								disabled={!svgUrl}
+								onClick={() => svgUrl && setPreviewSrc(svgUrl)}
+							>
+								<SafeImage
+									src={svgUrl}
+									alt="SVG Construction"
+									className="block h-auto max-h-[280px] w-auto max-w-[260px] object-contain"
+									fallbackClassName="h-[180px] w-[220px]"
+								/>
+							</button>
+							<div className="min-w-0 flex-1 overflow-x-auto text-left">
+								<div className="flex w-full min-w-0 flex-col items-start gap-1 text-left">
+									{[
+										...(construction?.constructionTypeObject.leftConstruction ||
+											[]),
+										...(construction?.constructionTypeObject
+											.centerConstruction || []),
+										...(construction?.constructionTypeObject
+											.rightConstruction || []),
+									].map((material: any, index: number) => (
+										<p
+											key={index}
+											className="whitespace-nowrap text-left text-[16px] leading-snug text-gray-800"
+										>
+											- {formatMaterial(material)}
+										</p>
+									))}
+								</div>
 							</div>
 						</div>
 					</div>
+					<div className="flex w-1/2 flex-col gap-[10px]">
+						<FormElementLabel className="text-left font-sans font-semibold leading-6 text-primary">
+							Технические параметры
+						</FormElementLabel>
+						<GeneralInformationPhysical
+							data={[
+								{
+									physical: 'Толщина, мм',
+									values: String(thickness) || '-',
+									requirements: formatRequirementLabel(
+										thicknessMin,
+										thicknessMax,
+									),
+									requirementMin: thicknessMin,
+									requirementMax: thicknessMax,
+								},
+								{
+									physical: 'Масса, кг/м²',
+									values: Number.isFinite(mass) ? mass.toFixed(2) : '-',
+									requirements: formatRequirementLabel(massMin, massMax),
+									requirementMin: massMin,
+									requirementMax: massMax,
+								},
+								buildCatalogHeightPhysicalRow(construction?.maxHeight, reportInfo),
+							]}
+						/>
+						<GeneralInformationSoundproofing
+							data={[
+								{
+									label: t('soundproofing.labTest'),
+									soundproofing: 'Rw, dB',
+									values: String(construction?.RCalcs) || '-',
+									requirements:
+										reportInfo?.regulatoryRequirement?.noizeIsolationIndex ||
+										'-',
+								},
+							]}
+							onSoundproofingLabelClick={
+								constructionHeaderId
+									? () => setIsLabGraphOpen(true)
+									: undefined
+							}
+						/>
+						<GeneralInformationThermal />
+						<GeneralInformationFireResistance />
+					</div>
 				</div>
-				<div className="flex w-1/2 flex-col gap-[10px]">
-					<FormElementLabel className="text-left font-sans font-semibold leading-6 text-primary">
-						Технические параметры
-					</FormElementLabel>
-					<GeneralInformationPhysical
-						data={[
-							{
-								physical: 'Толщина, мм',
-								values: String(thickness) || '-',
-								requirements: formatRequirementLabel(thicknessMin, thicknessMax),
-								requirementMin: thicknessMin,
-								requirementMax: thicknessMax,
-							},
-							{
-								physical: 'Масса, кг/м²',
-								values: Number.isFinite(mass) ? mass.toFixed(2) : '-',
-								requirements: formatRequirementLabel(massMin, massMax),
-								requirementMin: massMin,
-								requirementMax: massMax,
-							},
-							buildCatalogHeightPhysicalRow(construction?.maxHeight, reportInfo),
-						]}
-					/>
-					<GeneralInformationSoundproofing
-						data={[
-							{
-								label: t('soundproofing.labTest'),
-								soundproofing: 'Rw, dB',
-								values: String(construction?.RCalcs) || '-',
-								requirements:
-									reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
-							},
-						]}
-						onSoundproofingLabelClick={
-							constructionHeaderId
-								? () => setIsLabGraphOpen(true)
-								: undefined
-						}
-					/>
-					<GeneralInformationThermal />
-					<GeneralInformationFireResistance />
-				</div>
+				{constructionHeaderId ? (
+					<div className="flex justify-center">
+						<button
+							type="button"
+							onClick={() => setIsDetailsOpen(true)}
+							className="font-sans text-[28px] font-semibold leading-tight text-primary hover:opacity-80"
+						>
+							{t('createConstruction.details.more')}
+						</button>
+					</div>
+				) : null}
 			</div>
-			{constructionHeaderId ? (
-				<div className="flex justify-center">
-					<button
-						type="button"
-						onClick={() => setIsDetailsOpen(true)}
-						className="font-sans text-[28px] font-semibold leading-tight text-primary hover:opacity-80"
-					>
-						{t('createConstruction.details.more')}
-					</button>
-				</div>
-			) : null}
-		</div>
-		<ConstructionDetailsModal
-			isOpen={isDetailsOpen}
-			onClose={() => setIsDetailsOpen(false)}
-			constructionHeaderId={constructionHeaderId}
-			overrides={{
-				constructionType: construction?.constructionType,
-				issuerName: construction?.issuerName,
-				rw:
-					construction?.RCalcs != null && construction.RCalcs !== ''
-						? Number(String(construction.RCalcs).replace(',', '.'))
-						: null,
-				totalThickness: thickness || null,
-				massPerSquareMeter: Number.isFinite(mass) ? mass : null,
-			}}
-		/>
+			<ConstructionDetailsModal
+				isOpen={isDetailsOpen}
+				onClose={() => setIsDetailsOpen(false)}
+				constructionHeaderId={constructionHeaderId}
+				overrides={{
+					constructionType: construction?.constructionType,
+					issuerName: construction?.issuerName,
+					issuerImage: issuerLogo,
+					rw:
+						construction?.RCalcs != null && construction.RCalcs !== ''
+							? Number(String(construction.RCalcs).replace(',', '.'))
+							: null,
+					totalThickness: thickness || null,
+					massPerSquareMeter: Number.isFinite(mass) ? mass : null,
+				}}
+			/>
 		</>
 	);
 };

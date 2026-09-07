@@ -1,4 +1,4 @@
-import { ShortenedTextCell, SimpleTableCell, SimpleTableHeaderCell } from '@core';
+import { ShortenedTextCell, SafeImage, SimpleTableCell, SimpleTableHeaderCell } from '@core';
 import type { AccountData } from '@features/account/types';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -11,14 +11,12 @@ export const getUserColumns = (t: any): ColumnDef<AccountData>[] => [
 				<SimpleTableCell
 					contentClassName="flex size-[80px] items-center"
 					content={
-						info.row.original.companyLogo ? (
-							<img
-								src={info.row.original.companyLogo}
-								className="size-fit rounded-lg"
-							/>
-						) : (
-							''
-						)
+						<SafeImage
+							src={info.row.original.companyLogo}
+							alt=""
+							className="size-[80px] rounded-lg object-contain"
+							fallbackClassName="size-[80px]"
+						/>
 					}
 				/>
 			);

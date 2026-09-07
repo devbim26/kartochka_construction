@@ -95,7 +95,7 @@ export const SelectableMaterialType = memoize(
 									: '',
 							)}
 							wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
-							buttonClassName="text-sm rounded-[8px] w-[226px]"
+							buttonClassName="text-sm rounded-[8px] w-[452px]"
 							placeholder="Выберите тип материала"
 							onChange={(selectedOption: any) => {
 								field.onChange(selectedOption);
@@ -146,7 +146,7 @@ export const SelectableMaterialType = memoize(
 									: '',
 							)}
 							wrapperClassname="flex-row ring-input-border-primary items-center gap-[16px]"
-							buttonClassName="text-sm rounded-[8px] w-[226px]"
+							buttonClassName="text-sm rounded-[8px] w-[452px]"
 							placeholder="Выберите материал"
 							onChange={(selectedOption: string) => {
 								setValue(`${basePath}.materialId`, selectedOption);

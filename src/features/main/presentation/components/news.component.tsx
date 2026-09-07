@@ -1,5 +1,5 @@
 import type { ArticleDto } from '@api-gen';
-import { Button, useAppNavigate, useI18n } from '@core';
+import { Button, SafeImage, useAppNavigate, useI18n } from '@core';
 import { getPaginatedArticles } from '@features/news/services';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -71,13 +71,12 @@ export const News = ({ splitForGrid = false, className }: Props) => {
 							{currentArticle.title}
 						</p>
 						<div className="flex flex-row items-start gap-4">
-							{currentArticle.imageUrl && (
-								<img
-									src={currentArticle.imageUrl}
-									alt={currentArticle.title || t('main.news.imageAltFallback')}
-									className="h-[100px] w-[150px] shrink-0 rounded-lg object-cover"
-								/>
-							)}
+							<SafeImage
+								src={currentArticle.imageUrl}
+								alt={currentArticle.title || t('main.news.imageAltFallback')}
+								className="h-[100px] w-[150px] shrink-0 rounded-lg object-cover"
+								fallbackClassName="h-[100px] w-[150px]"
+							/>
 							<p className="font-sans text-base leading-5 text-gray-700">
 								{currentArticle.bodyText?.substring(0, 150)}
 								{currentArticle.bodyText && currentArticle.bodyText.length > 150

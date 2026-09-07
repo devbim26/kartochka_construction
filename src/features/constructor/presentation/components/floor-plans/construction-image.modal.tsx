@@ -1,4 +1,4 @@
-import { useI18n } from '@core';
+import { SafeImage, useI18n } from '@core';
 import { formatMaterial } from '@features/constructor/utils';
 import type { UserMaterials } from '@features/guidbooks/types';
 
@@ -28,10 +28,11 @@ export const ConstructionImageModal = ({
 				className="flex max-h-[92vh] max-w-[min(96vw,1680px)] flex-col gap-4 overflow-y-auto rounded-[18px] bg-white p-4 shadow-xl lg:flex-row lg:items-start lg:gap-6"
 				onClick={(e) => e.stopPropagation()}
 			>
-				<img
+				<SafeImage
 					src={src}
 					alt="constructionImage"
 					className="h-fit w-[300px] shrink-0 self-start rounded-lg border border-primary object-contain"
+					fallbackClassName="h-[200px] w-[300px]"
 				/>
 
 				<div className="flex min-w-0 shrink-0 flex-col justify-center gap-2 overflow-y-auto lg:max-w-[320px]">

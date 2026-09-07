@@ -150,6 +150,7 @@ export const ConstructionsAddConfig: EntityConfig = {
 			getDesignCalculationConstructionPurpose() ?? ConstructionPurpose.Soundproofing,
 		issuer: '',
 		issuerName: '',
+		issuerLogo: '',
 		maxHeight: '',
 		fireResistance: '',
 		propertySource: '',

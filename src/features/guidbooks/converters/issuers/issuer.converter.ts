@@ -1,5 +1,5 @@
 import type { IssuerDto } from '@api-gen';
-import { convertToClientCountryData, convertToServerCountryData } from '@core';
+import { convertToClientCountryData, convertToServerCountryData, resolveMediaUrl } from '@core';
 
 import type { Country, Issuer } from '@features/guidbooks/types';
 
@@ -29,6 +29,6 @@ export const convertToClientIssuerData = (data: IssuerDto): Issuer => ({
 	id: data.id ?? '',
 	name: data.name ?? '',
 	countries: (convertToClientCountryData(data.countries!) as []) ?? '',
-	logoUrl: data.logoUrl ?? '',
+	logoUrl: resolveMediaUrl(data.logoUrl) || '',
 	webSite: data.webSite ?? '',
 });

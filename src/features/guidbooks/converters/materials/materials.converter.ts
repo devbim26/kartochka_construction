@@ -1,6 +1,6 @@
 import type { GetMaterialsWithPaginationParamsQuery } from '@api-gen';
 import { MaterialPurpose } from '@api-gen';
-import { convertToClientCountryData, convertToServerCountryData } from '@core';
+import { convertToClientCountryData, convertToServerCountryData, resolveMediaUrl } from '@core';
 import type {
 	Country,
 	MaterialOriginType,
@@ -40,7 +40,8 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	type: convertToClientMaterialOriginTypeData(data.type!) ?? [],
 	country: (convertToClientCountryData(data.countries!) as string[]) ?? '',
 	issuer: data.issuer?.id ?? '',
-	imageUrl: data.imageUrl ?? '',
+	issuerName: data.issuer?.name ?? '',
+	imageUrl: resolveMediaUrl(data.imageUrl) || '',
 	materialCoefficient: String(data.materialCoefficient) ?? '',
 	materialType: convertToClientMaterialTypeData(data.materialType!) ?? '',
 	materialPurpose: (data.materialPurpose as string) || MaterialPurpose.Any,

@@ -156,6 +156,8 @@ const constructionsBaseShape = z.object({
 	constructionPurpose: z.string().min(1, 'validation.required'),
 	issuer: z.string().min(1, 'validation.required'),
 	issuerName: z.string().optional(),
+	/** Логотип производителя (из detail / paginated). */
+	issuerLogo: z.string().optional().nullable(),
 	maxHeight: z
 		.string()
 		.min(1, 'validation.required')

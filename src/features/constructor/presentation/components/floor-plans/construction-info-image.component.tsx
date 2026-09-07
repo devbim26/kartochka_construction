@@ -1,3 +1,4 @@
+import { SafeImage } from '@core';
 import { svgConstructionDetail } from '@features/constructor/services';
 import type { ConstructionsEditData } from '@features/guidbooks/types';
 import { Guidebooks } from '@features/guidbooks/types';
@@ -64,16 +65,23 @@ export const ConstructionImage = ({
 		handleGetConstructionImage(id);
 	}, [id]);
 
-	return svgUrl ? (
+	return (
 		<>
-			<div
-				className="flex h-[120px] w-[200px] cursor-pointer items-center justify-center rounded-[12px] border-2 border-primary bg-white"
-				onClick={() => setIsPreviewOpen(true)}
+			<button
+				type="button"
+				className="flex h-[120px] w-[200px] cursor-pointer items-center justify-center rounded-[12px] border-2 border-primary bg-white p-0"
+				onClick={() => svgUrl && setIsPreviewOpen(true)}
+				disabled={!svgUrl}
 			>
-				<img className="size-full object-contain" src={svgUrl} alt="constructionPreview" />
-			</div>
+				<SafeImage
+					className="size-full object-contain"
+					src={svgUrl}
+					alt="constructionPreview"
+					fallbackClassName="size-full"
+				/>
+			</button>
 
-			{isPreviewOpen && (
+			{isPreviewOpen && svgUrl && (
 				<ConstructionImageModal
 					src={svgUrl}
 					leftMaterials={construction?.constructionTypeObject?.leftConstruction || []}
@@ -83,7 +91,5 @@ export const ConstructionImage = ({
 				/>
 			)}
 		</>
-	) : (
-		<div className="h-[120px] w-[200px] rounded-[12px] border-2 border-primary bg-white" />
 	);
 };

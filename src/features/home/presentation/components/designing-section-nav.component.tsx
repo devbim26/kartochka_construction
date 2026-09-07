@@ -2,8 +2,8 @@ import { APP_ROUTES, useAppNavigate, useI18n } from '@core';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants';
 import { ReportCategory } from '@features/constructor/types';
 import {
-	clearCalculationSession,
 	activateProjectSession,
+	clearCalculationSession,
 	getProjectReportId,
 } from '@features/constructor/utils';
 import { DESIGNING_ROUTES } from '@features/home/constants';
@@ -33,8 +33,9 @@ export const DesigningSectionNav = ({ title }: Props) => {
 	const menuId = useId();
 
 	const path = location.pathname;
-	const isConstructor = path.includes(`/${DESIGNING_ROUTES.constructor.route}`);
 	const isCalculation = path.endsWith(`/${CONSTRUCTOR_ROUTES.calculation.route}`);
+	const isConstructor =
+		path.includes(`/${DESIGNING_ROUTES.constructor.route}`) && !isCalculation;
 	const isAiMode = path.includes(`/${DESIGNING_ROUTES.visualization.route}`);
 	const isReports =
 		path.includes(`/${DESIGNING_ROUTES.activeReports.route}`) ||
@@ -90,7 +91,7 @@ export const DesigningSectionNav = ({ title }: Props) => {
 		{
 			id: 'sound-report',
 			label: t('constructor.sectionNav.soundReport'),
-			active: isConstructor && !isCalculation,
+			active: isConstructor,
 			onClick: goSoundReport,
 		},
 		{

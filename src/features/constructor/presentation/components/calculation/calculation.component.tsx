@@ -6,6 +6,7 @@ import {
 	convertToSelectValues,
 	getAxiosErrorMessage,
 	Input,
+	SafeImage,
 	Select,
 	useAppDispatch,
 	useAppNavigate,
@@ -1819,11 +1820,12 @@ export const CalculationScreen = () => {
 				<>
 					<div className="flex h-fit w-full flex-row flex-wrap gap-[40px] rounded-[20px] bg-white px-[32px] py-[28px]">
 						{svgUrl ? (
-							<img
+							<SafeImage
 								key={graphHeaderId || catalogConstructionId || 'svg'}
 								className="h-auto max-h-[320px] w-fit max-w-[360px] object-contain"
 								src={svgUrl}
 								alt=""
+								fallbackClassName="size-[240px]"
 							/>
 						) : (
 							<div className="flex size-[240px] items-center justify-center">

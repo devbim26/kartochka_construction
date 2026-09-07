@@ -14,6 +14,7 @@ import {
 	convertToServerCountryData,
 	convertToServerPriorityData,
 	resolveClientPriorityValue,
+	resolveMediaUrl,
 } from '@core';
 import { MaterialParametrs } from '@api-gen';
 import {
@@ -203,7 +204,13 @@ export const getConstructionAdditionalInfoFilesUpload = (data: ConstructionsAddD
 export const convertToServerConstructionsFilterData = (data: ConstructionsFilterData): any => ({
 	// В таблице «Название» = description, поэтому фильтр name уходит в description.
 	description: data.name || null,
-	...(data.constructionType ? { constructionType: data.constructionType } : {}),
+	...(data.constructionType
+		? {
+				constructionType: convertToServerConstructionTypeEnumData(
+					data.constructionType as ConstructionTypeEnum,
+				),
+			}
+		: {}),
 	countryType: (convertToServerCountryData(data.country as Country) as CountryType) || null,
 	...(data.priority
 		? { priority: convertToServerPriorityData(data.priority as Priority) }
@@ -296,6 +303,7 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 		constructionTypeObject,
 		issuer: data.issuerId ?? data.issuer?.id ?? '',
 		issuerName: data.issuer?.name ?? '',
+		issuerLogo: resolveMediaUrl(data.issuerLogo ?? data.issuer?.logoUrl) || '',
 		rw: mapConstructionRwToClient(data),
 		lnw: mapConstructionLnwToClient(data),
 		isViewForDefaultUser: Boolean(data.isViewForDefaultUser),

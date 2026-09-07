@@ -1,4 +1,4 @@
-import { Button, ImagePreviewModal, useI18n } from '@core';
+import { Button, ImagePreviewModal, SafeImage, useI18n } from '@core';
 import Loader from '@core/presentation/components/loaders/loader.component';
 import { formatMaterial } from '@features';
 import {
@@ -187,22 +187,22 @@ export const CurrentConstructionCard = ({
 			</div>
 			<div className="flex min-h-0 flex-1 gap-[12px]">
 				<div className="flex w-[170px] shrink-0 items-center justify-center rounded-md bg-background-secondary">
-					{svgUrl ? (
+					{isImageLoading ? (
+						<Loader />
+					) : (
 						<button
 							type="button"
-							className="flex size-full cursor-pointer items-center justify-center border-0 bg-transparent p-0"
-							onClick={() => setPreviewSrc(svgUrl)}
+							className="flex size-full cursor-pointer items-center justify-center border-0 bg-transparent p-0 disabled:cursor-default"
+							disabled={!svgUrl}
+							onClick={() => svgUrl && setPreviewSrc(svgUrl)}
 						>
-							<img
+							<SafeImage
 								className="size-full object-contain"
 								src={svgUrl}
 								alt="SVG Construction"
+								fallbackClassName="size-full"
 							/>
 						</button>
-					) : isImageLoading ? (
-						<Loader />
-					) : (
-						<p className="text-[12px] text-input-label-primary">-</p>
 					)}
 				</div>
 				<div className="flex-1 text-[13px]">

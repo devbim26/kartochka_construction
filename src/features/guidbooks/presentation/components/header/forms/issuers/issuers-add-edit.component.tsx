@@ -1,4 +1,4 @@
-import { Button, CheckboxSelect, convertToBase64, FormElementLabel, Input } from '@core';
+import { Button, CheckboxSelect, convertToBase64, FormElementLabel, Input, SafeImage } from '@core';
 import type { Issuer } from '@features/guidbooks/types';
 import { RuCountryNamesSelectValues } from '@features/guidbooks/types';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -116,12 +116,21 @@ export const IssuersAddEdit = () => {
 						/>
 					</div>
 				</div>
-				{logoUrl && (
+				{logoUrl ? (
 					<div className="flex justify-center self-center">
-						<img
+						<SafeImage
 							src={logoUrl}
 							alt="Превью изображения"
 							className="size-[60px] rounded-md object-cover"
+							fallbackClassName="size-[60px]"
+						/>
+					</div>
+				) : (
+					<div className="flex justify-center self-center">
+						<SafeImage
+							src={null}
+							alt=""
+							fallbackClassName="size-[60px]"
 						/>
 					</div>
 				)}

@@ -16,7 +16,7 @@ import type {
 	UpdateAdditionalConstructionHeaderDto,
 	UpdateReportInfoBaseFieldsCommand,
 } from '@api-gen';
-import { convertToClientCountryData, convertToServerPurposeBuildingData } from '@core';
+import { convertToClientCountryData, convertToServerPurposeBuildingData, resolveMediaUrl } from '@core';
 import { convertToClientConstructionTypeEnumData } from '@features/guidbooks/converters';
 import type {
 	AlternateConstruction,
@@ -33,10 +33,10 @@ import type {
 	ConstructionSheet,
 	FloorConstruction,
 	FloorFromReport,
+	PurposeBuilding,
 	ReportInfoUpdate,
 	SingleConstruction,
 } from '../types';
-import { PurposeBuilding } from '../types';
 import type { ReportInfoShort } from '../utils';
 
 const SNAPSHOT_STANDART_DATE = '2000-01-01';
@@ -287,9 +287,7 @@ export const convertToClientSingleToFloorConstruction = (
 	data: ReportInfoSingleDto | SingleReportConstructionDto | ReportConstructionDto,
 ): FloorConstruction => {
 	const headerFromSingle: SingleReportConstructionDto | ReportConstructionDto | undefined =
-		'singleReportConstruction' in data
-			? data.singleReportConstruction ?? undefined
-			: data;
+		'singleReportConstruction' in data ? (data.singleReportConstruction ?? undefined) : data;
 
 	const floorHeader =
 		headerFromSingle && 'firstPlacementRoom' in headerFromSingle
@@ -379,9 +377,7 @@ export const convertFloorDataToClientConstructionSheet = (
 	};
 };
 
-const resolveLabRwFromPaginatedHeader = (
-	data: PaginatedConstructionHeaderDto,
-): number | null => {
+const resolveLabRwFromPaginatedHeader = (data: PaginatedConstructionHeaderDto): number | null => {
 	const lab = data.airNoiseLaboratoryData as ConstructionLaboratoryDataDto | undefined;
 	if (lab?.indexValue != null && Number.isFinite(Number(lab.indexValue))) {
 		return Number(lab.indexValue);
@@ -409,7 +405,12 @@ export const convertToClientAlternateConstruction = (
 		id: data.id || '',
 		descriptionSource: data.descriptionSource || '',
 		issuer: { id: data.issuer?.id || '', name: data.issuer?.name || '' },
-		issuerLogo: data.issuerLogo || '',
+		issuerLogo:
+			resolveMediaUrl(
+				data.issuerLogo ||
+					(data.issuer as { logoUrl?: string | null } | undefined)?.logoUrl ||
+					'',
+			) || '',
 		maxHeight: data.maxHeight || 0,
 		name: data.name || '',
 		shortName: data.shortName || '',

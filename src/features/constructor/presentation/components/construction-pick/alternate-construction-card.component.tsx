@@ -2,9 +2,11 @@ import {
 	Button,
 	FormElementLabel,
 	ImagePreviewModal,
+	SafeImage,
 	useAppDispatch,
 	useI18n,
 } from '@core';
+import type { IssuerDto } from '@api-gen';
 import type { ConstructionSelectRestrictions } from '@features/constructor/types';
 import {
 	svgConstructionDetail,
@@ -18,7 +20,10 @@ import {
 	getTotalThicknessMmFromMaterials,
 } from '@features/constructor/utils';
 import { buildCatalogHeightPhysicalRow } from '@features/constructor/utils/catalog-physical-rows.utils';
-import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
+import {
+	convertToClientConstructionsEditData,
+	convertToClientIssuerData,
+} from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
 import type {
 	AlternateConstruction,
@@ -78,10 +83,19 @@ export const AlternateConstructionCard = ({
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 	const [isLabGraphOpen, setIsLabGraphOpen] = useState(false);
 	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+	const [fetchedIssuerLogo, setFetchedIssuerLogo] = useState<string | null>(null);
 	const thicknessMin = toOptionalNumber(appliedRestrictions?.minThickness);
 	const thicknessMax = toOptionalNumber(appliedRestrictions?.maxThickness);
 	const massMin = toOptionalNumber(appliedRestrictions?.minWeight);
 	const massMax = toOptionalNumber(appliedRestrictions?.maxWeight);
+	const issuerLogo =
+		construction.issuerLogo ||
+		constructionHeader?.issuerLogo ||
+		fetchedIssuerLogo ||
+		null;
+	const issuerName =
+		construction.issuer.name || constructionHeader?.issuerName || '';
+	const issuerId = construction.issuer.id || constructionHeader?.issuer || '';
 
 	const labRwDisplay =
 		construction.rLab != null
@@ -137,6 +151,28 @@ export const AlternateConstructionCard = ({
 				}
 			});
 	}, [construction, svgUrl]);
+
+	useEffect(() => {
+		setFetchedIssuerLogo(null);
+		const knownLogo = construction.issuerLogo || constructionHeader?.issuerLogo;
+		if (!issuerId || knownLogo) return;
+
+		const subscription = from(
+			getGuidebooksDetail({ id: issuerId, guidebookType: Guidebooks.ISSUER }),
+		)
+			.pipe(
+				tap((response) => {
+					if (response?.status === 200 && response.data) {
+						const issuer = convertToClientIssuerData(response.data as IssuerDto);
+						setFetchedIssuerLogo(issuer.logoUrl || null);
+					}
+				}),
+				catchError(() => of(null)),
+			)
+			.subscribe();
+
+		return () => subscription.unsubscribe();
+	}, [issuerId, construction.issuerLogo, constructionHeader?.issuerLogo]);
 
 	const handleUseInReport = () => {
 		if (!reportConstructionId || !construction?.id) return;
@@ -194,39 +230,37 @@ export const AlternateConstructionCard = ({
 					</Button>
 				</div>
 				<div className="flex w-full min-w-0 flex-row items-start justify-start gap-3 text-left">
-					{construction.issuerLogo ? (
-						<button
-							type="button"
-							className="shrink-0 cursor-pointer border-0 bg-transparent p-0"
-							onClick={() => setPreviewSrc(construction.issuerLogo!)}
-						>
-							<img
-								src={construction.issuerLogo}
-								alt="Превью изображения"
-								className="h-[66px] w-[140px] shrink-0 rounded-md object-cover"
-							/>
-						</button>
-					) : (
-						<div className="h-[66px] w-[140px] shrink-0 rounded-md bg-background-secondary" />
-					)}
+					<button
+						type="button"
+						className="shrink-0 cursor-pointer border-0 bg-transparent p-0 disabled:cursor-default"
+						disabled={!issuerLogo}
+						onClick={() => issuerLogo && setPreviewSrc(issuerLogo)}
+					>
+						<SafeImage
+							src={issuerLogo}
+							alt={issuerName || 'Issuer logo'}
+							className="h-[66px] w-[140px] shrink-0 rounded-md object-contain"
+							fallbackClassName="h-[66px] w-[140px]"
+						/>
+					</button>
 					<p className="font-sans text-[14px] font-semibold leading-snug text-black">
-						{construction.issuer.name}
+						{issuerName || '—'}
 					</p>
 				</div>
 				<div className="flex min-w-0 flex-row items-start justify-start gap-4 text-left">
-					{svgUrl ? (
-						<button
-							type="button"
-							className="flex shrink-0 cursor-pointer items-start justify-start border-0 bg-transparent p-0"
-							onClick={() => setPreviewSrc(svgUrl)}
-						>
-							<img
-								className="block size-auto max-h-[280px] max-w-[260px] object-contain"
-								src={svgUrl}
-								alt="SVG Construction"
-							/>
-						</button>
-					) : null}
+					<button
+						type="button"
+						className="flex shrink-0 cursor-pointer items-start justify-start border-0 bg-transparent p-0 disabled:cursor-default"
+						disabled={!svgUrl}
+						onClick={() => svgUrl && setPreviewSrc(svgUrl)}
+					>
+						<SafeImage
+							src={svgUrl}
+							alt="SVG Construction"
+							className="block size-auto max-h-[280px] max-w-[260px] object-contain"
+							fallbackClassName="h-[180px] w-[220px]"
+						/>
+					</button>
 					<div className="min-w-0 flex-1 overflow-x-auto text-left">
 						<div className="flex w-full min-w-0 flex-col items-start gap-1 text-left">
 							{(
@@ -305,7 +339,8 @@ export const AlternateConstructionCard = ({
 				constructionHeaderId={constructionHeaderId}
 				overrides={{
 				constructionType: construction.constructionType,
-				issuerName: constructionHeader?.issuerName,
+				issuerName: issuerName || constructionHeader?.issuerName,
+				issuerImage: issuerLogo,
 					rw:
 						construction.rLab != null
 							? Number(construction.rLab)

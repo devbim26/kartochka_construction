@@ -5,6 +5,7 @@ import {
 	DeleteModal,
 	EditIcon,
 	paginationStateDefault,
+	SafeImage,
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
@@ -224,16 +225,14 @@ const IssuersScreen = () => {
 				cell: (info) => {
 					return (
 						<SimpleTableCell
-							contentClassName="flex items-center size-[80px]"
+							contentClassName="flex size-[80px] items-center"
 							content={
-								info.getValue() ? (
-									<img
-										src={info.getValue() as string}
-										className="size-fit rounded-lg"
-									/>
-								) : (
-									''
-								)
+								<SafeImage
+									src={info.getValue() as string}
+									alt=""
+									className="size-[80px] rounded-lg object-contain"
+									fallbackClassName="size-[80px]"
+								/>
 							}
 						/>
 					);

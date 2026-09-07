@@ -3,6 +3,7 @@ import {
 	FormElementLabel,
 	getFileNameFromUrl,
 	Input,
+	SafeImage,
 	TextArea,
 	useI18n,
 	useResolvedFileNames,
@@ -320,23 +321,25 @@ export const ConstructionsAdditionalInfo = () => {
 									target="_blank"
 									rel="noreferrer"
 								>
-									<img
+									<SafeImage
 										src={attachment.url ?? ''}
 										alt={
 											resolveAttachmentName(attachment, resolvedImageNames) ||
 											`${t('guides.constructions.info.currentImage')} ${index + 1}`
 										}
 										className="size-[60px] rounded-md object-cover"
+										fallbackClassName="size-[60px]"
 									/>
 								</a>
 							))}
 							{selectedImagePreviews.map((previewUrl, index) => (
-								<img
+								<SafeImage
 									key={previewUrl}
 									src={previewUrl}
 									alt={selectedImages[index]?.name ?? ''}
 									title={selectedImages[index]?.name}
 									className="size-[60px] rounded-md object-cover"
+									fallbackClassName="size-[60px]"
 								/>
 							))}
 						</div>

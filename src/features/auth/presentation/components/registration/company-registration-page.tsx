@@ -6,6 +6,7 @@ import {
 	FormElementLabel,
 	Input,
 	phoneNumberMask,
+	SafeImage,
 	selectIsUserLoggedIn,
 	useAppDispatch,
 	useAppNavigate,
@@ -385,15 +386,14 @@ const CompanyRegistrationPage = () => {
 											/>
 										</div>
 									</div>
-									{logo ? (
-										<div className="flex justify-center self-center">
-											<img
-												src={logo}
-												alt={t('account.form.companyLogo.preview')}
-												className="size-[60px] rounded-md object-cover"
-											/>
-										</div>
-									) : null}
+									<div className="flex justify-center self-center">
+										<SafeImage
+											src={logo}
+											alt={t('account.form.companyLogo.preview')}
+											className="size-[60px] rounded-md object-cover"
+											fallbackClassName="size-[60px]"
+										/>
+									</div>
 								</div>
 								<Input
 									{...form.register('compannyInfo')}
