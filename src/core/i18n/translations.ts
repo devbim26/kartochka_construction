@@ -747,6 +747,7 @@ export const en = {
 	'constructor.header.aboutBuilding': 'About building',
 	'constructor.header.floorPlans': 'Floor plans',
 	'constructor.header.floorPlans.deletePDF': 'Delete PDF',
+	'constructor.backToFloorPlans': 'Back to floor plans',
 
 	'constructor.header.designing': 'Home',
 	'constructor.header.constructionPick': 'Construction selection',
@@ -2074,6 +2075,7 @@ export const ru: Record<TranslationKey, string> = {
 	'constructor.header.title': 'Конструктор',
 	'constructor.header.aboutBuilding': 'О здании',
 	'constructor.header.floorPlans': 'Поэтажные планы',
+	'constructor.backToFloorPlans': 'К поэтажным планам',
 	'constructor.header.designing': 'Главная',
 	'constructor.header.constructionPick': 'Выбор конструкции',
 	'constructor.header.ifcModel': 'IFC модель',

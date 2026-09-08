@@ -1,4 +1,5 @@
 export * from './about-building';
+export * from './back-to-floor-plans-button.component';
 export * from './calculation';
 export * from './construction-pick';
 export * from './construction-catalog-select';
