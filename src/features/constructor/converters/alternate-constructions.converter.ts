@@ -1,4 +1,6 @@
 import type { GetAlternativeConstructionHeadersQuery } from '@api-gen';
+import { convertToServerConstructionTypeEnumData } from '@features/guidbooks/converters';
+import type { ConstructionTypeEnum } from '@features/guidbooks/types';
 import type { AlternateConstructionsType } from '../types';
 
 const toNum = (v: unknown): number | null => {
@@ -18,4 +20,11 @@ export const convertAlternateConstructionsCommand = (
 	maxMass: toNum(data.maxWeight),
 	minLabRw: toNum(data.minLabIndex),
 	maxLabRw: toNum(data.maxLabIndex),
+	...(data.constructionType
+		? {
+				constructionTypeEnum: convertToServerConstructionTypeEnumData(
+					data.constructionType as ConstructionTypeEnum,
+				),
+			}
+		: {}),
 });

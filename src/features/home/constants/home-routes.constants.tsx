@@ -1,15 +1,4 @@
 //TODO
-export const USERS_LIST_ROUTES = {
-	manager: {
-		id: 'manager-page-id',
-		route: 'manager',
-	},
-	client: {
-		id: 'client-page-id',
-		route: 'client',
-	},
-};
-
 export const DESIGNING_ROUTES = {
 	main: {
 		id: 'main-page-id',

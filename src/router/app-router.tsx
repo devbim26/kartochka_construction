@@ -12,7 +12,6 @@ import {
 	CONSTRUCTOR_ROUTES,
 	DesigningScreen,
 	DesigningRequireAuth,
-	DevScreen,
 	FloorPlansScreen,
 	GuidbooksLauout,
 	IFCModelScreen,
@@ -29,14 +28,13 @@ import {
 	ReportFormScreen,
 	RequirementsScreen,
 	UserScreen,
-	UsersLayout,
 } from '@features';
 import { AiVisualizationScreen } from '@features/ai-visualization/presentation/screens/ai-vizualization.screen';
 import { AUTH_ROUTES } from '@features/auth/constants';
 import { BillScreen } from '@features/bills';
 import MyConstructions from '@features/constructor/presentation/components/designing/my-costructions.component';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants';
-import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants';
+import { DESIGNING_ROUTES } from '@features/home/constants';
 import { ArticlePage } from '@features/news/presentation/components/article-page.component';
 import NewsScreen from '@features/news/presentation/screens/news.screen';
 import { ActiveReportsScreen, ReportScreen } from '@features/reports';
@@ -144,13 +142,7 @@ export const AppRouter = () => {
 							element={<AcousticModelsScreen />}
 						/>
 					</Route>
-					<Route path={DESIGNING_ROUTES.users_list.route} element={<UsersLayout />}>
-						<Route path={USERS_LIST_ROUTES.client.route} element={<UserScreen />} />
-						<Route
-							path={USERS_LIST_ROUTES.manager.route}
-							element={<DevScreen titleKey="sidebar.manager" />}
-						/>
-					</Route>
+					<Route path={DESIGNING_ROUTES.users_list.route} element={<UserScreen />} />
 				</Route>
 			</Route>
 			<Route path="*" element={<NotFoundScreen />} />

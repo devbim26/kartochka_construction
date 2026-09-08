@@ -315,8 +315,6 @@ export const en = {
 	'sidebar.subscriptionsConstructor': 'Plans constructor',
 	'sidebar.bills': 'Bills',
 	'sidebar.usersList': 'Users',
-	'sidebar.manager': 'Manager',
-	'sidebar.client': 'Client',
 	'sidebar.guides': 'Guidebooks',
 	'sidebar.materials': 'Materials',
 	'sidebar.constructions': 'Constructions',
@@ -534,11 +532,10 @@ export const en = {
 	'guides.export.constructionType.all': 'All types',
 
 	'guides.deleteModal.title': 'Confirm action',
-	'guides.deleteModal.materialQuestion': 'Are you sure you want to delete material {name}?',
-	'guides.deleteModal.constructionQuestion':
-		'Are you sure you want to delete construction {name}?',
-	'guides.deleteModal.requirementQuestion': 'Are you sure you want to delete requirement {name}?',
-	'guides.deleteModal.issuerQuestion': 'Are you sure you want to delete manufacturer {name}?',
+	'guides.deleteModal.materialQuestion': 'Are you sure you want to delete material',
+	'guides.deleteModal.constructionQuestion': 'Are you sure you want to delete construction',
+	'guides.deleteModal.requirementQuestion': 'Are you sure you want to delete requirement',
+	'guides.deleteModal.issuerQuestion': 'Are you sure you want to delete manufacturer',
 	'guides.deleteModal.tariffPlanQuestion': 'Are you sure you want to delete tariff plan',
 	'guides.deleteModal.acousticModelQuestion': 'Are you sure you want to delete model',
 
@@ -918,7 +915,7 @@ export const en = {
 	'news.errors.loadArticle': 'Failed to load article.',
 	'news.errors.unexpected': 'Unexpected error occurred.',
 	'news.errors.notFound': 'Article not found.',
-	'guides.deleteModal.newsQuestion': 'Are you sure you want to delete news "{title}"?',
+	'guides.deleteModal.newsQuestion': 'Are you sure you want to delete news',
 
 	// About Building
 	'aboutBuilding.title': 'About building',
@@ -1328,7 +1325,7 @@ export const ru: Record<TranslationKey, string> = {
 	'news.errors.loadArticle': 'Не удалось загрузить статью.',
 	'news.errors.unexpected': 'Произошла непредвиденная ошибка.',
 	'news.errors.notFound': 'Статья не найдена.',
-	'guides.deleteModal.newsQuestion': 'Вы уверены, что хотите удалить новость «{title}»?',
+	'guides.deleteModal.newsQuestion': 'Вы уверены, что хотите удалить новость',
 
 	'subscriptions.pageTitle': 'Конструктор тарифов',
 	'subscriptions.editTitle': 'Редактировать тариф',
@@ -1651,9 +1648,7 @@ export const ru: Record<TranslationKey, string> = {
 	'sidebar.account': 'Личный кабинет',
 	'sidebar.subscriptionsConstructor': 'Конструктор тарифов',
 	'sidebar.bills': 'Счета',
-	'sidebar.usersList': 'Список пользователей',
-	'sidebar.manager': 'Менеджер',
-	'sidebar.client': 'Клиент',
+	'sidebar.usersList': 'Пользователи',
 	'sidebar.guides': 'Справочники',
 	'sidebar.materials': 'Материалы',
 	'sidebar.constructions': 'Конструкции',
@@ -1870,10 +1865,10 @@ export const ru: Record<TranslationKey, string> = {
 	'guides.export.constructionType.all': 'Все типы',
 
 	'guides.deleteModal.title': 'Подтвердите действие',
-	'guides.deleteModal.materialQuestion': 'Вы уверены, что хотите удалить материал {name}?',
-	'guides.deleteModal.constructionQuestion': 'Вы уверены, что хотите удалить конструкцию {name}?',
-	'guides.deleteModal.requirementQuestion': 'Вы уверены, что хотите удалить требование {name}?',
-	'guides.deleteModal.issuerQuestion': 'Вы уверены, что хотите удалить производителя {name}?',
+	'guides.deleteModal.materialQuestion': 'Вы уверены, что хотите удалить материал',
+	'guides.deleteModal.constructionQuestion': 'Вы уверены, что хотите удалить конструкцию',
+	'guides.deleteModal.requirementQuestion': 'Вы уверены, что хотите удалить требование',
+	'guides.deleteModal.issuerQuestion': 'Вы уверены, что хотите удалить производителя',
 	'guides.deleteModal.tariffPlanQuestion': 'Вы уверены, что хотите удалить тарифный план',
 	'guides.deleteModal.acousticModelQuestion': 'Вы уверены, что хотите удалить модель',
 

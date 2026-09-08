@@ -11,7 +11,6 @@ export const reportToClientConverter = (data: ReportDto): Report => {
 		client: data.client || '',
 		lastUpdated: data.lastUpdated || '',
 		status: convertToClientReportStatus(data.status!),
-		fileUrl: data.fileUrl || '',
 		reportCategory: convertToClientReporCategory(data.reportCategory!),
 	};
 };

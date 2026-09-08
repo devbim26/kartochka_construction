@@ -9,15 +9,22 @@ import {
 	SimpleTable,
 	SimpleTableCell,
 	SimpleTableHeaderCell,
+	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
 	useAccessValidator,
 	UserRoles,
 } from '@core';
+import { getCurrentUser } from '@features/account/services';
 import { reportToClientConverter } from '@features/reports/converters';
 import { deleteReport, getPaginatedReports } from '@features/reports/services';
 import type { Report, ReportFilter } from '@features/reports/types';
-import { getReportColumns, openReportInConstructorTarget } from '@features/reports/utils';
+import {
+	downloadReportFileByInfoId,
+	getDownloadReportErrorMessage,
+	getReportColumns,
+	openReportInConstructorTarget,
+} from '@features/reports/utils';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -34,6 +41,7 @@ export const ReportScreen = () => {
 	const [tableData, setTableData] = useState<Array<Report>>([]);
 	const [search] = useSearchParams();
 	const navigate = useAppNavigate();
+	const dispatch = useAppDispatch();
 	const { validate } = useAccessValidator();
 	const isAdmin = validate(UserRoles.Admin);
 	const userId = useAppSelector((state) => state.userData.data?.id);
@@ -104,16 +112,22 @@ export const ReportScreen = () => {
 			});
 	};
 
-	const handleDownloadFile = () => {
-		const report = tableData.find((report) => report.id === search.get('id'));
-		if (report) {
-			const link = document.createElement('a');
-			link.href = report.fileUrl;
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-		} else {
+	const handleDownloadFile = async () => {
+		const report = tableData.find((item) => item.id === search.get('id'));
+		if (!report?.reportInfoId) {
 			toast.error('Отчет не найден');
+			return;
+		}
+
+		try {
+			await downloadReportFileByInfoId({
+				reportInfoId: report.reportInfoId,
+				reportCategory: report.reportCategory,
+			});
+			dispatch(getCurrentUser());
+			navigate('');
+		} catch (error) {
+			toast.error(await getDownloadReportErrorMessage(error));
 		}
 	};
 

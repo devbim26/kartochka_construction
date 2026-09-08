@@ -1128,7 +1128,7 @@ export interface MaterialTypeValue {
 	id?: string;
 	/** @format double */
 	value?: number;
-	materialParametr?: MaterialParametrs;
+	materialParametrs?: MaterialParametrs;
 }
 
 export interface MaterialTypeValueDto {
@@ -1436,7 +1436,6 @@ export interface ReportDto {
 	/** @format date */
 	lastUpdated?: string;
 	status?: ReportStatus;
-	fileUrl?: string | null;
 	reportCategory?: ReportCategory;
 	/** @format uuid */
 	reportInfoId?: string;

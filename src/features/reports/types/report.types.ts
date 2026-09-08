@@ -9,7 +9,6 @@ export type Report = {
 	client: string;
 	lastUpdated: string;
 	status: ReportStatus;
-	fileUrl: string;
 	reportCategory: ReportCategory;
 };
 

@@ -2,7 +2,7 @@ import { APP_ROUTES } from '@core/constants/app-routes.constants';
 import { AUTH_ROUTES } from '@features/auth/constants/routes/auth-routes.constants';
 import { CONSTRUCTOR_ROUTES } from '@features/constructor/constants/routes/constructor-routes.constants';
 import { GUIDBOOKS_ROUTES } from '@features/guidbooks/constants/guidbooks-routes.constants';
-import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from '@features/home/constants/home-routes.constants';
+import { DESIGNING_ROUTES } from '@features/home/constants/home-routes.constants';
 import type { TranslationKey } from '@core/i18n/translations';
 
 const designingBase = APP_ROUTES.designing.route;
@@ -53,7 +53,7 @@ export const resolveRoutePageTitleKey = (pathname: string): TranslationKey => {
 		return 'reports.pageTitle';
 	}
 
-	if (pathname.startsWith(`${designingBase}/${DESIGNING_ROUTES.users_list.route}/${USERS_LIST_ROUTES.client.route}`)) {
+	if (pathname.startsWith(`${designingBase}/${DESIGNING_ROUTES.users_list.route}`)) {
 		return 'users.pageTitle';
 	}
 

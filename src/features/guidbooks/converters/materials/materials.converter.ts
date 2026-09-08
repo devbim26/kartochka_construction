@@ -29,33 +29,38 @@ export const convertToServerMaterialsFilterData = (
 		: {}),
 });
 
+const toClientNumberField = (value: unknown): string => {
+	if (value == null || value === '') return '';
+	return String(value);
+};
+
 export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddAndEditData => ({
 	id: data.id ?? '',
 	editFile: false,
 	name: data.name ?? '',
 	description: data.description ?? '',
 	shortName: data.shortName ?? '',
-	density: String(data.density) ?? '',
-	thickness: String(data.thickness) ?? '',
+	density: toClientNumberField(data.density),
+	thickness: toClientNumberField(data.thickness),
 	type: convertToClientMaterialOriginTypeData(data.type!) ?? [],
 	country: (convertToClientCountryData(data.countries!) as string[]) ?? '',
 	issuer: data.issuer?.id ?? '',
 	issuerName: data.issuer?.name ?? '',
 	imageUrl: resolveMediaUrl(data.imageUrl) || '',
-	materialCoefficient: String(data.materialCoefficient) ?? '',
+	materialCoefficient: toClientNumberField(data.materialCoefficient),
 	materialType: convertToClientMaterialTypeData(data.materialType!) ?? '',
 	materialPurpose: (data.materialPurpose as string) || MaterialPurpose.Any,
-	velocity: String(data.velocity) ?? '',
-	lossFactor: String(data.lossFactor) ?? '',
-	youngModulus: String(data.youngModulus) ?? '',
-	damping: String(data.damping) ?? '',
-	solid: String(data.solid) ?? '',
-	rb: String(data.rb) ?? '',
-	rc: String(data.rc) ?? '',
-	fc: String(data.fc) ?? '',
-	fb: String(data.fb) ?? '',
-	relativeCompression: String(data.relativeCompression) ?? '',
-	edin: String(data.edin) ?? '',
+	velocity: toClientNumberField(data.velocity),
+	lossFactor: toClientNumberField(data.lossFactor),
+	youngModulus: toClientNumberField(data.youngModulus),
+	damping: toClientNumberField(data.damping),
+	solid: toClientNumberField(data.solid),
+	rb: toClientNumberField(data.rb),
+	rc: toClientNumberField(data.rc),
+	fc: toClientNumberField(data.fc),
+	fb: toClientNumberField(data.fb),
+	relativeCompression: toClientNumberField(data.relativeCompression),
+	edin: toClientNumberField(data.edin),
 });
 
 /** Пустое / нечисловое значение физ. параметра → 0 на сервер. */

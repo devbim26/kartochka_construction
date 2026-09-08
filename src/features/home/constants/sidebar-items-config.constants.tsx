@@ -9,7 +9,7 @@ import { HiOutlineUsers } from 'react-icons/hi2';
 import { RiDraftLine, RiFileList3Line, RiPencilRulerLine, RiWallet3Fill } from 'react-icons/ri';
 import { TiDocumentText } from 'react-icons/ti';
 import type { SidebarItemsConfig } from '../types';
-import { DESIGNING_ROUTES, USERS_LIST_ROUTES } from './home-routes.constants';
+import { DESIGNING_ROUTES } from './home-routes.constants';
 
 function buildPathWithParams(
 	basePath: string,
@@ -186,20 +186,6 @@ export function getSidebarItemsConfig(): SidebarItemsConfig {
 					path: DESIGNING_ROUTES.users_list.route,
 					permission: UserRoles.Admin,
 				},
-				childrens: [
-					{
-						id: USERS_LIST_ROUTES.manager.id,
-						path: USERS_LIST_ROUTES.manager.route,
-						labelKey: 'sidebar.manager',
-						permission: UserRoles.Admin,
-					},
-					{
-						id: USERS_LIST_ROUTES.client.id,
-						path: USERS_LIST_ROUTES.client.route,
-						labelKey: 'sidebar.client',
-						permission: UserRoles.Admin,
-					},
-				],
 			},
 			{
 				params: {
