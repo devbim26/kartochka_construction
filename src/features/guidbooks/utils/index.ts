@@ -1,4 +1,5 @@
 export * from './material-purpose.utils';
+export * from './material-select-options.utils';
 export * from './apply-material-thickness-density.utils';
 export * from './material-application-purpose.context';
 export * from './optional-layer-stack.utils';

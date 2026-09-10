@@ -696,6 +696,7 @@ export interface ExportMaterialsQuery {
 	thickness?: number | null;
 	materialType?: MaterialTypeEnum;
 	materialPurpose?: MaterialPurpose;
+	isCommonMaterials?: boolean | null;
 }
 
 export interface ExportRequirementQuery {
@@ -853,6 +854,7 @@ export interface GetMaterialsWithPaginationParamsQuery {
 	thickness?: number | null;
 	materialType?: MaterialTypeEnum;
 	materialPurpose?: MaterialPurpose;
+	isCommonMaterials?: boolean | null;
 }
 
 export interface GetPalacementRoomVariantsWithTypesQuery {

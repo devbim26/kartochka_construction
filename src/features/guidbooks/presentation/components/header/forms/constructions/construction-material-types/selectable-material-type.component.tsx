@@ -1,8 +1,9 @@
-import { convertToSelectValues, Input, Select } from '@core';
+import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
 import { MaterialTypeValuesMap } from '@features/guidbooks/constants';
 import {
 	applySelectedMaterialThicknessDensity,
+	convertMaterialsToSelectOptions,
 	useConstructionMaterialsCatalog,
 } from '@features/guidbooks/utils';
 import {
@@ -131,7 +132,7 @@ export const SelectableMaterialType = memoize(
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={convertToSelectValues(materials ?? []) || []}
+							options={convertMaterialsToSelectOptions(materials ?? [])}
 							error={
 								(formState.errors as any)?.constructionTypeObject?.[
 									positionMap[constructionPosition]

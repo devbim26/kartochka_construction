@@ -1,6 +1,6 @@
-import { convertToSelectValues, Input, Select } from '@core';
+import { Input, Select } from '@core';
 import { memoize } from '@core/utils/hoc/memo.utils';
-import { useConstructionMaterialsCatalog } from '@features/guidbooks/utils';
+import { convertMaterialsToSelectOptions, useConstructionMaterialsCatalog } from '@features/guidbooks/utils';
 import {
 	MaterialTypeEnum,
 	type ConstructionMaterialTypesProps,
@@ -38,7 +38,7 @@ export const FrameMaterialType = memoize(
 						<Select
 							{...field}
 							value={field.value || ''}
-							options={convertToSelectValues(materials ?? []) ?? []}
+							options={convertMaterialsToSelectOptions(materials ?? [])}
 							error={
 								(formState.errors as any)?.constructionTypeObject?.[
 									positionMap[constructionPosition]

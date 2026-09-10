@@ -27,12 +27,12 @@ type Props = {
 };
 
 const CONTROL_CLASS =
-	'relative flex min-h-[36px] w-full items-center rounded-[8px] bg-white px-3 py-[6px] font-sans text-sm leading-5 tracking-[0.1px] ring-1 ring-inset ring-input-border-primary';
+	'relative flex min-h-[50px] w-full items-center rounded-[8px] bg-white px-3 py-[10px] font-sans text-base leading-5 tracking-[0.1px] ring-1 ring-inset ring-input-border-primary';
 
 const selectStyles: StylesConfig<SelectOption, false, GroupBase<SelectOption>> = {
 	control: (base) => ({
 		...base,
-		minHeight: '36px',
+		minHeight: '50px',
 		':hover': { cursor: 'pointer' },
 	}),
 	menu: (base) => ({
@@ -118,20 +118,21 @@ export const ConstructionCatalogSelect = memoize(
 						state.isDisabled && 'bg-gray-100',
 					),
 				valueContainer: () => 'flex min-w-0 flex-1 items-center gap-1 py-0',
-				singleValue: () => 'm-0 flex min-w-0 max-w-full items-center',
+				singleValue: () =>
+					'm-0 flex min-w-0 max-w-full items-center font-sans text-base leading-5 tracking-[0.1px] text-black',
 				placeholder: () =>
-					'm-0 truncate font-sans text-sm leading-5 tracking-[0.1px] text-input-label-primary',
+					'm-0 truncate font-sans text-base leading-5 tracking-[0.1px] text-input-label-primary',
 				input: () =>
-					'm-0 font-sans text-sm leading-5 tracking-[0.1px] text-black caret-primary',
+					'm-0 font-sans text-base leading-5 tracking-[0.1px] text-black caret-primary',
 				indicatorsContainer: () => 'flex shrink-0 items-center self-center pl-2',
 				indicatorSeparator: () => 'hidden',
 				dropdownIndicator: () => 'flex items-center justify-center text-gray-500',
 				menu: () =>
 					'mt-1 min-w-full overflow-hidden rounded-[8px] bg-white shadow-lg ring-1 ring-black/5',
-				menuList: () => 'max-h-[320px] py-1',
+				menuList: () => 'max-h-[360px] py-1',
 				option: (state) =>
 					twMerge(
-						'flex min-h-[36px] w-full items-center truncate px-3 py-2 font-sans text-sm leading-5 tracking-[0.1px]',
+						'flex min-h-[44px] w-full items-center truncate px-3 py-2.5 font-sans text-base leading-5 tracking-[0.1px]',
 						state.isDisabled
 							? 'cursor-not-allowed bg-gray-50 text-gray-400'
 							: 'cursor-pointer hover:bg-primary hover:text-white',
@@ -204,7 +205,7 @@ export const ConstructionCatalogSelect = memoize(
 			(props: SingleValueProps<SelectOption, false, GroupBase<SelectOption>>) => (
 				<components.SingleValue {...props}>
 					<span
-						className="block truncate font-sans text-sm leading-5 tracking-[0.1px] text-black"
+						className="block truncate font-sans text-base leading-5 tracking-[0.1px] text-black"
 						title={props.data.label}
 					>
 						{props.data.label}

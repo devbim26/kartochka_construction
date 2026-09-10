@@ -6,7 +6,6 @@ import {
 import { getGuidebooksPaginated } from '@features/guidbooks/services';
 import {
 	Guidebooks,
-	MaterialOriginType,
 	type MaterialTypeEnum,
 	type MaterialsAddAndEditData,
 	type MaterialsFilterData,
@@ -15,44 +14,37 @@ import {
 	filterMaterialsByApplicationPurpose,
 	resolveMaterialPurposeForConstructionType,
 } from '@features/guidbooks/utils/material-purpose.utils';
-import { MaterialApplicationPurposeContext } from '@features/guidbooks/utils/material-application-purpose.context';
+import {
+	MaterialApplicationPurposeContext,
+	MaterialCatalogOnlyGeneralIssuerContext,
+} from '@features/guidbooks/utils/material-application-purpose.context';
 import type { AxiosResponse } from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useWatch } from 'react-hook-form';
 import { catchError, from, switchMap, tap } from 'rxjs';
 
+/**
+ * На сервер: тип материала + isCommonMaterials (true — только общий производитель).
+ * Применение (стена/пол) фильтруем на клиенте, чтобы не отсечь `Any`.
+ */
 function buildFilter(
 	materialTypeEnum: MaterialTypeEnum,
-	constructionType: string | undefined,
+	onlyGeneralIssuer: boolean,
 ): MaterialsFilterData {
-	const materialPurpose = resolveMaterialPurposeForConstructionType(constructionType);
 	return {
 		name: '',
 		density: '',
 		thickness: '',
 		materialType: materialTypeEnum as string,
-		materialPurpose: materialPurpose ?? '',
+		materialPurpose: '',
+		isCommonMaterials: onlyGeneralIssuer ? true : null,
 	};
 }
 
-const isGeneralIssuerName = (name?: string | null) => {
-	const n = (name ?? '').trim().toLowerCase();
-	return n === 'общий' || n === 'general';
-};
-
-/** В форме конструкции — только материалы производителя «Общий», не брендовые. */
-const isGeneralIssuerMaterial = (item: MaterialsAddAndEditData): boolean => {
-	if (item.issuerName != null && String(item.issuerName).trim()) {
-		return isGeneralIssuerName(item.issuerName);
-	}
-	// Fallback, если имя issuer не пришло в DTO списка.
-	return item.type === MaterialOriginType.Generic;
-};
-
 /**
- * Материалы справочника для слоя конструкции: тип материала + применение (стена/пол) по типу конструкции.
- * Только производитель «Общий» (не брендовые).
+ * Материалы справочника для слоя конструкции.
+ * Фильтр «Общий» (`isCommonMaterials: true`) — расчёт и проектирование; в справочнике не включается.
  */
 export function useConstructionMaterialsCatalog(
 	materialTypeEnum: MaterialTypeEnum | '',
@@ -68,6 +60,7 @@ export function useConstructionMaterialsCatalog(
 		name: 'constructionTypeObject.constructionTypeEnum',
 	});
 	const layoutClassPurpose = useContext(MaterialApplicationPurposeContext);
+	const onlyGeneralIssuer = useContext(MaterialCatalogOnlyGeneralIssuerContext);
 	const constructionType =
 		(typeof constructionTypeEnum === 'string' && constructionTypeEnum.trim()) ||
 		(typeof constructionTypeRoot === 'string' && constructionTypeRoot.trim()) ||
@@ -81,7 +74,7 @@ export function useConstructionMaterialsCatalog(
 			return;
 		}
 		const filterPayload = convertToServerMaterialsFilterData(
-			buildFilter(materialTypeEnum, constructionType),
+			buildFilter(materialTypeEnum, onlyGeneralIssuer),
 		);
 		const sub = from(
 			getGuidebooksPaginated({
@@ -98,11 +91,9 @@ export function useConstructionMaterialsCatalog(
 					return from([items]);
 				}),
 				tap((items) => {
-					const byPurpose = filterMaterialsByApplicationPurpose(
-						items.items || [],
-						materialPurpose,
+					setMaterials(
+						filterMaterialsByApplicationPurpose(items.items || [], materialPurpose),
 					);
-					setMaterials(byPurpose.filter(isGeneralIssuerMaterial));
 				}),
 				catchError(() => {
 					setMaterials([]);
@@ -111,7 +102,13 @@ export function useConstructionMaterialsCatalog(
 			)
 			.subscribe();
 		return () => sub.unsubscribe();
-	}, [materialTypeEnum, constructionType, materialPurpose, layoutClassPurpose]);
+	}, [
+		materialTypeEnum,
+		constructionType,
+		materialPurpose,
+		layoutClassPurpose,
+		onlyGeneralIssuer,
+	]);
 
 	return materials;
 }

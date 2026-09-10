@@ -3,7 +3,6 @@ import {
 	Button,
 	convertToClientCountryData,
 	convertToPaginatedType,
-	convertToSelectValues,
 	getAxiosErrorMessage,
 	Input,
 	SafeImage,
@@ -87,13 +86,14 @@ import {
 
 import {
 	flattenConstructionMaterialsTopToBottom,
+	formatConstructionSelectLabel,
 	MaterialApplicationPurposeProvider,
 	prepareConstructionEditDataForPersistence,
 } from '@features/guidbooks/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AxiosError, type AxiosResponse } from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { catchError, finalize, from, of, switchMap, tap } from 'rxjs';
 import { toast } from 'sonner';
@@ -440,26 +440,22 @@ export const CalculationScreen = () => {
 			return true;
 		});
 
-		const base =
-			convertToSelectValues(
-				filtered.map((c) => ({
-					...c,
-					name: c.description || c.name,
-				})),
+		const base = filtered
+			.filter((c): c is typeof c & { id: string } => Boolean(c.id))
+			.map(
+				(c): SelectOption => ({
+					value: c.id,
+					label: formatConstructionSelectLabel(c),
+					isDisabled: c.isView === false,
+				}),
 			)
-				?.map((option) => ({
-					...option,
-					isDisabled:
-						constructionData.find((c) => String(c.id) === String(option.value))
-							?.isView === false,
-				}))
-				?.sort((a, b) => {
-					const aFav = favoriteIds.has(String(a.value));
-					const bFav = favoriteIds.has(String(b.value));
-					if (aFav !== bFav) return Number(bFav) - Number(aFav);
-					return Number(a.isDisabled) - Number(b.isDisabled);
-				})
-				?.map(withFavoriteLabel) ?? [];
+			.sort((a, b) => {
+				const aFav = favoriteIds.has(String(a.value));
+				const bFav = favoriteIds.has(String(b.value));
+				if (aFav !== bFav) return Number(bFav) - Number(aFav);
+				return Number(a.isDisabled) - Number(b.isDisabled);
+			})
+			.map(withFavoriteLabel);
 
 		const valueSet = new Set(base.map((o) => String(o.value)));
 		const options: SelectOption[] = [...base];
@@ -486,7 +482,7 @@ export const CalculationScreen = () => {
 		return [
 			withFavoriteLabel({
 				value: selectedId,
-				label: selectedMeta.description || selectedMeta.name || String(selectedId),
+				label: formatConstructionSelectLabel(selectedMeta),
 				isDisabled: false,
 			}),
 			...options,
@@ -1290,22 +1286,16 @@ export const CalculationScreen = () => {
 		formLoadedForHeaderRef.current = '';
 	}, [form]);
 
-	/** Фильтр типа в селекте каталога — только сужает список, форму не трогает. */
+	/** Фильтр типа в селекте каталога — сбрасывает выбранную конструкцию и превью. */
 	const handleCatalogTypeChange = (nextType: string) => {
 		if (nextType === typeEnumFilter) return;
 		setTypeEnumFilter(nextType);
 
-		const selectedId = catalogConstructionIdRef.current;
-		if (!selectedId || !nextType) return;
-
-		const selected = constructionData.find((c) => String(c.id) === String(selectedId));
-		if (
-			selected?.constructionType &&
-			String(selected.constructionType) !== String(nextType)
-		) {
-			setCatalogConstructionId('');
-			catalogConstructionIdRef.current = '';
-		}
+		setCatalogConstructionId('');
+		catalogConstructionIdRef.current = '';
+		suppressWorkspaceAutoloadRef.current = true;
+		setIsConstructionSelectionCleared(true);
+		resetWorkspacePreview();
 	};
 
 	const handleCatalogConstructionChange = (next: string) => {
@@ -1833,25 +1823,6 @@ export const CalculationScreen = () => {
 							</div>
 						)}
 						<div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[20px] self-stretch">
-							<Controller
-								name="constructionTypeObject.constructionTypeEnum"
-								control={form.control}
-								render={({ field }) => (
-									<Select
-										{...field}
-										disabled={isConstructionEditLocked}
-										isSearchable
-										value={field.value || ''}
-										onChange={(value) =>
-											handleConstructionTypeChange(value ? String(value) : '')
-										}
-										options={typeSelectOptions}
-										wrapperClassname="w-fit min-w-[320px] ring-input-border-primary"
-										buttonClassName="text-sm rounded-[8px]"
-										placeholder={t('constructor.designing.selectType')}
-									/>
-								)}
-							/>
 							<div className="flex flex-col gap-2">
 								{materials.map((material, i) => (
 									<p key={`calc-layer-${i}`} className="pl-2 text-[18px]">
@@ -1881,6 +1852,7 @@ export const CalculationScreen = () => {
 							<MaterialApplicationPurposeProvider
 								key={graphHeaderId || workingHeaderId || 'construction-form'}
 								layoutClass={layoutClass}
+								onlyGeneralIssuer
 							>
 								<SelectableMaterialDesignationProvider
 									value={{ showMaterialDesignationInput: true }}

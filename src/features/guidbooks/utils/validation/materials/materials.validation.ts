@@ -48,6 +48,8 @@ export const MaterialsFilterSchema = z.object({
 	thickness: z.string().optional(),
 	materialType: z.string().optional(),
 	materialPurpose: z.string().optional(),
+	/** null — все; true — только общий производитель; false — только брендовые. */
+	isCommonMaterials: z.boolean().nullable().optional(),
 });
 
 export type MaterialsAddAndEditSchemaType = z.infer<typeof MaterialsAddAndEditSchema>;

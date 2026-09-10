@@ -27,6 +27,9 @@ export const convertToServerMaterialsFilterData = (
 	...(data.materialPurpose
 		? { materialPurpose: data.materialPurpose as MaterialPurpose }
 		: {}),
+	...(data.isCommonMaterials === undefined
+		? {}
+		: { isCommonMaterials: data.isCommonMaterials }),
 });
 
 const toClientNumberField = (value: unknown): string => {
@@ -42,13 +45,18 @@ export const convertToClientMaterialsAddAndEditData = (data: any): MaterialsAddA
 	shortName: data.shortName ?? '',
 	density: toClientNumberField(data.density),
 	thickness: toClientNumberField(data.thickness),
-	type: convertToClientMaterialOriginTypeData(data.type!) ?? [],
-	country: (convertToClientCountryData(data.countries!) as string[]) ?? '',
+	type: (data.type != null ? convertToClientMaterialOriginTypeData(data.type) : '') || '',
+	country: (data.countries != null
+		? (convertToClientCountryData(data.countries) as string[])
+		: []) || [],
 	issuer: data.issuer?.id ?? '',
 	issuerName: data.issuer?.name ?? '',
 	imageUrl: resolveMediaUrl(data.imageUrl) || '',
 	materialCoefficient: toClientNumberField(data.materialCoefficient),
-	materialType: convertToClientMaterialTypeData(data.materialType!) ?? '',
+	materialType:
+		(data.materialType != null
+			? convertToClientMaterialTypeData(data.materialType)
+			: '') || '',
 	materialPurpose: (data.materialPurpose as string) || MaterialPurpose.Any,
 	velocity: toClientNumberField(data.velocity),
 	lossFactor: toClientNumberField(data.lossFactor),

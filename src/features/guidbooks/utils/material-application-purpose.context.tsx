@@ -6,14 +6,20 @@ export const MaterialApplicationPurposeContext = createContext<MaterialPurpose |
 	undefined,
 );
 
+/** На расчёте / проектировании в селектах только материалы производителя «Общий». */
+export const MaterialCatalogOnlyGeneralIssuerContext = createContext(false);
+
 type MaterialApplicationPurposeProviderProps = {
 	layoutClass?: string | null;
+	/** Фильтровать только производителя «Общий» (`isCommonMaterials: true`). */
+	onlyGeneralIssuer?: boolean;
 	children: ReactNode;
 };
 
 /** Класс конструкции (Wall/Floor) из отчёта/вкладки — запасной источник для фильтра материалов. */
 export const MaterialApplicationPurposeProvider = ({
 	layoutClass,
+	onlyGeneralIssuer = false,
 	children,
 }: MaterialApplicationPurposeProviderProps) => {
 	const purpose = useMemo(() => {
@@ -23,8 +29,10 @@ export const MaterialApplicationPurposeProvider = ({
 	}, [layoutClass]);
 
 	return (
-		<MaterialApplicationPurposeContext.Provider value={purpose}>
-			{children}
-		</MaterialApplicationPurposeContext.Provider>
+		<MaterialCatalogOnlyGeneralIssuerContext.Provider value={onlyGeneralIssuer}>
+			<MaterialApplicationPurposeContext.Provider value={purpose}>
+				{children}
+			</MaterialApplicationPurposeContext.Provider>
+		</MaterialCatalogOnlyGeneralIssuerContext.Provider>
 	);
 };

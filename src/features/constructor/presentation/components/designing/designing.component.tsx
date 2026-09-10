@@ -819,7 +819,10 @@ const DesigningConstructionScreen = () => {
 					</p>
 				)}
 				{constructionType && !isConstructionEditLocked && (
-					<MaterialApplicationPurposeProvider layoutClass={constructionLayoutClass}>
+					<MaterialApplicationPurposeProvider
+						layoutClass={constructionLayoutClass}
+						onlyGeneralIssuer
+					>
 						<SelectableMaterialDesignationProvider
 							value={{ showMaterialDesignationInput: true }}
 						>
