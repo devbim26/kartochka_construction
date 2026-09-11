@@ -51,14 +51,16 @@ const constructionTypeColors: Record<string, { fill: string; stroke: string }> =
 	ElasticBaseFloor: { fill: 'rgba(255, 112, 67, 0.25)', stroke: '#D95A27' },
 };
 
-const resolveConstructionColor = (constructionType?: ConstructionTypeEnum) => {
+export const resolveConstructionColor = (constructionType?: ConstructionTypeEnum | string) => {
 	if (!constructionType) {
 		return { fill: 'rgba(195, 244, 186, 0.5)', stroke: '#65B764' };
 	}
-	return constructionTypeColors[constructionType] || {
-		fill: 'rgba(195, 244, 186, 0.5)',
-		stroke: '#65B764',
-	};
+	return (
+		constructionTypeColors[constructionType] || {
+			fill: 'rgba(195, 244, 186, 0.5)',
+			stroke: '#65B764',
+		}
+	);
 };
 
 export type ConstructionCanvasBounds = {

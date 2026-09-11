@@ -13,7 +13,7 @@ export const NewsSection = () => {
 	const { t } = useI18n();
 
 	useEffect(() => {
-		from(getPaginatedArticles({ data: { pageNumber: 1, pageSize: 6 } }))
+		from(getPaginatedArticles({ data: { pageNumber: 1, pageSize: 6, takeActual: true } }))
 			.pipe(
 				switchMap((response) => from([{ items: response.data.items ?? [] }])),
 				tap((res) => {

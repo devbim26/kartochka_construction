@@ -680,6 +680,7 @@ export interface ExportConstructionHeaderQuery {
 	orderByPriority?: boolean;
 	/** @format uuid */
 	issuerId?: string | null;
+	onlyManufacturers?: boolean | null;
 }
 
 export interface ExportMaterialsQuery {
@@ -776,6 +777,7 @@ export interface GetArticlesWithPaginationParamsQuery {
 	title?: string | null;
 	/** @format date */
 	publishDate?: string | null;
+	takeActual?: boolean | null;
 }
 
 export interface GetBillWithPaginationParamsQuery {
@@ -826,6 +828,7 @@ export interface GetConstructionHeaderWithPaginationQuery {
 	orderByPriority?: boolean;
 	/** @format uuid */
 	issuerId?: string | null;
+	onlyManufacturers?: boolean | null;
 }
 
 export interface GetIssuerWithPaginationParamsQuery {

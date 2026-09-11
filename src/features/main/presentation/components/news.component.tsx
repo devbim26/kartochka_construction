@@ -25,7 +25,7 @@ export const News = ({ splitForGrid = false, className }: Props) => {
 	useEffect(() => {
 		from(
 			getPaginatedArticles({
-				data: { pageNumber: 1, pageSize: 5 },
+				data: { pageNumber: 1, pageSize: 5, takeActual: true },
 			}),
 		)
 			.pipe(

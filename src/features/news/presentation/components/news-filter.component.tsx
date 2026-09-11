@@ -1,14 +1,15 @@
-import { dateMask, Input, useI18n } from '@core';
+import { Input, useI18n } from '@core';
 import type { Article } from '@features/news/types';
+import { isNewsDateComplete, newsDateMask } from '@features/news/utils';
 import { useMask } from '@react-input/mask';
 import { useFormContext } from 'react-hook-form';
 
 export const NewsFilter = () => {
 	const form = useFormContext<Article>();
-	const { register, watch, setValue } = form;
+	const { register, clearErrors } = form;
 	const { t } = useI18n();
-
-	const dateRef = useMask(dateMask);
+	const dateMaskRef = useMask(newsDateMask);
+	const publishDateField = register('publishDate');
 
 	return (
 		<>
@@ -24,18 +25,26 @@ export const NewsFilter = () => {
 			/>
 
 			<Input
+				name={publishDateField.name}
+				onBlur={publishDateField.onBlur}
 				onChange={(event) => {
-					setValue('publishDate', event.target.value);
+					publishDateField.onChange(event);
+					const value = event.target.value;
+					if (!value.replace(/\D/g, '') || isNewsDateComplete(value)) {
+						clearErrors('publishDate');
+					}
 				}}
-				value={watch('publishDate')}
-				ref={dateRef}
+				ref={(element) => {
+					publishDateField.ref(element);
+					dateMaskRef.current = element as HTMLInputElement;
+				}}
 				labelClassName={
 					'font-sans text-sm font-normal leading-5 tracking-[0.1px] text-input-label-primary'
 				}
 				inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 				containerClassName="w-[226px]"
 				label={t('news.columns.publishDate')}
-				placeholder={t('news.placeholders.date')}
+				placeholder="ДД.ММ.ГГГГ"
 				max={10}
 			/>
 		</>

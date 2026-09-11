@@ -57,8 +57,10 @@ export const CurrentSub = ({ className, splitForGrid = false }: Props) => {
 	const changePlanFlow = search.get('changePlanFlow');
 
 	const remainingCredits = userData.data?.budgetRemaining ?? 0;
-	const remainingCalculations = userData.data?.dowloadReportsNumber ?? 0;
-	const remainingReports = userData.data?.reportsNumber ?? 0;
+	/** reportsNumber на бэке — остаток расчётов. */
+	const remainingCalculations = userData.data?.reportsNumber ?? 0;
+	/** dowloadReportsNumber на бэке — остаток отчётов. */
+	const remainingDownloads = userData.data?.dowloadReportsNumber ?? 0;
 	const hasManyCards = activeSubscriptions.length > 1;
 
 	const handleChangePlan = async () => {
@@ -201,7 +203,7 @@ export const CurrentSub = ({ className, splitForGrid = false }: Props) => {
 					{t('main.currentSub.remainingReports')}: {remainingCalculations}
 				</p>
 				<p className="font-sans text-base font-semibold leading-6 text-[#1f2937]">
-					{t('main.currentSub.remainingDownloads')}: {remainingReports}
+					{t('main.currentSub.remainingDownloads')}: {remainingDownloads}
 				</p>
 			</div>
 		</div>

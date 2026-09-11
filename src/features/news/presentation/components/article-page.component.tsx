@@ -11,7 +11,7 @@ import { catchError, switchMap, tap } from 'rxjs/operators';
 import { toast } from 'sonner';
 
 export const ArticlePage = () => {
-	const { t, locale } = useI18n();
+	const { t } = useI18n();
 	const { articleId } = useParams<{ articleId: string }>();
 	const [article, setArticle] = useState<Article | null | undefined>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -85,12 +85,7 @@ export const ArticlePage = () => {
 				dangerouslySetInnerHTML={{ __html: article.bodyText || '' }}
 			/>
 			<p className="mt-12 text-left text-sm text-gray-400">
-				{article.publishDate
-					? new Date(article.publishDate).toLocaleDateString(
-							locale === 'ru' ? 'ru-RU' : 'en-US',
-							{ day: 'numeric', month: 'long', year: 'numeric' },
-						)
-					: ''}
+				{article.publishDate || ''}
 			</p>
 		</div>
 	);

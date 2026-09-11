@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { isRichTextEmpty } from '../html-text.utils';
+import { isNewsDateComplete } from '../news-date.utils';
 
 const requiredMessage = 'Поле обязательно для заполнения';
 
@@ -11,7 +12,7 @@ const NewsSchema = z
 		publishDate: z
 			.string()
 			.min(1, requiredMessage)
-			.refine((value) => !value.includes('_'), requiredMessage),
+			.refine((value) => isNewsDateComplete(value), requiredMessage),
 		imageUrl: z.union([z.string(), z.literal('')]).optional().nullable(),
 		imageFile: z.any().optional().nullable(),
 	})

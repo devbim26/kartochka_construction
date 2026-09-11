@@ -628,9 +628,8 @@ export const CreateConstructionForm = memoize(
 								...(paginationRw != null ? { rw: paginationRw } : {}),
 								...(reportCountryType ? { countryType: reportCountryType } : {}),
 								...(serverTypeFilter ? { constructionType: serverTypeFilter } : {}),
-								// Бэкенд: onlyManufacturers=true — без производителей (только «Общий»).
-								// Чекбокс «Производители» — наоборот: включён = показать брендовых.
-								...(filterByManufacturers ? {} : { onlyManufacturers: true }),
+								// Чекбокс «Производители»: выключен — все; включён — только с производителем.
+								...(filterByManufacturers ? { onlyManufacturers: true } : {}),
 								orderByPriority: true,
 							},
 							guidebookType: Guidebooks.CONSTRUCTION,

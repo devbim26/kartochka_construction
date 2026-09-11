@@ -222,6 +222,9 @@ export const CalculationScreen = () => {
 	const inflightDetailIdRef = useRef('');
 	/** Пользователь сбросил фильтр/селект — не автозаполнять форму клоном. */
 	const suppressWorkspaceAutoloadRef = useRef(false);
+	/** Снимки последнего успешного save — чтобы не дергать API без изменений. */
+	const lastSavedConstructionKeyRef = useRef('');
+	const lastSavedReportParamsKeyRef = useRef('');
 	const loadedReportIdRef = useRef('');
 
 	const form = useForm<DesigningData>({
@@ -559,11 +562,24 @@ export const CalculationScreen = () => {
 			if (existing.width != null) setWidth(String(existing.width));
 			if (existing.length != null) setLength(String(existing.length));
 
+			lastSavedReportParamsKeyRef.current = JSON.stringify({
+				calculationDocumentId: docId || calculationDocumentId,
+				construction: headerId,
+				name: (existing.name || name).trim(),
+				width: existing.width != null ? String(existing.width) : width,
+				length: existing.length != null ? String(existing.length) : length,
+				area:
+					existing.width != null && existing.length != null
+						? String(Math.round(Number(existing.width) * Number(existing.length)))
+						: area,
+				id: existing.id || null,
+			});
+
 			if (options?.syncUrl !== false && data.id) {
 				syncCloneToUrl(headerId, data.id);
 			}
 		},
-		[syncCloneToUrl],
+		[area, calculationDocumentId, length, name, syncCloneToUrl, width],
 	);
 
 	const handleLoadCalculationReport = useCallback(
@@ -639,6 +655,8 @@ export const CalculationScreen = () => {
 		suppressWorkspaceAutoloadRef.current = false;
 		setIsConstructionSelectionCleared(false);
 		lastSyncedKeyRef.current = '';
+		lastSavedConstructionKeyRef.current = '';
+		lastSavedReportParamsKeyRef.current = '';
 	}, [form, reportIdFromSearch]);
 
 	/** После create/update — фиксируем клон для редактора; селект справочника не трогаем. */
@@ -898,6 +916,13 @@ export const CalculationScreen = () => {
 							setName(String(data.name));
 						}
 						formLoadedForHeaderRef.current = id;
+						lastSavedConstructionKeyRef.current = JSON.stringify(
+							convertToServerConstructionsEditData({
+								...data,
+								id,
+								reportInfoId: reportIdRef.current || undefined,
+							}),
+						);
 						queueMicrotask(() => {
 							suppressLayerWatchRef.current = false;
 						});
@@ -1036,6 +1061,15 @@ export const CalculationScreen = () => {
 				additionalDoors: cloned?.additionalDoors,
 			});
 			lastSyncedKeyRef.current = formSyncKey;
+			lastSavedReportParamsKeyRef.current = JSON.stringify({
+				calculationDocumentId,
+				construction: catalogConstructionId,
+				name: name.trim(),
+				width,
+				length,
+				area,
+				id: cloned?.id || null,
+			});
 			setHasPendingTypeChange(false);
 
 			syncCloneToUrl(clonedHeaderId, id);
@@ -1501,22 +1535,60 @@ export const CalculationScreen = () => {
 			id: previousCloneId,
 			reportInfoId: ensuredReportId || undefined,
 		});
+		const constructionSaveKey = JSON.stringify(dataForCurrentClone);
+		const reportParamsKey = JSON.stringify({
+			calculationDocumentId,
+			construction: headerIdForReport,
+			name: name.trim(),
+			width,
+			length,
+			area,
+			id: reportConstructionRowId || null,
+		});
+
+		// Смена справочной в отчёте — всегда PUT отчёта; слои правим только у текущего клона.
+		const shouldUpdateConstruction =
+			!isCatalogReplace &&
+			(hasPendingTypeChange ||
+				constructionSaveKey !== lastSavedConstructionKeyRef.current);
+		const shouldUpdateReport =
+			isCatalogReplace || reportParamsKey !== lastSavedReportParamsKeyRef.current;
+
+		if (!shouldUpdateConstruction && !shouldUpdateReport) {
+			toast.success(
+				locale === 'ru' ? 'Изменений нет — пересчёт не требуется' : 'No changes to recalculate',
+			);
+			return;
+		}
+
 		suppressLayerWatchRef.current = true;
 		calculatingRef.current = true;
 		skipDetailLoadRef.current = true;
 
 		dispatch(startLoading());
-		// Как designing: сначала save слоёв в текущий клон, потом PUT отчёта.
-		from(
-			getGuidebooksEdit({
-				data: dataForCurrentClone,
-				guidebookType: Guidebooks.CONSTRUCTION,
-			}),
-		)
+
+		const updateConstruction$ = shouldUpdateConstruction
+			? from(
+					getGuidebooksEdit({
+						data: dataForCurrentClone,
+						guidebookType: Guidebooks.CONSTRUCTION,
+					}),
+				).pipe(switchMap((editRes) => of(isSuccessStatus(editRes?.status))))
+			: of(true);
+
+		updateConstruction$
 			.pipe(
-				switchMap((editRes) => {
-					if (!isSuccessStatus(editRes?.status)) {
+				switchMap((constructionOk) => {
+					if (!constructionOk) {
 						return of(null);
+					}
+					if (!shouldUpdateReport) {
+						return of({
+							nextCloneId: previousCloneId,
+							formData,
+							nextReportId: ensuredReportId,
+							cloned: null as ReturnType<typeof extractSingleReportConstruction>,
+						});
 					}
 					return from(
 						updateReportSingle({
@@ -1533,62 +1605,50 @@ export const CalculationScreen = () => {
 								calculationDocumentId,
 							}),
 						}),
+					).pipe(
+						switchMap((response) => {
+							if (!response || !isSuccessStatus(response?.status)) {
+								return of(null);
+							}
+
+							const nextReportId = response.data?.id || ensuredReportId;
+							reportIdRef.current = nextReportId;
+
+							const cloned = extractSingleReportConstruction(response.data, [
+								catalogConstructionIdRef.current,
+								appliedCatalogConstructionIdRef.current,
+								headerIdForReport,
+							]);
+							if (cloned?.id) {
+								setSavedConstructionId(cloned.id);
+								savedConstructionIdRef.current = cloned.id;
+							}
+
+							const returnedHeaderId = cloned?.constructionHeaderId || '';
+							const fromPut =
+								returnedHeaderId &&
+								String(returnedHeaderId) !== String(headerIdForReport)
+									? returnedHeaderId
+									: '';
+							// Не делаем второй PUT конструкции: один edit + один report update.
+							const nextCloneId = fromPut || previousCloneId;
+
+							if (isCatalogReplace && catalogConstructionId) {
+								appliedCatalogConstructionIdRef.current = catalogConstructionId;
+							}
+							suppressWorkspaceAutoloadRef.current = false;
+							setIsConstructionSelectionCleared(false);
+
+							return of({ nextCloneId, formData, nextReportId, cloned });
+						}),
 					);
 				}),
-				switchMap((response) => {
-					if (!response || !isSuccessStatus(response?.status)) {
-						return of(null);
-					}
-
-					const nextReportId = response.data?.id || ensuredReportId;
-					reportIdRef.current = nextReportId;
-
-					const cloned = extractSingleReportConstruction(response.data, [
-						catalogConstructionIdRef.current,
-						appliedCatalogConstructionIdRef.current,
-						headerIdForReport,
-					]);
-					if (cloned?.id) {
-						setSavedConstructionId(cloned.id);
-						savedConstructionIdRef.current = cloned.id;
-					}
-
-					const returnedHeaderId = cloned?.constructionHeaderId || '';
-					const fromPut =
-						returnedHeaderId && String(returnedHeaderId) !== String(headerIdForReport)
-							? returnedHeaderId
-							: '';
-					const nextCloneId = fromPut || previousCloneId;
-
-					if (isCatalogReplace && catalogConstructionId) {
-						appliedCatalogConstructionIdRef.current = catalogConstructionId;
-					}
-					suppressWorkspaceAutoloadRef.current = false;
-					setIsConstructionSelectionCleared(false);
-
-					const persistLayers$ =
-						String(nextCloneId) !== String(previousCloneId)
-							? from(
-									getGuidebooksEdit({
-										data: convertToServerConstructionsEditData({
-											...formData,
-											id: nextCloneId,
-											reportInfoId: nextReportId || undefined,
-										}),
-										guidebookType: Guidebooks.CONSTRUCTION,
-									}),
-								).pipe(switchMap((copyRes) => of(isSuccessStatus(copyRes?.status))))
-							: of(true);
-
-					return persistLayers$.pipe(
-						switchMap((layersOk) => {
-							if (!layersOk) return of(null);
-							return updateAdditionalOpenings$().pipe(
-								switchMap((openingsOk) => {
-									if (!openingsOk) return of(null);
-									return of({ nextCloneId, formData, nextReportId, cloned });
-								}),
-							);
+				switchMap((ctx) => {
+					if (!ctx) return of(null);
+					return updateAdditionalOpenings$().pipe(
+						switchMap((openingsOk) => {
+							if (!openingsOk) return of(null);
+							return of(ctx);
 						}),
 					);
 				}),
@@ -1613,11 +1673,29 @@ export const CalculationScreen = () => {
 					}
 					setReportId(nextReportId);
 					loadedReportIdRef.current = nextReportId;
+					lastSavedConstructionKeyRef.current = JSON.stringify(
+						convertToServerConstructionsEditData({
+							...savedForm,
+							id: nextCloneId,
+							reportInfoId: nextReportId || undefined,
+						}),
+					);
+					lastSavedReportParamsKeyRef.current = JSON.stringify({
+						calculationDocumentId,
+						construction: isCatalogReplace
+							? catalogConstructionId
+							: nextCloneId,
+						name: name.trim(),
+						width,
+						length,
+						area,
+						id: (cloned?.id || savedConstructionIdRef.current) ?? null,
+					});
+					lastSyncedKeyRef.current = formSyncKey;
 					syncCloneToUrl(nextCloneId, nextReportId);
 					refreshGraphVisualsAfterSave(nextCloneId);
 				}),
 				catchError((error) => {
-					// 400 и прочие ошибки API: показать сообщение, не сбрасывать форму/расчёт.
 					void getAxiosErrorMessage(error, t('errors.request')).then((message) => {
 						toast.error(message || t('errors.request'));
 					});

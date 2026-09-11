@@ -28,7 +28,7 @@ import {
 	updateArticle,
 } from '@features/news/services';
 import type { Article } from '@features/news/types';
-import { NewsAddAndEditConfig, NewsFilterConfig } from '@features/news/utils';
+import { NewsAddAndEditConfig, NewsFilterConfig, isNewsDateReadyForFilter } from '@features/news/utils';
 import type { ColumnDef } from '@tanstack/react-table';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -76,6 +76,9 @@ const NewsScreen = () => {
 	}, [singleArticle]);
 
 	useEffect(() => {
+		if (!isNewsDateReadyForFilter(filterPublishDate)) {
+			return;
+		}
 		handleGetTableData(form.filterForm.getValues(), paginationState);
 	}, [filterTitle, filterPublishDate]);
 

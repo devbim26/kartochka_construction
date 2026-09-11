@@ -1,6 +1,6 @@
-import { Button, convertToBase64, dateMask, FormElementLabel, Input, SafeImage, useI18n } from '@core';
+import { Button, convertToBase64, FormElementLabel, Input, SafeImage, useI18n } from '@core';
 import type { Article } from '@features/news/types';
-import { isRichTextEmpty } from '@features/news/utils';
+import { isRichTextEmpty, isNewsDateComplete, newsDateMask } from '@features/news/utils';
 import { useMask } from '@react-input/mask';
 import { useId } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -13,7 +13,7 @@ export const NewsAddEdit = () => {
 	const { errors } = formState;
 	const { t } = useI18n();
 	const imageInputId = useId();
-	const dateMaskRef = useMask(dateMask);
+	const dateMaskRef = useMask(newsDateMask);
 	const publishDateField = register('publishDate');
 
 	const imageUrl = watch('imageUrl');
@@ -58,7 +58,7 @@ export const NewsAddEdit = () => {
 					onBlur={publishDateField.onBlur}
 					onChange={(event) => {
 						publishDateField.onChange(event);
-						if (event.target.value.replace(/[_\s-]/g, '').length > 0) {
+						if (isNewsDateComplete(event.target.value)) {
 							clearErrors('publishDate');
 						}
 					}}
@@ -73,7 +73,7 @@ export const NewsAddEdit = () => {
 					inputClassName="py-[6px] px-[12px] h-fit font-sans text-sm font-normal leading-5 tracking-[0.1px]"
 					containerClassName="w-[226px]"
 					label={errors.publishDate?.message || t('news.columns.publishDate')}
-					placeholder={t('news.placeholders.date')}
+					placeholder="ДД.ММ.ГГГГ"
 					max={10}
 					error={errors.publishDate?.message}
 				/>
