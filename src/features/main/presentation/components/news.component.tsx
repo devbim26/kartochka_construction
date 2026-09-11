@@ -1,6 +1,7 @@
 import type { ArticleDto } from '@api-gen';
 import { Button, SafeImage, useAppNavigate, useI18n } from '@core';
 import { getPaginatedArticles } from '@features/news/services';
+import { stripHtmlToPlainText } from '@features/news/utils';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa6';
@@ -67,28 +68,25 @@ export const News = ({ splitForGrid = false, className }: Props) => {
 			<div className="flex min-h-0 flex-1 flex-col gap-3">
 				{currentArticle && (
 					<>
-						<p className="font-sans text-xl font-semibold leading-tight">
+						<p className="shrink-0 font-sans text-xl font-semibold leading-tight">
 							{currentArticle.title}
 						</p>
-						<div className="flex flex-row items-start gap-4">
+						<div className="flex min-h-0 flex-1 flex-row items-start gap-4">
 							<SafeImage
 								src={currentArticle.imageUrl}
 								alt={currentArticle.title || t('main.news.imageAltFallback')}
 								className="h-[100px] w-[150px] shrink-0 rounded-lg object-cover"
 								fallbackClassName="h-[100px] w-[150px]"
 							/>
-							<p className="font-sans text-base leading-5 text-gray-700">
-								{currentArticle.bodyText?.substring(0, 150)}
-								{currentArticle.bodyText && currentArticle.bodyText.length > 150
-									? '...'
-									: ''}
+							<p className="news-main-preview-text min-h-0 flex-1 font-sans text-base leading-5 text-gray-700">
+								{stripHtmlToPlainText(currentArticle.bodyText)}
 							</p>
 						</div>
 					</>
 				)}
 			</div>
 
-			<div className="flex flex-row items-center justify-between">
+			<div className="flex shrink-0 flex-row items-center justify-between">
 				<div className="flex gap-[12px]">
 					<Button
 						className="flex size-[28px] items-center justify-center p-0"

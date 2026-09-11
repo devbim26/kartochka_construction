@@ -8,6 +8,7 @@ import {
 	ConstructionsAddSchema,
 	ConstructionsEditSchema,
 	ConstructionsFilterSchema,
+	IssuersFilterSchema,
 	IssuersSchema,
 	MaterialsAddAndEditSchema,
 	MaterialsFilterSchema,
@@ -56,11 +57,18 @@ export const MaterialsFilterConfig: EntityConfig = {
 
 export const IssuersAddAndEditConfig: EntityConfig = {
 	schema: IssuersSchema,
-	defaultValues: { name: '', countries: [], logoUrl: '', logoFile: '', webSite: '' },
+	defaultValues: {
+		name: '',
+		countries: [],
+		logoUrl: '',
+		logoFile: '',
+		editFile: false,
+		webSite: '',
+	},
 };
 
 export const IssuersFilterConfig: EntityConfig = {
-	schema: IssuersSchema,
+	schema: IssuersFilterSchema,
 	defaultValues: { name: '', countries: '', webSite: '' },
 };
 

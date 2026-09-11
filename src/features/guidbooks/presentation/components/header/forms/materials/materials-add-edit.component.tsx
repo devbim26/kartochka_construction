@@ -13,7 +13,6 @@ import {
 } from '@features/guidbooks/types';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { useSearchParams } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { FormSubTitle } from '../../form-sub-title.component';
 
@@ -21,7 +20,6 @@ export const MaterialsAddAndEdit = () => {
 	const form = useFormContext<MaterialsAddAndEditData>();
 	const { formState, control, setValue, trigger, watch } = form;
 	const [issuerData, setIssuerData] = useState<Array<Issuer>>([]);
-	const [search] = useSearchParams();
 	const handleGetIssuerData = useCallback(async () => {
 		try {
 			const response = await getGuidebooksPaginated({
@@ -48,25 +46,12 @@ export const MaterialsAddAndEdit = () => {
 			if (base64 && typeof base64 === 'string') {
 				setValue('imageUrl', base64);
 				setValue('imageFile', file);
+				setValue('editFile', true);
 			}
 			trigger('imageUrl');
 			trigger('imageFile');
-			setValue('editFile', true);
 		}
 	};
-
-	useEffect(() => {
-		const fetchData = async () => {
-			if (!!search.get('edit')) {
-				const response = await fetch(imageUrl);
-				const blob = await response.blob();
-				if (blob) {
-					setValue('imageFile', new File([blob], 'Image'));
-				}
-			}
-		};
-		fetchData();
-	}, []);
 
 	const imageUrl = watch('imageUrl');
 

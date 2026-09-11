@@ -78,6 +78,9 @@ const toPhysicalParam = (value?: string | null): number => {
 	return Number.isFinite(n) ? n : 0;
 };
 
+const toFormFile = (file: unknown): File | null =>
+	file instanceof File && file.size > 0 ? file : null;
+
 export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): any => ({
 	id: data.id || null,
 	name: data.name || null,
@@ -88,7 +91,7 @@ export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): 
 	type: convertToServerMaterialOriginTypeData(data.type as MaterialOriginType) || null,
 	countryTypes: convertToServerCountryData(data.country as Country[]) || null,
 	issuerId: data.issuer || null,
-	formFile: data.imageFile,
+	formFile: toFormFile(data.imageFile),
 	materialCoefficient: toPhysicalParam(data.materialCoefficient),
 	materialTypeEnum: data.materialType || null,
 	materialPurpose: (data.materialPurpose as MaterialPurpose) || null,
@@ -103,10 +106,14 @@ export const convertToServerMaterialsAddData = (data: MaterialsAddAndEditData): 
 	fb: toPhysicalParam(data.fb),
 	relativeCompression: toPhysicalParam(data.relativeCompression),
 	edin: toPhysicalParam(data.edin),
-	editFile: data.editFile,
 });
 
-export const convertToServerMaterialsEditData = (data: MaterialsAddAndEditData): any => ({
-	...convertToServerMaterialsAddData(data),
-	countries: convertToServerCountryData(data.country as Country[]) || null,
-});
+export const convertToServerMaterialsEditData = (data: MaterialsAddAndEditData): any => {
+	const editFile = Boolean(data.editFile);
+	return {
+		...convertToServerMaterialsAddData(data),
+		countries: convertToServerCountryData(data.country as Country[]) || null,
+		editFile,
+		formFile: editFile ? toFormFile(data.imageFile) : null,
+	};
+};

@@ -81,7 +81,7 @@ export const ArticlePage = () => {
 				/>
 			</div>
 			<div
-				className="prose max-w-none"
+				className="news-article-body max-w-none font-sans text-base leading-7 text-gray-900"
 				dangerouslySetInnerHTML={{ __html: article.bodyText || '' }}
 			/>
 			<p className="mt-12 text-left text-sm text-gray-400">

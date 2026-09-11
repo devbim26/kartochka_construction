@@ -15,6 +15,7 @@ export const IssuersAddEdit = () => {
 			if (base64 && typeof base64 === 'string') {
 				setValue('logoUrl', base64);
 				setValue('logoFile', file);
+				setValue('editFile', true);
 			}
 			trigger('logoUrl');
 			trigger('logoFile');

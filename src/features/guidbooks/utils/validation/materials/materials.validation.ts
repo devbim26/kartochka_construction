@@ -5,6 +5,7 @@ export const MaterialsAddAndEditSchema = z.object({
 	name: z.string().min(1, 'Поле обязательно для заполнения'),
 	description: z.string().min(1, 'Поле обязательно для заполнения'),
 	shortName: z.string().min(1, 'Поле обязательно для заполнения'),
+	/** true — на сервер уйдёт новый файл; false — оставить текущее изображение. */
 	editFile: z.boolean(),
 	density: z
 		.string()
@@ -23,13 +24,12 @@ export const MaterialsAddAndEditSchema = z.object({
 	issuer: z.string().min(1, 'Поле обязательно для заполнения'),
 	/** Имя производителя из списка (не обязательно в форме создания). */
 	issuerName: z.string().optional(),
-	imageUrl: z.string().min(1, 'Поле обязательно для заполнения'),
+	/** Изображение материала необязательно. */
+	imageUrl: z.string().optional().nullable(),
+	imageFile: z.any().optional().nullable(),
 	/** Остальные физ. параметры опциональны — при пустом значении на сервер уходит 0. */
 	relativeCompression: z.string().optional(),
 	edin: z.string().optional(),
-	imageFile: z
-		.any()
-		.refine((file) => file instanceof File && file.size > 0, 'Поле обязательно для заполнения'),
 	materialCoefficient: z.string().optional(),
 	velocity: z.string().optional(),
 	lossFactor: z.string().optional(),

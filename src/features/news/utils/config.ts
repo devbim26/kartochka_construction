@@ -1,5 +1,5 @@
 import type { EntityConfig } from '@core';
-import { NewsSchema } from './validation';
+import { NewsFilterSchema, NewsSchema } from './validation';
 
 export const NewsAddAndEditConfig: EntityConfig = {
 	schema: NewsSchema,
@@ -7,6 +7,6 @@ export const NewsAddAndEditConfig: EntityConfig = {
 };
 
 export const NewsFilterConfig: EntityConfig = {
-	schema: NewsSchema,
+	schema: NewsFilterSchema,
 	defaultValues: { title: '', publishDate: '' },
 };

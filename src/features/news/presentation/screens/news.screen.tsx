@@ -192,13 +192,28 @@ const NewsScreen = () => {
 			.subscribe();
 	};
 
-	const onSaveHandle = useCallback(() => {
-		handleAddTableData(form.addForm.getValues());
-	}, [handleAddTableData, form.addForm.getValues()]);
+	const onSaveHandle = useCallback(
+		(data: Article) => {
+			handleAddTableData(data);
+		},
+		[form.addForm],
+	);
 
-	const onEditHandle = useCallback(() => {
-		handleEditTableData(form.editForm.getValues());
-	}, [handleEditTableData, form.editForm.getValues()]);
+	const onEditHandle = useCallback(
+		(data: Article) => {
+			handleEditTableData(data);
+		},
+		[form.editForm],
+	);
+
+	const formElements = useMemo(
+		() => ({
+			filter: NewsFilter,
+			add: NewsAddEdit,
+			edit: NewsAddEdit,
+		}),
+		[],
+	);
 
 	const columns = useMemo(() => {
 		const cols: ColumnDef<Article>[] = [
@@ -272,11 +287,7 @@ const NewsScreen = () => {
 					addTitleKey: 'news.addTitle',
 				}}
 				forms={form}
-				formElements={{
-					filter: NewsFilter,
-					add: NewsAddEdit,
-					edit: NewsAddEdit,
-				}}
+				formElements={formElements}
 			/>
 			<SimpleTable
 				data={tableData}
