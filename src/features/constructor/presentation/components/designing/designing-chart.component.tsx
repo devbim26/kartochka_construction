@@ -123,20 +123,40 @@ type LineTier = 'thick' | 'medium' | 'thin';
  * - без доп. конструкций: только итоговая (Computed) / лабораторная — Intermediate скрыт;
  * - с доп. конструкциями: итоговая + базовая (Intermediate) + двери/окна;
  * эталон всегда без подписи (пустой label).
+ *
+ * Двери/окна: тон серого от тёмного к светлому по порядку среди opening-кривых.
  */
 const GREY_SECONDARY_SERIES_COLOR = '#6b7280';
+const GREY_OPENING_DARK = '#374151';
+const GREY_OPENING_LIGHT = '#d1d5db';
 
 const isGreySecondarySeries = (kind: GraphSeriesKind) =>
 	kind === 'window' || kind === 'door' || kind === 'other';
 
+const isOpeningSeries = (s: DesigningChartSeries) =>
+	s.kind === 'window' ||
+	s.kind === 'door' ||
+	s.graphType === GraphType.AdditionalWindow ||
+	s.graphType === GraphType.AdditionalDoor;
+
 const hasAdditionalOpeningSeries = (series: DesigningChartSeries[]) =>
-	series.some(
-		(s) =>
-			s.kind === 'window' ||
-			s.kind === 'door' ||
-			s.graphType === GraphType.AdditionalWindow ||
-			s.graphType === GraphType.AdditionalDoor,
-	);
+	series.some(isOpeningSeries);
+
+const parseHexRgb = (hex: string): [number, number, number] => {
+	const h = hex.replace('#', '');
+	return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+};
+
+const toHexByte = (n: number) => Math.round(n).toString(16).padStart(2, '0');
+
+/** Интерполяция серого: index 0 — тёмный, последний — светлый. */
+const greyShadeForOpeningIndex = (index: number, total: number): string => {
+	if (total <= 1) return GREY_SECONDARY_SERIES_COLOR;
+	const t = index / (total - 1);
+	const [r1, g1, b1] = parseHexRgb(GREY_OPENING_DARK);
+	const [r2, g2, b2] = parseHexRgb(GREY_OPENING_LIGHT);
+	return `#${toHexByte(r1 + (r2 - r1) * t)}${toHexByte(g1 + (g2 - g1) * t)}${toHexByte(b1 + (b2 - b1) * t)}`;
+};
 
 /** Скрывать Intermediate, пока нет доп. конструкций; двери/окна в легенде всегда. */
 const isLegendHiddenKind = (
@@ -148,7 +168,7 @@ const isLegendHiddenKind = (
 	return false;
 };
 
-const seriesStyleByKind = (kind: GraphSeriesKind) => {
+const seriesStyleByKind = (kind: GraphSeriesKind, openingColor?: string) => {
 	switch (kind) {
 		case 'laboratory_wall':
 			return { color: '#ef4444', lineTier: 'thick' as const, borderDash: undefined as number[] | undefined };
@@ -169,7 +189,7 @@ const seriesStyleByKind = (kind: GraphSeriesKind) => {
 		case 'window':
 		case 'door':
 			return {
-				color: GREY_SECONDARY_SERIES_COLOR,
+				color: openingColor ?? GREY_SECONDARY_SERIES_COLOR,
 				lineTier: 'thin' as const,
 				borderDash: undefined,
 			};
@@ -188,9 +208,10 @@ const seriesStyleByKind = (kind: GraphSeriesKind) => {
 	}
 };
 
-const seriesColor = (s: DesigningChartSeries) => seriesStyleFromGraphSeries(s).color;
+const seriesColor = (s: DesigningChartSeries, openingColor?: string) =>
+	seriesStyleFromGraphSeries(s, openingColor).color;
 
-const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
+const seriesStyleFromGraphSeries = (s: DesigningChartSeries, openingColor?: string) => {
 	const gt = s.graphType;
 	if (gt === GraphType.Computed)
 		return { color: '#2563eb', lineTier: 'thick' as LineTier, borderDash: undefined };
@@ -212,15 +233,9 @@ const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 		return { color: '#9ca3af', lineTier: 'thin' as LineTier, borderDash: [6, 6] as number[] };
 	if (gt === GraphType.ImpactAtalon)
 		return { color: '#9ca3af', lineTier: 'thin' as LineTier, borderDash: [6, 6] as number[] };
-	if (gt === GraphType.AdditionalDoor)
+	if (gt === GraphType.AdditionalDoor || gt === GraphType.AdditionalWindow)
 		return {
-			color: GREY_SECONDARY_SERIES_COLOR,
-			lineTier: 'thin' as LineTier,
-			borderDash: undefined,
-		};
-	if (gt === GraphType.AdditionalWindow)
-		return {
-			color: GREY_SECONDARY_SERIES_COLOR,
+			color: openingColor ?? GREY_SECONDARY_SERIES_COLOR,
 			lineTier: 'thin' as LineTier,
 			borderDash: undefined,
 		};
@@ -230,7 +245,7 @@ const seriesStyleFromGraphSeries = (s: DesigningChartSeries) => {
 			lineTier: 'thin' as LineTier,
 			borderDash: undefined,
 		};
-	return seriesStyleByKind(s.kind);
+	return seriesStyleByKind(s.kind, openingColor);
 };
 
 const DesigningChart = ({
@@ -379,10 +394,17 @@ const DesigningChart = ({
 		},
 	};
 
+	const openingSeries = series.filter(isOpeningSeries);
+	const openingCount = openingSeries.length;
+	const openingColorByKey = new Map(
+		openingSeries.map((s, index) => [s.key, greyShadeForOpeningIndex(index, openingCount)]),
+	);
+	const openingColorFor = (s: DesigningChartSeries) => openingColorByKey.get(s.key);
+
 	const chartData: ChartData<'line'> = {
 		labels: displayFrequencies.map((freq) => String(freq)),
 		datasets: series.map((s) => {
-			const style = seriesStyleFromGraphSeries(s);
+			const style = seriesStyleFromGraphSeries(s, openingColorFor(s));
 			const { color, lineTier, borderDash: styleDash } = style;
 			const borderWidth =
 				lineTier === 'thick' ? thickWidth : lineTier === 'medium' ? (thickWidth + thinWidth) / 2 : thinWidth;
@@ -493,7 +515,7 @@ const DesigningChart = ({
 					},
 					color: (context) => {
 						const s = series[context.datasetIndex];
-						return s ? seriesColor(s) : '#14181f';
+						return s ? seriesColor(s, openingColorFor(s)) : '#14181f';
 					},
 				},
 				legend: {
@@ -519,7 +541,7 @@ const DesigningChart = ({
 									if (!text.length) return null;
 									const fill =
 										s != null
-											? seriesColor(s)
+											? seriesColor(s, openingColorFor(s))
 											: typeof dataset.borderColor === 'string'
 												? dataset.borderColor
 												: '#6b7280';
