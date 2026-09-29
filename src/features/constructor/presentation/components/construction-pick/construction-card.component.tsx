@@ -1,5 +1,14 @@
-import { FormElementLabel, ImagePreviewModal, SafeImage, useI18n } from '@core';
 import type { IssuerDto } from '@api-gen';
+import {
+	Carousel,
+	CarouselSlide,
+	getAttachmentDisplayName,
+	ImagePreviewModal,
+	normalizeAttachments,
+	SafeImage,
+	useI18n,
+	type FileAttachment,
+} from '@core';
 import type { ConstructionSelectRestrictions } from '@features/constructor/types';
 import type { ReportInfoShort } from '@features/constructor/utils';
 import {
@@ -7,25 +16,28 @@ import {
 	getSurfaceMassKgPerM2FromMaterials,
 	getTotalThicknessMmFromMaterials,
 } from '@features/constructor/utils';
-import { buildCatalogHeightPhysicalRow } from '@features/constructor/utils/catalog-physical-rows.utils';
 import { convertToClientIssuerData } from '@features/guidbooks/converters';
-import { getGuidebooksDetail } from '@features/guidbooks/services';
+import { getConstructionAdditionalInfo, getGuidebooksDetail } from '@features/guidbooks/services';
 import type { ConstructionsEditData, ConstructionTypeEnum } from '@features/guidbooks/types';
 import { Guidebooks, RuConstructionTypesMap } from '@features/guidbooks/types';
 import { useEffect, useState } from 'react';
 import { catchError, from, of, tap } from 'rxjs';
 import {
-	ConstructionDetailsModal,
-	GeneralInformationFireResistance,
-	GeneralInformationPhysical,
-	GeneralInformationSoundproofing,
-	GeneralInformationThermal,
-} from '../modals';
-import {
 	ConstructionComplianceBanner,
 	type ConstructionComplianceStatus,
 } from '../construction-compliance-banner.component';
+import { ConstructionDetailsModal } from '../modals';
 import { CatalogLabTestGraphModal } from './catalog-lab-test-graph-modal.component';
+import {
+	CatalogBasicCardView,
+	CatalogManufacturerHeader,
+	CatalogReportUsableBadge,
+	CatalogRequirementsInfoModal,
+	CatalogRequirementsTable,
+	CatalogTitleBar,
+	ConstructionDocumentsAccordion,
+	type CatalogRequirementsRow,
+} from './construction-card-sections.component';
 
 type Props = {
 	construction: ConstructionsEditData;
@@ -61,7 +73,13 @@ export const ConstructionCard = ({
 	const [previewSrc, setPreviewSrc] = useState<string | null>(null);
 	const [isLabGraphOpen, setIsLabGraphOpen] = useState(false);
 	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-	const [fetchedIssuerLogo, setFetchedIssuerLogo] = useState<string | null>(null);
+	const [fetchedIssuer, setFetchedIssuer] = useState<{
+		logoUrl: string | null;
+		webSite: string | null;
+	} | null>(null);
+	const [additionalImages, setAdditionalImages] = useState<FileAttachment[]>([]);
+	const [additionalFiles, setAdditionalFiles] = useState<FileAttachment[]>([]);
+	const [isReqInfoOpen, setIsReqInfoOpen] = useState(false);
 
 	useEffect(() => {
 		if (!construction) return;
@@ -76,11 +94,14 @@ export const ConstructionCard = ({
 		setMass(getSurfaceMassKgPerM2FromMaterials(allMaterials));
 	}, [construction]);
 
+	/** Размещение оплачено — расширенная брендовая карточка; иначе — базовая. */
+	const isPaidPlacement = construction?.isPaidPlacement ?? true;
+
 	useEffect(() => {
-		setFetchedIssuerLogo(null);
-		const issuerId = construction?.issuer;
-		const existingLogo = construction?.issuerLogo;
-		if (!issuerId || existingLogo) return;
+		setFetchedIssuer(null);
+		// Брендинг базовой карточки не показывается — эмитент не запрашивается.
+		const issuerId = isPaidPlacement ? construction?.issuer : null;
+		if (!issuerId) return;
 
 		const subscription = from(
 			getGuidebooksDetail({ id: issuerId, guidebookType: Guidebooks.ISSUER }),
@@ -89,7 +110,10 @@ export const ConstructionCard = ({
 				tap((response) => {
 					if (response?.status === 200 && response.data) {
 						const issuer = convertToClientIssuerData(response.data as IssuerDto);
-						setFetchedIssuerLogo(issuer.logoUrl || null);
+						setFetchedIssuer({
+							logoUrl: issuer.logoUrl || null,
+							webSite: issuer.webSite || null,
+						});
 					}
 				}),
 				catchError(() => of(null)),
@@ -97,16 +121,160 @@ export const ConstructionCard = ({
 			.subscribe();
 
 		return () => subscription.unsubscribe();
-	}, [construction?.issuer, construction?.issuerLogo]);
+	}, [construction?.issuer, isPaidPlacement]);
+
+	const constructionHeaderId = construction?.id ?? null;
+
+	useEffect(() => {
+		setAdditionalImages([]);
+		setAdditionalFiles([]);
+		// Слайдер и документы — часть оплаченного размещения.
+		if (!constructionHeaderId || !isPaidPlacement) return;
+		let cancelled = false;
+
+		getConstructionAdditionalInfo(constructionHeaderId)
+			.then((response) => {
+				if (cancelled || response.status !== 200 || !response.data) return;
+				setAdditionalImages(normalizeAttachments(response.data.imageUrls));
+				setAdditionalFiles(normalizeAttachments(response.data.fileUrls));
+			})
+			.catch(() => undefined);
+
+		return () => {
+			cancelled = true;
+		};
+	}, [constructionHeaderId, isPaidPlacement]);
 
 	const thicknessMin = toOptionalNumber(appliedRestrictions?.minThickness);
 	const thicknessMax = toOptionalNumber(appliedRestrictions?.maxThickness);
 	const massMin = toOptionalNumber(appliedRestrictions?.minWeight);
 	const massMax = toOptionalNumber(appliedRestrictions?.maxWeight);
 
-	const constructionHeaderId = construction?.id ?? null;
-	const issuerLogo = construction?.issuerLogo || fetchedIssuerLogo || null;
+	const issuerLogo = construction?.issuerLogo || fetchedIssuer?.logoUrl || null;
+	const issuerWebSite = fetchedIssuer?.webSite || null;
 	const issuerLabel = construction?.issuerName || '';
+
+	const typeLabel =
+		RuConstructionTypesMap[
+			construction.constructionTypeObject!.constructionTypeEnum as ConstructionTypeEnum
+		];
+	const titleText = construction?.name?.trim() || typeLabel;
+
+	const sliderSlides = [
+		...(svgUrl ? [{ url: svgUrl, alt: 'SVG Construction' }] : []),
+		...additionalImages.map((image, index) => ({
+			url: image.url ?? '',
+			alt:
+				getAttachmentDisplayName(image) ||
+				`${t('guides.constructions.info.currentImage')} ${index + 1}`,
+		})),
+	];
+
+	const materials = [
+		...(construction?.constructionTypeObject.leftConstruction || []),
+		...(construction?.constructionTypeObject.centerConstruction || []),
+		...(construction?.constructionTypeObject.rightConstruction || []),
+	];
+
+	const calcReq = reportInfo?.calculationRequirement ?? reportInfo?.regulatoryRequirement;
+	const requirementInfoLines = [
+		[calcReq?.standartShortName, calcReq?.standartFullName].filter(Boolean).join(' '),
+		calcReq?.noizeIsolationIndex != null
+			? `Rw ≥ ${calcReq.noizeIsolationIndex} ${t('constructor.catalog.dbUnit')}`
+			: '',
+		calcReq?.class ? `${t('constructor.catalog.requirementClassLabel')} ${calcReq.class}` : '',
+	].filter(Boolean);
+
+	const requirementRows: CatalogRequirementsRow[] = [
+		{
+			physical: t('constructor.catalog.thicknessLabel'),
+			values: String(thickness) || '-',
+			requirements: formatRequirementLabel(thicknessMin, thicknessMax),
+			requirementMin: thicknessMin,
+			requirementMax: thicknessMax,
+		},
+		{
+			physical: t('generalInfo.massPerSquareMeter'),
+			values: Number.isFinite(mass) ? mass.toFixed(2) : '-',
+			requirements: formatRequirementLabel(massMin, massMax),
+			requirementMin: massMin,
+			requirementMax: massMax,
+		},
+		{
+			physical: `${t('soundproofing.title')} Rw, dB`,
+			values: String(construction?.RCalcs) || '-',
+			requirements: reportInfo?.regulatoryRequirement?.noizeIsolationIndex || '-',
+			isSoundproofing: true,
+		},
+	];
+
+	const detailsModalOverrides = {
+		constructionType: construction?.constructionType,
+		issuerName: construction?.issuerName,
+		issuerImage: issuerLogo,
+		rw:
+			construction?.RCalcs != null && construction.RCalcs !== ''
+				? Number(String(construction.RCalcs).replace(',', '.'))
+				: null,
+		totalThickness: thickness || null,
+		massPerSquareMeter: Number.isFinite(mass) ? mass : null,
+	};
+
+	// Базовая карточка (размещение не оплачено): без брендинга, фото и документов.
+	if (!isPaidPlacement) {
+		return (
+			<>
+				<CatalogLabTestGraphModal
+					isOpen={isLabGraphOpen}
+					onClose={() => setIsLabGraphOpen(false)}
+					constructionHeaderId={constructionHeaderId}
+					regulatoryDocName={construction?.airLaboratory?.laboratoryTestSource ?? ''}
+					calculationDocName=""
+				/>
+				<CatalogBasicCardView
+					title={titleText}
+					caption={titleText !== typeLabel ? typeLabel : null}
+					svgUrl={svgUrl}
+					composition={materials.map((material: any, index: number) => (
+						<p
+							key={index}
+							className="whitespace-nowrap text-left text-[13px] leading-snug text-gray-800"
+						>
+							- {formatMaterial(material)}
+						</p>
+					))}
+					banner={
+						complianceStatus ? (
+							<ConstructionComplianceBanner
+								status={complianceStatus}
+								className="max-w-none"
+							/>
+						) : null
+					}
+					requirementRows={requirementRows}
+					soundproofingLabel={t('soundproofing.title')}
+					onSoundproofingLabelClick={
+						constructionHeaderId ? () => setIsLabGraphOpen(true) : undefined
+					}
+					onInfoClick={
+						requirementInfoLines.length > 0 ? () => setIsReqInfoOpen(true) : undefined
+					}
+					onMoreClick={constructionHeaderId ? () => setIsDetailsOpen(true) : undefined}
+				/>
+				<CatalogRequirementsInfoModal
+					isOpen={isReqInfoOpen}
+					onClose={() => setIsReqInfoOpen(false)}
+					lines={requirementInfoLines}
+				/>
+				<ConstructionDetailsModal
+					isOpen={isDetailsOpen}
+					onClose={() => setIsDetailsOpen(false)}
+					constructionHeaderId={constructionHeaderId}
+					overrides={detailsModalOverrides}
+				/>
+			</>
+		);
+	}
 
 	return (
 		<>
@@ -120,148 +288,138 @@ export const ConstructionCard = ({
 				regulatoryDocName={construction?.airLaboratory?.laboratoryTestSource ?? ''}
 				calculationDocName=""
 			/>
-			<div className="flex flex-col gap-[30px] rounded-xl bg-white px-[30px] py-[25px]">
+			<div className="flex w-full flex-col gap-[20px] rounded-xl border-[3px] border-primary/30 bg-white px-[24px] pb-[22px] pt-[18px]">
 				{complianceStatus ? (
 					<ConstructionComplianceBanner
 						status={complianceStatus}
 						className="max-w-none"
 					/>
 				) : null}
-				<p className="font-sans text-lg font-semibold leading-4">
-					{
-						RuConstructionTypesMap[
-							construction.constructionTypeObject!
-								.constructionTypeEnum as ConstructionTypeEnum
-						]
-					}
-				</p>
-				<div className="flex flex-row justify-between">
-					<div className="flex w-1/2 min-w-0 flex-col gap-[10px]">
-						<div className="flex flex-row items-start justify-start gap-3 text-left">
-							<button
-								type="button"
-								className="shrink-0 cursor-pointer border-0 bg-transparent p-0 disabled:cursor-default"
-								disabled={!issuerLogo}
-								onClick={() => issuerLogo && setPreviewSrc(issuerLogo)}
-							>
-								<SafeImage
-									src={issuerLogo}
-									alt={issuerLabel || 'Issuer logo'}
-									className="h-[66px] w-[140px] shrink-0 rounded-md object-contain"
-									fallbackClassName="h-[66px] w-[140px]"
-								/>
-							</button>
-							<p className="text-left text-[14px] leading-snug">{issuerLabel || '—'}</p>
-						</div>
-						<div className="flex min-w-0 flex-row items-start justify-start gap-4 text-left">
-							<button
-								type="button"
-								className="flex shrink-0 cursor-pointer items-start justify-start border-0 bg-transparent p-0 disabled:cursor-default"
-								disabled={!svgUrl}
-								onClick={() => svgUrl && setPreviewSrc(svgUrl)}
-							>
-								<SafeImage
-									src={svgUrl}
-									alt="SVG Construction"
-									className="block h-auto max-h-[280px] w-auto max-w-[260px] object-contain"
-									fallbackClassName="h-[180px] w-[220px]"
-								/>
-							</button>
-							<div className="min-w-0 flex-1 overflow-x-auto text-left">
-								<div className="flex w-full min-w-0 flex-col items-start gap-1 text-left">
-									{[
-										...(construction?.constructionTypeObject.leftConstruction ||
-											[]),
-										...(construction?.constructionTypeObject
-											.centerConstruction || []),
-										...(construction?.constructionTypeObject
-											.rightConstruction || []),
-									].map((material: any, index: number) => (
-										<p
-											key={index}
-											className="whitespace-nowrap text-left text-[16px] leading-snug text-gray-800"
+
+				<CatalogManufacturerHeader
+					logoUrl={issuerLogo}
+					issuerName={issuerLabel}
+					webSite={issuerWebSite}
+					constructionId={constructionHeaderId}
+					onLogoClick={issuerLogo ? () => setPreviewSrc(issuerLogo) : undefined}
+				/>
+
+				<CatalogTitleBar
+					title={titleText}
+					caption={titleText !== typeLabel ? typeLabel : null}
+					officialPageUrl={issuerWebSite}
+					constructionId={constructionHeaderId}
+				/>
+
+				<div className="grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,440px)_minmax(0,1fr)]">
+					<div className="flex min-w-0 flex-col gap-2">
+						{sliderSlides.length > 0 ? (
+							<div className="relative w-full">
+								<CatalogReportUsableBadge className="absolute left-3 top-3 z-20" />
+								<Carousel
+									className="w-full"
+									options={{ loop: sliderSlides.length > 1 }}
+									showPagination={sliderSlides.length > 1}
+								>
+									{sliderSlides.map((slide, index) => (
+										<CarouselSlide
+											key={`${slide.url}-${index}`}
+											className="min-w-0 flex-[0_0_100%]"
 										>
-											- {formatMaterial(material)}
-										</p>
+											<button
+												type="button"
+												className="flex h-[260px] w-full cursor-pointer items-center justify-center rounded-md border-0 bg-[#F5F5F5] p-3"
+												onClick={() =>
+													slide.url && setPreviewSrc(slide.url)
+												}
+											>
+												<SafeImage
+													src={slide.url}
+													alt={slide.alt}
+													className="max-h-full max-w-full object-contain"
+													fallbackClassName="h-full w-full"
+												/>
+											</button>
+										</CarouselSlide>
 									))}
-								</div>
+								</Carousel>
 							</div>
-						</div>
+						) : (
+							<div className="relative flex h-[260px] items-center justify-center rounded-md bg-[#F5F5F5] text-input-label-primary">
+								<CatalogReportUsableBadge className="absolute left-3 top-3 z-20" />
+								{t('guides.constructions.info.images')} —
+							</div>
+						)}
+						{constructionHeaderId ? (
+							<button
+								type="button"
+								onClick={() => setIsDetailsOpen(true)}
+								className="w-fit cursor-pointer self-center border-0 bg-transparent p-0 font-sans text-sm font-semibold text-primary underline hover:opacity-80"
+							>
+								{t('constructor.catalog.descriptionLink')}
+							</button>
+						) : null}
 					</div>
-					<div className="flex w-1/2 flex-col gap-[10px]">
-						<FormElementLabel className="text-left font-sans font-semibold leading-6 text-primary">
-							Технические параметры
-						</FormElementLabel>
-						<GeneralInformationPhysical
-							data={[
-								{
-									physical: 'Толщина, мм',
-									values: String(thickness) || '-',
-									requirements: formatRequirementLabel(
-										thicknessMin,
-										thicknessMax,
-									),
-									requirementMin: thicknessMin,
-									requirementMax: thicknessMax,
-								},
-								{
-									physical: 'Масса, кг/м²',
-									values: Number.isFinite(mass) ? mass.toFixed(2) : '-',
-									requirements: formatRequirementLabel(massMin, massMax),
-									requirementMin: massMin,
-									requirementMax: massMax,
-								},
-								buildCatalogHeightPhysicalRow(construction?.maxHeight, reportInfo),
-							]}
-						/>
-						<GeneralInformationSoundproofing
-							data={[
-								{
-									label: t('soundproofing.labTest'),
-									soundproofing: 'Rw, dB',
-									values: String(construction?.RCalcs) || '-',
-									requirements:
-										reportInfo?.regulatoryRequirement?.noizeIsolationIndex ||
-										'-',
-								},
-							]}
-							onSoundproofingLabelClick={
-								constructionHeaderId
-									? () => setIsLabGraphOpen(true)
-									: undefined
-							}
-						/>
-						<GeneralInformationThermal />
-						<GeneralInformationFireResistance />
+
+					<div className="flex min-w-0 flex-col items-start gap-[6px] text-left">
+						{construction?.description?.trim() ? (
+							<p className="min-w-0 max-w-full font-sans text-sm leading-relaxed text-[#374151]">
+								{construction.description}
+							</p>
+						) : (
+							<div className="flex min-w-0 flex-col gap-1 overflow-x-auto">
+								{materials.map((material: any, index: number) => (
+									<p
+										key={index}
+										className="whitespace-nowrap text-left text-[14px] leading-snug text-gray-800"
+									>
+										- {formatMaterial(material)}
+									</p>
+								))}
+							</div>
+						)}
+						{constructionHeaderId ? (
+							<button
+								type="button"
+								onClick={() => setIsDetailsOpen(true)}
+								className="mt-2 w-fit cursor-pointer border-0 bg-transparent p-0 font-sans text-sm font-semibold text-primary underline hover:opacity-80"
+							>
+								{t('createConstruction.details.more')}
+							</button>
+						) : null}
 					</div>
 				</div>
-				{constructionHeaderId ? (
-					<div className="flex justify-center">
-						<button
-							type="button"
-							onClick={() => setIsDetailsOpen(true)}
-							className="font-sans text-[28px] font-semibold leading-tight text-primary hover:opacity-80"
-						>
-							{t('createConstruction.details.more')}
-						</button>
-					</div>
-				) : null}
+
+				<div className="flex w-full flex-col gap-[10px]">
+					<p className="font-sans text-lg font-semibold leading-4 text-primary">
+						{t('constructor.catalog.requirementsTitle')}
+					</p>
+					<CatalogRequirementsTable
+						data={requirementRows}
+						soundproofingLabel={t('soundproofing.title')}
+						onSoundproofingLabelClick={
+							constructionHeaderId ? () => setIsLabGraphOpen(true) : undefined
+						}
+						onInfoClick={
+							requirementInfoLines.length > 0
+								? () => setIsReqInfoOpen(true)
+								: undefined
+						}
+					/>
+				</div>
+
+				<ConstructionDocumentsAccordion files={additionalFiles} />
 			</div>
+			<CatalogRequirementsInfoModal
+				isOpen={isReqInfoOpen}
+				onClose={() => setIsReqInfoOpen(false)}
+				lines={requirementInfoLines}
+			/>
 			<ConstructionDetailsModal
 				isOpen={isDetailsOpen}
 				onClose={() => setIsDetailsOpen(false)}
 				constructionHeaderId={constructionHeaderId}
-				overrides={{
-					constructionType: construction?.constructionType,
-					issuerName: construction?.issuerName,
-					issuerImage: issuerLogo,
-					rw:
-						construction?.RCalcs != null && construction.RCalcs !== ''
-							? Number(String(construction.RCalcs).replace(',', '.'))
-							: null,
-					totalThickness: thickness || null,
-					massPerSquareMeter: Number.isFinite(mass) ? mass : null,
-				}}
+				overrides={detailsModalOverrides}
 			/>
 		</>
 	);

@@ -52,6 +52,7 @@
 		"test:validation": "node --test src/features/guidbooks/utils/validation/constructions/material-parameter-value.validation.test.mjs",
 		"test:constructions-list": "node --test src/features/guidbooks/converters/constructions/constructions-list-mapping.test.mjs",
 		"test:pagination": "node --test src/core/presentation/components/pagination/pagination-row-range.test.mjs",
+		"test:utm-helper": "node --test src/features/constructor/presentation/components/construction-pick/build-issuer-url-utm.test.mjs",
 		"prod": "node ./tools/generate-api.js prettier --write ./src && eslint ./src cross-env NODE_ENV=production webpack --config webpack.config.js"
 	},
 	"browserslist": {

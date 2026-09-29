@@ -174,6 +174,8 @@ const constructionsBaseShape = z.object({
 	isViewForDefaultUser: z.boolean().optional(),
 	/** Доступна ли конструкция текущему пользователю в пагинированном списке (модалка) */
 	isView: z.boolean().optional(),
+	/** Оплачено ли размещение: true — расширенная брендовая карточка, false — базовая. */
+	isPaidPlacement: z.boolean().optional(),
 	constructionTypeObject: ConstructionTypeShema,
 	reportInfoId: z.string().optional(),
 	additionalInfo: ConstructionAdditionalInfoSchema.optional(),

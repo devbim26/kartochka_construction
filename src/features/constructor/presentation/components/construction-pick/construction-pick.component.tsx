@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import {
-	Switch,
 	convertToServerCountryData,
+	Switch,
 	useAppDispatch,
 	useAppNavigate,
 	useAppSelector,
+	useI18n,
 } from '@core';
 import {
 	buildRequirementDisplaySnapshot,
@@ -24,8 +25,12 @@ import { ReportCategory } from '@features/constructor/types';
 import type { ReportInfoShort } from '@features/constructor/utils';
 import { convertToClientConstructionsEditData } from '@features/guidbooks/converters';
 import { getGuidebooksDetail } from '@features/guidbooks/services';
-import type { AlternateConstruction, ConstructionsEditData } from '@features/guidbooks/types';
-import { ConstructionClass, Country, Guidebooks } from '@features/guidbooks/types';
+import type {
+	AlternateConstruction,
+	ConstructionsEditData,
+	Country,
+} from '@features/guidbooks/types';
+import { ConstructionClass, Guidebooks } from '@features/guidbooks/types';
 import { AxiosError } from 'axios';
 
 import Loader from '@core/presentation/components/loaders/loader.component';
@@ -50,6 +55,7 @@ const ContructionPick = () => {
 	const constructionHeaderId = search.get('constructionHeaderId');
 
 	const dispatch = useAppDispatch();
+	const { t } = useI18n();
 	const [svgUrl, setSvgUrl] = useState<string | null>(null);
 	const [alternateConstructions, setAlternateConstructions] = useState<AlternateConstruction[]>();
 	const [totalPages, setTotalPages] = useState(1);
@@ -68,9 +74,7 @@ const ContructionPick = () => {
 			currentReportInfo?.regulatoryRequirement?.noizeIsolationIndex ??
 			currentReportInfo?.calculationRequirement?.noizeIsolationIndex;
 		const value =
-			constructionHeader?.RCalcs ??
-			constructionHeader?.airLaboratory?.labIndexValue ??
-			null;
+			constructionHeader?.RCalcs ?? constructionHeader?.airLaboratory?.labIndexValue ?? null;
 		return getAirborneComplianceStatus(value, requirement);
 	}, [currentReportInfo, constructionHeader]);
 
@@ -333,11 +337,13 @@ const ContructionPick = () => {
 			)}
 			<div className="flex h-fit w-full flex-col rounded-xl bg-white pt-[18px]">
 				<div className="border-b px-[24px] pb-[18px]">
-					<p className="font-sans text-lg font-semibold leading-4">Требования</p>
+					<p className="font-sans text-lg font-semibold leading-4">
+						{t('constructor.catalog.requirementsTitle')}
+					</p>
 				</div>
 				<div className="flex flex-col gap-[10px] px-[24px] py-[10px]">
 					<p className="font-sans text-lg font-semibold leading-4 text-primary">
-						Звукоизоляция
+						{t('soundproofing.title')}
 					</p>
 					{currentReportInfo && (
 						<>
@@ -356,14 +362,16 @@ const ContructionPick = () => {
 								{currentReportInfo?.calculationRequirement?.noizeIsolationIndex}
 							</p>
 							<p className="font-sans text-[20px] font-semibold leading-4">
-								Класс{' '}
+								{t('constructor.catalog.requirementClassLabel')}{' '}
 								<span>{currentReportInfo?.calculationRequirement?.class}</span>
 							</p>
 						</>
 					)}
 				</div>
 			</div>
-			<p className="font-sans text-lg font-semibold leading-4">Базовая конструкция</p>
+			<p className="font-sans text-lg font-semibold leading-4">
+				{t('constructor.catalog.baseConstructionTitle')}
+			</p>
 			{currentReportInfo && constructionHeader && (
 				<ConstructionCard
 					key={constructionHeader.id}
@@ -376,7 +384,7 @@ const ContructionPick = () => {
 			)}
 			<div className="flex gap-[30px]">
 				<p className="font-sans text-lg font-semibold leading-4">
-					Альтернативные конструкции
+					{t('constructor.catalog.alternativeTitle')}
 				</p>
 				<Switch onChange={() => setShowAlternate(!showAlternate)} />
 			</div>

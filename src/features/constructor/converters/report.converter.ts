@@ -415,5 +415,10 @@ export const convertToClientAlternateConstruction = (
 		name: data.name || '',
 		shortName: data.shortName || '',
 		rLab: resolveLabRwFromPaginatedHeader(data),
+		// Без флага от бэкенда считаем размещение оплаченным (обратная совместимость).
+		// Поле появится в api-gen после добавления на бэкенде (см. СПЕКУ).
+		isPaidPlacement:
+			(data as PaginatedConstructionHeaderDto & { isPaidPlacement?: boolean })
+				.isPaidPlacement ?? true,
 	};
 };

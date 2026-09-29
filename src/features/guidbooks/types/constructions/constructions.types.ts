@@ -29,4 +29,6 @@ export type AlternateConstruction = {
 	shortName: string;
 	/** Лабораторный Rw из ответа alternativeConstructions */
 	rLab: number | null;
+	/** Оплачено ли размещение: false — базовая карточка без брендинга. */
+	isPaidPlacement?: boolean;
 };

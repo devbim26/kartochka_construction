@@ -308,6 +308,8 @@ export const convertToClientConstructionsAddData = (data: any): ConstructionsAdd
 		lnw: mapConstructionLnwToClient(data),
 		isViewForDefaultUser: Boolean(data.isViewForDefaultUser),
 		isView: data.isView !== undefined ? Boolean(data.isView) : undefined,
+		// Без флага от бэкенда считаем размещение оплаченным (обратная совместимость).
+		isPaidPlacement: data.isPaidPlacement ?? true,
 		additionalInfo: mapAdditionalInfoFromApi(null),
 	};
 };
