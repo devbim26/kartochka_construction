@@ -1,0 +1,3663 @@
+diff --git a/UnitTests/PlacementTests/ConstructionPlacementPolicyTests.cs b/UnitTests/PlacementTests/ConstructionPlacementPolicyTests.cs
+new file mode 100644
+index 0000000..4b8ac34
+--- /dev/null
++++ b/UnitTests/PlacementTests/ConstructionPlacementPolicyTests.cs
+@@ -0,0 +1,61 @@
++using System;
++using System.Linq;
++using Acoustics.Domain.Entities.Guidebooks._Construction_;
++using Acoustics.Domain.Enums;
++using FluentAssertions;
++using Xunit;
++
++namespace UnitTests.PlacementTests;
++
++/// <summary>
++/// Проверяет признак активного платного размещения — общий ключ сортировки выдач
++/// (вариант «а»: оплата поднимает конструкцию только при прочих равных).
++/// </summary>
++public class ConstructionPlacementPolicyTests
++{
++    [Fact]
++    public void IsPlacementActive_FutureDate_ShouldBeTrue()
++    {
++        var header = new ConstructionHeader { PaidPlacementUntil = DateTime.UtcNow.AddDays(1) };
++
++        ConstructionPlacementPolicy.IsPlacementActive.Compile()(header).Should().BeTrue();
++    }
++
++    [Fact]
++    public void IsPlacementActive_Null_ShouldBeFalse()
++    {
++        var header = new ConstructionHeader { PaidPlacementUntil = null };
++
++        ConstructionPlacementPolicy.IsPlacementActive.Compile()(header).Should().BeFalse();
++    }
++
++    [Fact]
++    public void IsPlacementActive_PastDate_ShouldBeFalse()
++    {
++        var header = new ConstructionHeader { PaidPlacementUntil = DateTime.UtcNow.AddDays(-1) };
++
++        ConstructionPlacementPolicy.IsPlacementActive.Compile()(header).Should().BeFalse();
++    }
++
++    [Fact]
++    public void SortByPriorityThenPlacement_PaidWithinSamePriorityGoesFirst_UnpaidHigherPriorityStaysFirst()
++    {
++        var now = DateTime.UtcNow;
++        var unpaidPriority8 = new ConstructionHeader { Name = "unpaid-8", Priority = Priority.Eight, PaidPlacementUntil = null };
++        var paidPriority5 = new ConstructionHeader { Name = "paid-5", Priority = Priority.Five, PaidPlacementUntil = now.AddDays(30) };
++        var unpaidPriority5 = new ConstructionHeader { Name = "unpaid-5", Priority = Priority.Five, PaidPlacementUntil = null };
++        var expiredPriority5 = new ConstructionHeader { Name = "expired-5", Priority = Priority.Five, PaidPlacementUntil = now.AddDays(-1) };
++        var items = new[] { unpaidPriority5, expiredPriority5, unpaidPriority8, paidPriority5 };
++
++        var isActive = ConstructionPlacementPolicy.IsPlacementActive.Compile();
++        var sorted = items
++            .OrderByDescending(x => x.Priority)
++            .ThenByDescending(isActive)
++            .Select(x => x.Name)
++            .ToList();
++
++        // Оплаченная поднялась выше неоплаченных в своей группе приоритета (Five),
++        // но не выше конструкции с приоритетом Eight (вариант «а»); истёкшая дата = не оплачено.
++        sorted.Should().Equal("unpaid-8", "paid-5", "unpaid-5", "expired-5");
++    }
++}
+diff --git a/UnitTests/PlacementTests/PlacementStatsAggregatorTests.cs b/UnitTests/PlacementTests/PlacementStatsAggregatorTests.cs
+new file mode 100644
+index 0000000..853e5c2
+--- /dev/null
++++ b/UnitTests/PlacementTests/PlacementStatsAggregatorTests.cs
+@@ -0,0 +1,79 @@
++using System;
++using System.Collections.Generic;
++using System.Linq;
++using Acoustics.Application.UseCases.Guidebooks._Placement_.Query;
++using Acoustics.Domain.Entities.Guidebooks._Construction_;
++using Acoustics.Domain.Enums;
++using FluentAssertions;
++using Xunit;
++
++namespace UnitTests.PlacementTests;
++
++public class PlacementStatsAggregatorTests
++{
++    private static readonly Guid HeaderA = Guid.Parse("c1f2a3b4-0001-4000-8000-0000000000a1");
++    private static readonly Guid HeaderB = Guid.Parse("c1f2a3b4-0001-4000-8000-0000000000b2");
++    private static readonly Guid User1 = Guid.Parse("00000000-0000-0000-0000-000000000001");
++    private static readonly Guid User2 = Guid.Parse("00000000-0000-0000-0000-000000000002");
++
++    [Fact]
++    public void Aggregate_2SiteClicks1DownloadFrom2Users_ShouldCountClicksDownloadsAndUniqueUsers()
++    {
++        var interactions = new List<PlacementInteraction>
++        {
++            new() { ConstructionHeaderId = HeaderA, Type = PlacementInteractionType.SiteClick, UserId = User1 },
++            new() { ConstructionHeaderId = HeaderA, Type = PlacementInteractionType.SiteClick, UserId = User2 },
++            new() { ConstructionHeaderId = HeaderA, Type = PlacementInteractionType.DocumentDownload, UserId = User1 },
++        };
++
++        var stats = PlacementStatsAggregator.Aggregate(interactions);
++
++        stats.Should().HaveCount(1);
++        var row = stats[0];
++        row.ConstructionHeaderId.Should().Be(HeaderA);
++        row.SiteClicks.Should().Be(2);
++        row.DocumentDownloads.Should().Be(1);
++        row.UniqueUsers.Should().Be(2);
++    }
++
++    [Fact]
++    public void Aggregate_TwoConstructions_ShouldGroupByConstructionHeader()
++    {
++        var interactions = new List<PlacementInteraction>
++        {
++            new() { ConstructionHeaderId = HeaderA, Type = PlacementInteractionType.SiteClick, UserId = User1 },
++            new() { ConstructionHeaderId = HeaderB, Type = PlacementInteractionType.DocumentDownload, UserId = User1 },
++            new() { ConstructionHeaderId = HeaderB, Type = PlacementInteractionType.DocumentDownload, UserId = null },
++        };
++
++        var stats = PlacementStatsAggregator.Aggregate(interactions);
++
++        stats.Should().HaveCount(2);
++        stats.Single(x => x.ConstructionHeaderId == HeaderA).SiteClicks.Should().Be(1);
++        var b = stats.Single(x => x.ConstructionHeaderId == HeaderB);
++        b.DocumentDownloads.Should().Be(2);
++        b.UniqueUsers.Should().Be(1);
++    }
++
++    [Fact]
++    public void Aggregate_AnonymousOnly_ShouldCountEventsWithoutUsers()
++    {
++        var interactions = new List<PlacementInteraction>
++        {
++            new() { ConstructionHeaderId = HeaderA, Type = PlacementInteractionType.SiteClick, UserId = null },
++            new() { ConstructionHeaderId = HeaderA, Type = PlacementInteractionType.SiteClick, UserId = null },
++        };
++
++        var stats = PlacementStatsAggregator.Aggregate(interactions);
++
++        stats.Single().SiteClicks.Should().Be(2);
++        stats.Single().UniqueUsers.Should().Be(0);
++    }
++
++    [Fact]
++    public void Aggregate_EmptyList_ShouldReturnEmptyList()
++    {
++        PlacementStatsAggregator.Aggregate(Enumerable.Empty<PlacementInteraction>())
++            .Should().BeEmpty();
++    }
++}
+diff --git a/src/Acoustics.API/Controllers/Guidebooks/PlacementController.cs b/src/Acoustics.API/Controllers/Guidebooks/PlacementController.cs
+new file mode 100644
+index 0000000..fd69213
+--- /dev/null
++++ b/src/Acoustics.API/Controllers/Guidebooks/PlacementController.cs
+@@ -0,0 +1,50 @@
++using Acoustics.API.Controllers.Abstraction;
++using Acoustics.Application.Models.Dto.Guidebooks.Placements;
++using Acoustics.Application.UseCases.Guidebooks._Placement_.Command;
++using Acoustics.Application.UseCases.Guidebooks._Placement_.Query;
++using MediatR;
++using Microsoft.AspNetCore.Authorization;
++using Microsoft.AspNetCore.Mvc;
++
++namespace Acoustics.API.Controllers.Guidebooks;
++
++/// <summary>
++/// Счётчики платных размещений: фиксация взаимодействий с карточками каталога
++/// и статистика для администратора.
++/// </summary>
++public class PlacementController(ISender sender) : RestApiController(sender)
++{
++    /// <summary>
++    /// Фиксирует взаимодействие с карточкой конструкции (клик по ссылке производителя,
++    /// скачивание документа). Фронт вызывает fire-and-forget: анонимно, переход не ждёт ответа.
++    /// Неизвестная конструкция обрабатывается успешно (событие отбрасывается).
++    /// </summary>
++    [AllowAnonymous]
++    [HttpPost("interaction")]
++    [ProducesResponseType(StatusCodes.Status200OK)]
++    public async Task<IActionResult> RegisterInteraction(CreatePlacementInteractionCommand command)
++    {
++        var result = await _sender.Send(command, HttpContext.RequestAborted);
++
++        return ToActionResult(result);
++    }
++
++    /// <summary>Агрегаты взаимодействий за период по конструкциям (клики, скачивания, уникальные пользователи).</summary>
++    [Authorize(Policy = "RequireAdmin")]
++    [HttpGet("stats")]
++    [ProducesResponseType(typeof(List<PlacementStatsDto>), StatusCodes.Status200OK)]
++    public async Task<IActionResult> GetStats(
++        [FromQuery] DateTime fromUtc,
++        [FromQuery] DateTime toUtc,
++        [FromQuery] Guid? constructionHeaderId)
++    {
++        var result = await _sender.Send(new GetPlacementStatsQuery
++        {
++            FromUtc = fromUtc,
++            ToUtc = toUtc,
++            ConstructionHeaderId = constructionHeaderId,
++        }, HttpContext.RequestAborted);
++
++        return ToActionResult(result);
++    }
++}
+diff --git a/src/Acoustics.Application/Abstractions/Repositories/Guidebooks/IPlacementInteractionRepository.cs b/src/Acoustics.Application/Abstractions/Repositories/Guidebooks/IPlacementInteractionRepository.cs
+new file mode 100644
+index 0000000..a0977bf
+--- /dev/null
++++ b/src/Acoustics.Application/Abstractions/Repositories/Guidebooks/IPlacementInteractionRepository.cs
+@@ -0,0 +1,16 @@
++using Acoustics.Domain.Entities.Guidebooks._Construction_;
++using Acoustics.Domain.Repositories;
++
++namespace Acoustics.Application.Abstractions.Repositories.Guidebooks;
++
++public interface IPlacementInteractionRepository : ICrudRepository<PlacementInteraction>
++{
++    /// <summary>
++    /// Возвращает взаимодействия за период [fromUtc, toUtc), опционально только по одной конструкции.
++    /// </summary>
++    Task<List<PlacementInteraction>> GetForPeriodAsync(
++        DateTime fromUtc,
++        DateTime toUtc,
++        Guid? constructionHeaderId = null,
++        CancellationToken cancellationToken = default);
++}
+diff --git a/src/Acoustics.Application/Models/Dto/Guidebooks/Constructions/ConstructionHeaderDto.cs b/src/Acoustics.Application/Models/Dto/Guidebooks/Constructions/ConstructionHeaderDto.cs
+index 7f2c62f..1743601 100644
+--- a/src/Acoustics.Application/Models/Dto/Guidebooks/Constructions/ConstructionHeaderDto.cs
++++ b/src/Acoustics.Application/Models/Dto/Guidebooks/Constructions/ConstructionHeaderDto.cs
+@@ -33,6 +33,9 @@ public record ConstructionHeaderDto : IMapFrom<ConstructionHeader>
+     public double ComputingIndexValue { get; init; }
+     public bool IsReportConstruction { get; init; }
+ 
++    /// <summary>Дата окончания оплаченного размещения (UTC); null — размещение не оплачено.</summary>
++    public DateTime? PaidPlacementUntil { get; init; }
++
+     public void ConfigureMapping(TypeAdapterConfig config)
+     {
+         config.NewConfig<ConstructionHeader, ConstructionHeaderDto>()
+diff --git a/src/Acoustics.Application/Models/Dto/Guidebooks/Constructions/PaginatedConstructionHeaderDto.cs b/src/Acoustics.Application/Models/Dto/Guidebooks/Constructions/PaginatedConstructionHeaderDto.cs
+index 168e665..aaeddbf 100644
+--- a/src/Acoustics.Application/Models/Dto/Guidebooks/Constructions/PaginatedConstructionHeaderDto.cs
++++ b/src/Acoustics.Application/Models/Dto/Guidebooks/Constructions/PaginatedConstructionHeaderDto.cs
+@@ -25,6 +25,9 @@ public record PaginatedConstructionHeaderDto : IMapFrom<ConstructionHeader>
+     public bool IsView { get; set; } = true;
+     public Guid? UserId { get; init; }
+ 
++    /// <summary>Дата окончания оплаченного размещения (UTC); null — размещение не оплачено.</summary>
++    public DateTime? PaidPlacementUntil { get; init; }
++
+     public void ConfigureMapping(TypeAdapterConfig config)
+     {
+         config.NewConfig<ConstructionHeader, PaginatedConstructionHeaderDto>()
+diff --git a/src/Acoustics.Application/Models/Dto/Guidebooks/Placements/PlacementStatsDto.cs b/src/Acoustics.Application/Models/Dto/Guidebooks/Placements/PlacementStatsDto.cs
+new file mode 100644
+index 0000000..b4961cb
+--- /dev/null
++++ b/src/Acoustics.Application/Models/Dto/Guidebooks/Placements/PlacementStatsDto.cs
+@@ -0,0 +1,18 @@
++namespace Acoustics.Application.Models.Dto.Guidebooks.Placements;
++
++/// <summary>
++/// Агрегаты взаимодействий с размещением конструкции за период (для GET /api/Placement/stats).
++/// </summary>
++public record PlacementStatsDto
++{
++    public Guid ConstructionHeaderId { get; init; }
++
++    /// <summary>Клики по ссылке производителя (сайт в шапке, кнопка «оф. страница»).</summary>
++    public int SiteClicks { get; init; }
++
++    /// <summary>Скачивания документов из аккордеона «Документы».</summary>
++    public int DocumentDownloads { get; init; }
++
++    /// <summary>Уникальные авторизованные пользователи за период (анонимные не учитываются).</summary>
++    public int UniqueUsers { get; init; }
++}
+diff --git a/src/Acoustics.Application/UseCases/Guidebooks/_Construction_/Command/CreateConstructionHeaderUseCase.cs b/src/Acoustics.Application/UseCases/Guidebooks/_Construction_/Command/CreateConstructionHeaderUseCase.cs
+index f97f1c7..05b2993 100644
+--- a/src/Acoustics.Application/UseCases/Guidebooks/_Construction_/Command/CreateConstructionHeaderUseCase.cs
++++ b/src/Acoustics.Application/UseCases/Guidebooks/_Construction_/Command/CreateConstructionHeaderUseCase.cs
+@@ -31,6 +31,9 @@ public record CreateConstructionHeaderCommand : IRequest<Result<ConstructionHead
+     public string FireResistance { get; set; } = null!;
+     public bool IsViewForDefaultUser { get; set; } = false;
+ 
++    /// <summary>Дата окончания оплаченного размещения (UTC); null — не оплачено. Эндпоинт доступен только админу.</summary>
++    public DateTime? PaidPlacementUntil { get; set; }
++
+     public CreateConstructionLaboratoryDataDto? AirNoizeLaboratoryData { get; set; } = null!;
+     public CreateConstructionLaboratoryDataDto? ImpactNoizeLaboratoryData { get; set; } = null!;
+ 
+@@ -126,6 +129,7 @@ public class CreateConstructionHeaderUseCase(
+             ImpactNoiseLaboratoryData = impactNoizeLaboratoryData,
+             PropertySource = request.PropertySource,
+             Priority = request.Priority,
++            PaidPlacementUntil = request.PaidPlacementUntil,
+             IsReportConstruction = false,
+             ConstructionPurpose = request.ConstructionPurpose,
+         };
+diff --git a/src/Acoustics.Application/UseCases/Guidebooks/_Construction_/Command/UpdateConstructionHeaderUseCase.cs b/src/Acoustics.Application/UseCases/Guidebooks/_Construction_/Command/UpdateConstructionHeaderUseCase.cs
+index 2fc5595..ebfb905 100644
+--- a/src/Acoustics.Application/UseCases/Guidebooks/_Construction_/Command/UpdateConstructionHeaderUseCase.cs
++++ b/src/Acoustics.Application/UseCases/Guidebooks/_Construction_/Command/UpdateConstructionHeaderUseCase.cs
+@@ -1,6 +1,7 @@
+ ﻿using Acoustics.Application.Abstractions.Repositories.Guidebooks;
+ using Acoustics.Application.Abstractions.Repositories.Guidebooks.Materials;
+ using Acoustics.Application.Abstractions.Repositories.Guidebooks.Reports.ReportInfos;
++using Acoustics.Application.Abstractions.Contexts;
+ using Acoustics.Application.Abstractions.Services;
+ using Acoustics.Application.Abstractions.Services.ComputingServices;
+ using Acoustics.Application.Abstractions.UseCases;
+@@ -10,6 +11,7 @@ using Acoustics.Application.Models.Dto.Guidebooks.Constructions.ConstructionLabo
+ using Acoustics.Application.Models.Dto.Guidebooks.Constructions.CreateDtos;
+ using Acoustics.Application.Services.ComputationalServices;
+ using Acoustics.Domain;
++using Acoustics.Domain.Constants;
+ using Acoustics.Domain.Constants._ConstructionType_;
+ using Acoustics.Domain.Constants.Guidebooks;
+ using Acoustics.Domain.Entities.Guidebooks._Construction_;
+@@ -33,6 +35,9 @@ public record UpdateConstructionHeaderCommand : IRequest<Result<ConstructionHead
+     public ConstructionPurpose ConstructionPurpose { get; set; }
+     public bool IsViewForDefaultUser { get; set; } = false;
+ 
++    /// <summary>Дата окончания оплаченного размещения (UTC); null — не оплачено. Менять может только администратор.</summary>
++    public DateTime? PaidPlacementUntil { get; set; }
++
+     public Guid IssuerId { get; set; }
+     public string PropertySource { get; set; } = null!;
+     public double MaxHeight { get; set; }
+@@ -57,6 +62,7 @@ public class UpdateConstructionHeaderUseCase(
+     IBaseReportInfoRepository reportInfoRepository,
+     IUserSubscriptionChecker userSubscriptionChecker,
+     IComputationalService computationalService,
++    IAuthenticatedContext authenticatedContext,
+     IMapper mapper)
+     : BaseConstructionHeaderUseCase(computationalService), IRequestHandler<UpdateConstructionHeaderCommand, Result<ConstructionHeaderDto>>
+ {
+@@ -74,6 +80,13 @@ public class UpdateConstructionHeaderUseCase(
+             return Result<ConstructionHeaderDto>.Failure(Error.NotFound("Конструкция не была найдена"));
+         }
+ 
++        if (request.PaidPlacementUntil != constructionHeader.PaidPlacementUntil
++            && authenticatedContext.RoleName != AuthConstants.AdminRole.Name)
++        {
++            return Result<ConstructionHeaderDto>.Failure(
++                Error.NotAllowed("Дату платного размещения может менять только администратор"));
++        }
++
+         if (constructionHeader.ReportConstruction == null)
+         {
+             if (await constructionHeaderRepository.IsExistsAsync(x => x.Description == request.Description && x.Id != constructionHeader.Id && !x.IsReportConstruction, cancellationToken))
+@@ -113,6 +126,7 @@ public class UpdateConstructionHeaderUseCase(
+         constructionHeader.DescriptionSource = request.DescriptionSource;
+         constructionHeader.Priority = request.Priority;
+         constructionHeader.Notation = request.Notation;
++        constructionHeader.PaidPlacementUntil = request.PaidPlacementUntil;
+         constructionHeader.MaxHeight = request.MaxHeight;
+         constructionHeader.PropertySource = request.PropertySource;
+         constructionHeader.ConstructionPurpose = request.ConstructionPurpose;
+diff --git a/src/Acoustics.Application/UseCases/Guidebooks/_Placement_/Command/CreatePlacementInteractionUseCase.cs b/src/Acoustics.Application/UseCases/Guidebooks/_Placement_/Command/CreatePlacementInteractionUseCase.cs
+new file mode 100644
+index 0000000..95f3c5c
+--- /dev/null
++++ b/src/Acoustics.Application/UseCases/Guidebooks/_Placement_/Command/CreatePlacementInteractionUseCase.cs
+@@ -0,0 +1,58 @@
++using Acoustics.Application.Abstractions.Contexts;
++using Acoustics.Application.Abstractions.Repositories;
++using Acoustics.Application.Abstractions.Repositories.Guidebooks;
++using Acoustics.Application.Models;
++using Acoustics.Domain;
++using Acoustics.Domain.Entities.Guidebooks._Construction_;
++using Acoustics.Domain.Enums;
++using MediatR;
++
++namespace Acoustics.Application.UseCases.Guidebooks._Placement_.Command;
++
++public record CreatePlacementInteractionCommand : IRequest<Result>
++{
++    public Guid ConstructionHeaderId { get; init; }
++
++    public PlacementInteractionType Type { get; init; }
++
++    /// <summary>Полная UTM-query ссылки производителя (utm_source=devbim&utm_medium=catalog&utm_content=…).</summary>
++    public string? Utm { get; init; }
++}
++
++/// <summary>
++/// Фиксирует взаимодействие с карточкой конструкции в каталоге (клик по ссылке производителя,
++/// скачивание документа). Вызывается фронтом fire-and-forget анонимно; если конструкция не существует,
++/// событие молча отбрасывается, чтобы не раскрывать существование идентификаторов и не мешать переходу.
++/// </summary>
++public class CreatePlacementInteractionUseCase(
++    IConstructionHeaderRepository constructionHeaderRepository,
++    IPlacementInteractionRepository placementInteractionRepository,
++    IAuthenticatedContext authenticatedContext,
++    IUnitOfWork unitOfWork)
++    : IRequestHandler<CreatePlacementInteractionCommand, Result>
++{
++    public async Task<Result> Handle(CreatePlacementInteractionCommand request, CancellationToken cancellationToken)
++    {
++        var constructionExists = await constructionHeaderRepository
++            .IsExistsAsync(x => x.Id == request.ConstructionHeaderId, cancellationToken);
++
++        if (!constructionExists)
++        {
++            return Result.Success();
++        }
++
++        var interaction = new PlacementInteraction
++        {
++            ConstructionHeaderId = request.ConstructionHeaderId,
++            Type = request.Type,
++            OccurredAtUtc = DateTime.UtcNow,
++            UserId = authenticatedContext.IsAuthenticated ? authenticatedContext.UserId : null,
++            Utm = request.Utm,
++        };
++
++        placementInteractionRepository.Create(interaction);
++        await unitOfWork.SaveChangesAsync(cancellationToken);
++
++        return Result.Success();
++    }
++}
+diff --git a/src/Acoustics.Application/UseCases/Guidebooks/_Placement_/Query/GetPlacementStatsUseCase.cs b/src/Acoustics.Application/UseCases/Guidebooks/_Placement_/Query/GetPlacementStatsUseCase.cs
+new file mode 100644
+index 0000000..afac516
+--- /dev/null
++++ b/src/Acoustics.Application/UseCases/Guidebooks/_Placement_/Query/GetPlacementStatsUseCase.cs
+@@ -0,0 +1,35 @@
++using Acoustics.Application.Abstractions.Repositories.Guidebooks;
++using Acoustics.Application.Models;
++using Acoustics.Application.Models.Dto.Guidebooks.Placements;
++using Acoustics.Domain;
++using MediatR;
++
++namespace Acoustics.Application.UseCases.Guidebooks._Placement_.Query;
++
++public record GetPlacementStatsQuery : IRequest<Result<List<PlacementStatsDto>>>
++{
++    /// <summary>Начало периода (UTC, включительно).</summary>
++    public DateTime FromUtc { get; init; }
++
++    /// <summary>Конец периода (UTC, не включается).</summary>
++    public DateTime ToUtc { get; init; }
++
++    /// <summary>Опциональный отбор по одной конструкции.</summary>
++    public Guid? ConstructionHeaderId { get; init; }
++}
++
++/// <summary>
++/// Возвращает агрегаты взаимодействий с размещениями за период: клики по ссылкам производителя,
++/// скачивания документов и уникальные пользователи по каждой конструкции. Доступ — только админ.
++/// </summary>
++public class GetPlacementStatsUseCase(IPlacementInteractionRepository placementInteractionRepository)
++    : IRequestHandler<GetPlacementStatsQuery, Result<List<PlacementStatsDto>>>
++{
++    public async Task<Result<List<PlacementStatsDto>>> Handle(GetPlacementStatsQuery request, CancellationToken cancellationToken)
++    {
++        var interactions = await placementInteractionRepository.GetForPeriodAsync(
++            request.FromUtc, request.ToUtc, request.ConstructionHeaderId, cancellationToken);
++
++        return Result<List<PlacementStatsDto>>.Success(PlacementStatsAggregator.Aggregate(interactions));
++    }
++}
+diff --git a/src/Acoustics.Application/UseCases/Guidebooks/_Placement_/Query/PlacementStatsAggregator.cs b/src/Acoustics.Application/UseCases/Guidebooks/_Placement_/Query/PlacementStatsAggregator.cs
+new file mode 100644
+index 0000000..86285cc
+--- /dev/null
++++ b/src/Acoustics.Application/UseCases/Guidebooks/_Placement_/Query/PlacementStatsAggregator.cs
+@@ -0,0 +1,30 @@
++using Acoustics.Application.Models.Dto.Guidebooks.Placements;
++using Acoustics.Domain.Entities.Guidebooks._Construction_;
++using Acoustics.Domain.Enums;
++
++namespace Acoustics.Application.UseCases.Guidebooks._Placement_.Query;
++
++/// <summary>
++/// Считает агрегаты взаимодействий с размещениями по конструкциям: клики по ссылкам производителя,
++/// скачивания документов, уникальные пользователи. Чистая функция — покрывается юнит-тестами.
++/// </summary>
++public static class PlacementStatsAggregator
++{
++    public static List<PlacementStatsDto> Aggregate(IEnumerable<PlacementInteraction> interactions)
++    {
++        return interactions
++            .GroupBy(x => x.ConstructionHeaderId)
++            .Select(g => new PlacementStatsDto
++            {
++                ConstructionHeaderId = g.Key,
++                SiteClicks = g.Count(x => x.Type == PlacementInteractionType.SiteClick),
++                DocumentDownloads = g.Count(x => x.Type == PlacementInteractionType.DocumentDownload),
++                UniqueUsers = g.Where(x => x.UserId.HasValue)
++                    .Select(x => x.UserId!.Value)
++                    .Distinct()
++                    .Count(),
++            })
++            .OrderByDescending(x => x.SiteClicks + x.DocumentDownloads)
++            .ToList();
++    }
++}
+diff --git a/src/Acoustics.Domain/Entities/Guidebooks/_Construction_/ConstructionHeader.cs b/src/Acoustics.Domain/Entities/Guidebooks/_Construction_/ConstructionHeader.cs
+index 3124ca2..470e93d 100644
+--- a/src/Acoustics.Domain/Entities/Guidebooks/_Construction_/ConstructionHeader.cs
++++ b/src/Acoustics.Domain/Entities/Guidebooks/_Construction_/ConstructionHeader.cs
+@@ -22,6 +22,11 @@ public class ConstructionHeader : BaseEntity
+     public ConstructionPurpose ConstructionPurpose { get; set; }
+     public bool IsViewForDefaultUser { get; set; } = false;
+ 
++    /// <summary>
++    /// Дата окончания оплаченного размещения карточки в каталоге (UTC). NULL — размещение не оплачено.
++    /// </summary>
++    public DateTime? PaidPlacementUntil { get; set; }
++
+     public Guid IssuerId { get; set; }
+     public Issuer Issuer { get; set; } = null!;
+ 
+diff --git a/src/Acoustics.Domain/Entities/Guidebooks/_Construction_/ConstructionPlacementPolicy.cs b/src/Acoustics.Domain/Entities/Guidebooks/_Construction_/ConstructionPlacementPolicy.cs
+new file mode 100644
+index 0000000..565d109
+--- /dev/null
++++ b/src/Acoustics.Domain/Entities/Guidebooks/_Construction_/ConstructionPlacementPolicy.cs
+@@ -0,0 +1,18 @@
++using System.Linq.Expressions;
++
++namespace Acoustics.Domain.Entities.Guidebooks._Construction_;
++
++/// <summary>
++/// Признак активного платного размещения, общий для сортировок выдачи (вариант «а»:
++/// оплата поднимает конструкцию только при прочих равных, внутри одной группы приоритета).
++/// Используется в query builders сортировки и в юнит-тестах.
++/// </summary>
++public static class ConstructionPlacementPolicy
++{
++    /// <summary>
++    /// Размещение оплачено и активно: дата окончания ещё в будущем.
++    /// Для NULL (не оплачено) сравнение даёт false и в SQL, и в памяти.
++    /// </summary>
++    public static readonly Expression<Func<ConstructionHeader, bool>> IsPlacementActive =
++        x => x.PaidPlacementUntil > DateTime.UtcNow;
++}
+diff --git a/src/Acoustics.Domain/Entities/Guidebooks/_Construction_/PlacementInteraction.cs b/src/Acoustics.Domain/Entities/Guidebooks/_Construction_/PlacementInteraction.cs
+new file mode 100644
+index 0000000..24994ff
+--- /dev/null
++++ b/src/Acoustics.Domain/Entities/Guidebooks/_Construction_/PlacementInteraction.cs
+@@ -0,0 +1,25 @@
++using Acoustics.Domain.Entities.Abstractions;
++using Acoustics.Domain.Enums;
++
++namespace Acoustics.Domain.Entities.Guidebooks._Construction_;
++
++/// <summary>
++/// Факт взаимодействия с карточкой конструкции в каталоге: клик по ссылке производителя
++/// или скачивание документа. Записи append-only (не редактируются и не удаляются),
++/// служат источником статистики платных размещений.
++/// </summary>
++public class PlacementInteraction : BaseEntity
++{
++    public Guid ConstructionHeaderId { get; set; }
++
++    public PlacementInteractionType Type { get; set; }
++
++    /// <summary>Момент события (UTC, ставится сервером — клиентскому времени не доверяем).</summary>
++    public DateTime OccurredAtUtc { get; set; }
++
++    /// <summary>Пользователь, выполнивший действие; null для анонимных посетителей каталога.</summary>
++    public Guid? UserId { get; set; }
++
++    /// <summary>Полная UTM-query ссылки производителя (utm_source=devbim&utm_medium=catalog&utm_content=…).</summary>
++    public string? Utm { get; set; }
++}
+diff --git a/src/Acoustics.Domain/Enums/PlacementInteractionType.cs b/src/Acoustics.Domain/Enums/PlacementInteractionType.cs
+new file mode 100644
+index 0000000..1dca257
+--- /dev/null
++++ b/src/Acoustics.Domain/Enums/PlacementInteractionType.cs
+@@ -0,0 +1,13 @@
++namespace Acoustics.Domain.Enums;
++
++/// <summary>
++/// Тип взаимодействия с карточкой конструкции в каталоге (счётчики платного размещения).
++/// </summary>
++public enum PlacementInteractionType
++{
++    /// <summary>Клик по ссылке производителя (сайт в шапке или кнопка «оф. страница»).</summary>
++    SiteClick = 0,
++
++    /// <summary>Скачивание документа из аккордеона «Документы».</summary>
++    DocumentDownload = 1,
++}
+diff --git a/src/Acoustics.Infrastructure/Database/AppDbContext.cs b/src/Acoustics.Infrastructure/Database/AppDbContext.cs
+index 7b0ca7f..baa1a7f 100644
+--- a/src/Acoustics.Infrastructure/Database/AppDbContext.cs
++++ b/src/Acoustics.Infrastructure/Database/AppDbContext.cs
+@@ -1,6 +1,7 @@
+ using Acoustics.Application.Abstractions.Repositories;
+ using Acoustics.Domain.Entities;
+ using Acoustics.Domain.Entities.Guidebooks;
++using Acoustics.Domain.Entities.Guidebooks._Construction_;
+ using Acoustics.Domain.Entities.Guidebooks.Requirements;
+ using Acoustics.Domain.Entities.MaterialTypes;
+ using Acoustics.Domain.Entities.Reports;
+@@ -26,6 +27,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
+     public DbSet<PlacementRoom> PlacementRooms { get; set; }
+     public DbSet<Article> Articles { get; set; }
+     public DbSet<PlacementRoomVariants> PlacementRoomVariants { get; set; }
++    public DbSet<PlacementInteraction> PlacementInteractions { get; set; }
+     public DbSet<ReportFloorInfo> ReportFloorInfos { get; set; }
+     public DbSet<ReportInfo> ReportInfos { get; set; }
+     public DbSet<SingleReportInfo> SingleReportInfos { get; set; }
+diff --git a/src/Acoustics.Infrastructure/Database/EntityConfigurations/Guidebooks/_Construction_/ConstructionHeaderConfig.cs b/src/Acoustics.Infrastructure/Database/EntityConfigurations/Guidebooks/_Construction_/ConstructionHeaderConfig.cs
+index 85c0d3b..92d279e 100644
+--- a/src/Acoustics.Infrastructure/Database/EntityConfigurations/Guidebooks/_Construction_/ConstructionHeaderConfig.cs
++++ b/src/Acoustics.Infrastructure/Database/EntityConfigurations/Guidebooks/_Construction_/ConstructionHeaderConfig.cs
+@@ -30,6 +30,9 @@ public class ConstructionHeaderConfig : IEntityTypeConfiguration<ConstructionHea
+         builder.Property(x => x.PublicId)
+             .ValueGeneratedOnAdd().UseIdentityColumn();
+ 
++        builder.Property(x => x.PaidPlacementUntil)
++            .HasColumnType("timestamptz");
++
+         builder.HasMany(x => x.Countries).WithMany();
+ 
+         builder.HasOne<AcousticUser>()
+diff --git a/src/Acoustics.Infrastructure/Database/EntityConfigurations/Guidebooks/_Construction_/PlacementInteractionConfig.cs b/src/Acoustics.Infrastructure/Database/EntityConfigurations/Guidebooks/_Construction_/PlacementInteractionConfig.cs
+new file mode 100644
+index 0000000..77ac8f7
+--- /dev/null
++++ b/src/Acoustics.Infrastructure/Database/EntityConfigurations/Guidebooks/_Construction_/PlacementInteractionConfig.cs
+@@ -0,0 +1,25 @@
++using Acoustics.Domain.Entities.Guidebooks._Construction_;
++using Microsoft.EntityFrameworkCore;
++using Microsoft.EntityFrameworkCore.Metadata.Builders;
++
++namespace Acoustics.Infrastructure.Database.EntityConfigurations.Guidebooks._Construction_;
++
++public class PlacementInteractionConfig : IEntityTypeConfiguration<PlacementInteraction>
++{
++    public void Configure(EntityTypeBuilder<PlacementInteraction> builder)
++    {
++        builder.ToTable(nameof(PlacementInteraction));
++        builder.HasKey(x => x.Id);
++
++        builder.HasOne<ConstructionHeader>()
++            .WithMany()
++            .HasForeignKey(x => x.ConstructionHeaderId)
++            .OnDelete(DeleteBehavior.Cascade);
++
++        builder.Property(x => x.OccurredAtUtc)
++            .HasColumnType("timestamptz");
++
++        builder.HasIndex(x => new { x.ConstructionHeaderId, x.OccurredAtUtc })
++            .HasDatabaseName("IX_PlacementInteraction_Header_OccurredAtUtc");
++    }
++}
+diff --git a/src/Acoustics.Infrastructure/Injections/DatabaseConfiguration.cs b/src/Acoustics.Infrastructure/Injections/DatabaseConfiguration.cs
+index 63187f7..8d89406 100644
+--- a/src/Acoustics.Infrastructure/Injections/DatabaseConfiguration.cs
++++ b/src/Acoustics.Infrastructure/Injections/DatabaseConfiguration.cs
+@@ -57,6 +57,7 @@ public static class DatabaseConfiguration
+         services.AddScoped<IIssuerRepository, IssuerRepository>();
+         services.AddScoped<IMaterialRepository, MaterialRepository>();
+         services.AddScoped<IConstructionHeaderRepository, ConstructionHeaderRepository>();
++        services.AddScoped<IPlacementInteractionRepository, PlacementInteractionRepository>();
+         services.AddScoped<IConstructionTypeRepository, ConstructionTypeRepository>();
+         services.AddScoped<IReportRepository, ReportRepository>();
+         services.AddScoped<IArticleRepository, ArticleRepository>();
+diff --git a/src/Acoustics.Infrastructure/Migrations/20260928135519_AddCatalogPaidPlacement.Designer.cs b/src/Acoustics.Infrastructure/Migrations/20260928135519_AddCatalogPaidPlacement.Designer.cs
+new file mode 100644
+index 0000000..049c8c3
+--- /dev/null
++++ b/src/Acoustics.Infrastructure/Migrations/20260928135519_AddCatalogPaidPlacement.Designer.cs
+@@ -0,0 +1,2748 @@
++﻿// <auto-generated />
++using System;
++using System.Collections.Generic;
++using Acoustics.Infrastructure.Database;
++using Microsoft.EntityFrameworkCore;
++using Microsoft.EntityFrameworkCore.Infrastructure;
++using Microsoft.EntityFrameworkCore.Migrations;
++using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
++using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
++
++#nullable disable
++
++namespace Acoustics.Infrastructure.Migrations
++{
++    [DbContext(typeof(AppDbContext))]
++    [Migration("20260928135519_AddCatalogPaidPlacement")]
++    partial class AddCatalogPaidPlacement
++    {
++        /// <inheritdoc />
++        protected override void BuildTargetModel(ModelBuilder modelBuilder)
++        {
++#pragma warning disable 612, 618
++            modelBuilder
++                .HasAnnotation("ProductVersion", "8.0.11")
++                .HasAnnotation("Relational:MaxIdentifierLength", 63);
++
++            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
++
++            modelBuilder.HasSequence("ReportInfoSequence");
++
++            modelBuilder.HasSequence("SingleReportInfoSequence");
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Country", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("CountryType")
++                        .HasColumnType("integer");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Country", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Article", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("BodyText")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("ImageUrl")
++                        .HasColumnType("text");
++
++                    b.Property<DateOnly>("PublishDate")
++                        .HasColumnType("date");
++
++                    b.Property<string>("Title")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Article", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Bill", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("BillType")
++                        .HasColumnType("integer");
++
++                    b.Property<string>("ClientName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<DateOnly>("Date")
++                        .HasColumnType("date");
++
++                    b.Property<string>("FileUrl")
++                        .HasColumnType("text");
++
++                    b.Property<long>("Number")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("bigint");
++
++                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Number"));
++
++                    b.Property<Guid>("UserSubscriptionId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Bill", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Issuer", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("LogoUrl")
++                        .HasColumnType("text");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("WebSite")
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Issuer", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Material", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<float>("Damping")
++                        .HasColumnType("real");
++
++                    b.Property<float>("Density")
++                        .HasColumnType("real");
++
++                    b.Property<string>("Description")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<float>("Edin")
++                        .HasColumnType("real");
++
++                    b.Property<float>("Fb")
++                        .HasColumnType("real");
++
++                    b.Property<float>("Fc")
++                        .HasColumnType("real");
++
++                    b.Property<string>("ImageUrl")
++                        .HasColumnType("text");
++
++                    b.Property<Guid?>("IssuerId")
++                        .HasColumnType("uuid");
++
++                    b.Property<float>("LossFactor")
++                        .HasColumnType("real");
++
++                    b.Property<float>("MaterialCoefficient")
++                        .HasColumnType("real");
++
++                    b.Property<int>("MaterialPurpose")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid>("MaterialTypeId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<long>("PublicId")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("bigint");
++
++                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("PublicId"));
++
++                    b.Property<float>("Rb")
++                        .HasColumnType("real");
++
++                    b.Property<float>("Rc")
++                        .HasColumnType("real");
++
++                    b.Property<float>("RelativeCompression")
++                        .HasColumnType("real");
++
++                    b.Property<string>("ShortName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<float>("Solid")
++                        .HasColumnType("real");
++
++                    b.Property<float>("Thickness")
++                        .HasColumnType("real");
++
++                    b.Property<int>("Type")
++                        .HasColumnType("integer");
++
++                    b.Property<float>("Velocity")
++                        .HasColumnType("real");
++
++                    b.Property<float>("VelocityLongitudinal")
++                        .HasColumnType("real");
++
++                    b.Property<float>("YoungModulus")
++                        .HasColumnType("real");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("IssuerId");
++
++                    b.HasIndex("MaterialTypeId");
++
++                    b.ToTable("Material", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.PlacementRoom", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("Name")
++                        .IsUnique();
++
++                    b.ToTable("PlacementRoom", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.PlacementRoomVariants", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("BuildingType")
++                        .HasColumnType("integer");
++
++                    b.Property<int>("ConstructionType")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid>("FirstPlacementRoomId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("SecondPlacementRoomId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("FirstPlacementRoomId");
++
++                    b.HasIndex("SecondPlacementRoomId");
++
++                    b.ToTable("PlacementRoomVariants", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Requirements.CalculationRequirementDocument", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("Country")
++                        .HasColumnType("integer");
++
++                    b.Property<string>("FullName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("ShortName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("CalculationRequirementDocument", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Requirements.RegulatoryRequirementDocument", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("Country")
++                        .HasColumnType("integer");
++
++                    b.Property<string>("FullName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("ShortName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("RegulatoryRequirementDocument", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Requirements.Requirement", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("BuildingType")
++                        .HasColumnType("integer");
++
++                    b.Property<int>("Class")
++                        .HasColumnType("integer");
++
++                    b.Property<int>("ConstructionClass")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid>("CountryId")
++                        .HasColumnType("uuid");
++
++                    b.Property<float?>("NoizeImpactIndex")
++                        .HasColumnType("real");
++
++                    b.Property<float>("NoizeIsolationIndex")
++                        .HasColumnType("real");
++
++                    b.Property<string>("Notice")
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("RegulatoryDocumentId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("StandartFullName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("StandartShortName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<DateOnly>("StandartValidityPeriod")
++                        .HasColumnType("date");
++
++                    b.ComplexProperty<Dictionary<string, object>>("FirstPlacementRoom", "Acoustics.Domain.Entities.Guidebooks.Requirements.Requirement.FirstPlacementRoom#PlacementRoom", b1 =>
++                        {
++                            b1.IsRequired();
++
++                            b1.Property<Guid>("Id")
++                                .HasColumnType("uuid");
++
++                            b1.Property<string>("Name")
++                                .IsRequired()
++                                .HasColumnType("text");
++                        });
++
++                    b.ComplexProperty<Dictionary<string, object>>("SecondPlacementRoom", "Acoustics.Domain.Entities.Guidebooks.Requirements.Requirement.SecondPlacementRoom#PlacementRoom", b1 =>
++                        {
++                            b1.IsRequired();
++
++                            b1.Property<Guid>("Id")
++                                .HasColumnType("uuid");
++
++                            b1.Property<string>("Name")
++                                .IsRequired()
++                                .HasColumnType("text");
++                        });
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("CountryId");
++
++                    b.HasIndex("RegulatoryDocumentId");
++
++                    b.ToTable("Requirement", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.UserMaterial", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("AdditionalName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<Guid?>("ConstructionId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("MaterialId")
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("PositionId")
++                        .HasColumnType("integer");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ConstructionId");
++
++                    b.HasIndex("MaterialId");
++
++                    b.ToTable("UserMaterial", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.Construction", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("ConstructionPosition")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid?>("ConstructionTypeId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ConstructionTypeId");
++
++                    b.ToTable("Construction", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("AirNoiseLaboratoryDataId")
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("ConstructionPurpose")
++                        .HasColumnType("integer");
++
++                    b.Property<string>("Description")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("DescriptionSource")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("FireResistance")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<Guid?>("GeneralConstructionParametrsId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("GuidebookConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("ImpactNoiseLaboratoryDataId")
++                        .HasColumnType("uuid");
++
++                    b.Property<bool>("IsReportConstruction")
++                        .HasColumnType("boolean");
++
++                    b.Property<bool>("IsViewForDefaultUser")
++                        .HasColumnType("boolean");
++
++                    b.Property<Guid>("IssuerId")
++                        .HasColumnType("uuid");
++
++                    b.Property<double>("MaxHeight")
++                        .HasColumnType("double precision");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("Notation")
++                        .HasColumnType("text");
++
++                    b.Property<DateTime?>("PaidPlacementUntil")
++                        .HasColumnType("timestamptz");
++
++                    b.Property<int>("Priority")
++                        .HasColumnType("integer");
++
++                    b.Property<string>("PropertySource")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<long>("PublicId")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("bigint");
++
++                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("PublicId"));
++
++                    b.Property<Guid?>("UserId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("AirNoiseLaboratoryDataId")
++                        .IsUnique();
++
++                    b.HasIndex("GuidebookConstructionHeaderId");
++
++                    b.HasIndex("ImpactNoiseLaboratoryDataId")
++                        .IsUnique();
++
++                    b.HasIndex("IssuerId");
++
++                    b.HasIndex("UserId");
++
++                    b.ToTable("ConstructionHeader", null, t =>
++                        {
++                            t.Property("Name")
++                                .HasColumnName("ConstructionHeader_Name");
++                        });
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionLaboratoryData.AirNoizeConstructionLaboratoryData", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("Index")
++                        .HasColumnType("integer");
++
++                    b.Property<float>("IndexValue")
++                        .HasColumnType("real");
++
++                    b.Property<double>("LaboratoryC")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("LaboratoryCtr")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("LaboratoryDelta")
++                        .HasColumnType("double precision");
++
++                    b.Property<string>("LaboratoryTestSource")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("AirNoizeConstructionLaboratoryData", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionLaboratoryData.ImpactNoizeConstructionLaboratoryData", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("Index")
++                        .HasColumnType("integer");
++
++                    b.Property<float>("IndexValue")
++                        .HasColumnType("real");
++
++                    b.Property<double>("LaboratoryC")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("LaboratoryCtr")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("LaboratoryDelta")
++                        .HasColumnType("double precision");
++
++                    b.Property<string>("LaboratoryTestSource")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("ImpactNoizeConstructionLaboratoryData", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionType", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("ConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("ConstructionTypeEnum")
++                        .HasColumnType("integer");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("ShortName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ConstructionHeaderId")
++                        .IsUnique();
++
++                    b.ToTable("ConstructionType", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.PlacementInteraction", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("ConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<DateTime>("OccurredAtUtc")
++                        .HasColumnType("timestamptz");
++
++                    b.Property<int>("Type")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid?>("UserId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Utm")
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ConstructionHeaderId", "OccurredAtUtc")
++                        .HasDatabaseName("IX_PlacementInteraction_Header_OccurredAtUtc");
++
++                    b.ToTable("PlacementInteraction", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.RTotal", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("AirNoizeConstructionLaboratoryDataId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("ImpactNoizeConstructionLaboratoryDataId")
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("Index")
++                        .HasColumnType("integer");
++
++                    b.Property<double>("Value")
++                        .HasColumnType("double precision");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("AirNoizeConstructionLaboratoryDataId");
++
++                    b.HasIndex("ImpactNoizeConstructionLaboratoryDataId");
++
++                    b.ToTable("RTotal");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.BaseConstructionTypeParameters", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("GeneralConstructionParametrsId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("GeneralConstructionParametrsId")
++                        .IsUnique();
++
++                    b.ToTable((string)null);
++
++                    b.UseTpcMappingStrategy();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.DotAdditional", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("GeneralConstructionParametrsId")
++                        .HasColumnType("uuid");
++
++                    b.ComplexProperty<Dictionary<string, object>>("Dot", "Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.DotAdditional.Dot#Dot", b1 =>
++                        {
++                            b1.IsRequired();
++
++                            b1.Property<double>("F")
++                                .HasColumnType("double precision");
++
++                            b1.Property<double>("R")
++                                .HasColumnType("double precision");
++                        });
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("GeneralConstructionParametrsId");
++
++                    b.ToTable("DotAdditional", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.DotR", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("GeneralConstructionParametrsId")
++                        .HasColumnType("uuid");
++
++                    b.ComplexProperty<Dictionary<string, object>>("Dot", "Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.DotR.Dot#Dot", b1 =>
++                        {
++                            b1.IsRequired();
++
++                            b1.Property<double>("F")
++                                .HasColumnType("double precision");
++
++                            b1.Property<double>("R")
++                                .HasColumnType("double precision");
++                        });
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("GeneralConstructionParametrsId");
++
++                    b.ToTable("DotR", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.FrameDot", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("FrameAbcd1Id")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("FrameEfklmnpId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("ImpactSoundInsolationId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Name")
++                        .HasColumnType("text");
++
++                    b.ComplexProperty<Dictionary<string, object>>("Dot", "Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.FrameDot.Dot#Dot", b1 =>
++                        {
++                            b1.IsRequired();
++
++                            b1.Property<double>("F")
++                                .HasColumnType("double precision");
++
++                            b1.Property<double>("R")
++                                .HasColumnType("double precision");
++                        });
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("FrameAbcd1Id");
++
++                    b.HasIndex("FrameEfklmnpId");
++
++                    b.HasIndex("ImpactSoundInsolationId");
++
++                    b.ToTable("FrameDot", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.GeneralConstructionParametrs", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<double>("AverageDensity")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("C")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("ComputingRw")
++                        .HasColumnType("double precision");
++
++                    b.Property<Guid>("ConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("ConstructionTypeParametrsId")
++                        .HasColumnType("uuid");
++
++                    b.Property<double>("Ctr")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("Delta")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("Density")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("EquivalentSurfaceDensity")
++                        .HasColumnType("double precision");
++
++                    b.Property<bool>("HasAdditionalConstructions")
++                        .HasColumnType("boolean");
++
++                    b.Property<double>("SurfaceDencity")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("Thickness")
++                        .HasColumnType("double precision");
++
++                    b.ComplexProperty<Dictionary<string, object>>("DotB", "Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.GeneralConstructionParametrs.DotB#Dot", b1 =>
++                        {
++                            b1.IsRequired();
++
++                            b1.Property<double>("F")
++                                .HasColumnType("double precision");
++
++                            b1.Property<double>("R")
++                                .HasColumnType("double precision");
++                        });
++
++                    b.ComplexProperty<Dictionary<string, object>>("DotC", "Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.GeneralConstructionParametrs.DotC#Dot", b1 =>
++                        {
++                            b1.IsRequired();
++
++                            b1.Property<double>("F")
++                                .HasColumnType("double precision");
++
++                            b1.Property<double>("R")
++                                .HasColumnType("double precision");
++                        });
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ConstructionHeaderId")
++                        .IsUnique();
++
++                    b.ToTable("GeneralConstructionParametrs", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.MaterialTypes.MaterialType", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("MaterialTypeEnum")
++                        .HasColumnType("integer");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("ShortName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("MaterialType", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.OpenRouterModels.AcousticModel", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<decimal>("Coefficient")
++                        .HasColumnType("numeric");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("OpenRouterModelId")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("AcousticModel", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.OpenRouterModels.TariffPlan", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<decimal>("Coefficient")
++                        .HasColumnType("numeric");
++
++                    b.Property<decimal>("Credits")
++                        .HasColumnType("numeric");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<int?>("ResetInterval")
++                        .HasColumnType("integer");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("TariffPlan", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.OpenRouterModels.UserModelMessage", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("AcousticModelId")
++                        .HasColumnType("uuid");
++
++                    b.Property<decimal>("Coefficient")
++                        .HasColumnType("numeric");
++
++                    b.Property<decimal>("Cost")
++                        .HasColumnType("numeric");
++
++                    b.Property<decimal>("CostInCredits")
++                        .HasColumnType("numeric");
++
++                    b.Property<string>("ErrorMessage")
++                        .HasColumnType("text");
++
++                    b.Property<string>("MetadataJson")
++                        .HasColumnType("jsonb");
++
++                    b.Property<string>("ModelId")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("OpenRouterWebUiUserId")
++                        .HasColumnType("text");
++
++                    b.Property<DateTime?>("RequestDate")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("RequestText")
++                        .HasColumnType("text");
++
++                    b.Property<DateTime?>("ResponseDate")
++                        .HasColumnType("timestamp with time zone");
++
++                    b.Property<string>("ResponseText")
++                        .HasColumnType("text");
++
++                    b.Property<Guid?>("SubscriptionId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("TariffPlanId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("UserId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("AcousticModelId");
++
++                    b.HasIndex("TariffPlanId");
++
++                    b.HasIndex("UserId");
++
++                    b.ToTable("UserModelMessage", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.OpenRouterModels.UserOpenRouterAccess", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("KeyCustomHash")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("KeyHash")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("KeyName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("UserId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("UserOpenRouterWebUiId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("UserId")
++                        .IsUnique();
++
++                    b.ToTable("UserOpenRouterAccess", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.AdditionalConstructionHeader", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("ConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<decimal>("Height")
++                        .HasColumnType("numeric");
++
++                    b.Property<decimal>("Lenght")
++                        .HasColumnType("numeric");
++
++                    b.Property<int>("Quantity")
++                        .HasColumnType("integer");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ConstructionHeaderId");
++
++                    b.ToTable("AdditionalConstructionHeader", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.Report", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Client")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<DateOnly>("LastUpdated")
++                        .HasColumnType("date");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<int>("ReportCategory")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid?>("ReportInfoId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("SingleReportInfoId")
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("Status")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid>("UserId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ReportInfoId")
++                        .IsUnique();
++
++                    b.HasIndex("SingleReportInfoId")
++                        .IsUnique();
++
++                    b.ToTable("Report", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportConstructionInfos.FloorConstructionInfo", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("DocumentImageUrl")
++                        .HasColumnType("text");
++
++                    b.Property<int>("Page")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid>("ReportConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("ReportFloorInfoId")
++                        .HasColumnType("uuid");
++
++                    b.ComplexProperty<Dictionary<string, object>>("Coordinates1", "Acoustics.Domain.Entities.Reports.ReportConstructionInfos.FloorConstructionInfo.Coordinates1#Coordinates", b1 =>
++                        {
++                            b1.IsRequired();
++
++                            b1.Property<int>("X")
++                                .HasColumnType("integer");
++
++                            b1.Property<int>("Y")
++                                .HasColumnType("integer");
++                        });
++
++                    b.ComplexProperty<Dictionary<string, object>>("Coordinates2", "Acoustics.Domain.Entities.Reports.ReportConstructionInfos.FloorConstructionInfo.Coordinates2#Coordinates", b1 =>
++                        {
++                            b1.IsRequired();
++
++                            b1.Property<int>("X")
++                                .HasColumnType("integer");
++
++                            b1.Property<int>("Y")
++                                .HasColumnType("integer");
++                        });
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ReportConstructionHeaderId")
++                        .IsUnique();
++
++                    b.HasIndex("ReportFloorInfoId");
++
++                    b.ToTable("FloorConstructionInfo", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportConstructionInfos.ReportFloorInfo", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("FloorNumber")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("ReportInfoId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ReportInfoId");
++
++                    b.ToTable("ReportFloorInfo", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportConstructions.BaseReportConstruction", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("ConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("ConstructionType")
++                        .IsRequired()
++                        .HasMaxLength(34)
++                        .HasColumnType("character varying(34)");
++
++                    b.Property<decimal>("Length")
++                        .HasColumnType("numeric");
++
++                    b.Property<decimal>("Square")
++                        .HasColumnType("numeric");
++
++                    b.Property<decimal>("Width")
++                        .HasColumnType("numeric");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ConstructionHeaderId")
++                        .IsUnique();
++
++                    b.ToTable("ReportConstructions", (string)null);
++
++                    b.HasDiscriminator<string>("ConstructionType").HasValue("BaseReportConstruction");
++
++                    b.UseTphMappingStrategy();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportDocumentInfo", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Code")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("Country")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("CreatorFullName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("CustomerName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<DateOnly>("Date")
++                        .HasColumnType("date");
++
++                    b.Property<string>("Director")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("LogoUrl")
++                        .HasColumnType("text");
++
++                    b.Property<string>("ObjectDescription")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<long>("ReportAutoNumber")
++                        .HasColumnType("bigint");
++
++                    b.Property<Guid?>("ReportFlagsId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("ReportId")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("ReportInfoId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("ReportName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("ReportUserNumber")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ReportFlagsId")
++                        .IsUnique();
++
++                    b.HasIndex("ReportInfoId")
++                        .IsUnique();
++
++                    b.ToTable("ReportDocumentInfo", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.DocumentReportFlags", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<bool>("TakeConclusion")
++                        .HasColumnType("boolean");
++
++                    b.Property<bool>("TakeContent")
++                        .HasColumnType("boolean");
++
++                    b.Property<bool>("TakeIntroduction")
++                        .HasColumnType("boolean");
++
++                    b.Property<bool>("TakeSupplementSoundInsulationAlternativeProtocols")
++                        .HasColumnType("boolean");
++
++                    b.Property<bool>("TakeSupplementSoundInsulationProtocolsWithCalculation")
++                        .HasColumnType("boolean");
++
++                    b.Property<bool>("TakeSupplementThermalInsulationProtocolsWithCalculation")
++                        .HasColumnType("boolean");
++
++                    b.Property<bool>("TakeTitleList")
++                        .HasColumnType("boolean");
++
++                    b.Property<bool>("TakeUsedLiteratureList")
++                        .HasColumnType("boolean");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("DocumentReportFlags", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.EnclosingStructuresSoundInsulationCalculationFlags", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("DocumentReportFlagsId")
++                        .HasColumnType("uuid");
++
++                    b.Property<bool>("TakeEnclosingStructuresSoundInsulationCalculation")
++                        .HasColumnType("boolean");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("DocumentReportFlagsId")
++                        .IsUnique();
++
++                    b.ToTable("EnclosingStructuresSoundInsulationCalculationFlags", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.EnclosingStructuresThermalInsulationCalculationFlags", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("DocumentReportFlagsId")
++                        .HasColumnType("uuid");
++
++                    b.Property<bool>("TakeDetailedCalculatingMethod")
++                        .HasColumnType("boolean");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("DocumentReportFlagsId")
++                        .IsUnique();
++
++                    b.ToTable("EnclosingStructuresThermalInsulationCalculationFlags", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.SounInsulationFlags.BaseSoundInsulationReportInfoFlags", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("EnclosingStructuresSoundInsulationCalculationFlagsId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("EnclosingStructuresSoundInsulationCalculationFlagsId");
++
++                    b.ToTable((string)null);
++
++                    b.UseTpcMappingStrategy();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.SounInsulationFlags.SoundInsulationNamedConstructionFlags", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("ConstructionName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("ReportConstructionId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("SoundInsulationFloorReportInfoFlagsId")
++                        .HasColumnType("uuid");
++
++                    b.Property<bool>("TakeConstruction")
++                        .HasColumnType("boolean");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ReportConstructionId")
++                        .IsUnique();
++
++                    b.HasIndex("SoundInsulationFloorReportInfoFlagsId");
++
++                    b.ToTable("SoundInsulationNamedConstructionFlags", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.ThermalnsulationFlags.BaseThermalInsulationReportInfoFlags", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("EnclosingStructuresThermalInsulationCalculationFlagsId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("EnclosingStructuresThermalInsulationCalculationFlagsId");
++
++                    b.ToTable((string)null);
++
++                    b.UseTpcMappingStrategy();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.ThermalnsulationFlags.ThermalInsulationNamedConstructionFlags", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("ConstructionName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("ReportConstructionId")
++                        .HasColumnType("uuid");
++
++                    b.Property<bool>("TakeConstruction")
++                        .HasColumnType("boolean");
++
++                    b.Property<Guid?>("ThermalInsulationFloorReportInfoFlagsId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ReportConstructionId")
++                        .IsUnique();
++
++                    b.HasIndex("ThermalInsulationFloorReportInfoFlagsId");
++
++                    b.ToTable("ThermalInsulationNamedConstructionFlags", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportInfos.ReportInfo", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("BuildingName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<int>("BuildingType")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid>("CalculationRequirementDocumentId")
++                        .HasColumnType("uuid");
++
++                    b.Property<int>("Class")
++                        .HasColumnType("integer");
++
++                    b.Property<int>("Country")
++                        .HasColumnType("integer");
++
++                    b.Property<string>("Description")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("FloorDocumentUrl")
++                        .HasColumnType("text");
++
++                    b.Property<string>("LogoUrl")
++                        .HasColumnType("text");
++
++                    b.Property<int>("PurposeBuilding")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid>("RegulatoryRequirementDocumentId")
++                        .HasColumnType("uuid");
++
++                    b.Property<long>("ReportInfoNumber")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("bigint")
++                        .HasDefaultValueSql("nextval('\"ReportInfoSequence\"')");
++
++                    NpgsqlPropertyBuilderExtensions.UseSequence(b.Property<long>("ReportInfoNumber"));
++
++                    b.Property<int>("Status")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid>("UserId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("CalculationRequirementDocumentId");
++
++                    b.HasIndex("RegulatoryRequirementDocumentId");
++
++                    b.HasIndex("UserId");
++
++                    b.ToTable("ReportInfo", (string)null);
++
++                    b.UseTpcMappingStrategy();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportInfos.SingleReportInfo", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("CalculationRequirementDocumentId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("RegulatoryRequirementDocumentId")
++                        .HasColumnType("uuid");
++
++                    b.Property<long>("ReportInfoNumber")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("bigint")
++                        .HasDefaultValueSql("nextval('\"SingleReportInfoSequence\"')");
++
++                    NpgsqlPropertyBuilderExtensions.UseSequence(b.Property<long>("ReportInfoNumber"));
++
++                    b.Property<Guid>("SingleReportConstructionId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("UserId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("CalculationRequirementDocumentId");
++
++                    b.HasIndex("RegulatoryRequirementDocumentId");
++
++                    b.HasIndex("SingleReportConstructionId")
++                        .IsUnique();
++
++                    b.HasIndex("UserId");
++
++                    b.ToTable("SingleReportInfo", (string)null);
++
++                    b.UseTpcMappingStrategy();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Subscription", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Description")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("Name")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<int>("NumberOfDowloadReports")
++                        .HasColumnType("integer");
++
++                    b.Property<int>("NumberOfReports")
++                        .HasColumnType("integer");
++
++                    b.Property<decimal>("Price")
++                        .HasColumnType("numeric");
++
++                    b.Property<Guid?>("TariffPlanId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("TariffPlanId");
++
++                    b.ToTable("Subscription", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.User.AcousticUser", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("BankAddress")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("BankIdNumber")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("CompanyAddress")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("CompanyDescription")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("CompanyName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("DirectorFullName")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("Email")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("LogoUrl")
++                        .HasColumnType("text");
++
++                    b.Property<string>("OpenRouterPassword")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("PayersRegistrationNumber")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("PaymentAccount")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<string>("PhoneNumber")
++                        .HasColumnType("text");
++
++                    b.Property<Guid>("RoleId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("User", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.User.AdditionalPhoneNumber", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid?>("AcousticUserId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("PhoneNumber")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("AcousticUserId");
++
++                    b.ToTable("AdditionalPhoneNumber");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.User.UserSubscription", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("BillId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("SubscriptionId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("UserId")
++                        .HasColumnType("uuid");
++
++                    b.Property<decimal>("_budgetRemaining")
++                        .HasColumnType("numeric")
++                        .HasColumnName("BudgetRemaining");
++
++                    b.Property<int>("_downloadReportsNumberRemaining")
++                        .HasColumnType("integer")
++                        .HasColumnName("DownloadReportsNumberRemaining");
++
++                    b.Property<int>("_reportsNumberRemaining")
++                        .HasColumnType("integer")
++                        .HasColumnName("ReportsNumberRemaining");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("BillId")
++                        .IsUnique();
++
++                    b.HasIndex("SubscriptionId");
++
++                    b.HasIndex("UserId");
++
++                    b.ToTable("UserSubscription", (string)null);
++                });
++
++            modelBuilder.Entity("ConstructionHeaderCountry", b =>
++                {
++                    b.Property<Guid>("ConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("CountriesId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("ConstructionHeaderId", "CountriesId");
++
++                    b.HasIndex("CountriesId");
++
++                    b.ToTable("ConstructionHeaderCountry");
++                });
++
++            modelBuilder.Entity("CountryIssuer", b =>
++                {
++                    b.Property<Guid>("CountriesId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("IssuerId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("CountriesId", "IssuerId");
++
++                    b.HasIndex("IssuerId");
++
++                    b.ToTable("CountryIssuer");
++                });
++
++            modelBuilder.Entity("CountryMaterial", b =>
++                {
++                    b.Property<Guid>("CountriesId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("MaterialId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("CountriesId", "MaterialId");
++
++                    b.HasIndex("MaterialId");
++
++                    b.ToTable("CountryMaterial");
++                });
++
++            modelBuilder.Entity("ReportConstructionDoor", b =>
++                {
++                    b.Property<Guid>("AdditionalConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("ReportConstructionId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("AdditionalConstructionHeaderId", "ReportConstructionId");
++
++                    b.HasIndex("ReportConstructionId");
++
++                    b.ToTable("ReportConstructionDoor");
++                });
++
++            modelBuilder.Entity("ReportConstructionWindow", b =>
++                {
++                    b.Property<Guid>("AdditionalConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("ReportConstructionId")
++                        .HasColumnType("uuid");
++
++                    b.HasKey("AdditionalConstructionHeaderId", "ReportConstructionId");
++
++                    b.HasIndex("ReportConstructionId");
++
++                    b.ToTable("ReportConstructionWindow");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.ConstructionTypeParametrs.FrameConstructionTypeParametrs", b =>
++                {
++                    b.HasBaseType("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.BaseConstructionTypeParameters");
++
++                    b.ToTable("FrameConstructionTypeParametrs", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.ConstructionTypeParametrs.ImpactConstructionTypeParametrs", b =>
++                {
++                    b.HasBaseType("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.BaseConstructionTypeParameters");
++
++                    b.Property<double>("C")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("ComputingLw")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("Ctr")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("Delta")
++                        .HasColumnType("double precision");
++
++                    b.Property<double>("M1")
++                        .HasColumnType("double precision");
++
++                    b.ToTable("ImpactConstructionTypeParametrs", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportConstructions.ReportConstruction", b =>
++                {
++                    b.HasBaseType("Acoustics.Domain.Entities.Reports.ReportConstructions.BaseReportConstruction");
++
++                    b.Property<Guid>("FirstPlacementRoomId")
++                        .HasColumnType("uuid");
++
++                    b.Property<float?>("RequirementNoizeImpactIndex")
++                        .HasPrecision(18, 2)
++                        .HasColumnType("real");
++
++                    b.Property<float>("RequirementNoizeIsolationIndex")
++                        .HasPrecision(18, 2)
++                        .HasColumnType("real");
++
++                    b.Property<Guid>("SecondPlacementRoomId")
++                        .HasColumnType("uuid");
++
++                    b.HasIndex("FirstPlacementRoomId");
++
++                    b.HasIndex("SecondPlacementRoomId");
++
++                    b.HasDiscriminator().HasValue("Report");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportConstructions.SingleReportConstruction", b =>
++                {
++                    b.HasBaseType("Acoustics.Domain.Entities.Reports.ReportConstructions.BaseReportConstruction");
++
++                    b.HasDiscriminator().HasValue("Single");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.SounInsulationFlags.SoundInsulationFloorReportInfoFlags", b =>
++                {
++                    b.HasBaseType("Acoustics.Domain.Entities.Reports.ReportFlags.SounInsulationFlags.BaseSoundInsulationReportInfoFlags");
++
++                    b.Property<string>("FloorNumber")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<bool>("TakeFloor")
++                        .HasColumnType("boolean");
++
++                    b.ToTable("SoundInsulationFloorReportInfoFlags", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.ThermalnsulationFlags.ThermalInsulationFloorReportInfoFlags", b =>
++                {
++                    b.HasBaseType("Acoustics.Domain.Entities.Reports.ReportFlags.ThermalnsulationFlags.BaseThermalInsulationReportInfoFlags");
++
++                    b.Property<string>("FloorNumber")
++                        .IsRequired()
++                        .HasColumnType("text");
++
++                    b.Property<bool>("TakeFloor")
++                        .HasColumnType("boolean");
++
++                    b.ToTable("ThermalInsulationFloorReportInfoFlags", (string)null);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Material", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Issuer", "Issuer")
++                        .WithMany()
++                        .HasForeignKey("IssuerId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.HasOne("Acoustics.Domain.Entities.MaterialTypes.MaterialType", "MaterialType")
++                        .WithMany()
++                        .HasForeignKey("MaterialTypeId")
++                        .OnDelete(DeleteBehavior.Restrict)
++                        .IsRequired();
++
++                    b.Navigation("Issuer");
++
++                    b.Navigation("MaterialType");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.PlacementRoomVariants", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.PlacementRoom", "FirstPlacementRoom")
++                        .WithMany()
++                        .HasForeignKey("FirstPlacementRoomId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.PlacementRoom", "SecondPlacementRoom")
++                        .WithMany()
++                        .HasForeignKey("SecondPlacementRoomId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("FirstPlacementRoom");
++
++                    b.Navigation("SecondPlacementRoom");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Requirements.Requirement", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Country", "Country")
++                        .WithMany()
++                        .HasForeignKey("CountryId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Requirements.RegulatoryRequirementDocument", "RegulatoryDocument")
++                        .WithMany("Requirements")
++                        .HasForeignKey("RegulatoryDocumentId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("Country");
++
++                    b.Navigation("RegulatoryDocument");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.UserMaterial", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.Construction", null)
++                        .WithMany("UserMaterials")
++                        .HasForeignKey("ConstructionId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Material", "Material")
++                        .WithMany()
++                        .HasForeignKey("MaterialId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.OwnsMany("Acoustics.Domain.Entities.MaterialTypes.MaterialTypeValue", "MaterialTypeValue", b1 =>
++                        {
++                            b1.Property<Guid>("UserMaterialId")
++                                .HasColumnType("uuid");
++
++                            b1.Property<Guid>("Id")
++                                .ValueGeneratedOnAdd()
++                                .HasColumnType("uuid");
++
++                            b1.Property<int>("MaterialParametrs")
++                                .HasColumnType("integer");
++
++                            b1.Property<double>("Value")
++                                .HasColumnType("double precision");
++
++                            b1.HasKey("UserMaterialId", "Id");
++
++                            b1.ToTable("UserMaterial_MaterialTypeValue");
++
++                            b1.WithOwner()
++                                .HasForeignKey("UserMaterialId");
++                        });
++
++                    b.Navigation("Material");
++
++                    b.Navigation("MaterialTypeValue");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.Construction", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionType", null)
++                        .WithMany("Constructions")
++                        .HasForeignKey("ConstructionTypeId")
++                        .OnDelete(DeleteBehavior.Cascade);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionLaboratoryData.AirNoizeConstructionLaboratoryData", "AirNoiseLaboratoryData")
++                        .WithOne()
++                        .HasForeignKey("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", "AirNoiseLaboratoryDataId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", null)
++                        .WithMany()
++                        .HasForeignKey("GuidebookConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.SetNull);
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionLaboratoryData.ImpactNoizeConstructionLaboratoryData", "ImpactNoiseLaboratoryData")
++                        .WithOne()
++                        .HasForeignKey("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", "ImpactNoiseLaboratoryDataId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Issuer", "Issuer")
++                        .WithMany()
++                        .HasForeignKey("IssuerId")
++                        .OnDelete(DeleteBehavior.Restrict)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.User.AcousticUser", null)
++                        .WithMany()
++                        .HasForeignKey("UserId")
++                        .OnDelete(DeleteBehavior.NoAction);
++
++                    b.OwnsOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionAdditionalInfo", "ConstructionAdditionalInfo", b1 =>
++                        {
++                            b1.Property<Guid>("ConstructionHeaderId")
++                                .HasColumnType("uuid");
++
++                            b1.Property<string[]>("Composition")
++                                .IsRequired()
++                                .HasColumnType("text[]");
++
++                            b1.Property<string[]>("Features")
++                                .IsRequired()
++                                .HasColumnType("text[]");
++
++                            b1.Property<string[]>("FireSafetyAndMore")
++                                .IsRequired()
++                                .HasColumnType("text[]");
++
++                            b1.Property<string[]>("Installation")
++                                .IsRequired()
++                                .HasColumnType("text[]");
++
++                            b1.Property<string[]>("PhysicalCharacteristics")
++                                .IsRequired()
++                                .HasColumnType("text[]");
++
++                            b1.Property<string>("StandartName")
++                                .HasColumnType("text");
++
++                            b1.Property<string[]>("Suppliers")
++                                .IsRequired()
++                                .HasColumnType("text[]");
++
++                            b1.HasKey("ConstructionHeaderId");
++
++                            b1.ToTable("ConstructionHeader");
++
++                            b1.ToJson("ConstructionAdditionalInfo");
++
++                            b1.WithOwner()
++                                .HasForeignKey("ConstructionHeaderId");
++
++                            b1.OwnsMany("Acoustics.Domain.Entities.Guidebooks._Construction_.Attachment", "FileUrls", b2 =>
++                                {
++                                    b2.Property<Guid>("ConstructionAdditionalInfoConstructionHeaderId")
++                                        .HasColumnType("uuid");
++
++                                    b2.Property<int>("Id")
++                                        .ValueGeneratedOnAdd()
++                                        .HasColumnType("integer");
++
++                                    b2.Property<string>("Name")
++                                        .IsRequired()
++                                        .ValueGeneratedOnUpdateSometimes()
++                                        .HasColumnType("text")
++                                        .HasColumnName("Name");
++
++                                    b2.Property<string>("Url")
++                                        .IsRequired()
++                                        .ValueGeneratedOnUpdateSometimes()
++                                        .HasColumnType("text")
++                                        .HasColumnName("Url");
++
++                                    b2.HasKey("ConstructionAdditionalInfoConstructionHeaderId", "Id");
++
++                                    b2.ToTable("ConstructionHeader");
++
++                                    b2.WithOwner()
++                                        .HasForeignKey("ConstructionAdditionalInfoConstructionHeaderId");
++                                });
++
++                            b1.OwnsMany("Acoustics.Domain.Entities.Guidebooks._Construction_.Attachment", "ImageUrls", b2 =>
++                                {
++                                    b2.Property<Guid>("ConstructionAdditionalInfoConstructionHeaderId")
++                                        .HasColumnType("uuid");
++
++                                    b2.Property<int>("Id")
++                                        .ValueGeneratedOnAdd()
++                                        .HasColumnType("integer");
++
++                                    b2.Property<string>("Name")
++                                        .IsRequired()
++                                        .ValueGeneratedOnUpdateSometimes()
++                                        .HasColumnType("text")
++                                        .HasColumnName("Name");
++
++                                    b2.Property<string>("Url")
++                                        .IsRequired()
++                                        .ValueGeneratedOnUpdateSometimes()
++                                        .HasColumnType("text")
++                                        .HasColumnName("Url");
++
++                                    b2.HasKey("ConstructionAdditionalInfoConstructionHeaderId", "Id");
++
++                                    b2.ToTable("ConstructionHeader");
++
++                                    b2.WithOwner()
++                                        .HasForeignKey("ConstructionAdditionalInfoConstructionHeaderId");
++                                });
++
++                            b1.Navigation("FileUrls");
++
++                            b1.Navigation("ImageUrls");
++                        });
++
++                    b.Navigation("AirNoiseLaboratoryData");
++
++                    b.Navigation("ConstructionAdditionalInfo")
++                        .IsRequired();
++
++                    b.Navigation("ImpactNoiseLaboratoryData");
++
++                    b.Navigation("Issuer");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionType", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", null)
++                        .WithOne("ConstructionType")
++                        .HasForeignKey("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionType", "ConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.PlacementInteraction", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", null)
++                        .WithMany()
++                        .HasForeignKey("ConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.RTotal", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionLaboratoryData.AirNoizeConstructionLaboratoryData", null)
++                        .WithMany("RTotals")
++                        .HasForeignKey("AirNoizeConstructionLaboratoryDataId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionLaboratoryData.ImpactNoizeConstructionLaboratoryData", null)
++                        .WithMany("RTotals")
++                        .HasForeignKey("ImpactNoizeConstructionLaboratoryDataId")
++                        .OnDelete(DeleteBehavior.Cascade);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.BaseConstructionTypeParameters", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.GeneralConstructionParametrs", "GeneralConstructionParametrs")
++                        .WithOne("ConstructionTypeParameters")
++                        .HasForeignKey("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.BaseConstructionTypeParameters", "GeneralConstructionParametrsId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.Navigation("GeneralConstructionParametrs");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.DotAdditional", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.GeneralConstructionParametrs", "GeneralConstructionParametrs")
++                        .WithMany("AdditionalDots")
++                        .HasForeignKey("GeneralConstructionParametrsId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("GeneralConstructionParametrs");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.DotR", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.GeneralConstructionParametrs", "GeneralConstructionParametrs")
++                        .WithMany("DotRs")
++                        .HasForeignKey("GeneralConstructionParametrsId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("GeneralConstructionParametrs");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.FrameDot", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.ConstructionTypeParametrs.FrameConstructionTypeParametrs", "FrameAbcd1")
++                        .WithMany("IncreasedSoundInsulationDots")
++                        .HasForeignKey("FrameAbcd1Id")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.ConstructionTypeParametrs.FrameConstructionTypeParametrs", "FrameEfklmnp")
++                        .WithMany("UltimateSoundInsulationDots")
++                        .HasForeignKey("FrameEfklmnpId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.ConstructionTypeParametrs.ImpactConstructionTypeParametrs", "ImpactSoundInsolation")
++                        .WithMany("ImpactSoundInsulationDots")
++                        .HasForeignKey("ImpactSoundInsolationId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.Navigation("FrameAbcd1");
++
++                    b.Navigation("FrameEfklmnp");
++
++                    b.Navigation("ImpactSoundInsolation");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.GeneralConstructionParametrs", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", "ConstructionHeader")
++                        .WithOne("GeneralConstructionParametrs")
++                        .HasForeignKey("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.GeneralConstructionParametrs", "ConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("ConstructionHeader");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.MaterialTypes.MaterialType", b =>
++                {
++                    b.OwnsMany("Acoustics.Domain.Entities.MaterialTypes.MaterialTypeValue", "MaterialTypeValues", b1 =>
++                        {
++                            b1.Property<Guid>("MaterialTypeId")
++                                .HasColumnType("uuid");
++
++                            b1.Property<Guid>("Id")
++                                .ValueGeneratedOnAdd()
++                                .HasColumnType("uuid");
++
++                            b1.Property<int>("MaterialParametrs")
++                                .HasColumnType("integer");
++
++                            b1.Property<double>("Value")
++                                .HasColumnType("double precision");
++
++                            b1.HasKey("MaterialTypeId", "Id");
++
++                            b1.ToTable("MaterialType_MaterialTypeValues");
++
++                            b1.WithOwner()
++                                .HasForeignKey("MaterialTypeId");
++                        });
++
++                    b.Navigation("MaterialTypeValues");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.OpenRouterModels.UserModelMessage", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.OpenRouterModels.AcousticModel", "AcousticModel")
++                        .WithMany()
++                        .HasForeignKey("AcousticModelId")
++                        .OnDelete(DeleteBehavior.SetNull);
++
++                    b.HasOne("Acoustics.Domain.Entities.OpenRouterModels.TariffPlan", "TariffPlan")
++                        .WithMany()
++                        .HasForeignKey("TariffPlanId")
++                        .OnDelete(DeleteBehavior.SetNull);
++
++                    b.HasOne("Acoustics.Domain.Entities.User.AcousticUser", null)
++                        .WithMany()
++                        .HasForeignKey("UserId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("AcousticModel");
++
++                    b.Navigation("TariffPlan");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.OpenRouterModels.UserOpenRouterAccess", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.User.AcousticUser", "User")
++                        .WithOne()
++                        .HasForeignKey("Acoustics.Domain.Entities.OpenRouterModels.UserOpenRouterAccess", "UserId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("User");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.AdditionalConstructionHeader", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", "ConstructionHeader")
++                        .WithMany()
++                        .HasForeignKey("ConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("ConstructionHeader");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.Report", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportInfos.ReportInfo", "ReportInfo")
++                        .WithOne()
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.Report", "ReportInfoId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportInfos.SingleReportInfo", "SingleReportInfo")
++                        .WithOne("Report")
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.Report", "SingleReportInfoId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.Navigation("ReportInfo");
++
++                    b.Navigation("SingleReportInfo");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportConstructionInfos.FloorConstructionInfo", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportConstructions.ReportConstruction", "ReportConstructionHeader")
++                        .WithOne()
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.ReportConstructionInfos.FloorConstructionInfo", "ReportConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportConstructionInfos.ReportFloorInfo", "ReportFloorInfo")
++                        .WithMany("ReportFloorInfos")
++                        .HasForeignKey("ReportFloorInfoId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("ReportConstructionHeader");
++
++                    b.Navigation("ReportFloorInfo");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportConstructionInfos.ReportFloorInfo", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportInfos.ReportInfo", "ReportInfo")
++                        .WithMany("_reportConstructionInfos")
++                        .HasForeignKey("ReportInfoId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.Navigation("ReportInfo");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportConstructions.BaseReportConstruction", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", "ConstructionHeader")
++                        .WithOne("ReportConstruction")
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.ReportConstructions.BaseReportConstruction", "ConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("ConstructionHeader");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportDocumentInfo", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportFlags.DocumentReportFlags", "ReportFlags")
++                        .WithOne()
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.ReportDocumentInfo", "ReportFlagsId")
++                        .OnDelete(DeleteBehavior.Cascade);
++
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportInfos.ReportInfo", "ReportInfo")
++                        .WithOne("ReportDocumentInfo")
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.ReportDocumentInfo", "ReportInfoId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("ReportFlags");
++
++                    b.Navigation("ReportInfo");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.EnclosingStructuresSoundInsulationCalculationFlags", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportFlags.DocumentReportFlags", null)
++                        .WithOne("SoundInsulationCalculation")
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.ReportFlags.EnclosingStructuresSoundInsulationCalculationFlags", "DocumentReportFlagsId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.EnclosingStructuresThermalInsulationCalculationFlags", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportFlags.DocumentReportFlags", null)
++                        .WithOne("ThermalInsulationCalculation")
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.ReportFlags.EnclosingStructuresThermalInsulationCalculationFlags", "DocumentReportFlagsId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.SounInsulationFlags.BaseSoundInsulationReportInfoFlags", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportFlags.EnclosingStructuresSoundInsulationCalculationFlags", null)
++                        .WithMany("BaseReportInfoFlags")
++                        .HasForeignKey("EnclosingStructuresSoundInsulationCalculationFlagsId")
++                        .OnDelete(DeleteBehavior.Cascade);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.SounInsulationFlags.SoundInsulationNamedConstructionFlags", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportConstructions.ReportConstruction", null)
++                        .WithOne()
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.ReportFlags.SounInsulationFlags.SoundInsulationNamedConstructionFlags", "ReportConstructionId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportFlags.SounInsulationFlags.SoundInsulationFloorReportInfoFlags", null)
++                        .WithMany("NamedConstructionFlags")
++                        .HasForeignKey("SoundInsulationFloorReportInfoFlagsId")
++                        .OnDelete(DeleteBehavior.Cascade);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.ThermalnsulationFlags.BaseThermalInsulationReportInfoFlags", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportFlags.EnclosingStructuresThermalInsulationCalculationFlags", null)
++                        .WithMany("BaseReportInfoFlags")
++                        .HasForeignKey("EnclosingStructuresThermalInsulationCalculationFlagsId")
++                        .OnDelete(DeleteBehavior.Cascade);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.ThermalnsulationFlags.ThermalInsulationNamedConstructionFlags", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportConstructions.ReportConstruction", null)
++                        .WithOne()
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.ReportFlags.ThermalnsulationFlags.ThermalInsulationNamedConstructionFlags", "ReportConstructionId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportFlags.ThermalnsulationFlags.ThermalInsulationFloorReportInfoFlags", null)
++                        .WithMany("NamedConstructionFlags")
++                        .HasForeignKey("ThermalInsulationFloorReportInfoFlagsId")
++                        .OnDelete(DeleteBehavior.Cascade);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportInfos.ReportInfo", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Requirements.CalculationRequirementDocument", "CalculationRequirementDocument")
++                        .WithMany()
++                        .HasForeignKey("CalculationRequirementDocumentId")
++                        .OnDelete(DeleteBehavior.Restrict)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Requirements.RegulatoryRequirementDocument", "RegulatoryRequirementDocument")
++                        .WithMany()
++                        .HasForeignKey("RegulatoryRequirementDocumentId")
++                        .OnDelete(DeleteBehavior.Restrict)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.User.AcousticUser", null)
++                        .WithMany()
++                        .HasForeignKey("UserId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("CalculationRequirementDocument");
++
++                    b.Navigation("RegulatoryRequirementDocument");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportInfos.SingleReportInfo", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Requirements.CalculationRequirementDocument", "CalculationRequirementDocument")
++                        .WithMany()
++                        .HasForeignKey("CalculationRequirementDocumentId")
++                        .OnDelete(DeleteBehavior.Restrict)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Requirements.RegulatoryRequirementDocument", "RegulatoryRequirementDocument")
++                        .WithMany()
++                        .HasForeignKey("RegulatoryRequirementDocumentId")
++                        .OnDelete(DeleteBehavior.Restrict)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportConstructions.SingleReportConstruction", "SingleReportConstruction")
++                        .WithOne()
++                        .HasForeignKey("Acoustics.Domain.Entities.Reports.ReportInfos.SingleReportInfo", "SingleReportConstructionId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.User.AcousticUser", null)
++                        .WithMany()
++                        .HasForeignKey("UserId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("CalculationRequirementDocument");
++
++                    b.Navigation("RegulatoryRequirementDocument");
++
++                    b.Navigation("SingleReportConstruction");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Subscription", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.OpenRouterModels.TariffPlan", "TariffPlan")
++                        .WithMany()
++                        .HasForeignKey("TariffPlanId")
++                        .OnDelete(DeleteBehavior.SetNull);
++
++                    b.Navigation("TariffPlan");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.User.AcousticUser", b =>
++                {
++                    b.OwnsOne("Acoustics.Domain.Entities.User.UserRole", "Role", b1 =>
++                        {
++                            b1.Property<Guid>("AcousticUserId")
++                                .HasColumnType("uuid");
++
++                            b1.Property<Guid>("Id")
++                                .HasColumnType("uuid")
++                                .HasColumnName("Role_Id");
++
++                            b1.Property<string>("Name")
++                                .IsRequired()
++                                .HasColumnType("text")
++                                .HasColumnName("Role_Name");
++
++                            b1.HasKey("AcousticUserId");
++
++                            b1.ToTable("User");
++
++                            b1.WithOwner()
++                                .HasForeignKey("AcousticUserId");
++                        });
++
++                    b.Navigation("Role")
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.User.AdditionalPhoneNumber", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.User.AcousticUser", null)
++                        .WithMany("AdditionalPhoneNumbers")
++                        .HasForeignKey("AcousticUserId")
++                        .OnDelete(DeleteBehavior.Cascade);
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.User.UserSubscription", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Bill", "Bill")
++                        .WithOne("UserSubscription")
++                        .HasForeignKey("Acoustics.Domain.Entities.User.UserSubscription", "BillId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Subscription", "Subscription")
++                        .WithMany("UserSubscriptions")
++                        .HasForeignKey("SubscriptionId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.User.AcousticUser", "User")
++                        .WithMany("_userSubscriptions")
++                        .HasForeignKey("UserId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.Navigation("Bill");
++
++                    b.Navigation("Subscription");
++
++                    b.Navigation("User");
++                });
++
++            modelBuilder.Entity("ConstructionHeaderCountry", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", null)
++                        .WithMany()
++                        .HasForeignKey("ConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Country", null)
++                        .WithMany()
++                        .HasForeignKey("CountriesId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("CountryIssuer", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Country", null)
++                        .WithMany()
++                        .HasForeignKey("CountriesId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Issuer", null)
++                        .WithMany()
++                        .HasForeignKey("IssuerId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("CountryMaterial", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Country", null)
++                        .WithMany()
++                        .HasForeignKey("CountriesId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.Material", null)
++                        .WithMany()
++                        .HasForeignKey("MaterialId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("ReportConstructionDoor", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.AdditionalConstructionHeader", null)
++                        .WithMany()
++                        .HasForeignKey("AdditionalConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportConstructions.BaseReportConstruction", null)
++                        .WithMany()
++                        .HasForeignKey("ReportConstructionId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("ReportConstructionWindow", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Reports.AdditionalConstructionHeader", null)
++                        .WithMany()
++                        .HasForeignKey("AdditionalConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Reports.ReportConstructions.BaseReportConstruction", null)
++                        .WithMany()
++                        .HasForeignKey("ReportConstructionId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportConstructions.ReportConstruction", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.PlacementRoom", "FirstPlacementRoom")
++                        .WithMany()
++                        .HasForeignKey("FirstPlacementRoomId")
++                        .OnDelete(DeleteBehavior.Restrict)
++                        .IsRequired();
++
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks.PlacementRoom", "SecondPlacementRoom")
++                        .WithMany()
++                        .HasForeignKey("SecondPlacementRoomId")
++                        .OnDelete(DeleteBehavior.Restrict)
++                        .IsRequired();
++
++                    b.Navigation("FirstPlacementRoom");
++
++                    b.Navigation("SecondPlacementRoom");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Bill", b =>
++                {
++                    b.Navigation("UserSubscription")
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks.Requirements.RegulatoryRequirementDocument", b =>
++                {
++                    b.Navigation("Requirements");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.Construction", b =>
++                {
++                    b.Navigation("UserMaterials");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", b =>
++                {
++                    b.Navigation("ConstructionType")
++                        .IsRequired();
++
++                    b.Navigation("GeneralConstructionParametrs");
++
++                    b.Navigation("ReportConstruction");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionLaboratoryData.AirNoizeConstructionLaboratoryData", b =>
++                {
++                    b.Navigation("RTotals");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionLaboratoryData.ImpactNoizeConstructionLaboratoryData", b =>
++                {
++                    b.Navigation("RTotals");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionType", b =>
++                {
++                    b.Navigation("Constructions");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.GeneralConstructionParametrs", b =>
++                {
++                    b.Navigation("AdditionalDots");
++
++                    b.Navigation("ConstructionTypeParameters")
++                        .IsRequired();
++
++                    b.Navigation("DotRs");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportConstructionInfos.ReportFloorInfo", b =>
++                {
++                    b.Navigation("ReportFloorInfos");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.DocumentReportFlags", b =>
++                {
++                    b.Navigation("SoundInsulationCalculation")
++                        .IsRequired();
++
++                    b.Navigation("ThermalInsulationCalculation")
++                        .IsRequired();
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.EnclosingStructuresSoundInsulationCalculationFlags", b =>
++                {
++                    b.Navigation("BaseReportInfoFlags");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.EnclosingStructuresThermalInsulationCalculationFlags", b =>
++                {
++                    b.Navigation("BaseReportInfoFlags");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportInfos.ReportInfo", b =>
++                {
++                    b.Navigation("ReportDocumentInfo");
++
++                    b.Navigation("_reportConstructionInfos");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportInfos.SingleReportInfo", b =>
++                {
++                    b.Navigation("Report");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Subscription", b =>
++                {
++                    b.Navigation("UserSubscriptions");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.User.AcousticUser", b =>
++                {
++                    b.Navigation("AdditionalPhoneNumbers");
++
++                    b.Navigation("_userSubscriptions");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.ConstructionTypeParametrs.FrameConstructionTypeParametrs", b =>
++                {
++                    b.Navigation("IncreasedSoundInsulationDots");
++
++                    b.Navigation("UltimateSoundInsulationDots");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_._GeneralConstructionRapametrs_.ConstructionTypeParametrs.ImpactConstructionTypeParametrs", b =>
++                {
++                    b.Navigation("ImpactSoundInsulationDots");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.SounInsulationFlags.SoundInsulationFloorReportInfoFlags", b =>
++                {
++                    b.Navigation("NamedConstructionFlags");
++                });
++
++            modelBuilder.Entity("Acoustics.Domain.Entities.Reports.ReportFlags.ThermalnsulationFlags.ThermalInsulationFloorReportInfoFlags", b =>
++                {
++                    b.Navigation("NamedConstructionFlags");
++                });
++#pragma warning restore 612, 618
++        }
++    }
++}
+diff --git a/src/Acoustics.Infrastructure/Migrations/20260928135519_AddCatalogPaidPlacement.cs b/src/Acoustics.Infrastructure/Migrations/20260928135519_AddCatalogPaidPlacement.cs
+new file mode 100644
+index 0000000..c3ec06b
+--- /dev/null
++++ b/src/Acoustics.Infrastructure/Migrations/20260928135519_AddCatalogPaidPlacement.cs
+@@ -0,0 +1,59 @@
++﻿using System;
++using Microsoft.EntityFrameworkCore.Migrations;
++
++#nullable disable
++
++namespace Acoustics.Infrastructure.Migrations
++{
++    /// <inheritdoc />
++    public partial class AddCatalogPaidPlacement : Migration
++    {
++        /// <inheritdoc />
++        protected override void Up(MigrationBuilder migrationBuilder)
++        {
++            migrationBuilder.AddColumn<DateTime>(
++                name: "PaidPlacementUntil",
++                table: "ConstructionHeader",
++                type: "timestamptz",
++                nullable: true);
++
++            migrationBuilder.CreateTable(
++                name: "PlacementInteraction",
++                columns: table => new
++                {
++                    Id = table.Column<Guid>(type: "uuid", nullable: false),
++                    ConstructionHeaderId = table.Column<Guid>(type: "uuid", nullable: false),
++                    Type = table.Column<int>(type: "integer", nullable: false),
++                    OccurredAtUtc = table.Column<DateTime>(type: "timestamptz", nullable: false),
++                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
++                    Utm = table.Column<string>(type: "text", nullable: true)
++                },
++                constraints: table =>
++                {
++                    table.PrimaryKey("PK_PlacementInteraction", x => x.Id);
++                    table.ForeignKey(
++                        name: "FK_PlacementInteraction_ConstructionHeader_ConstructionHeaderId",
++                        column: x => x.ConstructionHeaderId,
++                        principalTable: "ConstructionHeader",
++                        principalColumn: "Id",
++                        onDelete: ReferentialAction.Cascade);
++                });
++
++            migrationBuilder.CreateIndex(
++                name: "IX_PlacementInteraction_Header_OccurredAtUtc",
++                table: "PlacementInteraction",
++                columns: new[] { "ConstructionHeaderId", "OccurredAtUtc" });
++        }
++
++        /// <inheritdoc />
++        protected override void Down(MigrationBuilder migrationBuilder)
++        {
++            migrationBuilder.DropTable(
++                name: "PlacementInteraction");
++
++            migrationBuilder.DropColumn(
++                name: "PaidPlacementUntil",
++                table: "ConstructionHeader");
++        }
++    }
++}
+diff --git a/src/Acoustics.Infrastructure/Migrations/AppDbContextModelSnapshot.cs b/src/Acoustics.Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+index 02c475a..9ddcf6d 100644
+--- a/src/Acoustics.Infrastructure/Migrations/AppDbContextModelSnapshot.cs
++++ b/src/Acoustics.Infrastructure/Migrations/AppDbContextModelSnapshot.cs
+@@ -475,6 +475,9 @@ namespace Acoustics.Infrastructure.Migrations
+                     b.Property<string>("Notation")
+                         .HasColumnType("text");
+ 
++                    b.Property<DateTime?>("PaidPlacementUntil")
++                        .HasColumnType("timestamptz");
++
+                     b.Property<int>("Priority")
+                         .HasColumnType("integer");
+ 
+@@ -600,6 +603,35 @@ namespace Acoustics.Infrastructure.Migrations
+                     b.ToTable("ConstructionType", (string)null);
+                 });
+ 
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.PlacementInteraction", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd()
++                        .HasColumnType("uuid");
++
++                    b.Property<Guid>("ConstructionHeaderId")
++                        .HasColumnType("uuid");
++
++                    b.Property<DateTime>("OccurredAtUtc")
++                        .HasColumnType("timestamptz");
++
++                    b.Property<int>("Type")
++                        .HasColumnType("integer");
++
++                    b.Property<Guid?>("UserId")
++                        .HasColumnType("uuid");
++
++                    b.Property<string>("Utm")
++                        .HasColumnType("text");
++
++                    b.HasKey("Id");
++
++                    b.HasIndex("ConstructionHeaderId", "OccurredAtUtc")
++                        .HasDatabaseName("IX_PlacementInteraction_Header_OccurredAtUtc");
++
++                    b.ToTable("PlacementInteraction", (string)null);
++                });
++
+             modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.RTotal", b =>
+                 {
+                     b.Property<Guid>("Id")
+@@ -2063,6 +2095,15 @@ namespace Acoustics.Infrastructure.Migrations
+                         .IsRequired();
+                 });
+ 
++            modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.PlacementInteraction", b =>
++                {
++                    b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionHeader", null)
++                        .WithMany()
++                        .HasForeignKey("ConstructionHeaderId")
++                        .OnDelete(DeleteBehavior.Cascade)
++                        .IsRequired();
++                });
++
+             modelBuilder.Entity("Acoustics.Domain.Entities.Guidebooks._Construction_.RTotal", b =>
+                 {
+                     b.HasOne("Acoustics.Domain.Entities.Guidebooks._Construction_.ConstructionLaboratoryData.AirNoizeConstructionLaboratoryData", null)
+diff --git a/src/Acoustics.Infrastructure/Repositories/Guidebooks/ConstructionHeaderRepository.cs b/src/Acoustics.Infrastructure/Repositories/Guidebooks/ConstructionHeaderRepository.cs
+index aa015ba..c37b15d 100644
+--- a/src/Acoustics.Infrastructure/Repositories/Guidebooks/ConstructionHeaderRepository.cs
++++ b/src/Acoustics.Infrastructure/Repositories/Guidebooks/ConstructionHeaderRepository.cs
+@@ -118,7 +118,7 @@ public class ConstructionHeaderRepository(AppDbContext dbContext) : CrudReposito
+             .ByLabRw(filter.MinLabRw, filter.MaxLabRw)
+             .ByIsManufactory(filter.OnlyManufacturers)
+             .ByConstructionTypeEnum(filter.ConstructionTypeEnum)
+-            .OrderBy(filter.Ordering, filter.SortOrder)
++            .OrderByWithPlacementBoost(filter.Ordering, filter.SortOrder)
+             .BuildPagedListAsync(filter.PageNumber, filter.PageSize, cancellationToken);
+     }
+ }
+diff --git a/src/Acoustics.Infrastructure/Repositories/Guidebooks/PlacementInteractionRepository.cs b/src/Acoustics.Infrastructure/Repositories/Guidebooks/PlacementInteractionRepository.cs
+new file mode 100644
+index 0000000..703f6ed
+--- /dev/null
++++ b/src/Acoustics.Infrastructure/Repositories/Guidebooks/PlacementInteractionRepository.cs
+@@ -0,0 +1,32 @@
++using System.Linq.Expressions;
++using Acoustics.Application.Abstractions.Repositories.Guidebooks;
++using Acoustics.Domain.Entities.Guidebooks._Construction_;
++using Acoustics.Infrastructure.Database;
++using Acoustics.Infrastructure.Repositories.Abstract;
++using Microsoft.EntityFrameworkCore;
++
++namespace Acoustics.Infrastructure.Repositories.Guidebooks;
++
++public class PlacementInteractionRepository(AppDbContext dbContext)
++    : CrudRepository<PlacementInteraction>(dbContext), IPlacementInteractionRepository
++{
++    protected override IEnumerable<Expression<Func<PlacementInteraction, object>>> Includes => [];
++
++    public Task<List<PlacementInteraction>> GetForPeriodAsync(
++        DateTime fromUtc,
++        DateTime toUtc,
++        Guid? constructionHeaderId = null,
++        CancellationToken cancellationToken = default)
++    {
++        var query = _dbContext.Set<PlacementInteraction>().AsNoTracking();
++
++        query = query.Where(x => x.OccurredAtUtc >= fromUtc && x.OccurredAtUtc < toUtc);
++
++        if (constructionHeaderId.HasValue)
++        {
++            query = query.Where(x => x.ConstructionHeaderId == constructionHeaderId.Value);
++        }
++
++        return query.ToListAsync(cancellationToken);
++    }
++}
+diff --git a/src/Acoustics.Infrastructure/Repositories/QueryBuilders/Guidebooks/AlternativeConstructionHeaderQueryBuilder.cs b/src/Acoustics.Infrastructure/Repositories/QueryBuilders/Guidebooks/AlternativeConstructionHeaderQueryBuilder.cs
+index 70cf041..2bd4c0b 100644
+--- a/src/Acoustics.Infrastructure/Repositories/QueryBuilders/Guidebooks/AlternativeConstructionHeaderQueryBuilder.cs
++++ b/src/Acoustics.Infrastructure/Repositories/QueryBuilders/Guidebooks/AlternativeConstructionHeaderQueryBuilder.cs
+@@ -1,3 +1,4 @@
++using Acoustics.Application.Common.Extensions;
+ using Acoustics.Domain.Constants.Guidebooks;
+ using Acoustics.Domain.Entities.Guidebooks._Construction_;
+ using Acoustics.Domain.Enums;
+@@ -72,4 +73,30 @@ public class AlternativeConstructionHeaderQueryBuilder(IQueryable<ConstructionHe
+ 
+         return this;
+     }
++
++    /// <summary>
++    /// Сортировка альтернативных конструкций: сначала явная сортировка (если задана),
++    /// затем оплаченные размещения поднимаются выше неоплаченных при прочих равных (вариант «а»).
++    /// Без явной сортировки признак оплаты становится первичным ключом сортировки.
++    /// </summary>
++    public AlternativeConstructionHeaderQueryBuilder OrderByWithPlacementBoost(string? ordering, SortOrder sortOrder)
++    {
++        if (!string.IsNullOrEmpty(ordering))
++        {
++            var ordered = sortOrder == SortOrder.Asc
++                ? _query.OrderBy(ordering)
++                : _query.OrderByDescending(ordering);
++
++            // Строковый OrderBy возвращает IQueryable<T>, но в рантайме это уже
++            // упорядоченный запрос EF, поэтому каст к IOrderedQueryable корректен.
++            _query = ((IOrderedQueryable<ConstructionHeader>)ordered)
++                .ThenByDescending(ConstructionPlacementPolicy.IsPlacementActive);
++        }
++        else
++        {
++            _query = _query.OrderByDescending(ConstructionPlacementPolicy.IsPlacementActive);
++        }
++
++        return this;
++    }
+ }
+diff --git a/src/Acoustics.Infrastructure/Repositories/QueryBuilders/Guidebooks/ConstructionHeaderQueryBuilder.cs b/src/Acoustics.Infrastructure/Repositories/QueryBuilders/Guidebooks/ConstructionHeaderQueryBuilder.cs
+index 0eb899f..23431b6 100644
+--- a/src/Acoustics.Infrastructure/Repositories/QueryBuilders/Guidebooks/ConstructionHeaderQueryBuilder.cs
++++ b/src/Acoustics.Infrastructure/Repositories/QueryBuilders/Guidebooks/ConstructionHeaderQueryBuilder.cs
+@@ -72,7 +72,9 @@ public class ConstructionHeaderQueryBuilder(IQueryable<ConstructionHeader> query
+         if (byPriority)
+         {
+             _query = _query.Where(x => x.Priority != Priority.Zero);
+-            _query = _query.OrderByDescending(x => x.Priority);
++            // Оплаченные размещения поднимаются внутри одной группы приоритета (вариант «а»)
++            _query = _query.OrderByDescending(x => x.Priority)
++                .ThenByDescending(ConstructionPlacementPolicy.IsPlacementActive);
+         }
+ 
+         return this;
